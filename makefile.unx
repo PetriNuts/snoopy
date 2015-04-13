@@ -1,0 +1,57 @@
+#
+# PLEASE USE THE SCRIPT mk.sh INSTEAD OF CALLING make DIRECTLY!
+#
+
+
+RM-F := rm -f
+
+.PHONY: all clean veryclean tags testmk
+
+EXECUTABLE := snoopy2
+
+# all source files saved in the variable SRC
+include ../src.lst
+
+OBJS := $(notdir $(addsuffix .o, $(basename $(SRC))))
+
+DIRS :=  $(addprefix ../, $(sort $(dir $(SRC))))
+
+COMPFLAGS = -I.. -Wno-deprecated -DLANGUAGE_ENGLISH
+
+VPATH := $(DIRS)
+
+all: $(EXECUTABLE)
+
+%.o : %.cpp
+	${CXX} $(OFLAGS) $(COMPFLAGS) $(CXXFLAGS) -c -o $@ -MD $<
+
+$(EXECUTABLE): $(SRC) $(OBJS)
+	$(CXX) -o $(EXECUTABLE) $(OBJS) $(LIBPATH) $(LIBS)
+
+clean: 
+	@$(RM-F) $(EXECUTABLE)
+	@$(RM-F) $(OBJS)
+	@$(RM-F) *.d
+	@$(RM-F) *~
+	@$(RM-F) *.da
+	@$(RM-F) *.bb
+	@$(RM-F) *.bbg
+	@$(RM-F) *.gcov
+
+veryclean: clean
+	@$(RM-F) ../TAGS
+
+tags:
+	etags --c++ --members -o ../TAGS `find ../ -name '*.cpp' -o -name '*.h'`
+
+
+testmk: 
+	@echo test called
+	@echo $(CXXFLAGS)
+	@echo $(LIBPATH)
+	@echo $(LIBS)
+	@echo $(OFLAGS)
+
+
+include $(wildcard *.d)
+

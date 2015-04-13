@@ -1,0 +1,156 @@
+#!/bin/bash
+
+################################################################################
+# Skript zum Erzeugen von Snoopy Paketen fuer Debian, Ubuntu, Fedora, SUSE     #
+# und Mac OSX.                                                                 #
+# Dieses Script sollte im Homeverzeichnis eines Users ausgefuehrt werden       #
+################################################################################
+
+if [[ ("$1" != "suse") && ("$1" != "ubuntu") && ("$1" != "fedora") && ("$1" != "debian") && ("$1" != "mac") ]] ; then
+ echo "Please enter the Buildtarget as first Parameter" 
+ echo "Possible targets fedora, ubuntu, suse, debian, mac"
+ exit 2
+fi 
+
+if [[ ("$2" != "stable") && ("$2" != "beta") ]]; then
+ echo "Please enter the release type as second Parameter"
+ echo "Possible targets beta, stable"
+ exit 2
+fi
+
+if [ "$3" == "" ]; then
+ echo "Please enter the SVN Username as third Parameter"
+ exit 2
+fi
+
+WORKDIR=~/snoopybuild
+RELEASE=$2
+if [ "$2" == "stable" ]; then
+ SVNSERVER=http://dvorak.informatik.tu-cottbus.de/svn/snoopy
+ SVNBRANCHNAME=trunk
+else
+ SVNSERVER=http://dvorak.informatik.tu-cottbus.de/svn/snoopy/branches
+ SVNBRANCHNAME=Snoopy-Wxwidgets2.8
+fi
+SVNUSERNAME=$3
+UPLOAD_USERNAME=$3
+UPLOAD_DESTINATION=dvorak.informatik.tu-cottbus.de:/var/data/snoopy_versions
+BUILDTARGET=$1
+BUILD64=""
+BUILDDATE=$(date +%Y-%m-%d)
+
+if [ "$BUILDTARGET" = "ubuntu" ] || [ "$BUILDTARGET" = "debian" ] ; then
+	FILEEXT="deb"
+elif [ "$BUILDTARGET" = "suse" ] || [ "$BUILDTARGET" = "fedora" ] ; then
+	FILEEXT="rpm"
+else
+	FILEEXT="dmg"
+fi
+
+if [ `uname -m` == "x86_64" ] ; then
+BUILD64="64"
+fi
+
+BUILDNAME="snoopy-"$RELEASE"-linux-"$BUILDTARGET$BUILD64"-"$BUILDDATE"."$FILEEXT
+
+# -bb just build binarie Package, -ba binary & Source Package
+RPMBUILD_PARA=-bb
+
+echo "Cleanup Workspace? y/n"
+read -n 1 CLEANUP
+if [ "$CLEANUP" = "y" ] ; then
+	rm -rf $WORKDIR
+	mkdir $WORKDIR
+	mkdir $WORKDIR/rpmbuild
+	mkdir $WORKDIR/rpmbuild/BUILD
+	mkdir $WORKDIR/rpmbuild/SOURCES
+	mkdir $WORKDIR/rpmbuild/RPMS
+	mkdir $WORKDIR/rpmbuild/SRPMS
+	mkdir $WORKDIR/rpmbuild/SPECS
+else
+  exit 0
+fi
+
+#checkout svn repository
+svn --username $SVNUSERNAME checkout \
+$SVNSERVER/$SVNBRANCHNAME  $WORKDIR/$SVNBRANCHNAME &&
+
+if [ "$BUILDTARGET" = "mac" ] ; then
+	BUILDNAME="snoopy-"$RELEASE"-macosx-intel-"$BUILDDATE"."$FILEEXT
+	#build snoopy
+	echo "Begin Build of Package? y/n"
+	read -n 1 BUILD
+	if [ "$BUILD" != "y" ] ; then
+	  exit 0
+	fi
+	cd $WORKDIR/$SVNBRANCHNAME
+	sh mk_src_lst.sh
+	autoreconf -fvi
+	cd Release
+	../configure --enable-static --with-macosx-version-min=10.5
+	make
+	mv snoopy2 snoopy
+	sh ../mkAppBundleOSX.sh snoopy $RELEASE
+else
+	#grep out the version number from specfile
+	SNOOPYVERSION=$(cat $WORKDIR/$SVNBRANCHNAME/snoopy2.spec | grep "%define version")
+	SNOOPYVERSION=${SNOOPYVERSION:16}
+	
+	#copy spec-file to rpm working directory
+	cp $WORKDIR/$SVNBRANCHNAME/snoopy2.spec $WORKDIR/rpmbuild/SPECS
+	
+	#rename code directory
+	mv $WORKDIR/$SVNBRANCHNAME $WORKDIR/snoopy-$SNOOPYVERSION &&
+	
+	#make a tar.gz out of the checked out code
+	tar -czf $WORKDIR/snoopy-$SNOOPYVERSION.tar.gz -C $WORKDIR snoopy-$SNOOPYVERSION &&
+	
+	#copy tar.gz to rpm working directory
+	mv $WORKDIR/snoopy-$SNOOPYVERSION.tar.gz $WORKDIR/rpmbuild/SOURCES &&
+	
+	#build snoopy
+	echo "Begin Build of Package? y/n"
+	read -n 1 BUILD
+	if [ "$BUILD" = "y" ] ; then
+	  echo "%_topdir	$WORKDIR/rpmbuild" >> ~/.rpmmacros
+	  echo "please be patient, compiling can take up to 20 minutes"
+	  rpmbuild $RPMBUILD_PARA $WORKDIR/rpmbuild/SPECS/snoopy2.spec 2>&1 | tee $WORKDIR/snoopy-$SNOOPYVERSION.log
+	else
+	  exit 0
+	fi
+	
+	
+	#convert packages to deb format and rename
+	if [ "$BUILDTARGET" = "debian" ] || [ "$BUILDTARGET" = "ubuntu" ] ; then
+	  rm -rf snoopy-*
+	  fakeroot alien -v -c  $WORKDIR/rpmbuild/RPMS/*/snoopy-*.rpm
+	  mv snoopy_$SNOOPYVERSION*.deb $BUILDNAME
+	fi
+	
+	#rename
+	if [ "$BUILDTARGET" = "suse" ] || [ "$BUILDTARGET" = "fedora" ] ; then
+	  # fedora or suse
+	  PACKAGEPATH=$WORKDIR/rpmbuild/RPMS/*/snoopy-$SNOOPYVERSION*.rpm
+	  mv $WORKDIR/rpmbuild/RPMS/*/snoopy-$SNOOPYVERSION*.rpm $BUILDNAME
+	fi
+fi	
+
+#Upload Package
+echo "Upload Package? y/n"
+read -n 1 UPLOAD
+if [ "$UPLOAD" = "y" ] ; then
+    scp $BUILDNAME $UPLOAD_USERNAME@$UPLOAD_DESTINATION/
+else
+  exit 0
+fi
+
+
+echo "Cleanup Workspace? y/n"
+read -n 1 CLEANUP
+if [ "$CLEANUP" = "y" ] ; then
+	rm -rf $WORKDIR
+else
+  exit 0
+fi
+
+exit 0

@@ -1,0 +1,192 @@
+#                     -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+
+#min. version number of autoconf
+AC_PREREQ(2.61)
+
+AC_INIT([snoopy],[2],[snoopy@informatik.tu-cottbus.de])
+AM_INIT_AUTOMAKE([-Wall foreign])
+AC_CONFIG_HEADERS([config.h])
+
+AC_ARG_ENABLE(debug,[AS_HELP_STRING([--enable-debug],[ Snoopy with debug messages])])
+AC_ARG_ENABLE(static,[AS_HELP_STRING([--enable-static],[ wxWidgets static linking])])
+AC_ARG_ENABLE(x86_64,[AS_HELP_STRING([--enable-x86_64],[ x86_64 build])])
+AC_ARG_WITH(macosx_version_min,[AS_HELP_STRING([--with-macosx-version-min],[ build binaries which require at least this OS X version])])
+
+# Checks for programs.
+AC_PROG_CXX
+AC_PROG_CPP
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_INSTALL
+
+AC_LANG(C++)
+
+m4_include(wxwin.m4)
+m4_include(snoopy.m4)
+
+# Checks for wxwidgets.
+WXDEBUG=no
+if test "$[enable_debug]" = yes; then 
+	WXDEBUG=yes 
+fi
+
+WXSTATIC=no
+if test "$[enable_static]" = yes; then 
+	WXSTATIC=yes 
+fi
+
+SP_X86_64=no
+if test "`uname -m`" = x86_64; then
+	SP_X86_64=yes
+fi
+#if test "$[enable_x86_64]" = yes; then 
+#	SP_X86_64=yes 
+#fi
+#if test "$[enable_x86_64]" = no; then 
+#	SP_X86_64=no
+#fi
+
+MACOSX_MIN=$[with_macosx_version_min]
+
+AM_OPTIONS_WXCONFIG
+reqwx=2.8.4
+
+AM_PATH_WXCONFIG([2.8.4], [wxWin=1],[wxWin=0],[base,core,aui,adv,net,xml,html],[ --static="$WXSTATIC" --unicode=yes --debug="$WXDEBUG"])
+if test "$wxWin" != 1; then
+	AC_MSG_ERROR([wWidgets is required to build Snoopy
+	You can get wxWidgets from www.wxWidgets.org
+])
+fi
+
+LIBS="$WX_LIBS"
+CXXFLAGS="$WX_CXXFLAGS -D__SNOOPY__"
+CLFAGS="$WXCFLAGS -D__SNOOPY__"
+CPPFLAGS="$WX_CPPFLAGS -D__SNOOPY__"
+
+SP_WX_BASENAME=`$WX_CONFIG_WITH_ARGS --basename 2>/dev/null`
+SP_WXCODE_BASENAME=wxcode${SP_WX_BASENAME:2}
+SP_VERSION=${WX_VERSION%.*}
+
+if test "$SP_X86_64" = yes; then
+ 	CXXFLAGS="$CXXFLAGS -m64 "
+ 	CLFLAGS="$CLFLAGS -m64 "
+ 	CPPFLAGS="$CPPFLAGS -m64 "
+	AC_CHECK_DECL([_LP64], , AC_DEFINE([_LP64], , [X86_64 Support]) )
+else
+	CXXFLAGS="$CXXFLAGS -m32 "
+ 	CLFLAGS="$CLFLAGS -m32 "
+ 	CPPFLAGS="$CPPFLAGS -m32 "
+fi
+
+if test "$WXDEBUG" = yes; then
+	SPDIR="Debug"
+ 	CXXFLAGS="$CXXFLAGS -g "
+else
+	SPDIR="Release"
+	CXXFLAGS="$CXXFLAGS -O2 -fmessage-length=0 -msse2 -mfpmath=sse "
+fi
+
+if test -n "$MACOSX_MIN"; then
+ 	CXXFLAGS="$CXXFLAGS -mmacosx-version-min=$MACOSX_MIN "
+ 	CLFLAGS="$CLFLAGS -mmacosx-version-min=$MACOSX_MIN "
+fi
+
+
+# Checks for header files.
+
+AC_HEADER_STDC
+
+AC_COMPILE_STDCXX_0X
+AC_HEADER_STDCXX_0X
+AC_CHECK_DECL([STDCXX_0X_HEADERS], AC_DEFINE([__TR1__], , [Have C++ TR1 support]) )
+
+AC_CHECK_HEADERS(locale.h string.h )
+
+AC_CHECK_HEADER([limits.h])
+AC_CHECK_HEADER([arith.h])
+AC_CHECK_HEADER([ogdf/basic/Graph.h], , AC_MSG_ERROR(ogdf required))
+AC_CHECK_HEADER([sbml/SBMLTypes.h], , AC_MSG_ERROR(sbml required))
+AC_CHECK_HEADER([cvode/cvode.h], , AC_MSG_ERROR(cvode required))
+AC_CHECK_HEADER([gecode/driver.hh], , AC_MSG_ERROR(gecode required))
+
+# IrrKlang is not available on 64bit Linux
+AC_CHECK_DECL([_LP64], ,[AC_CHECK_HEADER([irrKlang.h], , AC_MSG_ERROR(IrrKlang required))])
+
+#Checks for libs
+AC_CHECK_LIB([${SP_WXCODE_BASENAME}_ogl-$SP_VERSION],[main], , AC_MSG_ERROR(ogl required))
+AC_CHECK_LIB([${SP_WXCODE_BASENAME}_freechart-$SP_VERSION],[main], , AC_MSG_ERROR(freechart required))
+
+AC_CHECK_LIB([pthread],[main], , AC_MSG_ERROR(pthread required))
+AC_CHECK_LIB([sbml],[main], , AC_MSG_ERROR(sbml required))
+AC_CHECK_LIB([OGDF],[main], , AC_MSG_ERROR(ogdf required))
+AC_CHECK_LIB([sundials_nvecserial],[main], , AC_MSG_ERROR(sundials_nvecserial required))
+AC_CHECK_LIB([sundials_cvode],[main], , AC_MSG_ERROR(sundials_cvode required))
+AC_CHECK_LIB([gecodeflatzinc],[main], , AC_MSG_ERROR(gecodeflatzinc required))
+AC_CHECK_LIB([gecodedriver],[main], , AC_MSG_ERROR(gecodedriver required))
+AC_CHECK_LIB([gecodesearch],[main], , AC_MSG_ERROR(gecodesearch required))
+AC_CHECK_LIB([gecodeminimodel],[main], , AC_MSG_ERROR(gecodeminimodel required))
+AC_CHECK_LIB([gecodeset],[main], , AC_MSG_ERROR(gecodeset required))
+AC_CHECK_LIB([gecodeint],[main], , AC_MSG_ERROR(gecodeint required))
+AC_CHECK_LIB([gecodekernel],[main], , AC_MSG_ERROR(gecodekernel required))
+AC_CHECK_LIB([gecodesupport],[main], , AC_MSG_ERROR(gecodesupport required))
+
+# IrrKlang is not available on 64bit Linux
+AC_CHECK_DECL([_LP64], ,[AC_CHECK_LIB([IrrKlang],[main], , AC_MSG_ERROR(IrrKlang required))])
+
+# Get SPSA_SteeringAPI library and include locations
+
+if test `uname` = Linux; then
+	SPDIR="$SPDIR\_Linux"
+else
+	SPDIR="$SPDIR\_MacOSX"
+fi
+STEERING_INC="$HOME/workspace/SPSA_SteeringAPI/include"
+STEERING_LIB="$HOME/workspace/SPSA_SteeringAPI/$SPDIR"
+
+AC_ARG_WITH([steering-include-path],
+  [AS_HELP_STRING([--with-steering-include-path],
+    [location of the SPSA_SteeringAPI headers, defaults to ~/workspace/SPSA_SteeringAPI/include])],
+  [STEERING_CFLAGS="-I$withval"],
+  [STEERING_CFLAGS="-I$STEERING_INC"])
+AC_SUBST([STEERING_CFLAGS])
+
+AC_ARG_WITH([steering-lib-path],
+  [AS_HELP_STRING([--with-steering-lib-path], [location of the SPSA_SteeringAPI libraries])],
+  [STEERING_LIBS="-L$withval -lSPSA_SteeringAPI"],
+  [STEERING_LIBS="-L$STEERING_LIB -lSPSA_SteeringAPI"])
+AC_SUBST([STEERING_LIBS])
+
+# Get SnoopySimulator library and include locations
+SPSIM_INC="$HOME/workspace/Snoopy\ Simulator/include"
+SPSIM_LIB="$HOME/workspace/Snoopy\ Simulator/$SPDIR"
+
+AC_ARG_WITH([spsim-include-path],
+  [AS_HELP_STRING([--with-spsim-include-path],
+    [location of the SnoopySimulator headers, defaults to ~/workspace/SnoopySimulator/include])],
+  [SPSIM_CFLAGS="-I$withval"],
+  [SPSIM_CFLAGS="-I$SPSIM_INC"])
+AC_SUBST([SPSIM_CFLAGS])
+
+AC_ARG_WITH([spsim-lib-path],
+  [AS_HELP_STRING([--with-spsim-lib-path], [location of the SnoopySimulator libraries])],
+  [SPSIM_LIBS="-L$withval -lSnoopySimulator"],
+  [SPSIM_LIBS="-L$SPSIM_LIB -lSnoopySimulator"])
+AC_SUBST([SPSIM_LIBS])
+
+CXXFLAGS="$CXXFLAGS $STEERING_CFLAGS $SPSIM_CFLAGS"
+LIBS="$STEERING_LIBS $SPSIM_LIBS $LIBS"
+
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
+# Checks for library functions.
+AC_FUNC_ERROR_AT_LINE
+AC_CHECK_FUNCS([floor isascii pow setlocale sqrt strstr])
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

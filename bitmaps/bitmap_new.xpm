@@ -1,0 +1,25 @@
+/* XPM */
+static const char *bitmap_new_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 3 1",
+"  c None",
+". c Black",
+"X c Gray100",
+/* pixels */
+"                ",
+"   ........     ",
+"   .XXXXXX..    ",
+"   .XXXXXX.X.   ",
+"   .XXXXXX....  ",
+"   .XXXXXXXXX.  ",
+"   .XXXXXXXXX.  ",
+"   .XXXXXXXXX.  ",
+"   .XXXXXXXXX.  ",
+"   .XXXXXXXXX.  ",
+"   .XXXXXXXXX.  ",
+"   .XXXXXXXXX.  ",
+"   .XXXXXXXXX.  ",
+"   ...........  ",
+"                ",
+"                "
+};

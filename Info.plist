@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>spbipart</string>
+				<string>spcontped</string>
+				<string>spstochpn</string>
+				<string>speft</string>
+				<string>spept</string>
+				<string>spft</string>
+				<string>spfreen</string>
+				<string>sphybrid</string>
+				<string>spmnet</string>
+				<string>spmtbdd</string>
+				<string>spmtidd</string>
+				<string>spm</string>
+				<string>sprgraph</string>
+				<string>spgraph</string>
+				<string>spped</string>
+				<string>sptpt</string>
+				<string>colpn</string>
+				<string>colextpn</string>
+				<string>colstochpn</string>
+				<string>colcontped</string>
+				<string>colhybpn</string>
+				<string>pn</string>
+				<string>xpn</string>
+				<string>cpn</string>
+				<string>spn</string>
+				<string>hpn</string>
+				<string>colxpn</string>
+				<string>colcpn</string>
+				<string>colspn</string>
+				<string>colhpn</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>snoopy.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>snoopy net file</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>TEXT</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>snoopy</string>
+	<key>CFBundleIconFile</key>
+	<string>snoopy.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>de.tu-cottbus.dssz.snoopy</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>crohr</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+</dict>
+</plist>

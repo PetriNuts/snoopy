@@ -1,0 +1,41 @@
+/*
+ * SP_DS_DoubleMarkingAttribute.h
+ *
+ *  Created on: 14.01.2013
+ *      Author: dell-notebook
+ */
+
+#ifndef SP_DS_DOUBLEMARKINGATTRIBUTE_H_
+#define SP_DS_DOUBLEMARKINGATTRIBUTE_H_
+
+#include "sp_ds/attributes/SP_DS_ExpressionAttribute.h"
+
+
+class  SP_DS_DoubleMarkingAttribute: public SP_DS_ExpressionAttribute
+{
+private:
+	 double m_nValue;				//for numeric value in animation
+
+protected:
+
+    virtual bool UpdateValue();
+
+public:
+	SP_DS_DoubleMarkingAttribute(const wxString& p_pchName, const wxString& p_pchVal);
+	SP_DS_DoubleMarkingAttribute(const wxString& p_pchName, double p_nVal = 1);
+    virtual ~SP_DS_DoubleMarkingAttribute() { }
+
+    virtual bool SetValue(double l_nValue);
+    virtual double GetValue(bool p_bUpdate = false);
+
+    virtual wxString GetValueString();
+    virtual bool SetValueString(const wxString& p_pchVal, bool p_bCheckValue = true);
+
+    virtual SP_DS_Attribute* Clone(bool p_bCloneGr = TRUE);
+
+	virtual bool CheckIntegrity();
+
+};
+
+
+#endif /* SP_DS_DOUBLEMARKINGATTRIBUTE_H_ */

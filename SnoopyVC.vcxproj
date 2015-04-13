@@ -1,0 +1,1552 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4569DA18-2406-4E27-A117-8F26DA1C9EB2}</ProjectGuid>
+    <RootNamespace>SnoopyVC</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="..\win-flex-bison\custom_build_rules\win_flex_bison_custom_build.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(Configuration)\$(Platform)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <EmbedManifest>true</EmbedManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(Configuration)\$(Platform)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <EmbedManifest>true</EmbedManifest>
+    <TargetName>snoopy</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(Configuration)\$(Platform)\</IntDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <LinkIncremental>true</LinkIncremental>
+    <EmbedManifest>false</EmbedManifest>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(Configuration)\$(Platform)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <EmbedManifest>false</EmbedManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Release/SnoopyVC.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>./;$(WXWIN)/include;$(WXWIN)/lib/vc_lib/mswu;$(WXCODE)/components/freechart/include/;$(OGL)/include/;$(LIBSBML)/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(BOOST_ROOT);$(CVODE)/include;$(CVODE)/builddir/include;$(SPSA_STEERINGAPI)/include;$(SP_SIMULATOR)/include;$(GECODEDIR)\include;$(WXWIN)/lib/vc_lib/$(Platform)/mswu;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__SNOOPY__;WIN32;NDEBUG;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__;__WIN32__;WINVER=0x0400;STRICT;__VCC__;LANGUAGE_ENGLISH;UNICODE;__TR1__;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderOutputFile>$(Configuration)/SnoopyVC.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(Configuration)/</AssemblerListingLocation>
+      <ObjectFileName>$(Configuration)/</ObjectFileName>
+      <ProgramDataBaseFileName>$(Configuration)/</ProgramDataBaseFileName>
+      <BrowseInformation />
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+      <AdditionalIncludeDirectories>$(WXWIN)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wsock32.lib;gdiplus.lib;Psapi.lib;wxbase28u.lib;wxbase28u_net.lib;wxbase28u_xml.lib;wxmsw28u_adv.lib;wxmsw28u_aui.lib;wxmsw28u_core.lib;wxmsw28u_html.lib;wxexpat.lib;wxregexu.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxzlib.lib;wxcode_msw28u_ogl.lib;libsbml.lib;irrKlang.lib;ogdf.lib;sundials_nvecserial.lib;sundials_cvode.lib;SPSA_SteeringAPI.lib;spsim_sr.lib;wxcode_msw28u_freechart.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(Configuration)/snoopy.exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(WXWIN)/lib/vc_lib/;$(WXCODE)/components/freechart/lib/vc_lib/;$(OGL)/lib/vc_lib/;$(IRRKLANG)/lib/Win32-visualStudio/;$(OGDF)/$(Platform)/release;$(LIBSBML)/win/bin/;$(LIBSBML)/lib;$(SPSA_STEERINGAPI)/libs/lib_win/release;$(SP_SIMULATOR)/lib/lib_win/release/static;$(GECODEDIR)\lib;$(CVODE)/lib;$(WXWIN)/lib/vc_lib/$(Platform)/;$(WXCODE)/components/freechart/lib/vc_lib/$(Platform)/;$(OGL)/lib/vc_lib/$(Platform)/;$(LIBSBML)/build/$(Platform)/src/Release;$(CVODE)/lib/$(Platform)/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ProgramDatabaseFile>$(Configuration)/SnoopyVC.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(Configuration)/SnoopyVC.map</MapFileName>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>$(Configuration)/SnoopyVC.bsc</OutputFile>
+    </Bscmake>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)SP_DLG_About.*
+del $(TargetDir)SP_DLG_CheckForUpdate.*
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Release/SnoopyVC.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(WXWIN)/include;$(WXWIN)/lib/vc_x64_dll/mswu/;$(OGL)/include/;$(WXCODE)/components/freechart/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(BOOST_ROOT);$(CVODE)/include;$(CVODE)/builddir/include;$(GECODEDIR);$(SP_SIMULATOR)/include;$(SPSA_STEERINGAPI)/include;$(DSSZ_UTIL)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__SNOOPY__;WIN32;NDEBUG;_WINDOWS;__WXMSW__;UNICODE;_LP64;WXUSINGDLL;wxDEBUG_LEVEL=0;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;SPSIM_USING_DLL;SPSA_STEERINGAPI_USING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+      <AdditionalIncludeDirectories>$(WXWIN)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wsock32.lib;gdiplus.lib;Psapi.lib;wxbase30u.lib;wxbase30u_net.lib;wxbase30u_xml.lib;wxmsw30u_adv.lib;wxmsw30u_aui.lib;wxmsw30u_core.lib;wxmsw30u_html.lib;wxexpat.lib;wxregexu.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxzlib.lib;wxcode_msw30u_ogl.lib;wxcode_msw30u_freechart.lib;SPSA_SteeringAPI.lib;dssz_util.lib;spsim_dr.lib;libsbml.lib;ogdf.lib;GecodeSupport-3-7-3-r-x64.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(WXWIN)/lib/vc_x64_dll/;$(OGL)/lib/vc_dll/;$(WXCODE)/components/freechart/lib/vc_dll/;$(LIBSBML)/builddir/src/$(Configuration);$(OGDF)/$(Platform)/$(Configuration);$(DSSZ_UTIL)/lib/$(Configuration);$(SP_SIMULATOR)/$(Configuration)/$(Platform);$(SPSA_STEERINGAPI)/$(Configuration)/$(Platform);$(GECODEDIR)/$(Configuration);$(CVODE)/builddir/src/cvode/$(Configuration);$(CVODE)/builddir/src/nvec_ser/$(Configuration);$(BOOST_ROOT)/stage/lib;$(IRRKLANG)/lib/Winx64-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(OutDir)$(TargetName).map</MapFileName>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
+    </Bscmake>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)SP_DLG_About.*
+del $(TargetDir)SP_DLG_CheckForUpdate.*
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command />
+    </CustomBuildStep>
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/SnoopyVC.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>./;$(WXWIN)/include;$(WXWIN)/lib/vc_lib/mswud;$(WXCODE)/components/freechart/include/;$(OGL)/include/;$(LIBSBML)/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(BOOST_ROOT);$(CVODE)/include/;$(CVODE)/builddir/include;$(SPSA_STEERINGAPI)/include;$(SP_SIMULATOR)/include;$(GECODEDIR)\include;$(WXWIN)/lib/vc_lib/$(Platform)/mswud;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__SNOOPY__;_DEBUG;WIN32;_LIB;__WIN32__;_WINDOWS;WINVER=0x0400;__WXMSW__;__WINDOWS__;__WIN95__;STRICT;__WXDEBUG__;LANGUAGE_ENGLISH;__VCC__;PLATFORM_WIN32;UNICODE;__TR1__;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderOutputFile />
+      <AssemblerListingLocation>$(Configuration)/</AssemblerListingLocation>
+      <ObjectFileName>$(Configuration)/</ObjectFileName>
+      <ProgramDataBaseFileName>$(Configuration)/</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+      <AdditionalIncludeDirectories>$(WXWIN)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/verbose:LIB %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wsock32.lib;gdiplus.lib;Psapi.lib;wxbase28ud.lib;wxbase28ud_net.lib;wxbase28ud_xml.lib;wxmsw28ud_adv.lib;wxmsw28ud_aui.lib;wxmsw28ud_core.lib;wxmsw28ud_html.lib;wxexpatd.lib;wxregexud.lib;wxpngd.lib;wxjpegd.lib;wxtiffd.lib;wxzlibd.lib;wxcode_msw28ud_ogl.lib;libsbml.lib;irrKlang.lib;ogdf.lib;sundials_cvode.lib;sundials_nvecserial.lib;SPSA_SteeringAPI.lib;spsim_sd.lib;wxcode_msw28u_freechart.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(Configuration)/snoopy.exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(WXWIN)/lib/vc_lib/;$(WXCODE)/components/freechart/lib/vc_lib/;$(OGL)/lib/vc_lib/;$(IRRKLANG)/lib/Win32-visualStudio/;$(OGDF)/$(Platform)/$(Configuration);$(CVODE)/lib;$(LIBSBML)/win/bin/;$(LIBSBML)/lib;$(GECODEDIR)\lib;$(SPSA_STEERINGAPI)//libs/lib_win/debug;$(SP_SIMULATOR)/lib/lib_win/debug\static;$(WXWIN)/lib/vc_lib/$(Platform)/;$(WXCODE)/components/freechart/lib/vc_lib/$(Platform)/;$(OGL)/lib/vc_lib/$(Platform)/;$(LIBSBML)/build/$(Platform)/src/Debug;$(CVODE)/lib/$(Platform)/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(Configuration)/SnoopyVC.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(Configuration)/SnoopyVC.map</MapFileName>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>$(Configuration)/SnoopyVC.bsc</OutputFile>
+    </Bscmake>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)SP_DLG_About.*
+del $(TargetDir)SP_DLG_CheckForUpdate.*
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command />
+    </CustomBuildStep>
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Debug/SnoopyVC.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(WXWIN)/include;$(WXWIN)/lib/vc_x64_dll/mswud/;$(OGL)/include/;$(WXCODE)/components/freechart/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(BOOST_ROOT);$(CVODE)/include;$(CVODE)/builddir/include;$(GECODEDIR);$(SP_SIMULATOR)/include;$(SPSA_STEERINGAPI)/include;$(DSSZ_UTIL)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__SNOOPY__;_DEBUG;WIN32;_LIB;__WIN32__;_WINDOWS;__WXMSW__;__WINDOWS__;__WXDEBUG__;UNICODE;_LP64;WXUSINGDLL;wxDEBUG_LEVEL=0;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;SPSIM_USING_DLL;SPSA_STEERINGAPI_USING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderOutputFile />
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+      <AdditionalIncludeDirectories>$(WXWIN)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/verbose:LIB %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wsock32.lib;gdiplus.lib;Psapi.lib;wxbase30ud.lib;wxbase30ud_net.lib;wxbase30ud_xml.lib;wxmsw30ud_adv.lib;wxmsw30ud_aui.lib;wxmsw30ud_core.lib;wxmsw30ud_html.lib;wxexpat.lib;wxregexu.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxzlib.lib;wxcode_msw30ud_ogl.lib;wxcode_msw30ud_freechart.lib;SPSA_SteeringAPI.lib;dssz_util.lib;spsim_dd.lib;libsbml.lib;ogdf.lib;GecodeSupport-3-7-3-d-x64.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(WXWIN)/lib/vc_x64_dll/;$(OGL)/lib/vc_dll/;$(WXCODE)/components/freechart/lib/vc_dll/;$(LIBSBML)/builddir/src/$(Configuration);$(OGDF)/$(Platform)/$(Configuration);$(DSSZ_UTIL)/lib/$(Configuration);$(SP_SIMULATOR)/$(Configuration)/$(Platform);$(SPSA_STEERINGAPI)/$(Configuration)/$(Platform);$(GECODEDIR)/$(Configuration);$(CVODE)/builddir/src/cvode/$(Configuration);$(CVODE)/builddir/src/nvec_ser/$(Configuration);$(BOOST_ROOT)/stage/lib;$(IRRKLANG)/lib/Winx64-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(OutDir)$(TargetName).map</MapFileName>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
+    </Bscmake>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)SP_DLG_About.*
+del $(TargetDir)SP_DLG_CheckForUpdate.*
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Data">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Xml">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="bitmaps\anim_backstep.bmp" />
+    <Image Include="bitmaps\anim_pause.bmp" />
+    <Image Include="bitmaps\anim_play.bmp" />
+    <Image Include="bitmaps\anim_play_bwd.bmp" />
+    <Image Include="bitmaps\anim_play_fwd.bmp" />
+    <Image Include="bitmaps\anim_play_mask.bmp" />
+    <Image Include="bitmaps\anim_reset.bmp" />
+    <Image Include="bitmaps\anim_step.bmp" />
+    <Image Include="bitmaps\anim_step_bwd.bmp" />
+    <Image Include="bitmaps\anim_stop.bmp" />
+    <Image Include="bitmaps\bitmap1.bmp" />
+    <Image Include="bitmaps\bitmap_a.bmp" />
+    <Image Include="wx\msw\cdrom.ico" />
+    <Image Include="wx\msw\colours.bmp" />
+    <Image Include="wx\msw\computer.ico" />
+    <Image Include="bitmaps\copy.bmp" />
+    <Image Include="wx\msw\csquery.bmp" />
+    <Image Include="bitmaps\cut.bmp" />
+    <Image Include="wx\msw\disable.bmp" />
+    <Image Include="wx\msw\drive.ico" />
+    <Image Include="wx\msw\file1.ico" />
+    <Image Include="bitmaps\file_norm.bmp" />
+    <Image Include="bitmaps\file_norm.ico" />
+    <Image Include="bitmaps\file_sel.bmp" />
+    <Image Include="bitmaps\file_sel.ico" />
+    <Image Include="wx\msw\floppy.ico" />
+    <Image Include="wx\msw\folder1.ico" />
+    <Image Include="wx\msw\folder2.ico" />
+    <Image Include="bitmaps\folder_norm.ico" />
+    <Image Include="bitmaps\folder_open.ico" />
+    <Image Include="bitmaps\folder_sel.ico" />
+    <Image Include="bitmaps\help.bmp" />
+    <Image Include="bitmaps\new.bmp" />
+    <Image Include="wx\plot\plot_zot.bmp" />
+    <Image Include="wx\msw\removble.ico" />
+    <Image Include="bitmaps\select.bmp" />
+    <Image Include="snoopy.ico" />
+    <Image Include="bitmaps\undo.bmp" />
+    <Image Include="bitmaps\wxbitmap.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wx\msw\blank.cur" />
+    <None Include="wx\msw\bullseye.cur" />
+    <None Include="wx\msw\hand.cur" />
+    <None Include="wx\msw\magnif1.cur" />
+    <None Include="wx\msw\noentry.cur" />
+    <None Include="wx\msw\pbrush.cur" />
+    <None Include="wx\msw\pencil.cur" />
+    <None Include="wx\msw\pntleft.cur" />
+    <None Include="wx\msw\pntright.cur" />
+    <None Include="wx\msw\query.cur" />
+    <None Include="wx\msw\rightarr.cur" />
+    <None Include="wx\msw\roller.cur" />
+    <None Include="wx\msw\size.cur" />
+    <None Include="wx\msw\watch1.cur" />
+    <None Include="..\..\Users\liu\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\Shows Desktop.lnk" />
+    <None Include="sp_ds\extensions\Col_PN\FlexBison\SP_CPN_Parser.yy" />
+    <None Include="sp_ds\extensions\Col_PN\FlexBison\SP_CPN_Scanner.ll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Snoopy.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="export\SP_ExportColPN2SBML.h" />
+    <ClInclude Include="export\SP_ExportColPN2SSC.h" />
+    <ClInclude Include="sp_core\MD5HasherDefs.h" />
+    <ClInclude Include="sp_core\SP_Core.h" />
+    <ClInclude Include="sp_core\SP_Deque.h" />
+    <ClInclude Include="sp_core\SP_GPR_Animation.h" />
+    <ClInclude Include="sp_core\SP_GPR_Base.h" />
+    <ClInclude Include="sp_core\SP_GPR_Canvas.h" />
+    <ClInclude Include="sp_core\SP_GPR_Elements.h" />
+    <ClInclude Include="sp_core\SP_GPR_Fonts.h" />
+    <ClInclude Include="sp_core\SP_List.h" />
+    <ClInclude Include="sp_core\SP_Map.h" />
+    <ClInclude Include="sp_core\SP_Matrix.h" />
+    <ClInclude Include="sp_core\SP_PriorityQueue.h" />
+    <ClInclude Include="sp_core\SP_Reader.h" />
+    <ClInclude Include="sp_core\SP_Set.h" />
+    <ClInclude Include="sp_core\SP_Signer.h" />
+    <ClInclude Include="sp_core\SP_Vector.h" />
+    <ClInclude Include="sp_core\SP_Writer.h" />
+    <ClInclude Include="sp_core\SP_XmlReader.h" />
+    <ClInclude Include="sp_core\SP_XmlWriter.h" />
+    <ClInclude Include="sp_core\base\SP_Animator.h" />
+    <ClInclude Include="sp_core\base\SP_Data.h" />
+    <ClInclude Include="sp_core\base\SP_ElementClass.h" />
+    <ClInclude Include="sp_core\base\SP_Error.h" />
+    <ClInclude Include="sp_core\base\SP_Graphic.h" />
+    <ClInclude Include="sp_core\base\SP_Name.h" />
+    <ClInclude Include="sp_core\base\SP_NetElement.h" />
+    <ClInclude Include="sp_core\base\SP_Type.h" />
+    <ClInclude Include="sp_core\tools\alphanum.h" />
+    <ClInclude Include="sp_core\tools\comp.h" />
+    <ClInclude Include="sp_core\tools\CyclicGraph.h" />
+    <ClInclude Include="sp_core\tools\MersenneTwister.h" />
+    <ClInclude Include="sp_core\tools\rfdag.h" />
+    <ClInclude Include="sp_core\tools\sh_ptr.h" />
+    <ClInclude Include="sp_core\tools\SP_ExpressionTree.h" />
+    <ClInclude Include="sp_core\tools\SP_FTreeNodeColourizer.h" />
+    <ClInclude Include="sp_core\tools\SP_NodeColourizer.h" />
+    <ClInclude Include="sp_core\tools\whitespace_parse.h" />
+    <ClInclude Include="sp_core\vector\SP_VectorParser.h" />
+    <ClInclude Include="sp_core\vector\SP_VectorReader.h" />
+    <ClInclude Include="sp_core\vector\SP_VectorScanner.h" />
+    <ClInclude Include="sp_core\vector\SP_VectorWriter.h" />
+    <ClInclude Include="sp_core\FTree\SP_FTree_TermParser.h" />
+    <ClInclude Include="sp_core\FTree\SP_FTree_TermScanner.h" />
+    <ClInclude Include="sp_core\TParser\SP_Parser.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_Animation.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_Function.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_FunctionEvaluator.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_FunctionRegistry.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_Transformer.h" />
+    <ClInclude Include="sp_ds\SP_DS_Animator.h" />
+    <ClInclude Include="sp_ds\SP_DS_Attribute.h" />
+    <ClInclude Include="sp_ds\SP_DS_Edge.h" />
+    <ClInclude Include="sp_ds\SP_DS_Edgeclass.h" />
+    <ClInclude Include="sp_ds\SP_DS_Graph.h" />
+    <ClInclude Include="sp_ds\SP_DS_Metadata.h" />
+    <ClInclude Include="sp_ds\SP_DS_Metadataclass.h" />
+    <ClInclude Include="sp_ds\SP_DS_Netclass.h" />
+    <ClInclude Include="sp_ds\SP_DS_Node.h" />
+    <ClInclude Include="sp_ds\SP_DS_Nodeclass.h" />
+    <ClInclude Include="sp_ds\SP_DS_NodeVector.h" />
+    <ClInclude Include="sp_ds\SP_DS_NodeVectorSystem.h" />
+    <ClInclude Include="sp_ds\SP_DS_TreeNode.h" />
+    <ClInclude Include="sp_ds\SP_DS_Visitor.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_Boolattribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_ColListAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_DoubleAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_DoubleListAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_DoubleMarkingAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_DoubleMarkingDependentMultiplicity.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_DoubleMultiplicityAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_EquationAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_ExpressionAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_ExtIdAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_ExtTextAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_FTreeLogicAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_FTreeNumberAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_IdAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_ListAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_LogicAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_MarkingAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_MarkingDependentMultiplicity.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_MultiplicityAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_NameAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_NumberAttribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_Textattribute.h" />
+    <ClInclude Include="sp_ds\attributes\SP_DS_TypeAttribute.h" />
+    <ClInclude Include="sp_ds\animators\SP_DS_CoarseTransAnimator.h" />
+    <ClInclude Include="sp_ds\animators\SP_DS_ExtPTPlaceAnimator.h" />
+    <ClInclude Include="sp_ds\animators\SP_DS_ExtPTTransAnimator.h" />
+    <ClInclude Include="sp_ds\animators\SP_DS_FTreeEventAnimator.h" />
+    <ClInclude Include="sp_ds\animators\SP_DS_FTreeGateAnimator.h" />
+    <ClInclude Include="sp_ds\animators\SP_DS_ModNetPlaceAnimator.h" />
+    <ClInclude Include="sp_ds\animators\SP_DS_MusTransAnimator.h" />
+    <ClInclude Include="sp_ds\animators\SP_DS_PlaceAnimator.h" />
+    <ClInclude Include="sp_ds\animators\SP_DS_TransAnimator.h" />
+    <ClInclude Include="sp_ds\animators\ani_CPN\SP_DS_CPN_Animation.h" />
+    <ClInclude Include="sp_ds\animators\ani_CPN\SP_DS_CPN_CoarseTransAnimator.h" />
+    <ClInclude Include="sp_ds\animators\ani_CPN\SP_DS_CPN_PlaceAnimator.h" />
+    <ClInclude Include="sp_ds\animators\ani_CPN\SP_DS_CPN_TransAnimator.h" />
+    <ClInclude Include="sp_ds\animators\ani_ColSPN\SP_DS_ColStAnimation.h" />
+    <ClInclude Include="sp_ds\animators\ani_ColSPN\SP_DS_ColStCoarseTransAnimator.h" />
+    <ClInclude Include="sp_ds\animators\ani_ColSPN\SP_DS_ColStPlaceAnimator.h" />
+    <ClInclude Include="sp_ds\animators\ani_ColSPN\SP_DS_ColStTransAnimator.h" />
+    <ClInclude Include="sp_ds\animators\ani_HybridPN\SP_DS_HybridAnimation.h" />
+    <ClInclude Include="sp_ds\animators\ani_SPN\SP_DS_StPlaceAnimator.h" />
+    <ClInclude Include="sp_ds\animators\ani_SPN\SP_DS_StTransAnimator.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_Coarse.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_ContinuousPedAnimation.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_Export.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_Formula.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_FTreePedAnimation.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_Import.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_MusicPedAnimation.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_NetCreater.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_PedAnimation.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_Simulation.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_SimulatorThread.h" />
+    <ClInclude Include="sp_ds\extensions\SP_DS_ThreadEvent.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeAlgebraicEquationCreater.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeAnalyser.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeCreater.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeCutSetsCreater.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeDeMorganTransformer.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeDNFCreater.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeExprOfSuccessTreeCreater.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeIrreparableSystemAnalyser.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeLogicalExpressionReader.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreePseudoFormCreater.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeReductionFinder.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeReductionTransformer.h" />
+    <ClInclude Include="sp_ds\extensions\Ftree\SP_DS_FTreeRepairableSystemAnalyser.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_ApFormula.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_ApParser.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_SimulatorThreadStochastic.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_StAnimation.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_StAnimationRunElem.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_StParser.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_StSimFAU.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_StSimGillespie.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_StSimImmediateTransitionList.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_StSimPlace.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_StSimTimeEvent.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_StSimTimeEventTimeline.h" />
+    <ClInclude Include="sp_ds\extensions\ext_SPN\SP_DS_StSimTransition.h" />
+    <ClInclude Include="sp_ds\extensions\continuous\SP_DS_ContinuousPlaceFormula.h" />
+    <ClInclude Include="sp_ds\extensions\continuous\SP_DS_EquationParser.h" />
+    <ClInclude Include="sp_ds\extensions\continuous\SP_DS_EquationParserConstant.h" />
+    <ClInclude Include="sp_ds\extensions\continuous\SP_DS_EquationParserObject.h" />
+    <ClInclude Include="sp_ds\extensions\continuous\SP_DS_EquationParserOperator.h" />
+    <ClInclude Include="sp_ds\extensions\continuous\SP_DS_EquationParserVariable.h" />
+    <ClInclude Include="sp_ds\extensions\continuous\SP_DS_PlaceODE.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\FlexBison\FlexLexer.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\FlexBison\location.hh" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\FlexBison\parser.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\FlexBison\position.hh" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\FlexBison\SP_CPN_Driver.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\FlexBison\SP_CPN_Parse_Context.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\FlexBison\SP_CPN_Parser.hh" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\FlexBison\SP_CPN_Scanner.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\FlexBison\stack.hh" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\FlexBison\unistd.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\FlexBison\y.tab.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\SyntaxChecking\SP_CPN_ColorProcessing.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\SyntaxChecking\SP_CPN_SyntaxChecking.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\ColorSetProcessing\SP_CPN_Binding.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\ColorSetProcessing\SP_CPN_ColorSet.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\ColorSetProcessing\SP_CPN_ColorSetClass.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\ColorSetProcessing\SP_CPN_PlaceMultiSet.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\ColorSetProcessing\SP_CPN_ValueAssign.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\Transform\SP_CPNToolXmlWriter.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\Folding\SP_CPN_GenMasterNet.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\Folding\SP_CPN_GenTwinNet.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\Preprocessing\SP_ColPN_ComBinding.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\Preprocessing\SP_ColPN_ProcessGuard.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\Preprocessing\SP_ColPN_ProcessRateFunction.h" />
+    <ClInclude Include="sp_ds\extensions\HybridPN\SP_DS_CheckTransitions.h" />
+    <ClInclude Include="sp_ds\extensions\HybridPN\SP_DS_SimulatorThreadHybrid.h" />
+    <ClInclude Include="sp_ds\extensions\Col_CPN\SP_DS_ColCPNPlaceFormula.h" />
+    <ClInclude Include="sp_ds\extensions\Col_CPN\SP_DS_ColPlaceODE.h" />
+    <ClInclude Include="sp_ds\extensions\ResultViewer\SP_DS_HistogramPlotViewer.h" />
+    <ClInclude Include="sp_ds\extensions\ResultViewer\SP_DS_PlotViewer.h" />
+    <ClInclude Include="sp_ds\extensions\ResultViewer\SP_DS_ResultViewer.h" />
+    <ClInclude Include="sp_ds\extensions\ResultViewer\SP_DS_TableViewer.h" />
+    <ClInclude Include="sp_ds\extensions\ResultViewer\SP_DS_ViewerCurve.h" />
+    <ClInclude Include="sp_ds\extensions\ResultViewer\SP_DS_xyPlotViewer.h" />
+    <ClInclude Include="sp_ds\extensions\ResultViewer\AttributeTypes\SP_DS_ViewerAttribute.h" />
+    <ClInclude Include="sp_ds\extensions\ResultViewer\AttributeTypes\SP_DS_ViewerAttributeCheckBox.h" />
+    <ClInclude Include="sp_ds\extensions\ResultViewer\AttributeTypes\SP_DS_ViewerAttributeList.h" />
+    <ClInclude Include="sp_ds\extensions\ResultViewer\AttributeTypes\SP_DS_ViewerAttributeText.h" />
+    <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_ColCSPSovler.h" />
+    <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_ColoredPNSimulation.h" />
+    <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_ColPN_ExportUnfolding.h" />
+    <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_ColPN_Unfolding.h" />
+    <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_ColTraceAnalyzer.h" />
+    <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_ColUnfoldFile.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_BipartGraph.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_ColCPN.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_ColExtPT.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_ColHPN.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_ColPT.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_ColSPN.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_ContinuousPed.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_EventSPN.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_ExtendedFaultTree.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_ExtPT.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_FaultTree.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_Freestyle.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_HybridPN.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_ModuloNets.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_MTBDD.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_MTIDD.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_MusicPed.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_ReachabilityGraph.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_SimpleGraph.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_SimplePed.h" />
+    <ClInclude Include="sp_ds\netclasses\SP_DS_TimePT.h" />
+    <ClInclude Include="sp_gr\metadata\SP_GR_MetaComposite.h" />
+    <ClInclude Include="sp_gr\SP_GR_Animator.h" />
+    <ClInclude Include="sp_gr\SP_GR_Attribute.h" />
+    <ClInclude Include="sp_gr\SP_GR_Edge.h" />
+    <ClInclude Include="sp_gr\SP_GR_Metadata.h" />
+    <ClInclude Include="sp_gr\SP_GR_Node.h" />
+    <ClInclude Include="sp_gr\base\SP_GR_BaseBitmap.h" />
+    <ClInclude Include="sp_gr\base\SP_GR_Basecircle.h" />
+    <ClInclude Include="sp_gr\base\SP_GR_BaseDrawn.h" />
+    <ClInclude Include="sp_gr\base\SP_GR_BaseEdge.h" />
+    <ClInclude Include="sp_gr\base\SP_GR_BaseEllipse.h" />
+    <ClInclude Include="sp_gr\base\SP_GR_BaseRectangle.h" />
+    <ClInclude Include="sp_gr\base\SP_GR_Basetext.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_ColListAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_CommentAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_ContinuousMarkAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_DoubleAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_DoubleMarkAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_DoubleMultiplicityAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_HiddenTextAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_ImageAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_MarkAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_MarkNumberAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_MultiplicityAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_NumberAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\SP_GR_Textattribute.h" />
+    <ClInclude Include="sp_gr\attributes\gra_SPN\SP_GR_StFunctionAttribute.h" />
+    <ClInclude Include="sp_gr\attributes\gra_SPN\SP_GR_StParameterListAttribute.h" />
+    <ClInclude Include="sp_gr\eventhandler\SP_GRM_AttributeHandler.h" />
+    <ClInclude Include="sp_gr\eventhandler\SP_GRM_EdgeHandler.h" />
+    <ClInclude Include="sp_gr\eventhandler\SP_GRM_EventHandler.h" />
+    <ClInclude Include="sp_gr\eventhandler\SP_GRM_ShapeHandler.h" />
+    <ClInclude Include="sp_gr\eventhandler\SP_GRM_UpwardHandler.h" />
+    <ClInclude Include="sp_gr\edges\SP_GR_ArrowEdge.h" />
+    <ClInclude Include="sp_gr\edges\SP_GR_ExtendedEdge.h" />
+    <ClInclude Include="sp_gr\edges\SP_GR_FaultEdge.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_Actor.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_Circle.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_Condition.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_DrawnShape.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_Ellipse.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_EllipseNoMerge.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_ExtendedAction.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_ExtendedCircle.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_ExtendedDrawnShape.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_ExtendedEllipse.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_ExtendedPaPLoop.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_ExtendedParallelogram.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_ExtendedParameterCondition.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_ExtendedRectangle.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_ExtendedRhombus.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_ExtendedState.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_GateRectangle.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_MusicTransition.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_NamedRectangle.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_Rectangle.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_RectangleNoMerge.h" />
+    <ClInclude Include="sp_gr\shapes\SP_GR_Rhombus.h" />
+    <ClInclude Include="sp_gr\animators\SP_GR_MarkAnimator.h" />
+    <ClInclude Include="sp_gr\metadata\SP_GR_MetaDrawnShape.h" />
+    <ClInclude Include="sp_gr\metadata\SP_GR_MetaRectangle.h" />
+    <ClInclude Include="sp_gr\metadata\SP_GR_PlotSymbol.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_CPNDeclaration.h" />
+    <ClInclude Include="sp_gui\windows\SP_GUI_Canvas.h" />
+    <ClInclude Include="sp_gui\windows\SP_GUI_Childframe.h" />
+    <ClInclude Include="sp_gui\windows\SP_GUI_DevbarContainer.h" />
+    <ClInclude Include="sp_gui\windows\SP_GUI_LogWindow.h" />
+    <ClInclude Include="sp_gui\windows\SP_GUI_Mainframe.h" />
+    <ClInclude Include="sp_gui\management\SP_GM_Docmanager.h" />
+    <ClInclude Include="sp_gui\management\SP_GM_DocTemplate.h" />
+    <ClInclude Include="sp_gui\mdi\SP_MDI_CoarseDoc.h" />
+    <ClInclude Include="sp_gui\mdi\SP_MDI_CoarseView.h" />
+    <ClInclude Include="sp_gui\mdi\SP_MDI_Diagram.h" />
+    <ClInclude Include="sp_gui\mdi\SP_MDI_Doc.h" />
+    <ClInclude Include="sp_gui\mdi\SP_MDI_View.h" />
+    <ClInclude Include="sp_gui\widgets\SP_WDG_CoarseTreectrl.h" />
+    <ClInclude Include="sp_gui\widgets\SP_WDG_GraphTreectrl.h" />
+    <ClInclude Include="sp_gui\widgets\SP_WDG_Notebook.h" />
+    <ClInclude Include="sp_gui\widgets\SP_WDG_NotebookPage.h" />
+    <ClInclude Include="sp_gui\widgets\SP_WDG_Toolbar.h" />
+    <ClInclude Include="sp_gui\widgets\SP_WDG_Treebook.h" />
+    <ClInclude Include="sp_gui\widgets\SP_WDG_Treectrl.h" />
+    <ClInclude Include="sp_ds\extensions\Col_PN\SP_WDG_ColorinPlace.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogBase.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogBool.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogChoice.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogColList.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogExtendedGraphic.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogFilename.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogGraphic.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogList.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogMultiline.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogNumber.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogShowOnly.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogSoundList.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogText.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_DialogUnsigned.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_GridCellChoiceEditor.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\SP_WDG_SpinCtrlDouble.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\wid_dia_SPN\SP_WDG_StDummyMarking.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\wid_dia_SPN\SP_WDG_StFunctionList.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\wid_dia_SPN\SP_WDG_StLookupTable.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\wid_dia_SPN\SP_WDG_StLookupTableName.h" />
+    <ClInclude Include="sp_gui\widgets\dialogs\wid_dia_SPN\SP_WDG_StParameterList.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_About.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_Animation.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_AnimationProperties.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ApplySound.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_CheckDuplicateNodes.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_CheckForUpdate.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_CheckNet.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ChooseFTreeCutSet.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ChooseFTreeReduction.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ChooseInvariant.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ChoseCoarse.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ColListOverview.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ConvertElements.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ExportProperties.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_GlobalPreferences.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_GraphProperties.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_IACommandConfigure.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_IAConfigure.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_IARegCmdList.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ImportSBML2extPN.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_LayoutProperties.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_MarkingOverview.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_NetInformations.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_NewConstantDefinition.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ReduceFTree.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ResultViewerProperties.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_SaveContinuousEquationProperties.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_SearchId.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_SelectXAxisVariable.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ShapeProperties.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ShowAllModelView.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_Simulation.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_SimulationParamterSelection.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_SimulationPlaceSelection.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_SimulationProperties.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_SMART.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_SortNodes.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_TransformGraphic.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StDirectExportProperties.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StEditTablePlot.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StFunctionAssistent.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StFunctionOverview.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StMarkingOverview.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StParameterOverview.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StSimulationResults.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StTransformation.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_BindingSelection.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_ChooseMasterNet.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_ColorSetOverview.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_ColorSetSelection.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_ColorSetSetting.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_ConstantDefinition.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_ExpressionAssistent.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_FuncParaDecl.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_FunctionAssistent.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_FunctionDefinition.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_GuardOverview.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_InscriptionOverview.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_RandomColor.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_RandomMarking.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_TwinNetSetting.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_VariableDefinition.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_WDG_ArcInscription.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_WDG_ColExtMarkingList.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_WDG_DeclarationTreectrl.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_WDG_Guard.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColPlacesSelection.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStEditTablePlot.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStFunctionOverview.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStMarkingOverview.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStSimulationResults.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStUnfolding.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_PlacesSelection.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_WDG_ColStFunctionList.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_WDG_ColStMarkingList.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\TraceAnalyzer\SP_DLG_ColAuxiliaryVariable.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\TraceAnalyzer\SP_DLG_ColColoredPlaceSelection.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ContinuousPN\SP_DLG_CPNSimulationResults.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_HybridPN\SP_DLG_HybridMarkingOverview.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_HybridPN\SP_DLG_HybridSimultionResults.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColCPN\SP_DLG_ColCPNSimulationResults.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SteeringGUI\SP_DLG_ChangeCurveAttributes.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SteeringGUI\SP_DLG_SelectNodes.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SteeringGUI\SP_DLG_SimulatorSetting.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SteeringGUI\SP_DS_GUI_SteeringSetting.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SteeringGUI\SP_GUI_ConnectToServer.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SteeringGUI\SP_GUI_SelectEditingList.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SteeringGUI\SP_GUI_SteeringDialog.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SteeringGUI\SP_GUI_SteeringOptions.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_SteeringGUI\SP_GUI_SteeringSubWindow.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColHPN\SP_DLG_ColHPNSimultionResults.h" />
+    <ClInclude Include="sp_gui\layout\SP_Layout.h" />
+    <ClInclude Include="sp_gui\layout\SP_LayoutOGDF.h" />
+    <ClInclude Include="sp_gui\interaction\SP_IA_Event.h" />
+    <ClInclude Include="sp_gui\interaction\SP_IA_Manager.h" />
+    <ClInclude Include="sp_gui\interaction\SP_IA_XmlReader.h" />
+    <ClInclude Include="sp_gui\interaction\SP_IA_XmlWriter.h" />
+    <ClInclude Include="sp_gui\interaction\commands\SP_IA_Command.h" />
+    <ClInclude Include="sp_gui\interaction\commands\SP_IA_Command_Colorize.h" />
+    <ClInclude Include="sp_gui\interaction\commands\SP_IA_Command_Delete.h" />
+    <ClInclude Include="sp_gui\interaction\commands\SP_IA_Command_Hide.h" />
+    <ClInclude Include="sp_gui\interaction\commands\SP_IA_Command_Insert.h" />
+    <ClInclude Include="sp_gui\interaction\commands\SP_IA_Command_SetAttribute.h" />
+    <ClInclude Include="sp_gui\interaction\commands\SP_IA_Command_UnHide.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DataProcessor.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_AttributeTranslator.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_ConverterQuantity2Value.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_ConverterValue2Quantity.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_ElementCreator.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_Filter.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_FilterByAttribute.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_FilterByClass.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_MapperByAttribute.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_RGEdgeSourceSetter.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_Setter.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_SetterByClass.h" />
+    <ClInclude Include="sp_gui\interaction\data_processors\SP_IA_DP_SetterByPosition.h" />
+    <ClInclude Include="sp_gui\commands\SP_CMD_ColorizeGraphic.h" />
+    <ClInclude Include="sp_gui\commands\SP_CMD_Edit.h" />
+    <ClInclude Include="export\SP_CTL_SMART.h" />
+    <ClInclude Include="export\SP_EPSDC.h" />
+    <ClInclude Include="export\SP_EXP_MIFDC.h" />
+    <ClInclude Include="export\SP_Export2HPN.h" />
+    <ClInclude Include="export\SP_ExportANDL.h" />
+    <ClInclude Include="export\SP_ExportAPNN.h" />
+    <ClInclude Include="export\SP_ExportCANDL.h" />
+    <ClInclude Include="export\SP_ExportColCPN2ColExtPT.h" />
+    <ClInclude Include="export\SP_ExportColCPN2ColHPN.h" />
+    <ClInclude Include="export\SP_ExportColCPN2ColPT.h" />
+    <ClInclude Include="export\SP_ExportColCPN2ColSPN.h" />
+    <ClInclude Include="export\SP_ExportColCPN2ContPed.h" />
+    <ClInclude Include="export\SP_ExportColCPN2CSV.h" />
+    <ClInclude Include="export\SP_ExportColEPN2ColHPN.h" />
+    <ClInclude Include="export\SP_ExportColExtPT2ColCPN.h" />
+    <ClInclude Include="export\SP_ExportColExtPT2ColPN.h" />
+    <ClInclude Include="export\SP_ExportColExtPT2ColStPN.h" />
+    <ClInclude Include="export\SP_ExportColExtPT2CPNTool.h" />
+    <ClInclude Include="export\SP_ExportColExtPT2CSV.h" />
+    <ClInclude Include="export\SP_ExportColExtPT2ExtPT.h" />
+    <ClInclude Include="export\SP_ExportColHPN2ColCPN.h" />
+    <ClInclude Include="export\SP_ExportColHPN2ColEPN.h" />
+    <ClInclude Include="export\SP_ExportColHPN2ColPN.h" />
+    <ClInclude Include="export\SP_ExportColHPN2ColSPN.h" />
+    <ClInclude Include="export\SP_ExportColHPN2HybridPN.h" />
+    <ClInclude Include="export\SP_ExportColPN2ANDL.h" />
+    <ClInclude Include="export\SP_ExportColPN2APNN.h" />
+    <ClInclude Include="export\SP_ExportColPN2ColHPN.h" />
+    <ClInclude Include="export\SP_ExportColPT2ColCPN.h" />
+    <ClInclude Include="export\SP_ExportColPT2ColExtPN.h" />
+    <ClInclude Include="export\SP_ExportColPT2ColStPN.h" />
+    <ClInclude Include="export\SP_ExportColPT2CSV.h" />
+    <ClInclude Include="export\SP_ExportColPT2PT.h" />
+    <ClInclude Include="export\SP_ExportColPT2Structure.h" />
+    <ClInclude Include="export\SP_ExportColSPN2ColCPN.h" />
+    <ClInclude Include="export\SP_ExportColSPN2ColHPN.h" />
+    <ClInclude Include="export\SP_ExportColSPN2CSV.h" />
+    <ClInclude Include="export\SP_ExportColStPN2ColExPN.h" />
+    <ClInclude Include="export\SP_ExportColStPN2ColPT.h" />
+    <ClInclude Include="export\SP_ExportColStPN2StochPed.h" />
+    <ClInclude Include="export\SP_ExportConfiguration.h" />
+    <ClInclude Include="export\SP_ExportContODE2Octave.h" />
+    <ClInclude Include="export\SP_ExportContODE2Text.h" />
+    <ClInclude Include="export\SP_ExportContPed2ColCPT.h" />
+    <ClInclude Include="export\SP_ExportContPed2ExtPT.h" />
+    <ClInclude Include="export\SP_ExportContPed2LaTeX.h" />
+    <ClInclude Include="export\SP_ExportContPed2METATOOL.h" />
+    <ClInclude Include="export\SP_ExportContPed2Ped.h" />
+    <ClInclude Include="export\SP_ExportContPed2PedConservative.h" />
+    <ClInclude Include="export\SP_ExportContPed2PedConvert.h" />
+    <ClInclude Include="export\SP_ExportContPed2PedRed.h" />
+    <ClInclude Include="export\SP_ExportContPed2SBML.h" />
+    <ClInclude Include="export\SP_ExportContPed2StochPed.h" />
+    <ClInclude Include="export\SP_ExportCPN2Matlab.h" />
+    <ClInclude Include="export\SP_ExportCPP.h" />
+    <ClInclude Include="export\SP_ExportCSV.h" />
+    <ClInclude Include="export\SP_ExportCUDA.h" />
+    <ClInclude Include="export\SP_ExportEPS.h" />
+    <ClInclude Include="export\SP_ExportExtPT2ColExtPT.h" />
+    <ClInclude Include="export\SP_ExportExtPT2ContPed.h" />
+    <ClInclude Include="export\SP_ExportExtPT2Ped.h" />
+    <ClInclude Include="export\SP_ExportExtPT2StochPed.h" />
+    <ClInclude Include="export\SP_ExportFAU.h" />
+    <ClInclude Include="export\SP_ExportFTree2ExtFTree.h" />
+    <ClInclude Include="export\SP_ExportGCM.h" />
+    <ClInclude Include="export\SP_ExportHPN2CPN.h" />
+    <ClInclude Include="export\SP_ExportHPN2SPN.h" />
+    <ClInclude Include="export\SP_ExportHybridPN2ColHybridPN.h" />
+    <ClInclude Include="export\SP_ExportINA.h" />
+    <ClInclude Include="export\SP_ExportLatex.h" />
+    <ClInclude Include="export\SP_ExportLLPEP.h" />
+    <ClInclude Include="export\SP_ExportLoLA.h" />
+    <ClInclude Include="export\SP_ExportManager.h" />
+    <ClInclude Include="export\SP_ExportMaria.h" />
+    <ClInclude Include="export\SP_ExportMETATOOL.h" />
+    <ClInclude Include="export\SP_ExportMIF.h" />
+    <ClInclude Include="export\SP_ExportModelica.h" />
+    <ClInclude Include="export\SP_ExportModuloNets2Ped.h" />
+    <ClInclude Include="export\SP_ExportMusicPed2Ped.h" />
+    <ClInclude Include="export\SP_ExportPed2ColExtPT.h" />
+    <ClInclude Include="export\SP_ExportPed2ColPT.h" />
+    <ClInclude Include="export\SP_ExportPed2ContPed.h" />
+    <ClInclude Include="export\SP_ExportPed2ExtPT.h" />
+    <ClInclude Include="export\SP_ExportPed2ModuloNets.h" />
+    <ClInclude Include="export\SP_ExportPed2MusicPed.h" />
+    <ClInclude Include="export\SP_ExportPed2StochPed.h" />
+    <ClInclude Include="export\SP_ExportPed2TimePT.h" />
+    <ClInclude Include="export\SP_ExportPNML.h" />
+    <ClInclude Include="export\SP_ExportPRISM.h" />
+    <ClInclude Include="export\SP_ExportProd.h" />
+    <ClInclude Include="export\SP_ExportPT.h" />
+    <ClInclude Include="export\SP_ExportRomeo.h" />
+    <ClInclude Include="export\SP_ExportRoutine.h" />
+    <ClInclude Include="export\SP_ExportSBML.h" />
+    <ClInclude Include="export\SP_ExportSMART.h" />
+    <ClInclude Include="export\SP_ExportSPN2Matlab.h" />
+    <ClInclude Include="export\SP_ExportStochPed2ColSPT.h" />
+    <ClInclude Include="export\SP_ExportStochPed2ContPed.h" />
+    <ClInclude Include="export\SP_ExportStochPed2ExtPT.h" />
+    <ClInclude Include="export\SP_ExportStochPed2Ped.h" />
+    <ClInclude Include="export\SP_ExportStochPed2TimePT.h" />
+    <ClInclude Include="export\SP_ExportSyRePa.h" />
+    <ClInclude Include="export\SP_ExportTIM.h" />
+    <ClInclude Include="export\SP_ExportTimePT2Ped.h" />
+    <ClInclude Include="export\SP_ExportTINA.h" />
+    <ClInclude Include="export\SP_ExportTMD.h" />
+    <ClInclude Include="export\SP_ExportTPN2Matlab.h" />
+    <ClInclude Include="export\SP_ExportXfig.h" />
+    <ClInclude Include="export\SP_IL_SMART.h" />
+    <ClInclude Include="export\SP_LatexDC.h" />
+    <ClInclude Include="export\SP_XfigDC.h" />
+    <ClInclude Include="import\SP_ImportANDL.h" />
+    <ClInclude Include="import\SP_ImportAPNN.h" />
+    <ClInclude Include="import\SP_ImportCANDL.h" />
+    <ClInclude Include="import\SP_ImportCSV.h" />
+    <ClInclude Include="import\SP_ImportCSV2ColPN.h" />
+    <ClInclude Include="import\SP_ImportCSV2SPN.h" />
+    <ClInclude Include="import\SP_ImportFTree_DNF.h" />
+    <ClInclude Include="import\SP_ImportManager.h" />
+    <ClInclude Include="import\SP_ImportPED.h" />
+    <ClInclude Include="import\SP_ImportRoutine.h" />
+    <ClInclude Include="import\SP_ImportSBML.h" />
+    <ClInclude Include="import\SP_ImportSBML2cntPn.h" />
+    <ClInclude Include="import\SP_ImportSBML2extPN.h" />
+    <ClInclude Include="import\SP_ImportSBML2sPn.h" />
+    <ClInclude Include="import\SP_ImportTINA.h" />
+    <ClInclude Include="snoopy.h" />
+    <ClInclude Include="sp_build.h" />
+    <ClInclude Include="sp_defines.h" />
+    <ClInclude Include="sp_revision.h" />
+    <ClInclude Include="sp_utilities.h" />
+    <ClInclude Include="wx_intellisense.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="export\SP_ExportColPN2SBML.cpp" />
+    <ClCompile Include="export\SP_ExportColPN2SSC.cpp" />
+    <ClCompile Include="sp_core\SP_Core.cpp" />
+    <ClCompile Include="sp_core\SP_Deque.cpp" />
+    <ClCompile Include="sp_core\SP_GPR_Animation.cpp" />
+    <ClCompile Include="sp_core\SP_GPR_Base.cpp" />
+    <ClCompile Include="sp_core\SP_GPR_Canvas.cpp" />
+    <ClCompile Include="sp_core\SP_GPR_Elements.cpp" />
+    <ClCompile Include="sp_core\SP_GPR_Fonts.cpp" />
+    <ClCompile Include="sp_core\SP_List.cpp" />
+    <ClCompile Include="sp_core\SP_Map.cpp" />
+    <ClCompile Include="sp_core\SP_Matrix.cpp" />
+    <ClCompile Include="sp_core\SP_PriorityQueue.cpp" />
+    <ClCompile Include="sp_core\SP_Reader.cpp" />
+    <ClCompile Include="sp_core\SP_Set.cpp" />
+    <ClCompile Include="sp_core\SP_Signer.cpp" />
+    <ClCompile Include="sp_core\SP_Vector.cpp" />
+    <ClCompile Include="sp_core\SP_Writer.cpp" />
+    <ClCompile Include="sp_core\SP_XmlReader.cpp" />
+    <ClCompile Include="sp_core\SP_XmlWriter.cpp" />
+    <ClCompile Include="sp_core\base\SP_Animator.cpp" />
+    <ClCompile Include="sp_core\base\SP_Data.cpp" />
+    <ClCompile Include="sp_core\base\SP_ElementClass.cpp" />
+    <ClCompile Include="sp_core\base\SP_Graphic.cpp" />
+    <ClCompile Include="sp_core\base\SP_NetElement.cpp" />
+    <ClCompile Include="sp_core\tools\CyclicGraph.cpp" />
+    <ClCompile Include="sp_core\tools\rfdag.cpp" />
+    <ClCompile Include="sp_core\tools\SP_ExpressionTree.cpp" />
+    <ClCompile Include="sp_core\tools\SP_FTreeNodeColourizer.cpp" />
+    <ClCompile Include="sp_core\tools\SP_NodeColourizer.cpp" />
+    <ClCompile Include="sp_core\vector\SP_VectorParser.cpp" />
+    <ClCompile Include="sp_core\vector\SP_VectorReader.cpp" />
+    <ClCompile Include="sp_core\vector\SP_VectorScanner.cpp" />
+    <ClCompile Include="sp_core\vector\SP_VectorWriter.cpp" />
+    <ClCompile Include="sp_core\FTree\SP_FTree_TermParser.cpp" />
+    <ClCompile Include="sp_core\FTree\SP_FTree_TermScanner.cpp" />
+    <ClCompile Include="sp_core\TParser\SP_Parser.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_Animation.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_FunctionEvaluator.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_FunctionRegistry.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_Transformer.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_Animator.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_Attribute.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_Edge.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_Edgeclass.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_Graph.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_Metadata.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_Metadataclass.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_Netclass.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_Node.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_Nodeclass.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_NodeVector.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_NodeVectorSystem.cpp" />
+    <ClCompile Include="sp_ds\SP_DS_Visitor.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_Boolattribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_ColListAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_DoubleAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_DoubleListAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_DoubleMarkingAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_DoubleMarkingDependentMultiplicity.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_DoubleMultiplicityAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_EquationAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_ExpressionAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_ExtIdAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_ExtTextAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_FTreeLogicAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_FTreeNumberAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_IdAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_ListAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_LogicAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_MarkingAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_MarkingDependentMultiplicity.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_MultiplicityAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_NameAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_NumberAttribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_Textattribute.cpp" />
+    <ClCompile Include="sp_ds\attributes\SP_DS_TypeAttribute.cpp" />
+    <ClCompile Include="sp_ds\animators\SP_DS_CoarseTransAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\SP_DS_ExtPTPlaceAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\SP_DS_ExtPTTransAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\SP_DS_FTreeEventAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\SP_DS_FTreeGateAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\SP_DS_ModNetPlaceAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\SP_DS_MusTransAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\SP_DS_PlaceAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\SP_DS_TransAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\ani_CPN\SP_DS_CPN_Animation.cpp" />
+    <ClCompile Include="sp_ds\animators\ani_CPN\SP_DS_CPN_CoarseTransAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\ani_CPN\SP_DS_CPN_PlaceAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\ani_CPN\SP_DS_CPN_TransAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\ani_ColSPN\SP_DS_ColStAnimation.cpp" />
+    <ClCompile Include="sp_ds\animators\ani_ColSPN\SP_DS_ColStCoarseTransAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\ani_ColSPN\SP_DS_ColStPlaceAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\ani_ColSPN\SP_DS_ColStTransAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\ani_HybridPN\SP_DS_HybridAnimation.cpp" />
+    <ClCompile Include="sp_ds\animators\ani_SPN\SP_DS_StPlaceAnimator.cpp" />
+    <ClCompile Include="sp_ds\animators\ani_SPN\SP_DS_StTransAnimator.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_Coarse.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_ContinuousPedAnimation.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_Export.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_Formula.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_FTreePedAnimation.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_Import.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_MusicPedAnimation.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_NetCreater.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_PedAnimation.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_Simulation.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_SimulatorThread.cpp" />
+    <ClCompile Include="sp_ds\extensions\SP_DS_ThreadEvent.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeAlgebraicEquationCreater.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeAnalyser.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeCreater.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeCutSetsCreater.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeDeMorganTransformer.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeDNFCreater.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeExprOfSuccessTreeCreater.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeIrreparableSystemAnalyser.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeLogicalExpressionReader.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreePseudoFormCreater.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeReductionFinder.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeReductionTransformer.cpp" />
+    <ClCompile Include="sp_ds\extensions\Ftree\SP_DS_FTreeRepairableSystemAnalyser.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_ApFormula.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_ApParser.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_SimulatorThreadStochastic.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_StAnimation.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_StAnimationRunElem.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_StParser.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_StSimFAU.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_StSimGillespie.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_StSimImmediateTransitionList.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_StSimPlace.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_StSimTimeEvent.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_StSimTimeEventTimeline.cpp" />
+    <ClCompile Include="sp_ds\extensions\ext_SPN\SP_DS_StSimTransition.cpp" />
+    <ClCompile Include="sp_ds\extensions\continuous\SP_DS_ContinuousPlaceFormula.cpp" />
+    <ClCompile Include="sp_ds\extensions\continuous\SP_DS_EquationParser.cpp" />
+    <ClCompile Include="sp_ds\extensions\continuous\SP_DS_EquationParserConstant.cpp" />
+    <ClCompile Include="sp_ds\extensions\continuous\SP_DS_EquationParserObject.cpp" />
+    <ClCompile Include="sp_ds\extensions\continuous\SP_DS_EquationParserOperator.cpp" />
+    <ClCompile Include="sp_ds\extensions\continuous\SP_DS_EquationParserVariable.cpp" />
+    <ClCompile Include="sp_ds\extensions\continuous\SP_DS_PlaceODE.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\FlexBison\SP_CPN_Driver.cc" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\FlexBison\SP_CPN_Parse_Context.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\FlexBison\SP_CPN_Parser.cc" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\FlexBison\SP_CPN_Scanner.cc" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\SyntaxChecking\SP_CPN_ColorProcessing.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\SyntaxChecking\SP_CPN_SyntaxChecking.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\ColorSetProcessing\SP_CPN_Binding.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\ColorSetProcessing\SP_CPN_ColorSet.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\ColorSetProcessing\SP_CPN_ColorSetClass.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\ColorSetProcessing\SP_CPN_PlaceMultiSet.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\ColorSetProcessing\SP_CPN_ValueAssign.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\Transform\SP_CPNToolXmlWriter.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\Folding\SP_CPN_GenMasterNet.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\Folding\SP_CPN_GenTwinNet.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\Preprocessing\SP_ColPN_ComBinding.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\Preprocessing\SP_ColPN_ProcessGuard.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_PN\Preprocessing\SP_ColPN_ProcessRateFunction.cpp" />
+    <ClCompile Include="sp_ds\extensions\HybridPN\SP_DS_CheckTransitions.cpp" />
+    <ClCompile Include="sp_ds\extensions\HybridPN\SP_DS_SimulatorThreadHybrid.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_CPN\SP_DS_ColCPNPlaceFormula.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_CPN\SP_DS_ColPlaceODE.cpp" />
+    <ClCompile Include="sp_ds\extensions\ResultViewer\SP_DS_HistogramPlotViewer.cpp" />
+    <ClCompile Include="sp_ds\extensions\ResultViewer\SP_DS_PlotViewer.cpp" />
+    <ClCompile Include="sp_ds\extensions\ResultViewer\SP_DS_ResultViewer.cpp" />
+    <ClCompile Include="sp_ds\extensions\ResultViewer\SP_DS_TableViewer.cpp" />
+    <ClCompile Include="sp_ds\extensions\ResultViewer\SP_DS_ViewerCurve.cpp" />
+    <ClCompile Include="sp_ds\extensions\ResultViewer\SP_DS_xyPlotViewer.cpp" />
+    <ClCompile Include="sp_ds\extensions\ResultViewer\AttributeTypes\SP_DS_ViewerAttribute.cpp" />
+    <ClCompile Include="sp_ds\extensions\ResultViewer\AttributeTypes\SP_DS_ViewerAttributeCheckBox.cpp" />
+    <ClCompile Include="sp_ds\extensions\ResultViewer\AttributeTypes\SP_DS_ViewerAttributeList.cpp" />
+    <ClCompile Include="sp_ds\extensions\ResultViewer\AttributeTypes\SP_DS_ViewerAttributeText.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_ColCSPSovler.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_ColoredPNSimulation.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_ColPN_ExportUnfolding.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_ColPN_Unfolding.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_ColTraceAnalyzer.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_ColUnfoldFile.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_BipartGraph.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_ColCPN.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_ColExtPT.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_ColHPN.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_ColPT.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_ColSPN.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_ContinuousPed.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_EventSPN.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_ExtendedFaultTree.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_ExtPT.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_FaultTree.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_Freestyle.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_HybridPN.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_ModuloNets.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_MTBDD.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_MTIDD.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_MusicPed.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_ReachabilityGraph.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_SimpleGraph.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_SimplePed.cpp" />
+    <ClCompile Include="sp_ds\netclasses\SP_DS_TimePT.cpp" />
+    <ClCompile Include="sp_gr\metadata\SP_GR_MetaComposite.cpp" />
+    <ClCompile Include="sp_gr\SP_GR_Animator.cpp" />
+    <ClCompile Include="sp_gr\SP_GR_Attribute.cpp" />
+    <ClCompile Include="sp_gr\SP_GR_Edge.cpp" />
+    <ClCompile Include="sp_gr\SP_GR_Metadata.cpp" />
+    <ClCompile Include="sp_gr\SP_GR_Node.cpp" />
+    <ClCompile Include="sp_gr\base\SP_GR_BaseBitmap.cpp" />
+    <ClCompile Include="sp_gr\base\SP_GR_BaseCircle.cpp" />
+    <ClCompile Include="sp_gr\base\SP_GR_BaseDrawn.cpp" />
+    <ClCompile Include="sp_gr\base\SP_GR_BaseEdge.cpp" />
+    <ClCompile Include="sp_gr\base\SP_GR_BaseEllipse.cpp" />
+    <ClCompile Include="sp_gr\base\SP_GR_BaseRectangle.cpp" />
+    <ClCompile Include="sp_gr\base\SP_GR_BaseText.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_ColListAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_CommentAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_ContinuousMarkAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_DoubleAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_DoubleMarkAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_DoubleMultiplicityAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_HiddenTextAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_ImageAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_MarkAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_MarkNumberAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_MultiplicityAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_NumberAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\SP_GR_Textattribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\gra_SPN\SP_GR_StFunctionAttribute.cpp" />
+    <ClCompile Include="sp_gr\attributes\gra_SPN\SP_GR_StParameterListAttribute.cpp" />
+    <ClCompile Include="sp_gr\eventhandler\SP_GRM_AttributeHandler.cpp" />
+    <ClCompile Include="sp_gr\eventhandler\SP_GRM_EdgeHandler.cpp" />
+    <ClCompile Include="sp_gr\eventhandler\SP_GRM_EventHandler.cpp" />
+    <ClCompile Include="sp_gr\eventhandler\SP_GRM_ShapeHandler.cpp" />
+    <ClCompile Include="sp_gr\eventhandler\SP_GRM_UpwardHandler.cpp" />
+    <ClCompile Include="sp_gr\edges\SP_GR_ArrowEdge.cpp" />
+    <ClCompile Include="sp_gr\edges\SP_GR_ExtendedEdge.cpp" />
+    <ClCompile Include="sp_gr\edges\SP_GR_FaultEdge.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_Actor.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_Circle.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_Condition.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_DrawnShape.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_Ellipse.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_EllipseNoMerge.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_ExtendedAction.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_ExtendedCircle.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_ExtendedDrawnShape.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_ExtendedEllipse.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_ExtendedPaPLoop.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_ExtendedParallelogram.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_ExtendedParameterCondition.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_ExtendedRectangle.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_ExtendedRhombus.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_ExtendedState.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_GateRectangle.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_MusicTransition.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_NamedRectangle.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_Rectangle.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_RectangleNoMerge.cpp" />
+    <ClCompile Include="sp_gr\shapes\SP_GR_Rhombus.cpp" />
+    <ClCompile Include="sp_gr\animators\SP_GR_MarkAnimator.cpp" />
+    <ClCompile Include="sp_gr\metadata\SP_GR_MetaDrawnShape.cpp" />
+    <ClCompile Include="sp_gr\metadata\SP_GR_MetaRectangle.cpp" />
+    <ClCompile Include="sp_gr\metadata\SP_GR_PlotSymbol.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_CPNDeclaration.cpp" />
+    <ClCompile Include="sp_gui\windows\SP_GUI_Canvas.cpp" />
+    <ClCompile Include="sp_gui\windows\SP_GUI_Childframe.cpp" />
+    <ClCompile Include="sp_gui\windows\SP_GUI_DevbarContainer.cpp" />
+    <ClCompile Include="sp_gui\windows\SP_GUI_LogWindow.cpp" />
+    <ClCompile Include="sp_gui\windows\SP_GUI_Mainframe.cpp" />
+    <ClCompile Include="sp_gui\management\SP_GM_Docmanager.cpp" />
+    <ClCompile Include="sp_gui\management\SP_GM_DocTemplate.cpp" />
+    <ClCompile Include="sp_gui\mdi\SP_MDI_CoarseDoc.cpp" />
+    <ClCompile Include="sp_gui\mdi\SP_MDI_CoarseView.cpp" />
+    <ClCompile Include="sp_gui\mdi\SP_MDI_Diagram.cpp" />
+    <ClCompile Include="sp_gui\mdi\SP_MDI_Doc.cpp" />
+    <ClCompile Include="sp_gui\mdi\SP_MDI_View.cpp" />
+    <ClCompile Include="sp_gui\widgets\SP_WDG_CoarseTreectrl.cpp" />
+    <ClCompile Include="sp_gui\widgets\SP_WDG_GraphTreectrl.cpp" />
+    <ClCompile Include="sp_gui\widgets\SP_WDG_Notebook.cpp" />
+    <ClCompile Include="sp_gui\widgets\SP_WDG_NotebookPage.cpp" />
+    <ClCompile Include="sp_gui\widgets\SP_WDG_Toolbar.cpp" />
+    <ClCompile Include="sp_gui\widgets\SP_WDG_Treebook.cpp" />
+    <ClCompile Include="sp_gui\widgets\SP_WDG_Treectrl.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogBase.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogBool.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogChoice.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogColList.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogExtendedGraphic.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogFilename.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogGraphic.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogList.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogMultiline.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogNumber.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogShowOnly.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogSoundList.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogText.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_DialogUnsigned.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_GridCellChoiceEditor.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\SP_WDG_SpinCtrlDouble.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\wid_dia_SPN\SP_WDG_StDummyMarking.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\wid_dia_SPN\SP_WDG_StFunctionList.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\wid_dia_SPN\SP_WDG_StLookupTable.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\wid_dia_SPN\SP_WDG_StLookupTableName.cpp" />
+    <ClCompile Include="sp_gui\widgets\dialogs\wid_dia_SPN\SP_WDG_StParameterList.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_About.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_Animation.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_AnimationProperties.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ApplySound.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_CheckDuplicateNodes.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_CheckForUpdate.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_CheckNet.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ChooseFTreeCutSet.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ChooseFTreeReduction.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ChooseInvariant.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ChoseCoarse.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ColListOverview.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ConvertElements.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ExportProperties.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_GlobalPreferences.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_GraphProperties.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_IACommandConfigure.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_IAConfigure.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_IARegCmdList.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ImportSBML2extPN.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_LayoutProperties.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_MarkingOverview.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_NetInformations.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_NewConstantDefinition.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ReduceFTree.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ResultViewerProperties.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_SaveContinuousEquationProperties.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_SearchId.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_SelectXAxisVariable.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ShapeProperties.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ShowAllModelView.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_Simulation.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_SimulationParamterSelection.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_SimulationPlaceSelection.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_SimulationProperties.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_SMART.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_SortNodes.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_TransformGraphic.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StDirectExportProperties.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StEditTablePlot.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StFunctionAssistent.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StFunctionOverview.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StMarkingOverview.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StParameterOverview.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StSimulationResults.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StTransformation.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_BindingSelection.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_ChooseMasterNet.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_ColorSetOverview.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_ColorSetSelection.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_ColorSetSetting.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_ConstantDefinition.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_ExpressionAssistent.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_FuncParaDecl.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_FunctionAssistent.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_FunctionDefinition.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_GuardOverview.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_InscriptionOverview.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_RandomColor.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_RandomMarking.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_TwinNetSetting.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_VariableDefinition.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_WDG_ArcInscription.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_WDG_ColExtMarkingList.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_WDG_DeclarationTreectrl.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_WDG_Guard.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColPlacesSelection.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStEditTablePlot.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStFunctionOverview.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStMarkingOverview.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStSimulationResults.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStUnfolding.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_PlacesSelection.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_WDG_ColStFunctionList.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_WDG_ColStMarkingList.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\TraceAnalyzer\SP_DLG_ColAuxiliaryVariable.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\TraceAnalyzer\SP_DLG_ColColoredPlaceSelection.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ContinuousPN\SP_DLG_CPNSimulationResults.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_HybridPN\SP_DLG_HybridMarkingOverview.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_HybridPN\SP_DLG_HybridSimultionResults.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColCPN\SP_DLG_ColCPNSimulationResults.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SteeringGUI\SP_DLG_ChangeCurveAttributes.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SteeringGUI\SP_DLG_SelectNodes.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SteeringGUI\SP_DLG_SimulatorSetting.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SteeringGUI\SP_DS_GUI_SteeringSetting.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SteeringGUI\SP_GUI_ConnectToServer.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SteeringGUI\SP_GUI_SelectEditingList.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SteeringGUI\SP_GUI_SteeringDialog.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SteeringGUI\SP_GUI_SteeringOptions.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_SteeringGUI\SP_GUI_SteeringSubWindow.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColHPN\SP_DLG_ColHPNSimultionResults.cpp" />
+    <ClCompile Include="sp_gui\layout\SP_Layout.cpp" />
+    <ClCompile Include="sp_gui\layout\SP_LayoutOGDF.cpp" />
+    <ClCompile Include="sp_gui\interaction\SP_IA_Event.cpp" />
+    <ClCompile Include="sp_gui\interaction\SP_IA_Manager.cpp" />
+    <ClCompile Include="sp_gui\interaction\SP_IA_XmlReader.cpp" />
+    <ClCompile Include="sp_gui\interaction\SP_IA_XmlWriter.cpp" />
+    <ClCompile Include="sp_gui\interaction\commands\SP_IA_Command.cpp" />
+    <ClCompile Include="sp_gui\interaction\commands\SP_IA_Command_Colorize.cpp" />
+    <ClCompile Include="sp_gui\interaction\commands\SP_IA_Command_Delete.cpp" />
+    <ClCompile Include="sp_gui\interaction\commands\SP_IA_Command_Hide.cpp" />
+    <ClCompile Include="sp_gui\interaction\commands\SP_IA_Command_Insert.cpp" />
+    <ClCompile Include="sp_gui\interaction\commands\SP_IA_Command_SetAttribute.cpp" />
+    <ClCompile Include="sp_gui\interaction\commands\SP_IA_Command_UnHide.cpp" />
+    <ClCompile Include="sp_gui\interaction\data_processors\SP_IA_DataProcessor.cpp" />
+    <ClCompile Include="sp_gui\interaction\data_processors\SP_IA_DP_AttributeTranslator.cpp" />
+    <ClCompile Include="sp_gui\interaction\data_processors\SP_IA_DP_ConverterQuantity2Value.cpp" />
+    <ClCompile Include="sp_gui\interaction\data_processors\SP_IA_DP_ConverterValue2Quantity.cpp" />
+    <ClCompile Include="sp_gui\interaction\data_processors\SP_IA_DP_ElementCreator.cpp" />
+    <ClCompile Include="sp_gui\interaction\data_processors\SP_IA_DP_FilterByAttribute.cpp" />
+    <ClCompile Include="sp_gui\interaction\data_processors\SP_IA_DP_FilterByClass.cpp" />
+    <ClCompile Include="sp_gui\interaction\data_processors\SP_IA_DP_MapperByAttribute.cpp" />
+    <ClCompile Include="sp_gui\interaction\data_processors\SP_IA_DP_RGEdgeSourceSetter.cpp" />
+    <ClCompile Include="sp_gui\interaction\data_processors\SP_IA_DP_SetterByClass.cpp" />
+    <ClCompile Include="sp_gui\interaction\data_processors\SP_IA_DP_SetterByPosition.cpp" />
+    <ClCompile Include="sp_gui\commands\SP_CMD_ColorizeGraphic.cpp" />
+    <ClCompile Include="sp_gui\commands\SP_CMD_Edit.cpp" />
+    <ClCompile Include="export\SP_CTL_SMART.cpp" />
+    <ClCompile Include="export\SP_EPSDC.cpp" />
+    <ClCompile Include="export\SP_EXP_MIFDC.cpp" />
+    <ClCompile Include="export\SP_Export2HPN.cpp" />
+    <ClCompile Include="export\SP_ExportANDL.cpp" />
+    <ClCompile Include="export\SP_ExportAPNN.cpp" />
+    <ClCompile Include="export\SP_ExportCANDL.cpp" />
+    <ClCompile Include="export\SP_ExportColCPN2ColExtPT.cpp" />
+    <ClCompile Include="export\SP_ExportColCPN2ColHPN.cpp" />
+    <ClCompile Include="export\SP_ExportColCPN2ColPT.cpp" />
+    <ClCompile Include="export\SP_ExportColCPN2ColSPN.cpp" />
+    <ClCompile Include="export\SP_ExportColCPN2ContPed.cpp" />
+    <ClCompile Include="export\SP_ExportColCPN2CSV.cpp" />
+    <ClCompile Include="export\SP_ExportColEPN2ColHPN.cpp" />
+    <ClCompile Include="export\SP_ExportColExtPT2ColCPN.cpp" />
+    <ClCompile Include="export\SP_ExportColExtPT2ColPN.cpp" />
+    <ClCompile Include="export\SP_ExportColExtPT2ColStPN.cpp" />
+    <ClCompile Include="export\SP_ExportColExtPT2CPNTool.cpp" />
+    <ClCompile Include="export\SP_ExportColExtPT2CSV.cpp" />
+    <ClCompile Include="export\SP_ExportColExtPT2ExtPT.cpp" />
+    <ClCompile Include="export\SP_ExportColHPN2ColCPN.cpp" />
+    <ClCompile Include="export\SP_ExportColHPN2ColEPN.cpp" />
+    <ClCompile Include="export\SP_ExportColHPN2ColPN.cpp" />
+    <ClCompile Include="export\SP_ExportColHPN2ColSPN.cpp" />
+    <ClCompile Include="export\SP_ExportColHPN2HybridPN.cpp" />
+    <ClCompile Include="export\SP_ExportColPN2ANDL.cpp" />
+    <ClCompile Include="export\SP_ExportColPN2APNN.cpp" />
+    <ClCompile Include="export\SP_ExportColPN2ColHPN.cpp" />
+    <ClCompile Include="export\SP_ExportColPT2ColCPN.cpp" />
+    <ClCompile Include="export\SP_ExportColPT2ColExtPN.cpp" />
+    <ClCompile Include="export\SP_ExportColPT2ColStPN.cpp" />
+    <ClCompile Include="export\SP_ExportColPT2CSV.cpp" />
+    <ClCompile Include="export\SP_ExportColPT2PT.cpp" />
+    <ClCompile Include="export\SP_ExportColPT2Structure.cpp" />
+    <ClCompile Include="export\SP_ExportColSPN2ColCPN.cpp" />
+    <ClCompile Include="export\SP_ExportColSPN2ColHPN.cpp" />
+    <ClCompile Include="export\SP_ExportColSPN2CSV.cpp" />
+    <ClCompile Include="export\SP_ExportColStPN2ColExPN.cpp" />
+    <ClCompile Include="export\SP_ExportColStPN2ColPT.cpp" />
+    <ClCompile Include="export\SP_ExportColStPN2StochPed.cpp" />
+    <ClCompile Include="export\SP_ExportConfiguration.cpp" />
+    <ClCompile Include="export\SP_ExportContODE2Octave.cpp" />
+    <ClCompile Include="export\SP_ExportContODE2Text.cpp" />
+    <ClCompile Include="export\SP_ExportContPed2ColCPT.cpp" />
+    <ClCompile Include="export\SP_ExportContPed2ExtPT.cpp" />
+    <ClCompile Include="export\SP_ExportContPed2LaTeX.cpp" />
+    <ClCompile Include="export\SP_ExportContPed2METATOOL.cpp" />
+    <ClCompile Include="export\SP_ExportContPed2Ped.cpp" />
+    <ClCompile Include="export\SP_ExportContPed2PedConservative.cpp" />
+    <ClCompile Include="export\SP_ExportContPed2PedConvert.cpp" />
+    <ClCompile Include="export\SP_ExportContPed2PedRed.cpp" />
+    <ClCompile Include="export\SP_ExportContPed2SBML.cpp" />
+    <ClCompile Include="export\SP_ExportContPed2StochPed.cpp" />
+    <ClCompile Include="export\SP_ExportCPN2Matlab.cpp" />
+    <ClCompile Include="export\SP_ExportCPP.cpp" />
+    <ClCompile Include="export\SP_ExportCSV.cpp" />
+    <ClCompile Include="export\SP_ExportCUDA.cpp" />
+    <ClCompile Include="export\SP_ExportEPS.cpp" />
+    <ClCompile Include="export\SP_ExportExtPT2ColExtPT.cpp" />
+    <ClCompile Include="export\SP_ExportExtPT2ContPed.cpp" />
+    <ClCompile Include="export\SP_ExportExtPT2Ped.cpp" />
+    <ClCompile Include="export\SP_ExportExtPT2StochPed.cpp" />
+    <ClCompile Include="export\SP_ExportFAU.cpp" />
+    <ClCompile Include="export\SP_ExportFTree2ExtFTree.cpp" />
+    <ClCompile Include="export\SP_ExportGCM.cpp" />
+    <ClCompile Include="export\SP_ExportHPN2CPN.cpp" />
+    <ClCompile Include="export\SP_ExportHPN2SPN.cpp" />
+    <ClCompile Include="export\SP_ExportHybridPN2ColHybridPN.cpp" />
+    <ClCompile Include="export\SP_ExportINA.cpp" />
+    <ClCompile Include="export\SP_ExportLatex.cpp" />
+    <ClCompile Include="export\SP_ExportLLPEP.cpp" />
+    <ClCompile Include="export\SP_ExportLoLA.cpp" />
+    <ClCompile Include="export\SP_ExportManager.cpp" />
+    <ClCompile Include="export\SP_ExportMaria.cpp" />
+    <ClCompile Include="export\SP_ExportMETATOOL.cpp" />
+    <ClCompile Include="export\SP_ExportMIF.cpp" />
+    <ClCompile Include="export\SP_ExportModelica.cpp" />
+    <ClCompile Include="export\SP_ExportModuloNets2Ped.cpp" />
+    <ClCompile Include="export\SP_ExportMusicPed2Ped.cpp" />
+    <ClCompile Include="export\SP_ExportPed2ColExtPT.cpp" />
+    <ClCompile Include="export\SP_ExportPed2ColPT.cpp" />
+    <ClCompile Include="export\SP_ExportPed2ContPed.cpp" />
+    <ClCompile Include="export\SP_ExportPed2ExtPT.cpp" />
+    <ClCompile Include="export\SP_ExportPed2ModuloNets.cpp" />
+    <ClCompile Include="export\SP_ExportPed2MusicPed.cpp" />
+    <ClCompile Include="export\SP_ExportPed2StochPed.cpp" />
+    <ClCompile Include="export\SP_ExportPed2TimePT.cpp" />
+    <ClCompile Include="export\SP_ExportPNML.cpp" />
+    <ClCompile Include="export\SP_ExportPRISM.cpp" />
+    <ClCompile Include="export\SP_ExportProd.cpp" />
+    <ClCompile Include="export\SP_ExportPT.cpp" />
+    <ClCompile Include="export\SP_ExportRomeo.cpp" />
+    <ClCompile Include="export\SP_ExportSBML.cpp" />
+    <ClCompile Include="export\SP_ExportSMART.cpp" />
+    <ClCompile Include="export\SP_ExportSPN2Matlab.cpp" />
+    <ClCompile Include="export\SP_ExportStochPed2ColSPT.cpp" />
+    <ClCompile Include="export\SP_ExportStochPed2ContPed.cpp" />
+    <ClCompile Include="export\SP_ExportStochPed2ExtPT.cpp" />
+    <ClCompile Include="export\SP_ExportStochPed2Ped.cpp" />
+    <ClCompile Include="export\SP_ExportStochPed2TimePT.cpp" />
+    <ClCompile Include="export\SP_ExportSyRePa.cpp" />
+    <ClCompile Include="export\SP_ExportTIM.cpp" />
+    <ClCompile Include="export\SP_ExportTimePT2Ped.cpp" />
+    <ClCompile Include="export\SP_ExportTINA.cpp" />
+    <ClCompile Include="export\SP_ExportTMD.cpp" />
+    <ClCompile Include="export\SP_ExportTPN2Matlab.cpp" />
+    <ClCompile Include="export\SP_ExportXfig.cpp" />
+    <ClCompile Include="export\SP_IL_SMART.cpp" />
+    <ClCompile Include="export\SP_LatexDC.cpp" />
+    <ClCompile Include="export\SP_XfigDC.cpp" />
+    <ClCompile Include="import\SP_ImportANDL.cpp" />
+    <ClCompile Include="import\SP_ImportAPNN.cpp" />
+    <ClCompile Include="import\SP_ImportCANDL.cpp" />
+    <ClCompile Include="import\SP_ImportCSV.cpp" />
+    <ClCompile Include="import\SP_ImportCSV2ColPN.cpp" />
+    <ClCompile Include="import\SP_ImportCSV2SPN.cpp" />
+    <ClCompile Include="import\SP_ImportFTree_DNF.cpp" />
+    <ClCompile Include="import\SP_ImportManager.cpp" />
+    <ClCompile Include="import\SP_ImportPED.cpp" />
+    <ClCompile Include="import\SP_ImportSBML.cpp" />
+    <ClCompile Include="import\SP_ImportSBML2cntPn.cpp" />
+    <ClCompile Include="import\SP_ImportSBML2extPN.cpp" />
+    <ClCompile Include="import\SP_ImportSBML2sPn.cpp" />
+    <ClCompile Include="import\SP_ImportTINA.cpp" />
+    <ClCompile Include="snoopy.cpp" />
+    <ClCompile Include="sp_utilities.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\win-flex-bison\custom_build_rules\win_flex_bison_custom_build.targets" />
+  </ImportGroup>
+</Project>

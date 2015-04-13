@@ -1,0 +1,114 @@
+//////////////////////////////////////////////////////////////////////
+// $Source: $
+// $Author: mf $
+// $Version: 0.0 $
+// $Revision: 1.30 $
+// $Date: 2003/09/12 11:55:00 $
+// Short Description:
+//////////////////////////////////////////////////////////////////////
+#ifndef __SP_UTILITIES_H__
+#define __SP_UTILITIES_H__
+
+#include "sp_defines.h"
+#include <wx/gdicmn.h>
+#include <wx/dialog.h>
+#include <wx/grid.h>
+
+void SP_LOGDEBUG(const wxString& s);
+void SP_LOGMESSAGE(const wxString& s);
+void SP_LOGWARNING(const wxString& s);
+void SP_LOGERROR(const wxString& s);
+
+
+/**	\brief	The SP_RectAroundOrigin function
+
+	\param	p_nX1	X coord of the first point
+	\param	p_nY1	Y coord of the first point
+	\param	p_nX2	X coord of the second point
+	\param	p_nY2	Y coord of the second point
+	\param	p_nMarg margin to be used as tolerance
+
+	\return	bool    TRUE if the points build up a rect around (,0) FALSE otherwise
+
+	Helperfunction to test, whether two points span a rectangle, the origin (0,0)
+    lies in completely or on one of the side lines.
+    This function is mainly used to add control points to edges by left clicking
+    on an edge with CTRL key hold down.
+*/
+bool SP_RectAroundOrigin(double p_nX1, double p_nY1,
+                         double p_nX2, double p_nY2,
+                         int p_nMarg = 2);
+
+double SP_CalculateDistance(wxRealPoint*, wxRealPoint*);
+
+// wrapperfunction for wxMessageBox()
+// creates custom MessageBox on MacOSX
+// calls wxMessageBox on other Systems (GTK, MSW, ...)
+int SP_MESSAGEBOX(const wxString& message,
+                        const wxString& caption = wxT("Default caption"),
+                        long style = wxOK | wxCENTRE,
+                        wxWindow *parent = NULL,
+                        int x = wxDefaultCoord, int y = wxDefaultCoord);
+
+// global function to auto size the rowlabels of a wxgrid
+void SP_AutoSizeRowLabelSize(wxGrid* p_Grid);
+
+/**
+ * @return: random double value from [0,1]
+ */
+double SP_RandomDouble();
+
+/**
+ * @return: random double value from [0,1)
+ */
+double SP_RandomDoubleExc();
+
+/**
+ * @return: random double value from (0,1)
+ */
+double SP_RandomDoubleDblExc();
+
+/**
+ * @return: random unsigned long value from [0,p_nUpperbound)
+ */
+unsigned long SP_RandomLong(unsigned long p_nUpperbound);
+
+/**
+ * convert Num to std::string
+ * @return: std::string
+ */
+template<typename T>std::string SP_ToString(T p_Param)
+{
+	std::stringstream l_StringStream;
+	std::string l_String;
+	try
+	{
+		l_StringStream << p_Param;
+	}catch(...)
+	{
+		assert("Error in Function SP_ToString!");
+	}
+	l_String = l_StringStream.str();
+	return l_String;
+}
+
+template<typename T>
+wxString SP_ToWxString(T p_Param)
+{
+	wxString r;
+	r << p_Param;
+	return r;
+}
+
+/**
+ * copy of wxNumberFormatter::AddThousandsSeparators
+ */
+bool SP_FormatWithComma(wxString& s);
+
+/**	\brief	replaces all non-alphanum chars with "_"
+	\param	string to normalize
+	\return	wxString
+*/
+wxString SP_NormalizeString (const wxString& p_sS);
+
+#endif //__SP_UTILITIES_H__

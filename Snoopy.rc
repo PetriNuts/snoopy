@@ -1,0 +1,169 @@
+//Microsoft Developer Studio generated resource script.
+//
+//#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+AAAA                    ICON    DISCARDABLE     "snoopy.ico"
+WXSTD_MDIPARENTFRAME    ICON    DISCARDABLE     "snoopy.ico"
+WXSTD_MDICHILDFRAME     ICON    DISCARDABLE     "snoopy.ico"
+SNOOPY                  ICON    DISCARDABLE     "snoopy.ico"
+FILE_NORM               ICON    DISCARDABLE     "bitmaps/file_norm.ico"
+FILE_SEL                ICON    DISCARDABLE     "bitmaps/file_sel.ico"
+FOLDER_NORM             ICON    DISCARDABLE     "bitmaps/folder_norm.ico"
+FOLDER_SEL              ICON    DISCARDABLE     "bitmaps/folder_sel.ico"
+FOLDER_OPEN             ICON    DISCARDABLE     "bitmaps/folder_open.ico"
+//WXICON_SMALL_CLOSED_FOLDER ICON    DISCARDABLE     "wx/msw/folder1.ico"
+WXICON_SMALL_OPEN_FOLDER ICON    DISCARDABLE     "wx/msw/folder2.ico"
+WXICON_SMALL_FILE       ICON    DISCARDABLE     "wx/msw/file1.ico"
+WXICON_SMALL_COMPUTER   ICON    DISCARDABLE     "wx/msw/computer.ico"
+WXICON_SMALL_DRIVE      ICON    DISCARDABLE     "wx/msw/drive.ico"
+WXICON_SMALL_CDROM      ICON    DISCARDABLE     "wx/msw/cdrom.ico"
+WXICON_SMALL_FLOPPY     ICON    DISCARDABLE     "wx/msw/floppy.ico"
+WXICON_SMALL_REMOVEABLE ICON    DISCARDABLE     "wx/msw/removble.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+BITMAP_ANIM_PLAY_BWD    BITMAP  MOVEABLE PURE   "bitmaps/anim_play_bwd.bmp"
+BITMAP_ANIM_STEP_BWD    BITMAP  MOVEABLE PURE   "bitmaps/anim_step_bwd.bmp"
+BITMAP_ANIM_RESET       BITMAP  MOVEABLE PURE   "bitmaps/anim_reset.bmp"
+BITMAP_ANIM_STEP_FWD    BITMAP  MOVEABLE PURE   "bitmaps/anim_step_fwd.bmp"
+BITMAP_ANIM_PLAY_FWD    BITMAP  MOVEABLE PURE   "bitmaps/anim_play_fwd.bmp"
+BITMAP_ANIM_PAUSE       BITMAP  MOVEABLE PURE   "bitmaps/anim_pause.bmp"
+WXDISABLE_BUTTON_BITMAP BITMAP  MOVEABLE PURE   "wx/msw/disable.bmp"
+BITMAP_FILE_NORM        BITMAP  MOVEABLE PURE   "bitmaps/file_norm.bmp"
+BITMAP_FILE_SEL         BITMAP  MOVEABLE PURE   "bitmaps/file_sel.bmp"
+BITMAP_FOLDER_NORM      BITMAP  MOVEABLE PURE   "bitmaps/folder_norm.bmp"
+BITMAP_FOLDER_SEL       BITMAP  MOVEABLE PURE   "bitmaps/folder_sel.bmp"
+BITMAP_FOLDER_OPEN      BITMAP  MOVEABLE PURE   "bitmaps/folder_open.bmp"
+BITMAP_NEW              BITMAP  MOVEABLE PURE   "bitmaps/new.bmp"
+BITMAP_OPEN             BITMAP  MOVEABLE PURE   "bitmaps/open.bmp"
+BITMAP_SAVE             BITMAP  MOVEABLE PURE   "bitmaps/save.bmp"
+BITMAP_COPY             BITMAP  MOVEABLE PURE   "bitmaps/copy.bmp"
+BITMAP_CUT              BITMAP  MOVEABLE PURE   "bitmaps/cut.bmp"
+BITMAP_PASTE            BITMAP  MOVEABLE PURE   "bitmaps/paste.bmp"
+BITMAP_PRINT            BITMAP  MOVEABLE PURE   "bitmaps/print.bmp"
+BITMAP_HELP             BITMAP  MOVEABLE PURE   "bitmaps/help.bmp"
+BITMAP_UNDO             BITMAP  MOVEABLE PURE   "bitmaps/undo.bmp"
+BITMAP_REDO             BITMAP  MOVEABLE PURE   "bitmaps/redo.bmp"
+BITMAP_SELECT           BITMAP  MOVEABLE PURE   "bitmaps/select.bmp"
+BITMAP_MODIFY           BITMAP  MOVEABLE PURE   "bitmaps/modify.bmp"
+CSQUERY                 BITMAP  MOVEABLE PURE   "bitmaps/csquery.bmp"
+WXBITMAP_STD_COLOURS    BITMAP  MOVEABLE PURE   "bitmaps/wxbitmap.bmp"
+PLOT_DWN_BMP            BITMAP  MOVEABLE PURE   "wx/plot/plot_dwn.bmp"
+PLOT_UP_BMP             BITMAP  MOVEABLE PURE   "wx/plot/plot_up.bmp"
+PLOT_ENL_BMP            BITMAP  MOVEABLE PURE   "wx/plot/plot_enl.bmp"
+PLOT_SHR_BMP            BITMAP  MOVEABLE PURE   "wx/plot/plot_shr.bmp"
+PLOT_ZIN_BMP            BITMAP  MOVEABLE PURE   "wx/plot/plot_zin.bmp"
+PLOT_ZOT_BMP            BITMAP  MOVEABLE PURE   "wx/plot/plot_zot.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+WXWINDOWMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&Cascade",                    4002
+        MENUITEM "Tile &Horizontally",          4001
+        MENUITEM "Tile &Vertically",            4005
+        MENUITEM "",                            65535
+        MENUITEM "&Arrange Icons",              4003
+        MENUITEM "&Next",                       4004
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+WXCURSOR_HAND           CURSOR  DISCARDABLE     "wx/msw/hand.cur"
+WXCURSOR_BULLSEYE       CURSOR  DISCARDABLE     "wx/msw/bullseye.cur"
+WXCURSOR_PENCIL         CURSOR  DISCARDABLE     "wx/msw/pencil.cur"
+WXCURSOR_MAGNIFIER      CURSOR  DISCARDABLE     "wx/msw/magnif1.cur"
+WXCURSOR_NO_ENTRY       CURSOR  DISCARDABLE     "wx/msw/noentry.cur"
+WXCURSOR_SIZING         CURSOR  DISCARDABLE     "wx/msw/size.cur"
+WXCURSOR_ROLLER         CURSOR  DISCARDABLE     "wx/msw/roller.cur"
+WXCURSOR_WATCH          CURSOR  DISCARDABLE     "wx/msw/watch1.cur"
+WXCURSOR_PBRUSH         CURSOR  DISCARDABLE     "wx/msw/pbrush.cur"
+WXCURSOR_PLEFT          CURSOR  DISCARDABLE     "wx/msw/pntleft.cur"
+WXCURSOR_PRIGHT         CURSOR  DISCARDABLE     "wx/msw/pntright.cur"
+WXCURSOR_QARROW         CURSOR  DISCARDABLE     "wx/msw/query.cur"
+WXCURSOR_BLANK          CURSOR  DISCARDABLE     "wx/msw/blank.cur"
+WXCURSOR_RIGHT_ARROW    CURSOR  DISCARDABLE     "wx/msw/rightarr.cur"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
