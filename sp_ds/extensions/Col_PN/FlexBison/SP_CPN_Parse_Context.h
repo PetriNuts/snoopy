@@ -2311,7 +2311,7 @@ private:
 	//void PrintErrorMessage();
 };
 
-typedef Sh_ptr<SP_CPN_Parse_Context> SP_CPN_Parse_Context_ptr;
+typedef std::shared_ptr<SP_CPN_Parse_Context> SP_CPN_Parse_Context_ptr;
 
 SP_CPN_Parse_Context_ptr make_CPN_Parse_Context();
 

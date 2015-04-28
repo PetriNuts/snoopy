@@ -31,12 +31,12 @@ class SP_ExportColPN2SBML: public SP_ExportPT
 	SBMLDocument* m_pcSbmlDoc;
 	Model* m_pcSbmlModel;
 
-  bool WritePlaces(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding);
-  bool WritePlaceClass(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding, const SP_CPN_UnfoldedPlaces& p_pmmUnfoldedPlaces);
-  bool WriteTransitions(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding);
-  bool WriteTransitionClass(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding, const SP_CPN_UnfoldedTransitions& p_mmUnfoldedTransions);
-  bool WriteParameters(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding);
-  bool WriteArcs(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding, const vector<SP_CPN_UnfoldedArcInfo>& p_vArcs, wxString& p_sConditions, wxString& p_sUpdates, bool p_bInput,Reaction* l_pcReaction );
+  bool WritePlaces(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding);
+  bool WritePlaceClass(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding, const SP_CPN_UnfoldedPlaces& p_pmmUnfoldedPlaces);
+  bool WriteTransitions(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding);
+  bool WriteTransitionClass(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding, const SP_CPN_UnfoldedTransitions& p_mmUnfoldedTransions);
+  bool WriteParameters(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding);
+  bool WriteArcs(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding, const vector<SP_CPN_UnfoldedArcInfo>& p_vArcs, wxString& p_sConditions, wxString& p_sUpdates, bool p_bInput,Reaction* l_pcReaction );
   virtual bool DoWrite();
   bool WriteConstants();
   bool ValidateSBML();

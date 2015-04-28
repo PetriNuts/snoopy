@@ -14,7 +14,12 @@
 #include "sp_ds/extensions/SP_DS_Coarse.h"
 #include "sp_gui/mdi/SP_MDI_CoarseDoc.h"
 
-#include<wx/wx.h>
+#include <wx/wx.h>
+#include <wx/txtstrm.h>
+#include <wx/sstream.h>
+#include <wx/stream.h>
+#include <wx/process.h>
+
 #include <wx/cmndata.h>
 #include <wx/scrolbar.h>
 #include <wx/vscroll.h>
@@ -25,11 +30,17 @@
 #include <wx/popupwin.h>
 #include <wx/dialog.h>
 #include <wx/collpane.h>
+#include <wx/regex.h>
 
 #include <wx/dc.h>
 #include <wx/paper.h>
 #include <wx/tokenzr.h>
 #include <wx/filename.h>
+#include <algorithm>     //for sort() function
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
+#include <wx/filefn.h>   //for file and directory functions
 
 enum {
 	SP_GENERATEPDF_CHECKBOX_SELECTED = SP_ID_LAST_ID + 1,
@@ -47,12 +58,15 @@ enum {
 	SP_ID_BUTTON_GRAPH_DOWN,
 
 	SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS_GRAPH,
-	SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS_DEC
+	SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS_DEC,
+
+	SP_REGEX_GRAPH,
+	SP_REGEX_DEC
 };
 
 SP_ExportLatex::SP_ExportLatex()
 {
-	//general tab options
+	//General tab options
 	tabs_items.Add("Basics");
 	tabs_items.Add("Graph Elements");
 	tabs_items.Add("Declarations");
@@ -120,6 +134,7 @@ SP_ExportLatex::SP_ExportLatex()
 	m_pcMeta = NULL;
 	m_pcCoarseTreectrl = NULL;
 	l_pcTree = NULL;
+	m_flagImages = 0;
 
 }
 
@@ -129,7 +144,7 @@ SP_ExportLatex::AddToDialog(SP_DLG_ExportProperties* p_pcDlg, SP_MDI_Doc* p_pcDo
 	SP_LOGMESSAGE("inside AddToDialog for SP_ExportLatex");
 
 	//Change notebook size for export to latex
-	p_pcDlg->SetNotebookSize(550, 420);
+	p_pcDlg->SetNotebookSize(550, 380);
 
 	this->p_pcDoc = p_pcDoc;
 	this->p_pcDlg = p_pcDlg;
@@ -170,10 +185,15 @@ SP_ExportLatex::AddToDialog(SP_DLG_ExportProperties* p_pcDlg, SP_MDI_Doc* p_pcDo
     SP_Name2Metadata.clear();
     SP_NetNumber2Label.clear();
 
+    m_pEdgesPlace2Transition.clear();
+    m_pEdgesTransition2Place.clear();
+    SP_Edgeclass2EdgeList.clear();
+
     m_nSelectionId_Graph = 0;
     m_nSelectionId_Declarations = 0;
 
-  //  arrays.Clear();
+    SP_Node2AttrNameMap.clear();
+    SP_DecNode2DecAttrNameMap.clear();
 
 	LoadData();
 
@@ -213,29 +233,112 @@ SP_ExportLatex::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
   WriteLatex();
   EndDoc();
 
-  /*
-  SP_LatexDC latexDC (*pd);
+  wxDELETE(pd);
+  //export to latex done here
+  //now export to pdf
 
-#if wxABI_VERSION < 30000
-  latexDC.SetResolution(72);
+  if(m_pcCheckBoxDirectPDF->IsChecked() ) {
+
+#ifdef __APPLE__
+
+	  SP_LOGMESSAGE("##################It is Apple");
+	  wxString l_sFilePath = m_sFilePath;
+	  const wxString cmd = wxT("which pdflatex");
+
+	  wxArrayString output, errors;
+	  int code = wxExecute(cmd, output, errors);
+
+	  for(int i = 0; i < output.size(); i++) {
+		  SP_LOGMESSAGE( wxT("output string = ") + output[i]);
+	  }
+
+	  for(int i = 0; i < errors.size(); i++) {
+		  SP_LOGMESSAGE( wxT("error string = ") + errors[i]);
+	  }
+
+	  output.clear();
+	  errors.clear();
+
+	  ///////////////////////////////////////////////////
+	  //Sets the latex file directory as current working directory
+	  if( wxSetWorkingDirectory( l_sFilePath ) ) {
+		  SP_LOGMESSAGE( wxT("Current working directory set.") );
+	  } else {
+		  SP_LOGMESSAGE( wxT("Failed to set Current working directory.") );
+	  }
+
+	  //Make a new folder PDF
+	  if( wxMkdir( wxT("PDF") ) ) {
+		  SP_LOGMESSAGE( wxT("New folder created in ") + wxGetCwd() );
+	  } else {
+		  SP_LOGMESSAGE( wxT("Failed to set Current working directory.") );
+	  }
+
+	  wxString l_sMainFileName = m_printData.GetFilename();
+	  l_sMainFileName = l_sMainFileName.AfterLast('/');
+
+	 /* for(int i = 0; i < l_sFilePath.length(); i++) {
+		  if(l_sFilePath[i] == ' ') {
+			  l_sFilePath = l_sFilePath.SubString(0, i-1) + wxT("\\") + l_sFilePath.SubString(i, l_sFilePath.Length()-1);
+			  i++;
+		  }
+	  } */
+
+	  for(int i = 0; i < l_sMainFileName.length(); i++) {
+		  if(l_sMainFileName[i] == ' ') {
+			  l_sMainFileName = l_sMainFileName.SubString(0, i-1) + wxT("\\") + l_sMainFileName.SubString(i, l_sMainFileName.Length()-1);
+			  i++;
+		  }
+	  }
+
+
+	  //wxString command = "/usr/texbin/pdflatex -output-directory " + l_sFilePath + " " + l_sMainFileName;
+	  //wxString command = "/usr/texbin/latexmk -pdf -silent " + l_sMainFileName;
+
+	  wxString command;
+
+	  if( m_rbPdfLatex->GetValue() ) {
+		  command = wxT("/usr/texbin/pdflatex -synctex=1 -interaction=nonstopmode -output-directory ./PDF/ ") + l_sMainFileName;
+
+		  int l_pcLog = wxExecute(command, output, errors);
+		  l_pcLog = wxExecute(command, output, errors);
+		  l_pcLog = wxExecute(command, output, errors);
+		  SP_LOGMESSAGE( wxT("Exporting to pdf: ") + command);
+
+		  for(int i = 0; i < output.size(); i++) {
+			  SP_LOGMESSAGE( wxT("output string = ") + output[i]);
+		  }
+
+		  for(int i = 0; i < errors.size(); i++) {
+			  SP_LOGMESSAGE( wxT("error string = ") + errors[i]);
+		  }
+
+	  } else {
+		  command = wxT("/usr/texbin/latexmk -pdf -jobname=./PDF/") + l_sMainFileName.BeforeLast('.') + wxT(" ") + l_sMainFileName;
+
+		  int l_pcLog = wxExecute(command, output, errors);
+		  SP_LOGMESSAGE( wxT("Exporting to pdf: ") + command);
+
+		  for(int i = 0; i < output.size(); i++) {
+			  SP_LOGMESSAGE( wxT("output string = ") + output[i]);
+		  }
+
+		  for(int i = 0; i < errors.size(); i++) {
+			  SP_LOGMESSAGE( wxT("error string = ") + errors[i]);
+		  }
+		  //std::system( command.ToUTF8() );
+	  }
+
+#elif linux
+
+	  SP_LOGMESSAGE("##################It is Linux");
+
+#elif _WIN32
+	  SP_LOGMESSAGE("##################It is Windows");
+
 #endif
 
-  latexDC.StartDoc(p_fileName);
-
-  wxNode *node = p_doc->GetDiagram()->GetShapeList()->GetFirst();
-
-  while (node) {
-    wxShape *shape = (wxShape*)node->GetData();
-    //shape->Select(FALSE);
-    shape->Draw(latexDC);
-    node = node->GetNext();
   }
-
-  latexDC.EndDoc();
-
-  */
-
-  wxDELETE(pd);
 
   return  !m_bError;
 }
@@ -255,6 +358,8 @@ SP_ExportLatex::LoadData()
     SP_ListAttribute::const_iterator itAttr;
     int i = 0;
     wxArrayString arrays;
+    map<wxString, wxString> l_AttrNameMap;
+    map<wxString, wxString> l_DecAttrNameMap;
 
     for (itNC = m_pcGraph->GetNodeclasses()->begin(); itNC != m_pcGraph->GetNodeclasses()->end(); ++itNC) {
 
@@ -268,23 +373,31 @@ SP_ExportLatex::LoadData()
     		itAttr = l_pcNode->GetAttributes()->begin();
 
     		arrays.Clear();
+    		l_AttrNameMap.clear();
 
     		for(;itAttr != l_pcNode->GetAttributes()->end(); itAttr++)
     	    {
     		    arrays.Add( (*itAttr)->GetDisplayName() );
+    		    l_AttrNameMap.insert( pair<wxString, wxString> ( (*itAttr)->GetDisplayName(), (*itAttr)->GetName()));
     		}
 
     		if( l_pcNode->GetClassName() == wxT("Coarse Place") || l_pcNode->GetClassName() == wxT("Coarse Transition") )
     		{
     			arrays.Add(wxT("Net number") );
+    			l_AttrNameMap.insert( pair<wxString, wxString> ( wxT("Net number"), wxT("Net number") ));
     		}
 
     		arrays.Add(wxT("Cross Refs.") );
+    		l_AttrNameMap.insert( pair<wxString, wxString> ( wxT("Cross Refs."), wxT("Cross Refs.") ));
 
-    		if( l_pcNode->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )
+    		if( l_pcNode->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) {
     			arrays.Add( wxT("Order Lexicographically") );
+    			l_AttrNameMap.insert( pair<wxString, wxString> (  wxT("Order Lexicographically"), wxT("Order Lexicographically") ));
+    		}
 
     		SP_Node2Attributes.insert(pair<int, wxArrayString > (i, arrays) );
+    		SP_Node2AttrNameMap.insert(pair<wxString, map<wxString, wxString> > (l_sNodename, l_AttrNameMap) );
+
     		SP_Index2Node.insert(pair<int, wxString> (i, l_sNodename) );
     		SP_LOGMESSAGE(l_sNodename + wxT("-"));
     	}
@@ -304,16 +417,21 @@ SP_ExportLatex::LoadData()
     	if( l_pcEdge ) {
 
         	arrays.Clear();
+        	l_AttrNameMap.clear();
 
         	for(itAttr = l_pcEdge->GetAttributes()->begin();itAttr != l_pcEdge->GetAttributes()->end(); itAttr++)
         	{
         	    arrays.Add( (*itAttr)->GetDisplayName() );
+        	    l_AttrNameMap.insert( pair<wxString, wxString> ( (*itAttr)->GetDisplayName(), (*itAttr)->GetName()));
         	}
 
-        	if( l_pcEdge->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )
+        	if( l_pcEdge->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) {
         		arrays.Add( wxT("Order Lexicographically") );
+        		l_AttrNameMap.insert( pair<wxString, wxString> (  wxT("Order Lexicographically"), wxT("Order Lexicographically") ));
+        	}
 
         	SP_Node2Attributes.insert(pair<int, wxArrayString > (i, arrays) );
+        	SP_Node2AttrNameMap.insert(pair<wxString, map<wxString, wxString> > (l_sEdgename, l_AttrNameMap) );
         	SP_Index2Node.insert(pair<int, wxString> (i, l_sEdgename) );
 
     	}
@@ -340,18 +458,32 @@ SP_ExportLatex::LoadData()
         		itAttr = l_pcMeta->GetAttributes()->begin();
 
         		arrays.Clear();
+        		l_AttrNameMap.clear();
 
+        		if( l_sMetaname.compare( wxT("Comment") ) == 0) { //first column for comments
+        		    arrays.Add( wxT("Net reference") );
+        		    l_AttrNameMap.insert( pair<wxString, wxString> ( wxT("Net reference"), wxT("Net reference")));
+        		}
 
         		for(;itAttr != l_pcMeta->GetAttributes()->end(); itAttr++)
         		{
         			arrays.Add( (*itAttr)->GetDisplayName() );
-        			SP_LOGMESSAGE( (*itAttr)->GetDisplayName() + wxT(" -> Meta") );
+        			l_AttrNameMap.insert( pair<wxString, wxString> ( (*itAttr)->GetDisplayName(), (*itAttr)->GetName()));
+        			//SP_LOGMESSAGE( (*itAttr)->GetDisplayName() + wxT(" -> Meta") );
         		}
 
-        		if( l_pcMeta->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )
+        		if( l_sMetaname.compare( wxT("Image") ) == 0) {
+        		    arrays.Add( wxT("Image reference") );
+        		    l_AttrNameMap.insert( pair<wxString, wxString> (  wxT("Image reference"), wxT("Image reference") ));
+        		}
+
+        		if( l_pcMeta->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) {
         			arrays.Add( wxT("Order Lexicographically") );
+        			l_AttrNameMap.insert( pair<wxString, wxString> (  wxT("Order Lexicographically"), wxT("Order Lexicographically") ));
+        		}
 
         		SP_Node2Attributes.insert(pair<int, wxArrayString > (i, arrays) );
+        		SP_Node2AttrNameMap.insert(pair<wxString, map<wxString, wxString> > (l_sMetaname, l_AttrNameMap) );
         		SP_Index2Node.insert(pair<int, wxString> (i, l_sMetaname) );
 
     		}
@@ -362,7 +494,7 @@ SP_ExportLatex::LoadData()
 
    //loads Declarations into the export dialog/////////////////////////////////
 
-    i = 0;
+     i = 0;
  	 if( ((m_pcGraph->GetNetclass()->GetName()==SP_DS_COLSPN_CLASS)
  		 || (m_pcGraph->GetNetclass()->GetName()==SP_DS_COLCPN_CLASS)
  		 || (m_pcGraph->GetNetclass()->GetName()==SP_DS_COLPN_CLASS)
@@ -372,66 +504,131 @@ SP_ExportLatex::LoadData()
 
  		for (itMC = m_pcGraph->GetMetadataclasses()->begin(); itMC != m_pcGraph->GetMetadataclasses()->end(); ++itMC)
  		{
- 			if( (*itMC)->GetShowInDeclarationTreeColorSet() )
+ 			if( (*itMC)->GetShowInDeclarationTreeColorSet() || (*itMC)->GetShowInDeclarationTreeOther() )
  			{
  				wxString l_sMetaname = (*itMC)->GetDisplayName();
  				m_Options_Declarations.Add(  l_sMetaname );
  				m_Options_Declarations_order.Add(i);
  				//SP_LOGMESSAGE( l_sMetaname + wxT("->>"));
 
- 				l_pcMeta = (*itMC)->GetPrototype();
-
- 				if( l_pcMeta ) {
- 					itAttr = l_pcMeta->GetAttributes()->begin();
+ 				if( (*itMC) ) {
  					arrays.Clear();
 
- 					for(;itAttr != l_pcMeta->GetAttributes()->end(); itAttr++)
- 					{
- 						arrays.Add( (*itAttr)->GetDisplayName() );
- 					//	SP_LOGMESSAGE( (*itAttr)->GetDisplayName() + wxT(" -> Declarations") );
+ 					//explicitly added column names to COLLIST attributes in colored nets
+ 					if( l_sMetaname.compare( wxT("Simple Color Sets")) == 0) {
+ 						arrays.Add( wxT("Name") );
+ 						arrays.Add( wxT("Type") );
+ 						arrays.Add( wxT("Colors") );
+ 						arrays.Add( wxT("Place Color") );
+
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Name"), wxT("Name") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Type"), wxT("Type") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Colors"), wxT("Colors") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Place Color"), wxT("Place Color") ) );
+
+ 					} else if( l_sMetaname.compare( wxT("Compound Color Sets")) == 0) {
+ 						arrays.Add( wxT("Name") );
+ 						arrays.Add( wxT("Type") );
+ 						arrays.Add( wxT("Component color sets") );
+ 						arrays.Add( wxT("Colors") );
+ 						arrays.Add( wxT("Place Color") );
+
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Name"), wxT("Name") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Type"), wxT("Type") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Component color sets"), wxT("Component color sets") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Colors"), wxT("Colors") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Place Color"), wxT("Place Color") ) );
+
+ 					} else if( l_sMetaname.compare( wxT("Alias Color Sets")) == 0) {
+ 						arrays.Add( wxT("Alias name") );
+ 						arrays.Add( wxT("Original color set") );
+
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Alias name"), wxT("Alias name") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Original color set"), wxT("Original color set") ) );
+
+ 					} else if( l_sMetaname.compare( wxT("Constants")) == 0) {
+ 						arrays.Add( wxT("Name") );
+ 						arrays.Add( wxT("Type") );
+ 						arrays.Add( wxT("Value") );
+ 						arrays.Add( wxT("Comment") );
+
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Name"), wxT("Name") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Type"), wxT("Type") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Value"), wxT("Value") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Comment"), wxT("Comment") ) );
+
+ 					} else if( l_sMetaname.compare( wxT("Functions")) == 0) {
+ 						arrays.Add( wxT("Return Type") );
+ 						arrays.Add( wxT("Function Name") );
+ 						arrays.Add( wxT("Parameter List") );
+ 						arrays.Add( wxT("Function Body") );
+ 						arrays.Add( wxT("Comment") );
+
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Return Type"), wxT("Return Type") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Function Name"), wxT("Function Name") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Parameter List"), wxT("Parameter List") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Function Body"), wxT("Function Body") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Comment"), wxT("Comment") ) );
+
+ 					} else if( l_sMetaname.compare( wxT("Variables")) == 0) {
+ 						arrays.Add( wxT("Name") );
+ 						arrays.Add( wxT("Color Set") );
+ 						arrays.Add( wxT("Comment") );
+
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Name"), wxT("Name") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Color Set"), wxT("Color Set") ) );
+ 						l_DecAttrNameMap.insert( pair<wxString, wxString> ( wxT("Comment"), wxT("Comment") ) );
  					}
 
- 					if( l_pcMeta->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )
- 					    arrays.Add( wxT("Order Lexicographically") );
-
- 				    SP_DecNode2Attributes.insert(pair<int, wxArrayString > (i, arrays) );
- 				    SP_Index2DecNode.insert(pair<int, wxString> (i, l_sMetaname) );
- 					i++;
+ 					SP_DecNode2Attributes.insert(pair<int, wxArrayString > (i, arrays) );
+					SP_DecNode2DecAttrNameMap.insert(pair<wxString, map<wxString, wxString> > (l_sMetaname, l_DecAttrNameMap) );
+					SP_Index2DecNode.insert(pair<int, wxString> (i, l_sMetaname) );
+					i++;
  				}
  		    }
  		}
+
+ 	 } else {
+
+ 	 	for (itMC = m_pcGraph->GetMetadataclasses()->begin(); itMC != m_pcGraph->GetMetadataclasses()->end(); ++itMC)
+ 	 	{
+ 	       if( (*itMC)->GetShowInDeclarationTreeOther() )
+ 	       {
+ 	    	   wxString l_sMetaname = (*itMC)->GetDisplayName();
+ 	    	   m_Options_Declarations.Add( l_sMetaname );
+ 	    	   m_Options_Declarations_order.Add(i);
+ 	    	 //  SP_LOGMESSAGE( l_sMetaname + wxT("->>"));
+
+ 	    	   l_pcMeta = (*itMC)->GetPrototype();
+
+ 	    	   if( l_pcMeta ) {
+
+ 	    		   itAttr = l_pcMeta->GetAttributes()->begin();
+ 	    	       arrays.Clear();
+ 	    	       l_DecAttrNameMap.clear();
+
+ 	    	       for(;itAttr != l_pcMeta->GetAttributes()->end(); itAttr++)
+ 	    	       {
+ 	    	    		arrays.Add( (*itAttr)->GetDisplayName() );
+ 	    	    		l_DecAttrNameMap.insert( pair<wxString, wxString> ( (*itAttr)->GetDisplayName(), (*itAttr)->GetName()));
+ 	    	    		//SP_LOGMESSAGE( (*itAttr)->GetDisplayName() + wxT(" -> Declarations") );
+ 	    	       }
+
+ 				   if( l_pcMeta->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) {
+ 					    arrays.Add( wxT("Order Lexicographically") );
+ 					    l_DecAttrNameMap.insert( pair<wxString, wxString> (  wxT("Order Lexicographically"), wxT("Order Lexicographically") ));
+ 				   }
+
+ 	    	       SP_DecNode2Attributes.insert(pair<int, wxArrayString > (i, arrays) );
+ 	    	       SP_DecNode2DecAttrNameMap.insert(pair<wxString, map<wxString, wxString> > (l_sMetaname, l_DecAttrNameMap) );
+ 	    	       SP_Index2DecNode.insert(pair<int, wxString> (i, l_sMetaname) );
+ 	    	       i++;
+ 	    	   }
+ 	       }
+ 	     }
+
  	 }
 
- 	for (itMC = m_pcGraph->GetMetadataclasses()->begin(); itMC != m_pcGraph->GetMetadataclasses()->end(); ++itMC)
- 	{
-       if( (*itMC)->GetShowInDeclarationTreeOther() )
-       {
-    	   wxString l_sMetaname = (*itMC)->GetDisplayName();
-    	   m_Options_Declarations.Add( l_sMetaname );
-    	   m_Options_Declarations_order.Add(i);
-    	 //  SP_LOGMESSAGE( l_sMetaname + wxT("->>"));
-
-    	   l_pcMeta = (*itMC)->GetPrototype();
-
-    	   if( l_pcMeta ) {
-    		   itAttr = l_pcMeta->GetAttributes()->begin();
-    	       arrays.Clear();
-
-    	       for(;itAttr != l_pcMeta->GetAttributes()->end(); itAttr++)
-    	       {
-    	    		arrays.Add( (*itAttr)->GetDisplayName() );
-    	    		//SP_LOGMESSAGE( (*itAttr)->GetDisplayName() + wxT(" -> Declarations") );
-    	       }
-
-			   if( l_pcMeta->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )
-				    arrays.Add( wxT("Order Lexicographically") );
-
-    	       SP_DecNode2Attributes.insert(pair<int, wxArrayString > (i, arrays) );
-    	       SP_Index2DecNode.insert(pair<int, wxString> (i, l_sMetaname) );
-    	       i++;
-    	   }
-       }
-     }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -446,7 +643,7 @@ SP_ExportLatex::LoadData()
 		arrays.Clear();
 
 		for(l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem) {
-			wxString l_sNodeName = ( (*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )->GetValueString();
+			wxString l_sNodeName =  dynamic_cast<SP_DS_NameAttribute*>( (*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )->GetValue();
 			arrays.Add( l_sNodeName );
 
 			SP_Name2Node.insert(pair<wxString, SP_DS_Node*> ( l_sNodeName, (*l_itElem) ) );
@@ -464,27 +661,33 @@ SP_ExportLatex::LoadData()
 		wxString EdgeclassName;
 		wxString l_sEdgeName;
 
-		if( l_pcEdgeclass && ( ( l_pcEdgeclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) ||
-				( l_pcEdgeclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID) ) ) ) {
+		if( l_pcEdgeclass ) {
 			EdgeclassName = l_pcEdgeclass->GetDisplayName();
+			SP_LOGMESSAGE( wxT("EdgeClassname: ") + EdgeclassName);
 
-			arrays.Clear();
+			m_pEdgesPlace2Transition.clear();
+			m_pEdgesTransition2Place.clear();
 
 			for(l_itElem = l_pcEdgeclass->GetElements()->begin(); l_itElem != l_pcEdgeclass->GetElements()->end(); ++l_itElem) {
 
-				if( l_pcEdgeclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )	{
-					l_sEdgeName = ( (*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )->GetValueString();
-					arrays.Add( l_sEdgeName );
-				} else {
-					l_sEdgeName = wxT("ID: ")
-							+ ( (*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID) )->GetValueString();
-					arrays.Add( l_sEdgeName );
-				}
-				SP_Name2Edge.insert(pair<wxString, SP_DS_Edge*> ( l_sEdgeName, (*l_itElem) ) );
+				wxString l_sSourceName = dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetSource()->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+				wxString l_sTargetName = dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetTarget()->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 
+				l_sEdgeName = l_sSourceName + wxT("->") + l_sTargetName;
+
+				wxString l_sSourceclass = (*l_itElem)->GetSource()->GetClassName();
+
+				if(l_sSourceclass == SP_DS_DISCRETE_PLACE || l_sSourceclass == SP_DS_COARSE_PLACE ||
+						l_sSourceclass == SP_DS_CONTINUOUS_PLACE) {
+					m_pEdgesPlace2Transition.push_back( make_pair(l_sSourceName, l_sTargetName) );
+				} else {
+					m_pEdgesTransition2Place.push_back( make_pair(l_sSourceName, l_sTargetName) );
+				}
+
+				SP_Name2Edge.insert(pair<wxString, SP_DS_Edge*> ( l_sEdgeName, (*l_itElem) ) );
 			}
 
-			SP_Nodeclass2NodeList.insert(pair<wxString, wxArrayString> (EdgeclassName, arrays) );
+			SP_Edgeclass2EdgeList.insert(pair<wxString, pair<EdgeVector, EdgeVector> > (EdgeclassName, make_pair(m_pEdgesPlace2Transition, m_pEdgesTransition2Place) ) );
 		}
 	}
 
@@ -528,8 +731,9 @@ SP_ExportLatex::LoadData()
 					for(l_itElem = l_pcMetaclass->GetElements()->begin(); l_itElem != l_pcMetaclass->GetElements()->end(); ++l_itElem) {
 						l_sMetaName = ( (*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_TEXT) )->GetValueString();
 						arrays.Add( l_sMetaName );
+
+						SP_Name2Metadata.insert(pair<wxString, SP_DS_Metadata*> ( l_sMetaName, (*l_itElem) ) );
 					}
-					SP_Name2Metadata.insert(pair<wxString, SP_DS_Metadata*> ( l_sMetaName, (*l_itElem) ) );
 
 					SP_Nodeclass2NodeList.insert(pair<wxString, wxArrayString> (MetaclassName, arrays) );
 
@@ -542,6 +746,7 @@ SP_ExportLatex::LoadData()
 	///////////////////////////////////////////////////////////
 	// loading individual declarations list into the dialog
 
+	//if colored net, load only the collist attributes and corresponding elements
  	 if( ((m_pcGraph->GetNetclass()->GetName()==SP_DS_COLSPN_CLASS)
  		 || (m_pcGraph->GetNetclass()->GetName()==SP_DS_COLCPN_CLASS)
  		 || (m_pcGraph->GetNetclass()->GetName()==SP_DS_COLPN_CLASS)
@@ -551,69 +756,102 @@ SP_ExportLatex::LoadData()
 
  		for (itMC = m_pcGraph->GetMetadataclasses()->begin(); itMC != m_pcGraph->GetMetadataclasses()->end(); ++itMC)
  		{
- 			SP_DS_Metadataclass* l_pcMetaclass = *itMC;
+ 			SP_DS_Metadataclass* l_pcMetadataclass = *itMC;
  			SP_ListMetadata::const_iterator l_itElem;
- 			wxString MetaclassName;
+ 			SP_DS_Metadata* l_pcNewMetadata;
+ 			SP_DS_ColListAttribute * l_pcColList;
+ 			wxString l_sMetaclassName;
  			arrays.Clear();
 
- 			if( l_pcMetaclass && l_pcMetaclass->GetShowInDeclarationTreeColorSet() )
+ 			if( l_pcMetadataclass && (l_pcMetadataclass->GetShowInDeclarationTreeColorSet() || l_pcMetadataclass->GetShowInDeclarationTreeOther() ) )
  			{
- 				MetaclassName = l_pcMetaclass->GetDisplayName();
+ 				l_sMetaclassName = l_pcMetadataclass->GetDisplayName();
+ 				l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
 
- 				if ( ( l_pcMetaclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) ||
- 										( l_pcMetaclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID) )  )
- 				{
- 					for(l_itElem = l_pcMetaclass->GetElements()->begin(); l_itElem != l_pcMetaclass->GetElements()->end(); ++l_itElem) {
- 						wxString l_sMetaName;
- 						if( l_pcMetaclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) {
- 							l_sMetaName = ( (*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )->GetValueString();
- 							arrays.Add( l_sMetaName );
- 						} else {
- 							l_sMetaName = wxT("ID: ")
- 									+ ( (*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID) )->GetValueString();
- 							arrays.Add( l_sMetaName );
- 						}
- 						SP_Name2Metadata.insert(pair<wxString, SP_DS_Metadata*> ( l_sMetaName, (*l_itElem) ) );
+ 				if(l_pcNewMetadata) {
+
+ 					if(l_sMetaclassName.compare( wxT("Simple Color Sets")) == 0)
+ 					{
+ 						l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ColorsetList")));
+ 					}
+ 					else if(l_sMetaclassName.compare( wxT("Compound Color Sets")) == 0)
+ 					{
+ 						l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("StructuredColorsetList")));
+ 					}
+ 					else if(l_sMetaclassName.compare( wxT("Alias Color Sets")) == 0)
+ 					{
+ 						l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("AliasColorsetList")));
+ 					}
+ 					else if(l_sMetaclassName.compare( wxT("Constants")) == 0)
+ 					{
+ 						l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
+ 					}
+ 					else if(l_sMetaclassName.compare( wxT("Functions")) == 0)
+ 					{
+ 						l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("FunctionList")));
+ 					}
+ 					else if(l_sMetaclassName.compare( wxT("Variables")) == 0)
+ 					{
+ 						l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("VariableList")));
+ 					} else {
+ 						l_pcColList = NULL;
  					}
 
- 					SP_DecNodeclass2NodeList.insert(pair<wxString, wxArrayString> (MetaclassName, arrays) );
- 			    }
-
+ 					if(l_pcColList) {
+ 						for (unsigned int r = 0; r < l_pcColList->GetRowCount(); r++)
+ 						{
+ 							wxString l_sMetaName;
+ 							if(l_pcColList->GetDisplayName().compare( wxT("FunctionList") ) == 0) {
+ 								l_sMetaName = l_pcColList->GetCell(r,1);
+ 							} else {
+ 								l_sMetaName = l_pcColList->GetCell(r,0);
+ 							}
+ 							arrays.Add( l_sMetaName );
+ 							SP_Name2Metadata.insert(pair<wxString, SP_DS_Metadata*> ( l_sMetaName, l_pcNewMetadata ) );
+ 						}
+ 						SP_DecNodeclass2NodeList.insert(pair<wxString, wxArrayString> (l_sMetaclassName, arrays) );
+ 					}
+ 					else {
+ 						SP_LOGMESSAGE( l_sMetaclassName + wxT("has no COLLIST attribute") );
+ 					}
+ 				}
  		    }
  		}
+
+ 	 } else {
+ 		 // for uncolored nets
+ 	 	for (itMC = m_pcGraph->GetMetadataclasses()->begin(); itMC != m_pcGraph->GetMetadataclasses()->end(); ++itMC)
+ 	 	{
+ 	 		SP_DS_Metadataclass* l_pcMetaclass = *itMC;
+ 	 		SP_ListMetadata::const_iterator l_itElem;
+ 	 		wxString MetaclassName;
+ 	 		arrays.Clear();
+
+ 	       if( l_pcMetaclass && l_pcMetaclass->GetShowInDeclarationTreeOther() )
+ 	       {
+ 	    	   MetaclassName = l_pcMetaclass->GetDisplayName();
+
+ 	    	   if ( ( l_pcMetaclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) ||
+ 	    			   ( l_pcMetaclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID) )  )
+ 	    	   {
+ 	    		   for(l_itElem = l_pcMetaclass->GetElements()->begin(); l_itElem != l_pcMetaclass->GetElements()->end(); ++l_itElem) {
+ 	    			   wxString l_sMetaName;
+ 	    			   if( l_pcMetaclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) {
+ 	    				   l_sMetaName = ( (*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )->GetValueString();
+ 	    	    		   arrays.Add( l_sMetaName );
+ 	    	    		} else {
+ 	    	    			l_sMetaName = wxT("ID: ")
+ 	    	    					+ ( (*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID) )->GetValueString();
+ 	    	    			arrays.Add( l_sMetaName );
+ 	    	    		}
+ 	    			    SP_Name2Metadata.insert(pair<wxString, SP_DS_Metadata*> ( l_sMetaName, (*l_itElem) ) );
+ 	    	    	}
+
+ 	    	    	SP_DecNodeclass2NodeList.insert(pair<wxString, wxArrayString> (MetaclassName, arrays) );
+ 	    	    }
+ 	         }
+ 	     }
  	 }
-
- 	for (itMC = m_pcGraph->GetMetadataclasses()->begin(); itMC != m_pcGraph->GetMetadataclasses()->end(); ++itMC)
- 	{
- 		SP_DS_Metadataclass* l_pcMetaclass = *itMC;
- 		SP_ListMetadata::const_iterator l_itElem;
- 		wxString MetaclassName;
- 		arrays.Clear();
-
-       if( l_pcMetaclass && l_pcMetaclass->GetShowInDeclarationTreeOther() )
-       {
-    	   MetaclassName = l_pcMetaclass->GetDisplayName();
-
-    	   if ( ( l_pcMetaclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) ||
-    			   ( l_pcMetaclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID) )  )
-    	   {
-    		   for(l_itElem = l_pcMetaclass->GetElements()->begin(); l_itElem != l_pcMetaclass->GetElements()->end(); ++l_itElem) {
-    			   wxString l_sMetaName;
-    			   if( l_pcMetaclass->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) {
-    				   l_sMetaName = ( (*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )->GetValueString();
-    	    		   arrays.Add( l_sMetaName );
-    	    		} else {
-    	    			l_sMetaName = wxT("ID: ")
-    	    					+ ( (*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID) )->GetValueString();
-    	    			arrays.Add( l_sMetaName );
-    	    		}
-    			    SP_Name2Metadata.insert(pair<wxString, SP_DS_Metadata*> ( l_sMetaName, (*l_itElem) ) );
-    	    	}
-
-    	    	SP_DecNodeclass2NodeList.insert(pair<wxString, wxArrayString> (MetaclassName, arrays) );
-    	    }
-         }
-     }
 
 }
 
@@ -642,21 +880,38 @@ SP_ExportLatex::AddGeneral()
 	wxStaticText* l_pcStaticText = new wxStaticText(m_pcNotebookPageGeneral, wxID_ANY, wxT("Reorder tabs as required"));
 	m_pcMainSizerGeneral->Add(l_pcStaticText, 0, wxALL | wxEXPAND, 5);
 
-	wxRearrangeCtrl* rearrangectrl = new wxRearrangeCtrl(m_pcNotebookPageGeneral, -1, wxPoint(50, 50), wxSize(10, 100), order, tabs_items);
-	m_pcMainSizerGeneral->Add(rearrangectrl, 1, wxALL | wxEXPAND, 5);
+	m_pcRearrangeCtrl_General = new wxRearrangeCtrl(m_pcNotebookPageGeneral, -1, wxPoint(50, 50), wxDefaultSize, order, tabs_items);
+	m_pcMainSizerGeneral->Add(m_pcRearrangeCtrl_General, 1, wxALL | wxEXPAND, 5);
 
 
 	//checkbox for pdf
-	wxCheckBox* l_pcCheckBoxDirectPDF = new wxCheckBox( m_pcNotebookPageGeneral, SP_GENERATEPDF_CHECKBOX_SELECTED, wxT("Generate PDF Report") );
-	l_pcCheckBoxDirectPDF->SetValue(true);
+	m_pcCheckBoxDirectPDF = new wxCheckBox( m_pcNotebookPageGeneral, SP_GENERATEPDF_CHECKBOX_SELECTED, wxT("Generate PDF Report") );
+	m_pcCheckBoxDirectPDF->SetValue(true);
 
-	m_pcMainSizerGeneral->Add(l_pcCheckBoxDirectPDF, 0, wxALL, 5);
+	m_pcMainSizerGeneral->Add(10, 10);
+	m_pcMainSizerGeneral->Add(m_pcCheckBoxDirectPDF, 0, wxALL, 5);
 	m_pcMainSizerGeneral->Add(10, 10);
 
-	l_pcCheckBoxDirectPDF->Bind(wxEVT_CHECKBOX, &SP_ExportLatex::OnClickGeneratePDF, this, SP_GENERATEPDF_CHECKBOX_SELECTED);
+	m_pcCheckBoxDirectPDF->Bind(wxEVT_CHECKBOX, &SP_ExportLatex::OnClickGeneratePDF, this, SP_GENERATEPDF_CHECKBOX_SELECTED);
 
 
 	m_pcSizerGeneratePDF = new wxBoxSizer( wxVERTICAL );
+
+	//sizer for multiple compiler options
+	wxSizer* l_pcSizerCompilers = new wxStaticBoxSizer( new wxStaticBox( m_pcNotebookPageGeneral, -1, wxT("Tex Compiler") ), wxHORIZONTAL );
+
+	//wxRadioButton* l_rbCompiler1 = new wxRadioButton(m_pcNotebookPageGeneral, -1, wxT("LaTeX"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	m_rbPdfLatex = new wxRadioButton(m_pcNotebookPageGeneral, -1, wxT("PdfLaTeX"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	m_rbLatexmk = new wxRadioButton(m_pcNotebookPageGeneral, -1, wxT("Latexmk"));
+	m_rbPdfLatex->SetValue(true);
+
+	//m_rbPdfLatex->Bind(wxEVT_RADIOBUTTON, &SP_ExportLatex::OnSelectLatexCompiler_Pdflatex, this, SP_ID_COMPILER_SELECTION_PDFLATEX);
+	//m_rbLatexmk->Bind(wxEVT_RADIOBUTTON, &SP_ExportLatex::OnSelectLatexCompiler_Latexmk, this, SP_ID_COMPILER_SELECTION_LATEXMK);
+
+	l_pcSizerCompilers->Add(m_rbPdfLatex, 1, wxALL | wxEXPAND, 5);
+	l_pcSizerCompilers->Add(m_rbLatexmk, 1, wxALL | wxEXPAND, 5);
+
+	m_pcSizerGeneratePDF->Add(l_pcSizerCompilers, 1, wxALL | wxEXPAND, 5);
 
 	//sizer for latex compiler browse
 	wxSizer* l_pcSizerPath1 = new wxBoxSizer( wxHORIZONTAL ); //path for generated pdf file
@@ -676,7 +931,7 @@ SP_ExportLatex::AddGeneral()
 	///////////////
 
 	//sizer for pdf file browse
-	wxSizer* l_pcSizerPath2 = new wxBoxSizer( wxHORIZONTAL ); //path for generated pdf file
+/*	wxSizer* l_pcSizerPath2 = new wxBoxSizer( wxHORIZONTAL ); //path for generated pdf file
 
 	l_pcSizerPath2->Add(new wxStaticText( m_pcNotebookPageGeneral, -1, wxT("PDF Filename:") ), 0, wxALL, 5);
 
@@ -694,7 +949,7 @@ SP_ExportLatex::AddGeneral()
 	l_pcFilePickerCtrl2->SetPath( l_sPath2 );
 
 	l_pcSizerPath2->Add(l_pcFilePickerCtrl2, 1, wxALL | wxEXPAND, 5);
-	m_pcSizerGeneratePDF->Add(l_pcSizerPath2, 1, wxALL | wxEXPAND, 5);
+	m_pcSizerGeneratePDF->Add(l_pcSizerPath2, 1, wxALL | wxEXPAND, 5);   */
 	//////////
 
 	m_pcMainSizerGeneral->Add(m_pcSizerGeneratePDF, 1, wxALL | wxEXPAND, 5);
@@ -783,12 +1038,14 @@ SP_ExportLatex::AddAttributes_GraphElements()
 
 		SP_Node2AttributeCheckList.insert(pair<int, wxCheckListBox* > ( (*itN).first, l_pcCheckList) );
 
-	    if( (l_sCurrentNode.Find("Edge") == wxNOT_FOUND) && l_sCurrentNode.Cmp("Comment") )
+	    if( (l_sCurrentNode.Find( wxT("Edge") ) == wxNOT_FOUND) && l_sCurrentNode.Cmp("Comment") )  //if not an edge or comment
 	    {
 	    	l_pcRightSizer->Add(5, 20);
 	    	l_pcRightSizer->Add(new wxStaticText( m_pcNotebookPageGraph, -1, wxT("Wildcard") ), 0, wxALL, 5);
-	        wxTextCtrl* l_pcTextCtrl = new wxTextCtrl(m_pcNotebookPageGraph, -1);
+	        wxTextCtrl* l_pcTextCtrl = new wxTextCtrl(m_pcNotebookPageGraph, SP_REGEX_GRAPH);
 	        l_pcRightSizer->Add(l_pcTextCtrl, 0, wxALL | wxEXPAND, 5);
+
+	        l_pcTextCtrl->Bind(wxEVT_TEXT, &SP_ExportLatex::OnRegEx_Graph, this, SP_REGEX_GRAPH);
 
 		    wxCheckListBox* l_pcCheckList1 = new wxCheckListBox( m_pcNotebookPageGraph, -1, wxDefaultPosition, wxDefaultSize);
 			l_pcRightSizer->Add(l_pcCheckList1, 1, wxALL | wxEXPAND, 5);
@@ -799,12 +1056,60 @@ SP_ExportLatex::AddAttributes_GraphElements()
 						wxT("Select/deselect all"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE);
 
 		    l_pcRightSizer->Add(l_pcSelectClearAllChkBox, 0, wxALL, 5);
-			l_pcSelectClearAllChkBox->Set3StateValue(wxCHK_UNDETERMINED);
+			l_pcSelectClearAllChkBox->Set3StateValue(wxCHK_CHECKED);
+
+			for (unsigned int i = 0; i < SP_Node2NodeCheckList[ (*itN).first ]->GetCount() ; i++) {
+				SP_Node2NodeCheckList[ (*itN).first ]->Check(i, true);
+			}
 
 			l_pcSelectClearAllChkBox->Bind(wxEVT_CHECKBOX, &SP_ExportLatex::OnSelectClearAllItems_Graph, this,
 					SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS_GRAPH);
 			SP_Node2SelectClearAllCheckBox.insert(pair<int, wxCheckBox* > ( (*itN).first, l_pcSelectClearAllChkBox) );
 
+
+	    }
+
+	    //Add ordering criteria for 'Edges'
+	    if( l_sCurrentNode.Find( wxT("Edge") ) != wxNOT_FOUND) {
+
+	    	 //Order By
+	    	 l_pcRightSizer->Add(0, 20);
+
+	    	 wxStaticText* l_pcStaticText_OrderBy = new wxStaticText(m_pcNotebookPageGraph, -1, wxT("Order By"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+			 l_pcRightSizer->Add(l_pcStaticText_OrderBy, 0, wxALL, 2);
+
+	    	 m_pcOrderBySource = new wxRadioButton(m_pcNotebookPageGraph, -1, wxT("Source"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	    	 m_pcOrderbyTarget = new wxRadioButton(m_pcNotebookPageGraph, -1, wxT("Target"));
+	    	 m_pcOrderBySource->SetValue(true);
+
+	    	 wxSizer* l_pcSizerOrientation1 = new wxBoxSizer(wxHORIZONTAL);
+
+		 	 l_pcSizerOrientation1->Add(10, 0);
+			 l_pcSizerOrientation1->Add(m_pcOrderBySource, 0, wxALL, 2);
+			 l_pcSizerOrientation1->Add(m_pcOrderbyTarget, 0, wxALL, 2);
+
+			 l_pcRightSizer->Add(l_pcSizerOrientation1, 0, wxALL, 5);
+
+
+			 //Group By
+			 l_pcRightSizer->Add(0, 10);
+
+	    	 wxStaticText* l_pcStaticText_GroupBy = new wxStaticText(m_pcNotebookPageGraph, -1, wxT("Group By"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+			 l_pcRightSizer->Add(l_pcStaticText_GroupBy, 0, wxALL, 2);
+
+			 m_pcGroupByPlace2Transition = new wxRadioButton(m_pcNotebookPageGraph, -1, wxT("Place to Transition"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+		     m_pcGroupbyTransition2Place = new wxRadioButton(m_pcNotebookPageGraph, -1, wxT("Transition to Place"));
+		     m_pcGroupByPlace2Transition->SetValue(true);
+
+	    	 wxSizer* l_pcSizerOrientation2 = new wxBoxSizer(wxHORIZONTAL);
+	    	 wxSizer* l_pcSizerOrientation3 = new wxBoxSizer(wxVERTICAL);
+
+		 	 l_pcSizerOrientation2->Add(10, 0);
+		 	 l_pcSizerOrientation2->Add(l_pcSizerOrientation3, 0, wxALL, 2);
+			 l_pcSizerOrientation3->Add(m_pcGroupByPlace2Transition, 0, wxALL, 2);
+			 l_pcSizerOrientation3->Add(m_pcGroupbyTransition2Place, 0, wxALL, 2);
+
+			 l_pcRightSizer->Add(l_pcSizerOrientation2, 0, wxALL, 5);
 	    }
 
 		SP_Node2Sizer.insert(pair<int, wxSizer* > ( (*itN).first, l_pcRightSizer) );
@@ -862,6 +1167,7 @@ SP_ExportLatex::AddGraphElements()
     m_pcNotebookPageGraph->AddControl(m_pcMainSizer_Graph, 0, wxEXPAND | wxALIGN_LEFT | wxALL, 5);
 }
 
+
 bool
 SP_ExportLatex::AddAttributes_Declarations()
 {
@@ -893,8 +1199,10 @@ SP_ExportLatex::AddAttributes_Declarations()
 
 		l_pcRightSizer->Add(5, 20);
 		l_pcRightSizer->Add(new wxStaticText( m_pcNotebookPageDeclarations, -1, wxT("Wildcard") ), 0, wxALL, 5);
-		wxTextCtrl* l_pcTextCtrl = new wxTextCtrl(m_pcNotebookPageDeclarations, -1);
+		wxTextCtrl* l_pcTextCtrl = new wxTextCtrl(m_pcNotebookPageDeclarations, SP_REGEX_DEC);
 		l_pcRightSizer->Add(l_pcTextCtrl, 0, wxALL | wxEXPAND, 5);
+
+		l_pcTextCtrl->Bind(wxEVT_TEXT, &SP_ExportLatex::OnRegEx_Dec, this, SP_REGEX_DEC);
 
 		wxCheckListBox* l_pcCheckList1 = new wxCheckListBox( m_pcNotebookPageDeclarations, -1, wxDefaultPosition, wxDefaultSize);
 		l_pcRightSizer->Add(l_pcCheckList1, 1, wxALL | wxEXPAND, 5);
@@ -906,7 +1214,11 @@ SP_ExportLatex::AddAttributes_Declarations()
 								wxT("Select/deselect all"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE);
 
 		l_pcRightSizer->Add(l_pcSelectClearAllChkBox, 0, wxALL, 5);
-		l_pcSelectClearAllChkBox->Set3StateValue(wxCHK_UNDETERMINED);
+		l_pcSelectClearAllChkBox->Set3StateValue(wxCHK_CHECKED);
+
+		for (unsigned int i = 0; i < SP_DecNode2NodeCheckList[ (*itN).first ]->GetCount(); i++) {
+			SP_DecNode2NodeCheckList[ (*itN).first ]->Check(i, true);
+		}
 
 		l_pcSelectClearAllChkBox->Bind(wxEVT_CHECKBOX, &SP_ExportLatex::OnSelectClearAllItems_Dec, this, SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS_DEC);
 		SP_DecNode2SelectClearAllCheckBox.insert(pair<int, wxCheckBox* > ( (*itN).first, l_pcSelectClearAllChkBox) );
@@ -1010,7 +1322,6 @@ SP_ExportLatex::copyTree_recur(const wxTreeItemId& into, const wxTreeItemId& fro
 void
 SP_ExportLatex::AddHierarchy()
 {
-
 	m_pcNotebookPageHierarchy = p_pcDlg->AddPage(wxT("Hierarchy"));
 
 	wxSizer* l_pcMainSizer = new wxBoxSizer( wxHORIZONTAL );
@@ -1022,9 +1333,9 @@ SP_ExportLatex::AddHierarchy()
 	wxSizer* l_pcTreeSizer = new wxStaticBoxSizer( new wxStaticBox( m_pcNotebookPageHierarchy, -1,
 			wxT("Select the topmost hierarchy level"), wxDefaultPosition, wxDefaultSize ), wxVERTICAL );
 
- 	wxCheckBox* l_pcCheckBoxHierarchyTree = new wxCheckBox(m_pcNotebookPageHierarchy, -1, wxT("Generate Hierarchy Tree"));
- 	l_pcCheckBoxHierarchyTree->SetValue(true);
- 	l_pcTopSizer->Add(l_pcCheckBoxHierarchyTree, 0, wxALL | wxEXPAND, 5);
+ 	m_pcCheckBoxHierarchyTree = new wxCheckBox(m_pcNotebookPageHierarchy, -1, wxT("Generate Hierarchy Tree"));
+ 	m_pcCheckBoxHierarchyTree->SetValue(true);
+ 	l_pcTopSizer->Add(m_pcCheckBoxHierarchyTree, 0, wxALL | wxEXPAND, 5);
  	l_pcTopSizer->Add(0, 20);
  	l_pcTopSizer->Add(l_pcTreeSizer, 1 , wxALL | wxEXPAND, 5);
 
@@ -1051,22 +1362,21 @@ SP_ExportLatex::AddHierarchy()
 }
 
 void
-SP_ExportLatex:: OnClickGeneratePDF(wxCommandEvent& p_cEvent)
+SP_ExportLatex::OnClickGeneratePDF(wxCommandEvent& p_cEvent)
 {
 	if( p_cEvent.IsChecked() ) {
-		SP_LOGMESSAGE("generate pdf");
+		SP_LOGMESSAGE("generate PDF");
 
 		l_pcFilePickerCtrl1->Enable(true);
-		l_pcFilePickerCtrl2->Enable(true);
+		//l_pcFilePickerCtrl2->Enable(true);
 
 	} else {
-		SP_LOGMESSAGE("generate pdf Else");
+		SP_LOGMESSAGE("generate PDF Else");
 
 		l_pcFilePickerCtrl1->Enable(false);
-		l_pcFilePickerCtrl2->Enable(false);
+		//l_pcFilePickerCtrl2->Enable(false);
 	}
-	m_pcSizerGeneratePDF->Layout();
-
+	//m_pcSizerGeneratePDF->Layout();
 }
 
 void
@@ -1192,20 +1502,15 @@ SP_ExportLatex::AddAttributes_BasicsLayout()
     wxStaticText* l_pcStaticText_Orientation = new wxStaticText(m_pcNotebookPageBasics, -1, wxT("Orientation"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
     m_pcSizer_Basics_ReportLayout->Add(l_pcStaticText_Orientation, 0, wxALL, 2);
 
-    wxRadioButton* l_pcRB_Landscape = new wxRadioButton(m_pcNotebookPageBasics, -1, wxT("Landscape"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-    wxRadioButton* l_pcRB_Portrait = new wxRadioButton(m_pcNotebookPageBasics, -1, wxT("Portrait"));
-    l_pcRB_Portrait->SetValue(true);
+    m_pcBasics_Landscape = new wxRadioButton(m_pcNotebookPageBasics, -1, wxT("Landscape"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+    m_pcBasics_Portrait = new wxRadioButton(m_pcNotebookPageBasics, -1, wxT("Portrait"));
+    m_pcBasics_Portrait->SetValue(true);
 
     l_pcSizerOrientation1->Add(10, 0);
-    l_pcSizerOrientation1->Add(l_pcRB_Landscape, 0, wxALL, 2);
-    l_pcSizerOrientation1->Add(l_pcRB_Portrait, 0, wxALL, 2);
+    l_pcSizerOrientation1->Add(m_pcBasics_Landscape, 0, wxALL, 2);
+    l_pcSizerOrientation1->Add(m_pcBasics_Portrait, 0, wxALL, 2);
 
     m_pcSizer_Basics_ReportLayout->Add(l_pcSizerOrientation1, 0, wxALL, 5);
-
-	wxCheckBox* l_pcCheckBox_TitlePage = new wxCheckBox( m_pcNotebookPageBasics, -1, wxT("Title Page") );
-	l_pcCheckBox_TitlePage->SetValue(true);
-	m_pcSizer_Basics_ReportLayout->Add(l_pcCheckBox_TitlePage, 0, wxALL, 5);
-	m_pcCheckBox_BasicsLayout.push_back(l_pcCheckBox_TitlePage);
 
 	wxCheckBox* l_pcCheckBox_InsertPageNum = new wxCheckBox( m_pcNotebookPageBasics, -1, wxT("Insert Page Numbers") );
 	l_pcCheckBox_InsertPageNum->SetValue(true);
@@ -1457,6 +1762,50 @@ SP_ExportLatex::OnSelectClearAllItems_Dec(wxCommandEvent& p_cEvent)
 	}
 }
 
+void
+SP_ExportLatex::OnRegEx_Graph(wxCommandEvent& p_cEvent)
+{
+	int id = m_nSelectionId_Graph;
+	wxRegEx l_cRegEx;
+
+	wxString l_sNameRegEx = p_cEvent.GetString();
+
+	if(l_cRegEx.Compile( l_sNameRegEx )) {
+		wxArrayString arr = SP_Node2NodeCheckList[ id ]->GetStrings();
+
+		for(int i = 0; i < arr.size(); i++)
+		{
+			SP_Node2NodeCheckList[ id ]->Check(i, false);
+			if( l_cRegEx.Matches( arr[i] ) )
+			{
+				SP_Node2NodeCheckList[ id ]->Check(i, true);
+			}
+		}
+	}
+}
+
+void
+SP_ExportLatex::OnRegEx_Dec(wxCommandEvent& p_cEvent)
+{
+	int id = m_nSelectionId_Declarations;
+	wxRegEx l_cRegEx;
+
+	wxString l_sNameRegEx = p_cEvent.GetString();
+
+	if(l_cRegEx.Compile( l_sNameRegEx )) {
+		wxArrayString arr = SP_DecNode2NodeCheckList[ id ]->GetStrings();
+
+		for(int i = 0; i < arr.size(); i++)
+		{
+			SP_DecNode2NodeCheckList[ id ]->Check(i, false);
+			if( l_cRegEx.Matches( arr[i] ) )
+			{
+				SP_DecNode2NodeCheckList[ id ]->Check(i, true);
+			}
+		}
+	}
+}
+
 wxTreeItemId
 SP_ExportLatex::FindTreeItemRec(const wxTreeItemId& p_Id, wxString label)
 {
@@ -1479,7 +1828,11 @@ SP_ExportLatex::FindTreeItemRec(const wxTreeItemId& p_Id, wxString label)
   return found;
 }
 
-
+//predicate function for sort() function
+bool
+compareTarget(const pair<wxString, wxString> p_pTarget1, const pair<wxString, wxString> p_pTarget2) {
+	return ( p_pTarget1.second < p_pTarget2.second );
+}
 
 bool
 SP_ExportLatex::StartDoc(const wxString& p_fileName)
@@ -1488,6 +1841,8 @@ SP_ExportLatex::StartDoc(const wxString& p_fileName)
 	m_sFilePath = p_fileName.BeforeLast('/') + wxT("/");
 
 	SetUpPrintData(m_printData, p_fileName);
+
+	//m_MainFilePath = m_printData.GetFilename();
 
 /*	if (m_printData.GetFilename() == wxT(""))
 	{
@@ -1516,10 +1871,11 @@ SP_ExportLatex::StartDoc(const wxString& p_fileName)
 	wxFprintf(m_pstream, wxT("\\usepackage{lastpage}\n") );
 	wxFprintf(m_pstream, wxT("\\usepackage{multirow}\n") );
 	wxFprintf(m_pstream, wxT("\\usepackage{adjustbox}\n") );
-	wxFprintf(m_pstream, wxT("\\usepackage{longtable}\n") );
+	wxFprintf(m_pstream, wxT("\\usepackage{longtable, tabu}\n") );
 	wxFprintf(m_pstream, wxT("\\usepackage{pgf}\n") );
 	wxFprintf(m_pstream, wxT("\\usepackage{tikz}\n") );
-	wxFprintf(m_pstream, wxT("\\usetikzlibrary{positioning,arrows,shapes,backgrounds,calc,patterns}\n") );
+	wxFprintf(m_pstream, wxT("\\usepackage{verbatim}\n") );
+	wxFprintf(m_pstream, wxT("\\usetikzlibrary{positioning,arrows,shapes,backgrounds,calc,patterns,trees}\n") );
 	wxFprintf(m_pstream, wxT("\\usepackage{fancyhdr}\n") );
 	wxFprintf(m_pstream, wxT("\\pagestyle{fancy}\n") );
 	wxFprintf(m_pstream, wxT("\n") );
@@ -1548,10 +1904,48 @@ SP_ExportLatex::StartDoc(const wxString& p_fileName)
 	}
 
 	//Set paper size
+
 	out = wxT("\\usepackage[top=1.0in, ") + m_pcComboBox_PaperSize->GetValue() + wxT("]{geometry}\n\n");
 	wxFprintf(m_pstream, wxT("%s"), out.c_str());
 
-	wxFprintf(m_pstream, wxT("\\begin{document}\n\n") );
+	out = wxT("\\newcommand{\\UnderscoreCommands}{ \n\t"
+			"\\do\\citeNP \\do\\citeA \\do\\citeANP \\do\\citeN \\do\\shortcite \n\t"
+			"\\do\\shortciteNP \\do\\shortciteA \\do\\shortciteANP \\do\\shortciteN \n\t"
+			"\\do\\citeyear \\do\\citeyearNP \n\t"
+			"} \n" );
+
+	out += wxT("\\usepackage[strings]{underscore}");
+	wxFprintf(m_pstream, wxT("%s"), out.c_str());
+
+	wxFprintf(m_pstream, wxT("\n\\newcommand{\\linkto}[1]{\\phantomsection \\label{#1}}") );
+
+	//new command and settings for inserting image thumbnail
+	// set up a counter for links
+	wxFprintf(m_pstream, wxT("\\newcounter{thumbnail}\n\n") );
+	wxFprintf(m_pstream, wxT("\\newbox\\savedimgs\n") );
+	wxFprintf(m_pstream, wxT("\\setbox\\savedimgs\\vbox{}\n\n") );
+
+	wxFprintf(m_pstream, wxT("% thumbnail and appendix command\n") );
+
+	out = wxT("\\newcommand{\\thumbnailandappendix}[1]{\n\t"
+			"\\refstepcounter{thumbnail}\n\t"
+			"\\hypertarget{small\\thethumbnail}{}\n\t");
+	wxFprintf(m_pstream, wxT("%s"), out.c_str());
+
+	out = wxT("\\hyperlink{big\\thethumbnail}{\\includegraphics[width=1cm,height=1cm]{#1}}\n\t"
+			"\\global\\setbox\\savedimgs\\vbox{\n\t\t"
+			"\\unvbox\\savedimgs\n\t\t"
+			"\\bigskip\n\t\t"
+			"\\filbreak\n\t\t"
+			"\\noindent\n\t\t"
+			"\\hypertarget{big\\thethumbnail}{}\n\t\t"
+			"\\hyperlink{small\\thethumbnail}{\\includegraphics[width=10cm,height=10cm]{#1}}\n\t"
+			"}\n}\n");
+	wxFprintf(m_pstream, wxT("%s"), out.c_str());
+	wxFprintf(m_pstream, wxT("\\let\\realwrite\\write\n\n") );
+
+
+	wxFprintf(m_pstream, wxT("\n\n\\begin{document}\n\n") );
 
 	return true;
 }
@@ -1561,28 +1955,26 @@ SP_ExportLatex::WriteLatex()
 {
 
 	//Title page
-	if( m_pcCheckBox_BasicsLayout[0]->GetValue() ) {
-		WriteTitlePage();
-	}
+	WriteTitlePage();
 
 	//Basic Page Layout
 	wxFprintf(m_pstream, wxT("\\pagestyle{fancy}\n") );
 	wxFprintf(m_pstream, wxT("\\fancyhf{}\n") );
-	wxFprintf(m_pstream, wxT("\\rhead{snoopy2\\LaTeX}\n") );
+	wxFprintf(m_pstream, wxT("\\rhead{Snoopy2\\LaTeX}\n") );
 
 	//Insert Date to footer
-	if( m_pcCheckBox_BasicsLayout[2]->GetValue() && m_pcCheckBox_BasicsLayout[3]->GetValue()) {
+	if( m_pcCheckBox_BasicsLayout[1]->GetValue() && m_pcCheckBox_BasicsLayout[2]->GetValue()) {
 		wxFprintf(m_pstream, wxT("\\lfoot{\\today \\hspace{1pt} \\currenttime}\n") );
-	} else if( m_pcCheckBox_BasicsLayout[2]->GetValue() ) {
+	} else if( m_pcCheckBox_BasicsLayout[1]->GetValue() ) {
 		wxFprintf(m_pstream, wxT("\\lfoot{\\today}\n") );
-	} else if( m_pcCheckBox_BasicsLayout[3]->GetValue() ) {
+	} else if( m_pcCheckBox_BasicsLayout[2]->GetValue() ) {
 		wxFprintf(m_pstream, wxT("\\lfoot{\\currenttime}\n") );
 	}
 
 	wxString out;
 
 	//Insert user-defined header
-	if( m_pcCheckBox_BasicsLayout[4]->GetValue() ) {
+	if( m_pcCheckBox_BasicsLayout[3]->GetValue() ) {
 		out = wxT("\\lhead{ ");
 		out += EditStringforLatex( m_pcTextCtrlHeaderFooter[0]->GetValue() ) + wxT(" }\n");
 		wxFprintf(m_pstream, wxT("%s"), out.c_str());
@@ -1593,49 +1985,67 @@ SP_ExportLatex::WriteLatex()
 	}
 
 	//Insert user-defined footer
-	if( m_pcCheckBox_BasicsLayout[5]->GetValue() ) {
+	if( m_pcCheckBox_BasicsLayout[4]->GetValue() ) {
 		out = wxT("\\cfoot{ ");
 		out += EditStringforLatex( m_pcTextCtrlHeaderFooter[1]->GetValue() ) + wxT(" }\n");
 		wxFprintf(m_pstream, wxT("%s"), out.c_str());
 	}
 
 
-	//Disclaimer
-	wxFprintf(m_pstream, wxT("\\newpage\n") );
-	wxFprintf(m_pstream, wxT("\\begin{center}\n\t") );
-
-	wxFprintf(m_pstream, wxT("\\vspace*{20cm}\n\t") );
-	wxFprintf(m_pstream, wxT("This document has been generated with Snoopy \\cite{heiner:pn:2012,Rohr:bi:2010}. \\\\ \n\t") );
-	wxFprintf(m_pstream, wxT("If you have any comments or suggestions, \\\\ \n\t") );
-	wxFprintf(m_pstream, wxT("Please contact \\url{snoopy@informatik.tu-cottbus.de}\n\t") );
-
-	wxFprintf(m_pstream, wxT("\\end{center}\n\n") );
-
 	//Add table of contents
-	wxFprintf(m_pstream, wxT("\\newpage\n") );
+	wxFprintf(m_pstream, wxT("\n\\newpage\n") );
 	wxFprintf(m_pstream, wxT("\\tableofcontents\n\n") );
 
 	////Insert Page number to footer
-	if( m_pcCheckBox_BasicsLayout[1]->GetValue() ) {
+	if( m_pcCheckBox_BasicsLayout[0]->GetValue() ) {
 		wxFprintf(m_pstream, wxT("\\pagenumbering{arabic}\n") );
-		wxFprintf(m_pstream, wxT("\\rfoot{Page \\thepage \\hspace{1pt} of \\pageref{LastPage} }\n\n") );
+		wxFprintf(m_pstream, wxT("\\rfoot{Page \\thepage \\hspace{1pt} of \\pageref*{LastPage} }\n\n") );
 	}
 
+	wxRearrangeList* l_pcRearrangelist_General = m_pcRearrangeCtrl_General->GetList();
 
-	//Add Basics section
-	WriteBasics();
+	for(int i = 0; i < l_pcRearrangelist_General->GetCount(); i++) {
+		if( l_pcRearrangelist_General->IsChecked(i) ) {
+			int order = l_pcRearrangelist_General->GetCurrentOrder()[ i ];
 
-	//Add Graph Elements section
-    WriteGraphElements();
+			if(order == 0) {
+				//Add Basics section
+				WriteBasics();
+			} else if(order == 1) {
+			    //Add Graph Elements section
+				WriteGraphElements();
+			} else if(order == 2) {
+				//Add Declarations section
+				if( ((m_pcGraph->GetNetclass()->GetName()==SP_DS_COLSPN_CLASS)
+					 || (m_pcGraph->GetNetclass()->GetName()==SP_DS_COLCPN_CLASS)
+					 || (m_pcGraph->GetNetclass()->GetName()==SP_DS_COLPN_CLASS)
+					 || (m_pcGraph->GetNetclass()->GetName()==SP_DS_COLHPN_CLASS)
+					 || (m_pcGraph->GetNetclass()->GetName()==SP_DS_COLEPN_CLASS) )) {
 
-    //Add Declarations section
-    WriteDeclarations();
+					WriteDeclarations_Colored();
+				} else {
 
-    //Add Hierarchy section
-    WriteHierarchy();
+					WriteDeclarations();
+				}
 
+			} else if(order == 3) {
+				//Add Hierarchy section
+			    WriteHierarchy();
+			}
+		}
+	}
+
+	if( m_flagImages ) {
+		wxFprintf(m_pstream, wxT("\\clearpage\n") );
+		wxFprintf(m_pstream, wxT("\\section{Full-size Images}\n\t") );
+		wxFprintf(m_pstream, wxT("\\unvbox\\savedimgs\n\n") );
+
+	}
 	//Add references page
 	WriteReferences();
+
+	//Add Glossary Page
+	WriteGlossary();
 
 	return true;
 }
@@ -1643,41 +2053,71 @@ SP_ExportLatex::WriteLatex()
 bool
 SP_ExportLatex::WriteTitlePage()
 {
-	SP_LOGMESSAGE( wxT("Inside write title...") );
+	const wxString latexTitlePage_file = m_sFilePath + wxT("TitlePage.tex");
+	SP_LOGMESSAGE( latexTitlePage_file );
 
-	wxFprintf(m_pstream, wxT("\\begin{titlepage}\n\n\t") );
+	wxPrintData *pd = new wxPrintData();
+	SetUpPrintData(*pd, latexTitlePage_file);
 
-	wxFprintf(m_pstream, wxT("\\thispagestyle{fancy}\n\t") );
-	wxFprintf(m_pstream, wxT("\\fancyhf{}\n\t") );
-	wxFprintf(m_pstream, wxT("\\rhead{snoopy2\\LaTeX}\n\t") );
+	FILE* l_pstream = wxFopen( (*pd).GetFilename().c_str(), wxT("w+"));
+
+	if (!l_pstream)
+	{
+		SP_LOGERROR(_("Cannot open file for Latex output!"));
+		return FALSE;
+	}
+
+	wxFprintf(l_pstream, wxT("\\begin{titlepage}\n\n\t") );
+
+	wxFprintf(l_pstream, wxT("\\thispagestyle{fancy}\n\t") );
+	wxFprintf(l_pstream, wxT("\\fancyhf{}\n\t") );
+	wxFprintf(l_pstream, wxT("\\rhead{Snoopy2\\LaTeX}\n\t") );
 
 	wxString out = wxT("\\lhead{");
 	out << InputNetname + wxT("}\n\t");
-	out << wxT("\\cfoot{\\today}\n\n\t");
-	wxFprintf(m_pstream, wxT("%s"), out.c_str());
+	out << wxT("\\cfoot{\\today}\n\n");
+	wxFprintf(l_pstream, wxT("%s"), out.c_str());
 
-	wxFprintf(m_pstream, wxT("\\begin{center}\n\n\t") );
-	wxFprintf(m_pstream, wxT("\\vspace*{4cm}\n\t") );
+	wxFprintf(l_pstream, wxT("\\begin{center}\n\n\t") );
+	wxFprintf(l_pstream, wxT("\\vspace*{4cm}\n\t") );
 
 	out = wxT("\\includegraphics[width=0.20\\textwidth]");
 	out += wxT("{/Users/anjali/workspace/snoopy/images/snoopy_logo.png}~\\\\[1cm]\n\t");
-	wxFprintf(m_pstream, wxT("%s"), out.c_str());
+	wxFprintf(l_pstream, wxT("%s"), out.c_str());
 
-	wxFprintf(m_pstream, wxT("\\vspace{5mm}\n\t") );
-	wxFprintf(m_pstream, wxT("\\hrule\n\t") );
-	wxFprintf(m_pstream, wxT("\\vspace{2mm}\n\t") );
+	wxFprintf(l_pstream, wxT("\\vspace{5mm}\n\t") );
+	wxFprintf(l_pstream, wxT("\\hrule\n\t") );
+	wxFprintf(l_pstream, wxT("\\vspace{2mm}\n\t") );
 
 	out = wxT("\\huge{\\bfseries ");
 	out += InputNetname + wxT("}\n\t");
-	wxFprintf(m_pstream, wxT("%s"), out.c_str());
+	wxFprintf(l_pstream, wxT("%s"), out.c_str());
 
-	wxFprintf(m_pstream, wxT("\\vspace{1.4mm}\n\t") );
-	wxFprintf(m_pstream, wxT("\\hrule\n\t") );
-	wxFprintf(m_pstream, wxT("\\vspace{8mm}\n\t") );
-	wxFprintf(m_pstream, wxT("\\small {\\url {http://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Snoopy} }\n") );
+	wxFprintf(l_pstream, wxT("\\vspace{1.4mm}\n\t") );
+	wxFprintf(l_pstream, wxT("\\hrule\n\t") );
+	wxFprintf(l_pstream, wxT("\\vspace{8mm}\n\t") );
+	wxFprintf(l_pstream, wxT("\\small {\\url {http://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Snoopy} }\n") );
 
-	wxFprintf(m_pstream, wxT("\\end{center}\n\n") );
-	wxFprintf(m_pstream, wxT("\\end{titlepage}\n\n") );
+	wxFprintf(l_pstream, wxT("\\end{center}\n\n") );
+	wxFprintf(l_pstream, wxT("\\end{titlepage}\n\n") );
+
+	//Disclaimer
+	wxFprintf(l_pstream, wxT("\\newpage\n") );
+	wxFprintf(l_pstream, wxT("\\begin{center}\n\t") );
+
+	wxFprintf(l_pstream, wxT("\\vspace*{20cm}\n\t") );
+	wxFprintf(l_pstream, wxT("This document has been generated with Snoopy \\cite{heiner:pn:2012,Rohr:bi:2010}. \\\\ \n\t") );
+	wxFprintf(l_pstream, wxT("If you have any comments or suggestions, \\\\ \n\t") );
+	wxFprintf(l_pstream, wxT("Please contact \\url{snoopy@informatik.tu-cottbus.de}\n") );
+
+	wxFprintf(l_pstream, wxT("\\end{center}\n\n") );
+
+
+	fclose( l_pstream );
+	l_pstream = (FILE *) NULL;
+	wxDELETE(pd);
+
+	wxFprintf(m_pstream, wxT("\\input{./TitlePage.tex}\n") );
 
 	return true;
 }
@@ -1708,13 +2148,13 @@ SP_ExportLatex::WriteBasics()
 
 	wxFprintf(l_pstream, wxT("\\subsection{General Informations}\n") );
 	wxFprintf(l_pstream, wxT("\\vspace{5mm}\n") );
-	wxFprintf(l_pstream, wxT("\\noindent\n") );
+	wxFprintf(l_pstream, wxT("\\noindent\n{") );
 
 	wxString out;
 
 	//File name
 	if( m_pcCheckBox_BasicsGeneral[0]->GetValue() ) {
-		out = wxT("{\\textbf{File Name:} ");
+		out = wxT("\\textbf{File Name:} ");
 		out += InputNetname + wxT("\\\\ \n");
 		wxFprintf(l_pstream, wxT("%s"), out.c_str());
 	}
@@ -1728,9 +2168,12 @@ SP_ExportLatex::WriteBasics()
 
 	//Authors
 	if( m_pcCheckBox_BasicsGeneral[2]->GetValue() ) {
-	    out = wxT("\\textbf{Authors:} ");
-	    out += m_pcMeta->GetAttribute(wxT("Authors"))->GetValueString() + wxT("\\\\ \n");
-	    wxFprintf(l_pstream, wxT("%s"), out.c_str());
+		wxString authors = m_pcMeta->GetAttribute(wxT("Authors"))->GetValueString();
+		if( authors.length() ) {
+			out = wxT("\\textbf{Authors:} ");
+			out += authors + wxT("\\\\ \n");
+			wxFprintf(l_pstream, wxT("%s"), out.c_str());
+		}
 	}
 
 	//Creation Timestamp
@@ -1742,16 +2185,23 @@ SP_ExportLatex::WriteBasics()
 
 	//Description
 	if( m_pcCheckBox_BasicsGeneral[4]->GetValue() ) {
-		out = wxT("\\textbf{Description:} ");
-	    out += m_pcMeta->GetAttribute(wxT("Description"))->GetValueString() + wxT("\\\\ \n");
-	    wxFprintf(l_pstream, wxT("%s"), out.c_str());
+		wxString desc = m_pcMeta->GetAttribute(wxT("Description"))->GetValueString();
+		if(desc.length()) {
+			out = wxT("\\textbf{Description:} ");
+			out += desc + wxT("\\\\ \n");
+			wxFprintf(l_pstream, wxT("%s"), out.c_str());
+		}
 	}
 
 	//Keywords
 	if( m_pcCheckBox_BasicsGeneral[5]->GetValue() ) {
-		out = wxT("\\textbf{Keywords:} ");
-	    out += m_pcMeta->GetAttribute(wxT("Keywords"))->GetValueString() + wxT("\\\\ \n");
-	    wxFprintf(l_pstream, wxT("%s"), out.c_str());
+		wxString keywords = m_pcMeta->GetAttribute(wxT("Keywords"))->GetValueString();
+
+		if(keywords.length()) {
+			out = wxT("\\textbf{Keywords:} ");
+			out += keywords + wxT("\\\\ \n");
+			wxFprintf(l_pstream, wxT("%s"), out.c_str());
+		}
 	}
 
 	//References
@@ -1760,71 +2210,77 @@ SP_ExportLatex::WriteBasics()
 		//load references to export: add to map
 		wxString references = m_pcMeta->GetAttribute(wxT("References"))->GetValueString();
 
-		int found = references.find(wxT("bibitem"));
-		wxString label;
-		int found2;
-		int key = 2;
+		if(references.length()) {
 
-		while(found != wxString::npos) {
-			found2 = references.find(wxT("bibitem"), found + 1);
+			int found = references.find(wxT("bibitem"));
+			wxString label;
+			int found2;
+			int key = 2;
 
-			//add label of found reference to map SP_LatexReferencesIndex2Ref
-			label = "";
-			int i = found;
+			while(found != wxString::npos) {
+				found2 = references.find(wxT("bibitem"), found + 1);
 
-			for(; i < references.size() && references.at(i) != '}';) {
+				//add label of found reference to map SP_LatexReferencesIndex2Ref
+				label = "";
+				int i = found;
 
-				if( references.at(i) == '{') {
-					i++;
-					while( references.at(i) != '}' ) {
-						label += references.substr(i, 1);
+				for(; i < references.size() && references.at(i) != '}';) {
+
+					if( references.at(i) == '{') {
 						i++;
-					};
-				} else
-					i++;
+						while( references.at(i) != '}' ) {
+							label += references.substr(i, 1);
+							i++;
+						};
+					} else
+						i++;
+				}
+
+				if(found2 != wxString::npos) {
+					out = references.SubString(i + 1, found2-2);
+				} else {
+					out = references.SubString(i + 1, references.length()-1);
+				}
+				SP_LatexReferencesIndex2Ref.insert(pair< pair<int, wxString>, wxString> ( make_pair(++key, label), out ) );
+
+				found = found2;
+			};
+
+			out = wxT("\\textbf{References:} \\cite{ ");
+
+			map< pair<int, wxString>, wxString>::iterator it;
+			for(it = SP_LatexReferencesIndex2Ref.begin(); it != SP_LatexReferencesIndex2Ref.end();) {
+				out += (*it).first.second;  //add label to cite
+				it++;
+
+				if(it != SP_LatexReferencesIndex2Ref.end() ) {
+					out += wxT(", ");
+				}
 			}
 
-			if(found2 != wxString::npos) {
-				out = references.SubString(i + 1, found2-2);
-			} else {
-				out = references.SubString(i + 1, references.length()-1);
-			}
-			SP_LatexReferencesIndex2Ref.insert(pair< pair<int, wxString>, wxString> ( make_pair(++key, label), out ) );
+			out += wxT("}\n");
 
-			found = found2;
-		};
-
-		//////////////////////////////
-		out = wxT("\\textbf{References:} \\cite{ ");
-
-		map< pair<int, wxString>, wxString>::iterator it;
-		for(it = SP_LatexReferencesIndex2Ref.begin(); it != SP_LatexReferencesIndex2Ref.end();) {
-			out += (*it).first.second;  //add label to cite
-			it++;
-
-			if(it != SP_LatexReferencesIndex2Ref.end() ) {
-				out += wxT(", ");
-			}
+			wxFprintf(l_pstream, wxT("%s"), out.c_str());
 		}
-
-		out += wxT("}\n\n");
-
-	    wxFprintf(l_pstream, wxT("%s"), out.c_str());
 
 	}
 
-	//Net Information
+	wxFprintf(l_pstream, wxT("}\n\n") );
 
+
+	//Net Information
 	wxFprintf(l_pstream, wxT("\\subsection{Net Informations}\n") );
 	wxFprintf(l_pstream, wxT("\\vspace{5mm}\n\n") );
 
 
+	//Net Class
 	if( m_pcCheckBox_BasicsNet[0]->GetValue() ) {
 		out = wxT("\\noindent{\\textbf{Net Class: } ");
 		out += p_pcDoc->GetNetclassName() + wxT("}  \\\\ \\\\ \n");
 		wxFprintf(l_pstream, wxT("%s"), out.c_str());
 	}
 
+	//Element count
 	if( m_pcCheckBox_BasicsNet[1]->GetValue() ) {
 		wxFprintf(l_pstream, wxT("\\begin{tabular}{l c }\n\t") );
 		wxFprintf(l_pstream, wxT("\\textbf{Element} & \\textbf{Count} \\\\ \n\t") );
@@ -1891,7 +2347,7 @@ SP_ExportLatex::WriteGraphElements()
 		return FALSE;
 	}
 
-	wxFprintf(l_pstream, wxT("\n\\newpage\n") );
+	wxFprintf(l_pstream, wxT("\\newpage\n") );
 	wxFprintf(l_pstream, wxT("\\section{Graph Elements}\n") );
 	wxFprintf(l_pstream, wxT("This section contains information related to graph elements specific to the net.\n") );
 	//////////////////////
@@ -1902,7 +2358,8 @@ SP_ExportLatex::WriteGraphElements()
 
 			int order = m_pcRearrangelist_Graph->GetCurrentOrder()[ i ];
 
-			wxString element = m_Options_Graph[ order ] + wxT("s");
+			wxString l_sElementDisplayName = m_Options_Graph[ order ];
+			wxString element = l_sElementDisplayName + wxT("s");
 			wxString latexEle_file = m_sFilePath + EditStringforLatex( element ) + wxT(".tex");
 
 			wxPrintData *pd1 = new wxPrintData();
@@ -1927,50 +2384,131 @@ SP_ExportLatex::WriteGraphElements()
 			wxCheckListBox* l_pcCheckListAttributes = SP_Node2AttributeCheckList[ order ];
 			int l_nAttributes = l_pcCheckListAttributes->GetCheckedItems( l_nArrayIntAttributes );
 
-			SP_DS_Nodeclass* nodeclass = m_pcGraph->GetNodeclassByDisplayedName( m_Options_Graph[ order ] );
-			SP_DS_Edgeclass* edgeclass = m_pcGraph->GetEdgeclassByDisplayedName( m_Options_Graph[ order ] );
-			SP_DS_Metadataclass* metadataclass = m_pcGraph->GetMetadataclassByDisplayedName( m_Options_Graph[ order ] );
+			SP_DS_Nodeclass* nodeclass = m_pcGraph->GetNodeclassByDisplayedName( l_sElementDisplayName );
+			SP_DS_Edgeclass* edgeclass = m_pcGraph->GetEdgeclassByDisplayedName( l_sElementDisplayName );
+			SP_DS_Metadataclass* metadataclass = m_pcGraph->GetMetadataclassByDisplayedName( l_sElementDisplayName );
 
 			if( nodeclass ) {
 
 				wxArrayInt l_nArrayIntElements;
 				wxCheckListBox* l_pcCheckListElements = SP_Node2NodeCheckList[ order ];
+				map<wxString, wxString> l_sAttrNameMap = SP_Node2AttrNameMap[ l_sElementDisplayName ];
+
 				int l_nElements = l_pcCheckListElements->GetCheckedItems( l_nArrayIntElements );
 
 				if( l_nAttributes && l_nElements ) { //if non-zero number of attributes and nodes selected -> draw table
 
-					SP_LOGMESSAGE( wxT("nodeclass found: ") + nodeclass->GetDisplayName() );
+					SP_LOGMESSAGE( wxT("nodeclass found: ") + nodeclass->GetDisplayName() + wxT("->")+ wxString::Format(wxT("%i"), l_nElements));
 
 					SP_ListAttribute::const_iterator itAttr;
-					SP_DS_Node* nd = nodeclass->GetPrototype();
+					//SP_DS_Node* l_pcProtoNode = nodeclass->GetPrototype();
 					SP_DS_Node* l_pcNode;
+					wxArrayString l_sNodeList; //list of node names
 
-					wxFprintf(l_pstream1, wxT("\\emph{") + element + wxT(" Table}\n\n") );
+					for(int j = 0; j < l_nElements; j++) {
+						int index = l_nArrayIntElements[ j ];
+						wxString element_name = l_pcCheckListElements->GetString( index );
+						l_sNodeList.Add( element_name );
+					}
 
-					wxFprintf(l_pstream1, wxT("\\begin{longtable}") );
+					l_pcNode = SP_Name2Node[ l_sNodeList[0] ];
+
+					wxFprintf(l_pstream1, wxT("\\begin{longtabu}") );
 					wxString out = wxT("{ | ");
 
 					for(int i = 0; i < l_nAttributes; i++) {
-						out += wxT("l |");
-					}
-					out += wxT("}\n\n\t");
-					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
-					wxFprintf(l_pstream1, wxT("\\hline\n\t") );
+						wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+						SP_DS_Attribute* sp = l_pcNode->GetAttribute( l_sAttrNameMap[ name ] );
 
-					int flag_crossRef = 0;
+						if( name.compare( wxT("Order Lexicographically")) ) {
+							if( (name.compare( wxT("ID") ) == 0) ||
+									(name.compare( wxT("Logic") ) == 0) ||
+									(name.compare( wxT("Marking") ) == 0) ||
+									(name.compare( wxT("Net number") ) == 0) ) {
+								out += wxT(">{\\hspace{0pt}} X[-0.5, l] |");
+							} else {
+								if(sp && sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+									SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+									for(unsigned k = 0; k < l_pcColAttr->GetColCount(); k++) {
+										if(k < 2) {
+											out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+										}
+									}
+
+								} else {
+									out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+								}
+							}
+						}
+					}
+					out += wxT("}\n\n");
+					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+					wxFprintf(l_pstream1, wxT("\\caption{") + element + wxT(" Table}\\\\ \\hline\n") );
 
 					out = "";
+					int l_ncols = 0;
+					int flag_crossRef = 0;
+					int flag_Order = 0;
+
 					for(int i = 0; i < l_nAttributes; i++) {
 						wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
-						SP_DS_Attribute* sp = nd->GetAttribute( name );
+						SP_DS_Attribute* sp = l_pcNode->GetAttribute( l_sAttrNameMap[ name ] );
 
-						if( sp || name.compare( wxT("Net number") ) == 0 ) {  //not cross-ref or ordering
-						//	SP_LOGMESSAGE( wxT("attribute: ") + sp->GetDisplayName() );
-							out += name;
-							out += wxT(" & ");
+						if( sp ) {  //not cross-ref or ordering
+							SP_LOGMESSAGE( wxT("Nodeclass attribute it is: >>>>>> ") + name);
+
+							if( name.compare( wxT("Logic") ) == 0) {
+								out += wxT("\\hspace{0pt}LOG. &");
+								l_ncols++;
+							} else if( name.compare( wxT("Marking") ) == 0) {
+								out += wxT("\\hspace{0pt}MAR. &");
+								l_ncols++;
+							} else {
+
+								//collist attribute (added to table as a column entry if count is 1)
+								if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+
+									SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+									for(unsigned k = 0; k < l_pcColAttr->GetColCount(); k++) {
+										//wxString l_sColLabel = l_pcColAttr->GetCell(k, 0);
+										wxString l_sColLabel = l_pcColAttr->GetColLabel(k);
+
+										if(l_sColLabel.IsEmpty()) {
+											SP_LOGMESSAGE("Unnamed entry in COLLIST");
+										}
+
+										if( k < 2 ) {
+											out += wxT("\\hspace{0pt}") + l_sColLabel.MakeUpper() + wxT(" & ");
+											l_ncols++;
+										} else {
+											out = out.BeforeLast('&');
+											out += wxT("; ") + l_sColLabel.MakeUpper() + wxT(" & ");
+										}
+									}
+
+								} else {
+									out += wxT("\\hspace{0pt}") + name.MakeUpper();
+									out += wxT(" & ");
+									l_ncols++;
+								}
+							}
 						} else if( name.compare( wxT("Cross Refs.") ) == 0) {
-							out += name;
+							out += wxT("\\hspace{0pt}");
+							out += name.MakeUpper();
 							flag_crossRef = 1;
+							l_ncols++;
+						} else if(name.compare( wxT("Net number") ) == 0) {
+							out += wxT("\\hspace{0pt}NET.");
+							out += wxT(" & ");
+							l_ncols++;
+						} else if( name.compare( wxT("Order Lexicographically") ) == 0 ) {
+							flag_Order = 1;
+						} else {
+							out += wxT("\\hspace{0pt}") + name.MakeUpper();
+							out += wxT(" & ");
+							l_ncols++;
 						}
 					}
 
@@ -1981,75 +2519,140 @@ SP_ExportLatex::WriteGraphElements()
 					out += wxT("\\\\ \\hline \\hline \\endhead\n");
 					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 
+					out = wxT("\\hline \\multicolumn{") + wxString::Format(wxT("%i"), l_ncols)
+							+ wxT("}{|r|}{{Continued on next page}}\\\\ \\hline \\endfoot\n");
+					out+= wxT("\\hline \\hline \\endlastfoot\n\n");
+					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 
-					//popoulate table with element details
+					out = "";
+
+					if(flag_Order) {
+						l_sNodeList.Sort();
+					}
+
+					//populate table with element details
 					for(int j = 0; j < l_nElements; j++) {
 						out = "";
-						int index = l_nArrayIntElements[ j ];
-						wxString element_name = l_pcCheckListElements->GetString( index );
+						wxString element_name = l_sNodeList[j];
 						l_pcNode = SP_Name2Node[ element_name ];
 
 						if(l_pcNode) SP_LOGMESSAGE( element_name );
 
+						//out = wxT("\\multirow{1}{*}");
+
 						for(int i = 0; i < l_nAttributes; i++) {
+
 							wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
-							SP_DS_Attribute* sp = l_pcNode->GetAttribute( name );
+							SP_DS_Attribute* sp = l_pcNode->GetAttribute( l_sAttrNameMap[ name ] );
 
 							if( sp ) { //not cross-ref or ordering
-								wxString value = EditStringforLatex( sp->GetValueString() );
+								SP_LOGMESSAGE( wxT("Nodeclass attribute it is: >>>2>>> ") + name);
 
-								if(i == 0) {
-									out += wxT("\\multirow{1}{*}{") + value +  wxT("}&");
-								} else {
+								wxString value = sp->GetValueString();
+
+								if( name.compare( wxT("Name") ) == 0 ) {   //add cross-reference label
+									if(value.size() == 0) {   //no name attribute
+										//fetch default assigned name
+										value = dynamic_cast<SP_DS_NameAttribute*>( (l_pcNode)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) )->GetValue();
+									}
+									wxString l_slabel = EditStringforCrossRef(value);
+
+									value = EditStringforLatex(value);
+									out += value + wxT(" \\linkto{") + l_slabel + wxT("} &");
+								} else if( name.compare( wxT("Logic") ) == 0 ) {
+
+									if(value == wxT("0") )
+										value = wxT("\\xmark");
+									else
+										value = wxT("\\cmark");
+
 									out += value + wxT("&");
-								}
 
+								} else {
+
+									//collist attribute
+									if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+										SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+										for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++) {
+
+											for(unsigned k = 0; k < l_pcColAttr->GetRowCount(); k++)
+											{
+												wxString l_sSetName = l_pcColAttr->GetCell(k, col);
+
+												if(!l_sSetName.IsEmpty()) {
+													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+												}
+
+												/*
+												if (k < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak");
+												} else {
+													out += wxT("&");
+												} */
+
+												if(col < 2) {
+													out += l_sSetName + wxT("&");
+												} else {
+													out = out.BeforeLast('&');
+													out += wxT("; ") + l_sSetName + wxT("&");
+												}
+											}
+
+										}
+
+									} else {
+										out += value + wxT("&");
+									}
+								}
 							} else if( name.compare( wxT("Cross Refs.") ) == 0 ) {
 								//add cross-refs here
 								wxString value = SP_NetNumber2Label[ wxString::Format(wxT("%i"), l_pcNode->GetNetnumber()) ];
+								wxString l_slinkLabel = EditStringforCrossRef( value);
 
 								if(i == 0) {
-									out += wxT("\\multirow{1}{*}{") + EditStringforLatex( value ) +  wxT("}&");
-								} else {
-									//out +=  EditStringforLatex( value ) + wxT("\\\\ \n");
+									value = EditStringforLatex( value );
+									//value = wxT("$") + value + wxT("$");    //names in math mode temporarily
 
-									SP_Graphic* l_pcGraphics = l_pcNode->GetGraphicInSubnet( l_pcNode->GetNetnumber() );
-									SP_ListGraphic l_lGraphics;
-									//l_pcNode->GetCoupledGraphics(l_lGraphics, l_pcGraphics);
-									//SP_ListGraphic l_lGraphics;
-									l_pcNode->GetGraphicsInNet(&l_lGraphics, l_pcNode->GetNetnumber());
+									out += wxT("\\hyperref[") + l_slinkLabel
+											+ wxT("]{") + value +  wxT("} &");
+								} else {
+
+									SP_ListGraphic* l_lGraphics = l_pcNode->GetGraphics();
 
 									SP_ListGraphic::iterator l_Iter;
 									set<int> l_SetNetNumber;
 									set<int>::iterator it;
 
-									for(l_Iter = l_lGraphics.begin(); l_Iter != l_lGraphics.end(); ++l_Iter)
+									for(l_Iter = l_lGraphics->begin(); l_Iter != l_lGraphics->end(); ++l_Iter)
 									{
 										l_SetNetNumber.insert( (*l_Iter)->GetNetnumber() );
 									}
 
 									for(it = l_SetNetNumber.begin(); it != l_SetNetNumber.end(); it++) {
-
 										value = SP_NetNumber2Label[ wxString::Format(wxT("%i"), (*it) ) ];
+										l_slinkLabel = EditStringforCrossRef(value);
 
-										wxString ref = "";
-
-										if(it != l_SetNetNumber.begin()) {
-											for(int k = 0; k < i; k++) ref += wxT("&");
-										}
-
-										ref += EditStringforLatex( value ) + wxT(" \\\\ \n");
-										out += ref;
+										value = EditStringforLatex( value );
+										out += wxT("\\hyperref[") + l_slinkLabel
+												+ wxT("]{") + value +  wxT("} \\linebreak\n");
 									}
+
+									if( l_SetNetNumber.size() ) {
+										out = out.BeforeLast(' ');
+									}
+									out += wxT(" \\\\ \n");
 								}
 
 							} else if( name.compare( wxT("Net number") ) == 0 ) {
 								wxString value = wxString::Format(wxT("%i"), l_pcNode->GetNetnumber());
 								if(i == 0) {
-									out += wxT("\\multirow{1}{*}{") + value +  wxT("}&");
+									out += value + wxT("&");
 								} else {
 									out += value + wxT("&");
 								}
+							} else if(name.compare( wxT("Order Lexicographically") ) ) {
+								out += wxT("&");
 							}
 						}
 
@@ -2060,7 +2663,7 @@ SP_ExportLatex::WriteGraphElements()
 						wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 					}
 
-					wxFprintf(l_pstream1, wxT("\\end{longtable}\n") );
+					wxFprintf(l_pstream1, wxT("\\end{longtabu}\n") );
 
 				} else {
 					wxFprintf(l_pstream1, wxT("\\emph{No elements available for description}\n\n") );
@@ -2073,35 +2676,142 @@ SP_ExportLatex::WriteGraphElements()
 				SP_LOGMESSAGE( wxT("Edgeclass found: ") + edgeclass->GetDisplayName() );
 
 				SP_ListAttribute::const_iterator itAttr;
-				SP_DS_Edge* nd = edgeclass->GetPrototype();
+				//SP_DS_Edge* l_pcProtoEdge = edgeclass->GetPrototype();
+				SP_DS_Edge* l_pcEdge;
+				map<wxString, wxString> l_sAttrNameMap = SP_Node2AttrNameMap[ l_sElementDisplayName ];
 
-				if( l_nAttributes ) {  //if non-zero number of attributes selected -> draw table
-					wxFprintf(l_pstream1, wxT("\\emph{") + element + wxT(" Table}\n\n") );
+				m_pEdgesPlace2Transition.clear();
+				m_pEdgesTransition2Place.clear();
 
-					wxFprintf(l_pstream1, wxT("\\begin{longtable}") );
-					wxString out = wxT("{ | ");
+				m_pEdgesPlace2Transition = SP_Edgeclass2EdgeList[ l_sElementDisplayName ].first;
+				m_pEdgesTransition2Place = SP_Edgeclass2EdgeList[ l_sElementDisplayName ].second;
+
+				int l_nEdgesCount1 = m_pEdgesPlace2Transition.size();
+				int l_nEdgesCount2 = m_pEdgesTransition2Place.size();
+
+
+				if( l_nAttributes && ( l_nEdgesCount1 ||l_nEdgesCount2 ) ) {  //if non-zero number of attributes selected -> draw table
+
+					//order edges as per user-customised ordering and grouping
+					if( m_pcOrderBySource->GetValue() ) {
+						//order by source
+						sort(m_pEdgesPlace2Transition.begin(), m_pEdgesPlace2Transition.end() );
+						sort(m_pEdgesTransition2Place.begin(), m_pEdgesTransition2Place.end() );
+					} else {
+						//order by target
+						sort(m_pEdgesPlace2Transition.begin(), m_pEdgesPlace2Transition.end(), compareTarget);
+						sort(m_pEdgesTransition2Place.begin(), m_pEdgesTransition2Place.end(), compareTarget);
+					}
+
+					//fetching one edge for reference
+					wxString element_name = m_pEdgesPlace2Transition[0].first + wxT("->") + m_pEdgesPlace2Transition[0].second;
+					l_pcEdge = SP_Name2Edge[ element_name ];
+
+					wxFprintf(l_pstream1, wxT("\\begin{longtabu}") );
+					wxString out = wxT("{ | >{\\hspace{0pt}} X[-1, l] | >{\\hspace{0pt}} X[-0.5, l] | >{\\hspace{0pt}} X[-1, l] | >{\\hspace{0pt}} X[-0.5, l] | ");
 
 					for(int i = 0; i < l_nAttributes; i++) {
-						out += wxT("l |");
+						wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+						SP_DS_Attribute* sp = l_pcEdge->GetAttribute( l_sAttrNameMap[ name] );
+
+						if( name.compare( wxT("Order Lexicographically")) ) {
+							if( name.compare( wxT("Multiplicity") ) == 0) {
+								out += wxT(">{\\hspace{0pt}} X[-0.5, l] |");
+							} else {
+								if(sp && sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+									SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+									for(unsigned int k = 0; k < l_pcColAttr->GetColCount(); k++) {
+										out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+									}
+
+								} else {
+									out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+								}
+							}
+						}
 					}
-					out += wxT("}\n\n\t");
+					out += wxT("}\n\n");
 					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
-					wxFprintf(l_pstream1, wxT("\\hline\n\t") );
+
+					wxFprintf(l_pstream1, wxT("\\caption{") + element + wxT(" Table}\\\\ \\hline\n") );
 
 					int flag_crossRef = 0;
 
-					out = "";
+					out = wxT("\\multicolumn{2}{|c|}{SOURCE} & \\multicolumn{2}{|c|}{TARGET} ");
 					for(int i = 0; i < l_nAttributes; i++) {
 						wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
-						SP_DS_Attribute* sp = nd->GetAttribute( name );
+						SP_DS_Attribute* sp = l_pcEdge->GetAttribute( l_sAttrNameMap[ name] );
+
+						if(sp) {
+							if(sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+								SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+								for(unsigned int k = 0; k < l_pcColAttr->GetColCount(); k++) {
+									if(k < 2) {
+										out += wxT("& ");
+									}
+								}
+							} else {
+								out += wxT("& ");
+							}
+						} else {
+							out += wxT("& ");
+						}
+					}
+
+					out += wxT("\\\\ \\cline{1-4}\n");
+
+					out += wxT("NAME & TYPE & NAME & TYPE &");
+
+					int l_ncols = 4;
+					for(int i = 0; i < l_nAttributes; i++) {
+						wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+						SP_DS_Attribute* sp = l_pcEdge->GetAttribute( l_sAttrNameMap[ name] );
 
 						if( sp ) {  //not cross-ref or ordering
-							SP_LOGMESSAGE( wxT("attribute: ") + sp->GetDisplayName() );
-							out += name;
-							out += wxT(" & ");
+
+							if( name.compare( wxT("Multiplicity")) == 0) {
+								out += wxT("\\hspace{0pt} MUL. &");
+								l_ncols++;
+							} else {
+
+								//collist attribute (added to table as a column entry if count is 1)
+								if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+
+									SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+									for(unsigned int k = 0; k < l_pcColAttr->GetColCount(); k++) {
+										wxString l_sColLabel = l_pcColAttr->GetColLabel(k);
+
+										if(l_sColLabel.IsEmpty()) {
+											SP_LOGMESSAGE("Unnamed entry in COLLIST");
+										}
+
+										if(k < 2) {
+											out += wxT("\\hspace{0pt}") + l_sColLabel.MakeUpper() + wxT(" & ");
+											l_ncols++;
+										} else {
+											out = out.BeforeLast('&');
+											out += wxT("; ") + l_sColLabel.MakeUpper() + wxT(" & ");
+										}
+									}
+
+								} else {
+									out += wxT("\\hspace{0pt}") + name.MakeUpper();
+									out += wxT(" & ");
+									l_ncols++;
+								}
+							}
 						} else if( name.compare( wxT("Cross Refs.") ) == 0) {
-								out += name;
-								flag_crossRef = 1;
+							out += wxT("\\hspace{0pt}");
+							out += name.MakeUpper();
+							flag_crossRef = 1;
+							l_ncols++;
+						} else if(name.compare( wxT("Order Lexicographically") )) {
+							out += wxT("\\hspace{0pt}") + name.MakeUpper();
+							out += wxT(" & ");
+							l_ncols++;
 						}
 					}
 
@@ -2112,7 +2822,320 @@ SP_ExportLatex::WriteGraphElements()
 					out += wxT("\\\\ \\hline \\hline \\endhead\n");
 					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 
-					wxFprintf(l_pstream1, wxT("\\end{longtable}\n") );
+					out = wxT("\\hline \\multicolumn{") + wxString::Format(wxT("%i"), l_ncols)
+							+ wxT("}{|r|}{{Continued on next page}}\\\\ \\hline \\endfoot\n");
+					out+= wxT("\\hline \\hline \\endlastfoot\n\n");
+					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+
+					if( m_pcGroupByPlace2Transition->GetValue() ) {
+
+						//Place to Transition
+						for(int j = 0; j < l_nEdgesCount1; j++) {
+							wxString l_sSourceName = m_pEdgesPlace2Transition[j].first;
+							wxString l_sTargetName = m_pEdgesPlace2Transition[j].second;
+							wxString element_name = l_sSourceName + wxT("->") + l_sTargetName;
+							l_pcEdge = SP_Name2Edge[ element_name ];
+
+							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
+							l_sSourceName = EditStringforLatex( l_sSourceName );
+							//l_sSourceName = wxT("$") + l_sSourceName + wxT("$");
+
+							out = wxT("\\hyperref[") + l_slinklabel
+									+ wxT("]{") + l_sSourceName
+									+ wxT("} & P &");
+
+							l_slinklabel = EditStringforCrossRef(l_sTargetName);
+							l_sTargetName = EditStringforLatex( l_sTargetName );
+							//l_sTargetName = wxT("$") + l_sTargetName + wxT("$");
+
+							out += wxT("\\hyperref[") + l_slinklabel
+									+ wxT("]{") + l_sTargetName
+									+ wxT("} & T &");
+
+							if(l_pcEdge) SP_LOGMESSAGE( element_name );
+
+							for(int i = 0; i < l_nAttributes; i++) {
+								wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+								SP_DS_Attribute* sp = l_pcEdge->GetAttribute( l_sAttrNameMap[ name] );
+
+								if( sp ) { //not cross-ref or ordering
+									wxString value = sp->GetValueString();
+
+									//collist attribute
+									if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+										SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+										for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++) {
+
+											for(unsigned k = 0; k < l_pcColAttr->GetRowCount(); k++)
+											{
+												wxString l_sSetName = l_pcColAttr->GetCell(k, col);
+
+												if(!l_sSetName.IsEmpty()) {
+													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+												}
+
+												/*
+												if (k < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak");
+												} else {
+													out += wxT("&");
+												} */
+
+												if(col < 2) {
+													out += l_sSetName + wxT("&");
+												} else {
+													out = out.BeforeLast('&');
+													out += wxT("; ") + l_sSetName + wxT("&");
+												}
+											}
+										}
+
+									} else {
+										value = EditStringforLatex( value );
+										out += value + wxT("&");
+									}
+								} else {
+									out += wxT("&");
+								}
+							}
+
+							out = out.BeforeLast('&');
+							out += wxT("\\\\ \\hline\n");
+							wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+						}
+
+						//Transition to Place
+						for(int j = 0; j < l_nEdgesCount2; j++) {
+							wxString l_sSourceName = m_pEdgesTransition2Place[j].first;
+							wxString l_sTargetName = m_pEdgesTransition2Place[j].second;
+							wxString element_name = l_sSourceName + wxT("->") + l_sTargetName;
+							l_pcEdge = SP_Name2Edge[ element_name ];
+
+							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
+							l_sSourceName = EditStringforLatex( l_sSourceName );
+							//l_sSourceName = wxT("$") + l_sSourceName + wxT("$");
+
+							out = wxT("\\hyperref[") + l_slinklabel
+									+ wxT("]{") + l_sSourceName
+									+ wxT("} & T &");
+
+							l_slinklabel = EditStringforCrossRef(l_sTargetName);
+							l_sTargetName = EditStringforLatex( l_sTargetName );
+							//l_sTargetName = wxT("$") + l_sTargetName + wxT("$");
+
+							out += wxT("\\hyperref[") + l_slinklabel
+									+ wxT("]{") + l_sTargetName
+									+ wxT("} & P &");
+
+							if(l_pcEdge) SP_LOGMESSAGE( element_name );
+
+							for(int i = 0; i < l_nAttributes; i++) {
+								wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+								SP_DS_Attribute* sp = l_pcEdge->GetAttribute( l_sAttrNameMap[ name] );
+
+								if( sp ) { //not cross-ref or ordering
+									wxString value = sp->GetValueString();
+
+									//collist attribute
+									if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+										SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+										 for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++) {
+
+											for(unsigned k = 0; k < l_pcColAttr->GetRowCount(); k++)
+											{
+												wxString l_sSetName = l_pcColAttr->GetCell(k, col);
+
+												if(!l_sSetName.IsEmpty()) {
+													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+												}
+
+												/*
+												if (k < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak");
+												} else {
+													out += wxT("&");
+												} */
+
+												if(col < 2) {
+													out += l_sSetName + wxT("&");
+												} else {
+													out = out.BeforeLast('&');
+													out += wxT("; ") + l_sSetName + wxT("&");
+												}
+											}
+										}
+									} else {
+										value = EditStringforLatex( value );
+										out += value + wxT("&");
+									}
+								} else {
+									out += wxT("&");
+								}
+							}
+
+							out = out.BeforeLast('&');
+							out += wxT("\\\\ \\hline\n");
+							wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+						}
+					} else {
+
+						//Transition to Place
+						for(int j = 0; j < l_nEdgesCount2; j++) {
+							wxString l_sSourceName = m_pEdgesTransition2Place[j].first;
+							wxString l_sTargetName = m_pEdgesTransition2Place[j].second;
+							wxString element_name = l_sSourceName + wxT("->") + l_sTargetName;
+							l_pcEdge = SP_Name2Edge[ element_name ];
+
+							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
+							l_sSourceName = EditStringforLatex( l_sSourceName );
+							//l_sSourceName = wxT("$") + l_sSourceName + wxT("$");
+
+							out = wxT("\\hyperref[") + l_slinklabel
+									+ wxT("]{") + l_sSourceName
+									+ wxT("} & T &");
+
+							l_slinklabel = EditStringforCrossRef(l_sTargetName);
+							l_sTargetName = EditStringforLatex( l_sTargetName );
+							//l_sTargetName = wxT("$") + l_sTargetName + wxT("$");
+
+							out += wxT("\\hyperref[") + l_slinklabel
+									+ wxT("]{") + l_sTargetName
+									+ wxT("} & P &");
+
+
+							if(l_pcEdge) SP_LOGMESSAGE( element_name );
+
+							for(int i = 0; i < l_nAttributes; i++) {
+								wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+								SP_DS_Attribute* sp = l_pcEdge->GetAttribute( l_sAttrNameMap[ name] );
+
+								if( sp ) { //not cross-ref or ordering
+									wxString value = sp->GetValueString();
+
+									//collist attribute
+									if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+										SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+										 for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++) {
+
+											for(unsigned k = 0; k < l_pcColAttr->GetRowCount(); k++)
+											{
+												wxString l_sSetName = l_pcColAttr->GetCell(k, col);
+
+												if(!l_sSetName.IsEmpty()) {
+													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+												}
+
+												/*
+												if (k < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak");
+												} else {
+													out += wxT("&");
+												} */
+
+												if(col < 2) {
+													out += l_sSetName + wxT("&");
+												} else {
+													out = out.BeforeLast('&');
+													out += wxT("; ") + l_sSetName + wxT("&");
+												}
+											}
+										}
+
+									} else {
+										value = EditStringforLatex( value );
+										out += value + wxT("&");
+									}
+								} else {
+									out += wxT("&");
+								}
+							}
+
+							out = out.BeforeLast('&');
+							out += wxT("\\\\ \\hline\n");
+							wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+						}
+
+						//Place to Transition
+						for(int j = 0; j < l_nEdgesCount1; j++) {
+							wxString l_sSourceName = m_pEdgesPlace2Transition[j].first;
+							wxString l_sTargetName = m_pEdgesPlace2Transition[j].second;
+							wxString element_name = l_sSourceName + wxT("->") + l_sTargetName;
+							l_pcEdge = SP_Name2Edge[ element_name ];
+
+							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
+							l_sSourceName = EditStringforLatex( l_sSourceName );
+							//l_sSourceName = wxT("$") + l_sSourceName + wxT("$");
+
+							out = wxT("\\hyperref[") + l_slinklabel
+									+ wxT("]{") + l_sSourceName
+									+ wxT("} & P &");
+
+							l_slinklabel = EditStringforCrossRef(l_sTargetName);
+							l_sTargetName = EditStringforLatex( l_sTargetName );
+							//l_sTargetName = wxT("$") + l_sTargetName + wxT("$");
+
+							out += wxT("\\hyperref[") + l_slinklabel
+									+ wxT("]{") + l_sTargetName
+									+ wxT("} & T &");
+
+							if(l_pcEdge) SP_LOGMESSAGE( element_name );
+
+							for(int i = 0; i < l_nAttributes; i++) {
+								wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+								SP_DS_Attribute* sp = l_pcEdge->GetAttribute( l_sAttrNameMap[ name] );
+
+								if( sp ) { //not cross-ref or ordering
+									wxString value = sp->GetValueString();
+
+									//collist attribute
+									if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+										SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+										 for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++) {
+
+											for(unsigned k = 0; k < l_pcColAttr->GetRowCount(); k++)
+											{
+												wxString l_sSetName = l_pcColAttr->GetCell(k, col);
+
+												if(!l_sSetName.IsEmpty()) {
+													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+												}
+
+												/*
+												if (k < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak");
+												} else {
+													out += wxT("&");
+												} */
+
+												if(col < 2) {
+													out += l_sSetName + wxT("&");
+												} else {
+													out = out.BeforeLast('&');
+													out += wxT("; ") + l_sSetName + wxT("&");
+												}
+											}
+										}
+									} else {
+										value = EditStringforLatex( value );
+										out += value + wxT("&");
+									}
+								} else {
+									out += wxT("&");
+								}
+						    }
+
+							out = out.BeforeLast('&');
+							out += wxT("\\\\ \\hline\n");
+							wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+						}
+
+					}
+
+					wxFprintf(l_pstream1, wxT("\\end{longtabu}\n") );
 				} else {
 					wxFprintf(l_pstream1, wxT("\\emph{No elements available for description}\n\n") );
 				}
@@ -2124,41 +3147,238 @@ SP_ExportLatex::WriteGraphElements()
 				SP_LOGMESSAGE( wxT("Metadataclass found: ") + metadataclass->GetDisplayName() );
 
 				SP_ListAttribute::const_iterator itAttr;
-				SP_DS_Metadata* nd = metadataclass->GetPrototype();
+				SP_DS_Metadata* l_pcProtoMeta = metadataclass->GetPrototype();
 				SP_DS_Metadata* l_pcMetadata;
+				map<wxString, wxString> l_sAttrNameMap = SP_Node2AttrNameMap[ l_sElementDisplayName ];
 
-				if( element.compare( wxT("Comments") ) ) {
+				if( element.compare( wxT("Comments")) == 0) {  //Comment
+
+					if( l_nAttributes ) {
+
+						wxArrayString l_sComments = SP_Nodeclass2NodeList[ wxT("Comment") ];
+
+						if( !l_sComments.IsEmpty() )
+						{
+							wxFprintf(l_pstream1, wxT("\\begin{longtabu}") );
+							wxString out = wxT("{ |");
+
+							for(int i = 0; i < l_nAttributes; i++) {
+								wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+								SP_DS_Attribute* sp = l_pcProtoMeta->GetAttribute( l_sAttrNameMap[name] );
+
+								if( name.compare( wxT("Order Lexicographically")) ) {
+
+									if(sp && sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+										SP_DS_ColListAttribute* l_pcProtoColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+										for(unsigned k = 1; k < l_pcProtoColAttr->GetColCount(); k++) {
+											out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+										}
+
+									} else {
+										out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+									}
+								}
+							}
+							out += wxT("}\n\n");
+							wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+
+							wxFprintf(l_pstream1, wxT("\\caption{") + element + wxT(" Table}\\\\ \\hline\n") );
+
+							out = "";
+							int l_ncols = 0;
+							int flag_crossRef = 0;
+
+							for(int i = 0; i < l_nAttributes; i++) {
+								wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+								SP_DS_Attribute* sp = l_pcProtoMeta->GetAttribute( l_sAttrNameMap[name] );
+
+								if( sp ) {  //not cross-ref or ordering
+
+									//collist attribute (added to table as a column entry if count is 1)
+									if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+
+										SP_DS_ColListAttribute* l_pcProtoColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+										for(unsigned k = 1; k < l_pcProtoColAttr->GetColCount(); k++) {
+											wxString l_sColLabel = l_pcProtoColAttr->GetColLabel(k);
+											out += wxT("\\hspace{0pt}") + l_sColLabel.MakeUpper() + wxT(" & ");
+											l_ncols++;
+										}
+									} else {
+										out += wxT("\\hspace{0pt}") + name.MakeUpper();
+										out += wxT(" & ");
+										l_ncols++;
+									}
+								} else if( name.compare( wxT("Cross Refs.") ) == 0) {
+									out += wxT("\\hspace{0pt}");
+									out += name.MakeUpper();
+									flag_crossRef = 1;
+									l_ncols++;
+								} else if( name.compare( wxT("Net reference") ) == 0) {
+									out += wxT("\\hspace{0pt}");
+									out += name.MakeUpper();
+									out += wxT(" & ");
+									l_ncols++;
+								}
+							}
+
+							if( !flag_crossRef  ) {
+								out = out.BeforeLast('&');
+							}
+
+							out += wxT("\\\\ \\hline \\hline \\endhead\n");
+							wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+
+							out = wxT("\\hline \\multicolumn{") + wxString::Format(wxT("%i"), l_ncols)
+									+ wxT("}{|r|}{{Continued on next page}}\\\\ \\hline \\endfoot\n");
+							out+= wxT("\\hline \\hline \\endlastfoot\n\n");
+							wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+
+							//populate table with element details
+
+							int l_nComments = l_sComments.size();
+
+
+							wxArrayString l_sComments = SP_Nodeclass2NodeList[ wxT("Comment") ];
+
+							for(int i = 0; i < l_nComments; i++) {
+								out = "";
+								l_pcMetadata = SP_Name2Metadata[ l_sComments[i] ];
+
+								for(int i = 0; i < l_nAttributes; i++) {
+									wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+									SP_DS_Attribute* sp = l_pcMetadata->GetAttribute( l_sAttrNameMap[name] );
+
+									if( sp ) { //not cross-ref or ordering
+
+										wxString value = sp->GetValueString();
+
+										//collist attribute
+										if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+											SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+											for(unsigned k = 1; k < l_pcColAttr->GetColCount(); k++)
+											{
+												wxString l_sSetName = l_pcColAttr->GetActiveCellValue(k);
+												out += wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+
+												if(k < l_pcColAttr->GetColCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
+										} else {
+
+											if( name.compare( wxT("Comment")) == 0) {
+												value = EditStringforLatex(value, false);
+											} else {
+												value = EditStringforLatex( value );
+											}											//value = wxT("$") + value + wxT("$");
+											out += value + wxT("&");
+										}
+
+									} else if( name.compare( wxT("Net reference")) == 0) {
+										wxString value = SP_NetNumber2Label[ wxString::Format(wxT("%i"), l_pcMetadata->GetNetnumber()) ];
+										wxString l_slinkLabel = EditStringforCrossRef( value);
+										value = EditStringforLatex( value );
+
+										out += wxT("\\hyperref[") + l_slinkLabel
+												+ wxT("]{") + value +  wxT("} &");
+									} else {
+										out += wxT("&");
+									}
+								}
+
+								out = out.BeforeLast('&');
+								out += wxT("\\\\ \\hline\n");
+								wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+							}
+
+							wxFprintf(l_pstream1, wxT("\\end{longtabu}\n") );
+						} else {
+							wxFprintf(l_pstream1, wxT("\\emph{No elements available for description}\n\n") );
+						}
+
+					} else {
+						wxFprintf(l_pstream1, wxT("\\emph{No elements available for description}\n\n") );
+					}
+				}
+				else {  //if metadata class is not comment
 					wxArrayInt l_nArrayIntElements;
 					wxCheckListBox* l_pcCheckListElements = SP_Node2NodeCheckList[ order ];
 					int l_nElements = l_pcCheckListElements->GetCheckedItems( l_nArrayIntElements );
 
 					if( l_nAttributes && l_nElements) {  //if non-zero number of attributes selected -> draw table
-						wxFprintf(l_pstream1, wxT("\\emph{") + element + wxT(" Table}\n\n") );
 
-						wxFprintf(l_pstream1, wxT("\\begin{longtable}") );
+						wxFprintf(l_pstream1, wxT("\\begin{longtabu}") );
 						wxString out = wxT("{ | ");
 
 						for(int i = 0; i < l_nAttributes; i++) {
-							out += wxT("l |");
-						}
-						out += wxT("}\n\n\t");
-						wxFprintf(l_pstream1, wxT("%s"), out.c_str());
-						wxFprintf(l_pstream1, wxT("\\hline\n\t") );
+							wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+							SP_DS_Attribute* sp = l_pcProtoMeta->GetAttribute( l_sAttrNameMap[name] );
 
-						int flag_crossRef = 0;
+							if( name.compare( wxT("Order Lexicographically")) ) {
+
+								if(sp && sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+									SP_DS_ColListAttribute* l_pcProtoColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+									for(unsigned k = 1; k < l_pcProtoColAttr->GetColCount(); k++) {
+										out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+									}
+
+								} else {
+									out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+								}
+							}
+						}
+						out += wxT("}\n\n");
+						wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+
+						wxFprintf(l_pstream1, wxT("\\caption{") + element + wxT(" Table}\\\\ \\hline\n") );
 
 						out = "";
+						int l_ncols = 0;
+						int flag_crossRef = 0;
+						int flag_Order = 0;
+
 						for(int i = 0; i < l_nAttributes; i++) {
 							wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
-							SP_DS_Attribute* sp = nd->GetAttribute( name );
+							SP_DS_Attribute* sp = l_pcProtoMeta->GetAttribute( l_sAttrNameMap[name] );
 
 							if( sp ) {  //not cross-ref or ordering
-								SP_LOGMESSAGE( wxT("attribute: ") + sp->GetDisplayName() );
-								out += name;
-								out += wxT(" & ");
+
+								if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+
+									SP_DS_ColListAttribute* l_pcProtoColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+									//SP_DS_ColListAttribute* l_pcProtoColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcProtoAttr);
+
+									for(unsigned k = 1; k < l_pcProtoColAttr->GetColCount(); k++) {
+										wxString l_sColLabel = l_pcProtoColAttr->GetColLabel(k);
+										out += wxT("\\hspace{0pt}") + l_sColLabel.MakeUpper() + wxT(" & ");
+										l_ncols++;
+									}
+
+								} else {
+									out += wxT("\\hspace{0pt}") + name.MakeUpper();
+									out += wxT(" & ");
+									l_ncols++;
+								}
+
 							} else if( name.compare( wxT("Cross Refs.") ) == 0) {
-									out += name;
-									flag_crossRef = 1;
+								out += wxT("\\hspace{0pt}");
+								out += name.MakeUpper();
+								out += wxT(" & ");
+								flag_crossRef = 1;
+								l_ncols++;
+							} else if( name.compare( wxT("Order Lexicographically") ) == 0 ) {
+								flag_Order = 1;
+							} else {
+								out += wxT("\\hspace{0pt}");
+								out += name.MakeUpper();
+								out += wxT(" & ");
+								l_ncols++;
 							}
 						}
 
@@ -2169,93 +3389,116 @@ SP_ExportLatex::WriteGraphElements()
 						out += wxT("\\\\ \\hline \\hline \\endhead\n");
 						wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 
-						//popoulate table with element details
-						for(int j = 0; j < l_nElements; j++) {
-							out = "";
-							int index = l_nArrayIntElements[ j ];
-							wxString element_name = l_pcCheckListElements->GetString( index );
-							l_pcMetadata = SP_Name2Metadata[ element_name ];
+						out = wxT("\\hline \\multicolumn{") + wxString::Format(wxT("%i"), l_ncols)
+								+ wxT("}{|r|}{{Continued on next page}}\\\\ \\hline \\endfoot\n");
+						out+= wxT("\\hline \\hline \\endlastfoot\n\n");
+						wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 
-							if(l_pcMetadata) SP_LOGMESSAGE( element_name );
 
-							for(int i = 0; i < l_nAttributes; i++) {
-								wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
-								SP_DS_Attribute* sp = l_pcMetadata->GetAttribute( name );
+						//populate table with element details
 
-								if( sp ) { //not cross-ref or ordering
+						if( element.compare( wxT("Images")) == 0) {
+
+							wxArrayString l_ImageList;
+							for(int j = 0; j < l_nElements; j++) {
+								int index = l_nArrayIntElements[ j ];
+								wxString element_name = l_pcCheckListElements->GetString( index );
+								l_pcMetadata = SP_Name2Metadata[ element_name ];
+
+								SP_DS_Attribute* sp = l_pcMetadata->GetAttribute( wxT("Filename") );
+
+								if( sp ) {
 									wxString value = EditStringforLatex( sp->GetValueString() );
-									out += value + wxT("&");
+									l_ImageList.Add(value);
 								}
 							}
 
-							out = out.BeforeLast('&');
-							out += wxT("\\\\ \\hline\n");
-							wxFprintf(l_pstream1, wxT("%s"), out.c_str());
-						}
+							if(!l_ImageList.IsEmpty()) {
+								m_flagImages = 1;
+							}
 
-						wxFprintf(l_pstream1, wxT("\\end{longtable}\n") );
-					} else {
-						wxFprintf(l_pstream1, wxT("\\emph{No elements available for description}\n\n") );
-					}
-				} else {  //Comment
+							for(int j = 0; j < l_nElements; j++) {
+								out = "";
+								int index = l_nArrayIntElements[ j ];
+								wxString element_name = l_pcCheckListElements->GetString( index );
+								l_pcMetadata = SP_Name2Metadata[ element_name ];
 
-					if( l_nAttributes ) {
-						wxFprintf(l_pstream1, wxT("\\emph{") + element + wxT(" Table}\n\n") );
+								if(l_pcMetadata) SP_LOGMESSAGE( element_name );
 
-						wxFprintf(l_pstream1, wxT("\\begin{longtable}") );
-						wxString out = wxT("{ | ");
+								for(int i = 0; i < l_nAttributes; i++) {
+									wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
 
-						for(int i = 0; i < l_nAttributes; i++) {
-							out += wxT("l |");
-						}
-						out += wxT("}\n\n\t");
-						wxFprintf(l_pstream1, wxT("%s"), out.c_str());
-						wxFprintf(l_pstream1, wxT("\\hline\n\t") );
+									if(name.compare( wxT("Image reference")) == 0) {
 
-						int flag_crossRef = 0;
+										out += wxT("\n\\linebreak \\ifx\\write\\realwrite\\thumbnailandappendix{")
+												+ l_ImageList[j]
+												+ wxT("} \\fi \\medskip");
+										out += wxT("&");
+									} else {
+										SP_DS_Attribute* sp = l_pcMetadata->GetAttribute( l_sAttrNameMap[name] );
 
-						out = "";
-						for(int i = 0; i < l_nAttributes; i++) {
-							wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
-							SP_DS_Attribute* sp = nd->GetAttribute( name );
+										if( sp ) {
+											wxString value = EditStringforLatex( sp->GetValueString() );
+											out += value + wxT("&");
+										}
+									}
+								}
 
-							if( sp ) {  //not cross-ref or ordering
-								SP_LOGMESSAGE( wxT("attribute: ") + sp->GetDisplayName() );
-								out += name;
-								out += wxT(" & ");
-							} else if( name.compare( wxT("Cross Refs.") ) == 0) {
-									out += name;
-									flag_crossRef = 1;
+								out = out.BeforeLast('&');
+								out += wxT("\\\\ \\hline\n");
+								wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+							}
+
+
+						} else {
+
+							for(int j = 0; j < l_nElements; j++) {
+								out = "";
+								int index = l_nArrayIntElements[ j ];
+								wxString element_name = l_pcCheckListElements->GetString( index );
+								l_pcMetadata = SP_Name2Metadata[ element_name ];
+
+								if(l_pcMetadata) SP_LOGMESSAGE( element_name );
+
+								for(int i = 0; i < l_nAttributes; i++) {
+									wxString name = l_pcCheckListAttributes->GetString( l_nArrayIntAttributes[i] );
+									SP_DS_Attribute* sp = l_pcMetadata->GetAttribute( l_sAttrNameMap[name] );
+
+									if( sp ) { //not cross-ref or ordering
+										wxString value = sp->GetValueString();
+
+										//collist attribute
+										if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+											SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+											for(unsigned k = 1; k < l_pcColAttr->GetColCount(); k++)
+											{
+												wxString l_sSetName = l_pcColAttr->GetActiveCellValue(k);
+												out += wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+
+												if(k < l_pcColAttr->GetColCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
+
+										} else {
+											value = EditStringforLatex( value );
+											out += value + wxT("&");
+										}
+									} else {
+										out += wxT("&");
+									}
+								}
+
+								out = out.BeforeLast('&');
+								out += wxT("\\\\ \\hline\n");
+								wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 							}
 						}
 
-						if( !flag_crossRef  ) {
-							out = out.BeforeLast('&');
-						}
-
-						out += wxT("\\\\ \\hline \\hline \\endhead\n");
-						wxFprintf(l_pstream1, wxT("%s"), out.c_str());
-
-						//popoulate table with element details
-
-						wxArrayString l_sComments = SP_Nodeclass2NodeList[ wxT("Comment") ];
-
-						if( !l_sComments.IsEmpty() ) {
-							SP_LOGMESSAGE( wxT("Not Empty") );
-						} else {
-							SP_LOGMESSAGE( wxT("Is Empty") );
-						}
-
-						int l_nComments = l_sComments.size();
-
-						for(int i = 0; i < l_nComments; i++) {
-							out = EditStringforLatex( l_sComments[i], false );
-							out += wxT("\\\\ \\hline\n");
-							wxFprintf(l_pstream1, wxT("%s"), out.c_str());
-						}
-
-						wxFprintf(l_pstream1, wxT("\\end{longtable}\n") );
-
+						wxFprintf(l_pstream1, wxT("\\end{longtabu}\n") );
 					} else {
 						wxFprintf(l_pstream1, wxT("\\emph{No elements available for description}\n\n") );
 					}
@@ -2265,7 +3508,7 @@ SP_ExportLatex::WriteGraphElements()
 			wxFprintf(l_pstream1, wxT("\\end{center}\n") );
 
 			//-----------
-		    wxFprintf(l_pstream, wxT("\\input{./") + EditStringforLatex( element ) + wxT(".tex }\n") );
+		    wxFprintf(l_pstream, wxT("\\input{./") + EditStringforLatex( element ) + wxT(".tex}\n") );
 
 			fclose( l_pstream1 );
 			l_pstream1 = (FILE *) NULL;
@@ -2286,7 +3529,7 @@ SP_ExportLatex::WriteGraphElements()
 
 
 bool
-SP_ExportLatex::WriteDeclarations()
+SP_ExportLatex::WriteDeclarations_Colored()
 {
 	const wxString latexDec_file = m_sFilePath + wxT("Declarations.tex");
 	SP_LOGMESSAGE( latexDec_file );
@@ -2305,7 +3548,7 @@ SP_ExportLatex::WriteDeclarations()
 	wxArrayInt l_nArrayIntDecAttributes;
 	wxArrayInt l_nArrayIntDecElements;
 
-	wxFprintf(l_pstream, wxT("\n\\newpage\n") );
+	wxFprintf(l_pstream, wxT("\\newpage\n") );
 	wxFprintf(l_pstream, wxT("\\section{Declarations}\n") );
 	wxFprintf(l_pstream, wxT("This section contains information related to declarations specific to the net.") );
 
@@ -2352,32 +3595,321 @@ SP_ExportLatex::WriteDeclarations()
 				SP_ListMetadata::const_iterator l_itElem;
 
 				SP_ListAttribute::const_iterator itAttr;
-				SP_DS_Metadata* nd = metadataclass->GetPrototype();
+				//SP_DS_Metadata* l_pcProtoMeta = metadataclass->GetPrototype();
 				SP_DS_Metadata* l_pcMetadata;
-
+				map<wxString, wxString> l_sDecAttrNameMap = SP_DecNode2DecAttrNameMap[ element ];
 
 				if( l_nAttributes && l_nElements ) {  //if non-zero number of attributes selected -> draw table
-					wxFprintf(l_pstream1, wxT("\\emph{") + element + wxT(" Table}\n\n") );
 
-					wxFprintf(l_pstream1, wxT("\\begin{longtable}") );
+		            //fetching one entry (first) for reference
+					l_pcMetadata = *(metadataclass->GetElements()->begin());
+					SP_DS_ColListAttribute * l_pcColList;
+					wxString l_sColListName;
+
+					wxFprintf(l_pstream1, wxT("\\begin{longtabu}") );
 					wxString out = wxT("{ | ");
 
-					for(int i = 0; i < l_nAttributes; i++) {
-						out += wxT("l |");
+					//wxString name = l_pcCheckListDecAttributes->GetString( l_nArrayIntDecAttributes[i] );
+
+ 					if(element.compare( wxT("Simple Color Sets")) == 0) {
+ 						l_sColListName = wxT("ColorsetList");
+ 					}
+ 					else if(element.compare( wxT("Compound Color Sets")) == 0) {
+ 						l_sColListName = wxT("StructuredColorsetList");
+ 					}
+ 					else if(element.compare( wxT("Alias Color Sets")) == 0) {
+ 						l_sColListName = wxT("AliasColorsetList");
+ 					}
+ 					else if(element.compare( wxT("Constants")) == 0) {
+ 						l_sColListName = wxT("ConstantList");
+ 					}
+ 					else if(element.compare( wxT("Functions")) == 0) {
+ 						l_sColListName = wxT("FunctionList");
+ 					}
+ 					else if(element.compare( wxT("Variables")) == 0) {
+ 						l_sColListName = wxT("VariableList");
+ 					}
+
+ 					l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcMetadata->GetAttribute(l_sColListName) );
+
+					if( l_pcColList ) {
+
+						SP_LOGMESSAGE( wxT("<<<<<<<<<<COLLIST") + l_sColListName + wxT(" ") + l_sDecAttrNameMap[l_sColListName] );
+
+						for(unsigned int k = 0; k < l_nAttributes; k++) {
+							out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+						}
+
+					} else {
+						SP_LOGMESSAGE( wxT("<<<<<<<<<<NOT SP") + l_sColListName + wxT(" ") + l_sDecAttrNameMap[l_sColListName] );
 					}
-					out += wxT("}\n\n\t");
+
+
+					out += wxT("}\n\n");
 					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
-					wxFprintf(l_pstream1, wxT("\\hline\n\t") );
+
+					wxFprintf(l_pstream1, wxT("\\caption{") + element + wxT(" Table}\\\\ \\hline\n") );
 
 					out = "";
+					int l_ncols = 0;
+
+					for(int i = 0; i < l_nAttributes; i++) {
+						int check_index = l_nArrayIntDecAttributes[i];
+						wxString l_sColAttrName = l_pcCheckListDecAttributes->GetString( check_index );
+						out += wxT("\\hspace{0pt}") + l_sColAttrName.MakeUpper();
+						out += wxT(" & ");
+						l_ncols++;
+					}
+
+					out = out.BeforeLast('&');
+					out += wxT("\\\\ \\hline \\hline \\endhead \n");
+					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+
+					out = wxT("\\hline \\multicolumn{") + wxString::Format(wxT("%i"), l_ncols)
+							+ wxT("}{|r|}{{Continued on next page}}\\\\ \\hline \\endfoot\n");
+					out+= wxT("\\hline \\hline \\endlastfoot\n\n");
+					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+
+					out = "";
+
+					//populate table with element details
+
+					for(int j = 0; j < l_nElements; j++) {
+						int checked_element = l_nArrayIntDecElements[j];
+						wxString l_sCheckedElement = l_pcCheckListDecElements->GetString( checked_element );
+
+						if(l_sColListName.compare( wxT("FunctionList") ) == 0) {
+							if(l_sCheckedElement.compare( l_pcColList->GetCell(checked_element, 1)) == 0)
+							{ // is a checked element
+								for(unsigned int c = 0; c < l_nAttributes; c++) {
+									int check_index = l_nArrayIntDecAttributes[c];
+									wxString l_sSetName = l_pcColList->GetCell(checked_element, check_index);
+
+									if(!l_sSetName.IsEmpty()) {
+										out += wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+									}
+
+									out += wxT("&");
+								}
+							}
+						} else {
+							if(l_sCheckedElement.compare( l_pcColList->GetCell(checked_element, 0)) == 0)
+							{ // is a checked element
+								for(unsigned int c = 0; c < l_nAttributes; c++) {
+									int check_index = l_nArrayIntDecAttributes[c];
+									wxString l_sSetName = l_pcColList->GetCell(checked_element, check_index);
+
+									if(!l_sSetName.IsEmpty()) {
+										out += wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+									}
+
+									out += wxT("&");
+								}
+							}
+						}
+
+						out = out.BeforeLast('&');
+						out += wxT("\\\\ \\hline\n");
+						wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+						out = "";
+					}
+
+					wxFprintf(l_pstream1, wxT("\\end{longtabu}\n") );
+				} else {
+					wxFprintf(l_pstream1, wxT("\\emph{No elements available for description}\n\n") );
+				}
+			}
+
+			wxFprintf(l_pstream1, wxT("\\end{center}\n") );
+
+		    wxFprintf(l_pstream, wxT("\\input{./") + EditStringforLatex( element ) + wxT(".tex}\n") );
+
+			//-----------
+			fclose( l_pstream1 );
+			l_pstream1 = (FILE *) NULL;
+			wxDELETE(pd1);
+
+			l_nArrayIntDecAttributes.Clear();
+			l_nArrayIntDecElements.Clear();
+		}
+	}
+
+	//////////
+	fclose( l_pstream );
+	l_pstream = (FILE *) NULL;
+	wxDELETE(pd);
+
+	wxFprintf(m_pstream, wxT("\\input{./Declarations.tex}\n") );
+
+	return true;
+}
+
+bool
+SP_ExportLatex::WriteDeclarations()
+{
+	const wxString latexDec_file = m_sFilePath + wxT("Declarations.tex");
+	SP_LOGMESSAGE( latexDec_file );
+
+	wxPrintData *pd = new wxPrintData();
+	SetUpPrintData(*pd, latexDec_file);
+
+	FILE* l_pstream = wxFopen( (*pd).GetFilename().c_str(), wxT("w+"));
+
+	if (!l_pstream)
+	{
+		SP_LOGERROR(_("Cannot open file for Latex output!"));
+		return FALSE;
+	}
+
+	wxArrayInt l_nArrayIntDecAttributes;
+	wxArrayInt l_nArrayIntDecElements;
+
+	wxFprintf(l_pstream, wxT("\\newpage\n") );
+	wxFprintf(l_pstream, wxT("\\section{Declarations}\n") );
+	wxFprintf(l_pstream, wxT("This section contains information related to declarations specific to the net.") );
+
+	//////////////////////
+
+	for(int i = 0; i < m_pcRearrangelist_declarations->GetCount(); i++) {
+
+		if( m_pcRearrangelist_declarations->IsChecked(i) ) {
+
+			int order = m_pcRearrangelist_declarations->GetCurrentOrder()[ i ];
+
+			wxString element = m_Options_Declarations[ order ];
+			wxString latexDecEle_file = m_sFilePath + EditStringforLatex( element ) + wxT(".tex");
+
+			wxPrintData *pd1 = new wxPrintData();
+			SetUpPrintData(*pd1, latexDecEle_file);
+
+			FILE* l_pstream1 = wxFopen( (*pd1).GetFilename().c_str(), wxT("w+"));
+
+			if (!l_pstream1)
+			{
+				SP_LOGERROR(_("Cannot open file for Latex output!"));
+				return FALSE;
+			}
+
+			wxFprintf(l_pstream1, wxT("\\subsection{") + element + wxT("}\n") );
+			wxFprintf(l_pstream1, wxT("\\begin{center}\n") );
+
+			//-----------
+
+			//create table for subsection
+			wxCheckListBox* l_pcCheckListDecAttributes = SP_DecNode2AttributeCheckList[ order ];
+			wxCheckListBox* l_pcCheckListDecElements = SP_DecNode2NodeCheckList[ order ];
+
+			int l_nAttributes = l_pcCheckListDecAttributes->GetCheckedItems( l_nArrayIntDecAttributes );
+			int l_nElements = l_pcCheckListDecElements->GetCheckedItems( l_nArrayIntDecElements );
+
+			SP_DS_Metadataclass* metadataclass = m_pcGraph->GetMetadataclassByDisplayedName( element );
+
+			if( metadataclass ) {
+
+				SP_LOGMESSAGE( wxT("Metadata Declaration class found: ") + metadataclass->GetDisplayName() );
+
+				SP_ListMetadata::const_iterator l_itElem;
+
+				SP_ListAttribute::const_iterator itAttr;
+				//SP_DS_Metadata* l_pcProtoMeta = metadataclass->GetPrototype();
+				SP_DS_Metadata* l_pcMetadata;
+				map<wxString, wxString> l_sDecAttrNameMap = SP_DecNode2DecAttrNameMap[ element ];
+
+				if( l_nAttributes && l_nElements ) {  //if non-zero number of attributes selected -> draw table
+
+					wxArrayString l_sDecNodeList;
+
+					for(int j = 0; j < l_nElements; j++) {
+						int index = l_nArrayIntDecElements[ j ];
+						wxString element_name = l_pcCheckListDecElements->GetString( index );
+						l_sDecNodeList.Add( element_name );
+					}
+
+		            //fetching one entry (first) for reference
+					l_pcMetadata = SP_Name2Metadata[ l_sDecNodeList[0] ];
+
+
+					wxFprintf(l_pstream1, wxT("\\begin{longtabu}") );
+					wxString out = wxT("{ | ");
+
+					for(int i = 0; i < l_nAttributes; i++)
+					{
+						wxString name = l_pcCheckListDecAttributes->GetString( l_nArrayIntDecAttributes[i] );
+						SP_DS_Attribute* sp = l_pcMetadata->GetAttribute( l_sDecAttrNameMap[name] );
+
+						if( name.compare( wxT("Order Lexicographically")) ) //any attribute except ordering
+						{
+							if(sp) {
+
+								if(sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+
+									SP_LOGMESSAGE( wxT("<<<<<<<<<<COLLIST") + name + wxT(" ") + l_sDecAttrNameMap[name] );
+
+									SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+									 if(l_pcColAttr->GetRowCount() > 0) {
+										 for(unsigned int r = 0; r < l_pcColAttr->GetRowCount(); r++) {
+											 out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+										 }
+									 }
+
+								} else {
+									out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+								}
+
+							} else if( name.compare( wxT("ID")) == 0 ) {
+								out += wxT(">{\\hspace{0pt}} X[-0.5, l] |");
+							} else {
+								out += wxT(">{\\hspace{0pt}} X[-1, l] |");
+							}
+						}
+					}
+					out += wxT("}\n\n");
+					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+
+					wxFprintf(l_pstream1, wxT("\\caption{") + element + wxT(" Table}\\\\ \\hline\n") );
+
+					out = "";
+					int l_ncols = 0;
+					int flag_Order = 0;
+
 					for(int i = 0; i < l_nAttributes; i++) {
 						wxString name = l_pcCheckListDecAttributes->GetString( l_nArrayIntDecAttributes[i] );
-						SP_DS_Attribute* sp = nd->GetAttribute( name );
+						SP_DS_Attribute* sp = l_pcMetadata->GetAttribute( l_sDecAttrNameMap[name] );
 
 						if( sp ) {  //not cross-ref or ordering
-							SP_LOGMESSAGE( wxT("attribute: ") + sp->GetDisplayName() );
-							out += name;
+
+							//collist attribute (added to table as a column entry if count is 1)
+							if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+
+								SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+								if(l_pcColAttr->GetRowCount() > 0) {  //if non-zero number of entries in collist table
+
+									for(unsigned int r = 0; r < l_pcColAttr->GetRowCount(); r++) {
+										wxString l_sColLabel = l_pcColAttr->GetCell(r, 0);
+
+										SP_LOGMESSAGE( wxT("==============================") + name + wxT("==>") + l_sColLabel);
+
+										if(l_sColLabel.IsEmpty()) {
+											SP_LOGMESSAGE("Unnamed entry in COLLIST");
+										}
+										out += wxT("\\hspace{0pt}") + l_sColLabel.MakeUpper() + wxT(" & ");
+										l_ncols++;
+									}
+								}
+
+							} else {
+								out += wxT("\\hspace{0pt}") + name.MakeUpper();
+								out += wxT(" & ");
+								l_ncols++;
+							}
+						} else if( name.compare( wxT("Order Lexicographically")) == 0) {
+							flag_Order = 1;
+						} else {
+							out += wxT("\\hspace{0pt}") + name.MakeUpper();
 							out += wxT(" & ");
+							l_ncols++;
 						}
 					}
 
@@ -2386,26 +3918,62 @@ SP_ExportLatex::WriteDeclarations()
 					out += wxT("\\\\ \\hline \\hline \\endhead \n");
 					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 
+					out = wxT("\\hline \\multicolumn{") + wxString::Format(wxT("%i"), l_ncols)
+							+ wxT("}{|r|}{{Continued on next page}}\\\\ \\hline \\endfoot\n");
+					out+= wxT("\\hline \\hline \\endlastfoot\n\n");
+					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 
-					//popoulate table with element details
+					out = "";
+
+					if(flag_Order) {
+						l_sDecNodeList.Sort();
+					}
+
+					//////////////////////////////popoulate table with element details
+
 					for(int j = 0; j < l_nElements; j++) {
 						out = "";
-						int index = l_nArrayIntDecElements[ j ];
-						wxString element_name = l_pcCheckListDecElements->GetString( index );
+						wxString element_name = l_sDecNodeList[j];
 						l_pcMetadata = SP_Name2Metadata[ element_name ];
 
 						if(l_pcMetadata) SP_LOGMESSAGE( element_name );
 
 						for(int i = 0; i < l_nAttributes; i++) {
 							wxString name = l_pcCheckListDecAttributes->GetString( l_nArrayIntDecAttributes[i] );
-							SP_DS_Attribute* sp = l_pcMetadata->GetAttribute( name );
+							SP_DS_Attribute* sp = l_pcMetadata->GetAttribute( l_sDecAttrNameMap[name] );
 
 							if( sp ) { //not cross-ref or ordering
 								wxString value = EditStringforLatex( sp->GetValueString() );
-								out += value + wxT("&");
+
+								//collist attribute
+								if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
+									SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
+
+									if(l_pcColAttr->GetRowCount() > 0) {
+
+										for(unsigned c = 1; c < l_pcColAttr->GetColCount(); c++) {
+											for(unsigned r = 0; r < l_pcColAttr->GetRowCount(); r++)
+											{
+												wxString l_sSetName = l_pcColAttr->GetCell(r, c);
+
+												if(!l_sSetName.IsEmpty()) {
+													out += wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+												}
+
+												out += wxT("&");
+											}
+										}
+									}
+
+								} else {
+									out += value + wxT("&");
+								}
+
 							} else if( name.compare( wxT("Cross Refs.") ) == 0 ) {
 								//add cross-refs here
-								out += wxT("&");
+								out += wxT(" & ");
+							} else if( name.compare( wxT("Order Lexicographically")) ) {
+								out += wxT(" & ");
 							}
 						}
 
@@ -2414,7 +3982,7 @@ SP_ExportLatex::WriteDeclarations()
 						wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 					}
 
-					wxFprintf(l_pstream1, wxT("\\end{longtable}\n") );
+					wxFprintf(l_pstream1, wxT("\\end{longtabu}\n") );
 				} else {
 					wxFprintf(l_pstream1, wxT("\\emph{No elements available for description}\n\n") );
 				}
@@ -2422,7 +3990,7 @@ SP_ExportLatex::WriteDeclarations()
 
 			wxFprintf(l_pstream1, wxT("\\end{center}\n") );
 
-		    wxFprintf(l_pstream, wxT("\\input{./") + EditStringforLatex( element ) + wxT(".tex }\n") );
+		    wxFprintf(l_pstream, wxT("\\input{./") + EditStringforLatex( element ) + wxT(".tex}\n") );
 
 			//-----------
 			fclose( l_pstream1 );
@@ -2445,6 +4013,94 @@ SP_ExportLatex::WriteDeclarations()
 }
 
 void
+SP_ExportLatex::WriteHierarchyTreeRecur(const wxTreeItemId& tree_item, FILE* l_pstream)
+{
+	if(!tree_item.IsOk() ) { return; }
+	  wxTreeItemIdValue cookie= NULL;
+	  wxTreeItemId child_from = l_pcTree->GetFirstChild(tree_item, cookie);
+
+
+	  while( child_from.IsOk() ) {
+
+		  wxString name = l_pcTree->GetItemText(child_from);
+
+		  wxString out = wxT("child { node {") + name + wxT("}\n");
+		  wxFprintf(l_pstream, wxT("%s"), out.c_str());
+
+		  WriteHierarchyTreeRecur(child_from, l_pstream);
+
+		  wxFprintf(l_pstream, wxT("}\n") );
+
+		  int l_nChildMissing = l_pcTree->GetChildrenCount(child_from);
+
+		  for(int i = 0; i < l_nChildMissing; i++) {
+			  wxFprintf(l_pstream, wxT("child [missing] {}\n") );
+		  }
+
+		  child_from = l_pcTree->GetNextChild(tree_item, cookie);
+	  };
+
+}
+
+bool
+SP_ExportLatex::WriteHierarchyTree(FILE* l_pstream)
+{
+	const wxString latexHierarchyTree_file = m_sFilePath + wxT("HierarchyTree.tex");
+	SP_LOGMESSAGE( latexHierarchyTree_file );
+
+	wxPrintData *pd = new wxPrintData();
+	SetUpPrintData(*pd, latexHierarchyTree_file);
+
+	FILE* l_pstream1 = wxFopen( (*pd).GetFilename().c_str(), wxT("w+"));
+
+	if (!l_pstream1)
+	{
+		SP_LOGERROR(_("Cannot open file for Latex output!"));
+		return FALSE;
+	}
+
+	wxFprintf(l_pstream1, wxT("\\newpage\n") );
+	wxFprintf(l_pstream1, wxT("\\subsection{Hierarchy Tree}\n\n") );
+
+	wxTreeItemId root = l_pcTree->GetRootItem();
+	int l_nChildrenCount = l_pcTree->GetChildrenCount(root, false);
+	SP_LOGMESSAGE( wxT("Non-recursive child count of hierarchy tree = ") +  wxString::Format( wxT("%i"), l_nChildrenCount));
+
+	if( l_nChildrenCount ) {
+
+		wxFprintf(l_pstream1, wxT("\\tikzstyle{every node}=[draw=black,thick,anchor=west]\n") );
+		wxFprintf(l_pstream1, wxT("\\maxsizebox{\\linewidth}{.99\\textheight}{\n") );
+
+		wxString out = wxT("\\begin{tikzpicture}["
+				"grow via three points={one child at (0.5,-0.8) and "
+				"two children at (0.5,-0.8) and (0.5,-1.6)}, "
+				"edge from parent path={(\\tikzparentnode.south) "
+				"|- (\\tikzchildnode.west)}]\n\n");
+		wxFprintf(l_pstream1, wxT("%s"), out.c_str());
+		///////////////
+		wxFprintf(l_pstream1, wxT("\\node{Top Level}\n") );   //the top level
+
+		WriteHierarchyTreeRecur(root, l_pstream1);
+
+		//////////////////
+		wxFprintf(l_pstream1, wxT(";\n\\end{tikzpicture}\n"));
+		wxFprintf(l_pstream1, wxT("}\n\n"));
+
+	} else {
+		//only top level (no hierarchy)
+		wxFprintf(l_pstream1, wxT("\\emph{No Hierarchial structure found.}\n") );
+	}
+
+	fclose( l_pstream1 );
+	l_pstream1 = (FILE *) NULL;
+	wxDELETE(pd);
+
+	wxFprintf(l_pstream, wxT("\n\\input{./HierarchyTree.tex}\n") );
+
+	return true;
+}
+
+void
 SP_ExportLatex::WriteHierarchylevelRec(const wxTreeItemId& p_Id, FILE* l_pstream)
 {
 	if(!p_Id.IsOk() ) { return; }
@@ -2456,11 +4112,11 @@ SP_ExportLatex::WriteHierarchylevelRec(const wxTreeItemId& p_Id, FILE* l_pstream
 	{
 		wxString level_label = m_pcCoarseTreectrl->GetItemText( l_nId );
 		wxString level_id = SP_HierarchyLabel2ID[ level_label ];
-		wxString label_name =  EditStringforLatex( level_id + wxT(" ") + level_label );
+		wxString label_name =  EditStringforLatex( (level_id + wxT(" ") + level_label), false );
+		wxString l_slinkLabel =  EditStringforCrossRef( level_label);
 
-		//SP_LOGMESSAGE( wxT("Into WriteHierarchylevelRec(): ") + label_name );
-
-		wxString out = wxT("\n\\newpage\n\\subsection{Level ") + label_name  + wxT("}\n");
+		wxFprintf(l_pstream, wxT("\n\\newpage\n\\linkto{") + l_slinkLabel + wxT("}\n") );
+		wxString out = wxT("\\subsection{Level ") + label_name  + wxT("}\n");
 		wxFprintf(l_pstream, wxT("%s"), out.c_str());
 
 		label_name =  wxT("Level") + level_id + wxT("tex");
@@ -2542,7 +4198,13 @@ SP_ExportLatex::WriteHierarchy()
 	wxFprintf(l_pstream, wxT("\\newpage\n") );
 	wxFprintf(l_pstream, wxT("\\section{Hierarchy}\n") );
 	wxFprintf(l_pstream, wxT("This section contains information about the net hierarchy.") );
+	//////////////////////////////////
 
+	//Complete Hierarchy Tree
+	if(m_pcCheckBoxHierarchyTree->IsChecked() ) {
+		WriteHierarchyTree(l_pstream);
+		wxFprintf(l_pstream, wxT("\\tikzstyle{every node}=[draw=none]\n") );
+	}
 
 	///////////////////////////////////
     wxTreeItemId local_tree = l_pcTree->GetFocusedItem();
@@ -2579,11 +4241,11 @@ SP_ExportLatex::WriteHierarchy()
 
 	wxString level_label = m_pcCoarseTreectrl->GetItemText( main_treeItem );
 	wxString level_id = SP_HierarchyLabel2ID[ level_label ];
-	wxString label_name =  EditStringforLatex( level_id + wxT(" ") + level_label );
+	wxString label_name =  EditStringforLatex( (level_id + wxT(" ") + level_label), false );
+	wxString l_slinkLabel =  EditStringforCrossRef( level_label);
 
-	//SP_LOGMESSAGE( wxT("Start WriteHierarchylevelRec(): ") + label_name );
-
-	wxString out = wxT("\n\\newpage\n\\subsection{Level ") + label_name  + wxT("}\n");
+	wxFprintf(l_pstream, wxT("\n\\newpage\n\\linkto{") + l_slinkLabel + wxT("}\n") );
+	wxString out = wxT("\\subsection{Level ") + label_name  + wxT("}\n");
 	wxFprintf(l_pstream, wxT("%s"), out.c_str());
 
 	label_name =  wxT("Level") + level_id + wxT("tex");
@@ -2628,7 +4290,7 @@ SP_ExportLatex::WriteHierarchy()
 	l_pstream = (FILE *) NULL;
 	wxDELETE(pd);
 
-	wxFprintf(m_pstream, wxT("\\input{./Hierarchy.tex }\n") );
+	wxFprintf(m_pstream, wxT("\\input{./Hierarchy.tex}\n") );
 
 	return true;
 }
@@ -2636,37 +4298,97 @@ SP_ExportLatex::WriteHierarchy()
 bool
 SP_ExportLatex::WriteReferences()
 {
-	wxFprintf(m_pstream, wxT("\n\\newpage\n") );
-	wxFprintf(m_pstream, wxT("\\addcontentsline{toc}{section}{References}\n") );
-	wxFprintf(m_pstream, wxT("\\begin{thebibliography}{0}\n\n") );
+	const wxString latexReferences_file = m_sFilePath + wxT("References.tex");
+	SP_LOGMESSAGE( latexReferences_file );
+
+	wxPrintData *pd = new wxPrintData();
+	SetUpPrintData(*pd, latexReferences_file);
+
+	FILE* l_pstream = wxFopen( (*pd).GetFilename().c_str(), wxT("w+"));
+
+	if (!l_pstream)
+	{
+		SP_LOGERROR(_("Cannot open file for Latex output!"));
+		return FALSE;
+	}
+
+	wxFprintf(l_pstream, wxT("\\newpage\n") );
+	wxFprintf(l_pstream, wxT("\\addcontentsline{toc}{section}{References}\n") );
+	wxFprintf(l_pstream, wxT("\\begin{thebibliography}{0}\n\n") );
 
 	//Two basic references
 
-	wxFprintf(m_pstream, wxT("\\bibitem{heiner:pn:2012}\n") );
+	wxFprintf(l_pstream, wxT("\\bibitem{heiner:pn:2012}\n") );
 	wxString out = wxT("M. Heiner, M. Herajy, F. Liu, C. Rohr and M. Schwarick.\n"
 			"Snoopy a unifying Petri net tool. \n"
 			"Proc. PETRI NETS 2012, Volume 7347, Springer, June 2012, pages 398-407.\n\n");
-	wxFprintf(m_pstream, wxT("%s"), out.c_str());
-//	SP_LatexReferencesIndex2Ref.insert(pair< pair<int, wxString>, wxString> ( make_pair(1, wxT("heiner:pn:2012") ), out ) );
+	wxFprintf(l_pstream, wxT("%s"), out.c_str());
 
-	wxFprintf(m_pstream, wxT("\\bibitem{Rohr:bi:2010}\n") );
+	wxFprintf(l_pstream, wxT("\\bibitem{Rohr:bi:2010}\n") );
 	out = wxT("C. Rohr, W. Marwan and M. Hiener.\n"
 			"Snoopy - a unifying Perti net framework to investigate biomolecular networks. \n"
 			"Bioinformatics, 26(7):974-975, 2010. \n\n");
-	wxFprintf(m_pstream, wxT("%s"), out.c_str());
-//	SP_LatexReferencesIndex2Ref.insert(pair< pair<int, wxString>, wxString> ( make_pair(2, wxT("Rohr:bi:2010") ), out ) );
+	wxFprintf(l_pstream, wxT("%s"), out.c_str());
 
 	//adding dynamic references
 	map< pair<int, wxString>, wxString>::iterator it;
 	for(it = SP_LatexReferencesIndex2Ref.begin(); it != SP_LatexReferencesIndex2Ref.end(); it++) {
 		 out = wxT("\\bibitem{") + (*it).first.second + wxT("}\n");  //add label to cite
 		 out += (*it).second;
-		 wxFprintf(m_pstream, wxT("%s"), out.c_str());
+		 wxFprintf(l_pstream, wxT("%s"), out.c_str());
 	}
 
-	wxFprintf(m_pstream, wxT("\\end{thebibliography}\n\n") );
+	wxFprintf(l_pstream, wxT("\\end{thebibliography}\n\n") );
+
+
+	fclose( l_pstream );
+	l_pstream = (FILE *) NULL;
+	wxDELETE(pd);
+
+	wxFprintf(m_pstream, wxT("\\input{./References.tex}\n") );
 
 	return true;
+}
+
+bool
+SP_ExportLatex::WriteGlossary()
+{
+	const wxString latexGlossary_file = m_sFilePath + wxT("Glossary.tex");
+	SP_LOGMESSAGE( latexGlossary_file );
+
+	wxPrintData *pd = new wxPrintData();
+	SetUpPrintData(*pd, latexGlossary_file);
+
+	FILE* l_pstream = wxFopen( (*pd).GetFilename().c_str(), wxT("w+"));
+
+	if (!l_pstream)
+	{
+		SP_LOGERROR(_("Cannot open file for Latex output!"));
+		return FALSE;
+	}
+
+	wxFprintf(l_pstream, wxT("\\newpage\n") );
+	wxFprintf(l_pstream, wxT("\\addcontentsline{toc}{section}{Glossary}\n") );
+	wxFprintf(l_pstream, wxT("\\section*{Glossary}\n\n") );
+
+	wxFprintf(l_pstream, wxT("\\begin{description}\n\t") );
+	wxFprintf(l_pstream, wxT("\\item[CROSS REFS.] Cross-References\n\t") );
+	wxFprintf(l_pstream, wxT("\\item[LOG.] Logic\n\t") );
+	wxFprintf(l_pstream, wxT("\\item[MAR.] Marking\n\t") );
+	wxFprintf(l_pstream, wxT("\\item[MUL.] Multiplicity\n\t") );
+	wxFprintf(l_pstream, wxT("\\item[NET.] Net number\n\t") );
+	wxFprintf(l_pstream, wxT("\\item[P] Place\n\t") );
+	wxFprintf(l_pstream, wxT("\\item[T] Transition\n\t") );
+	wxFprintf(l_pstream, wxT("\\end{description}\n") );
+
+	fclose( l_pstream );
+	l_pstream = (FILE *) NULL;
+	wxDELETE(pd);
+
+	wxFprintf(m_pstream, wxT("\\input{./Glossary.tex}\n") );
+
+	return true;
+
 }
 
 void
@@ -2701,20 +4423,39 @@ SP_ExportLatex::SetUpPrintData(wxPrintData& pd, const wxString& p_fileName)
 wxString
 SP_ExportLatex::EditStringforLatex(wxString filename,  bool remove_space)
 {
-	//This function appends backslash to underscores in strings for inserting in latex code
+	//This function appends backslash to & in strings and remove space for inserting in latex code
 
 	for(int i = 0; i < filename.length(); i++) {
-		if(filename[i] == '_') {
-			filename = filename.SubString(0, i-1) + wxT("\\") + filename.SubString(i, filename.Length()-1);
-			i++;
-		}
 
-		if(remove_space && filename[i] == ' ') {
+		while(remove_space && filename[i] == ' ') {
 			filename.Remove(i, 1);
+		};
+
+		//other special characters
+		if(filename[i] == '&' || filename[i] == '%' || filename[i] == '$' ||
+				filename[i] == '#' || filename[i] == '{' || filename[i] == '}' ||
+				filename[i] == '~' || filename[i] == '^' || filename[i] == '\\' ||
+				filename[i] == '_') { //underscore added later for words with multiple underscore and digit
+			filename = filename.SubString(0, i-1) + wxT("\\") + filename.SubString(i, filename.Length()-1);
+			i+=2;
 		}
 	}
 
 	return filename;
 }
 
+wxString
+SP_ExportLatex::EditStringforCrossRef(wxString filename)
+{
+	for(int i = 0; i < filename.length(); i++) {
+		if((filename[i] >= 'a' && filename[i] <= 'z') ||
+				(filename[i] >= 'A' && filename[i] <= 'Z') ||
+				(filename[i] >= '0' && filename[i] <= '9') ) {
+		} else {
+			filename[i] = ':';
+		}
+	}
+
+	return filename;
+}
 

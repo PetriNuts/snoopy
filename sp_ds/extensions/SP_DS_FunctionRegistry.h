@@ -74,13 +74,13 @@ private:
 	SP_DS_Graph* m_pcGraph;
 	bool m_bIsValid;
 
-	typedef Sh_ptr<dsszmc::functions::FunctionRegistry> FunctionRegistryPtr;
+	typedef std::shared_ptr<dsszmc::functions::FunctionRegistry> FunctionRegistryPtr;
 	FunctionRegistryPtr m_pcRegistry;
 
-	typedef Sh_ptr<dsszmc::functions::AbstractFunctionBuilder> FunctionBuilderPtr;
+	typedef std::shared_ptr<dsszmc::functions::AbstractFunctionBuilder> FunctionBuilderPtr;
 	FunctionBuilderPtr m_pcBuilder;
 
-	typedef Sh_ptr<dsszmc::functions::FunctionParser> FunctionParserPtr;
+	typedef std::shared_ptr<dsszmc::functions::FunctionParser> FunctionParserPtr;
 	FunctionParserPtr m_pcParser;
 };
 

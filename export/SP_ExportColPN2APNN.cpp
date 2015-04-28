@@ -231,7 +231,7 @@ bool SP_ExportColPN2APNN::WriteArcs()
 
 bool SP_ExportColPN2APNN::Initialize()
 {
-	Sh_ptr<SP_DS_ColPN_Unfolding> l_pcUnfolding = Sh_ptr<SP_DS_ColPN_Unfolding>(new SP_DS_ColPN_Unfolding());
+	std::shared_ptr<SP_DS_ColPN_Unfolding> l_pcUnfolding = std::shared_ptr<SP_DS_ColPN_Unfolding>(new SP_DS_ColPN_Unfolding());
 
 	if( ! l_pcUnfolding->Unfolding() )
 		return false;

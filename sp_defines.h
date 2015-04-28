@@ -20,7 +20,6 @@
 #include <wx/colour.h>
 
 #include "dssz/auxi/sh_ptr.h"
-using dsszmc::aux::Sh_ptr;
 
 #include "dssz/functions/comp.h"
 

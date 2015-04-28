@@ -40,7 +40,7 @@ bool SP_ExportColPN2ANDL::DoWrite()
 {
 	m_sNetClass = m_graph->GetNetclass()->GetName();
 
-	Sh_ptr<SP_DS_ColPN_Unfolding> l_pcUnfolding = Sh_ptr<SP_DS_ColPN_Unfolding>(new SP_DS_ColPN_Unfolding());
+	std::shared_ptr<SP_DS_ColPN_Unfolding> l_pcUnfolding = std::shared_ptr<SP_DS_ColPN_Unfolding>(new SP_DS_ColPN_Unfolding());
 
 	if( !l_pcUnfolding->Unfolding() )
 		return false;	
@@ -90,7 +90,7 @@ bool SP_ExportColPN2ANDL::DoWrite()
 	return true;
 }
 
-bool SP_ExportColPN2ANDL::WritePlaces(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding)
+bool SP_ExportColPN2ANDL::WritePlaces(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding)
 {
 	m_file.Write(wxT("places:\n"));
 
@@ -130,7 +130,7 @@ bool SP_ExportColPN2ANDL::WritePlaces(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding)
 	return TRUE;
 }
 
-bool SP_ExportColPN2ANDL::WritePlaceClass(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding,
+bool SP_ExportColPN2ANDL::WritePlaceClass(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding,
 							const SP_CPN_UnfoldedPlaces& p_pmmUnfoldedPlaces)
 {
 	SP_DS_ColListAttribute* l_pcColList = NULL;
@@ -171,7 +171,7 @@ bool SP_ExportColPN2ANDL::WritePlaceClass(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfold
 	return true;
 }
 
-bool SP_ExportColPN2ANDL::WriteTransitions(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding)
+bool SP_ExportColPN2ANDL::WriteTransitions(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding)
 {
 	m_file.Write(wxT("transitions:\n"));
 
@@ -244,7 +244,7 @@ bool SP_ExportColPN2ANDL::WriteTransitions(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfol
 	return TRUE;
 }
 
-bool SP_ExportColPN2ANDL::WriteTransitionClass(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding,
+bool SP_ExportColPN2ANDL::WriteTransitionClass(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding,
 							const SP_CPN_UnfoldedTransitions& p_mmUnfoldedTransions)
 {
 	SP_DS_ColListAttribute* l_pcColList = NULL;
@@ -306,7 +306,7 @@ bool SP_ExportColPN2ANDL::WriteTransitionClass(Sh_ptr<SP_DS_ColPN_Unfolding> p_U
 }
 
 
-bool SP_ExportColPN2ANDL::WriteArcs(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding,
+bool SP_ExportColPN2ANDL::WriteArcs(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding,
 							const vector<SP_CPN_UnfoldedArcInfo>& p_vArcs,
 							wxString& p_sConditions, wxString& p_sUpdates, bool p_bInput)
 {
@@ -422,7 +422,7 @@ bool SP_ExportColPN2ANDL::WriteArcs(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding,
 	return TRUE;
 }
 
-bool SP_ExportColPN2ANDL::WriteParameters(Sh_ptr<SP_DS_ColPN_Unfolding> p_Unfolding)
+bool SP_ExportColPN2ANDL::WriteParameters(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding)
 {
 	m_file.Write(wxT("constants:\n"));
 

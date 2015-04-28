@@ -484,6 +484,22 @@ bool SP_ColoredNetBuilder::CreateColorsets(dsszmc::andl::simple_net_builder& b)
 		std::string value = "{" + l_pcColList->GetCell(i,2) + "}";
 		dsszmc::aux::replaceAll(value, "-", "..");
 		auto cs = std::make_shared<dsszmc::andl::Colorset>(name, value);
+		if(type == wxT("dot"))
+		{
+			cs->type_ = dsszmc::andl::ColorsetType::DOT_T;
+		}
+		else if(type == wxT("int"))
+		{
+			cs->type_ = dsszmc::andl::ColorsetType::INT_T;
+		}
+		else if(type == wxT("enum"))
+		{
+			cs->type_ = dsszmc::andl::ColorsetType::ENUM_T;
+		}
+		else if(type == wxT("string"))
+		{
+			cs->type_ = dsszmc::andl::ColorsetType::STRING_T;
+		}
 		b.addColorset(cs);
 	}
 

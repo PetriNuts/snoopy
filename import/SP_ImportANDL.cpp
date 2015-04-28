@@ -28,7 +28,6 @@
 #include "sp_defines.h"
 
 #include "dssz/andl/andl_reader.h"
-#include "dssz/misc/exception.h"
 
 #include <wx/spinctrl.h>
 
@@ -61,7 +60,7 @@ bool SP_ImportANDL::ReadFile(const wxString& p_sFile)
 			doLayout();
 		}
 	}
-	catch(const dsszmc::andl::parse_error& e)
+	catch(const std::exception& e)
 	{
 		wxString l_sMsg = wxT("Error while parsing ") + p_sFile;
 		SP_LOGERROR(l_sMsg);

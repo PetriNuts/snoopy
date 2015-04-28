@@ -61,7 +61,7 @@ struct SP_CPN_Function
 
 	wxString m_sFunctionBody;
 
-	Sh_ptr<SP_CPN_Parse_Context> 	m_pParseContext;
+	std::shared_ptr<SP_CPN_Parse_Context> 	m_pParseContext;
 	//SP_CPN_Parse_Context_ptr 	m_pParseContext;
 	SP_CPN_Driver_ptr 	m_pDriver;
 

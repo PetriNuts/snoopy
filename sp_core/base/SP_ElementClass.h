@@ -14,7 +14,7 @@
 #include "sp_core/base/SP_Name.h"
 #include "sp_ds/SP_DS_Attribute.h"
 
-typedef Sh_ptr<long> LongPtr;
+typedef std::shared_ptr<long> LongPtr;
 
 class SP_DS_Graph;
 class SP_DS_Animator;

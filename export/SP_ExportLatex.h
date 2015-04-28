@@ -19,6 +19,7 @@
 #include <wx/dc.h>
 #include <wx/cmndata.h>
 
+typedef vector< pair<wxString, wxString> > EdgeVector;
 
 class SP_ExportLatex : public wxEvtHandler,
 	public SP_ExportRoutine, public SP_Error
@@ -90,18 +91,31 @@ class SP_ExportLatex : public wxEvtHandler,
     void OnSelectClearAllItems_Graph(wxCommandEvent& p_cEvent);
     void OnSelectClearAllItems_Dec(wxCommandEvent& p_cEvent);
 
+    void OnRegEx_Graph(wxCommandEvent& p_cEvent);
+    void OnRegEx_Dec(wxCommandEvent& p_cEvent);
+
     bool StartDoc(const wxString& p_fileName);
     bool WriteLatex();
     bool WriteTitlePage();
     bool WriteBasics();
     bool WriteGraphElements();
+
+    //Declarations are handled differently for colored and uncolored nets
     bool WriteDeclarations();
+    bool WriteDeclarations_Colored();
+    ///
+
     bool WriteHierarchy();
+    bool WriteHierarchyTree(FILE* l_pstream);
+    void WriteHierarchyTreeRecur(const wxTreeItemId& tree_item, FILE* l_pstream);
+
     bool WriteReferences();
+    bool WriteGlossary();
 
     void EndDoc();
 
     wxString EditStringforLatex(wxString filename, bool remove_space = true);
+    wxString EditStringforCrossRef(wxString filename);
     bool SetUpPrintData( wxPrintData& pd, const wxString& p_fileName);
 
     wxTreeItemId FindTreeItemRec(const wxTreeItemId& p_Id, wxString label);
@@ -112,12 +126,15 @@ class SP_ExportLatex : public wxEvtHandler,
     FILE*             m_pstream;    //  output stream
     wxString          m_title;
     wxPrintData       m_printData;
-    wxString m_sFilePath;
+    wxString          m_sFilePath;
+    //wxString          m_MainFilePath;
 
     float m_scale;
     int m_resolution;
 
     int m_bitmapCount;
+
+    int m_flagImages;
 
 
     private:
@@ -137,6 +154,19 @@ class SP_ExportLatex : public wxEvtHandler,
     map<int, wxCheckBox* > SP_Node2SelectClearAllCheckBox;
     map<int, wxCheckListBox* > SP_Node2NodeCheckList;
     map<int, wxCheckListBox* > SP_Node2AttributeCheckList;
+
+    /*specific map for edges
+     * m_pEdgesPlace2Transition: stores edges from place to transition
+     * m_pEdgesTransition2Place: stores edges from transition to place
+     * SP_Edgeclass2EdgeList: maps these edge lists to corresponding Edgeclass
+     */
+
+    EdgeVector m_pEdgesPlace2Transition;
+    EdgeVector m_pEdgesTransition2Place;
+    map<wxString, pair<EdgeVector, EdgeVector> > SP_Edgeclass2EdgeList;
+
+    map<wxString, map<wxString, wxString> > SP_Node2AttrNameMap;
+    map<wxString, map<wxString, wxString> > SP_DecNode2DecAttrNameMap;
 
     //declarations mapping
     map<int, wxString> SP_Index2DecNode;
@@ -185,7 +215,13 @@ class SP_ExportLatex : public wxEvtHandler,
 
     //General tab
     wxFilePickerCtrl* l_pcFilePickerCtrl1;
-    wxFilePickerCtrl* l_pcFilePickerCtrl2;
+    //wxFilePickerCtrl* l_pcFilePickerCtrl2;
+    wxRearrangeCtrl* m_pcRearrangeCtrl_General;
+
+    wxCheckBox* m_pcCheckBoxDirectPDF;
+    wxRadioButton* m_rbPdfLatex;
+    wxRadioButton* m_rbLatexmk;
+
 
     //Basics tab///////////////////////////
     wxSizer* m_pcMainSizer_Basics;
@@ -212,6 +248,8 @@ class SP_ExportLatex : public wxEvtHandler,
     wxArrayString m_Basics_FontStyle_Strings;
     wxArrayString m_Basics_PaperSize_Strings;
 
+    wxRadioButton* m_pcBasics_Landscape;
+    wxRadioButton* m_pcBasics_Portrait;
 
     //Graph Elements tab//////////////////////
     wxSizer* m_pcMainSizer_Graph;
@@ -225,6 +263,11 @@ class SP_ExportLatex : public wxEvtHandler,
     wxButton* m_pcGraph_ButtonUp;
     wxButton* m_pcGraph_ButtonDown;
 
+	wxRadioButton* m_pcOrderBySource;
+	wxRadioButton* m_pcOrderbyTarget;
+	wxRadioButton* m_pcGroupByPlace2Transition;
+	wxRadioButton* m_pcGroupbyTransition2Place;
+
     //Declarations tab/////////////////////////
     wxSizer* m_pcMainSizer_Declarations;
     wxSizer* m_pcLeftSizer_Declarations;
@@ -236,6 +279,9 @@ class SP_ExportLatex : public wxEvtHandler,
     wxRearrangeList* m_pcRearrangelist_declarations;
     wxButton* m_pcDeclarations_ButtonUp;
     wxButton* m_pcDeclarations_ButtonDown;
+
+    //Hierarchy tab/////////////////////////////
+    wxCheckBox* m_pcCheckBoxHierarchyTree;
 
     //////////////
 

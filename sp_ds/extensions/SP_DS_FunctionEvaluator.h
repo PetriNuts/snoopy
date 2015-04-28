@@ -41,7 +41,7 @@ class SP_DS_FunctionEvaluator
 			//wxString l_sFunction(m_Function->toString().c_str(), wxConvUTF8);
 			//SP_LOGMESSAGE( l_sFunction);
 			SP_FunctionPtr f = m_FunctionRegistry->substituteFunctions(m_Function);
-	    	Sh_ptr<dsszmc::functions::FunctionArgument> tmp(f->createFunctionArgument());
+	    	std::shared_ptr<dsszmc::functions::FunctionArgument> tmp(f->createFunctionArgument());
 
 			dsszmc::functions::Name2Id l_Places;
 	    	const SP_ListEdge* l_plEdges = p_pcTrans->GetTargetEdges();

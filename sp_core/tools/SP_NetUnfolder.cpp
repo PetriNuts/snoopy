@@ -46,9 +46,9 @@ SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph)
 			wxString l_sMsg = sout.str();
 			SP_LOGMESSAGE(l_sMsg);
 		}
-		catch (dsszmc::exc::Exc &exc)
+		catch (const std::exception &exc)
 		{
-				wxString l_sMsg = exc.getMsg();
+				wxString l_sMsg = exc.what();
 				SP_LOGERROR(l_sMsg);
 		}
 		catch(...)
@@ -312,6 +312,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 
 	return true;
 }
+
 
 
 template class SP_AbstractNetUnfolder<dsszmc::unfolding::idd_guard_representation>;

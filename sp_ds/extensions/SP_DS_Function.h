@@ -13,6 +13,6 @@
 #include "sp_defines.h"
 
 typedef dsszmc::functions::Function SP_Function;
-typedef Sh_ptr<SP_Function> SP_FunctionPtr;
+typedef std::shared_ptr<SP_Function> SP_FunctionPtr;
 
 #endif /* SP_DS_FUNCTION_H_ */

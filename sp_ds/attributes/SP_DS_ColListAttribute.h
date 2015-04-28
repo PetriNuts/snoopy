@@ -11,7 +11,7 @@
 
 #include "sp_ds/SP_DS_Attribute.h"
 
-typedef Sh_ptr<unsigned int> UIntPtr;
+typedef std::shared_ptr<unsigned int> UIntPtr;
 
 enum SP_COLLIST_TYPE{
 	SP_COLLIST_BOOL,

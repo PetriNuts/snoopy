@@ -87,7 +87,7 @@ public:
 
 } // namespace SP_CPN
 
-typedef Sh_ptr<SP_CPN::SP_CPN_Driver> SP_CPN_Driver_ptr;
+typedef std::shared_ptr<SP_CPN::SP_CPN_Driver> SP_CPN_Driver_ptr;
 
 SP_CPN_Driver_ptr make_CPN_Driver(class SP_CPN_Parse_Context& calc);
 
