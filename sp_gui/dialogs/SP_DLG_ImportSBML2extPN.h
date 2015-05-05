@@ -20,7 +20,7 @@ private:
     DECLARE_EVENT_TABLE()
 		//! the top level sizer
 		wxBoxSizer* m_pcSizer;
-		wxCheckBox *m_cbShowReactionReverseReaction;
+		wxCheckBox *m_cbCreateReactionReverseReaction;
     DECLARE_CLASS(SP_DLG_ImportSBML2extPN)
 protected:
 
@@ -31,7 +31,7 @@ public:
 
     void OnDlgOk(wxCommandEvent& p_cEvent);
     void OnDlgCancel(wxCommandEvent& p_cEvent);
-	bool GetShowReverseReactions();
+	bool GetCreateReverseReactions();
 };
 
 #endif // __SP_DLG_IMPORTSBML2EXTPN_H__

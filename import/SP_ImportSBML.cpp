@@ -32,14 +32,6 @@ SP_ImportSBML::getSBMLSpeciesName(Species* p_Species, wxString& p_Id, wxString& 
 	{
 		p_Name = wxString(p_Species->getName().c_str(), wxConvUTF8);
 		ret = true;
-		//add to conversion map
-		wxString l_Name = p_Name;
-		if(p_Species->isSetCompartment())
-		{
-			wxString l_Comp = wxString(p_Species->getCompartment().c_str(), wxConvUTF8);
-			l_Name << wxT("__") << m_Id2Name[l_Comp];
-		}
-		m_Id2Name[p_Id] = l_Name;
 	}
 	return ret;
 }
@@ -60,8 +52,6 @@ SP_ImportSBML::getSBMLEventName(Event* p_Event, wxString& p_Id, wxString& p_Name
 	{
 		p_Name = wxString(p_Event->getName().c_str(), wxConvUTF8);
 		ret = true;
-		//add to conversion map
-		m_Id2Name[p_Id] = p_Name;
 	}
 	return ret;
 }
@@ -82,14 +72,6 @@ SP_ImportSBML::getSBMLReactionName(Reaction* p_Reaction, wxString& p_Id, wxStrin
 	{
 		p_Name = wxString(p_Reaction->getName().c_str(), wxConvUTF8);
 		ret = true;
-		//add to conversion map
-		wxString l_Name = p_Name;
-		if(p_Reaction->isSetCompartment())
-		{
-			wxString l_Comp = wxString(p_Reaction->getCompartment().c_str(), wxConvUTF8);
-			l_Name << wxT("__") << m_Id2Name[l_Comp];
-		}
-		m_Id2Name[p_Id] = l_Name;
 	}
 	return ret;
 }
@@ -111,8 +93,6 @@ SP_ImportSBML::getSBMLParameterName(Parameter* p_Parameter, wxString& p_Id, wxSt
 	{
 		p_Name = wxString(p_Parameter->getName().c_str(), wxConvUTF8);
 		ret = true;
-		//add to conversion map
-		m_Id2Name[p_Id] = p_Name;
 	}
 	return ret;
 }
@@ -133,8 +113,6 @@ SP_ImportSBML::getSBMLCompartmentName(Compartment* p_Compartment, wxString& p_Id
 	{
 		p_Name = wxString(p_Compartment->getName().c_str(), wxConvUTF8);
 		ret = true;
-		//add to conversion map
-		m_Id2Name[p_Id] = p_Name;
 	}
 	return ret;
 }
@@ -262,41 +240,4 @@ bool SP_ImportSBML::ValidateSBML(SBMLDocument* p_sbmlDoc)
 	}
 
 	return !l_nSeriousErrors;
-}
-
-bool SP_ImportSBML::ConvertIds2Names()
-{
-	for(SP_DS_Metadataclass* l_pcMC : *(m_pcGraph->GetMetadataclasses()))
-	{
-		for(SP_DS_Metadata* l_pcMeta : *(l_pcMC->GetElements()))
-		{
-			SP_DS_Attribute* l_pcAttr = l_pcMeta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME);
-			if(l_pcAttr)
-			{
-				wxString l_sId = l_pcAttr->GetValueString();
-				wxString l_sName = m_Id2Name[l_sId];
-				if(l_sName != wxT(""))
-				{
-					l_pcAttr->SetValueString(l_sName);
-				}
-			}
-		}
-	}
-	for(SP_DS_Nodeclass* l_pcNC : *(m_pcGraph->GetNodeclasses()))
-	{
-		for(SP_DS_Node* l_pcNode : *(l_pcNC->GetElements()))
-		{
-			SP_DS_Attribute* l_pcAttr = l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME);
-			if(l_pcAttr)
-			{
-				wxString l_sId = l_pcAttr->GetValueString();
-				wxString l_sName = m_Id2Name[l_sId];
-				if(l_sName != wxT(""))
-				{
-					l_pcAttr->SetValueString(l_sName);
-				}
-			}
-		}
-	}
-	return true;
 }

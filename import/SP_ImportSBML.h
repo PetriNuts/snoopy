@@ -25,7 +25,6 @@ class SP_ImportSBML: public SP_ImportRoutine,
 private:
 
 protected:
-	SP_MapString2String m_Id2Name;
 
 public:
 	wxString formulaToString(const ASTNode* p_Math);

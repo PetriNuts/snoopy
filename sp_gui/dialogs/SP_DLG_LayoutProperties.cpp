@@ -33,8 +33,8 @@ m_pcDoc(p_pcDoc)
 
 	/* Layout */
     wxArrayString l_asLayoutChoices;
-    l_asLayoutChoices.Add(wxT("Planarization"));
     l_asLayoutChoices.Add(wxT("FMMM"));
+    l_asLayoutChoices.Add(wxT("Planarization"));
     l_asLayoutChoices.Add(wxT("Sugiyama"));
 	m_pcLayoutChoice = new wxChoice(this,
 									-1,

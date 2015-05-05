@@ -51,7 +51,7 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 		getSpecies();
 		getReactions();
 
-		ConvertIds2Names();
+		//ConvertIds2Names();
 
 		DoVisualization();
 
@@ -165,12 +165,11 @@ void SP_ImportSBML2cntPn::getReactions ()
 			if (l_sbmlReaction->isSetKineticLaw())
 			{
 				KineticLaw* l_sbmlKineticLaw =  l_sbmlReaction->getKineticLaw();
-				KineticLaw l_sbmlMyKineticLaw(2,3);
 				ASTNode* l_sbmlMath = l_sbmlKineticLaw->getMath()->deepCopy();
-				l_sbmlMyKineticLaw.setMath(getSBMLFormula(l_sbmlMath));
 
-				wxString l_kinetic =  wxString(l_sbmlMyKineticLaw.getFormula().c_str(), wxConvUTF8);
-				(dynamic_cast<SP_DS_ColListAttribute *>(l_reactionNode->GetAttribute(wxT("FunctionList"))))->SetCell(0,1,l_kinetic);
+				wxString l_kinetic =  formulaToString(getSBMLFormula(l_sbmlMath));
+				SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_reactionNode->GetAttribute(wxT("FunctionList")));
+				l_pcColAttr->SetCell(0, 1, l_kinetic);
 
 				wxDELETE(l_sbmlMath);
 

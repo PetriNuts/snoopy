@@ -50,7 +50,7 @@ bool SP_ImportSBML2sPn::ReadFile(const wxString& p_sFile)
 		//TODO check events
 		//getEvents();
 
-		ConvertIds2Names();
+		//ConvertIds2Names();
 
 		DoVisualization();
 

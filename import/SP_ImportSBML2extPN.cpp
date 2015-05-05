@@ -34,7 +34,7 @@ bool SP_ImportSBML2extPN::ReadFile(const wxString& p_sFile)
 
 	if (l_cDlg.ShowModal() ==  wxID_OK)
 	{
-		g_ShowReverseReactions = l_cDlg.GetShowReverseReactions();
+		m_CreateReverseReactions = l_cDlg.GetCreateReverseReactions();
 
 		l_sbmlDocument = readSBML(p_sFile.mb_str());
 		CHECK_POINTER(l_sbmlDocument, return FALSE);
@@ -49,7 +49,7 @@ bool SP_ImportSBML2extPN::ReadFile(const wxString& p_sFile)
 			getSpecies();
 			getReactions();
 
-			ConvertIds2Names();
+			//ConvertIds2Names();
 
 			DoVisualization();
 
@@ -84,7 +84,7 @@ void SP_ImportSBML2extPN::getModelCompartments()
 
 		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_CompId);
 		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("compartment"));
-		l_constant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
+		l_constant->GetAttribute(wxT("Type"))->SetValueString(wxT("int"));
 		if(!l_CompName.IsEmpty())
 			l_constant->GetAttribute(wxT("Comment"))->SetValueString(wxT("name: ")+l_CompName);
 
@@ -189,11 +189,11 @@ void SP_ImportSBML2extPN::getReactions ()
 			// is reversible (0,1 for false,true) or 0 for default (false)
 			bool b_IsReversible = l_sbmlReaction->getReversible();
 
-			if (b_IsReversible && g_ShowReverseReactions)
+			if (b_IsReversible && m_CreateReverseReactions)
 			{
 				++yComRea;
 				l_revReactionNode = extTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
-				l_revReactionNode->GetAttribute(wxT("Name"))->SetValueString(wxT("re:")+l_ReactionName);
+				l_revReactionNode->GetAttribute(wxT("Name"))->SetValueString(wxT("re_")+l_ReactionId);
 				l_revReactionNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
 				l_revReactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 			}
@@ -218,7 +218,7 @@ void SP_ImportSBML2extPN::getReactions ()
 						wxString l_stoichiometry =
 								wxString::Format(wxT("%.0f"),l_sbmlReaction->getReactant(lor)->getStoichiometry());
 						drawDpnEdge(l_pcNode, l_reactionNode,wxT("Edge"),l_stoichiometry);
-						if (b_IsReversible && l_revReactionNode && g_ShowReverseReactions)
+						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 						{
 							drawDpnEdge(l_revReactionNode, l_pcNode,wxT("Edge"),l_stoichiometry);
 						}
@@ -234,7 +234,7 @@ void SP_ImportSBML2extPN::getReactions ()
 						wxString l_stoichiometry =
 								wxString::Format(wxT("%.0f"),l_sbmlReaction->getProduct(lop)->getStoichiometry());
 						drawDpnEdge(l_reactionNode, l_pcNode,wxT("Edge"),l_stoichiometry);
-						if (b_IsReversible && l_revReactionNode && g_ShowReverseReactions)
+						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 						{
 							drawDpnEdge(l_pcNode, l_revReactionNode, wxT("Edge"),l_stoichiometry);
 						}
@@ -262,7 +262,7 @@ void SP_ImportSBML2extPN::getReactions ()
 					{
 						wxString l_stoichiometry = wxT("0"); // no info about in sbml
 						drawDpnEdge( l_pcNode, l_reactionNode, wxT("Read Edge"), l_stoichiometry);
-						if (b_IsReversible && l_revReactionNode && g_ShowReverseReactions)
+						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 						{
 							drawDpnEdge(l_pcNode, l_revReactionNode,wxT("Read Edge"),l_stoichiometry);
 						}

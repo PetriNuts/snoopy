@@ -26,8 +26,8 @@ SP_DLG_ImportSBML2extPN::SP_DLG_ImportSBML2extPN(SP_GUI_Mainframe*  p_pcParent,
     /* top level sizer */
     m_pcSizer = new wxBoxSizer(wxVERTICAL);
 
-	m_cbShowReactionReverseReaction = new wxCheckBox(this, -1, wxT("Show reverse reactions"));
-	m_pcSizer->Add(m_cbShowReactionReverseReaction, 0, wxALL, 10);
+	m_cbCreateReactionReverseReaction = new wxCheckBox(this, -1, wxT("Show reverse reactions"));
+	m_pcSizer->Add(m_cbCreateReactionReverseReaction, 0, wxALL, 10);
 
 	/* Buttons in the lower right hand corner */
     wxBoxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
@@ -42,9 +42,9 @@ SP_DLG_ImportSBML2extPN::SP_DLG_ImportSBML2extPN(SP_GUI_Mainframe*  p_pcParent,
 }
 
 bool
-SP_DLG_ImportSBML2extPN::GetShowReverseReactions()
+SP_DLG_ImportSBML2extPN::GetCreateReverseReactions()
 {
-	return( m_cbShowReactionReverseReaction->IsChecked() );
+	return( m_cbCreateReactionReverseReaction->IsChecked() );
 }
 
 void

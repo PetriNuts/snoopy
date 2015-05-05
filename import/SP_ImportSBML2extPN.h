@@ -16,7 +16,7 @@ class SP_ImportSBML2extPN: public SP_ImportSBML
 
 private:
 
-	bool g_ShowReverseReactions;
+	bool m_CreateReverseReactions;
 
 	/**
 	\brief  Add model compartment as a parameter node to the a net
