@@ -124,11 +124,7 @@ void SP_ImportSBML2extPN::getSpecies()
 				wxString l_sCompartment = wxString(l_sbmlSpecies->getCompartment().c_str(), wxConvUTF8);
 				if(!l_sCompartment.IsEmpty())
 				{
-					wxString l_CompName = m_Id2Name[l_sCompartment];
-					if(l_CompName == wxT(""))
-						l_comment << wxT("compartment: ") << l_sCompartment << wxT("\n");
-					else
-						l_comment << wxT("compartment: ") << l_CompName << wxT("\n");
+					l_comment << wxT("compartment: ") << l_sCompartment << wxT("\n");
 				}
 				if(!l_speciesName.IsEmpty())
 				{
