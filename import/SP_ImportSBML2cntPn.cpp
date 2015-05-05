@@ -29,11 +29,9 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 	g_ParameterList.clear();
 	g_ReactionList.clear();
 
-	SBMLReader* l_sbmlReader;
 	SBMLDocument* l_sbmlDocument;
 
-	l_sbmlReader = SBMLReader_create();
-	l_sbmlDocument = SBMLReader_readSBML(l_sbmlReader, p_sFile.mb_str());
+	l_sbmlDocument = readSBML(p_sFile.mb_str());
 	CHECK_POINTER(l_sbmlDocument, return FALSE);
 
 	m_sbmlModel = l_sbmlDocument->getModel();
@@ -43,7 +41,7 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 	{
 		m_pcGraph = CreateDocument(SP_DS_CONTINUOUSPED_CLASS);
 
-		SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(m_pcMyDoc->GetFirstView());
+		//SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(m_pcMyDoc->GetFirstView());
 
 		getModelCompartments();
 		// first we have to get model parameters, later the reaction parameters
@@ -60,8 +58,6 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 		m_pcMyDoc->Modify(true);
 	}
 	wxDELETE(l_sbmlDocument);
-	wxDELETE(l_sbmlReader);
-
 	return true;
 }
 

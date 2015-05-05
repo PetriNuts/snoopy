@@ -26,15 +26,14 @@ SP_DLG_ImportSBML2extPN::SP_DLG_ImportSBML2extPN(SP_GUI_Mainframe*  p_pcParent,
     /* top level sizer */
     m_pcSizer = new wxBoxSizer(wxVERTICAL);
 
-	m_cbCreateReactionReverseReaction = new wxCheckBox(this, -1, wxT("Show reverse reactions"));
+	m_cbHighlightReverseReaction = new wxCheckBox(this, -1, wxT("Highlight reversible reactions"));
+	m_pcSizer->Add(m_cbHighlightReverseReaction, 0, wxALL, 10);
+	m_cbCreateReactionReverseReaction = new wxCheckBox(this, -1, wxT("Create reverse reactions"));
 	m_pcSizer->Add(m_cbCreateReactionReverseReaction, 0, wxALL, 10);
 
 	/* Buttons in the lower right hand corner */
-    wxBoxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
-	l_pcButtonSizer->Add(new wxButton(this, wxID_OK, wxT("OK")), 0, wxLEFT | wxRIGHT | wxTOP, 5);
-	l_pcButtonSizer->Add(new wxButton(this, wxID_CANCEL, wxT("Cancel")), 0, wxALL, 5);
-
-    m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT);
+	wxStdDialogButtonSizer* l_pcButtons = CreateStdDialogButtonSizer(wxOK | wxCANCEL);
+    m_pcSizer->Add(l_pcButtons, 0, wxALL, 10);
 
    SetSizerAndFit(m_pcSizer);
 
@@ -45,6 +44,12 @@ bool
 SP_DLG_ImportSBML2extPN::GetCreateReverseReactions()
 {
 	return( m_cbCreateReactionReverseReaction->IsChecked() );
+}
+
+bool
+SP_DLG_ImportSBML2extPN::GetHighlightReverseReactions()
+{
+	return( m_cbHighlightReverseReaction->IsChecked() );
 }
 
 void

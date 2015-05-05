@@ -35,6 +35,7 @@ bool SP_ImportSBML2extPN::ReadFile(const wxString& p_sFile)
 	if (l_cDlg.ShowModal() ==  wxID_OK)
 	{
 		m_CreateReverseReactions = l_cDlg.GetCreateReverseReactions();
+		m_HighlightReversibleReactions = l_cDlg.GetHighlightReverseReactions();
 
 		l_sbmlDocument = readSBML(p_sFile.mb_str());
 		CHECK_POINTER(l_sbmlDocument, return FALSE);
@@ -190,12 +191,18 @@ void SP_ImportSBML2extPN::getReactions ()
 			// is reversible (0,1 for false,true) or 0 for default (false)
 			bool b_IsReversible = l_sbmlReaction->getReversible();
 
+			if(b_IsReversible && m_HighlightReversibleReactions)
+			{
+				l_reactionNode->GetGraphics()->front()->SetBrushColour(*wxBLUE);
+			}
+
 			if (b_IsReversible && m_CreateReverseReactions)
 			{
 				++yComRea;
 				l_revReactionNode = extTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
 				l_revReactionNode->GetAttribute(wxT("Name"))->SetValueString(wxT("re_")+l_ReactionId);
 				l_revReactionNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
+				l_revReactionNode->GetGraphics()->front()->SetBrushColour(*wxRED);
 				l_revReactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 			}
 

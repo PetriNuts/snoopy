@@ -16,6 +16,7 @@ class SP_ImportSBML2extPN: public SP_ImportSBML
 
 private:
 
+	bool m_HighlightReversibleReactions;
 	bool m_CreateReverseReactions;
 
 	/**

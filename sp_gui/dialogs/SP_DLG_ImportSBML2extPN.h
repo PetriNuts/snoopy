@@ -21,6 +21,7 @@ private:
 		//! the top level sizer
 		wxBoxSizer* m_pcSizer;
 		wxCheckBox *m_cbCreateReactionReverseReaction;
+		wxCheckBox *m_cbHighlightReverseReaction;
     DECLARE_CLASS(SP_DLG_ImportSBML2extPN)
 protected:
 
@@ -32,6 +33,7 @@ public:
     void OnDlgOk(wxCommandEvent& p_cEvent);
     void OnDlgCancel(wxCommandEvent& p_cEvent);
 	bool GetCreateReverseReactions();
+	bool GetHighlightReverseReactions();
 };
 
 #endif // __SP_DLG_IMPORTSBML2EXTPN_H__

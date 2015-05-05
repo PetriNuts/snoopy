@@ -15,6 +15,9 @@ class SP_ImportSBML2sPn: public SP_ImportSBML
 
 private:
 
+	bool m_HighlightReversibleReactions;
+	bool m_CreateReverseReactions;
+
 	SP_ListMetadata g_ParameterList;
 
 	/**

@@ -9,6 +9,7 @@
 
 #include "sp_ds/netclasses/SP_DS_EventSPN.h"
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
+#include "sp_gui/dialogs/SP_DLG_ImportSBML2extPN.h"
 
 SP_ImportSBML2sPn::SP_ImportSBML2sPn()
 {
@@ -28,40 +29,48 @@ bool SP_ImportSBML2sPn::ReadFile(const wxString& p_sFile)
 	g_ParameterList.clear();
 	g_ReactionList.clear();
 
-	SBMLReader* l_sbmlReader = new SBMLReader();
-	std::string l_sFile = std::string(p_sFile.mb_str());
-	SBMLDocument* l_sbmlDocument = l_sbmlReader->readSBML(l_sFile);
-	CHECK_POINTER(l_sbmlDocument, return FALSE);
+	SBMLDocument* l_sbmlDocument;
 
-	m_sbmlModel = l_sbmlDocument->getModel();
-	CHECK_POINTER(m_sbmlModel, return FALSE);
+	SP_DLG_ImportSBML2extPN l_cDlg(NULL);
 
-	if(ValidateSBML(l_sbmlDocument))
+	if (l_cDlg.ShowModal() ==  wxID_OK)
 	{
-		m_pcGraph = CreateDocument(SP_DS_SPN_CLASS);
+		m_CreateReverseReactions = l_cDlg.GetCreateReverseReactions();
+		m_HighlightReversibleReactions = l_cDlg.GetHighlightReverseReactions();
 
-		//SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(m_pcMyDoc->GetFirstView());
+		l_sbmlDocument = readSBML(p_sFile.mb_str());
+		CHECK_POINTER(l_sbmlDocument, return FALSE);
 
-		getModelCompartments();
-		// first we have to get model parameters, later the reaction parameters
-		getModelParameters();
-		getSpecies();
-		getReactions();
-		//TODO check events
-		//getEvents();
+		m_sbmlModel = l_sbmlDocument->getModel();
+		CHECK_POINTER(m_sbmlModel, return FALSE);
 
-		//ConvertIds2Names();
+		if(ValidateSBML(l_sbmlDocument))
+		{
+			m_pcGraph = CreateDocument(SP_DS_SPN_CLASS);
 
-		DoVisualization();
+			//SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(m_pcMyDoc->GetFirstView());
 
-		SP_MESSAGEBOX(wxT("The SBML import is experimental!\nPlease note: rules, events and functions are not supported yet.\nPlease check the result!"),wxT("Notice"), wxOK | wxICON_INFORMATION);
+			getModelCompartments();
+			// first we have to get model parameters, later the reaction parameters
+			getModelParameters();
+			getSpecies();
+			getReactions();
+			//TODO check events
+			//getEvents();
 
-		m_pcMyDoc->Modify(true);
+			//ConvertIds2Names();
+
+			DoVisualization();
+
+			SP_MESSAGEBOX(wxT("The SBML import is experimental!\nPlease note: rules, events and functions are not supported yet.\nPlease check the result!"),wxT("Notice"), wxOK | wxICON_INFORMATION);
+
+			m_pcMyDoc->Modify(true);
+		}
+		wxDELETE(l_sbmlDocument);
+
+		return true;
 	}
-	wxDELETE(l_sbmlDocument);
-	wxDELETE(l_sbmlReader);
-
-	return true;
+	return false;
 }
 
 
@@ -212,6 +221,7 @@ void SP_ImportSBML2sPn::getReactions ()
 		getSBMLReactionName(l_sbmlReaction, l_ReactionId, l_ReactionName);
 
 		SP_DS_Node* l_reactionNode = l_pcNodeClass->NewElement(m_pcCanvas->GetNetnumber());
+		SP_DS_Node* l_revReactionNode = NULL;
 		if (l_reactionNode)
 		{
 			++yComRea;
@@ -225,25 +235,46 @@ void SP_ImportSBML2sPn::getReactions ()
 			}
 			l_reactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 
-			// is reversible (0,1 for false,true) or 0 for default (false)
-			if(l_sbmlReaction->getReversible() == 1)
-			{
-				SP_LOGWARNING( l_ReactionName + wxT("has set reversible == true. Stochastic Petri Nets doesn't support reversible Transitions."));
-			}
-
 			// get KineticLaw
+			wxString l_kinetic;
 			if (l_sbmlReaction->isSetKineticLaw())
 			{
 				KineticLaw* l_sbmlKineticLaw =  l_sbmlReaction->getKineticLaw();
 				ASTNode* l_sbmlMath = l_sbmlKineticLaw->getMath()->deepCopy();
 
-				wxString l_kinetic =  formulaToString(getSBMLFormula(l_sbmlMath));
+				l_kinetic =  formulaToString(getSBMLFormula(l_sbmlMath));
 				SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_reactionNode->GetAttribute(wxT("FunctionList")));
 				l_pcColAttr->SetCell(0, 1, l_kinetic);
 
 				wxDELETE(l_sbmlMath);
 
 				getReactionParameters(l_sbmlReaction);
+			}
+
+			// is reversible (0,1 for false,true) or 0 for default (false)
+			bool b_IsReversible = l_sbmlReaction->getReversible();
+
+			if(b_IsReversible)
+			{
+				SP_LOGWARNING( l_ReactionId + wxT(" has set reversible == true. Stochastic Petri Nets doesn't support reversible Transitions."));
+			}
+
+			if(b_IsReversible && m_HighlightReversibleReactions)
+			{
+				l_reactionNode->GetGraphics()->front()->SetBrushColour(*wxBLUE);
+			}
+
+			if (b_IsReversible && m_CreateReverseReactions)
+			{
+				++yComRea;
+				l_revReactionNode = l_pcNodeClass->NewElement(m_pcCanvas->GetNetnumber());
+				l_revReactionNode->GetAttribute(wxT("Name"))->SetValueString(wxT("re_")+l_ReactionId);
+				l_revReactionNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
+				SP_DS_ColListAttribute* l_pcFuncAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_revReactionNode->GetAttribute(wxT("FunctionList")));
+				//set ratefunction the same as reversible transition, because we dont know it
+				l_pcFuncAttr->SetCell(0,1, l_kinetic);
+				l_revReactionNode->GetGraphics()->front()->SetBrushColour(*wxRED);
+				l_revReactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 			}
 
 		 	// get reactants, products and modifiers
@@ -266,6 +297,10 @@ void SP_ImportSBML2sPn::getReactions ()
 						wxString l_stoichiometry =
 								wxString::Format(wxT("%.0f"),l_sbmlReaction->getReactant(lor)->getStoichiometry());
 						drawEdge(l_pcNode, l_reactionNode, wxT("Edge"),l_stoichiometry);
+						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
+						{
+							drawDpnEdge(l_revReactionNode, l_pcNode,wxT("Edge"),l_stoichiometry);
+						}
 					}
 				}
 
@@ -279,6 +314,10 @@ void SP_ImportSBML2sPn::getReactions ()
 								wxString::Format(wxT("%.0f"),l_sbmlReaction->getProduct(lop)->getStoichiometry());
 						drawEdge(l_reactionNode, l_pcNode,wxT("Edge"),l_stoichiometry);
 
+						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
+						{
+							drawDpnEdge(l_pcNode, l_revReactionNode, wxT("Edge"),l_stoichiometry);
+						}
 						if(l_sbmlReaction->isSetKineticLaw())
 						{
 							const ASTNode* l_sbmlMath = l_sbmlReaction->getKineticLaw()->getMath();
@@ -298,6 +337,10 @@ void SP_ImportSBML2sPn::getReactions ()
 					if (sId == l_modifierName)
 					{
 						drawEdge( l_pcNode, l_reactionNode, wxT("Modifier Edge"), wxT("0"));
+						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
+						{
+							drawEdge( l_pcNode, l_reactionNode, wxT("Modifier Edge"), wxT("0"));
+						}
 					}
 				}
 			}
