@@ -102,6 +102,11 @@ void SP_ImportSBML2sPn::getSpecies()
 				wxString l_sMarking = wxString::Format(wxT("%.0f"),l_sbmlSpecies->getInitialAmount());
 				l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
 			}
+			else if(l_sbmlSpecies->isSetInitialConcentration())
+			{
+				wxString l_sMarking = wxString::Format(wxT("%.0f"),l_sbmlSpecies->getInitialConcentration());
+				l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
+			}
 
 			l_pcNode->ShowOnCanvas(m_pcCanvas, FALSE, 50, yComRea,0);
 

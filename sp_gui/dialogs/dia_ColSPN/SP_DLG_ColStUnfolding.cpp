@@ -93,6 +93,7 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 	unfolderChoices.Add(wxT("Gecode (intern)"));
 	unfolderChoices.Add(wxT("Generic (intern)"));
 	m_pcUnfolderRadioBox = new wxRadioBox(this, -1, wxT("Engine"), wxDefaultPosition, wxDefaultSize, unfolderChoices, 0, wxRA_SPECIFY_ROWS);
+	m_pcUnfolderRadioBox->SetSelection(2);
 	m_pcSizer->Add( m_pcUnfolderRadioBox, 0, wxALL| wxEXPAND, 5 );
 
 	//fourth row

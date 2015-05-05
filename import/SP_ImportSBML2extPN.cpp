@@ -139,6 +139,11 @@ void SP_ImportSBML2extPN::getSpecies()
 					wxString l_sMarking = wxString::Format(wxT("%.0f"),l_sbmlSpecies->getInitialAmount());
 					l_compoundNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
 				}
+				else if(l_sbmlSpecies->isSetInitialConcentration())
+				{
+					wxString l_sMarking = wxString::Format(wxT("%.0f"),l_sbmlSpecies->getInitialConcentration());
+					l_compoundNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
+				}
 
 				g_CompoundList.push_back(l_compoundNode);
 			}
