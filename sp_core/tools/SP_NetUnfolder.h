@@ -16,7 +16,7 @@ namespace dsszmc
 {
 namespace unfolding
 {
-	struct idd_guard_representation;
+	class idd_guard_representation;
 	struct gecode_guard_representation;
 }
 }

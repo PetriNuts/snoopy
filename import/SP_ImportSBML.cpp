@@ -25,12 +25,12 @@ SP_ImportSBML::getSBMLSpeciesName(Species* p_Species, wxString& p_Id, wxString& 
 	wxString l_Name;
 	if (p_Species->isSetId())
 	{
-		p_Id = wxString(p_Species->getId().c_str(), wxConvUTF8);
+		p_Id = p_Species->getId();
 		ret = true;
 	}
 	if (p_Species->isSetName())
 	{
-		p_Name = wxString(p_Species->getName().c_str(), wxConvUTF8);
+		p_Name = p_Species->getName();
 		ret = true;
 	}
 	return ret;
@@ -45,12 +45,12 @@ SP_ImportSBML::getSBMLEventName(Event* p_Event, wxString& p_Id, wxString& p_Name
 	wxString l_Name;
 	if (p_Event->isSetId())
 	{
-		p_Id = wxString(p_Event->getId().c_str(), wxConvUTF8);
+		p_Id = p_Event->getId();
 		ret = true;
 	}
 	if (p_Event->isSetName())
 	{
-		p_Name = wxString(p_Event->getName().c_str(), wxConvUTF8);
+		p_Name = p_Event->getName();
 		ret = true;
 	}
 	return ret;
@@ -65,12 +65,12 @@ SP_ImportSBML::getSBMLReactionName(Reaction* p_Reaction, wxString& p_Id, wxStrin
 	wxString l_Name;
 	if (p_Reaction->isSetId())
 	{
-		p_Id = wxString(p_Reaction->getId().c_str(), wxConvUTF8);
+		p_Id = p_Reaction->getId();
 		ret = true;
 	}
 	if (p_Reaction->isSetName())
 	{
-		p_Name = wxString(p_Reaction->getName().c_str(), wxConvUTF8);
+		p_Name = p_Reaction->getName();
 		ret = true;
 	}
 	return ret;
@@ -86,12 +86,12 @@ SP_ImportSBML::getSBMLParameterName(Parameter* p_Parameter, wxString& p_Id, wxSt
 	wxString l_Name;
 	if (p_Parameter->isSetId())
 	{
-		p_Id = wxString(p_Parameter->getId().c_str(), wxConvUTF8);
+		p_Id = p_Parameter->getId();
 		ret = true;
 	}
 	if (p_Parameter->isSetName())
 	{
-		p_Name = wxString(p_Parameter->getName().c_str(), wxConvUTF8);
+		p_Name = p_Parameter->getName();
 		ret = true;
 	}
 	return ret;
@@ -106,12 +106,12 @@ SP_ImportSBML::getSBMLCompartmentName(Compartment* p_Compartment, wxString& p_Id
 	wxString l_Name;
 	if (p_Compartment->isSetId())
 	{
-		p_Id = wxString(p_Compartment->getId().c_str(), wxConvUTF8);
+		p_Id = p_Compartment->getId();
 		ret = true;
 	}
 	if (p_Compartment->isSetName())
 	{
-		p_Name = wxString(p_Compartment->getName().c_str(), wxConvUTF8);
+		p_Name = p_Compartment->getName();
 		ret = true;
 	}
 	return ret;
@@ -164,7 +164,7 @@ bool SP_ImportSBML::existInReactionFormula(const wxString& p_sName, const ASTNod
 		if(p_sbmlFormula->isName())
 		{
 			const char* l_sName = p_sbmlFormula->getName();
-			if(p_sName == wxString(l_sName, wxConvUTF8))
+			if(p_sName == l_sName)
 			{
 				l_bReturn = true;
 			}

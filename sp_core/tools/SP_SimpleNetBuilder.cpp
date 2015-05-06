@@ -946,4 +946,3 @@ bool SP_ColoredNetBuilder::CreateObservers(dsszmc::andl::simple_net_builder& b)
 }
 
 //////////////////////////////////////////////////////////////////////
-
