@@ -90,11 +90,14 @@ void SP_ImportSBML2sPn::getSpecies()
 		if (l_pcNode)
 		{
 			++yComRea;
-			l_pcNode->GetAttribute(wxT("Name"))->SetValueString(l_speciesId);
-			l_pcNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
+			SP_DS_Attribute* l_pcAttrName = l_pcNode->GetAttribute(wxT("Name"));
+			l_pcAttrName->SetValueString(l_speciesId);
+			l_pcAttrName->SetShow(true);
 
-			wxString l_comment = l_pcNode->GetAttribute(wxT("Comment"))->GetValueString();
-			wxString l_sCompartment = wxString(l_sbmlSpecies->getCompartment().c_str(), wxConvUTF8);
+			SP_DS_Attribute* l_pcAttrComment = l_pcNode->GetAttribute(wxT("Comment"));
+			wxString l_comment = l_pcAttrComment->GetValueString();
+
+			wxString l_sCompartment = l_sbmlSpecies->getCompartment();
 			if(!l_sCompartment.IsEmpty())
 			{
 				l_comment << wxT("compartment: ") << l_sCompartment << wxT("\n");
@@ -103,8 +106,8 @@ void SP_ImportSBML2sPn::getSpecies()
 			{
 				l_comment << wxT("name: ") << l_speciesName << wxT("\n");
 			}
-			l_pcNode->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
-			l_pcNode->GetAttribute(wxT("Comment"))->SetShow(false);
+			l_pcAttrComment->SetValueString(l_comment);
+			l_pcAttrComment->SetShow(false);
 
 			if (l_sbmlSpecies->isSetInitialAmount())
 			{
@@ -139,10 +142,12 @@ void SP_ImportSBML2sPn::getEvents()
 		if (l_pcNode)
 		{
 			++yComRea;
-			l_pcNode->GetAttribute(wxT("Name"))->SetValueString(l_eventId);
-			l_pcNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
-			SP_DS_Attribute* l_pcComment = l_pcNode->GetAttribute(wxT("Comment"));
-			wxString l_comment = l_pcComment->GetValueString();
+			SP_DS_Attribute* l_pcAttrName = l_pcNode->GetAttribute(wxT("Name"));
+			l_pcAttrName->SetValueString(l_eventId);
+			l_pcAttrName->SetShow(true);
+
+			SP_DS_Attribute* l_pcAttrComment = l_pcNode->GetAttribute(wxT("Comment"));
+			wxString l_comment = l_pcAttrComment->GetValueString();
 
 			if(!l_eventName.IsEmpty())
 			{
@@ -200,7 +205,8 @@ void SP_ImportSBML2sPn::getEvents()
 				}
 			}
 
-			l_pcComment->SetValueString(l_comment);
+			l_pcAttrComment->SetValueString(l_comment);
+			l_pcAttrComment->SetShow(false);
 			l_pcNode->ShowOnCanvas(m_pcCanvas, FALSE, 50, yComRea,0);
 		}
     }
@@ -225,14 +231,22 @@ void SP_ImportSBML2sPn::getReactions ()
 		if (l_reactionNode)
 		{
 			++yComRea;
-			l_reactionNode->GetAttribute(wxT("Name"))->SetValueString(l_ReactionId);
-			l_reactionNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
+			SP_DS_Attribute* l_pcAttrName = l_reactionNode->GetAttribute(wxT("Name"));
+			l_pcAttrName->SetValueString(l_ReactionId);
+			l_pcAttrName->SetShow(true);
+
+			SP_DS_Attribute* l_pcAttrComment = l_reactionNode->GetAttribute(wxT("Comment"));
+			wxString l_comment = l_pcAttrComment->GetValueString();
+
 			if(!l_ReactionName.IsEmpty())
 			{
-				wxString l_comment = l_reactionNode->GetAttribute(wxT("Comment"))->GetValueString();
-				l_comment << wxT("\n") << wxT("name: ") << l_ReactionName;
-				l_reactionNode->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
+				if(!l_comment.IsEmpty())
+					l_comment << wxT("\n");
+				l_comment << wxT("name: ") << l_ReactionName;
 			}
+			l_pcAttrComment->SetValueString(l_comment);
+			l_pcAttrComment->SetShow(false);
+
 			l_reactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 
 			// get KineticLaw
