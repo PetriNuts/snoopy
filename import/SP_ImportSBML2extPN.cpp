@@ -118,11 +118,14 @@ void SP_ImportSBML2extPN::getSpecies()
 			if (l_compoundNode)
 			{
 				++yComRea;
-				l_compoundNode->GetAttribute(wxT("Name"))->SetValueString(l_speciesId);
-				l_compoundNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
+				SP_DS_Attribute* l_pcAttrName = l_compoundNode->GetAttribute(wxT("Name"));
+				l_pcAttrName->SetValueString(l_speciesId);
+				l_pcAttrName->SetShow(true);
 
-				wxString l_comment = l_compoundNode->GetAttribute(wxT("Comment"))->GetValueString();
-				wxString l_sCompartment = wxString(l_sbmlSpecies->getCompartment().c_str(), wxConvUTF8);
+				SP_DS_Attribute* l_pcAttrComment = l_compoundNode->GetAttribute(wxT("Comment"));
+				wxString l_comment = l_pcAttrComment->GetValueString();
+
+				wxString l_sCompartment = l_sbmlSpecies->getCompartment();
 				if(!l_sCompartment.IsEmpty())
 				{
 					l_comment << wxT("compartment: ") << l_sCompartment << wxT("\n");
@@ -131,8 +134,8 @@ void SP_ImportSBML2extPN::getSpecies()
 				{
 					l_comment << wxT("name: ") << l_speciesName << wxT("\n");
 				}
-				l_compoundNode->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
-				l_compoundNode->GetAttribute(wxT("Comment"))->SetShow(false);
+				l_pcAttrComment->SetValueString(l_comment);
+				l_pcAttrComment->SetShow(false);
 
 				l_compoundNode->ShowOnCanvas(m_pcCanvas, FALSE, 50, yComRea,0);
 				if (l_sbmlSpecies->isSetInitialAmount())
@@ -171,22 +174,26 @@ void SP_ImportSBML2extPN::getReactions ()
 		if (l_reactionNode)
 		{
 			++yComRea;
-			l_reactionNode->GetAttribute(wxT("Name"))->SetValueString(l_ReactionId);
-			l_reactionNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
+			SP_DS_Attribute* l_pcAttrName = l_reactionNode->GetAttribute(wxT("Name"));
+			l_pcAttrName->SetValueString(l_ReactionId);
+			l_pcAttrName->SetShow(true);
+
+			SP_DS_Attribute* l_pcAttrComment = l_reactionNode->GetAttribute(wxT("Comment"));
+			wxString l_comment = l_pcAttrComment->GetValueString();
+
 			if(!l_ReactionName.IsEmpty())
 			{
-				wxString l_comment = l_reactionNode->GetAttribute(wxT("Comment"))->GetValueString();
-				l_comment << wxT("\n") << wxT("name: ") << l_ReactionName;
-				l_reactionNode->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
+				l_comment << wxT("name: ") << l_ReactionName << wxT("\n");
 			}
+
 			if(l_sbmlReaction->isSetKineticLaw())
 			{
 				wxString l_kinetic(l_sbmlReaction->getKineticLaw()->getFormula().c_str(), wxConvUTF8);
-				l_kinetic.Replace(wxT("*"), wxT("\"multiply\""));
-				l_reactionNode->GetAttribute(wxT("Comment"))->SetValueString(l_kinetic);
-				l_reactionNode->GetAttribute(wxT("Comment"))->SetShow(FALSE);
+				l_kinetic.Replace(wxT("*"), wxT("•"));
+				l_comment << wxT("rate: ") << l_kinetic << wxT("\n");
 			}
-			l_reactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
+			l_pcAttrComment->SetValueString(l_comment);
+			l_pcAttrComment->SetShow(false);
 
 			// is reversible (0,1 for false,true) or 0 for default (false)
 			bool b_IsReversible = l_sbmlReaction->getReversible();
@@ -196,12 +203,13 @@ void SP_ImportSBML2extPN::getReactions ()
 				l_reactionNode->GetGraphics()->front()->SetBrushColour(*wxBLUE);
 			}
 
+			l_reactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
+
 			if (b_IsReversible && m_CreateReverseReactions)
 			{
 				++yComRea;
 				l_revReactionNode = extTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
 				l_revReactionNode->GetAttribute(wxT("Name"))->SetValueString(wxT("re_")+l_ReactionId);
-				l_revReactionNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
 				l_revReactionNode->GetGraphics()->front()->SetBrushColour(*wxRED);
 				l_revReactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 			}

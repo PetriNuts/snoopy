@@ -240,14 +240,10 @@ void SP_ImportSBML2sPn::getReactions ()
 
 			if(!l_ReactionName.IsEmpty())
 			{
-				if(!l_comment.IsEmpty())
-					l_comment << wxT("\n");
-				l_comment << wxT("name: ") << l_ReactionName;
+				l_comment << wxT("name: ") << l_ReactionName << wxT("\n");
 			}
 			l_pcAttrComment->SetValueString(l_comment);
 			l_pcAttrComment->SetShow(false);
-
-			l_reactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 
 			// get KineticLaw
 			wxString l_kinetic;
@@ -277,6 +273,8 @@ void SP_ImportSBML2sPn::getReactions ()
 			{
 				l_reactionNode->GetGraphics()->front()->SetBrushColour(*wxBLUE);
 			}
+
+			l_reactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 
 			if (b_IsReversible && m_CreateReverseReactions)
 			{

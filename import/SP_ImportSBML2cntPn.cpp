@@ -81,10 +81,13 @@ void SP_ImportSBML2cntPn::getSpecies()
 			if (l_compoundNode)
 			{
 				++yComRea;
-				l_compoundNode->GetAttribute(wxT("Name"))->SetValueString(l_speciesId);
-				l_compoundNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
+				SP_DS_Attribute* l_pcAttrName = l_compoundNode->GetAttribute(wxT("Name"));
+				l_pcAttrName->SetValueString(l_speciesId);
+				l_pcAttrName->SetShow(true);
 
-				wxString l_comment = l_compoundNode->GetAttribute(wxT("Comment"))->GetValueString();
+				SP_DS_Attribute* l_pcAttrComment = l_compoundNode->GetAttribute(wxT("Comment"));
+				wxString l_comment = l_pcAttrComment->GetValueString();
+
 				wxString l_sCompartment = wxString(l_sbmlSpecies->getCompartment().c_str(), wxConvUTF8);
 				if(!l_sCompartment.IsEmpty())
 				{
@@ -94,8 +97,8 @@ void SP_ImportSBML2cntPn::getSpecies()
 				{
 					l_comment << wxT("name: ") << l_speciesName << wxT("\n");
 				}
-				l_compoundNode->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
-				l_compoundNode->GetAttribute(wxT("Comment"))->SetShow(false);
+				l_pcAttrComment->SetValueString(l_comment);
+				l_pcAttrComment->SetShow(false);
 
 				if(l_sbmlSpecies->isSetInitialConcentration())
 				{
@@ -140,15 +143,14 @@ void SP_ImportSBML2cntPn::getReactions ()
 		if (l_reactionNode)
 		{
 			++yComRea;
-			l_reactionNode->GetAttribute(wxT("Name"))->SetValueString(l_ReactionId);
-			l_reactionNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
-			if(!l_ReactionName.IsEmpty())
-			{
-				wxString l_comment = l_reactionNode->GetAttribute(wxT("Comment"))->GetValueString();
-				l_comment << wxT("\n") << wxT("name: ") << l_ReactionName;
-				l_reactionNode->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
-			}
-			l_reactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
+			SP_DS_Attribute* l_pcAttrName = l_reactionNode->GetAttribute(wxT("Name"));
+			l_pcAttrName->SetValueString(l_ReactionId);
+			l_pcAttrName->SetShow(true);
+
+			SP_DS_Attribute* l_pcAttrComment = l_reactionNode->GetAttribute(wxT("Comment"));
+			wxString l_comment = l_pcAttrComment->GetValueString();
+			l_pcAttrComment->SetValueString(l_comment);
+			l_pcAttrComment->SetShow(false);
 
 			// is reversible (0,1 for false,true) or 0 for default (false)
 			l_reactionNode->GetAttribute(wxT("Reversible"))->SetValueString(wxString::Format(wxT("%d"), l_sbmlReaction->getReversible()));
@@ -167,6 +169,8 @@ void SP_ImportSBML2cntPn::getReactions ()
 
 				getReactionParameters(l_sbmlReaction);
 			}
+
+			l_reactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 
 		 	// get reactants, products and modifiers
 			const ListOfSpeciesReferences* rectants = l_sbmlReaction->getListOfReactants();
