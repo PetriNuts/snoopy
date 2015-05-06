@@ -22,13 +22,12 @@ GetNextChild(wxXmlNode* p_pcVal, wxXmlNodeType p_eType = wxXML_ELEMENT_NODE)
     if (!p_pcVal)
         return NULL;
 
-    wxXmlNode* l_pcNode = p_pcVal->GetChildren();
-    while (l_pcNode)
+    for(wxXmlNode* l_pcNode = p_pcVal->GetChildren();
+    		l_pcNode;
+    		l_pcNode = l_pcNode->GetNext())
     {
         if (l_pcNode->GetType() == p_eType)
             return l_pcNode;
-
-        l_pcNode = l_pcNode->GetNext();
     }
     return NULL;
 }
@@ -39,13 +38,12 @@ GetNextSibling(wxXmlNode* p_pcVal, wxXmlNodeType p_eType = wxXML_ELEMENT_NODE)
     if (!p_pcVal)
         return NULL;
 
-    wxXmlNode* l_pcNode = p_pcVal->GetNext();
-    while (l_pcNode)
+    for(wxXmlNode* l_pcNode = p_pcVal->GetNext();
+    		l_pcNode;
+    		l_pcNode = l_pcNode->GetNext())
     {
         if (l_pcNode->GetType() == p_eType)
             return l_pcNode;
-
-        l_pcNode = l_pcNode->GetNext();
     }
     return GetNextSibling(p_pcVal->GetNext());
 }
@@ -56,14 +54,14 @@ GetAttributeChar(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
     if(!p_pcNode)
         return wxT("");
 
-    wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetProperties();
-    while(l_pcAttributeNode)
+    for(wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetAttributes();
+    		l_pcAttributeNode;
+    		l_pcAttributeNode = l_pcAttributeNode->GetNext())
     {
     	if(l_pcAttributeNode->GetName() == p_pchAttr)
     	{
     		return l_pcAttributeNode->GetValue();
     	}
-    	l_pcAttributeNode = l_pcAttributeNode->GetNext();
     }
     return wxT("");
 }
@@ -76,15 +74,15 @@ SetAttributeChar(wxXmlNode* p_pcNode, const wxString& p_pchAttr,const wxString& 
     if(!p_pcNode)
         return ;
 
-    wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetProperties();
-    while(l_pcAttributeNode)
+    for(wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetAttributes();
+    		l_pcAttributeNode;
+    		l_pcAttributeNode = l_pcAttributeNode->GetNext())
     {
     	if(l_pcAttributeNode->GetName() == p_pchAttr)
     	{
     		l_pcAttributeNode->SetValue(p_pchValue);
     		break;
     	}
-    	l_pcAttributeNode = l_pcAttributeNode->GetNext();
     }
 }
 
@@ -116,14 +114,14 @@ HasAttribute(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
     if (!p_pcNode)
         return FALSE;
 
-    wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetProperties();
-    while(l_pcAttributeNode)
+    for(wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetAttributes();
+    		l_pcAttributeNode;
+    		l_pcAttributeNode = l_pcAttributeNode->GetNext())
     {
     	if(l_pcAttributeNode->GetName() == p_pchAttr)
     	{
     		return true;
     	}
-    	l_pcAttributeNode = l_pcAttributeNode->GetNext();
     }
     return FALSE;
 }
@@ -165,8 +163,9 @@ GetAttributeUInt(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
         return 0;
 
     long l_nRet = 0;
-    wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetProperties();
-    while(l_pcAttributeNode)
+    for(wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetAttributes();
+    		l_pcAttributeNode;
+    		l_pcAttributeNode = l_pcAttributeNode->GetNext())
     {
     	if(l_pcAttributeNode->GetName() == p_pchAttr)
     	{
@@ -175,7 +174,6 @@ GetAttributeUInt(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
 				return 0;
 			return l_nRet;
     	}
-    	l_pcAttributeNode = l_pcAttributeNode->GetNext();
     }
     return l_nRet;
 }
@@ -187,8 +185,9 @@ GetAttributeLong(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
         return 0;
 
     unsigned long l_nRet = 0;
-    wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetProperties();
-    while(l_pcAttributeNode)
+    for(wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetAttributes();
+    		l_pcAttributeNode;
+    		l_pcAttributeNode = l_pcAttributeNode->GetNext())
     {
     	if(l_pcAttributeNode->GetName() == p_pchAttr)
     	{
@@ -197,7 +196,6 @@ GetAttributeLong(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
 				return 0;
 			return l_nRet;
     	}
-    	l_pcAttributeNode = l_pcAttributeNode->GetNext();
     }
     return l_nRet;
 }
@@ -209,8 +207,9 @@ GetAttributeDouble(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
         return 0.0;
 
     double l_nRet = 0.0;
-    wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetProperties();
-    while(l_pcAttributeNode)
+    for(wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetAttributes();
+    		l_pcAttributeNode;
+    		l_pcAttributeNode = l_pcAttributeNode->GetNext())
     {
     	if(l_pcAttributeNode->GetName() == p_pchAttr)
     	{
@@ -219,7 +218,6 @@ GetAttributeDouble(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
 				return 0.0;
 			return l_nRet;
     	}
-    	l_pcAttributeNode = l_pcAttributeNode->GetNext();
     }
     return l_nRet;
 }
@@ -230,14 +228,14 @@ GetAttributeBool(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
     if (!p_pcNode)
         return FALSE;
 
-    wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetProperties();
-    while(l_pcAttributeNode)
+    for(wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetAttributes();
+    		l_pcAttributeNode;
+    		l_pcAttributeNode = l_pcAttributeNode->GetNext())
     {
     	if(l_pcAttributeNode->GetName() == p_pchAttr)
     	{
     		return (l_pcAttributeNode->GetValue() == wxT("1"));
     	}
-    	l_pcAttributeNode = l_pcAttributeNode->GetNext();
     }
     return FALSE;
 }
@@ -250,8 +248,9 @@ GetAttributeGraphicState(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
 
     SP_GRAPHIC_STATE l_nRet = SP_STATE_NORMAL;
     long l_nTemp;
-    wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetProperties();
-    while(l_pcAttributeNode)
+    for(wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetAttributes();
+    		l_pcAttributeNode;
+    		l_pcAttributeNode = l_pcAttributeNode->GetNext())
     {
     	if(l_pcAttributeNode->GetName() == p_pchAttr)
     	{
@@ -261,7 +260,6 @@ GetAttributeGraphicState(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
 				return (SP_GRAPHIC_STATE)l_nTemp;
 			}
     	}
-    	l_pcAttributeNode = l_pcAttributeNode->GetNext();
     }
     return l_nRet;
 }
@@ -1018,21 +1016,14 @@ SP_XmlReader::ReadData(SP_Data* p_pcVal, wxXmlNode* p_pcRoot)
 
     FillInMap(p_pcVal);
 
-    wxXmlNode* l_pcNode = GetNextChild(p_pcRoot);
-	
- 
-
-	while (l_pcNode)
+    for(wxXmlNode* node = GetNextChild(p_pcRoot); node; node = GetNextSibling(node))
     {
-        if (l_pcNode->GetName() == wxT("graphics"))
+        if (node->GetName() == wxT("graphics"))
         {
             // new graphic
-            return ReadGraphics(p_pcVal, l_pcNode);
+            return ReadGraphics(p_pcVal, node);
         }
-        l_pcNode = GetNextSibling(l_pcNode);
     }
-
-
 
     return TRUE;
 }
@@ -1073,12 +1064,11 @@ SP_XmlReader::ReadGraphics(SP_Data* p_pcVal, wxXmlNode* p_pcRoot)
     CHECK_POINTER(p_pcVal, return FALSE);
     CHECK_POINTER(p_pcRoot, return FALSE);
 
-    wxXmlNode* l_pcNode = GetNextChild(p_pcRoot);
     unsigned int l_nGrCount = 0;
 
-    while (l_pcNode)
+    for(wxXmlNode* node = GetNextChild(p_pcRoot); node; node = GetNextSibling(node))
     {
-        if (l_pcNode->GetName() == wxT("graphic"))
+        if (node->GetName() == wxT("graphic"))
         {			
 			if(!p_pcVal->GetGraphics()->empty())
         	{
@@ -1088,11 +1078,10 @@ SP_XmlReader::ReadGraphics(SP_Data* p_pcVal, wxXmlNode* p_pcRoot)
         		{
         			l_pcNewGr = p_pcVal->AddGraphic(l_pcNewGr->Clone(p_pcVal));
         		}
-				ReadGraphic(l_pcNewGr, l_pcNode);
-				l_nGrCount++;
+				ReadGraphic(l_pcNewGr, node);
+				++l_nGrCount;
 			}            
         }
-        l_pcNode = GetNextSibling(l_pcNode);
     }	
 
     return TRUE;
@@ -1143,8 +1132,9 @@ SP_XmlReader::ReadGraphic(SP_Graphic* p_pcVal, wxXmlNode* p_pcRoot)
     p_pcVal->SetPosY(GetAttributeDouble(p_pcRoot, wxT("y")));
     p_pcVal->SetOffsetX(GetAttributeDouble(p_pcRoot, wxT("xoff")));
     p_pcVal->SetOffsetY(GetAttributeDouble(p_pcRoot, wxT("yoff")));
-    if (GetGraphicById(p_pcRoot, wxT("grparent")))
-        GetGraphicById(p_pcRoot, wxT("grparent"))->AddGraphicChildren(p_pcVal);
+    SP_Graphic* l_pcGrParent = GetGraphicById(p_pcRoot, wxT("grparent"));
+    if (l_pcGrParent)
+    	l_pcGrParent->AddGraphicChildren(p_pcVal);
     if (HasAttribute(p_pcRoot, wxT("pen")))
         ReadPenColour(p_pcVal, p_pcRoot);
     if (HasAttribute(p_pcRoot, wxT("brush")))
@@ -1285,7 +1275,11 @@ SP_XmlReader::FillInMap(SP_Graphic* p_pcGraphic)
 			m_mId2Graphic.insert(make_pair(p_pcGraphic->GetId(),p_pcGraphic));
 		if(l_Return.second == false)
 		{
-			SP_LOGERROR(wxString::Format(wxT("Error ID: %d already in m_mId2Graphic!"), p_pcGraphic->GetId()));
+			SP_LOGERROR(wxString::Format(wxT("Error ID: %lu already in m_mId2Graphic!"), p_pcGraphic->GetId()));
+		}
+		else
+		{
+			SP_LOGDEBUG(wxString::Format(wxT("Graphic ID: %lu added in m_mId2Graphic!"), p_pcGraphic->GetId()));
 		}
     }
     return TRUE;
