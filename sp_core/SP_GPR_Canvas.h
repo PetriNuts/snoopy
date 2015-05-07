@@ -21,7 +21,7 @@ const int SP_GRID_SIZE_MAX = 10000;
 const int SP_WINDOW_SIZE_X = 600;
 const int SP_WINDOW_SIZE_Y = 400;
 const bool SP_DEFAULT_LOG_VERBOSE = false;
-const bool SP_DEFAULT_COMPRESS_FILE = true;
+const bool SP_DEFAULT_COMPRESS_FILE = false;
 
 #include <wx/tokenzr.h>
 
