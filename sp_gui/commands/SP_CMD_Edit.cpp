@@ -199,27 +199,11 @@ bool SP_CMD_Edit::DoDelete(bool p_bDeleteAll)
 
 			if (l_pcParent->GetLogical())
 			{
-/*				const SP_ListAttribute* l_plAttributes = l_pcParent->GetAttributes();
-				for (SP_DS_Attribute* l_pcAttr : *l_plAttributes)
+			    for(auto itC = (*itG)->GetGraphicChildren()->begin();
+			    		itC != (*itG)->GetGraphicChildren()->end();
+			    		itC = (*itG)->GetGraphicChildren()->begin())
 				{
-					SP_ListGraphic* l_plGraphic = l_pcAttr->GetGraphics();
-					if (l_plGraphic)
-					{
-						for (SP_Graphic* l_pcGraphic : *l_plGraphic)
-							if (l_pcGraphic && (l_pcGraphic->GetGraphicParent()->GetId() == (*itG)->GetId()))
-							{
-								// add the attribute graphics to the map for undo-ing
-								m_mGraphic2Parent[l_pcGraphic] = l_pcAttr;
-								//remove the graphics of the child attributes
-								l_pcAttr->RemoveGraphic(l_pcGraphic, false);
-
-								break;
-							}
-					} // end if
-				} //end for
-*/
-				for (SP_Graphic* l_pcGraphicChild : *((*itG)->GetGraphicChildren()))
-				{
+			    	SP_Graphic* l_pcGraphicChild = *itC;
 					if (l_pcGraphicChild)
 					{
 						SP_Data* l_pcAttr = l_pcGraphicChild->GetParent();
@@ -228,16 +212,12 @@ bool SP_CMD_Edit::DoDelete(bool p_bDeleteAll)
 						//remove the graphics of the child attributes
 						l_pcGraphicChild->RemoveFromCanvas();
 						l_pcAttr->RemoveGraphic(l_pcGraphicChild, false);
-						SP_LOGMESSAGE(wxT("delete child id: ") + wxString::Format(wxT("%lu"), l_pcGraphicChild->GetId()));
-						break;
 					}
 				}
 			} // end if
 
 			//finally removing the graphic itself
 			m_mGraphic2Parent[*itG] = l_pcParent;
-			SP_LOGMESSAGE(wxT("delete graphic id: ") + wxString::Format(wxT("%lu"), (*itG)->GetId()));
-			//RemoveGraphicFromCanvas(*itG);
 			(*itG)->RemoveFromCanvas();
 			l_pcParent->RemoveGraphic(*itG, false);
 

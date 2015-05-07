@@ -101,7 +101,7 @@ SP_Graphic::GetParent()
 void
 SP_Graphic::Select(bool p_bVal, wxDC* p_pcDC)
 {
-	for (SP_Graphic* l_pcGrChild : *GetGraphicChildren())
+	for (SP_Graphic* l_pcGrChild : m_lGraphicChildren)
 	{
 	  l_pcGrChild->Select(p_bVal, p_pcDC);
 	}
@@ -203,8 +203,9 @@ SP_Graphic::AddChildToCanvas(SP_Graphic* p_pcChild)
     // if not already added
     if (!p_pcChild->GetPrimitive()->GetCanvas())
     {
-        l_pcCanvas->AddShape(p_pcChild->GetPrimitive(), GetPrimitive());
-        //l_pcCanvas->AddShape(p_pcChild->GetPrimitive());
+    	//TODO check whats the difference here
+        //l_pcCanvas->AddShape(p_pcChild->GetPrimitive(), GetPrimitive());
+        l_pcCanvas->AddShape(p_pcChild->GetPrimitive());
         // p_pcChild->GetPrimitive()->Show(p_pcChild->GetShow());
     }
 
@@ -255,7 +256,7 @@ SP_Graphic::CheckIntegrity()
 	double parY = GetPosAttributesY();
 	double newYOffset = wxGetApp().getStdOffset();
 	bool xMoved;
-	for (SP_Graphic* l_pcGrChild : *GetGraphicChildren())
+	for (SP_Graphic* l_pcGrChild : m_lGraphicChildren)
 	{
 		wxString l_sMsg = l_pcGrChild->GetGraphicParent()->GetParent()->GetClassName();
 		l_sMsg << wxT(" - ") << l_pcGrChild->GetParent()->GetClassName();
@@ -417,15 +418,18 @@ SP_Graphic::AddGraphicChildren(SP_Graphic* p_pcChild)
     // AND not to a parent, that is marked for deletion
     // we continue
     if (p_pcChild->GetGraphicParent() && p_pcChild->GetGraphicParent() != p_pcChild)
-        if ((p_pcChild->GetGraphicParent() != this) &&
+    {
+    	if ((p_pcChild->GetGraphicParent() != this) &&
             (!p_pcChild->GetGraphicParent()->GetDelete()))
-            return FALSE;
-
+        {
+        	return FALSE;
+        }
+    }
     // remember this pointer to be bound to me,
     // so, moving etc. should affect this child, too.
-    if (SP_Find(*GetGraphicChildren(), p_pcChild) == GetGraphicChildren()->end())
+    if (SP_Find(m_lGraphicChildren, p_pcChild) == m_lGraphicChildren.end())
     {
-    	GetGraphicChildren()->push_back(p_pcChild);
+    	m_lGraphicChildren.push_back(p_pcChild);
     }
     // and remember me as graphic parent for the param
     p_pcChild->SetGraphicParent(this);
@@ -450,15 +454,19 @@ SP_Graphic::RemoveGraphicChildren(SP_Graphic* p_pcChild)
     // AND not to a parent, that is marked for deletion
     // we continue
     if (p_pcChild->GetGraphicParent() && p_pcChild->GetGraphicParent() != p_pcChild)
-        if ((p_pcChild->GetGraphicParent() != this) &&
+    {
+    	if ((p_pcChild->GetGraphicParent() != this) &&
             (!p_pcChild->GetGraphicParent()->GetDelete()))
-            return FALSE;
+    	{
+    		return FALSE;
+    	}
+    }
 
     // remember this pointer to be bound to me,
     // so, moving etc. should affect this child, too.
-    if (SP_Find(*GetGraphicChildren(), p_pcChild) != GetGraphicChildren()->end())
+    if (SP_Find(m_lGraphicChildren, p_pcChild) != m_lGraphicChildren.end())
     {
-    	GetGraphicChildren()->remove(p_pcChild);
+    	m_lGraphicChildren.remove(p_pcChild);
     }
     // and remember me as graphic parent for the param
     p_pcChild->SetGraphicParent(p_pcChild);
@@ -475,7 +483,7 @@ SP_Graphic::AddToDeleteQueue(SP_GRAPHIC_STATE p_eFilter)
     if (GetDelete())
         return TRUE;
 
-    for (SP_Graphic* l_pcGrChild : *GetGraphicChildren())
+    for (SP_Graphic* l_pcGrChild : m_lGraphicChildren)
 	{
 		// recursive add all children to the queue
 		l_pcGrChild->AddToDeleteQueue(p_eFilter);
@@ -566,7 +574,7 @@ SP_Graphic::Translate(double p_nX, double p_nY)
 {
     bool l_bReturn = SetPosXY(GetPosX() + p_nX, GetPosY() + p_nY);
 
-    for (SP_Graphic* l_pcGrChild : *GetGraphicChildren())
+    for (SP_Graphic* l_pcGrChild : m_lGraphicChildren)
 	{
 		// recursive add all children to the queue
 		l_bReturn &= l_pcGrChild->Translate(p_nX, p_nY);
@@ -587,7 +595,7 @@ SP_Graphic::Coarse(unsigned int p_nNewNet, SP_Graphic* p_pcCoarseGr, SP_ListGrap
 bool
 SP_Graphic::OnCoarse(unsigned int p_nNewNet, SP_Graphic* p_pcCoarseGr, SP_ListGraphic* p_plShapes)
 {
-	for (SP_Graphic* l_pcGrChild : *GetGraphicChildren())
+	for (SP_Graphic* l_pcGrChild : m_lGraphicChildren)
 	{
 		// recursive Coarse the children
 		l_pcGrChild->Coarse(p_nNewNet, p_pcCoarseGr, p_plShapes);
@@ -764,7 +772,7 @@ SP_Graphic::SetNetnumber(unsigned int p_nNewVal, unsigned int p_nOldVal)
         return TRUE;
 
     bool l_bReturn = TRUE;
-    for (SP_Graphic* l_pcGrChild : *GetGraphicChildren())
+    for (SP_Graphic* l_pcGrChild : m_lGraphicChildren)
 	{
 		// recursive add all children to the queue
 		l_bReturn &= l_pcGrChild->SetNetnumber(p_nNewVal, p_nOldVal);
@@ -798,11 +806,11 @@ SP_Graphic::ShowDebug(unsigned int p_nTabs)
 				   wxT("children and    %p   as graphic parent and")
 				   wxT("%p   as ds parent in net %u"),
 				   this, GetPosX(), GetPosY(),
-				   GetGraphicChildren()->size(),
+				   m_lGraphicChildren.size(),
 				   GetGraphicParent(), GetParent(),
 				   GetNetnumber()).Pad(p_nTabs, '\t', FALSE));
 
-    for (SP_Graphic* l_pcGrChild : *GetGraphicChildren())
+    for (SP_Graphic* l_pcGrChild : m_lGraphicChildren)
 	{
 		// recursive add all children to the queue
 		l_pcGrChild->ShowDebug(4);
@@ -828,7 +836,7 @@ SP_Graphic::UpdateChildrenOffsets()
 	bool res = TRUE;
 	double posAX = GetPosAttributesX();
 	double posAY = GetPosAttributesY();
-	for (SP_Graphic* l_pcGrChild : *GetGraphicChildren())
+	for (SP_Graphic* l_pcGrChild : m_lGraphicChildren)
 	{
 		if (l_pcGrChild->GetPosX() - posAX != l_pcGrChild->GetOffsetX())
 		{

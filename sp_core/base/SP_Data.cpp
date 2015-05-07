@@ -153,11 +153,14 @@ SP_Data::RemoveGraphic(SP_ListGraphic* p_plGraphic, bool p_bDelete)
     if (!p_plGraphic)
         return SP_DELETE_ERROR;
 
-    for (SP_Graphic* l_pcGraphic : *p_plGraphic)
+    for (auto itG = p_plGraphic->begin();
+    		itG != p_plGraphic->end();
+    		itG = p_plGraphic->begin())
 	{
+    	SP_Graphic* l_pcGraphic = *itG;
     	RemoveGraphic(l_pcGraphic, p_bDelete);
+    	p_plGraphic->erase(itG);
 	}
-    p_plGraphic->clear();
 	return GetGraphics()->empty() ? SP_NO_MORE_OBJECTS : SP_MORE_OBJECTS;
 }
 

@@ -1134,7 +1134,13 @@ SP_XmlReader::ReadGraphic(SP_Graphic* p_pcVal, wxXmlNode* p_pcRoot)
     p_pcVal->SetOffsetY(GetAttributeDouble(p_pcRoot, wxT("yoff")));
     SP_Graphic* l_pcGrParent = GetGraphicById(p_pcRoot, wxT("grparent"));
     if (l_pcGrParent)
+    {
+    	if(l_pcGrParent != p_pcVal->GetGraphicParent())
+    	{
+    		p_pcVal->GetGraphicParent()->RemoveGraphicChildren(p_pcVal);
+    	}
     	l_pcGrParent->AddGraphicChildren(p_pcVal);
+    }
     if (HasAttribute(p_pcRoot, wxT("pen")))
         ReadPenColour(p_pcVal, p_pcRoot);
     if (HasAttribute(p_pcRoot, wxT("brush")))
