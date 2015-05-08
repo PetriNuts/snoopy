@@ -14,6 +14,7 @@
 #include "dssz/auxi/timer.h"
 #include "dssz/andl/andl_reader.h"
 #include "dssz/andl/andl_writer.h"
+#include "dssz/candl/candl_writer.h"
 #include "dssz/unfolding/net_unfolding.icc"
 #include "dssz/unfolding/gecode_representation.h"
 #include "dssz/unfolding/idd_representation.h"
@@ -26,25 +27,30 @@ SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph)
 	if(!p_pcGraph) return false;
 
 	m_pcGraph = p_pcGraph;
-	bool l_bFinish = true;
+	bool l_bFinish = false;
 
 
 	SP_ColoredNetBuilder builder;
 	if(builder(m_pcGraph))
 	{
 		m_ColoredNet = builder.GetNet();
+		//dsszmc::candl::writer w(m_ColoredNet);
+		//std::stringstream tout;
+		//w(tout);
+		//SP_LOGMESSAGE(wxString(tout.str()));
 		try
 		{
 			dsszmc::functions::FunctionRegistry fReg;
 			dsszmc::unfolding::net_unfolder<Repr> unfolder(m_ColoredNet,fReg);
 			dsszmc::aux::Timer unfoldTime;
 			unfolder();
-			m_UnfoldedNet = unfolder.result_;
+			m_UnfoldedNet = unfolder.result();
 			std::stringstream sout;
 			sout << "time for unfolding: " << unfoldTime << "\n";
 			sout << "\nunfolding complete |P|=" << m_UnfoldedNet->nrPlaces() << "|T|=" << m_UnfoldedNet->nrTransitions() << "|A|=" << m_UnfoldedNet->nrArcs() << "\n";
 			wxString l_sMsg = sout.str();
 			SP_LOGMESSAGE(l_sMsg);
+			l_bFinish = true;
 		}
 		catch (const std::exception &exc)
 		{
@@ -316,4 +322,5 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 
 template class SP_AbstractNetUnfolder<dsszmc::unfolding::idd_guard_representation>;
 template class SP_AbstractNetUnfolder<dsszmc::unfolding::gecode_guard_representation>;
+
 

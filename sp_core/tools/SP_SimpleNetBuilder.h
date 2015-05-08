@@ -27,7 +27,7 @@ public:
 
 	virtual bool operator()(SP_DS_Graph* p_pcGraph) = 0;
 
-	dsszmc::andl::Net_ptr& GetNet() { return m_Net; }
+	dsszmc::andl::Net_ptr GetNet() { return m_Net; }
 	SP_DS_Graph* GetGraph() { return m_pcGraph; }
 
 protected:
