@@ -111,27 +111,11 @@ SP_DS_ApFormula::LoadParameters()
 				wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
 				if(l_sType == wxT("int"))
 				{
-					SP_DS_FunctionEvaluatorLong el(l_pcFR, l_Function);
-					try
-					{
-						l_nValue = el();
-					}
-					catch(dsszmc::functions::Exception& e)
-					{
-						SP_LOGERROR( wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
-					}
+					l_nValue = SP_DS_FunctionEvaluatorLong{l_pcFR, l_Function}();
 				}
 				else if(l_sType == wxT("double"))
 				{
-					SP_DS_FunctionEvaluatorDouble el(l_pcFR, l_Function);
-					try
-					{
-						l_nValue = el();
-					}
-					catch(dsszmc::functions::Exception& e)
-					{
-						SP_LOGERROR( wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
-					}
+					l_nValue = SP_DS_FunctionEvaluatorDouble{l_pcFR, l_Function}();
 				}
 			}
 			//****************************************************************************************

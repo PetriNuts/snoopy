@@ -21,66 +21,84 @@
 template<typename T>
 class SP_DS_FunctionEvaluator
 {
+	using ValueT = T;
+	using ArgumentT = std::vector<T>;
+	using FunctionT = dsszmc::functions::SimulatorFunction;
+	using EvalT = dsszmc::functions::GenericEvaluator<ValueT, ArgumentT, FunctionT>;
 	public:
-	SP_DS_FunctionEvaluator(SP_DS_FunctionRegistry* p_FunctionRegistry, SP_FunctionPtr p_Function):
-		m_FunctionRegistry(p_FunctionRegistry), m_Function(p_Function)
+	SP_DS_FunctionEvaluator(SP_DS_FunctionRegistry* p_FunctionRegistry, SP_FunctionPtr p_Function, ValueT p_Default = 0):
+		m_FunctionRegistry(p_FunctionRegistry), m_Function(p_Function), m_Default(p_Default)
 	{
 	}
 
 	T operator()()
 	{
-		SP_FunctionPtr f = m_FunctionRegistry->substituteFunctions(m_Function);
-		dsszmc::functions::Evaluator<T> eval(*f);
-		return eval();
+		try
+		{
+			SP_FunctionPtr f = m_FunctionRegistry->substituteFunctions(m_Function);
+			return EvalT{static_cast<FunctionT&>(*f)}();
+		}
+		catch(std::exception& e)
+		{
+			SP_LOGERROR(wxString(e.what(), wxConvUTF8));
+		}
+		return m_Default;
 	}
 
 	T operator()(SP_DS_Node* p_pcTrans)
 	{
 	    if(p_pcTrans)
     	{
-			//wxString l_sFunction(m_Function->toString().c_str(), wxConvUTF8);
-			//SP_LOGMESSAGE( l_sFunction);
-			SP_FunctionPtr f = m_FunctionRegistry->substituteFunctions(m_Function);
-	    	std::shared_ptr<dsszmc::functions::FunctionArgument> tmp(f->createFunctionArgument());
-
-			dsszmc::functions::Name2Id l_Places;
-	    	const SP_ListEdge* l_plEdges = p_pcTrans->GetTargetEdges();
-			SP_ListEdge::const_iterator it = l_plEdges->begin();
-			SP_ListEdge::const_iterator end = l_plEdges->end();
-			unsigned int i = 0;
-			for(; it != end; ++it)
+			try
 			{
-				SP_DS_Edge* l_pcEdge = *it;
-				SP_DS_Node* l_pcPlace = dynamic_cast<SP_DS_Node*>(l_pcEdge->GetSource());
-				wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlace->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-				l_Places.insert(make_pair(std::string(l_sPlaceName.mb_str()), i));
-				dsszmc::functions::FunctionArgument::ValueT l_nToken = 0;
-				SP_DS_Attribute* l_pcAttr = l_pcPlace->GetAttribute(wxT("Marking"));
-				if(l_pcAttr)
+				//wxString l_sFunction(m_Function->toString().c_str(), wxConvUTF8);
+				//SP_LOGMESSAGE( l_sFunction);
+				SP_FunctionPtr f = m_FunctionRegistry->substituteFunctions(m_Function);
+				ArgumentT tmp;
+
+				dsszmc::functions::Name2Id l_Places;
+				const SP_ListEdge* l_plEdges = p_pcTrans->GetTargetEdges();
+				SP_ListEdge::const_iterator it = l_plEdges->begin();
+				SP_ListEdge::const_iterator end = l_plEdges->end();
+				unsigned int i = 0;
+				for(; it != end; ++it)
 				{
-					bool l_bAnim = !(SP_Core::Instance()->GetAnimMode());
+					SP_DS_Edge* l_pcEdge = *it;
+					SP_DS_Node* l_pcPlace = dynamic_cast<SP_DS_Node*>(l_pcEdge->GetSource());
+					wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlace->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+					l_Places.insert(make_pair(std::string(l_sPlaceName.mb_str()), i));
+					ValueT l_nToken = 0;
+					SP_DS_Attribute* l_pcAttr = l_pcPlace->GetAttribute(wxT("Marking"));
+					if(l_pcAttr)
+					{
+						bool l_bAnim = !(SP_Core::Instance()->GetAnimMode());
 
-					if(l_pcAttr->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_MARKING)
-					{
-						l_nToken = static_cast<SP_DS_MarkingAttribute*>(l_pcAttr)->GetValue(l_bAnim);
+						if(l_pcAttr->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_MARKING)
+						{
+							l_nToken = static_cast<SP_DS_MarkingAttribute*>(l_pcAttr)->GetValue(l_bAnim);
+						}
+						else if(l_pcAttr->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_DOUBLEMARKING)
+						{
+							l_nToken = static_cast<SP_DS_DoubleMarkingAttribute*>(l_pcAttr)->GetValue(l_bAnim);
+						}
 					}
-					else if(l_pcAttr->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_DOUBLEMARKING)
-					{
-						l_nToken = static_cast<SP_DS_DoubleMarkingAttribute*>(l_pcAttr)->GetValue(l_bAnim);
-					}
+					tmp.push_back(l_nToken);
+
+					++i;
 				}
-				tmp->add(l_nToken, i);
 
-				++i;
+				//TODO: check this option
+				dsszmc::functions::convertOptions co;
+				f->setVariableIds(l_Places, co);
+				//wxString l_sF(f->toString().c_str(), wxConvUTF8);
+				//SP_LOGMESSAGE( l_sF);
+				return EvalT{static_cast<FunctionT&>(*f)}(tmp);
 			}
-
-			//TODO: check this option
-			dsszmc::functions::convertOptions co;
-			f->setVariableIds(l_Places, co);
-			//wxString l_sF(f->toString().c_str(), wxConvUTF8);
-			//SP_LOGMESSAGE( l_sF);
-			dsszmc::functions::SimulatorFunctionEvaluator<T> eval(*f);
-			return eval(*tmp);
+			catch(std::exception& e)
+			{
+				SP_LOGERROR(wxString(e.what(), wxConvUTF8));
+			}
+			return m_Default;
     	}
 	    else
 	    {
@@ -91,6 +109,7 @@ class SP_DS_FunctionEvaluator
 	private:
 	SP_DS_FunctionRegistry* m_FunctionRegistry;
 	SP_FunctionPtr m_Function;
+	ValueT m_Default;
 };
 
 typedef SP_DS_FunctionEvaluator<long> SP_DS_FunctionEvaluatorLong;

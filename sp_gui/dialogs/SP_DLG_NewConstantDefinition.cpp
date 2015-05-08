@@ -636,38 +636,32 @@ bool SP_DLG_NewConstantDefinition::DoCheckFunction(const wxString& p_sName, cons
 
 	if(p_sType == wxT("int"))
 	{
-		SP_DS_FunctionEvaluatorLong el(l_pcFR, l_pcFunction);
-		long l_Val = 0;
-		try
+		long l_Val = SP_DS_FunctionEvaluatorLong{l_pcFR, l_pcFunction, std::numeric_limits<long>::min()}();
+		if(l_Val > std::numeric_limits<long>::min())
 		{
-			l_Val = el();
 			l_sValue << l_Val;
 			//SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" with value ") + l_sValue + wxT(" is correct"), wxT("Check Constant"), wxOK | wxICON_INFORMATION);
 			new wxTipWindow(this, wxT("the constant ") + p_sName + wxT(" with value ") + l_sValue + wxT(" is correct"), 1000);
 			return true;
 		}
-		catch(dsszmc::functions::Exception& e)
+		else
 		{
-			SP_LOGERROR( wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
 			SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" with value ") + p_sValue + wxT(" is not correct"), wxT("Check Constant"), wxOK | wxICON_ERROR);
 			return false;
 		}
 	}
 	else if(p_sType == wxT("double"))
 	{
-		SP_DS_FunctionEvaluatorDouble el(l_pcFR, l_pcFunction);
-		double l_Val = 0;
-		try
+		double l_Val = SP_DS_FunctionEvaluatorDouble{l_pcFR, l_pcFunction, std::numeric_limits<double>::min()}();
+		if(l_Val > std::numeric_limits<double>::min())
 		{
-			l_Val = el();
 			l_sValue << l_Val;
 			//SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" with value ") + l_sValue + wxT(" is correct"), wxT("Check Constant"), wxOK | wxICON_INFORMATION);
 			new wxTipWindow(this, wxT("the constant ") + p_sName + wxT(" with value ") + l_sValue + wxT(" is correct"), 1000);
 			return true;
 		}
-		catch(dsszmc::functions::Exception& e)
+		else
 		{
-			SP_LOGERROR( wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
 			SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" with value ") + p_sValue + wxT(" is not correct"), wxT("Check Constant"), wxOK | wxICON_ERROR);
 			return false;
 		}

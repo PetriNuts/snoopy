@@ -134,9 +134,9 @@ SP_DS_FunctionRegistry::parseFunctionString(wxString p_sFunction)
 			SP_FunctionPtr l_pcFunction(m_pcParser->getFunction());
 			return l_pcFunction;
 		}
-		catch(dsszmc::functions::Exception& e)
+		catch(std::exception& e)
 		{
-			SP_LOGERROR( wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
+			SP_LOGERROR( wxString(e.what(), wxConvUTF8));
 		}
 		catch(...)
 		{
@@ -163,9 +163,9 @@ SP_DS_FunctionRegistry::registerFunction(SP_FunctionPtr p_Signature, SP_Function
 	{
 		m_pcBuilder->registerFunctionTemplate(p_Signature->copy(), p_Definition->copy());
 	}
-	catch(dsszmc::functions::Exception& e)
+	catch(std::exception& e)
 	{
-		SP_LOGERROR( wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
+		SP_LOGERROR( wxString(e.what(), wxConvUTF8));
 	}
 	catch(...)
 	{
@@ -222,9 +222,9 @@ SP_DS_FunctionRegistry::substituteFunctions(SP_FunctionPtr p_Function)
 		l_pcRet->substituteFunctions(*m_pcRegistry);
 		return l_pcRet;
 	}
-	catch(dsszmc::functions::Exception& e)
+	catch(std::exception& e)
 	{
-		SP_LOGERROR( wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
+		SP_LOGERROR( wxString(e.what(), wxConvUTF8));
 	}
 	catch(...)
 	{

@@ -98,18 +98,10 @@ SP_DS_DoubleMarkingAttribute::UpdateValue()
 	}
 	else
 	{
-		try
-		{
-			SP_DS_Graph* l_pcGraph = GetParent()->GetClassObject()->GetParentGraph();
-			SP_DS_FunctionRegistry* l_pcFR = l_pcGraph->GetFunctionRegistry();
-			SP_DS_FunctionEvaluatorDouble eval(l_pcFR, m_Function);
-			val = eval();
-		}
-		catch(dsszmc::functions::Exception& e)
-		{
-			SP_LOGERROR( wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
-			m_sValueStandard.ToDouble(&val);
-		}
+		m_sValueStandard.ToDouble(&val);
+		SP_DS_Graph* l_pcGraph = GetParent()->GetClassObject()->GetParentGraph();
+		SP_DS_FunctionRegistry* l_pcFR = l_pcGraph->GetFunctionRegistry();
+		val = SP_DS_FunctionEvaluatorDouble{l_pcFR, m_Function, val}();
 	}
 	if ( val < 0 )
 	{

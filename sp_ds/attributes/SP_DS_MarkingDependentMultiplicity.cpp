@@ -42,28 +42,20 @@ SP_DS_MarkingDependentMultiplicity::UpdateValue()
 	}
 	else
 	{
-		try
+		m_sValueStandard.ToLong(&val);
+		SP_DS_Graph* l_pcGraph = GetParent()->GetClassObject()->GetParentGraph();
+		SP_DS_FunctionRegistry* l_pcFR = l_pcGraph->GetFunctionRegistry();
+		SP_DS_Node* l_pcTrans = NULL;
+		SP_DS_Edge* l_pcEdge = dynamic_cast<SP_DS_Edge*>(GetParent());
+		if(l_pcEdge)
 		{
-			SP_DS_Graph* l_pcGraph = GetParent()->GetClassObject()->GetParentGraph();
-			SP_DS_FunctionRegistry* l_pcFR = l_pcGraph->GetFunctionRegistry();
-			SP_DS_FunctionEvaluatorLong eval(l_pcFR, m_Function);
-			SP_DS_Node* l_pcTrans = NULL;
-			SP_DS_Edge* l_pcEdge = dynamic_cast<SP_DS_Edge*>(GetParent());
-			if(l_pcEdge)
+			l_pcTrans = dynamic_cast<SP_DS_Node*>(l_pcEdge->GetSource());
+			if(l_pcTrans && !l_pcTrans->GetClassName().Contains(SP_DS_DISCRETE_TRANS))
 			{
-				l_pcTrans = dynamic_cast<SP_DS_Node*>(l_pcEdge->GetSource());
-				if(l_pcTrans && !l_pcTrans->GetClassName().Contains(SP_DS_DISCRETE_TRANS))
-				{
-					l_pcTrans = dynamic_cast<SP_DS_Node*>(l_pcEdge->GetTarget());
-				}
+				l_pcTrans = dynamic_cast<SP_DS_Node*>(l_pcEdge->GetTarget());
 			}
-			val = eval(l_pcTrans);
 		}
-		catch(dsszmc::functions::Exception& e)
-		{
-			SP_LOGERROR( wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
-			m_sValueStandard.ToLong(&val);
-		}
+		val = SP_DS_FunctionEvaluatorLong{l_pcFR, m_Function, val}(l_pcTrans);
 	}
 	if ( val < 0 )
 	{

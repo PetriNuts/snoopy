@@ -268,21 +268,10 @@ void SP_DLG_MarkingOverview::OnCellValueChanged(wxGridEvent& ev)
 	{
 		if(m_nNumDiscretePlaces > 0 && ev.GetRow() < m_nNumDiscretePlaces)
 		{
-			SP_DS_FunctionEvaluatorLong el(l_pcFR, l_pcFunction);
-			long l_Val = 0;
-			try
+
+			long l_Val = SP_DS_FunctionEvaluatorLong{l_pcFR, l_pcFunction, -1}();
+			if ( l_Val < 0)
 			{
-				l_Val = el();
-				if ( l_Val < 0)
-				{
-					m_pcMarkingGrid->SetCellValue(ev.GetRow(), ev.GetCol(), m_sOldCellValue);
-					m_pcMarkingGrid->Update();
-					SP_MESSAGEBOX(wxT("the value ") + l_sValue + wxT(" is not allowed"), wxT("Error"), wxOK | wxICON_ERROR);
-				}
-			}
-			catch(dsszmc::functions::Exception& e)
-			{
-				SP_LOGERROR( wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
 				m_pcMarkingGrid->SetCellValue(ev.GetRow(), ev.GetCol(), m_sOldCellValue);
 				m_pcMarkingGrid->Update();
 				SP_MESSAGEBOX(wxT("the value ") + l_sValue + wxT(" is not allowed"), wxT("Error"), wxOK | wxICON_ERROR);
@@ -290,21 +279,9 @@ void SP_DLG_MarkingOverview::OnCellValueChanged(wxGridEvent& ev)
 		}
 		else
 		{
-			SP_DS_FunctionEvaluatorDouble el(l_pcFR, l_pcFunction);
-			double l_Val = 0;
-			try
+			double l_Val = SP_DS_FunctionEvaluatorDouble{l_pcFR, l_pcFunction, -1}();
+			if ( l_Val < 0)
 			{
-				l_Val = el();
-				if ( l_Val < 0)
-				{
-					m_pcMarkingGrid->SetCellValue(ev.GetRow(), ev.GetCol(), m_sOldCellValue);
-					m_pcMarkingGrid->Update();
-					SP_MESSAGEBOX(wxT("the value ") + l_sValue + wxT(" is not allowed"), wxT("Error"), wxOK | wxICON_ERROR);
-				}
-			}
-			catch(dsszmc::functions::Exception& e)
-			{
-				SP_LOGERROR( wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
 				m_pcMarkingGrid->SetCellValue(ev.GetRow(), ev.GetCol(), m_sOldCellValue);
 				m_pcMarkingGrid->Update();
 				SP_MESSAGEBOX(wxT("the value ") + l_sValue + wxT(" is not allowed"), wxT("Error"), wxOK | wxICON_ERROR);
