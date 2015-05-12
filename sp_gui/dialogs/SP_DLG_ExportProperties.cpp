@@ -252,14 +252,14 @@ SP_DLG_ExportProperties::OnDlgOk(wxCommandEvent& p_cEvent)
         int l_nReturn = wxID_OK;
 
         wxWindowDisabler disableAll;
-        wxBusyInfo wait("Please wait, working...");
+        wxBusyInfo wait("Please wait, exporting...");
 
         if(!m_pcExport->Write(m_pcDoc, l_sOutName))
         {
         	l_nReturn = wxID_CANCEL;
         }
 
-        SP_LOGMESSAGE( wxString::Format(wxT("\n\nDoing %s: %s"),
+        SP_LOGMESSAGE( wxString::Format(wxT("\n\nFinished %s: %s"),
 											m_pcExport->GetName().c_str(),
 											l_sOutName.c_str()));
         if ( IsModal() )
