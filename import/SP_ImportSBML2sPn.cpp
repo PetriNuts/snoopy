@@ -383,13 +383,17 @@ void SP_ImportSBML2sPn::getModelCompartments()
 		if(!l_CompName.IsEmpty())
 			l_constant->GetAttribute(wxT("Comment"))->SetValueString(wxT("name: ")+l_CompName);
 
+		wxString l_parameterValue;
 		if (l_sbmlCompartment->isSetSize())
 		{
-			wxString l_parameterValue;
 			l_parameterValue << l_sbmlCompartment->getSize();
-			SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
-			l_pcColAttr->SetCell(0, 1, l_parameterValue);
 		}
+		else
+		{
+			l_parameterValue = wxT("0");
+		}
+		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
+		l_pcColAttr->SetCell(0, 1, l_parameterValue);
 	}
 }
 

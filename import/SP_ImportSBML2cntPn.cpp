@@ -252,13 +252,17 @@ void SP_ImportSBML2cntPn::getModelCompartments()
 		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("compartment"));
 		l_constant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
 
+		wxString l_parameterValue;
 		if (l_sbmlCompartment->isSetSize())
 		{
-			wxString l_parameterValue;
 			l_parameterValue << l_sbmlCompartment->getSize();
-			SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
-			l_pcColAttr->SetCell(0, 1, l_parameterValue);
 		}
+		else
+		{
+			l_parameterValue = wxT("0");
+		}
+		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
+		l_pcColAttr->SetCell(0, 1, l_parameterValue);
 	}
 }
 
