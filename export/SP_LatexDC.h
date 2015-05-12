@@ -22,10 +22,10 @@
 class SP_LatexDC: public wxDC
 {
 public:
-	SP_LatexDC();
+	SP_LatexDC(bool enableNewDoc = true);
 
   // Recommended constructor
-	SP_LatexDC(const wxPrintData& printData);
+	SP_LatexDC(const wxPrintData& printData, bool enableNewDoc = true);
 private:
     DECLARE_DYNAMIC_CLASS(SP_LatexDC)
 };
@@ -40,10 +40,10 @@ typedef std::map<wxString, wxString> colourDB_t;
 class SP_LatexDCImpl: public wxDCImpl
 {
 public:
-	SP_LatexDCImpl( wxPrinterDC *owner );
-	SP_LatexDCImpl( wxPrinterDC *owner, const wxPrintData& data );
-	SP_LatexDCImpl( SP_LatexDC *owner );
-	SP_LatexDCImpl( SP_LatexDC *owner, const wxPrintData& data );
+	SP_LatexDCImpl( wxPrinterDC *owner, bool enableNewDoc = true);
+	SP_LatexDCImpl( wxPrinterDC *owner, const wxPrintData& data, bool enableNewDoc = true);
+	SP_LatexDCImpl( SP_LatexDC *owner, bool enableNewDoc = true );
+	SP_LatexDCImpl( SP_LatexDC *owner, const wxPrintData& data, bool enableNewDoc = true );
 
   ~SP_LatexDCImpl();
 
@@ -152,6 +152,7 @@ protected:
     double            m_underlinePosition;
     double            m_underlineThickness;
     wxPrintData       m_printData;
+    bool              m_enableNewDoc;
 
     float m_scale;
     int m_resolution;
@@ -193,10 +194,10 @@ typedef std::map<wxString, wxString> colourDB_t;
 class SP_LatexDC: public wxDC
 {
 public:
-  SP_LatexDC();
+  SP_LatexDC(bool enableNewDoc = true);
 
   // Recommended constructor
-  SP_LatexDC(const wxPrintData& printData);
+  SP_LatexDC(const wxPrintData& printData, bool enableNewDoc = true);
 
   ~SP_LatexDC();
 
@@ -305,6 +306,7 @@ protected:
     double            m_underlinePosition;
     double            m_underlineThickness;
     wxPrintData       m_printData;
+    bool              m_enableNewDoc;
 
     float m_scale;
     int m_resolution;

@@ -14,6 +14,7 @@
 #include "sp_gui/widgets/SP_WDG_CoarseTreectrl.h"
 #include <wx/wx.h>
 #include <wx/rearrangectrl.h>
+#include <wx/progdlg.h>
 #include <wx/event.h>
 
 #include <wx/dc.h>
@@ -52,6 +53,9 @@ class SP_ExportLatex : public wxEvtHandler,
     void OnClickGeneral(wxCommandEvent& p_cEvent);
     void OnClickGeneratePDF(wxCommandEvent& p_cEvent);
 
+    void OnSelectLatexCompiler_Pdflatex(wxCommandEvent& p_cEvent);
+    void OnSelectLatexCompiler_Latexmk(wxCommandEvent& p_cEvent);
+
     //Basics tab
     void AddBasics();
     void AddAttributes_BasicsGeneral();
@@ -87,6 +91,7 @@ class SP_ExportLatex : public wxEvtHandler,
     void AddHierarchy();
     void copyTree_recur(const wxTreeItemId& x, const wxTreeItemId& y, wxString label, int id);
 
+    //////////////////////////
 
     void OnSelectClearAllItems_Graph(wxCommandEvent& p_cEvent);
     void OnSelectClearAllItems_Dec(wxCommandEvent& p_cEvent);
@@ -105,9 +110,16 @@ class SP_ExportLatex : public wxEvtHandler,
     bool WriteDeclarations_Colored();
     ///
 
+    //Write Hierarchy
     bool WriteHierarchy();
     bool WriteHierarchyTree(FILE* l_pstream);
-    void WriteHierarchyTreeRecur(const wxTreeItemId& tree_item, FILE* l_pstream);
+    void WriteHierarchyTreeRecur(const wxTreeItemId& tree_item, FILE* l_pstream, int &p_nChildCount);
+
+    bool WriteHierarchylevel(FILE* l_pstream);
+    void WriteHierarchylevelRec(const wxTreeItemId& tree_item, FILE* l_pstream);
+
+    wxTreeItemId FindTreeItemRec(const wxTreeItemId& p_Id, wxString label);
+    bool IsAncestorSelected(const wxTreeItemId& tree_item);
 
     bool WriteReferences();
     bool WriteGlossary();
@@ -118,8 +130,7 @@ class SP_ExportLatex : public wxEvtHandler,
     wxString EditStringforCrossRef(wxString filename);
     bool SetUpPrintData( wxPrintData& pd, const wxString& p_fileName);
 
-    wxTreeItemId FindTreeItemRec(const wxTreeItemId& p_Id, wxString label);
-    void WriteHierarchylevelRec(const wxTreeItemId& tree_item, FILE* l_pstream);
+
 
     protected:
 
@@ -144,6 +155,8 @@ class SP_ExportLatex : public wxEvtHandler,
   	SP_WDG_NotebookPage* m_pcNotebookPageGraph;
   	SP_WDG_NotebookPage* m_pcNotebookPageDeclarations;
   	SP_WDG_NotebookPage* m_pcNotebookPageHierarchy;
+
+  	//wxProgressDialog* m_pcProgressDlg;
 
   	//graph elements mapping
     map<int, wxString> SP_Index2Node;
@@ -193,7 +206,8 @@ class SP_ExportLatex : public wxEvtHandler,
     SP_MDI_Doc* p_pcDoc;
     SP_DS_Metadata* m_pcMeta;
     SP_WDG_CoarseTreectrl* m_pcCoarseTreectrl;
-    wxTreeCtrl* l_pcTree;
+    wxTreeCtrl* m_pcTree;
+    wxTreeCtrl* m_pcTree2;
 
     wxString NetClass;
    // wxArrayString arrays;
@@ -221,6 +235,7 @@ class SP_ExportLatex : public wxEvtHandler,
     wxCheckBox* m_pcCheckBoxDirectPDF;
     wxRadioButton* m_rbPdfLatex;
     wxRadioButton* m_rbLatexmk;
+    wxString m_sCompilerPath;
 
 
     //Basics tab///////////////////////////
@@ -282,6 +297,10 @@ class SP_ExportLatex : public wxEvtHandler,
 
     //Hierarchy tab/////////////////////////////
     wxCheckBox* m_pcCheckBoxHierarchyTree;
+    wxCheckBox* m_pcCheckBoxIncludeSubtrees;
+
+    wxArrayTreeItemIds m_ArrayTreeItemIds;
+    int m_nflagIncludeSubtrees;
 
     //////////////
 

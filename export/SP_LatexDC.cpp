@@ -21,13 +21,13 @@
 
 IMPLEMENT_DYNAMIC_CLASS(SP_LatexDC, wxDC)
 
-SP_LatexDC::SP_LatexDC()
- : wxDC(new SP_LatexDCImpl(this))
+SP_LatexDC::SP_LatexDC(bool enableNewDoc)
+ : wxDC(new SP_LatexDCImpl(this, enableNewDoc))
 {
 }
 
-SP_LatexDC::SP_LatexDC(const wxPrintData& printData)
- : wxDC(new SP_LatexDCImpl(this, printData))
+SP_LatexDC::SP_LatexDC(const wxPrintData& printData, bool enableNewDoc)
+ : wxDC(new SP_LatexDCImpl(this, printData, enableNewDoc))
 {
 }
 
@@ -35,16 +35,18 @@ SP_LatexDC::SP_LatexDC(const wxPrintData& printData)
 
 IMPLEMENT_ABSTRACT_CLASS(SP_LatexDCImpl, wxDCImpl)
 
-SP_LatexDCImpl::SP_LatexDCImpl (SP_LatexDC *owner)
+SP_LatexDCImpl::SP_LatexDCImpl (SP_LatexDC *owner, bool enableNewDoc)
 	: wxDCImpl(owner)
 {
 	Init();
+	m_enableNewDoc = enableNewDoc;
 }
 
-SP_LatexDCImpl::SP_LatexDCImpl (SP_LatexDC *owner, const wxPrintData& printData)
+SP_LatexDCImpl::SP_LatexDCImpl (SP_LatexDC *owner, const wxPrintData& printData, bool enableNewDoc)
 	: wxDCImpl(owner)
 {
 	Init();
+  m_enableNewDoc = enableNewDoc;
   m_printData = printData;
   m_ok = TRUE;
 #if wxMAC_USE_CORE_GRAPHICS
@@ -54,16 +56,18 @@ SP_LatexDCImpl::SP_LatexDCImpl (SP_LatexDC *owner, const wxPrintData& printData)
 #endif
 }
 
-SP_LatexDCImpl::SP_LatexDCImpl (wxPrinterDC *owner)
+SP_LatexDCImpl::SP_LatexDCImpl (wxPrinterDC *owner, bool enableNewDoc)
 	: wxDCImpl(owner)
 {
 	Init();
+	m_enableNewDoc = enableNewDoc;
 }
 
-SP_LatexDCImpl::SP_LatexDCImpl (wxPrinterDC *owner, const wxPrintData& printData)
+SP_LatexDCImpl::SP_LatexDCImpl (wxPrinterDC *owner, const wxPrintData& printData, bool enableNewDoc)
 	: wxDCImpl(owner)
 {
 	Init();
+  m_enableNewDoc = enableNewDoc;
   m_printData = printData;
   m_ok = TRUE;
 #if wxMAC_USE_CORE_GRAPHICS
@@ -243,9 +247,9 @@ wxString SP_LatexDCImpl::GetLatexColor(const wxColour& color)
 		if(res.IsEmpty())
 		{
 			res = wxT("");
-			res << wxT("r") << color.Red();
-			res << wxT("g") << color.Green();
-			res << wxT("b") << color.Blue();
+			res << wxT("r") << (unsigned int)( color.Red() );
+			res << wxT("g") << (unsigned int)( color.Green() );
+			res << wxT("b") << (unsigned int)( color.Blue() );
 		}
 		m_ColourDB.insert(make_pair(l_sColor, res));
 		wxFprintf(m_pstream, wxT("\\definecolor{%s}{RGB}{%u,%u,%u}\n"), res.c_str(), color.Red(), color.Green(), color.Blue());
@@ -413,25 +417,31 @@ bool SP_LatexDCImpl::StartDoc(const wxString& message)
 
 	m_ok = TRUE;
 
-	wxFprintf(m_pstream, wxT("\\documentclass{article}\n"));
-	wxFprintf(m_pstream, wxT("\n"));
-	wxFprintf(m_pstream, wxT("\\usepackage{pgf}\n"));
-	wxFprintf(m_pstream, wxT("\\usepackage{tikz}\n"));
-	wxFprintf(m_pstream, wxT("\\usetikzlibrary{positioning,arrows,shapes,backgrounds,calc,patterns}\n"));
-	wxFprintf(m_pstream, wxT("\n"));
-	wxFprintf(m_pstream, wxT("\\usepackage[graphics,tightpage,active]{preview}\n"));
-	wxFprintf(m_pstream, wxT("\\PreviewEnvironment{tikzpicture}\n"));
-	wxFprintf(m_pstream, wxT("\\PreviewEnvironment{equation}\n"));
-	wxFprintf(m_pstream, wxT("\\PreviewEnvironment{equation*}\n"));
-	wxFprintf(m_pstream, wxT("\\newlength{\\imagewidth}\n"));
-	wxFprintf(m_pstream, wxT("\\newlength{\\imagescale}\n"));
-	wxFprintf(m_pstream, wxT("\\pagestyle{empty}\n"));
-	wxFprintf(m_pstream, wxT("\\thispagestyle{empty}\n"));
-	wxFprintf(m_pstream, wxT("\n"));
-	wxFprintf(m_pstream, wxT("\\begin{document}\n"));
-	wxFprintf(m_pstream, wxT("\n"));
+	if( m_enableNewDoc )
+	{
+		wxFprintf(m_pstream, wxT("\\documentclass{article}\n"));
+		wxFprintf(m_pstream, wxT("\n"));
+		wxFprintf(m_pstream, wxT("\\usepackage{pgf}\n"));
+		wxFprintf(m_pstream, wxT("\\usepackage{tikz}\n"));
+		wxFprintf(m_pstream, wxT("\\usetikzlibrary{positioning,arrows,shapes,backgrounds,calc,patterns}\n"));
+		wxFprintf(m_pstream, wxT("\n"));
+		wxFprintf(m_pstream, wxT("\\usepackage[graphics,tightpage,active]{preview}\n"));
+		wxFprintf(m_pstream, wxT("\\PreviewEnvironment{tikzpicture}\n"));
+		wxFprintf(m_pstream, wxT("\\PreviewEnvironment{equation}\n"));
+		wxFprintf(m_pstream, wxT("\\PreviewEnvironment{equation*}\n"));
+		wxFprintf(m_pstream, wxT("\\newlength{\\imagewidth}\n"));
+		wxFprintf(m_pstream, wxT("\\newlength{\\imagescale}\n"));
+		wxFprintf(m_pstream, wxT("\\pagestyle{empty}\n"));
+		wxFprintf(m_pstream, wxT("\\thispagestyle{empty}\n"));
+		wxFprintf(m_pstream, wxT("\n"));
+		wxFprintf(m_pstream, wxT("\\begin{document}\n"));
+		wxFprintf(m_pstream, wxT("\n"));
+	}
+
+
 	wxFprintf(m_pstream, wxT("\\begin{tikzpicture}[x=1pt,y=-1pt]\n"));
 	wxFprintf(m_pstream, wxT("\n"));
+
 	return TRUE;
 }
 
@@ -441,7 +451,11 @@ void SP_LatexDCImpl::EndDoc()
 	wxCHECK_RET( m_ok && m_pstream, wxT("invalid latex dc"));
 
 	wxFprintf(m_pstream, wxT("\\end{tikzpicture}\n\n"));
-	wxFprintf(m_pstream, wxT("\\end{document}\n\n"));
+
+	if( m_enableNewDoc )
+	{
+		wxFprintf(m_pstream, wxT("\\end{document}\n\n"));
+	}
 
 	fclose(m_pstream);
 	m_pstream = (FILE *) NULL;
@@ -1203,9 +1217,9 @@ wxString SP_LatexDC::GetLatexColor(const wxColour& color)
 		if(res.IsEmpty())
 		{
 			res = wxT("");
-			res << wxT("r") << color.Red();
-			res << wxT("g") << color.Green();
-			res << wxT("b") << color.Blue();
+			res << wxT("r") << (unsigned int)( color.Red() );
+			res << wxT("g") << (unsigned int)( color.Green() );
+			res << wxT("b") << (unsigned int)( color.Blue() );
 		}
 		m_ColourDB.insert(make_pair(l_sColor, res));
 		wxFprintf(m_pstream, wxT("\\definecolor{%s}{RGB}{%u,%u,%u}\n"), res.c_str(), color.Red(), color.Green(), color.Blue());
@@ -1414,25 +1428,30 @@ bool SP_LatexDC::StartDoc(const wxString& message)
 
 	m_ok = TRUE;
 
-	wxFprintf(m_pstream, wxT("\\documentclass{article}\n"));
-	wxFprintf(m_pstream, wxT("\n"));
-	wxFprintf(m_pstream, wxT("\\usepackage{pgf}\n"));
-	wxFprintf(m_pstream, wxT("\\usepackage{tikz}\n"));
-	wxFprintf(m_pstream, wxT("\\usetikzlibrary{positioning,arrows,shapes,backgrounds,calc,patterns}\n"));
-	wxFprintf(m_pstream, wxT("\n"));
-	wxFprintf(m_pstream, wxT("\\usepackage[graphics,tightpage,active]{preview}\n"));
-	wxFprintf(m_pstream, wxT("\\PreviewEnvironment{tikzpicture}\n"));
-	wxFprintf(m_pstream, wxT("\\PreviewEnvironment{equation}\n"));
-	wxFprintf(m_pstream, wxT("\\PreviewEnvironment{equation*}\n"));
-	wxFprintf(m_pstream, wxT("\\newlength{\\imagewidth}\n"));
-	wxFprintf(m_pstream, wxT("\\newlength{\\imagescale}\n"));
-	wxFprintf(m_pstream, wxT("\\pagestyle{empty}\n"));
-	wxFprintf(m_pstream, wxT("\\thispagestyle{empty}\n"));
-	wxFprintf(m_pstream, wxT("\n"));
-	wxFprintf(m_pstream, wxT("\\begin{document}\n"));
-	wxFprintf(m_pstream, wxT("\n"));
+	if( m_enableNewDoc )
+	{
+		wxFprintf(m_pstream, wxT("\\documentclass{article}\n"));
+		wxFprintf(m_pstream, wxT("\n"));
+		wxFprintf(m_pstream, wxT("\\usepackage{pgf}\n"));
+		wxFprintf(m_pstream, wxT("\\usepackage{tikz}\n"));
+		wxFprintf(m_pstream, wxT("\\usetikzlibrary{positioning,arrows,shapes,backgrounds,calc,patterns}\n"));
+		wxFprintf(m_pstream, wxT("\n"));
+		wxFprintf(m_pstream, wxT("\\usepackage[graphics,tightpage,active]{preview}\n"));
+		wxFprintf(m_pstream, wxT("\\PreviewEnvironment{tikzpicture}\n"));
+		wxFprintf(m_pstream, wxT("\\PreviewEnvironment{equation}\n"));
+		wxFprintf(m_pstream, wxT("\\PreviewEnvironment{equation*}\n"));
+		wxFprintf(m_pstream, wxT("\\newlength{\\imagewidth}\n"));
+		wxFprintf(m_pstream, wxT("\\newlength{\\imagescale}\n"));
+		wxFprintf(m_pstream, wxT("\\pagestyle{empty}\n"));
+		wxFprintf(m_pstream, wxT("\\thispagestyle{empty}\n"));
+		wxFprintf(m_pstream, wxT("\n"));
+		wxFprintf(m_pstream, wxT("\\begin{document}\n"));
+		wxFprintf(m_pstream, wxT("\n"));
+	}
+
 	wxFprintf(m_pstream, wxT("\\begin{tikzpicture}[x=1pt,y=-1pt]\n"));
 	wxFprintf(m_pstream, wxT("\n"));
+
 	return TRUE;
 }
 
@@ -1442,7 +1461,11 @@ void SP_LatexDC::EndDoc()
 	wxCHECK_RET( m_ok && m_pstream, wxT("invalid latex dc"));
 
 	wxFprintf(m_pstream, wxT("\\end{tikzpicture}\n\n"));
-	wxFprintf(m_pstream, wxT("\\end{document}\n\n"));
+
+	if( m_enableNewDoc )
+	{
+		wxFprintf(m_pstream, wxT("\\end{document}\n\n"));
+	}
 
 	fclose(m_pstream);
 	m_pstream = (FILE *) NULL;
