@@ -15,6 +15,8 @@
 #include "sp_ds/SP_DS_Graph.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 
+#include <wx/busyinfo.h>
+
 IMPLEMENT_CLASS(SP_DLG_ExportProperties, wxDialog)
 
 BEGIN_EVENT_TABLE(SP_DLG_ExportProperties, wxDialog)
@@ -248,6 +250,9 @@ SP_DLG_ExportProperties::OnDlgOk(wxCommandEvent& p_cEvent)
         }
 
         int l_nReturn = wxID_OK;
+
+        wxWindowDisabler disableAll;
+        wxBusyInfo wait("Please wait, working...");
 
         if(!m_pcExport->Write(m_pcDoc, l_sOutName))
         {
