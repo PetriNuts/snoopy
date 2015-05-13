@@ -29,6 +29,8 @@ bool SP_ImportSBML2sPn::ReadFile(const wxString& p_sFile)
 	g_ParameterList.clear();
 	g_ReactionList.clear();
 
+	numReverseReactions = 0;
+
 	SBMLDocument* l_sbmlDocument;
 
 	SP_DLG_ImportSBML2extPN l_cDlg(NULL);
@@ -58,7 +60,7 @@ bool SP_ImportSBML2sPn::ReadFile(const wxString& p_sFile)
 			//TODO check events
 			//getEvents();
 
-			//ConvertIds2Names();
+			SP_LOGMESSAGE(wxString::Format(wxT("The imported SBML contains %u reversible reaction(s)."), numReverseReactions));
 
 			DoVisualization();
 
@@ -266,6 +268,7 @@ void SP_ImportSBML2sPn::getReactions ()
 
 			if(b_IsReversible)
 			{
+				++numReverseReactions;
 				SP_LOGWARNING( l_ReactionId + wxT(" has set reversible == true. Stochastic Petri Nets doesn't support reversible Transitions."));
 			}
 

@@ -28,6 +28,8 @@ bool SP_ImportSBML2extPN::ReadFile(const wxString& p_sFile)
 	g_CompoundList.clear();
 	g_ReactionList.clear();
 
+	numReverseReactions = 0;
+
 	SBMLDocument* l_sbmlDocument;
 
 	SP_DLG_ImportSBML2extPN l_cDlg(NULL);
@@ -50,7 +52,7 @@ bool SP_ImportSBML2extPN::ReadFile(const wxString& p_sFile)
 			getSpecies();
 			getReactions();
 
-			//ConvertIds2Names();
+			SP_LOGMESSAGE(wxString::Format(wxT("The imported SBML contains %u reversible reaction(s)."), numReverseReactions));
 
 			DoVisualization();
 
@@ -193,7 +195,6 @@ void SP_ImportSBML2extPN::getReactions ()
 			if(l_sbmlReaction->isSetKineticLaw())
 			{
 				wxString l_kinetic(l_sbmlReaction->getKineticLaw()->getFormula().c_str(), wxConvUTF8);
-				l_kinetic.Replace(wxT("*"), wxT("•"));
 				l_comment << wxT("rate: ") << l_kinetic << wxT("\n");
 			}
 			l_pcAttrComment->SetValueString(l_comment);
@@ -201,6 +202,11 @@ void SP_ImportSBML2extPN::getReactions ()
 
 			// is reversible (0,1 for false,true) or 0 for default (false)
 			bool b_IsReversible = l_sbmlReaction->getReversible();
+
+			if(b_IsReversible)
+			{
+				++numReverseReactions;
+			}
 
 			if(b_IsReversible && m_HighlightReversibleReactions)
 			{

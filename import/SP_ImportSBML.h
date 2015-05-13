@@ -50,8 +50,8 @@ public:
 
 	bool ConvertIds2Names();
 
-	SP_DS_Graph* m_pcGraph;
-	Model* m_sbmlModel;
+	SP_DS_Graph* m_pcGraph = nullptr;
+	Model* m_sbmlModel = nullptr;
 
 	SP_ListNode g_CompoundList;
 	SP_ListNode g_ReactionList;
@@ -59,6 +59,8 @@ public:
 	int yComRea;
 	int xPara;
 	int yPara;
+
+	size_t numReverseReactions = 0;
 
 };
 

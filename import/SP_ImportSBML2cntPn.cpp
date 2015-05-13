@@ -29,6 +29,8 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 	g_ParameterList.clear();
 	g_ReactionList.clear();
 
+	numReverseReactions = 0;
+
 	SBMLDocument* l_sbmlDocument;
 
 	l_sbmlDocument = readSBML(p_sFile.mb_str());
@@ -49,7 +51,7 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 		getSpecies();
 		getReactions();
 
-		//ConvertIds2Names();
+		SP_LOGMESSAGE(wxString::Format(wxT("The imported SBML contains %u reversible reaction(s)."), numReverseReactions));
 
 		DoVisualization();
 
@@ -153,7 +155,14 @@ void SP_ImportSBML2cntPn::getReactions ()
 			l_pcAttrComment->SetShow(false);
 
 			// is reversible (0,1 for false,true) or 0 for default (false)
-			l_reactionNode->GetAttribute(wxT("Reversible"))->SetValueString(wxString::Format(wxT("%d"), l_sbmlReaction->getReversible()));
+			bool b_IsReversible = l_sbmlReaction->getReversible();
+
+			if(b_IsReversible)
+			{
+				++numReverseReactions;
+			}
+
+			l_reactionNode->GetAttribute(wxT("Reversible"))->SetValueString(wxString::Format(wxT("%d"), b_IsReversible));
 
 			// get KineticLaw
 			if (l_sbmlReaction->isSetKineticLaw())
@@ -248,7 +257,7 @@ void SP_ImportSBML2cntPn::getModelCompartments()
 		wxString l_CompName;
 		getSBMLCompartmentName(l_sbmlCompartment, l_CompId, l_CompName);
 
-		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_CompName);
+		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_CompId);
 		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("compartment"));
 		l_constant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
 
@@ -284,9 +293,11 @@ void SP_ImportSBML2cntPn::getModelParameters()
 		wxString l_ParamName;
 		getSBMLParameterName(l_sbmlParameter, l_ParamId, l_ParamName);
 
-		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_ParamName);
+		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_ParamId);
 		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("parameter"));
 		l_constant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
+		if(!l_ParamName.IsEmpty())
+			l_constant->GetAttribute(wxT("Comment"))->SetValueString(wxT("name: ")+l_ParamName);
 
 		if (l_sbmlParameter->isSetValue())
 		{
