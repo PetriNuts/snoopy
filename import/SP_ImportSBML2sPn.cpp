@@ -11,6 +11,9 @@
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 #include "sp_gui/dialogs/SP_DLG_ImportSBML2extPN.h"
 
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
+#include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+
 SP_ImportSBML2sPn::SP_ImportSBML2sPn()
 {
 	yComRea = 40;
@@ -59,6 +62,8 @@ bool SP_ImportSBML2sPn::ReadFile(const wxString& p_sFile)
 			getReactions();
 			//TODO check events
 			//getEvents();
+
+			m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
 
 			SP_LOGMESSAGE(wxString::Format(wxT("The imported SBML contains %u reversible reaction(s)."), numReverseReactions));
 
@@ -397,6 +402,12 @@ void SP_ImportSBML2sPn::getModelCompartments()
 		}
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
 		l_pcColAttr->SetCell(0, 1, l_parameterValue);
+
+		SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_CompId);
+		SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_parameterValue);
+		m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
+
+		g_ParameterList.push_back(l_constant);
 	}
 }
 
@@ -435,6 +446,12 @@ void SP_ImportSBML2sPn::getModelParameters()
 		}
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
 		l_pcColAttr->SetCell(0, 1, l_parameterValue);
+
+		SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_ParamId);
+		SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_parameterValue);
+		m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
+
+		g_ParameterList.push_back(l_constant);
 	}
 }
 
@@ -476,6 +493,11 @@ void SP_ImportSBML2sPn::getReactionParameters(Reaction*  l_sbmlReaction)
 			}
 			SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
 			l_pcColAttr->SetCell(0, 1, l_parameterValue);
+
+			SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_ParamId);
+			SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_parameterValue);
+			m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
+
 			g_ParameterList.push_back(l_constant);
 		}
 	}
