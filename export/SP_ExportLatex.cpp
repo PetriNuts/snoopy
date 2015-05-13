@@ -15,34 +15,7 @@
 #include "sp_gui/mdi/SP_MDI_CoarseDoc.h"
 
 #include <wx/wx.h>
-/*
-#include <wx/txtstrm.h>
-#include <wx/sstream.h>
-#include <wx/stream.h>
-#include <wx/process.h>
-
-#include <wx/cmndata.h>
-#include <wx/scrolbar.h>
-#include <wx/vscroll.h>
-#include <wx/scrolwin.h>
-#include <wx/checklst.h>
-#include <wx/treectrl.h>
-#include <wx/rearrangectrl.h>
-#include <wx/popupwin.h>
-#include <wx/dialog.h>
-#include <wx/collpane.h>
-*/
 #include <wx/regex.h>
-
-/*
-#include <wx/progdlg.h>
-
-#include <wx/dc.h>
-#include <wx/paper.h>
-#include <wx/tokenzr.h>
-#include <wx/filename.h>
-#include <wx/filefn.h>   //for file and directory functions
-*/
 
 #include <algorithm>     //for sort() function
 #include <cstdio>
@@ -157,7 +130,7 @@ SP_ExportLatex::AddToDialog(SP_DLG_ExportProperties* p_pcDlg, SP_MDI_Doc* p_pcDo
 {
 	SP_LOGMESSAGE("inside AddToDialog for SP_ExportLatex");
 
-	//Change notebook size for export to latex
+	//Change notebook size for Export to Latex
 	p_pcDlg->SetNotebookSize(550, 380);
 
 	this->p_pcDoc = p_pcDoc;
@@ -209,8 +182,10 @@ SP_ExportLatex::AddToDialog(SP_DLG_ExportProperties* p_pcDlg, SP_MDI_Doc* p_pcDo
     SP_Node2AttrNameMap.clear();
     SP_DecNode2DecAttrNameMap.clear();
 
+    //Load net elements into code
 	LoadData();
 
+	//Add tabs with net elements to Export Dialog
 	AddGeneral();
 	AddBasics();
 	AddGraphElements();
@@ -276,7 +251,6 @@ SP_ExportLatex::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 
 	  wxString l_sFilePath = m_sFilePath;
 
-	  ///////////////////////////////////////////////////
 	  //Sets the latex file directory as current working directory
 	  if( wxSetWorkingDirectory( l_sFilePath ) ) {
 		  SP_LOGMESSAGE( wxT("Current working directory set.") );
@@ -284,11 +258,13 @@ SP_ExportLatex::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 		  SP_LOGMESSAGE( wxT("Failed to set Current working directory.") );
 	  }
 
-	  //Make a new folder PDF
+	  /* Make a new folder AUX to store auxiliary files
+	   * generated during PDF generation by Latex compiler
+	   */
 	  if( wxMkdir( wxT("AUX") ) ) {
 		  SP_LOGMESSAGE( wxT("New folder created in ") + wxGetCwd() );
 	  } else {
-		  SP_LOGMESSAGE( wxT("Failed to set Current working directory.") );
+		  SP_LOGMESSAGE( wxT("Failed to create AUX folder. Already exists.") );
 	  }
 
 	  wxString l_sMainFileName = m_printData.GetFilename();
@@ -304,24 +280,21 @@ SP_ExportLatex::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 	  wxString command;
 	  int l_pcLog;
 	  m_sCompilerPath = l_pcFilePickerCtrl1->GetPath();
-	  SP_LOGMESSAGE( wxT("Compiler Path: ") + m_sCompilerPath);
+	  SP_LOGMESSAGE( wxT("Latex Compiler Path: ") + m_sCompilerPath);
 
 	  if( m_rbPdfLatex->GetValue() ) {
 
 		  command = m_sCompilerPath + wxT(" -interaction=nonstopmode -output-directory ./AUX ") + l_sMainFileName;
 		  //m_pcProgressDlg->Pulse( wxT("Export to PDF: Execution round 1...") );
 		  l_pcLog = wxExecute(command, wxEXEC_SYNC);
-		  //SP_LOGMESSAGE( wxT("Execution round 1 complete...") );
 
 		  command = m_sCompilerPath + wxT(" -interaction=nonstopmode -output-directory ./AUX ") + l_sMainFileName;
 		  //m_pcProgressDlg->Pulse( wxT("Export to PDF: Execution round 2...") );
 		  l_pcLog = wxExecute(command, wxEXEC_SYNC);
-		  //SP_LOGMESSAGE( wxT("Execution round 2 complete...") );
 
 		  command = m_sCompilerPath + wxT(" -interaction=nonstopmode -output-directory ./AUX ") + l_sMainFileName;
 		  //m_pcProgressDlg->Pulse( wxT("Export to PDF: Execution round 3...") );
 		  l_pcLog = wxExecute(command, wxEXEC_SYNC);
-		  //SP_LOGMESSAGE( wxT("Execution round 3 complete...") );
 
 	  } else {
 
@@ -359,14 +332,17 @@ SP_ExportLatex::LoadData()
 	m_pcMeta = m_pcGraph->GetMetadataclass( wxT("General") )->GetElements()->front();
 	m_pcCoarseTreectrl = p_pcDoc->GetCoarseTreectrl();
 
-	//Loads list of graph elements for the export dialog////////////////////////////
+
     SP_ListNodeclass::const_iterator itNC;
     SP_ListAttribute::const_iterator itAttr;
-    int i = 0;
-    wxArrayString arrays;
+
     map<wxString, wxString> l_AttrNameMap;
     map<wxString, wxString> l_DecAttrNameMap;
 
+    int i = 0;
+    wxArrayString arrays;
+
+	//Loads list of Graph Elements for the dialog
     for (itNC = m_pcGraph->GetNodeclasses()->begin(); itNC != m_pcGraph->GetNodeclasses()->end(); ++itNC) {
 
     	wxString l_sNodename = (*itNC)->GetDisplayName();
@@ -498,8 +474,7 @@ SP_ExportLatex::LoadData()
     }
 
 
-   //loads Declarations into the export dialog/////////////////////////////////
-
+     //loads Declarations for the export dialog
      i = 0;
  	 if( ((m_pcGraph->GetNetclass()->GetName()==SP_DS_COLSPN_CLASS)
  		 || (m_pcGraph->GetNetclass()->GetName()==SP_DS_COLCPN_CLASS)
@@ -603,7 +578,6 @@ SP_ExportLatex::LoadData()
  	    	   wxString l_sMetaname = (*itMC)->GetDisplayName();
  	    	   m_Options_Declarations.Add( l_sMetaname );
  	    	   m_Options_Declarations_order.Add(i);
- 	    	 //  SP_LOGMESSAGE( l_sMetaname + wxT("->>"));
 
  	    	   l_pcMeta = (*itMC)->GetPrototype();
 
@@ -617,7 +591,6 @@ SP_ExportLatex::LoadData()
  	    	       {
  	    	    		arrays.Add( (*itAttr)->GetDisplayName() );
  	    	    		l_DecAttrNameMap.insert( pair<wxString, wxString> ( (*itAttr)->GetDisplayName(), (*itAttr)->GetName()));
- 	    	    		//SP_LOGMESSAGE( (*itAttr)->GetDisplayName() + wxT(" -> Declarations") );
  	    	       }
 
  				   if( l_pcMeta->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME) ) {
@@ -635,12 +608,10 @@ SP_ExportLatex::LoadData()
 
  	 }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//loading list of individual Graph Elements from current graph for the right-side panels
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//loading list of individual graph elements from current graph for right panels//////////////////////////
-
- 	//node class
+ 	//Nodeclass
 	for(itNC = m_pcGraph->GetNodeclasses()->begin(); itNC != m_pcGraph->GetNodeclasses()->end(); ++itNC)
 	{
 		SP_DS_Nodeclass* l_pcNodeclass = *itNC;
@@ -659,7 +630,7 @@ SP_ExportLatex::LoadData()
 		SP_Nodeclass2NodeList.insert(pair<wxString, wxArrayString> (NodeclassName, arrays) );
 	}
 
-	//edge class
+	//Edgeclass
 	for(itEC = m_pcGraph->GetEdgeclasses()->begin(); itEC != m_pcGraph->GetEdgeclasses()->end(); ++itEC)
 	{
 		SP_DS_Edgeclass* l_pcEdgeclass = *itEC;
@@ -698,7 +669,7 @@ SP_ExportLatex::LoadData()
 	}
 
 
-	//meta class
+	//Metaclass
 	for(itMC = m_pcGraph->GetMetadataclasses()->begin(); itMC != m_pcGraph->GetMetadataclasses()->end(); ++itMC)
 	{
 		if( (*itMC)->GetShowInElementTree() ) {
@@ -749,10 +720,10 @@ SP_ExportLatex::LoadData()
 		}
 	}
 
-	///////////////////////////////////////////////////////////
-	// loading individual declarations list into the dialog
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	// loading individual Declarations list for the right-side panels
 
-	//if colored net, load only the collist attributes and corresponding elements
+	//if Colored net, load only the COLLIST attributes and corresponding elements
  	 if( ((m_pcGraph->GetNetclass()->GetName()==SP_DS_COLSPN_CLASS)
  		 || (m_pcGraph->GetNetclass()->GetName()==SP_DS_COLCPN_CLASS)
  		 || (m_pcGraph->GetNetclass()->GetName()==SP_DS_COLPN_CLASS)
@@ -825,7 +796,7 @@ SP_ExportLatex::LoadData()
  		}
 
  	 } else {
- 		 // for uncolored nets
+ 		 // for Uncolored nets
  	 	for (itMC = m_pcGraph->GetMetadataclasses()->begin(); itMC != m_pcGraph->GetMetadataclasses()->end(); ++itMC)
  	 	{
  	 		SP_DS_Metadataclass* l_pcMetaclass = *itMC;
@@ -886,11 +857,11 @@ SP_ExportLatex::AddGeneral()
 	wxStaticText* l_pcStaticText = new wxStaticText(m_pcNotebookPageGeneral, wxID_ANY, wxT("Reorder tabs as required"));
 	m_pcMainSizerGeneral->Add(l_pcStaticText, 0, wxALL | wxEXPAND, 5);
 
+	//Rearrangectrl to facilitate rearranging of tabs for report
 	m_pcRearrangeCtrl_General = new wxRearrangeCtrl(m_pcNotebookPageGeneral, -1, wxPoint(50, 50), wxDefaultSize, order, tabs_items);
 	m_pcMainSizerGeneral->Add(m_pcRearrangeCtrl_General, 1, wxALL | wxEXPAND, 5);
 
 
-	//checkbox for pdf
 	m_pcCheckBoxDirectPDF = new wxCheckBox( m_pcNotebookPageGeneral, SP_GENERATEPDF_CHECKBOX_SELECTED, wxT("Generate PDF Report") );
 	m_pcCheckBoxDirectPDF->SetValue(true);
 
@@ -903,10 +874,9 @@ SP_ExportLatex::AddGeneral()
 
 	m_pcSizerGeneratePDF = new wxBoxSizer( wxVERTICAL );
 
-	//sizer for multiple compiler options
+	//sizer for Compiler options
 	wxSizer* l_pcSizerCompilers = new wxStaticBoxSizer( new wxStaticBox( m_pcNotebookPageGeneral, -1, wxT("Tex Compiler") ), wxHORIZONTAL );
 
-	//wxRadioButton* l_rbCompiler1 = new wxRadioButton(m_pcNotebookPageGeneral, -1, wxT("LaTeX"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	m_rbPdfLatex = new wxRadioButton(m_pcNotebookPageGeneral, SP_ID_GENERAL_PDFLATEX, wxT("PdfLaTeX"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	m_rbLatexmk = new wxRadioButton(m_pcNotebookPageGeneral, SP_ID_GENERAL_LATEXMK, wxT("Latexmk"));
 
@@ -921,7 +891,7 @@ SP_ExportLatex::AddGeneral()
 	m_pcSizerGeneratePDF->Add(l_pcSizerCompilers, 1, wxALL | wxEXPAND, 5);
 
 	//sizer for latex compiler browse
-	wxSizer* l_pcSizerPath1 = new wxBoxSizer( wxHORIZONTAL ); //path for generated pdf file
+	wxSizer* l_pcSizerPath1 = new wxBoxSizer( wxHORIZONTAL );
 
 	l_pcSizerPath1->Add(new wxStaticText( m_pcNotebookPageGeneral, -1, wxT("Latex Compiler Location:") ), 0, wxALL, 5);
 
@@ -938,29 +908,6 @@ SP_ExportLatex::AddGeneral()
 
 	l_pcSizerPath1->Add(l_pcFilePickerCtrl1, 1, wxALL | wxEXPAND, 5);
 	m_pcSizerGeneratePDF->Add(l_pcSizerPath1, 1, wxALL | wxEXPAND, 5);
-	///////////////
-
-	//sizer for pdf file browse
-/*	wxSizer* l_pcSizerPath2 = new wxBoxSizer( wxHORIZONTAL ); //path for generated pdf file
-
-	l_pcSizerPath2->Add(new wxStaticText( m_pcNotebookPageGeneral, -1, wxT("PDF Filename:") ), 0, wxALL, 5);
-
-	wxString l_sPath2 = p_pcDlg->GetCurrentFileName();
-	l_sPath2 = l_sPath2.Before('.');
-	wxString l_sPDFExtension = wxT("pdf");
-
-	l_sPath2 += wxT(".") + l_sPDFExtension;
-
-	wxString l_sPDFDescr2 = wxT("PDF Files");
-	wxString wildcard2 = l_sPDFDescr2 + wxT("(*.") + l_sPDFExtension + wxT(")|*.") + l_sPDFExtension;
-
-	l_pcFilePickerCtrl2 = new wxFilePickerCtrl( m_pcNotebookPageGeneral, -1, l_sPath2, wxT("Browse"),
-			wildcard2, wxDefaultPosition, wxDefaultSize, wxFLP_SAVE | wxFLP_USE_TEXTCTRL );
-	l_pcFilePickerCtrl2->SetPath( l_sPath2 );
-
-	l_pcSizerPath2->Add(l_pcFilePickerCtrl2, 1, wxALL | wxEXPAND, 5);
-	m_pcSizerGeneratePDF->Add(l_pcSizerPath2, 1, wxALL | wxEXPAND, 5);   */
-	//////////
 
 	m_pcMainSizerGeneral->Add(m_pcSizerGeneratePDF, 1, wxALL | wxEXPAND, 5);
 
@@ -982,14 +929,13 @@ SP_ExportLatex::AddBasics()
     m_pcMainSizer_Basics->Add(m_pcLeftSizer_Basics, 1, wxALL | wxEXPAND, 5);
     m_pcMainSizer_Basics->Add(m_pcRightSizer_Basics, 1, wxALL | wxEXPAND, 5);
 
-    //rearrangelist
+    //Rearrangelist for Basic options
 	m_pcRearrangelist_basics = new wxRearrangeList(m_pcNotebookPageBasics, SP_ID_BASICS_UPDATE, wxDefaultPosition, wxSize(50, 200), l_pcOptions_basics_order, l_pcOptions_basics);
 	m_pcLeftSizer_Basics->Add(m_pcRearrangelist_basics, 1, wxALL | wxEXPAND, 5);
 
 	l_pcButtonUp = new wxButton( m_pcNotebookPageBasics, SP_ID_BUTTON_BASICS_UP, wxT("Up"), wxDefaultPosition, wxDefaultSize );
 	l_pcButtonDown = new wxButton( m_pcNotebookPageBasics, SP_ID_BUTTON_BASICS_DOWN, wxT("Down"), wxDefaultPosition, wxDefaultSize );
 
-	//Dynamic event binding
 	m_pcRearrangelist_basics->Bind(wxEVT_LISTBOX, &SP_ExportLatex::OnSelChange_Basics, this, SP_ID_BASICS_UPDATE);
 
 	l_pcButtonUp->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Basics_UpdateUI, this, SP_ID_BUTTON_BASICS_UP);
@@ -1149,7 +1095,7 @@ SP_ExportLatex::AddGraphElements()
     m_pcMainSizer_Graph->Add(m_pcLeftSizer_Graph, 1, wxALL | wxEXPAND, 5);
     m_pcMainSizer_Graph->Add(m_pcRightSizer_Graph, 1, wxALL | wxEXPAND, 5);
 
-    //rearrangelist
+    //Rearrangelist for reordering the sequence of Graph Elements
     m_pcRearrangelist_Graph = new wxRearrangeList(m_pcNotebookPageGraph, SP_ID_GRAPH_UPDATE, wxDefaultPosition,
     		wxSize(50, 200), m_Options_Graph_order, m_Options_Graph);
     m_pcLeftSizer_Graph->Add(m_pcRearrangelist_Graph, 1, wxALL | wxEXPAND, 5);
@@ -1157,7 +1103,6 @@ SP_ExportLatex::AddGraphElements()
     m_pcGraph_ButtonUp = new wxButton(m_pcNotebookPageGraph, SP_ID_BUTTON_GRAPH_UP, wxT("Up"), wxDefaultPosition, wxDefaultSize );
 	m_pcGraph_ButtonDown = new wxButton(m_pcNotebookPageGraph, SP_ID_BUTTON_GRAPH_DOWN, wxT("Down"), wxDefaultPosition, wxDefaultSize );
 
-	//Dynamic event binding
 	m_pcRearrangelist_Graph->Bind(wxEVT_LISTBOX, &SP_ExportLatex::OnSelChange_Graph, this, SP_ID_GRAPH_UPDATE);
 
 	m_pcGraph_ButtonUp->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Graph_UpdateUI, this, SP_ID_BUTTON_GRAPH_UP);
@@ -1221,7 +1166,7 @@ SP_ExportLatex::AddAttributes_Declarations()
 
 
 		wxCheckBox* l_pcSelectClearAllChkBox = new wxCheckBox(m_pcNotebookPageDeclarations, SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS_DEC,
-								wxT("Select/deselect all"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE);
+								wxT("Select/Deselect all"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE);
 
 		l_pcRightSizer->Add(l_pcSelectClearAllChkBox, 0, wxALL, 5);
 		l_pcSelectClearAllChkBox->Set3StateValue(wxCHK_CHECKED);
@@ -1260,7 +1205,7 @@ SP_ExportLatex::AddDeclarations()
     m_pcMainSizer_Declarations->Add(m_pcLeftSizer_Declarations, 1, wxALL | wxEXPAND, 5);
     m_pcMainSizer_Declarations->Add(m_pcRightSizer_Declarations, 1, wxALL | wxEXPAND, 5);
 
-	//rearrangelist
+    //Rearrangelist for reordering the sequence of Declarations
 	m_pcRearrangelist_declarations = new wxRearrangeList(m_pcNotebookPageDeclarations, SP_ID_DECLARATIONS_UPDATE, wxDefaultPosition,
 			wxSize(50, 200), m_Options_Declarations_order, m_Options_Declarations);
 	m_pcLeftSizer_Declarations->Add(m_pcRearrangelist_declarations, 1, wxALL | wxEXPAND, 5);
@@ -1268,9 +1213,7 @@ SP_ExportLatex::AddDeclarations()
 	m_pcDeclarations_ButtonUp = new wxButton( m_pcNotebookPageDeclarations, SP_ID_BUTTON_DECLARATIONS_UP, wxT("Up"), wxDefaultPosition, wxDefaultSize );
 	m_pcDeclarations_ButtonDown = new wxButton( m_pcNotebookPageDeclarations, SP_ID_BUTTON_DECLARATIONS_DOWN, wxT("Down"), wxDefaultPosition, wxDefaultSize );
 
-	//dynamic event binding
 	m_pcRearrangelist_declarations->Bind(wxEVT_LISTBOX, &SP_ExportLatex::OnSelChange_Declarations, this, SP_ID_DECLARATIONS_UPDATE);
-
 
 	m_pcDeclarations_ButtonUp->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Declarations_UpdateUI, this, SP_ID_BUTTON_DECLARATIONS_UP);
 	m_pcDeclarations_ButtonDown->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Declarations_UpdateUI, this, SP_ID_BUTTON_DECLARATIONS_DOWN);
@@ -1283,7 +1226,7 @@ SP_ExportLatex::AddDeclarations()
 
 	m_pcLeftSizer_Declarations->Add(l_pcButtonSizer, 0, wxALL | wxEXPAND, 5);
 
-	//right panel
+	//to populate the right panel
     AddAttributes_Declarations();
 
 	m_pcNotebookPageDeclarations->AddControl(m_pcMainSizer_Declarations, 1, wxALL | wxEXPAND, 5);
@@ -1355,7 +1298,6 @@ SP_ExportLatex::AddHierarchy()
  	l_pcTopSizer->Add(l_pcTreeSizer, 1 , wxALL | wxEXPAND, 5);
 
     //tree implementation
-
  	m_pcTree = new wxTreeCtrl(m_pcNotebookPageHierarchy, -1, wxDefaultPosition, wxSize(300, 190), wxTR_DEFAULT_STYLE | wxTR_MULTIPLE);
  	l_pcTreeSizer->Add(m_pcTree, 1, wxALL | wxEXPAND, 5);
 
@@ -1386,7 +1328,6 @@ SP_ExportLatex::OnClickGeneratePDF(wxCommandEvent& p_cEvent)
 		l_pcFilePickerCtrl1->Enable(true);
 		m_rbPdfLatex->Enable(true);
 	    m_rbLatexmk->Enable(true);
-		//l_pcFilePickerCtrl2->Enable(true);
 
 	} else {
 		SP_LOGMESSAGE("generate PDF Else");
@@ -1394,9 +1335,8 @@ SP_ExportLatex::OnClickGeneratePDF(wxCommandEvent& p_cEvent)
 		l_pcFilePickerCtrl1->Enable(false);
 		m_rbPdfLatex->Enable(false);
 		m_rbLatexmk->Enable(false);
-		//l_pcFilePickerCtrl2->Enable(false);
 	}
-	//m_pcSizerGeneratePDF->Layout();
+
 }
 
 void
@@ -1560,7 +1500,7 @@ SP_ExportLatex::AddAttributes_BasicsLayout()
 	l_pcSizerHeader->Add(l_pcTextCtrl_Header, 1, wxALL | wxEXPAND, 2);
 	m_pcTextCtrlHeaderFooter.push_back(l_pcTextCtrl_Header);
 
-	//sizer
+	//footer
 	wxCheckBox* l_pcCheckBox_Footer = new wxCheckBox( m_pcNotebookPageBasics, -1, wxT("Footer") );
 	l_pcCheckBox_Footer->SetValue(true);
 	m_pcSizer_Basics_ReportLayout->Add(l_pcCheckBox_Footer , 0, wxALL, 5);
@@ -1650,8 +1590,6 @@ SP_ExportLatex::UpdateRightPanel_Basics(int id)
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_NetInfo, false, true);
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_ReportLayout, false, true);
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_ReportTypography, false, true);
-		//m_pcRightSizer_Basics->Hide(m_pcSizer_Basics_NetInfo, true);
-		//m_pcRightSizer_Basics->Add(m_pcSizer_Basics_GeneralInfo, 1, wxALL, 5);
 		break;
 
 	case 1:
@@ -1660,8 +1598,6 @@ SP_ExportLatex::UpdateRightPanel_Basics(int id)
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_NetInfo, true, true);
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_ReportLayout, false, true);
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_ReportTypography, false, true);
-		//m_pcRightSizer_Basics->Hide(m_pcSizer_Basics_GeneralInfo, true);
-		//m_pcRightSizer_Basics->Add(m_pcSizer_Basics_NetInfo, 1, wxALL, 5);
 		break;
 
 	case 2:
@@ -1670,7 +1606,6 @@ SP_ExportLatex::UpdateRightPanel_Basics(int id)
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_NetInfo, false, true);
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_ReportLayout, true, true);
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_ReportTypography, false, true);
-		//m_pcRightSizer_Basics->Hide(m_pcSizer_Basics_ReportLayout, true);
 		break;
 
 	case 3:
@@ -1679,7 +1614,6 @@ SP_ExportLatex::UpdateRightPanel_Basics(int id)
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_NetInfo, false, true);
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_ReportLayout, false, true);
 		m_pcRightSizer_Basics->Show(m_pcSizer_Basics_ReportTypography, true, true);
-		//m_pcRightSizer_Basics->Hide(m_pcSizer_Basics_ReportTypography, true);
 		break;
 
 	default:
@@ -1731,8 +1665,6 @@ SP_ExportLatex::UpdateRightPanel_Declarations(int id)
 void
 SP_ExportLatex::OnSelChange_Basics(wxCommandEvent& p_cEvent)
 {
-	//l_pcOptions_basics_order = m_pcRearrangelist_basics->GetCurrentOrder();
-	//UpdateRightPanel_Basics( l_pcOptions_basics_order[ p_cEvent.GetInt() ] );
 	UpdateRightPanel_Basics( m_pcRearrangelist_basics->GetCurrentOrder()[ p_cEvent.GetInt() ] );
 }
 
@@ -1854,7 +1786,7 @@ SP_ExportLatex::FindTreeItemRec(const wxTreeItemId& p_Id, wxString label)
   return found;
 }
 
-//predicate function for sort() function
+//predicate for sort() function
 bool
 compareTarget(const pair<wxString, wxString> p_pTarget1, const pair<wxString, wxString> p_pTarget2) {
 	return ( p_pTarget1.second < p_pTarget2.second );
@@ -1878,8 +1810,23 @@ SP_ExportLatex::StartDoc(const wxString& p_fileName)
 
 	InputNetname = EditStringforLatex( p_pcDoc->GetUserReadableName() );
 
-	wxFprintf(m_pstream, wxT("\\documentclass[pdftex,12pt,a4paper]{article}\n") );
+	wxFprintf(m_pstream, wxT("\\documentclass[pdftex,12pt]{article}\n") );
 	wxFprintf(m_pstream, wxT("\n") );
+
+	wxString out = wxT("\\usepackage[top=1.0in, ");
+
+	//Set paper size
+	out += m_pcComboBox_PaperSize->GetValue();
+
+	//Set orientation
+	if( m_pcBasics_Landscape->GetValue() ) {
+		out += wxT(", landscape ");
+	}
+
+	out += wxT("]{geometry}\n\n");
+
+	wxFprintf(m_pstream, wxT("%s"), out.c_str());
+
 	wxFprintf(m_pstream, wxT("\\usepackage[ddmmyyyy]{datetime}\n") );
 	wxFprintf(m_pstream, wxT("\\usepackage{url}\n") );
 	wxFprintf(m_pstream, wxT("\\usepackage{hyperref}\n") );
@@ -1904,8 +1851,6 @@ SP_ExportLatex::StartDoc(const wxString& p_fileName)
 	wxFprintf(m_pstream, wxT("\\newcommand{\\cmark}{\\ding{51}}\n") );
 	wxFprintf(m_pstream, wxT("\\newcommand{\\xmark}{\\ding{55}}\n") );
 
-	wxString out;
-
 	//Set font family
 	switch( m_pcComboBox_FontFamily->GetSelection() )
 	{
@@ -1918,21 +1863,6 @@ SP_ExportLatex::StartDoc(const wxString& p_fileName)
 		case 3: out = wxT("\\renewcommand*{\\familydefault}{\\ttdefault}");
 				break;
 	}
-
-
-	out = wxT("\\usepackage[top=1.0in, ");
-
-	//Set paper size
-	out += m_pcComboBox_PaperSize->GetValue();
-
-	//Set orientation
-	if( m_pcBasics_Landscape->GetValue() ) {
-		out += wxT(", landscape ");
-	}
-
-	out += wxT("]{geometry}\n\n");
-
-	wxFprintf(m_pstream, wxT("%s"), out.c_str());
 
 	out = wxT("\\newcommand{\\UnderscoreCommands}{ \n\t"
 			"\\do\\citeNP \\do\\citeA \\do\\citeANP \\do\\citeN \\do\\shortcite \n\t"
@@ -2368,8 +2298,6 @@ SP_ExportLatex::WriteBasics()
 		wxFprintf(l_pstream, wxT("\\end{tabular}\n\n") );
 	}
 
-
-	//////////
 	fclose( l_pstream );
 	l_pstream = (FILE *) NULL;
 	wxDELETE(pd);
@@ -2458,7 +2386,6 @@ SP_ExportLatex::WriteGraphElements()
 					SP_LOGMESSAGE( wxT("nodeclass found: ") + nodeclass->GetDisplayName() + wxT("->")+ wxString::Format(wxT("%i"), l_nElements));
 
 					SP_ListAttribute::const_iterator itAttr;
-					//SP_DS_Node* l_pcProtoNode = nodeclass->GetPrototype();
 					SP_DS_Node* l_pcNode;
 					wxArrayString l_sNodeList; //list of node names
 
@@ -2529,7 +2456,6 @@ SP_ExportLatex::WriteGraphElements()
 									SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
 
 									for(unsigned k = 0; k < l_pcColAttr->GetColCount(); k++) {
-										//wxString l_sColLabel = l_pcColAttr->GetCell(k, 0);
 										wxString l_sColLabel = l_pcColAttr->GetColLabel(k);
 
 										if(l_sColLabel.IsEmpty()) {
@@ -2594,8 +2520,6 @@ SP_ExportLatex::WriteGraphElements()
 						l_pcNode = SP_Name2Node[ element_name ];
 
 						if(l_pcNode) SP_LOGMESSAGE( element_name );
-
-						//out = wxT("\\multirow{1}{*}");
 
 						for(int i = 0; i < l_nAttributes; i++) {
 
@@ -2886,7 +2810,6 @@ SP_ExportLatex::WriteGraphElements()
 
 							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
 							l_sSourceName = EditStringforLatex( l_sSourceName );
-							//l_sSourceName = wxT("$") + l_sSourceName + wxT("$");
 
 							out = wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sSourceName
@@ -2894,7 +2817,6 @@ SP_ExportLatex::WriteGraphElements()
 
 							l_slinklabel = EditStringforCrossRef(l_sTargetName);
 							l_sTargetName = EditStringforLatex( l_sTargetName );
-							//l_sTargetName = wxT("$") + l_sTargetName + wxT("$");
 
 							out += wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sTargetName
@@ -2922,13 +2844,6 @@ SP_ExportLatex::WriteGraphElements()
 												if(!l_sSetName.IsEmpty()) {
 													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
 												}
-
-												/*
-												if (k < l_pcColAttr->GetRowCount()-1) {
-													out += wxT("\\linebreak");
-												} else {
-													out += wxT("&");
-												} */
 
 												if(col < 2) {
 													out += l_sSetName + wxT("&");
@@ -2962,7 +2877,6 @@ SP_ExportLatex::WriteGraphElements()
 
 							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
 							l_sSourceName = EditStringforLatex( l_sSourceName );
-							//l_sSourceName = wxT("$") + l_sSourceName + wxT("$");
 
 							out = wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sSourceName
@@ -2970,7 +2884,6 @@ SP_ExportLatex::WriteGraphElements()
 
 							l_slinklabel = EditStringforCrossRef(l_sTargetName);
 							l_sTargetName = EditStringforLatex( l_sTargetName );
-							//l_sTargetName = wxT("$") + l_sTargetName + wxT("$");
 
 							out += wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sTargetName
@@ -2998,13 +2911,6 @@ SP_ExportLatex::WriteGraphElements()
 												if(!l_sSetName.IsEmpty()) {
 													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
 												}
-
-												/*
-												if (k < l_pcColAttr->GetRowCount()-1) {
-													out += wxT("\\linebreak");
-												} else {
-													out += wxT("&");
-												} */
 
 												if(col < 2) {
 													out += l_sSetName + wxT("&");
@@ -3038,7 +2944,6 @@ SP_ExportLatex::WriteGraphElements()
 
 							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
 							l_sSourceName = EditStringforLatex( l_sSourceName );
-							//l_sSourceName = wxT("$") + l_sSourceName + wxT("$");
 
 							out = wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sSourceName
@@ -3046,7 +2951,6 @@ SP_ExportLatex::WriteGraphElements()
 
 							l_slinklabel = EditStringforCrossRef(l_sTargetName);
 							l_sTargetName = EditStringforLatex( l_sTargetName );
-							//l_sTargetName = wxT("$") + l_sTargetName + wxT("$");
 
 							out += wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sTargetName
@@ -3075,13 +2979,6 @@ SP_ExportLatex::WriteGraphElements()
 												if(!l_sSetName.IsEmpty()) {
 													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
 												}
-
-												/*
-												if (k < l_pcColAttr->GetRowCount()-1) {
-													out += wxT("\\linebreak");
-												} else {
-													out += wxT("&");
-												} */
 
 												if(col < 2) {
 													out += l_sSetName + wxT("&");
@@ -3115,7 +3012,6 @@ SP_ExportLatex::WriteGraphElements()
 
 							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
 							l_sSourceName = EditStringforLatex( l_sSourceName );
-							//l_sSourceName = wxT("$") + l_sSourceName + wxT("$");
 
 							out = wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sSourceName
@@ -3123,7 +3019,6 @@ SP_ExportLatex::WriteGraphElements()
 
 							l_slinklabel = EditStringforCrossRef(l_sTargetName);
 							l_sTargetName = EditStringforLatex( l_sTargetName );
-							//l_sTargetName = wxT("$") + l_sTargetName + wxT("$");
 
 							out += wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sTargetName
@@ -3151,13 +3046,6 @@ SP_ExportLatex::WriteGraphElements()
 												if(!l_sSetName.IsEmpty()) {
 													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
 												}
-
-												/*
-												if (k < l_pcColAttr->GetRowCount()-1) {
-													out += wxT("\\linebreak");
-												} else {
-													out += wxT("&");
-												} */
 
 												if(col < 2) {
 													out += l_sSetName + wxT("&");
@@ -3400,7 +3288,6 @@ SP_ExportLatex::WriteGraphElements()
 								if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
 
 									SP_DS_ColListAttribute* l_pcProtoColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
-									//SP_DS_ColListAttribute* l_pcProtoColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcProtoAttr);
 
 									for(unsigned k = 1; k < l_pcProtoColAttr->GetColCount(); k++) {
 										wxString l_sColLabel = l_pcProtoColAttr->GetColLabel(k);
@@ -3650,7 +3537,6 @@ SP_ExportLatex::WriteDeclarations_Colored()
 				SP_ListMetadata::const_iterator l_itElem;
 
 				SP_ListAttribute::const_iterator itAttr;
-				//SP_DS_Metadata* l_pcProtoMeta = metadataclass->GetPrototype();
 				SP_DS_Metadata* l_pcMetadata;
 				map<wxString, wxString> l_sDecAttrNameMap = SP_DecNode2DecAttrNameMap[ element ];
 
@@ -3873,7 +3759,6 @@ SP_ExportLatex::WriteDeclarations()
 				SP_ListMetadata::const_iterator l_itElem;
 
 				SP_ListAttribute::const_iterator itAttr;
-				//SP_DS_Metadata* l_pcProtoMeta = metadataclass->GetPrototype();
 				SP_DS_Metadata* l_pcMetadata;
 				map<wxString, wxString> l_sDecAttrNameMap = SP_DecNode2DecAttrNameMap[ element ];
 
@@ -4213,11 +4098,6 @@ SP_ExportLatex::WriteHierarchyTree(FILE* l_pstream)
 			}
 		}
 
-
-		//m_pcTree->SelectChildren(root);
-
-		//WriteHierarchyTreeRecur(root, l_pstream1);
-
 	} else {
 		//only top level (no hierarchy)
 		wxFprintf(l_pstream1, wxT("\\emph{No Hierarchial structure found.}\n") );
@@ -4233,7 +4113,7 @@ SP_ExportLatex::WriteHierarchyTree(FILE* l_pstream)
 }
 
 void
-SP_ExportLatex::WriteHierarchylevelRec(const wxTreeItemId& p_Id, FILE* l_pstream)
+SP_ExportLatex::WriteHierarchyFigureRec(const wxTreeItemId& p_Id, FILE* l_pstream)
 {
 	if(!p_Id.IsOk() ) { return; }
 
@@ -4317,12 +4197,12 @@ SP_ExportLatex::WriteHierarchylevelRec(const wxTreeItemId& p_Id, FILE* l_pstream
 
 		if( m_nflagIncludeSubtrees ) {
 			SP_LOGMESSAGE( m_pcTree->GetItemText(l_nId) + wxT("is being sent to recursive call. Include = true"));
-			WriteHierarchylevelRec(l_nId, l_pstream);
+			WriteHierarchyFigureRec(l_nId, l_pstream);
 
 		} else {      //if not checked, include subtrees only if expanded in treectrl
 			if( m_pcTree->ItemHasChildren(l_nId) && m_pcTree->IsExpanded( l_nId ) ) {
 				SP_LOGMESSAGE( m_pcTree->GetItemText(l_nId) + wxT("is expanded. Include = false"));
-				WriteHierarchylevelRec(l_nId, l_pstream);
+				WriteHierarchyFigureRec(l_nId, l_pstream);
 			}
 		}
 
@@ -4332,7 +4212,7 @@ SP_ExportLatex::WriteHierarchylevelRec(const wxTreeItemId& p_Id, FILE* l_pstream
 }
 
 bool
-SP_ExportLatex::WriteHierarchylevel(FILE* l_pstream)
+SP_ExportLatex::WriteHierarchyFigure(FILE* l_pstream)
 {
 	const wxString latexHierarchyFigures_file = m_sFilePath + wxT("HierarchyFigures.tex");
 	SP_LOGMESSAGE( latexHierarchyFigures_file );
@@ -4451,10 +4331,10 @@ SP_ExportLatex::WriteHierarchylevel(FILE* l_pstream)
 
 
 			if( m_nflagIncludeSubtrees ) {
-				WriteHierarchylevelRec( local_tree, l_pstream1);
+				WriteHierarchyFigureRec( local_tree, l_pstream1);
 			} else {      //if not checked, include subtrees only if expanded in treectrl
 				if( m_pcTree->IsExpanded( local_tree ) ) {
-					WriteHierarchylevelRec( local_tree, l_pstream1);
+					WriteHierarchyFigureRec( local_tree, l_pstream1);
 				}
 			}
 
@@ -4530,7 +4410,7 @@ SP_ExportLatex::WriteHierarchy()
 	//m_pcProgressDlg->Pulse( wxT("Exporting to Latex...Hierarchy Figures") );
 
 	//Hierarchy Figures
-	WriteHierarchylevel(l_pstream);
+	WriteHierarchyFigure(l_pstream);
 
 	fclose( l_pstream );
 	l_pstream = (FILE *) NULL;

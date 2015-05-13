@@ -115,8 +115,8 @@ class SP_ExportLatex : public wxEvtHandler,
     bool WriteHierarchyTree(FILE* l_pstream);
     void WriteHierarchyTreeRecur(const wxTreeItemId& tree_item, FILE* l_pstream, int &p_nChildCount);
 
-    bool WriteHierarchylevel(FILE* l_pstream);
-    void WriteHierarchylevelRec(const wxTreeItemId& tree_item, FILE* l_pstream);
+    bool WriteHierarchyFigure(FILE* l_pstream);
+    void WriteHierarchyFigureRec(const wxTreeItemId& tree_item, FILE* l_pstream);
 
     wxTreeItemId FindTreeItemRec(const wxTreeItemId& p_Id, wxString label);
     bool IsAncestorSelected(const wxTreeItemId& tree_item);
