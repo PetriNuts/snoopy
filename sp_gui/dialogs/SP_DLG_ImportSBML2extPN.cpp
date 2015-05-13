@@ -30,6 +30,8 @@ SP_DLG_ImportSBML2extPN::SP_DLG_ImportSBML2extPN(SP_GUI_Mainframe*  p_pcParent,
 	m_pcSizer->Add(m_cbHighlightReverseReaction, 0, wxALL, 10);
 	m_cbCreateReactionReverseReaction = new wxCheckBox(this, -1, wxT("Create reverse reactions"));
 	m_pcSizer->Add(m_cbCreateReactionReverseReaction, 0, wxALL, 10);
+	m_cbCreateBoundaryConditions = new wxCheckBox(this, -1, wxT("Create boundary conditions"));
+	m_pcSizer->Add(m_cbCreateBoundaryConditions, 0, wxALL, 10);
 
 	/* Buttons in the lower right hand corner */
 	wxStdDialogButtonSizer* l_pcButtons = CreateStdDialogButtonSizer(wxOK | wxCANCEL);
@@ -44,6 +46,12 @@ bool
 SP_DLG_ImportSBML2extPN::GetCreateReverseReactions()
 {
 	return( m_cbCreateReactionReverseReaction->IsChecked() );
+}
+
+bool
+SP_DLG_ImportSBML2extPN::GetCreateBoundaryConditions()
+{
+	return( m_cbCreateBoundaryConditions->IsChecked() );
 }
 
 bool

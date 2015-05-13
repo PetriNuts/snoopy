@@ -20,8 +20,10 @@ private:
     DECLARE_EVENT_TABLE()
 		//! the top level sizer
 		wxBoxSizer* m_pcSizer;
-		wxCheckBox *m_cbCreateReactionReverseReaction;
-		wxCheckBox *m_cbHighlightReverseReaction;
+		wxCheckBox* m_cbCreateReactionReverseReaction;
+		wxCheckBox* m_cbHighlightReverseReaction;
+		wxCheckBox* m_cbCreateBoundaryConditions;
+
     DECLARE_CLASS(SP_DLG_ImportSBML2extPN)
 protected:
 
@@ -34,6 +36,7 @@ public:
     void OnDlgCancel(wxCommandEvent& p_cEvent);
 	bool GetCreateReverseReactions();
 	bool GetHighlightReverseReactions();
+	bool GetCreateBoundaryConditions();
 };
 
 #endif // __SP_DLG_IMPORTSBML2EXTPN_H__
