@@ -424,13 +424,17 @@ void SP_ImportSBML2sPn::getModelParameters()
 		if(!l_ParamName.IsEmpty())
 			l_constant->GetAttribute(wxT("Comment"))->SetValueString(wxT("name: ")+l_ParamName);
 
+		wxString l_parameterValue;
 		if (l_sbmlParameter->isSetValue())
 		{
-			wxString l_parameterValue;
 			l_parameterValue << l_sbmlParameter->getValue();
-			SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
-			l_pcColAttr->SetCell(0, 1, l_parameterValue);
 		}
+		else
+		{
+			l_parameterValue = wxT("0");
+		}
+		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
+		l_pcColAttr->SetCell(0, 1, l_parameterValue);
 	}
 }
 
@@ -461,13 +465,17 @@ void SP_ImportSBML2sPn::getReactionParameters(Reaction*  l_sbmlReaction)
 			if(!l_ParamName.IsEmpty())
 				l_constant->GetAttribute(wxT("Comment"))->SetValueString(wxT("name: ")+l_ParamName);
 
+			wxString l_parameterValue;
 			if (l_sbmlParameter->isSetValue())
 			{
-				wxString l_parameterValue;
 				l_parameterValue << l_sbmlParameter->getValue();
-				SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
-				l_pcColAttr->SetCell(0, 1, l_parameterValue);
 			}
+			else
+			{
+				l_parameterValue = wxT("0");
+			}
+			SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
+			l_pcColAttr->SetCell(0, 1, l_parameterValue);
 			g_ParameterList.push_back(l_constant);
 		}
 	}
