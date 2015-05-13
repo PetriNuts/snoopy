@@ -32,7 +32,7 @@ SP_DS_TextAttribute::SetValue(const wxString& p_pchVal)
 
     // special, if the param contains '*' as wildcard, we replace every occurance
     // of '*' with the content of the old member value
-    l_sTemp.Replace(wxT("*"), m_sValue);
+    l_sTemp.Replace(SP_WILDCARD, m_sValue);
 
     // hack to make empty lines (only newline) show up in the canvas
     // l_sTemp.Replace(wxT("\n\n"), wxT("\n \n"));

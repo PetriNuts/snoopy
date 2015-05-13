@@ -105,7 +105,7 @@ bool SP_WDG_DialogChoice::AddToDialog(const SP_ListAttribute* p_ptlAttributes, S
 		wxChoice* l_pcChoice = new wxChoice(l_pcPage, -1, wxDefaultPosition, wxDefaultSize, m_pcChoiceValues);
 		if(m_bMultiple)
 		{
-			l_pcChoice->Insert(wxT("*"), 0);
+			l_pcChoice->Insert(SP_WILDCARD, 0);
 			l_pcChoice->SetSelection(0);
 		}
 		else
@@ -194,7 +194,7 @@ bool SP_WDG_DialogChoice::OnDlgOk()
     {
     	int l_nSelected = m_pcChoice.front()->GetSelection();
     	wxString l_sValue = m_pcChoice.front()->GetString(l_nSelected);
-        if (m_bMultiple && (l_sValue.Cmp(wxT("*")) == 0))
+        if (m_bMultiple && (l_sValue.Cmp(SP_WILDCARD) == 0))
             return SP_WDG_DialogBase::OnDlgOk();
 
         SP_ListAttribute::const_iterator l_Iter;

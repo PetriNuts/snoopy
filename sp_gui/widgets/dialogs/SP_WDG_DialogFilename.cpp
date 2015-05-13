@@ -76,7 +76,7 @@ SP_WDG_DialogFilename::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
         SP_WDG_NotebookPage* l_pcPage = p_pcDlg->AddPage(l_sPage, GetDialogOrdering());
         CHECK_POINTER(l_pcPage, return FALSE);
 
-    	wxString l_pchValue = (m_bMultiple ? wxT("*") : l_pcAttr->GetValueString());
+    	wxString l_pchValue = (m_bMultiple ? SP_WILDCARD : l_pcAttr->GetValueString());
 
         l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
         wxFilePickerCtrl* l_pcFilePickerCtrl = new wxFilePickerCtrl(l_pcPage, -1, l_pchValue);
@@ -109,7 +109,7 @@ SP_WDG_DialogFilename::OnDlgOk()
     else
     {
     	wxString l_sValue = m_pcFilePickerCtrl.front()->GetPath();
-        if (m_bMultiple && (l_sValue.Cmp(wxT("*")) == 0))
+        if (m_bMultiple && (l_sValue.Cmp(SP_WILDCARD) == 0))
             return SP_WDG_DialogBase::OnDlgOk();
 
         SP_ListAttribute::const_iterator l_Iter;

@@ -78,7 +78,7 @@ SP_WDG_DialogMultiline::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
         SP_WDG_NotebookPage* l_pcPage = p_pcDlg->AddPage(l_sPage, GetDialogOrdering());
         CHECK_POINTER(l_pcPage, return FALSE);
 
-    	wxString l_pchValue = (m_bMultiple ? wxT("*") : l_pcAttr->GetValueString());
+    	wxString l_pchValue = (m_bMultiple ? SP_WILDCARD : l_pcAttr->GetValueString());
 
         l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 1, wxALL | wxALIGN_CENTER_VERTICAL, 5);
         AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);

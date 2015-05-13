@@ -45,6 +45,8 @@ typedef SP_Matrix<SP_PairDouble> SP_MatrixPairDouble;
 
 const unsigned SP_INFINITY = std::numeric_limits<unsigned>::max();
 
+const wxString SP_WILDCARD = wxT("<*>");
+
 //------------------------------------------------------------------------
 
 #define SP_Find(Container, Value) std::find(std::begin(Container),std::end(Container),(Value))

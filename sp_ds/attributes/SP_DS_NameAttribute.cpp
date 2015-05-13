@@ -60,7 +60,7 @@ SP_DS_NameAttribute::SetValue(const wxString& p_pchVal)
 
     // special, if the param contains '*' as wildcard, we replace every occurance
     // of '*' with the content of the old member value
-    l_sTemp.Replace(wxT("*"), m_sValue);
+    l_sTemp.Replace(SP_WILDCARD, m_sValue);
     m_sValue = l_sTemp;
     //TODO
     //check if name is accepted by ^[a-zA-Z][0-9a-zA-Z_]*$

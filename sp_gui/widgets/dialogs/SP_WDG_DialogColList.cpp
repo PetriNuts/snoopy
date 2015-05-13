@@ -225,7 +225,7 @@ bool SP_WDG_DialogColList::LoadData()
 				if( i == 0 )				
 					m_pcValueGrid->SetCellValue(0, i, wxT("true"));
 				else
-					m_pcValueGrid->SetCellValue(0, i, wxT("*"));
+					m_pcValueGrid->SetCellValue(0, i, SP_WILDCARD);
 				m_pcValueGrid->SetCellAlignment(0, i, wxALIGN_LEFT, wxALIGN_TOP);
 			}
 		}
@@ -259,7 +259,7 @@ bool SP_WDG_DialogColList::LoadData()
 			m_pcValueGrid->SetReadOnly(l_nRow, 0, true);
 			for(unsigned int l_nCol = 0; l_nCol < m_pcColList->GetColCount(); l_nCol++)
 			{
-				wxString l_sValue = wxT("*");
+				wxString l_sValue = SP_WILDCARD;
 				if(!m_bMultiple || l_nCol == 0)
 				{
 					l_sValue = m_pcColList->GetCell(l_nRow, l_nCol);
@@ -301,7 +301,7 @@ bool SP_WDG_DialogColList::SaveData()
 					if(i == 0)
 						l_pcColList->AppendEmptyRow();
 
-					//if((m_bMultiple && l_sValue != wxT("*")) || !m_bMultiple)
+					//if((m_bMultiple && l_sValue != SP_WILDCARD) || !m_bMultiple)
 					l_pcColList->SetCell(j, i, l_sValue);			
 				}
 			}	
@@ -318,7 +318,7 @@ bool SP_WDG_DialogColList::SaveData()
 					for(int l_nCol = 0; l_nCol < m_pcValueGrid->GetNumberCols(); l_nCol++)
 					{
 						wxString l_sValue = m_pcValueGrid->GetCellValue(l_nRow, l_nCol);
-						if((m_bMultiple && l_sValue != wxT("*")) )
+						if((m_bMultiple && l_sValue != SP_WILDCARD) )
 						{
 							l_pcColList->SetCell(l_nRow, l_nCol, l_sValue);
 						}
@@ -340,7 +340,7 @@ bool SP_WDG_DialogColList::SaveData()
 				for(int l_nCol = 0; l_nCol < m_pcValueGrid->GetNumberCols(); l_nCol++)
 				{
 					wxString l_sValue = m_pcValueGrid->GetCellValue(l_nRow, l_nCol);
-					if((m_bMultiple && l_sValue != wxT("*")) || !m_bMultiple)
+					if((m_bMultiple && l_sValue != SP_WILDCARD) || !m_bMultiple)
 					{
 						l_pcColList->SetCell(l_nRow, l_nCol, l_sValue);
 					}

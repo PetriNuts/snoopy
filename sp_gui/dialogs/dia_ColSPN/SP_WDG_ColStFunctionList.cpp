@@ -232,7 +232,7 @@ bool SP_WDG_ColStFunctionList::LoadData()
 		m_pcFunctionGrid->SetColLabelValue(i,l_pcColList->GetColLabel(i));
 		for(unsigned int j = 0; j < l_pcColList->GetRowCount(); j++)
 		{
-			wxString l_sValue = wxT("*");
+			wxString l_sValue = SP_WILDCARD;
 			if(!m_bMultiple)
 			{
 				l_sValue = l_pcColList->GetCell(j,i);
@@ -274,7 +274,7 @@ bool SP_WDG_ColStFunctionList::LoadData()
 				if( i == 0 )				
 					m_pcFunctionGrid->SetCellValue(0, i, wxT("true"));
 				else
-					m_pcFunctionGrid->SetCellValue(0, i, wxT("*"));
+					m_pcFunctionGrid->SetCellValue(0, i, SP_WILDCARD);
 				m_pcFunctionGrid->SetCellAlignment(0, i, wxALIGN_LEFT);
 			}
 		}
@@ -299,7 +299,7 @@ bool SP_WDG_ColStFunctionList::SaveData()
 					for(int l_nCol = 0; l_nCol < m_pcFunctionGrid->GetNumberCols(); l_nCol++)
 					{
 						wxString l_sValue = m_pcFunctionGrid->GetCellValue(l_nRow, l_nCol);
-						if((m_bMultiple && l_sValue != wxT("*")) )
+						if((m_bMultiple && l_sValue != SP_WILDCARD) )
 						{
 							l_pcColList->SetCell(l_nRow, l_nCol, l_sValue);
 						}

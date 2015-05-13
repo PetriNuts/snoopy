@@ -237,7 +237,7 @@ bool SP_WDG_ColStMarkingList::LoadData()
 		m_pcMarkingGrid->SetColLabelValue(i,l_pcColList->GetColLabel(i));
 		for(unsigned int j = 0; j < l_pcColList->GetRowCount(); j++)
 		{
-			wxString l_sColorValue = wxT("*");
+			wxString l_sColorValue = SP_WILDCARD;
 			if(!m_bMultiple)
 			{
 				l_sColorValue = l_pcColList->GetCell(j,i);
@@ -282,7 +282,7 @@ bool SP_WDG_ColStMarkingList::SaveData()
 					for(int l_nCol = 0; l_nCol < m_pcMarkingGrid->GetNumberCols(); l_nCol++)
 					{
 						wxString l_sValue = m_pcMarkingGrid->GetCellValue(l_nRow, l_nCol);
-						if((m_bMultiple && l_sValue != wxT("*")) )
+						if((m_bMultiple && l_sValue != SP_WILDCARD) )
 						{
 							l_pcColList->SetCell(l_nRow, l_nCol, l_sValue);
 						}

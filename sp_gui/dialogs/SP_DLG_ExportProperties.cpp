@@ -259,7 +259,7 @@ SP_DLG_ExportProperties::OnDlgOk(wxCommandEvent& p_cEvent)
         	l_nReturn = wxID_CANCEL;
         }
 
-        SP_LOGMESSAGE( wxString::Format(wxT("\n\nFinished %s: %s"),
+        SP_LOGMESSAGE( wxString::Format(wxT("\nFinished %s: %s\n"),
 											m_pcExport->GetName().c_str(),
 											l_sOutName.c_str()));
         if ( IsModal() )

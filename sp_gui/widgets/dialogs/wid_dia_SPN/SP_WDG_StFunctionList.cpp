@@ -170,7 +170,7 @@ bool SP_WDG_StFunctionList::LoadData()
 		m_pcFunctionGrid->SetCellBackgroundColour(i, 0, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
 
 		/////////////////
-		wxString l_sValue = wxT("*");
+		wxString l_sValue = SP_WILDCARD;
 		if( !m_bMultiple ) 
 			l_sValue = l_pcColList->GetCell(i,1);
 		////////////////////
@@ -203,7 +203,7 @@ bool SP_WDG_StFunctionList::SaveData()
 					for(int l_nCol = 0; l_nCol < m_pcFunctionGrid->GetNumberCols(); l_nCol++)
 					{
 						wxString l_sValue = m_pcFunctionGrid->GetCellValue(l_nRow, l_nCol);
-						if((m_bMultiple && l_sValue != wxT("*")) )
+						if((m_bMultiple && l_sValue != SP_WILDCARD) )
 						{
 							l_pcColList->SetCell(l_nRow, l_nCol, l_sValue);
 						}

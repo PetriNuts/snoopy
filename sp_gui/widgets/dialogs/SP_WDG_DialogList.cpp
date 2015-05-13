@@ -64,7 +64,7 @@ SP_WDG_DialogList::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
 
   if ( m_bMultiple){
 		 m_pcListBoxValues.Clear();
-		 m_pcListBoxValues.Add(wxT("*"));
+		 m_pcListBoxValues.Add(SP_WILDCARD);
   }	else{
 		m_pcListBoxValues = FillValues(l_pcListAttr);
   }
@@ -166,7 +166,7 @@ SP_WDG_DialogList::OnDlgOk()
     }
   }
 
-  if (m_bMultiple && (l_sValue.Cmp(wxT("*")) == 0))
+  if (m_bMultiple && (l_sValue.Cmp(SP_WILDCARD) == 0))
     return SP_WDG_DialogBase::OnDlgOk();
 
   SP_ListAttribute::const_iterator l_Iter;

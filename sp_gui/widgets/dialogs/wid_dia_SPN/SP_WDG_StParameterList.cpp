@@ -159,7 +159,7 @@ bool SP_WDG_StParameterList::LoadData()
 
 		m_pcParameterGrid->SetCellBackgroundColour(i, 0, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
 
-		wxString l_sValue = wxT("*");
+		wxString l_sValue = SP_WILDCARD;
 		if(!m_bMultiple)
 		{
 			l_sValue = l_pcColList->GetCell(i,1);
@@ -193,7 +193,7 @@ bool SP_WDG_StParameterList::SaveData()
 		{
 			l_pcColList->SetCell(i, 0, m_pcParameterGrid->GetCellValue(i, 0));
 			wxString l_sValue = m_pcParameterGrid->GetCellValue(i, 1);
-			if((m_bMultiple && l_sValue != wxT("*")) || !m_bMultiple)
+			if((m_bMultiple && l_sValue != SP_WILDCARD) || !m_bMultiple)
 			{
 				l_pcColList->SetCell(i, 1, l_sValue);
 			}
