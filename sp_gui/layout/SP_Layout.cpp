@@ -18,6 +18,7 @@
 #include "snoopy.h"
 #include "sp_core/SP_Core.h"
 #include "sp_gui/windows/SP_GUI_Childframe.h"
+#include <wx/busyinfo.h>
 
 SP_Layout::SP_Layout():
 	m_nMaxX(0), m_nMaxY(0), m_pcGraph(NULL), m_pcDoc(NULL), m_sLayout(wxT(""))
@@ -32,6 +33,9 @@ bool SP_Layout::Visualization(SP_DLG_LayoutProperties* p_pcDlg, SP_MDI_Doc* p_pc
 {
 	CHECK_POINTER(p_pcDlg, return FALSE);
 	CHECK_POINTER(p_pcDoc, return FALSE);
+
+    wxWindowDisabler disableAll;
+    wxBusyInfo wait("Please wait, layouting...");
 
 	//set MemberVariable
 	m_pcDoc = p_pcDoc;

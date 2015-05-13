@@ -20,6 +20,7 @@
 #include "sp_core/SP_Signer.h"
 #include <wx/file.h>
 #include <wx/regex.h>
+#include <wx/busyinfo.h>
 
 #include "snoopy.h"
 #include "sp_gui/interaction/SP_IA_Manager.h"
@@ -415,6 +416,9 @@ bool SP_MDI_Doc::OnSaveDocument(const wxString& p_sFile)
 {
 	if (m_pcGraph)
 	{
+        wxWindowDisabler disableAll;
+        wxBusyInfo wait("Please wait, saving...");
+
 		SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(GetFirstView());
 		l_pcView->SelectAll(true);
 		wxCommandEvent l_cEvent;
@@ -429,7 +433,6 @@ bool SP_MDI_Doc::OnSaveDocument(const wxString& p_sFile)
 		Modify(FALSE);
 		m_savedYet = TRUE;
 		SetFilename(p_sFile);
-
 	}
 
 	return TRUE;
