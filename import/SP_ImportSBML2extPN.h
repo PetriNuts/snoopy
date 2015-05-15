@@ -18,6 +18,7 @@ private:
 
 	bool m_HighlightReversibleReactions;
 	bool m_CreateReverseReactions;
+	bool m_CreateBoundaryConditions;
 
 	/**
 	\brief  Add model compartment as a parameter node to the a net

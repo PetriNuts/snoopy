@@ -17,6 +17,7 @@ private:
 
 	bool m_HighlightReversibleReactions;
 	bool m_CreateReverseReactions;
+	bool m_CreateBoundaryConditions;
 
 	SP_ListMetadata g_ParameterList;
 

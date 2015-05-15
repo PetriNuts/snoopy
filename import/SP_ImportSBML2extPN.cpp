@@ -41,6 +41,7 @@ bool SP_ImportSBML2extPN::ReadFile(const wxString& p_sFile)
 	{
 		m_CreateReverseReactions = l_cDlg.GetCreateReverseReactions();
 		m_HighlightReversibleReactions = l_cDlg.GetHighlightReverseReactions();
+		m_CreateBoundaryConditions = l_cDlg.GetCreateBoundaryConditions();
 
 		l_sbmlDocument = readSBML(p_sFile.mb_str());
 		CHECK_POINTER(l_sbmlDocument, return FALSE);
@@ -129,15 +130,15 @@ void SP_ImportSBML2extPN::getSpecies()
 		// Species _void_ is only for Gepasi, don't import
 		if (l_speciesName != wxT("_void_"))
 		{
-			SP_DS_Node* l_compoundNode = placeClass->NewElement(m_pcCanvas->GetNetnumber());
-			if (l_compoundNode)
+			SP_DS_Node* l_pcNode = placeClass->NewElement(m_pcCanvas->GetNetnumber());
+			if (l_pcNode)
 			{
 				++yComRea;
-				SP_DS_Attribute* l_pcAttrName = l_compoundNode->GetAttribute(wxT("Name"));
+				SP_DS_Attribute* l_pcAttrName = l_pcNode->GetAttribute(wxT("Name"));
 				l_pcAttrName->SetValueString(l_speciesId);
 				l_pcAttrName->SetShow(true);
 
-				SP_DS_Attribute* l_pcAttrComment = l_compoundNode->GetAttribute(wxT("Comment"));
+				SP_DS_Attribute* l_pcAttrComment = l_pcNode->GetAttribute(wxT("Comment"));
 				wxString l_comment = l_pcAttrComment->GetValueString();
 
 				wxString l_sCompartment = l_sbmlSpecies->getCompartment();
@@ -152,19 +153,37 @@ void SP_ImportSBML2extPN::getSpecies()
 				l_pcAttrComment->SetValueString(l_comment);
 				l_pcAttrComment->SetShow(false);
 
-				l_compoundNode->ShowOnCanvas(m_pcCanvas, FALSE, 50, yComRea,0);
+				l_pcNode->ShowOnCanvas(m_pcCanvas, FALSE, 50, yComRea,0);
 				if (l_sbmlSpecies->isSetInitialAmount())
 				{
 					wxString l_sMarking = wxString::Format(wxT("%.0f"),l_sbmlSpecies->getInitialAmount());
-					l_compoundNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
+					l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
 				}
 				else if(l_sbmlSpecies->isSetInitialConcentration())
 				{
 					wxString l_sMarking = wxString::Format(wxT("%.0f"),l_sbmlSpecies->getInitialConcentration());
-					l_compoundNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
+					l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
 				}
 
-				g_CompoundList.push_back(l_compoundNode);
+				if(m_CreateBoundaryConditions
+					&& l_sbmlSpecies->getBoundaryCondition()
+					&& !l_sbmlSpecies->getConstant())
+				{
+					SP_DS_Nodeclass* extTransitionClass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_TRANS);
+					SP_DS_Node* l_inNode = extTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
+					l_inNode->GetAttribute(wxT("Name"))->SetValueString(wxT("in_")+l_speciesId);
+					l_inNode->GetGraphics()->front()->SetBrushColour(*wxGREEN);
+					l_inNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
+					drawDpnEdge(l_inNode,l_pcNode,wxT("Edge"),wxT("1"));
+
+					SP_DS_Node* l_outNode = extTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
+					l_outNode->GetAttribute(wxT("Name"))->SetValueString(wxT("out_")+l_speciesId);
+					l_outNode->GetGraphics()->front()->SetBrushColour(*wxGREEN);
+					l_outNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
+					drawDpnEdge(l_pcNode,l_outNode,wxT("Edge"),wxT("1"));
+				}
+
+				g_CompoundList.push_back(l_pcNode);
 			}
 		}
     }
@@ -175,7 +194,7 @@ void SP_ImportSBML2extPN::getReactions ()
 {
 	// reads the Reactions from the SBML File
 	yComRea = 40;
- 	SP_DS_Nodeclass* extTransitionClass = m_pcGraph->GetNodeclass(wxT("Transition"));
+ 	SP_DS_Nodeclass* extTransitionClass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_TRANS);
 	for (unsigned int i = 0; i < m_sbmlModel->getNumReactions() ; ++i)
     {
 		Reaction* l_sbmlReaction = m_sbmlModel->getReaction(i);
@@ -247,15 +266,24 @@ void SP_ImportSBML2extPN::getReactions ()
 				// get rectants of actual reaction
 				for (unsigned int lor = 0; lor < rectants->size() ; ++lor)
 				{
-					wxString l_eductName = wxString(l_sbmlReaction->getReactant(lor)->getSpecies().c_str(), wxConvUTF8);
+					auto l_sbmlReactant = l_sbmlReaction->getReactant(lor);
+					wxString l_eductName = l_sbmlReactant->getSpecies();
 					if (sId == l_eductName)
 					{
 						wxString l_stoichiometry =
-								wxString::Format(wxT("%.0f"),l_sbmlReaction->getReactant(lor)->getStoichiometry());
-						drawDpnEdge(l_pcNode, l_reactionNode,wxT("Edge"),l_stoichiometry);
+								wxString::Format(wxT("%.0f"),l_sbmlReactant->getStoichiometry());
+						drawDpnEdge(l_pcNode, l_reactionNode,SP_DS_EDGE,l_stoichiometry);
+						if(l_sbmlReactant->isSetConstant())
+						{
+							drawDpnEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+						}
 						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 						{
-							drawDpnEdge(l_revReactionNode, l_pcNode,wxT("Edge"),l_stoichiometry);
+							drawDpnEdge(l_revReactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
+							if(l_sbmlReactant->isSetConstant())
+							{
+								drawDpnEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+							}
 						}
 					}
 				}
@@ -263,15 +291,24 @@ void SP_ImportSBML2extPN::getReactions ()
 				// get products of actual reaction
 				for (unsigned int lop = 0; lop < products->size() ; ++lop)
 				{
-					wxString l_productName = wxString(l_sbmlReaction->getProduct(lop)->getSpecies().c_str(), wxConvUTF8);
+					auto l_sbmlProduct = l_sbmlReaction->getProduct(lop);
+					wxString l_productName = l_sbmlProduct->getSpecies();
 					if (sId == l_productName)
 					{
 						wxString l_stoichiometry =
-								wxString::Format(wxT("%.0f"),l_sbmlReaction->getProduct(lop)->getStoichiometry());
-						drawDpnEdge(l_reactionNode, l_pcNode,wxT("Edge"),l_stoichiometry);
+								wxString::Format(wxT("%.0f"),l_sbmlProduct->getStoichiometry());
+						drawDpnEdge(l_reactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
+						if(l_sbmlProduct->isSetConstant())
+						{
+							drawDpnEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+						}
 						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 						{
-							drawDpnEdge(l_pcNode, l_revReactionNode, wxT("Edge"),l_stoichiometry);
+							drawDpnEdge(l_pcNode, l_revReactionNode, SP_DS_EDGE,l_stoichiometry);
+							if(l_sbmlProduct->isSetConstant())
+							{
+								drawDpnEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+							}
 						}
 						if(l_sbmlReaction->isSetKineticLaw())
 						{
@@ -279,7 +316,7 @@ void SP_ImportSBML2extPN::getReactions ()
 							if(existInReactionFormula(l_productName, l_sbmlMath) &&
 								!l_reactionNode->IsTargetOf(l_pcNode))
 							{
-								drawEdge( l_pcNode, l_reactionNode, wxT("Read Edge"), wxT("0"));
+								drawEdge( l_pcNode, l_reactionNode, SP_DS_READ_EDGE, wxT("0"));
 								wxString l_sText = wxT("The semantics of reaction \"") + l_ReactionName +
 									wxT("\" is defined by it's kinetic law\nand there is no known way to decide the structure in general.\n") +
 									wxT("Please check the resulting transition.");
@@ -292,14 +329,15 @@ void SP_ImportSBML2extPN::getReactions ()
 				// get modifiers of actual reaction
 				for (unsigned int lom = 0; lom < modifiers->size() ; ++lom)
 				{
-					wxString l_modifierName = wxString(l_sbmlReaction->getModifier(lom)->getSpecies().c_str(), wxConvUTF8);
+					auto l_sbmlModifier = l_sbmlReaction->getModifier(lom);
+					wxString l_modifierName = l_sbmlModifier->getSpecies();
 					if (sId == l_modifierName)
 					{
 						wxString l_stoichiometry = wxT("0"); // no info about in sbml
-						drawDpnEdge( l_pcNode, l_reactionNode, wxT("Read Edge"), l_stoichiometry);
+						drawDpnEdge( l_pcNode, l_reactionNode, SP_DS_READ_EDGE, l_stoichiometry);
 						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 						{
-							drawDpnEdge(l_pcNode, l_revReactionNode,wxT("Read Edge"),l_stoichiometry);
+							drawDpnEdge(l_pcNode, l_revReactionNode,SP_DS_READ_EDGE,l_stoichiometry);
 						}
 					}
 				}
