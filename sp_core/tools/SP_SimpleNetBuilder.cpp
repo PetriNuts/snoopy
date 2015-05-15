@@ -288,7 +288,21 @@ bool SP_SimpleNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
 	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 	if(mc)
 	{
-		bool first = true;
+		//create valuesets
+		if(!mc->GetElements()->empty())
+		{
+			SP_DS_Metadata* l_pcMetadata = mc->GetElements()->front();
+			SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcMetadata->GetAttribute(wxT("ValueList")));
+			if(l_pcColList->GetRowCount() > 1)
+			{
+				for (unsigned i = 0; i < l_pcColList->GetRowCount(); ++i)
+				{
+					wxString valueSet = SP_NormalizeString(l_pcColList->GetCell(i,0));
+					b.registerValueSet(valueSet.ToStdString());
+				}
+			}
+		}
+		//create constants
 		for (SP_DS_Metadata* l_pcMetadata : *(mc->GetElements()))
 		{
 			auto type = dsszmc::andl::ConstType::INT_T;
@@ -305,15 +319,9 @@ bool SP_SimpleNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
 			values.reserve(l_pcColList->GetRowCount());
 			for (unsigned i = 0; i < l_pcColList->GetRowCount(); ++i)
 			{
-				if(first)
-				{
-					wxString valueSet = SP_NormalizeString(l_pcColList->GetCell(i,0));
-					b.registerValueSet(valueSet.ToStdString());
-				}
 				std::string l_sValue = l_pcColList->GetCell(i, 1);
 				values.push_back(l_sValue);
 			}
-			first = false;
 			auto c = make_shared<dsszmc::andl::Constant>(type, l_sName, l_sGroup, values);
 			b.addConstant(c);
 		}
@@ -859,7 +867,19 @@ bool SP_ColoredNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
 	SP_DS_Nodeclass* l_pcNC = m_pcGraph->GetNodeclass(SP_DS_PARAM);
 	if(l_pcNC)
 	{
-		bool first = true;
+		if(!l_pcNC->GetElements()->empty())
+		{
+			SP_DS_Node* l_pcNode = l_pcNC->GetElements()->front();
+			SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("ParameterList")));
+			if(l_pcColList->GetRowCount() > 1)
+			{
+				for (unsigned i = 0; i < l_pcColList->GetRowCount(); ++i)
+				{
+					wxString valueSet = SP_NormalizeString(l_pcColList->GetCell(i,0));
+					b.registerValueSet(valueSet.ToStdString());
+				}
+			}
+		}
 		for(SP_DS_Node* l_pcNode : *l_pcNC->GetElements())
 		{
 			auto type = dsszmc::andl::ConstType::DOUBLE_T;
@@ -869,55 +889,14 @@ bool SP_ColoredNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
 			values.reserve(l_pcColList->GetRowCount());
 			for (unsigned i = 0; i < l_pcColList->GetRowCount(); ++i)
 			{
-				if(first)
-				{
-					wxString valueSet = SP_NormalizeString(l_pcColList->GetCell(i,0));
-					b.registerValueSet(valueSet.ToStdString());
-				}
 				std::string l_sValue = l_pcColList->GetCell(i, 1);
 				values.push_back(l_sValue);
 			}
-			first = false;
-			auto c = make_shared<dsszmc::andl::Constant>(type, name, "all", values);
+			auto c = make_shared<dsszmc::andl::Constant>(type, name, "param", values);
 			b.addConstant(c);
 		}
 	}
 
-	// for the new constants
-/*	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
-	if(mc)
-	{
-		bool first = true;
-		for (SP_DS_Metadata* l_pcMetadata : *(mc->GetElements()))
-		{
-			auto type = dsszmc::andl::ConstType::INT_T;
-			wxString l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
-			if(l_sType == wxT("double"))
-			{
-				type = dsszmc::andl::ConstType::DOUBLE_T;
-			}
-			std::string l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-			std::string l_sGroup = l_pcMetadata->GetAttribute(wxT("Group"))->GetValueString();
-
-			SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcMetadata->GetAttribute(wxT("ValueList")));
-			std::vector<std::string> values;
-			values.reserve(l_pcColList->GetRowCount());
-			for (unsigned i = 0; i < l_pcColList->GetRowCount(); ++i)
-			{
-				if(first)
-				{
-					wxString valueSet = SP_NormalizeString(l_pcColList->GetCell(i,0));
-					b.registerValueSet(valueSet.ToStdString());
-				}
-				std::string l_sValue = l_pcColList->GetCell(i, 1);
-				values.push_back(l_sValue);
-			}
-			first = false;
-			auto c = make_shared<dsszmc::andl::Constant>(type, l_sName, l_sGroup, values);
-			b.addConstant(c);
-		}
-	}
-*/
 	return TRUE;
 }
 
