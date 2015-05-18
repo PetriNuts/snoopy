@@ -16,7 +16,7 @@
 
 class SP_DS_Metadata;
 class SP_DS_ResultViewer;
-class SP_DLG_ShowAllModelView: public wxDialog, public SP_Error
+class SP_DLG_ShowAllModelView: public wxFrame, public SP_Error
 {
 private:
 	DECLARE_EVENT_TABLE();

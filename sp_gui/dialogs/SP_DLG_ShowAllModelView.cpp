@@ -22,7 +22,7 @@
 #include <wx/scrolwin.h>
 #include <wx/regex.h>
 
-IMPLEMENT_CLASS(SP_DLG_ShowAllModelView, wxDialog)
+IMPLEMENT_CLASS(SP_DLG_ShowAllModelView, wxFrame)
 
 enum
 {
@@ -38,7 +38,7 @@ enum
 	SP_ID_BUTTON_SHOW_HIDE_NODE_LIST
 };
 
-BEGIN_EVENT_TABLE(SP_DLG_ShowAllModelView,wxDialog)
+BEGIN_EVENT_TABLE(SP_DLG_ShowAllModelView,wxFrame)
 
 EVT_BUTTON(SP_ID_BUTTON_REFRESH,SP_DLG_ShowAllModelView::OnRefresh)
 EVT_BUTTON(wxID_CANCEL,SP_DLG_ShowAllModelView::OnClose)
@@ -64,7 +64,7 @@ END_EVENT_TABLE()
  */
 
 SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metadata* p_pcModelView) :
-		wxDialog(p_pcWnd, -1, wxT("Show all views"), wxPoint(700, 10), wxSize(800, 750),  wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxDEFAULT_DIALOG_STYLE),
+		wxFrame(p_pcWnd, -1, wxT("Show all views"), wxPoint(700, 10), wxSize(800, 750),  wxFRAME_FLOAT_ON_PARENT | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | wxCAPTION | wxCLOSE_BOX),
 		m_pcModelView(p_pcModelView), m_pcParentWnd(p_pcWnd), m_bIsDisconnected(false), m_bIsShown(true)
 {
 	if (m_pcModelView == NULL)
