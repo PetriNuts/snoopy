@@ -1883,12 +1883,7 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 	
 		if(l_pcDlg != NULL)
 		{
-#ifdef __WXGTK__
 			l_pcDlg->Show();
-#else
-			l_pcDlg->ShowModal();
-			l_pcDlg->Destroy();
-#endif
 		}
 	}
 	catch(std::exception& e)
