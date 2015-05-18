@@ -5,7 +5,7 @@
 #include <iostream>
 #include "sp_gui/dialogs/SP_DLG_BaseSimulation.h"
 #include "sp_ds/SP_DS_Graph.h"
-using namespace std;
+
 IMPLEMENT_CLASS(SP_DLG_BaseSimulation, wxDialog )
 
 enum
