@@ -111,37 +111,37 @@ SP_DLG_Simulation(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle)
 	{
 		//function set
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Marking overview:")), 1, wxALL | wxEXPAND, 5);
-		l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("")), 0, wxALL | wxEXPAND, 5);
-		l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Marking overview:")), 1, wxALL | wxEXPAND, 5);
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("")), 0, wxALL | wxEXPAND, 5);
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
-		l_pcRowSizer->Add( new wxStaticText( this, -1, wxT("Function set:") ), 1, wxALL | wxEXPAND, 5 );
-		m_apcComboBoxes.push_back(new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+		l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Function set:") ), 1, wxALL | wxEXPAND, 5 );
+		m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 		l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5 );
-		l_pcRowSizer->Add( new wxButton( this, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify") ), 0, wxALL, 5 );
+		l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify") ), 0, wxALL, 5 );
 		m_pcSetsSizer->Add( l_pcRowSizer , 1, wxEXPAND);
 
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Weight set:")), 1, wxALL | wxEXPAND, 5);
-		m_apcComboBoxes.push_back(new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Weight set:")), 1, wxALL | wxEXPAND, 5);
+		m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 		l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5);
-		l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_WEIGHT_SETS, wxT("Modify")), 0, wxALL, 5);
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_WEIGHT_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Delay set:")), 1, wxALL | wxEXPAND, 5);
-		m_apcComboBoxes.push_back(new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Delay set:")), 1, wxALL | wxEXPAND, 5);
+		m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 		l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5);
-		l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify")), 0, wxALL, 5);
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Schedule set:")), 1, wxALL | wxEXPAND, 5);
-		m_apcComboBoxes.push_back(new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Schedule set:")), 1, wxALL | wxEXPAND, 5);
+		m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 		l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5);
-		l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("Modify")), 0, wxALL, 5);
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 		UpdateChoices();
@@ -150,10 +150,10 @@ SP_DLG_Simulation(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle)
 		{
 			wxString l_sGroup = *l_itChoice;
 			l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
-			l_pcRowSizer->Add( new wxStaticText( this, -1, l_sGroup + wxT(':') ), 1, wxALL | wxEXPAND, 5 );
-			m_apcComboBoxes.push_back(new wxComboBox( this, -1 , wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
+			l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, l_sGroup + wxT(':') ), 1, wxALL | wxEXPAND, 5 );
+			m_apcComboBoxes.push_back(new wxComboBox( m_pcPropertyWindowSetsSizer, -1 , wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
 			l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5 );
-			l_pcRowSizer->Add( new wxButton( this, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), 0, wxALL, 5 );
+			l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), 0, wxALL, 5 );
 			m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND);
 		}
 	}
@@ -161,28 +161,28 @@ SP_DLG_Simulation(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle)
 	// rows of PropertySizer
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Simulator:")), 1, wxALL | wxEXPAND, 5);
-	m_pcSimulatorComboBox = new wxComboBox(this, SP_ID_COMBOBOX_SIMULATOR_CHOICE, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Simulator:")), 1, wxALL | wxEXPAND, 5);
+	m_pcSimulatorComboBox = new wxComboBox(m_pcPropertyWindowPropertySizer, SP_ID_COMBOBOX_SIMULATOR_CHOICE, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
 	m_pcSimulatorComboBox->Append(wxT("Gillespie"));
 	m_pcSimulatorComboBox->Append(wxT("Tau Leaping"));
 	m_pcSimulatorComboBox->Append(wxT("Parameter Free"));
 	m_pcSimulatorComboBox->Append(wxT("FAU"));
 	m_pcSimulatorComboBox->SetSelection(l_nSimulatorType);
 	l_pcRowSizer->Add(m_pcSimulatorComboBox, 0, wxALL, 5);
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_SIMULATION_PROPERTIES, wxT("Properties")), 0, wxALL, 5);
+	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowPropertySizer, SP_ID_BUTTON_SIMULATION_PROPERTIES, wxT("Properties")), 0, wxALL, 5);
 	m_pcPropertySizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	// rows of direct export sizer
 	l_pcRowSizer = m_pcDirectExportSizer->GetChildren().front()->GetSizer();
-	m_pcDirectSingleExportRadioButton = new wxRadioButton(this, -1, wxT("Single trace export"), wxDefaultPosition, wxDefaultSize, 0);
+	m_pcDirectSingleExportRadioButton = new wxRadioButton(m_pcPropertyWindowDirectExportSizer, -1, wxT("Single trace export"), wxDefaultPosition, wxDefaultSize, 0);
 	l_pcRowSizer->Add(m_pcDirectSingleExportRadioButton, 1, wxALL, 5);
-	m_pcDirectSingleExactExportRadioButton = new wxRadioButton(this, -1, wxT("Exact trace export"), wxDefaultPosition, wxDefaultSize, 0);
+	m_pcDirectSingleExactExportRadioButton = new wxRadioButton(m_pcPropertyWindowDirectExportSizer, -1, wxT("Exact trace export"), wxDefaultPosition, wxDefaultSize, 0);
 	l_pcRowSizer->Add(m_pcDirectSingleExactExportRadioButton, 1, wxALL, 5);
 
 	//Check formula
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK_ILFORMULAE_MENU, wxT("Check Formula ...")), 1, wxEXPAND | wxALL, 2);
-	m_pcModelViewsSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 2);
+	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_CHECK_ILFORMULAE_MENU, wxT("Check Formula ...")), 1, wxEXPAND | wxALL, 2);
+	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 2);
 
 	SetSizerAndFit(m_pcMainSizer);
 

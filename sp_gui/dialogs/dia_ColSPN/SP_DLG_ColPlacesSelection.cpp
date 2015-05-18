@@ -47,7 +47,7 @@ SP_DLG_ColPlacesSelection::SP_DLG_ColPlacesSelection(SP_DLG_Simulation* p_pcColS
 
 	m_pcEditMetadata = p_pcEditMetadata;
 
-	Initialize();	
+	Initialize();
 
 	InitilizeFromMetaData();
 
@@ -159,7 +159,6 @@ void SP_DLG_ColPlacesSelection::Initialize()
 		m_ArrayColTransitions.Add(l_sTransName);
 		m_mColTransName2ID[l_sTransName] = i;
 	}
-
 	m_msaCurLBInStrings[wxT("Place:Unfolded")] = m_ArrayUnPlaces;
 	m_msaCurLBInStrings[wxT("Place:Colored")] = m_ArrayColPlaces;
 	m_msaCurLBInStrings[wxT("Place:Auxiliary variables")] = m_ArrayPlaceAuxVar;
@@ -353,7 +352,10 @@ void SP_DLG_ColPlacesSelection::OnChangedOutType(wxCommandEvent& p_cEvent)
 	}
 	
 	LoadData();
-
+	wxString l_RegExString = m_pcEditMetadata->GetAttribute(wxT("RegEx"))->GetValueString();
+	if (l_RegExString != wxT("")) {
+		NodesThroughRegEx();
+	}
 }
 
 
@@ -409,6 +411,11 @@ void SP_DLG_ColPlacesSelection::OnChangedPlaceTransition(wxCommandEvent& p_cEven
 	m_pcFourthColumStaticBox->SetLabel(wxT("The selected ") + m_sNodeType);
 		
 	LoadData();
+
+	wxString l_RegExString = m_pcEditMetadata->GetAttribute(wxT("RegEx"))->GetValueString();
+	if (l_RegExString != wxT("")) {
+		NodesThroughRegEx();
+	}
 }
 
 void SP_DLG_ColPlacesSelection::AddtoCurLBInStrings(wxString p_sName)

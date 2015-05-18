@@ -39,6 +39,23 @@ private:
 	wxWindow* m_pcParentWnd;
 
 	bool m_bIsDisconnected;
+
+	wxCheckListBox* m_pcPlaceChoiceCheckListBox;
+	wxCheckBox* m_pcSelectClearAllChkBox;
+	wxComboBox *m_pcOutputViewerType;
+	wxComboBox *m_pcOutputExportType;
+	wxSizer *m_pcRightSizer;
+	wxButton *m_pcShowHideButton;
+	wxButton *m_pcXAxis;
+	wxButton *m_pcViewerTypeButton;
+	wxButton *m_pcEditNodeListButton;
+	wxArrayInt m_IsSelectedPlace, m_IsSelectedTransition;
+	wxArrayInt m_PlaceLineStyle, m_TransitionLineStyle;
+	wxArrayInt m_PlaceLineWidth, m_TransitionLineWidth;
+	wxArrayString m_PlaceColor, m_TransitionColor;
+
+	bool m_bIsShown;
+	wxSizer *m_pcContentSizer;
 protected:
 
 	void OnRefresh(wxCommandEvent& event);
@@ -47,9 +64,17 @@ protected:
 
 	void OnWindowActivate(wxActivateEvent& event);
 
-	void OnImageExport(wxCommandEvent &event);
-
 	void OnDisconnect(wxCommandEvent &event);
+	void OnPlaceCheckUncheck(wxCommandEvent& p_cEvent);
+	void OnItemDoubleClick(wxCommandEvent& p_cEvent);
+	void OnSelectClearAllItems(wxCommandEvent& p_cEvent);
+	void OnEditViewerProperties(wxCommandEvent& p_cEvent);
+	void OnChangeResultViewer(wxCommandEvent& event);
+	void OnExportClick(wxCommandEvent& event);
+	void OnChangeXAxis(wxCommandEvent& event);
+	void OnEditNodeList(wxCommandEvent& event);
+	void OnShowHideNodeList(wxCommandEvent& event);
+
 protected:
 	void CreateResultViewer();
 
@@ -59,11 +84,12 @@ protected:
 	void LoadCurveSetting(SP_DS_ResultViewer* p_pcViewer, SP_DS_ColListAttribute* p_pcCurveInfoList, const unsigned int& p_nRow);
 
 public:
+
 	SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metadata* p_pcModelView);
 	virtual ~SP_DLG_ShowAllModelView();
 
 	void RefreshWindow();
-
+	void RefreshCurrentWindow(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle);
 	void RemoveExternalWindowsPointer();
 
 	//return the associated model view

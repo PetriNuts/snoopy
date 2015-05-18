@@ -33,6 +33,8 @@
 
 #include "sp_ds/extensions/ResultViewer/SP_DS_ResultViewer.h"
 #include "sp_gui/dialogs/SP_DLG_SelectXAxisVariable.h"
+#include "sp_gui/dialogs/SP_DLG_BaseSimulation.h"
+#include <wx/collpane.h>
 
 typedef map<long, wxColour> SP_MapLong2Colour;
 
@@ -50,12 +52,11 @@ typedef enum
 
 class SP_DS_Simulation;
 class SP_DS_ResultViewer;
-class SP_DLG_Simulation: public wxDialog, public SP_Error
+class SP_DLG_Simulation: public SP_DLG_BaseSimulation
 {
 protected:
 	// Current Graph
 	SP_DS_Graph* m_pcGraph;
-
 #ifdef __WXGTK__
 	wxWindowDisabler m_DisableOtherWindows;
 #endif
@@ -124,10 +125,10 @@ protected:
 	wxRadioButton* m_pcDirectSingleExportRadioButton;
 	wxRadioButton* m_pcDirectSingleExactExportRadioButton;
 
-	//Input parameters for simulation
+/*	//Input parameters for simulation
 	wxTextCtrl* m_pcIntervalStartTextCtrl;
 	wxTextCtrl* m_pcIntervalEndTextCtrl;
-	wxTextCtrl* m_pcResultPointCountTextCtrl;
+	wxTextCtrl* m_pcResultPointCountTextCtrl;*/
 
 	//Simulation status controls
 	wxStaticText* m_pcPlotStatusText;
@@ -135,11 +136,35 @@ protected:
 
 	wxCheckBox* m_pcImmediatelyOutputCheckBox;
 
-	wxBoxSizer* m_pcMainSizer;
-	wxStaticBoxSizer* m_pcPropertySizer;
-	wxStaticBoxSizer* m_pcSetsSizer;
-	wxStaticBoxSizer* m_pcDirectExportSizer;
-	wxStaticBoxSizer* m_pcSimulationButtonSizer;
+//	wxBoxSizer* m_pcMainSizer;
+
+	/*wxSizer* m_pcPropertySizer;
+	wxSizer* m_pcSetsSizer;
+	wxSizer* m_pcDirectExportSizer;
+	wxSizer* m_pcSimulationButtonSizer;
+	wxSizer* m_pcModelViewsSizer;*/
+
+	bool m_nlayoutAdaptaion;
+
+
+	wxComboBox* m_pcShowGraphViewBox;
+
+	/*wxWindow *m_pcPropertyWindowSimulationButtonSizer;
+	wxWindow *m_pcPropertyWindowPropertySizer;
+	wxWindow *m_pcPropertyWindowDirectExportSizer;
+	wxWindow *m_pcPropertyWindowSetsSizer;
+
+	wxCollapsiblePane *m_pcCollpaneDirectExportSizer;
+	wxCollapsiblePane *m_pcCollpanePropertySizer;
+	wxCollapsiblePane *m_pcCollpaneSetsSizer;*/
+
+	wxListBox *m_pcListboxShowAllGraphViewName;
+
+	wxDialogLayoutAdapter *m_pLayoutAdapter;
+
+
+
+
 
 	wxStaticBoxSizer* m_pcOutputSizer;
 
@@ -149,7 +174,7 @@ protected:
 
 	wxSizer* m_pcPlotControlSizer;
 	wxSizer* m_pcTableControlSizer;
-	wxSizer* m_pcModelViewsSizer;
+
 
 	wxButton* m_pcSaveTablePlotButton;
 
@@ -168,6 +193,10 @@ protected:
 
 	//a list of pointer to currently opened windows
 	std::list<wxWindow*> m_pcExternalWindows;
+public:
+	wxArrayString m_ArrayUnPlaces, m_ArrayUnTranstions;
+	wxArrayString m_ArrayColPlaces, m_ArrayColTranstions;
+	wxArrayString m_ArrayAuxPlaces, m_ArrayAuxtranstions;
 protected:
 	/*
 	 * net information
@@ -260,7 +289,6 @@ DECLARE_EVENT_TABLE()
     virtual void LoadParameters();
 	virtual bool InitializeSimulator()=0;
 
-	virtual void OnPlaceCheckUncheck(wxCommandEvent& p_cEvent);
 	virtual void OnColourClick(wxGridEvent& p_cEvent);
 
 	virtual void OnLabelDClick(wxGridEvent& p_cEvent);
@@ -283,33 +311,25 @@ DECLARE_EVENT_TABLE()
 	virtual void OnPlotZoomCentral(wxCommandEvent& p_cEvent);
 	virtual void OnPlotSaveArea(wxCommandEvent& p_cEvent);
 
-	virtual void OnEditViewerProperties(wxCommandEvent& p_cEvent);
-
-	virtual void OnItemDClick(wxCommandEvent& p_cEvent);
-
-	virtual void OnShowEditModelViewMenu(wxCommandEvent& p_cEvent);
-
-	virtual void OnNewModelView(wxCommandEvent& p_cEvent);
-
-	virtual void OnChangeModelView(wxCommandEvent& p_cEvent);
-
-	virtual void OnRemoveModelView(wxCommandEvent& event);
-
-	virtual void OnEditOtherView(wxCommandEvent& p_cEvent);
-
-	virtual void OnImageExport(wxCommandEvent &event);
+//	virtual void OnEditViewerProperties(wxCommandEvent& p_cEvent);
 
 	virtual void OnSelectXAxis(wxCommandEvent& p_cEvent);
 
-	virtual void OnChangeResultViewer(wxCommandEvent & envent);
+//	virtual void OnChangeResultViewer(wxCommandEvent & envent);
 
-	virtual void OnExportToCSV(wxCommandEvent& p_cEvent);
+
 	virtual void OnPrint(wxCommandEvent& p_cEvent);
 
-	virtual void OnOpenCurrentViewSeparately(wxCommandEvent& p_cEvent);
 	virtual void OnOpenAllViewsSeparately(wxCommandEvent& p_cEvent);
-	virtual void OnSelectClearAllItems(wxCommandEvent& p_cEvent);
 
+	virtual void OnExportToCSV();
+
+//	virtual void OnCollapsePropertySizer(wxCollapsiblePaneEvent& event);
+	virtual void OnCollapseSetsSizer(wxCollapsiblePaneEvent& event);
+	virtual void OnCollapseDirectExportSizer(wxCollapsiblePaneEvent& event);
+	virtual void OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent);
+	virtual void OnAddingNewModalView(wxCommandEvent& p_cEvent);
+	virtual void OnRemovingModalViews(wxCommandEvent& p_cEvent);
 	//overwrite this function in child class to give periodic update
 	virtual void OnTimer(wxTimerEvent& event)
 	{
@@ -362,7 +382,7 @@ protected:
 	//update the x axis values base on the user selection
 	virtual void UpdateXAxisValues()=0;
 
-	virtual void DoEditViewerProperties();
+	virtual void DoEditViewerProperties(wxWindow *p_pcExternalWindowDialog);
 
 	//check for existence of a view with a certain name
 	virtual bool IsViewNameExist(const wxString& p_sViewName);
@@ -394,6 +414,9 @@ protected:
 	//Refresh currently opened window
 	virtual void RefreshExternalWindows();
 
+	//Refresh currnet external window
+	virtual void RefreshCurrentExternalView(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle);
+
 	//open one window for a view
 	virtual void OpenViewInSeparateWindow(SP_DS_Metadata* p_pcModelView);
 
@@ -417,6 +440,15 @@ protected:
 
 	virtual void OnLoadData(wxCommandEvent& p_cEvent);
 
+public:
+	virtual void OnClearPlaceList(bool p_nCheck);
+	virtual void OnItemDoubleClick(wxWindow *p_pcExternalWindowDialog, unsigned int p_nLocation, int p_nCount);
+	virtual void OnItemCheckUncheck(unsigned int p_nLocation, bool p_nCheck);
+	virtual void OnEditViewerTypeProperties(wxWindow *p_pcExternalWindowDialog);
+	virtual void OnChangingResultViewer(unsigned int p_nLocation);
+	virtual void OnEditOtherNodeList(wxWindow *p_pcExternalWindowDialog);
+	virtual void OnEditXAxis(wxWindow *p_pcExternalWindowDialog);
+	virtual void OnExportClicked(wxWindow *p_pcExternalWindowDialog, int p_nSelection);
 protected:
 
 DECLARE_CLASS( SP_DLG_Simulation )
@@ -482,7 +514,21 @@ public:
 	virtual void LoadResults();
 	virtual void SetSimulationStopWatch(long p_nTime)
 	{
-		m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f sec"), (float) p_nTime / 1000));
+		float se = (float)p_nTime / 1000;
+		int secs = (int)(se);
+		int hr = secs / 3600;
+		int mi =  (secs % 3600) / 60;
+		int secsi = secs - (hr * 3600 + mi * 60);
+		se -= secs;
+		se += (secsi);
+		if (hr != 0) {
+			m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%d h %d m %.3f s"), hr, mi, se));
+		} else if (mi != 0) {
+			m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%d m %.3f s"), mi, se));
+		} else {
+			m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), se));
+		}
+
 	}
 	virtual wxString GetApFormulae()
 	{

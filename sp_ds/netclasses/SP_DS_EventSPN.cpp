@@ -443,6 +443,8 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("Nodeclass"), wxT("Place") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("ViewerType"), wxT("xyPlot") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("Results"), wxT("Marking") ) );
+	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("RegEx"), wxT("") ) );
+	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("RegExOutputType"), wxT("Unfolded") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("PlaceList"), SP_COLLIST_UNSIGNED_INTEGER, 1 ) );
 	
     /*
@@ -463,6 +465,8 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	//xy plot
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("ViewTitle"), wxT("Untitled") ) );
+	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("ChartWidth"), wxT("600") ) );
+	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("ChartHeight"), wxT("600") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("XAxisTitle"), wxT("Time") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("YAxisTitle"), wxT("") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_NumberAttribute( wxT("DefaultLineWidth"), 2 ) );

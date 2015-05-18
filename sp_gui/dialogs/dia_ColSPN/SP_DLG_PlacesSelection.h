@@ -65,7 +65,6 @@ protected:
 	wxComboBox* m_pcChooseColoredPlace;
 
 	wxString m_sPlaceType;
-	wxString m_sOutputType;
 
 	wxArrayString m_ArrayString;
 
@@ -94,6 +93,10 @@ protected:
 
 	 wxString m_sPlotName;
 
+public:
+	 wxTextCtrl *m_pcPlaceChoiceRegex;
+	 wxTextCtrl *m_pcPlaceChoiceOutRegex;
+	 wxString m_sOutputType;
 protected:
 
 	 //load Node colours
@@ -143,7 +146,9 @@ protected:
   
 	virtual void OnChangedOutType( wxCommandEvent& p_cEvent );
 
-
+	void OnRegexSelection(wxCommandEvent& p_cEvent );
+	void OnLoadingPlacesAccordingToRegex(wxCommandEvent& p_cEvent);
+	void NodesThroughRegEx();
 	DECLARE_CLASS( SP_DLG_PlacesSelection )
 	DECLARE_EVENT_TABLE()
 

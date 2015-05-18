@@ -9,7 +9,7 @@
 
 #include <wx/valgen.h>
 #include <wx/tipwin.h>
-
+#include <wx/regex.h>
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_PlacesSelection.h"
 
 #include "sp_gui/mdi/SP_MDI_Doc.h"
@@ -34,7 +34,9 @@ enum
 
 	SP_ID_PLACETRANSITIONRADIOBOX,
 	SP_ID_OUTPUTTYPERADIOBOX,
-	SP_ID_CHECKLISTBOX_PLACE_CHOICE
+	SP_ID_CHECKLISTBOX_PLACE_CHOICE,
+	SP_ID_BUTTON_REGEX_COMPILE_SELECT,
+	SP_ID_LIST_BOX_OUT_REGEX_BUTTON
 };
 
 BEGIN_EVENT_TABLE( SP_DLG_PlacesSelection, wxDialog )
@@ -48,12 +50,16 @@ BEGIN_EVENT_TABLE( SP_DLG_PlacesSelection, wxDialog )
 	EVT_BUTTON(SP_ID_BUTTON_LF2RTALL, SP_DLG_PlacesSelection::OnLeftToRightAll)
 	EVT_BUTTON(SP_ID_BUTTON_RT2LFALL, SP_DLG_PlacesSelection::OnRightToLeftAll)
 
+	EVT_TEXT(SP_ID_BUTTON_REGEX_COMPILE_SELECT, SP_DLG_PlacesSelection::OnRegexSelection)
+
 	EVT_BUTTON(SP_ID_BUTTON_EDITAUXVAR, SP_DLG_PlacesSelection::OnEditAuxVariable)
 
 	EVT_COMBOBOX(SP_ID_COMBOBOX_COLORPLACE_CHOICE, SP_DLG_PlacesSelection::OnColPlaceSel)
 
 	EVT_RADIOBOX( SP_ID_PLACETRANSITIONRADIOBOX, SP_DLG_PlacesSelection::OnChangedPlaceTransition )
 	EVT_RADIOBOX( SP_ID_OUTPUTTYPERADIOBOX, SP_DLG_PlacesSelection::OnChangedOutType )
+
+	EVT_BUTTON(SP_ID_LIST_BOX_OUT_REGEX_BUTTON, SP_DLG_PlacesSelection::OnLoadingPlacesAccordingToRegex)
 
 
 END_EVENT_TABLE()
@@ -68,7 +74,7 @@ SP_DLG_PlacesSelection::SP_DLG_PlacesSelection(wxString p_sNodeType, SP_DS_Metad
          m_sOutputType(wxT("Unfolded")),
          m_sNodeType(p_sNodeType),
          m_pcEditMetadata(p_pcEditMetadata){
-	
+	m_sOutputType = m_pcEditMetadata->GetAttribute(wxT("RegExOutputType"))->GetValueString();
 	SetCommonLayout1();
 
 	Initialize();	
@@ -189,7 +195,7 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 
 	wxSizer* l_pcControlButtonSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);  //for save and cancel buttons
 
-	m_pcMainSizer->Add(l_pcMainContentSizer);
+	m_pcMainSizer->Add(l_pcMainContentSizer, 1, wxALL | wxEXPAND, 5);
 	m_pcMainSizer->Add(l_pcControlButtonSizer);
 
 
@@ -197,19 +203,29 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 
 	//wxSizer* l_pcContentSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Properties:")), wxVERTICAL);  //the first column
 
-	m_pcPlaceChoiceStaticBox = new wxStaticBox(this, -1,  wxT("The overall ")+ m_sNodeType);           //the second column
+	m_pcPlaceChoiceStaticBox = new wxStaticBox(this, -1,  wxT("The overall ")+ m_sNodeType + wxT("s"));           //the second column
+
 	wxSizer* l_pcPlaceChoiceSizer = new wxStaticBoxSizer(m_pcPlaceChoiceStaticBox, wxVERTICAL);
 
 	wxStaticBox* l_pcThirdColumStaticBox = new wxStaticBox(this, -1, wxT(" "));           //the third column, buttons
 	wxSizer* l_pcThirdColumSizer = new wxBoxSizer(wxVERTICAL);
 
-	m_pcFourthColumStaticBox = new wxStaticBox(this, -1,  wxT("The selected ")+ m_sNodeType );           //the fourth column, selected places
+	m_pcFourthColumStaticBox = new wxStaticBox(this, -1,  wxT("The selected ")+ m_sNodeType + wxT("s") );           //the fourth column, selected places
 	wxSizer* l_pcFourthColumSizer = new wxStaticBoxSizer(m_pcFourthColumStaticBox, wxVERTICAL);
 
+	wxSizer* l_pcTopContentSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxSizer* l_pcBottomContentSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxSizer* l_pcRightContentSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
+
 	l_pcMainContentSizer->Add(l_pcFirstSizer);
-	l_pcMainContentSizer->Add(l_pcPlaceChoiceSizer);
-	l_pcMainContentSizer->Add(l_pcThirdColumSizer);
-	l_pcMainContentSizer->Add(l_pcFourthColumSizer);
+	l_pcMainContentSizer->Add(l_pcRightContentSizer, 1, wxALL | wxEXPAND, 5);
+
+	l_pcRightContentSizer->Add(l_pcTopContentSizer, 1, wxLEFT | wxEXPAND, 5);
+	l_pcRightContentSizer->Add(l_pcBottomContentSizer, 7, wxALL | wxEXPAND, 5);
+
+	l_pcBottomContentSizer->Add(l_pcPlaceChoiceSizer, 1, wxALL | wxEXPAND, 5);
+	l_pcBottomContentSizer->Add(l_pcThirdColumSizer);
+	l_pcBottomContentSizer->Add(l_pcFourthColumSizer, 1, wxALL | wxEXPAND, 5);
 
 	wxSizer* l_pcContentSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Properties:")), wxVERTICAL);  //the first column
 	l_pcFirstSizer->Add(l_pcContentSizer);
@@ -226,7 +242,7 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 	//node class
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	wxString l_asPlaceTransitionChoices[] = { wxT("Place"), wxT("Transition")};
-	m_pcPlaceTransitionRadioBox = new wxRadioBox(this, SP_ID_PLACETRANSITIONRADIOBOX, wxT("Nodeclass"), wxDefaultPosition, wxDefaultSize, 2, l_asPlaceTransitionChoices, 2, wxRA_SPECIFY_ROWS | wxEXPAND);
+	m_pcPlaceTransitionRadioBox = new wxRadioBox(this, SP_ID_PLACETRANSITIONRADIOBOX, wxT("Observers"), wxDefaultPosition, wxDefaultSize, 2, l_asPlaceTransitionChoices, 2, wxRA_SPECIFY_ROWS | wxEXPAND);
 	l_pcRowSizer->Add(m_pcPlaceTransitionRadioBox, 1, wxLEFT | wxRIGHT | wxTOP | wxEXPAND, 5);
 
 	l_pcContentSizer->Add(l_pcRowSizer, 0, wxEXPAND);
@@ -315,29 +331,33 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 	l_pcRowSizer->Add(l_pEditAuxVarButton, 0, wxALIGN_CENTER| wxALL, 5);	
 	l_pcAuxiliarySizer->Add(l_pcRowSizer, 0, wxEXPAND);
 		
+	/**************top row****************/
+
+	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("RegEx")), wxHORIZONTAL);
+	m_pcPlaceChoiceOutRegex = new wxTextCtrl(this, SP_ID_BUTTON_REGEX_COMPILE_SELECT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
+	l_pcRowSizer->Add(m_pcPlaceChoiceOutRegex, 1, wxALL | wxEXPAND, 5);
+	l_pcTopContentSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND, 5);
+
+	/**********************the second column**************************/
+
+	wxSizer* l_pcWholePlaceSizer = new wxBoxSizer(wxHORIZONTAL | wxVERTICAL);
+	m_pListBoxIn = new wxListBox(this, SP_ID_LISTBOX_IN, wxDefaultPosition,wxSize( 150, 400 ),0,NULL,wxLB_EXTENDED);
+	l_pcWholePlaceSizer->Add(m_pListBoxIn, 1, wxALL | wxEXPAND, 5);
+
+	l_pcPlaceChoiceSizer->Add(l_pcWholePlaceSizer, 1, wxALL | wxEXPAND);
 
 
-
-	//the second column
-	wxSizer* l_pcWholePlaceSizer = new wxBoxSizer(wxHORIZONTAL);
-	m_pListBoxIn = new wxListBox(this, SP_ID_LISTBOX_IN,wxDefaultPosition,wxSize( 150, 400 ),0,NULL,wxLB_EXTENDED);
-	l_pcWholePlaceSizer->Add(m_pListBoxIn, 1, wxLEFT | wxRIGHT | wxTOP, 5);
-
-	l_pcPlaceChoiceSizer->Add(l_pcWholePlaceSizer, 0, wxEXPAND);
-
-
-	//the third column
+	/*****************the third column***************************/
 	wxBoxSizer* l_pcSizerColumn3 = new wxStaticBoxSizer( l_pcThirdColumStaticBox,wxVERTICAL );
 	wxButton* l_pButton1=new wxButton( this, SP_ID_BUTTON_LF2RT, wxT( ">" ) );
 	wxButton* l_pButton2=new wxButton( this, SP_ID_BUTTON_RT2LF, wxT( "<" ) );
 	wxButton* l_pButton3=new wxButton( this, SP_ID_BUTTON_LF2RTALL, wxT( ">>" ) );
-	wxButton* l_pButton4=new wxButton( this, SP_ID_BUTTON_RT2LFALL, wxT( "<<" ) );    
-	l_pcSizerColumn3->Add(l_pButton1, 0,  wxALIGN_CENTER| wxALL, 5);
+	wxButton* l_pButton4=new wxButton( this, SP_ID_BUTTON_RT2LFALL, wxT( "<<" ) );
+
+	l_pcSizerColumn3->Add(l_pButton1, 0,  wxALIGN_CENTER| wxTOP, 25);
 	l_pcSizerColumn3->Add(l_pButton2, 0, wxALIGN_CENTER| wxALL, 5);
 	l_pcSizerColumn3->Add(l_pButton3, 0,  wxALIGN_CENTER| wxALL, 5);
 	l_pcSizerColumn3->Add(l_pButton4, 0, wxALIGN_CENTER| wxALL, 5);
-
-	/************************************************************************/
 	//advanced selection
 	if(l_sNetClass == SP_DS_COLSPN_CLASS ||
 		l_sNetClass == SP_DS_COLCPN_CLASS ||
@@ -352,17 +372,15 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 
 		l_pcSizerColumn3->Add(l_pcRowSizer, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL);
 	}	
-	/************************************************************************/
 	l_pcThirdColumSizer->Add(l_pcSizerColumn3, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL);
 
 
 
-	//the fourth column
-	wxSizer* l_pcSelectedPlaceSizer = new wxBoxSizer(wxHORIZONTAL);
+	/***************************the fourth column**************************/
+	wxSizer* l_pcSelectedPlaceSizer = new wxBoxSizer(wxHORIZONTAL | wxVERTICAL);
 	m_pListBoxOut = new wxListBox(this, SP_ID_LISTBOX_OUT,wxDefaultPosition,wxSize( 150, 400 ),0,NULL,wxLB_EXTENDED);
-	l_pcSelectedPlaceSizer->Add(m_pListBoxOut, 1, wxLEFT | wxRIGHT | wxTOP, 5);
-
-	l_pcFourthColumSizer->Add(l_pcSelectedPlaceSizer, 0, wxEXPAND);
+	l_pcSelectedPlaceSizer->Add(m_pListBoxOut, 1, wxALL | wxEXPAND, 5);
+	l_pcFourthColumSizer->Add(l_pcSelectedPlaceSizer, 1, wxALL | wxEXPAND);
 
 
 	//the save or close button
@@ -372,12 +390,91 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 
 	l_pcControlButtonSizer->Add(l_pcRowSizer);	
 
+	m_pcPlaceChoiceOutRegex->SetValue(m_pcEditMetadata->GetAttribute(wxT("RegEx"))->GetValueString());
+
 	SetSizerAndFit(m_pcMainSizer);
 
 	//if(m_sPlaceType==SP_DS_CONTINUOUS_PLACE)
 	//	m_pcPlaceTransitionRadioBox->Enable(false);
 }
 
+void SP_DLG_PlacesSelection::OnRegexSelection(wxCommandEvent& p_cEvent ) {
+
+	/*wxString l_nRegexString = m_pcPlaceChoiceOutRegex->GetValue();
+	if (wxT("") == l_nRegexString) {
+		return;
+	}
+
+	wxRegEx l_nRegex;
+
+	if (l_nRegex.Compile(l_nRegexString, wxRE_DEFAULT)) {
+
+		int l_ncount = m_pListBoxIn->GetCount();
+
+		for (int i = 0; i < l_ncount; i++) {
+
+			m_pListBoxIn->Deselect(i);
+			wxString l_tempString = m_pListBoxIn->GetString(i);
+
+			if (l_nRegex.Matches(l_tempString)) {
+
+				m_pListBoxIn->SetStringSelection(l_tempString);
+
+			}
+		}
+	}*/
+	NodesThroughRegEx();
+}
+
+void SP_DLG_PlacesSelection::OnLoadingPlacesAccordingToRegex(wxCommandEvent& p_cEvent) {
+}
+
+void SP_DLG_PlacesSelection::NodesThroughRegEx() {
+
+		wxString l_nRegexString = m_pcPlaceChoiceOutRegex->GetValue();
+
+		wxArrayString l_placeOut, l_placeIn;
+		int l_nCountOutBox = m_pListBoxOut->GetCount();
+
+		wxRegEx l_nRegex;
+
+		if (l_nRegex.Compile(l_nRegexString, wxRE_DEFAULT)) {
+
+			int l_ncount = m_pListBoxIn->GetCount();
+
+			for (int i = 0; i < l_ncount; i++) {
+
+				wxString l_tempString = m_pListBoxIn->GetString(i);
+
+				if (l_nRegex.Matches(l_tempString)) {
+
+					l_placeOut.Add(l_tempString, 1);
+					RemovefromCurLBInStrings(l_tempString);
+
+				} else {
+					l_placeIn.Add(l_tempString, 1);
+				}
+			}
+
+			for (int i = 0; i < l_nCountOutBox; i++) {
+				wxString l_tempString = m_pListBoxOut->GetString(i);
+
+				if (l_nRegex.Matches(l_tempString)) {
+					l_placeOut.Add(l_tempString, 1);
+				} else {
+					l_placeIn.Add(l_tempString, 1);
+					AddtoCurLBInStrings(l_tempString);
+				}
+			}
+			m_pListBoxIn->Clear();
+			m_pListBoxOut->Clear();
+			l_placeOut.Sort(false);
+			m_pListBoxIn->InsertItems(l_placeIn,0);
+			m_pListBoxOut->InsertItems(l_placeOut, 0);
+
+
+		}
+}
 
 void SP_DLG_PlacesSelection::LoadData()
 {
@@ -425,7 +522,6 @@ void SP_DLG_PlacesSelection::OnDlgOk(wxCommandEvent& p_cEvent)
 	{
 		GetSelResults();
 		SaveMetaData();
-
 		if (IsModal())
 		{			
 			EndModal(wxID_OK);	
@@ -456,7 +552,11 @@ void SP_DLG_PlacesSelection::OnLeftToRight(wxCommandEvent& p_cEvent )
 {
 	wxArrayInt l_Selections;
 	wxString l_SelectionItem;
+	wxArrayString l_ArrayTemp;
 	int l_number=m_pListBoxIn->GetSelections(l_Selections);
+	for (unsigned int i = 0; i < m_pListBoxOut->GetCount(); i++) {
+		l_ArrayTemp.Add(m_pListBoxOut->GetString(i));
+	}
 	if(l_number>0)
 	{
 		for(int Counter = 0; Counter <l_number; Counter++ )
@@ -464,25 +564,34 @@ void SP_DLG_PlacesSelection::OnLeftToRight(wxCommandEvent& p_cEvent )
 		    int l_nNum = l_Selections.Item(Counter);
 			l_SelectionItem = m_pListBoxIn->GetString(l_nNum);
 
-			m_pListBoxOut->Insert(l_SelectionItem, m_pListBoxOut->GetCount());
+			l_ArrayTemp.Add(l_SelectionItem);
+//			m_pListBoxOut->Insert(l_SelectionItem, m_pListBoxOut->GetCount());
 
 			RemovefromCurLBInStrings(l_SelectionItem);
 		}	
 	}
-
-		LoadData();
+	m_pListBoxOut->Clear();
+	l_ArrayTemp.Sort(false);
+	m_pListBoxOut->InsertItems(l_ArrayTemp, 0);
+	LoadData();
 }
 
 void SP_DLG_PlacesSelection::OnLeftToRightAll(wxCommandEvent& p_cEvent )
 {	
 	wxArrayInt l_Selections;	
+	wxArrayString l_ArrayTemp;
+	for (unsigned int i = 0; i < m_pListBoxOut->GetCount(); i++) {
+		l_ArrayTemp.Add(m_pListBoxOut->GetString(i));
+	}
 	for(unsigned int Counter = 0; Counter <m_pListBoxIn->GetCount(); Counter++ )
 	{
 		wxString l_SelectionItem=m_pListBoxIn->GetString(Counter);
-
-		m_pListBoxOut->Insert(l_SelectionItem, m_pListBoxOut->GetCount());				
+		l_ArrayTemp.Add(l_SelectionItem);
+//		m_pListBoxOut->Insert(l_SelectionItem, m_pListBoxOut->GetCount());
 	}
-
+	m_pListBoxOut->Clear();
+	l_ArrayTemp.Sort(false);
+	m_pListBoxOut->InsertItems(l_ArrayTemp, 0);
 	map<wxString, wxArrayString>::iterator itMap;		
 	itMap = m_msaCurLBInStrings.find( m_sNodeType+wxT(":")+m_sOutputType);
 
@@ -649,77 +758,79 @@ void SP_DLG_PlacesSelection::SaveMetaData()
 	m_pcEditMetadata->GetAttribute(wxT("Nodeclass"))->SetValueString(m_sNodeType);
 	m_pcEditMetadata->GetAttribute(wxT("Name"))->SetValueString(m_pcNameTextCtrl->GetValue());
 
+	wxString l_nRegexString = m_pcPlaceChoiceOutRegex->GetValue();
+	if (l_nRegexString == wxT("")) {
+		SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*> (m_pcEditMetadata->GetAttribute(wxT("CurveInfo")));
+		l_pcCurveInfoList->Clear();
+
+		SP_VectorString l_asColours;
 	
-	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*> (m_pcEditMetadata->GetAttribute(wxT("CurveInfo")));
-	l_pcCurveInfoList->Clear();
+		l_asColours.clear();
+
+		wxString l_sNetClass = m_pcGraph->GetNetclass()->GetName();
 	
-	SP_VectorString l_asColours;
-
-    l_asColours.clear();
-
-    wxString l_sNetClass = m_pcGraph->GetNetclass()->GetName();
-
-	if(m_sNodeType==wxT("Place"))
-	{
-		 LoadNodeColours(SP_DS_CONTINUOUS_PLACE,l_asColours);
-		 LoadNodeColours(SP_DS_DISCRETE_PLACE,l_asColours);
-	}
-	else if(m_sNodeType==wxT("Transition"))
-	{
-		LoadNodeColours(SP_DS_CONTINUOUS_TRANS,l_asColours);
-		LoadNodeColours(SP_DS_DISCRETE_TRANS,l_asColours);
-	}
-
-	//check if this net is a coloured one
-	bool l_bColouredNet=false;
-
-	if(l_sNetClass.Contains(wxT("Colored")))
-	{
-		l_bColouredNet=true;
-	}
-
-	for(unsigned int i = 0; i < m_vmSelectedNodes.size(); i++)
-	{
-		wxString l_sPos;
-		l_sPos  = wxString::Format(wxT("%ld"),m_vmSelectedNodes[i].m_nPosition);
-		wxString l_sType;
-		l_sType =  m_vmSelectedNodes[i].m_OutputType; 
-		wxString l_sCheckState;
-		l_sCheckState << true;
-		wxString l_sCurveColor;
-
-		unsigned long l_nPos=m_vmSelectedNodes[i].m_nPosition;
-
-		//get either the node colour or assign an arbitrary colour
-		if(l_bColouredNet==false && l_nPos< l_asColours.size() && l_asColours[l_nPos]!=wxT(""))
+		if(m_sNodeType==wxT("Place"))
 		{
-			l_sCurveColor<<l_asColours[l_nPos];
+			 LoadNodeColours(SP_DS_CONTINUOUS_PLACE,l_asColours);
+			 LoadNodeColours(SP_DS_DISCRETE_PLACE,l_asColours);
 		}
-		else if( l_sType==wxT("Colored") && l_nPos< l_asColours.size() && l_asColours[l_nPos]!=wxT(""))
+		else if(m_sNodeType==wxT("Transition"))
 		{
-			l_sCurveColor<<l_asColours[l_nPos];
-		}
-		else
-		{
-			l_sCurveColor << SP_DLG_Simulation::GetColourString(i);
+			LoadNodeColours(SP_DS_CONTINUOUS_TRANS,l_asColours);
+			LoadNodeColours(SP_DS_DISCRETE_TRANS,l_asColours);
 		}
 
+		//check if this net is a coloured one
+		bool l_bColouredNet=false;
 
-		wxString l_sLinewidth;
-		l_sLinewidth <<-1;
-		wxString l_sLineStype;
-		l_sLineStype << -1;
-		
-		wxString l_sName=m_vmSelectedNodes[i].m_sName;
+		if(l_sNetClass.Contains(wxT("Colored")))
+		{
+			l_bColouredNet=true;
+		}
 
-		unsigned int l_nRow = l_pcCurveInfoList->AppendEmptyRow();
-		l_pcCurveInfoList->SetCell(l_nRow,0,l_sPos);
-		l_pcCurveInfoList->SetCell(l_nRow,1,l_sType);
-		l_pcCurveInfoList->SetCell(l_nRow,2,l_sCheckState);
-		l_pcCurveInfoList->SetCell(l_nRow,3,l_sCurveColor);
-		l_pcCurveInfoList->SetCell(l_nRow,4,l_sLinewidth);
-		l_pcCurveInfoList->SetCell(l_nRow,5,l_sLineStype);
-		l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);		
+		for(unsigned int i = 0; i < m_vmSelectedNodes.size(); i++)
+		{
+			wxString l_sPos;
+			l_sPos  = wxString::Format(wxT("%ld"),m_vmSelectedNodes[i].m_nPosition);
+			wxString l_sType;
+			l_sType =  m_vmSelectedNodes[i].m_OutputType;
+			wxString l_sCheckState;
+			l_sCheckState << true;
+			wxString l_sCurveColor;
+
+			unsigned long l_nPos=m_vmSelectedNodes[i].m_nPosition;
+
+			//get either the node colour or assign an arbitrary colour
+			if(l_bColouredNet==false && l_nPos< l_asColours.size() && l_asColours[l_nPos]!=wxT(""))
+			{
+				l_sCurveColor<<l_asColours[l_nPos];
+			}
+			else if( l_sType==wxT("Colored") && l_nPos< l_asColours.size() && l_asColours[l_nPos]!=wxT(""))
+			{
+				l_sCurveColor<<l_asColours[l_nPos];
+			}
+			else
+			{
+				l_sCurveColor << SP_DLG_Simulation::GetColourString(i);
+			}
+
+
+			wxString l_sLinewidth;
+			l_sLinewidth <<-1;
+			wxString l_sLineStype;
+			l_sLineStype << -1;
+
+			wxString l_sName=m_vmSelectedNodes[i].m_sName;
+
+			unsigned int l_nRow = l_pcCurveInfoList->AppendEmptyRow();
+			l_pcCurveInfoList->SetCell(l_nRow,0,l_sPos);
+			l_pcCurveInfoList->SetCell(l_nRow,1,l_sType);
+			l_pcCurveInfoList->SetCell(l_nRow,2,l_sCheckState);
+			l_pcCurveInfoList->SetCell(l_nRow,3,l_sCurveColor);
+			l_pcCurveInfoList->SetCell(l_nRow,4,l_sLinewidth);
+			l_pcCurveInfoList->SetCell(l_nRow,5,l_sLineStype);
+			l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);
+		}
 	}
 	
 }
@@ -749,10 +860,14 @@ void SP_DLG_PlacesSelection::OnChangedPlaceTransition(wxCommandEvent& p_cEvent)
 
 	m_pListBoxOut->Clear();
 	
-	m_pcPlaceChoiceStaticBox->SetLabel(wxT("The overall ") + m_sNodeType);
-	m_pcFourthColumStaticBox->SetLabel(wxT("The selected ") + m_sNodeType);
+	m_pcPlaceChoiceStaticBox->SetLabel(wxT("The overall ") + m_sNodeType+ wxT("s"));
+	m_pcFourthColumStaticBox->SetLabel(wxT("The selected ") + m_sNodeType+ wxT("s"));
 	
 	LoadData();
+	wxString l_RegExString = m_pcEditMetadata->GetAttribute(wxT("RegEx"))->GetValueString();
+	if (l_RegExString != wxT("")) {
+		NodesThroughRegEx();
+	}
 }
 
 
@@ -768,8 +883,12 @@ void SP_DLG_PlacesSelection::OnChangedOutType(wxCommandEvent& p_cEvent)
 	{
 		m_sOutputType = wxT("Auxiliary variables");
 	}
-	
+	wxString l_RegExString = m_pcEditMetadata->GetAttribute(wxT("RegEx"))->GetValueString();
+	if (l_RegExString == wxT("")) {
+		NodesThroughRegEx();
+	}
 	LoadData();
+
 
 }
 
@@ -778,7 +897,7 @@ void SP_DLG_PlacesSelection::Initialize()
 	m_ArrayUnPlaces.clear();
 	m_ArrayUnTranstions.clear();
 	SP_DS_Nodeclass* l_pcNodeclass;
-	SP_ListNode::const_iterator l_itElem;	
+	SP_ListNode::const_iterator l_itElem;
 
 	long l_nPos = 0;
 
@@ -889,6 +1008,7 @@ void SP_DLG_PlacesSelection::Initialize()
 		}	
 	}	
 
+
 	m_msaCurLBInStrings[wxT("Place:Unfolded")] = m_ArrayUnPlaces;
 	m_msaCurLBInStrings[wxT("Place:Auxiliary variables")] = m_ArrayPlaceAuxVar;
 	m_msaCurLBInStrings[wxT("Transition:Unfolded")] = m_ArrayUnTranstions;
@@ -899,6 +1019,7 @@ void SP_DLG_PlacesSelection::Initialize()
 
 void SP_DLG_PlacesSelection::InitilizeFromMetaData()
 {
+//	SP_LOGMESSAGE("initialize from metadata");
 	m_sNodeType = m_pcEditMetadata->GetAttribute(wxT("Nodeclass"))->GetValueString();
 	if(m_sNodeType == wxT("Place"))
 	{
@@ -909,8 +1030,8 @@ void SP_DLG_PlacesSelection::InitilizeFromMetaData()
 		m_pcPlaceTransitionRadioBox->SetSelection(1);
 	}
 
-	m_pcPlaceChoiceStaticBox->SetLabel(wxT("The overall ") + m_sNodeType);
-	m_pcFourthColumStaticBox->SetLabel(wxT("The selected ") + m_sNodeType);
+	m_pcPlaceChoiceStaticBox->SetLabel(wxT("The overall ") + m_sNodeType+ wxT("s"));
+	m_pcFourthColumStaticBox->SetLabel(wxT("The selected ") + m_sNodeType+ wxT("s"));
 
 	m_pcNameTextCtrl->SetValue((m_pcEditMetadata->GetAttribute(wxT("Name")))->GetValueString());
 
@@ -918,40 +1039,125 @@ void SP_DLG_PlacesSelection::InitilizeFromMetaData()
 	
 
 	//load data to listboxout
+	wxString l_RegExString = m_pcEditMetadata->GetAttribute(wxT("RegEx"))->GetValueString();
+	wxRegEx l_RegEx;
 	wxArrayString l_arSelected;
-	for(unsigned int i = 0; i < l_pcCurveInfoList->GetRowCount(); i++)
-	{
-		wxString l_sPlTrName = l_pcCurveInfoList->GetCell(i,6);
-		l_arSelected.Add(l_sPlTrName);
+	if (l_RegExString == wxT("")) {
+		for(unsigned int i = 0; i < l_pcCurveInfoList->GetRowCount(); i++)
+		{
+			wxString l_sPlTrName = l_pcCurveInfoList->GetCell(i,6);
+			l_arSelected.Add(l_sPlTrName);
+
+		}
+		m_pListBoxOut->Clear();
+		if (!l_arSelected.IsEmpty())
+		{
+		  m_pListBoxOut->InsertItems(l_arSelected,0);
+		}
+
+		//initialize array for showing
+
+		for(unsigned int i = 0; i < l_pcCurveInfoList->GetRowCount(); i++)
+		{
+			wxString l_sPlTrID = l_pcCurveInfoList->GetCell(i,0);
+			long l_nPlTrID;
+			if( !l_sPlTrID.ToLong(&l_nPlTrID) )
+				continue;
+
+			wxString l_sOutput = l_pcCurveInfoList->GetCell(i,1);
+
+			map<wxString, wxArrayString>::iterator itMap;
+
+			itMap = m_msaCurLBInStrings.find( m_sNodeType+wxT(":")+l_sOutput);
+			if(itMap == m_msaCurLBInStrings.end())
+				continue;
+
+			wxString l_sPlTrName = l_pcCurveInfoList->GetCell(i,6);
+
+			itMap->second.Remove(l_sPlTrName);
+
+		}
+
+	} else {
+		wxArrayString l_arSelected;
+		wxString l_sPlTrName;
+		wxString l_RegExOutputType = m_pcEditMetadata->GetAttribute(wxT("RegExOutputType"))->GetValueString();
+		map<wxString, wxArrayString>::iterator itMap = m_msaCurLBInStrings.find( m_sNodeType+wxT(":")+l_RegExOutputType);
+
+		if (l_RegEx.Compile(l_RegExString, wxRE_DEFAULT)) {
+			if (m_sNodeType == wxT("Place")) {
+				if (l_RegExOutputType == wxT("Unfolded")) {
+					for (unsigned int i = 0; i < m_ArrayUnPlaces.GetCount(); i++) {
+						l_sPlTrName = m_ArrayUnPlaces[i];
+						if (l_RegEx.Matches(l_sPlTrName)) {
+							l_arSelected.Add(l_sPlTrName);
+							if(itMap == m_msaCurLBInStrings.end())
+								continue;
+							itMap->second.Remove(l_sPlTrName);
+						}
+					}
+				} else if (l_RegExOutputType == wxT("Colored")) {
+					for (unsigned int i = 0; i < m_ArrayColPlaces.GetCount(); i++) {
+						l_sPlTrName = m_ArrayColPlaces[i];
+						if (l_RegEx.Matches(l_sPlTrName)) {
+							l_arSelected.Add(l_sPlTrName);
+							if(itMap == m_msaCurLBInStrings.end())
+								continue;
+							itMap->second.Remove(l_sPlTrName);
+						}
+					}
+				} else {
+					for (unsigned int i = 0; i < m_ArrayPlaceAuxVar.GetCount(); i++) {
+						l_sPlTrName = m_ArrayPlaceAuxVar[i];
+						if (l_RegEx.Matches(l_sPlTrName)) {
+							l_arSelected.Add(l_sPlTrName);
+							if(itMap == m_msaCurLBInStrings.end())
+								continue;
+							itMap->second.Remove(l_sPlTrName);
+						}
+					}
+				}
+			} else if (m_sNodeType == wxT("Transition")) {
+				if (l_RegExOutputType == wxT("Unfolded")) {
+					for (unsigned int i = 0; i < m_ArrayUnTranstions.GetCount(); i++) {
+						l_sPlTrName = m_ArrayUnTranstions[i];
+						if (l_RegEx.Matches(l_sPlTrName)) {
+							l_arSelected.Add(l_sPlTrName);
+							if(itMap == m_msaCurLBInStrings.end())
+								continue;
+							itMap->second.Remove(l_sPlTrName);
+						}
+					}
+				} else if (l_RegExOutputType == wxT("Colored")) {
+					for (unsigned int i = 0; i < m_ArrayColTransitions.GetCount(); i++) {
+						l_sPlTrName = m_ArrayColTransitions[i];
+						if (l_RegEx.Matches(l_sPlTrName)) {
+							l_arSelected.Add(l_sPlTrName);
+							if(itMap == m_msaCurLBInStrings.end())
+								continue;
+							itMap->second.Remove(l_sPlTrName);
+						}
+					}
+				} else {
+					for (unsigned int i = 0; i < m_ArrayTransAuxVar.GetCount(); i++) {
+						l_sPlTrName = m_ArrayTransAuxVar[i];
+						if (l_RegEx.Matches(l_sPlTrName)) {
+							l_arSelected.Add(l_sPlTrName);
+							if(itMap == m_msaCurLBInStrings.end())
+								continue;
+							itMap->second.Remove(l_sPlTrName);
+						}
+					}
+				}
+			}
+			m_pListBoxOut->Clear();
+			if (!l_arSelected.IsEmpty())
+			{
+			  l_arSelected.Sort(false);
+			  m_pListBoxOut->InsertItems(l_arSelected,0);
+			}
+		}
 	}
-	m_pListBoxOut->Clear();
-	if (!l_arSelected.IsEmpty())
-	{
-	  m_pListBoxOut->InsertItems(l_arSelected,0);
-    }
-
-	//initialize array for showing
-	for(unsigned int i = 0; i < l_pcCurveInfoList->GetRowCount(); i++)
-	{
-		wxString l_sPlTrID = l_pcCurveInfoList->GetCell(i,0);
-		long l_nPlTrID;
-		if( !l_sPlTrID.ToLong(&l_nPlTrID) )
-			continue;
-
-		wxString l_sOutput = l_pcCurveInfoList->GetCell(i,1);
-
-		map<wxString, wxArrayString>::iterator itMap;
-		
-		itMap = m_msaCurLBInStrings.find( m_sNodeType+wxT(":")+l_sOutput);
-
-		if(itMap == m_msaCurLBInStrings.end())
-			continue;
-
-		wxString l_sPlTrName = l_pcCurveInfoList->GetCell(i,6);
-
-		itMap->second.Remove(l_sPlTrName);
-	}
-	
 }
 
 void SP_DLG_PlacesSelection::AddtoCurLBInStrings(wxString p_sName)

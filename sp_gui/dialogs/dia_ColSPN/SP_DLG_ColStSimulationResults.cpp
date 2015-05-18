@@ -11,6 +11,7 @@
 #include <wx/printdlg.h>
 #include <wx/filename.h>
 #include <wx/textfile.h>
+#include <wx/regex.h>
 #include "export/SP_EPSDC.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStSimulationResults.h"
 #include "sp_ds/extensions/ext_SPN/SP_DS_StSimGillespie.h"
@@ -99,45 +100,45 @@ SP_DLG_ColStSimulationResults::SP_DLG_ColStSimulationResults(SP_DS_Graph* p_pcGr
 
 	// rows of SetsSizer
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Marking set:")), 1, wxALL | wxEXPAND, 5);
-	m_apcComboBoxes.push_back(new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Marking set:")), 1, wxALL | wxEXPAND, 5);
+	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
+	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Function set:")), 1, wxALL | wxEXPAND, 5);
-	m_apcComboBoxes.push_back(new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Function set:")), 1, wxALL | wxEXPAND, 5);
+	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify")), 0, wxALL, 5);
+	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Weight set:")), 1, wxALL | wxEXPAND, 5);
-	m_apcComboBoxes.push_back(new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Weight set:")), 1, wxALL | wxEXPAND, 5);
+	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_WEIGHT_SETS, wxT("Modify")), 0, wxALL, 5);
+	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_WEIGHT_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Delay set:")), 1, wxALL | wxEXPAND, 5);
-	m_apcComboBoxes.push_back(new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Delay set:")), 1, wxALL | wxEXPAND, 5);
+	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify")), 0, wxALL, 5);
+	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Schedule set:")), 1, wxALL | wxEXPAND, 5);
-	m_apcComboBoxes.push_back(new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Schedule set:")), 1, wxALL | wxEXPAND, 5);
+	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("Modify")), 0, wxALL, 5);
+	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Parameter set:")), 1, wxALL | wxEXPAND, 5);
-	m_apcComboBoxes.push_back(new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Parameter set:")), 1, wxALL | wxEXPAND, 5);
+	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify")), 0, wxALL, 5);
+	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	SetSizerAndFit(m_pcMainSizer);
@@ -167,82 +168,191 @@ bool SP_DLG_ColStSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewe
 
 	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(p_pcView->GetAttribute(wxT("CurveInfo")));
 	CHECK_POINTER(l_pcCurveInfoList, return false);
+	wxString l_RegExString = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
+	wxRegEx l_RegEx;
 
-	for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
-	{
-		wxString l_sPosition = l_pcCurveInfoList->GetCell(l_nRow, 0);
-		unsigned long l_nPosition = 0;
-		if (!l_sPosition.ToULong(&l_nPosition))
-		{
-			return false;
-		}
+	m_ArrayUnPlaces.Clear();
+	m_ArrayUnTranstions.Clear();
+	m_ArrayColPlaces.Clear();
+	m_ArrayColTranstions.Clear();
+	m_ArrayAuxPlaces.Clear();
+	m_ArrayAuxtranstions.Clear();
 
-		wxString l_sOutType = l_pcCurveInfoList->GetCell(l_nRow, 1);
-
-		if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_msPlaceNames.size()) //unfolded place
-		{
-			l_sName = m_msPlaceNames[l_nPosition];
-
-			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
-		}
-		else
-		if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_msTransitionNames.size()) //unfolded transition
-		{
-			l_sName = m_msTransitionNames[l_nPosition];
-
-			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
-		}
-		else
-		if (l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_msColoredPlaceNames.size()) //colored  place
-		{
-			l_sName = m_msColoredPlaceNames[l_nPosition];
-
-			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_aanColPlaceResults);
-		}
-		else
-		if (l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_msColoredTransitionNames.size()) //colored transition
-		{
-			l_sName = m_msColoredTransitionNames[l_nPosition];
-
-			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_aanColTransResults);
-		}
-		else
-		if (l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_vAuxPLVars.size()) //Auxiliary variables place
-		{
-			l_sName = m_vAuxPLVars[l_nPosition];
-
-			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_aanAuxPLVarsResults);
-		}
-		else
-		if (l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_vAuxTRVars.size()) //Auxiliary variables transition
-		{
-			l_sName = m_vAuxTRVars[l_nPosition];
-
-			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_aanAuxTRVarsResults);
-		}
-		else
-		{
-			SP_LOGERROR( wxT("Invalid node names, we stop loading the rest of the file"));
-
-			//invalid row index, therefore we ignore the remaining rows
-			l_pcCurveInfoList->RemoveRemainingRows(l_nRow);
-
-			break;
-		}
-
-		wxString l_sOrignialName = l_pcCurveInfoList->GetCell(l_nRow, 6);
-
-		if (l_sOrignialName != l_sName)
-		{
-			SP_LOGWARNING( wxT("Name for position (") + wxString::Format(wxT("%d"), l_nRow) + wxT(") is changed to ") + l_sName);
-		}
-
-		//update curve name
-		l_pcCurveInfoList->SetCell(l_nRow, 6, l_sName);
-
-		p_asPlaces.Add(l_sName);
+	for (unsigned int i = 0; i < m_msPlaceNames.size(); i++) {
+		m_ArrayUnPlaces.Add(m_msPlaceNames[i]);
+	}
+	for (unsigned int i = 0; i < m_msTransitionNames.size(); i++) {
+		m_ArrayUnTranstions.Add(m_msTransitionNames[i]);
+	}
+	for (unsigned int i = 0; i < m_msColoredPlaceNames.size(); i++) {
+		m_ArrayColPlaces.Add(m_msColoredPlaceNames[i]);
+	}
+	for (unsigned int i = 0; i < m_msColoredTransitionNames.size(); i++) {
+		m_ArrayColTranstions.Add(m_msColoredTransitionNames[i]);
+	}
+	for (unsigned int i = 0; i < m_vAuxPLVars.size(); i++) {
+		m_ArrayAuxPlaces.Add(m_vAuxPLVars[i]);
+	}
+	for (unsigned int i = 0; i < m_vAuxTRVars.size(); i++) {
+		m_ArrayAuxtranstions.Add(m_vAuxTRVars[i]);
 	}
 
+/*	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayColPlaces.GetCount()));
+	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayColTranstions.GetCount()));
+	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnPlaces.GetCount()));
+	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnTranstions.GetCount()));*/
+	if (l_RegExString == wxT("")) {
+		for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
+		{
+			wxString l_sPosition = l_pcCurveInfoList->GetCell(l_nRow, 0);
+			unsigned long l_nPosition = 0;
+			if (!l_sPosition.ToULong(&l_nPosition))
+			{
+				return false;
+			}
+
+			wxString l_sOutType = l_pcCurveInfoList->GetCell(l_nRow, 1);
+
+			if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_msPlaceNames.size()) //unfolded place
+			{
+				l_sName = m_msPlaceNames[l_nPosition];
+
+				p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
+			}
+			else
+			if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_msTransitionNames.size()) //unfolded transition
+			{
+				l_sName = m_msTransitionNames[l_nPosition];
+
+				p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
+			}
+			else
+			if (l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_msColoredPlaceNames.size()) //colored  place
+			{
+				l_sName = m_msColoredPlaceNames[l_nPosition];
+
+				p_pcViewer->AddCurve(l_sName, l_nPosition, &m_aanColPlaceResults);
+			}
+			else
+			if (l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_msColoredTransitionNames.size()) //colored transition
+			{
+				l_sName = m_msColoredTransitionNames[l_nPosition];
+
+				p_pcViewer->AddCurve(l_sName, l_nPosition, &m_aanColTransResults);
+			}
+			else
+			if (l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_vAuxPLVars.size()) //Auxiliary variables place
+			{
+				l_sName = m_vAuxPLVars[l_nPosition];
+
+				p_pcViewer->AddCurve(l_sName, l_nPosition, &m_aanAuxPLVarsResults);
+			}
+			else
+			if (l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_vAuxTRVars.size()) //Auxiliary variables transition
+			{
+				l_sName = m_vAuxTRVars[l_nPosition];
+
+				p_pcViewer->AddCurve(l_sName, l_nPosition, &m_aanAuxTRVarsResults);
+			}
+			else
+			{
+				SP_LOGERROR( wxT("Invalid node names, we stop loading the rest of the file"));
+
+				//invalid row index, therefore we ignore the remaining rows
+				l_pcCurveInfoList->RemoveRemainingRows(l_nRow);
+
+				break;
+			}
+
+			wxString l_sOrignialName = l_pcCurveInfoList->GetCell(l_nRow, 6);
+
+			if (l_sOrignialName != l_sName)
+			{
+				SP_LOGWARNING( wxT("Name for position (") + wxString::Format(wxT("%d"), l_nRow) + wxT(") is changed to ") + l_sName);
+			}
+
+			//update curve name
+			l_pcCurveInfoList->SetCell(l_nRow, 6, l_sName);
+
+			p_asPlaces.Add(l_sName);
+		}
+	} else {
+		wxString l_RegExOutputType = m_pcCurrentTablePlot->GetAttribute(wxT("RegExOutputType"))->GetValueString();
+		if (l_RegEx.Compile(l_RegExString, wxRE_DEFAULT)) {
+			unsigned l_sPosition = 0;
+			if (l_sElementType.IsSameAs(wxT("Place"))) {
+				if (l_RegExOutputType == wxT("Unfolded")) {
+					l_sPosition = 0;
+					for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnPlaces.GetCount(); l_nRow++)
+					{
+						wxString l_sName = m_ArrayUnPlaces[l_nRow];
+						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_anResultMatrix);
+						if (l_RegEx.Matches(l_sName)) {
+							p_asPlaces.Add(l_sName);
+						}
+						l_sPosition++;
+					}
+				} else if (l_RegExOutputType == wxT("Colored")) {
+					l_sPosition = 0;
+					for (unsigned int l_nRow = 0; l_nRow < m_ArrayColPlaces.GetCount(); l_nRow++)
+					{
+						wxString l_sName = m_ArrayColPlaces[l_nRow];
+						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_aanColPlaceResults);
+						if (l_RegEx.Matches(l_sName)) {
+							p_asPlaces.Add(l_sName);
+						}
+						l_sPosition++;
+					}
+				} else {
+					l_sPosition = 0;
+					for (unsigned int l_nRow = 0; l_nRow < m_ArrayAuxPlaces.GetCount(); l_nRow++)
+					{
+						wxString l_sName = m_ArrayAuxPlaces[l_nRow];
+						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_aanAuxPLVarsResults);
+						if (l_RegEx.Matches(l_sName)) {
+							p_asPlaces.Add(l_sName);
+						}
+						l_sPosition++;
+					}
+				}
+			} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
+				if (l_RegExOutputType == wxT("Unfolded")) {
+					l_sPosition = 0;
+					for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnTranstions.GetCount(); l_nRow++)
+					{
+						wxString l_sName = m_ArrayUnTranstions[l_nRow];
+						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_anResultMatrix);
+						if (l_RegEx.Matches(l_sName)) {
+							p_asPlaces.Add(l_sName);
+						}
+						l_sPosition++;
+					}
+				} else if (l_RegExOutputType == wxT("Colored")) {
+					l_sPosition = 0;
+					for (unsigned int l_nRow = 0; l_nRow < m_ArrayColTranstions.GetCount(); l_nRow++)
+					{
+						wxString l_sName = m_ArrayColTranstions[l_nRow];
+						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_aanColTransResults);
+						if (l_RegEx.Matches(l_sName)) {
+							p_asPlaces.Add(l_sName);
+						}
+						l_sPosition++;
+					}
+				} else {
+					l_sPosition = 0;
+					for (unsigned int l_nRow = 0; l_nRow < m_ArrayAuxtranstions.GetCount(); l_nRow++)
+					{
+						wxString l_sName = m_ArrayAuxtranstions[l_nRow];
+						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_aanAuxTRVarsResults);
+						if (l_RegEx.Matches(l_sName)) {
+							p_asPlaces.Add(l_sName);
+						}
+						l_sPosition++;
+					}
+				}
+			}
+		}
+	}
 	return true;
 }
 

@@ -97,16 +97,16 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 	{
 		//function set
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Marking overview:")), 1, wxALL | wxEXPAND, 5);
-		l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("")), 0, wxALL | wxEXPAND, 5);
-		l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Marking overview:")), 1, wxALL | wxEXPAND, 5);
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("")), 0, wxALL | wxEXPAND, 5);
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
-		l_pcRowSizer->Add( new wxStaticText( this, -1, wxT("Function set:") ), 1, wxALL | wxEXPAND, 5 );
-		m_apcComboBoxes.push_back(new wxComboBox(this, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+		l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Function set:") ), 1, wxALL | wxEXPAND, 5 );
+		m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 		l_pcRowSizer->Add( m_apcComboBoxes[0], 0, wxALL, 5 );
-		l_pcRowSizer->Add( new wxButton( this, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify") ), 0, wxALL, 5 );
+		l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify") ), 0, wxALL, 5 );
 		m_pcSetsSizer->Add( l_pcRowSizer , 1, wxEXPAND);
 
 		UpdateChoices();
@@ -115,10 +115,10 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 		{
 			wxString l_sGroup = *l_itChoice;
 			l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
-			l_pcRowSizer->Add( new wxStaticText( this, -1, l_sGroup + wxT(':') ), 1, wxALL | wxEXPAND, 5 );
-			m_apcComboBoxes.push_back(new wxComboBox( this, SP_ID_COMBOBOX_MARKING_SETS , wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
+			l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, l_sGroup + wxT(':') ), 1, wxALL | wxEXPAND, 5 );
+			m_apcComboBoxes.push_back(new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_MARKING_SETS , wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
 			l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5 );
-			l_pcRowSizer->Add( new wxButton( this, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), 0, wxALL, 5 );
+			l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), 0, wxALL, 5 );
 			m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND);
 		}
 	}
@@ -129,14 +129,14 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 	wxString l_asStiffSolverChoices[] =
 	{ wxT("BDF"), wxT("Rosenbrock-Method of Shampine"), wxT("Rosenbrock-Method GRK4T of Kaps-Rentrop"), wxT("Rosenbrock-Method GRK4A of Kaps-Rentrop"),
 			wxT("Rosenbrock-Method of Van Veldhuizen [gamma = 1/2]"), wxT("Rosenbrock-Method of Van Veldhuizen [D-stable]"), wxT("an L-stable Rosenbrock-Method") };
-	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Solver Type")), 1, wxALL | wxEXPAND, 5);
-	m_pcSolverType = new wxRadioBox(this, SP_ID_RADIOBOX_SOLVER_TYPE, wxT(""), wxDefaultPosition, wxDefaultSize, 2, l_sChoices, 2, wxRA_SPECIFY_COLS);
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Solver Type")), 1, wxALL | wxEXPAND, 5);
+	m_pcSolverType = new wxRadioBox(m_pcPropertyWindowPropertySizer, SP_ID_RADIOBOX_SOLVER_TYPE, wxT(""), wxDefaultPosition, wxDefaultSize, 2, l_sChoices, 2, wxRA_SPECIFY_COLS);
 	l_pcRowSizer->Add(m_pcSolverType);
 	m_pcPropertySizer->Add(l_pcRowSizer, 1, wxEXPAND);
 	//
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Simulator")), 1, wxALL | wxEXPAND, 5);
-	m_pcSolver = new wxComboBox(this, SP_ID_COMBOBOX_SOLVER, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Simulator")), 1, wxALL | wxEXPAND, 5);
+	m_pcSolver = new wxComboBox(m_pcPropertyWindowPropertySizer, SP_ID_COMBOBOX_SOLVER, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
 	m_pcSolver->Clear();
 	for (int i = 0; i < 7; i++)
 		m_pcSolver->Append(l_asStiffSolverChoices[i]);
@@ -148,7 +148,7 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 	m_pcSolverType->SetSelection(0);
 	l_pcRowSizer->Add(m_pcSolver, 0, wxALL, 5);
 
-	m_pcSimulationProperites = new wxButton(this, SP_ID_BUTTON_SIMULATION_PROPERTIES, wxT("Properties"));
+	m_pcSimulationProperites = new wxButton(m_pcPropertyWindowPropertySizer, SP_ID_BUTTON_SIMULATION_PROPERTIES, wxT("Properties"));
 	l_pcRowSizer->Add(m_pcSimulationProperites, 0, wxALL
 #if wxCHECK_VERSION(2,8,8)
 			| wxRESERVE_SPACE_EVEN_IF_HIDDEN
@@ -158,14 +158,14 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 	m_pcPropertySizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	l_pcRowSizer = m_pcDirectExportSizer->GetChildren().back()->GetSizer();
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_SAVE_ODE, wxT("Save ODE")), 1, wxALL, 5);
+	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowDirectExportSizer, SP_ID_BUTTON_SAVE_ODE, wxT("Save ODE")), 1, wxALL, 5);
 
 	// simulation Current time
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Simulation current time: ")), 0, wxALL | wxEXPAND, 5);
-	m_pcCurrentSimulationTimeTxtCtrl = new wxStaticText(this, -1, wxT("0,0 units"));
-	l_pcRowSizer->Add(m_pcCurrentSimulationTimeTxtCtrl, 1, wxALL | wxEXPAND, 5);
-	m_pcSimulationButtonSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND, 5);
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("Current simulation time: ")), 0, wxALL | wxEXPAND, 5);
+	m_pcCurrentSimulationTimeTxtCtrl = new wxStaticText(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("0,0 units"));
+	l_pcRowSizer->Add(m_pcCurrentSimulationTimeTxtCtrl, 0, wxALL | wxEXPAND, 5);
+	m_pcSimulationButtonSizer->Add(l_pcRowSizer, 0, wxALL | wxEXPAND, 5);
 
 	//At the end call this function for alignment
 	SetSizerAndFit(m_pcMainSizer);
