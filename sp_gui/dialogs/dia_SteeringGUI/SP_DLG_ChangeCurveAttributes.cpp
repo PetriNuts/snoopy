@@ -62,7 +62,7 @@ wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 		  l_pcRowSizer->Add(m_pcLineStyleBox,1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 		  l_pcTopSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
-		  m_pcLineStyleBox->Append(wxT("Sold"));
+		  m_pcLineStyleBox->Append(wxT("Solid"));
 		  m_pcLineStyleBox->Append(wxT("Dot"));
 		  m_pcLineStyleBox->Append(wxT("Long Dash"));
 		  m_pcLineStyleBox->Append(wxT("Short Dash"));
