@@ -57,9 +57,7 @@ class SP_DLG_Simulation: public SP_DLG_BaseSimulation
 protected:
 	// Current Graph
 	SP_DS_Graph* m_pcGraph;
-#ifdef __WXGTK__
 	wxWindowDisabler m_DisableOtherWindows;
-#endif
 	long m_nRefreshRate;
 
 	//New Simulator

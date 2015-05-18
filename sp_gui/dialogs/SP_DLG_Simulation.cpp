@@ -145,9 +145,6 @@ SP_DLG_Simulation::SP_DLG_Simulation(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParen
 //		wxDialog(p_pcParent, -1, p_sTitle, wxPoint(20, 20), wxSize(800, 750), p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
 		SP_DLG_BaseSimulation(p_pcParent, p_sHelpText, p_sTitle, p_nStyle),
 		m_pcGraph(p_pcGraph),
-#ifdef __WXGTK__
-   		m_DisableOtherWindows(p_pcParent),
-#endif
         m_nRefreshRate(5000),
         m_nResultPointCount(0),
         m_sExportFilename(p_pcGraph->GetParentDoc()->GetFilename()),
@@ -510,7 +507,7 @@ void SP_DLG_Simulation :: OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent) {
 
 	SP_DS_Metadata* l_pcView;
 
-	for (int i = 0; i < (int)tmp; i++) {
+	for (size_t i = 0; i < tmp; ++i) {
 		// get a pointer to the view
 		l_pcView = FindView(m_pcListboxShowAllGraphViewName->GetString(currentSelections[i]));
 		ChangeCurrentView(l_pcView);
