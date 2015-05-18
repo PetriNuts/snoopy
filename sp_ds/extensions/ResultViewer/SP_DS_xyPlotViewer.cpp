@@ -62,7 +62,7 @@ SP_DS_xyPlotViewer::SP_DS_xyPlotViewer(wxWindow* p_pcParent,wxSizer* p_pcSizer)
 
 		  //Line styles
 		  l_pcAttribute=new SP_DS_ViewerAttributeList(wxT("LINE_STYLE"),wxT("Curves"),wxT("Line style"));
-		  l_pcAttribute->AddToPossibleValues(wxT("Sold"));
+		  l_pcAttribute->AddToPossibleValues(wxT("Solid"));
 		  l_pcAttribute->AddToPossibleValues(wxT("Dot"));
 		  l_pcAttribute->AddToPossibleValues(wxT("Long Dash"));
 		  l_pcAttribute->AddToPossibleValues(wxT("Short Dash"));
