@@ -143,6 +143,7 @@ public:
     void OnCopy(wxCommandEvent& p_cEvent);
     void OnPaste(wxCommandEvent& p_cEvent);
     void OnToggleAnim(wxCommandEvent& p_cEvent);
+    void DoToggleAnim(bool p_bEnable);
 
     //by sl
     void OnToggleMarking(wxCommandEvent& p_cEvent);

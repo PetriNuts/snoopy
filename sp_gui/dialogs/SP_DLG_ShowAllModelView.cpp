@@ -217,6 +217,8 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metada
 	temp.SetWidth(l_ChartWidth + 246);
 
 	this->SetSize(temp);
+
+	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnClose, this, wxID_CANCEL);
 }
 
 SP_DLG_ShowAllModelView::~SP_DLG_ShowAllModelView()

@@ -125,11 +125,7 @@ EVT_BUTTON( SP_ID_BUTTON_LOAD_DATA, SP_DLG_Simulation :: OnLoadData )
 EVT_BUTTON( SP_ID_PRINT, SP_DLG_Simulation :: OnPrint )
 
 
-EVT_CLOSE(SP_DLG_Simulation::OnCloseWindow)
-
 EVT_TIMER( SP_ID_TIMER_UPDATE_DIALOG, SP_DLG_Simulation :: OnTimer)
-
-EVT_INIT_DIALOG(SP_DLG_Simulation::OnInitDialog)
 
 //EVT_COLLAPSIBLEPANE_CHANGED(SP_ID_COLLAPSEPANEL_PROPERTY_SIZER, SP_DLG_Simulation :: OnCollapsePropertySizer)
 EVT_COLLAPSIBLEPANE_CHANGED(SP_ID_COLLAPSEPANEL_SETS_SIZER, SP_DLG_Simulation :: OnCollapseSetsSizer)
@@ -171,9 +167,11 @@ SP_DLG_Simulation::SP_DLG_Simulation(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParen
     m_pcXAxisChoices[wxT("Transition")] = &m_asTransitionNames;
 
     m_pcTimer = new wxTimer(this, SP_ID_TIMER_UPDATE_DIALOG);
- //   ScrollWindow(0, 1000);
+    //ScrollWindow(0, 1000);
     //give the simulator a pointer to Snoopy log
     spsim::Simulator::SetLogFunction(SimulatorLogFunction);
+
+    Bind(wxEVT_CLOSE_WINDOW, &SP_DLG_Simulation::OnCloseWindow, this);
 }
 
 void SP_DLG_Simulation::OnInitDialog(wxInitDialogEvent& event)
@@ -928,8 +926,6 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
     SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(p_pcView->GetAttribute(wxT("CurveInfo")));
     CHECK_POINTER(l_pcCurveInfoList, return false);
 
-    wxString l_RegExString = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
-    wxRegEx l_RegEx;
     m_ArrayUnPlaces.Clear();
 	m_ArrayUnTranstions.Clear();
 	for (unsigned int i = 0; i < m_asPlaceNames.size(); i++) {
@@ -939,6 +935,12 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
 		m_ArrayUnTranstions.Add(m_asTransitionNames[i]);
 	}
 
+    wxString l_RegExString;
+    SP_DS_Attribute* l_RegExAttr = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"));
+    if(l_RegExAttr)
+    {
+    	l_RegExString = l_RegExAttr->GetValueString();
+    }
     if (l_RegExString == wxT("")) {
     	for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
 		{
@@ -987,6 +989,7 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
     } else {
 
 //		SP_LOGMESSAGE(wxT("simulation LoadviewerData"));
+        wxRegEx l_RegEx;
 		if (l_RegEx.Compile(l_RegExString, wxRE_DEFAULT)) {
 			if (l_sElementType.IsSameAs(wxT("Place"))) {
 				unsigned l_sPosition = 0;
@@ -1624,9 +1627,9 @@ void SP_DLG_Simulation::OnDlgCancel(wxCommandEvent& p_cEvent)
     //ask the user if he wants to close the external windows
     if (m_pcExternalWindows.size() != 0)
     {
-        int l_nAnswer = SP_MESSAGEBOX(wxT("Would you like to close external view windows?"), wxT("Questions"), wxYES_NO, this);
+        //int l_nAnswer = SP_MESSAGEBOX(wxT("Would you like to close external view windows?"), wxT("Questions"), wxYES_NO, this);
 
-        if (l_nAnswer == wxYES)
+        //if (l_nAnswer == wxYES)
         {
             std::list<wxWindow*>::iterator l_itWindow;
 
@@ -1655,8 +1658,9 @@ void SP_DLG_Simulation::OnDlgCancel(wxCommandEvent& p_cEvent)
 
 void SP_DLG_Simulation::OnCloseWindow(wxCloseEvent& p_cEvent)
 {
-	Destroy();  // you may also do:  event.Skip();
+	//Destroy();  // you may also do:  event.Skip();
                 // since the default event handler does call Destroy(), too
+	p_cEvent.Skip();
 }
 
 void SP_DLG_Simulation::OnDirectExportProperties(wxCommandEvent& p_cEvent)

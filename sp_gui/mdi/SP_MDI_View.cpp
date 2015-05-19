@@ -1380,6 +1380,11 @@ void SP_MDI_View::OnUnHide(wxCommandEvent& p_cEvent)
 
 void SP_MDI_View::OnToggleAnim(wxCommandEvent& p_cEvent)
 {
+	DoToggleAnim(p_cEvent.IsChecked());
+}
+
+void SP_MDI_View::DoToggleAnim(bool p_bEnable)
+{
 	if (!GetDocument())
 		return;
 
@@ -1394,7 +1399,7 @@ void SP_MDI_View::OnToggleAnim(wxCommandEvent& p_cEvent)
 		if (l_pcGraph)
 		{
 			l_pcGraph->SqueezeIdAttributes();
-			l_pcGraph->OnToggleAnim(p_cEvent.IsChecked());
+			l_pcGraph->OnToggleAnim(p_bEnable);
 		}
 
 		l_pcNode = l_pcNode->GetNext();
@@ -1880,7 +1885,6 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 			l_pcDlg = new SP_DLG_HybridSimulationResults( l_pcGraph, m_pcCanvas );
 		}
 
-	
 		if(l_pcDlg != NULL)
 		{
 			l_pcDlg->Show();

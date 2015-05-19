@@ -6,6 +6,7 @@
 #include "sp_gui/dialogs/SP_DLG_BaseSimulation.h"
 #include "sp_ds/SP_DS_Graph.h"
 
+
 IMPLEMENT_CLASS(SP_DLG_BaseSimulation, wxDialog )
 
 enum
@@ -14,15 +15,15 @@ enum
 };
 
 BEGIN_EVENT_TABLE( SP_DLG_BaseSimulation, wxDialog )
-
-EVT_COLLAPSIBLEPANE_CHANGED(SP_ID_COLLAPSEPANEL_PROPERTY_SIZER, SP_DLG_BaseSimulation :: OnCollapsePropertySizer)
-
 END_EVENT_TABLE()
+
 SP_DLG_BaseSimulation::SP_DLG_BaseSimulation(wxWindow* p_pcParent, wxString p_sHelpText, wxString p_sTitle, long p_nStyle) :
 	wxDialog(p_pcParent, -1, p_sTitle, wxPoint(10, 10), wxSize(800, 800), p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
-
+#ifdef __WXGTK__
+	, m_WindowDisabler(this)
+#endif
 {
-	SP_LOGERROR(wxT("name"));
+	//SP_LOGERROR(wxT("name"));
 	m_pcMainSizer = new wxBoxSizer(wxVERTICAL);
 	m_pcContentSizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -53,6 +54,14 @@ SP_DLG_BaseSimulation::SP_DLG_BaseSimulation(wxWindow* p_pcParent, wxString p_sH
 
 
 	SetSizerAndFit(m_pcMainSizer);
+
+	Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, &SP_DLG_BaseSimulation::OnCollapsePropertySizer, this, SP_ID_COLLAPSEPANEL_PROPERTY_SIZER);
+	Bind(wxEVT_INIT_DIALOG, &SP_DLG_BaseSimulation::OnInitDialog, this);
+
+}
+
+SP_DLG_BaseSimulation::~SP_DLG_BaseSimulation()
+{
 }
 
 void SP_DLG_BaseSimulation::OnCollapsePropertySizer(wxCollapsiblePaneEvent& event) {
@@ -62,8 +71,3 @@ void SP_DLG_BaseSimulation::OnCollapsePropertySizer(wxCollapsiblePaneEvent& even
 	this->SetSize(temp);
 }
 
-void SP_DLG_BaseSimulation::OnInitDialog(wxInitDialogEvent& event)
-{
-    SP_LOGMESSAGE("open a new dialog");
-
-}

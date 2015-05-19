@@ -27,8 +27,9 @@ private:
 	DECLARE_CLASS( SP_DLG_BaseSimulation )
 
 protected:
+
 #ifdef __WXGTK__
-	wxWindowDisabler m_DisableOtherWindows;
+	wxWindowDisabler m_WindowDisabler;
 #endif
 	wxBoxSizer* m_pcMainSizer;
 	wxSizer* m_pcSimulationControlSizer;
@@ -59,11 +60,11 @@ protected:
 protected:
 
 	//on initialize dialog
-	virtual void OnInitDialog(wxInitDialogEvent& event);
+	virtual void OnInitDialog(wxInitDialogEvent& event) =0;
 	virtual void OnCollapsePropertySizer(wxCollapsiblePaneEvent& event);
 
 public:
 	SP_DLG_BaseSimulation(wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), wxString p_sTitle = wxT("Simulationsssssss results"), long p_nStyle = wxDEFAULT_DIALOG_STYLE);
-
+	virtual ~SP_DLG_BaseSimulation();
 };
 #endif
