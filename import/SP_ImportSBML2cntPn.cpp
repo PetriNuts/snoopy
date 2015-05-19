@@ -204,7 +204,7 @@ void SP_ImportSBML2cntPn::getReactions ()
 					if (sId == l_eductName)
 					{
 						wxString l_stoichiometry =
-								wxString::Format(wxT("%.0f"),l_sbmlReactant->getStoichiometry());
+								wxString::Format(wxT("%f"),l_sbmlReactant->getStoichiometry());
 						drawEdge(l_pcNode, l_reactionNode,SP_DS_EDGE,l_stoichiometry);
 						if(l_sbmlReactant->isSetConstant())
 						{
@@ -221,7 +221,7 @@ void SP_ImportSBML2cntPn::getReactions ()
 					if (sId == l_productName)
 					{
 						wxString l_stoichiometry =
-								wxString::Format(wxT("%.0f"),l_sbmlProduct->getStoichiometry());
+								wxString::Format(wxT("%f"),l_sbmlProduct->getStoichiometry());
 						drawEdge(l_reactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
 						if(l_sbmlProduct->isSetConstant())
 						{
