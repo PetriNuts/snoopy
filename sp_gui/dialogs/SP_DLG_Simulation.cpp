@@ -319,25 +319,28 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	m_pcPropertyWindowPropertySizer = m_pcCollpanePropertySizer->GetPane();*/
 
     l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Interval start:")), 1, wxALL | wxEXPAND, 5);
+    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Interval start:")),
+    					wxSizerFlags(1).Expand().Border(wxALL, 2));
     l_pcAttr = l_pcSimProp->GetAttribute(wxT("interval start"));
     m_pcIntervalStartTextCtrl = new wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, l_pcAttr->GetValueString(), wxDefaultPosition, wxDefaultSize, 0);
-    l_pcRowSizer->Add(m_pcIntervalStartTextCtrl, 0, wxALL, 5);
-    m_pcPropertySizer->Add(l_pcRowSizer, 1, wxEXPAND);
+    l_pcRowSizer->Add(m_pcIntervalStartTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
+    m_pcPropertySizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
     l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Interval end:")), 1, wxALL | wxEXPAND, 5);
+    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Interval end:")),
+    					wxSizerFlags(1).Expand().Border(wxALL, 2));
     l_pcAttr = l_pcSimProp->GetAttribute(wxT("interval end"));
     m_pcIntervalEndTextCtrl = new wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, l_pcAttr->GetValueString(), wxDefaultPosition, wxDefaultSize, 0);
-    l_pcRowSizer->Add(m_pcIntervalEndTextCtrl, 0, wxALL, 5);
-    m_pcPropertySizer->Add(l_pcRowSizer, 1, wxEXPAND);
+    l_pcRowSizer->Add(m_pcIntervalEndTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
+    m_pcPropertySizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
     l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Interval Splitting:")), 1, wxALL | wxEXPAND, 5);
+    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Interval Splitting:")),
+    					wxSizerFlags(1).Expand().Border(wxALL, 2));
     l_pcAttr = l_pcSimProp->GetAttribute(wxT("output step"));
     m_pcResultPointCountTextCtrl = new wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, l_pcAttr->GetValueString(), wxDefaultPosition, wxDefaultSize, 0);
-    l_pcRowSizer->Add(m_pcResultPointCountTextCtrl, 0, wxALL, 5);
-    m_pcPropertySizer->Add(l_pcRowSizer, 1, wxEXPAND);
+    l_pcRowSizer->Add(m_pcResultPointCountTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
+    m_pcPropertySizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 	/*m_pcPropertyWindowPropertySizer->SetSizerAndFit(m_pcPropertySizer);
 	m_pcPropertySizer->SetSizeHints(m_pcPropertyWindowPropertySizer);
 	m_pcSimulationControlSizer->Add(m_pcCollpanePropertySizer, 0, wxALL | wxEXPAND, 5);*/
@@ -351,19 +354,21 @@ void SP_DLG_Simulation::SetMinimalLayout()
     l_pcRowSizer = new wxBoxSizer(wxVERTICAL);
     m_pcNoExportRadioButton = new wxRadioButton(m_pcPropertyWindowDirectExportSizer, -1, wxT("No export"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
     m_pcNoExportRadioButton->SetValue(true);
-    l_pcRowSizer->Add(m_pcNoExportRadioButton, 1, wxALL, 5);
+    l_pcRowSizer->Add(m_pcNoExportRadioButton, wxSizerFlags(0).Border(wxALL, 5));
     m_pcDirectExportRadioButton = new wxRadioButton(m_pcPropertyWindowDirectExportSizer, -1, wxT("Direct export"), wxDefaultPosition, wxDefaultSize, 0);
-    l_pcRowSizer->Add(m_pcDirectExportRadioButton, 1, wxALL, 5);
+    l_pcRowSizer->Add(m_pcDirectExportRadioButton, wxSizerFlags(0).Border(wxALL, 5));
     m_pcDirectExportSizer->Add(l_pcRowSizer);
 
     l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowDirectExportSizer, SP_ID_BUTTON_DIRECT_EXPORT_PROPERTIES, wxT("Properties")), 1, wxALL, 5);
-    l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowDirectExportSizer, SP_ID_BUTTON_LOAD_DATA, wxT("Load Data")), 1, wxALL, 5);
+    l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowDirectExportSizer, SP_ID_BUTTON_DIRECT_EXPORT_PROPERTIES, wxT("Properties")),
+    					wxSizerFlags(0).Border(wxALL, 5));
+    l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowDirectExportSizer, SP_ID_BUTTON_LOAD_DATA, wxT("Load Data")),
+    					wxSizerFlags(0).Border(wxALL, 5));
     m_pcDirectExportSizer->Add(l_pcRowSizer);
 
 	m_pcPropertyWindowDirectExportSizer->SetSizerAndFit(m_pcDirectExportSizer);
 	m_pcDirectExportSizer->SetSizeHints(m_pcPropertyWindowDirectExportSizer);
-	m_pcSimulationControlSizer->Add(m_pcCollpaneDirectExportSizer, 0, wxALL | wxEXPAND, 5);
+	m_pcSimulationControlSizer->Add(m_pcCollpaneDirectExportSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 	m_pcOutputViewerType = new wxComboBox(m_pcPropertyWindowPropertySizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
 	m_pcOutputViewerType->Hide();
@@ -376,34 +381,38 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	// rows of control button#
 	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("Views")), wxVERTICAL);
 	m_pcListboxShowAllGraphViewName = new wxListBox(m_pcPropertyWindowSimulationButtonSizer, -1, wxDefaultPosition, wxSize(-1, 125), 0, NULL, wxLB_MULTIPLE | wxLB_EXTENDED | wxLB_HSCROLL);
-	l_pcRowSizer->Add(m_pcListboxShowAllGraphViewName, 1, wxALL | wxEXPAND, 5);
+	l_pcRowSizer->Add(m_pcListboxShowAllGraphViewName, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
 	wxSizer *l_pctemp = new wxBoxSizer(wxHORIZONTAL);
-	l_pctemp->Add(new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_SHOW_SELECTED_VIEWS, wxT("Show Selected Views")), 0, wxALL, 2);
-	l_pctemp->Add(new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_SHOW_ALL_VIEWS, wxT("Show All")), 0, wxALL, 2);
-	l_pcRowSizer->Add(l_pctemp, 0, wxALL, 2);
+	l_pctemp->Add(new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_SHOW_SELECTED_VIEWS, wxT("Show Selected Views")),
+					wxSizerFlags(0).Border(wxALL, 2));
+	l_pctemp->Add(new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_SHOW_ALL_VIEWS, wxT("Show All")),
+					wxSizerFlags(0).Border(wxALL, 2));
+	l_pcRowSizer->Add(l_pctemp, wxSizerFlags(0).Border(wxALL, 2));
 
 	l_pctemp = new wxBoxSizer(wxHORIZONTAL);
-	l_pctemp->Add(new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_ADD_NEW_VIEW, wxT("Add a New View")), 0, wxALL, 2);
-	l_pctemp->Add(new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_REMOVE_VIEWS, wxT("Remove Views")), 0, wxALL, 2);
-	l_pcRowSizer->Add(l_pctemp, 0, wxALL, 2);
+	l_pctemp->Add(new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_ADD_NEW_VIEW, wxT("Add a New View")),
+					wxSizerFlags(0).Border(wxALL, 2));
+	l_pctemp->Add(new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_REMOVE_VIEWS, wxT("Remove Views")),
+					wxSizerFlags(0).Border(wxALL, 2));
+	l_pcRowSizer->Add(l_pctemp, wxSizerFlags(0).Border(wxALL, 2));
 
-	m_pcSimulationButtonSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND, 5);
+	m_pcSimulationButtonSizer->Add(l_pcRowSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
 	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("")), wxHORIZONTAL);
 	m_pcStartButton = new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_START_SIMULATION, wxT("Start Simulation"));
 	m_pcStartButton->SetBackgroundColour(*wxGREEN);
-	l_pcRowSizer->Add(m_pcStartButton, 0, wxALL, 5);
+	l_pcRowSizer->Add(m_pcStartButton, wxSizerFlags(0).Expand().Border(wxALL, 5));
 	m_pcSimulationProgressGauge = new wxGauge(m_pcPropertyWindowSimulationButtonSizer, -1, 100, wxDefaultPosition, wxDefaultSize, 0);
-	l_pcRowSizer->Add(m_pcSimulationProgressGauge, 0, wxALL, 5);
-	m_pcSimulationButtonSizer->Add(l_pcRowSizer, 0, wxALL, 5);
+	l_pcRowSizer->Add(m_pcSimulationProgressGauge, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	m_pcSimulationButtonSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 	// simulation stop watch
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("Simulation runtime:")), 0, wxALL, 5);
 	m_pcSimulationStopWatch = new wxStaticText(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("0.000 s"));
-	l_pcRowSizer->Add(m_pcSimulationStopWatch, 0, wxALL, 5);
-	m_pcSimulationButtonSizer->Add(l_pcRowSizer, 0, wxALL, 5);
+	l_pcRowSizer->Add(m_pcSimulationStopWatch, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_pcSimulationButtonSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 /*
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("")), 0, wxALL, 5);
@@ -411,9 +420,9 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
 	m_pcPropertyWindowSimulationButtonSizer->SetSizerAndFit(m_pcSimulationButtonSizer);
 	m_pcSimulationButtonSizer->SetSizeHints(m_pcPropertyWindowSimulationButtonSizer);
-	m_pcSimulationControlSizer->Add(m_pcPropertyWindowSimulationButtonSizer, 1, wxALL , 5);
+	m_pcSimulationControlSizer->Add(m_pcPropertyWindowSimulationButtonSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
-	m_pcSimulationControlSizer->Add(new wxButton(this, wxID_CANCEL, wxT("Close")), 0, wxALL, 5);
+	m_pcSimulationControlSizer->Add(new wxButton(this, wxID_CANCEL, wxT("Close")), wxSizerFlags(0).Border(wxALL, 5));
 	//create the viewers
 	InitializeResultViewer();
     SetSizerAndFit(m_pcMainSizer);

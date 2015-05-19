@@ -25,8 +25,11 @@ private:
 
 	DECLARE_EVENT_TABLE();
 	DECLARE_CLASS( SP_DLG_BaseSimulation )
-protected:
 
+protected:
+#ifdef __WXGTK__
+	wxWindowDisabler m_DisableOtherWindows;
+#endif
 	wxBoxSizer* m_pcMainSizer;
 	wxSizer* m_pcSimulationControlSizer;
 	wxSizer* m_pcContentSizer;
