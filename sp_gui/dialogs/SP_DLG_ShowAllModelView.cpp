@@ -64,11 +64,11 @@ END_EVENT_TABLE()
  */
 
 SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metadata* p_pcModelView) :
-		wxFrame(p_pcWnd, -1, wxT("Show all views"), wxPoint(700, 10), wxSize(800, 750),  wxFRAME_FLOAT_ON_PARENT | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | wxCAPTION | wxCLOSE_BOX),
+		wxFrame(p_pcWnd, -1, wxT("Show all views"), wxPoint(700, 10), wxSize(800, 750), wxFRAME_FLOAT_ON_PARENT | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | wxCAPTION | wxCLOSE_BOX),
 		m_pcModelView(p_pcModelView), m_pcParentWnd(p_pcWnd), m_bIsDisconnected(false), m_bIsShown(true)
 {
 	if (m_pcModelView == NULL)
-			return;
+		return;
 	wxSizer* l_pcMainSizer = new wxBoxSizer(wxVERTICAL);
 	m_pcContentSizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -94,8 +94,6 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metada
 	m_pcSelectClearAllChkBox->Set3StateValue(wxCHK_UNDETERMINED);
 	l_pcSelectDeselecteSizer->Add(m_pcSelectClearAllChkBox, 1, wxEXPAND);
 
-
-
 	SP_DS_Attribute* l_pcAttribute = m_pcModelView->GetAttribute(wxT("Name"));
 
 	if (l_pcAttribute == NULL)
@@ -109,30 +107,41 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metada
 	wxString l_RegExOutputType = m_pcModelView->GetAttribute(wxT("RegExOutputType"))->GetValueString();
 	wxString l_sElementType = m_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
 	int l_nSize, l_nSize1 = 0;
-	if (l_sElementType == wxT("Place")) {
-			l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnPlaces.GetCount();
-			if (l_nSize > l_nSize1) l_nSize1 = l_nSize;
-			l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColPlaces.GetCount();
-			if (l_nSize > l_nSize1) l_nSize1 = l_nSize;
-			l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxPlaces.GetCount();
-			if (l_nSize > l_nSize1) l_nSize1 = l_nSize;
-	} else {
-			l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnTranstions.GetCount();
-			if (l_nSize > l_nSize1) l_nSize1 = l_nSize;
-			l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColTranstions.GetCount();
-			if (l_nSize > l_nSize1) l_nSize1 = l_nSize;
-			l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxtranstions.GetCount();
-			if (l_nSize > l_nSize1) l_nSize1 = l_nSize;
+	if (l_sElementType == wxT("Place"))
+	{
+		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnPlaces.GetCount();
+		if (l_nSize > l_nSize1)
+			l_nSize1 = l_nSize;
+		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColPlaces.GetCount();
+		if (l_nSize > l_nSize1)
+			l_nSize1 = l_nSize;
+		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxPlaces.GetCount();
+		if (l_nSize > l_nSize1)
+			l_nSize1 = l_nSize;
+	}
+	else
+	{
+		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnTranstions.GetCount();
+		if (l_nSize > l_nSize1)
+			l_nSize1 = l_nSize;
+		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColTranstions.GetCount();
+		if (l_nSize > l_nSize1)
+			l_nSize1 = l_nSize;
+		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxtranstions.GetCount();
+		if (l_nSize > l_nSize1)
+			l_nSize1 = l_nSize;
 	}
 
-	for (int i = 0; i < l_nSize1; i++) {
+	for (int i = 0; i < l_nSize1; i++)
+	{
 		m_IsSelectedPlace.Add(1);
 		m_PlaceLineStyle.Add(0);
 		m_PlaceLineWidth.Add(2);
 		m_PlaceColor.Add((dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->GetColourString(i));
 	}
 
-	for (int i = 0; i < l_nSize1; i++) {
+	for (int i = 0; i < l_nSize1; i++)
+	{
 		m_IsSelectedTransition.Add(1);
 		m_TransitionLineStyle.Add(0);
 		m_TransitionLineWidth.Add(2);
@@ -196,10 +205,9 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metada
 	l_pcMainSizer->Add(l_pcViewSizer, 0, wxALL, 1);
 	SetSizerAndFit(l_pcMainSizer);
 
-
 	wxSize temp = l_pcMainSizer->GetSize();
-	cout << temp.GetWidth() << " " << temp.GetHeight()<< endl;
-	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
+	cout << temp.GetWidth() << " " << temp.GetHeight() << endl;
+	temp.SetHeight(wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
 
 	wxString temp1 = m_pcModelView->GetAttribute(wxT("ChartWidth"))->GetValueString();
 	long l_ChartWidth = 0;
@@ -208,9 +216,12 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metada
 	wxString temp2 = m_pcModelView->GetAttribute(wxT("ChartHeight"))->GetValueString();
 	long l_ChartHeight = 0;
 	temp2.ToLong(&l_ChartHeight);
-	if (l_ChartHeight <= 633) {
+	if (l_ChartHeight <= 633)
+	{
 		l_ChartHeight += (633 - l_ChartHeight);
-	} else {
+	}
+	else
+	{
 		l_ChartHeight += 33;
 	}
 	temp.SetHeight(l_ChartHeight + 180);
@@ -230,56 +241,78 @@ SP_DLG_ShowAllModelView::~SP_DLG_ShowAllModelView()
 
 }
 
-void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
+void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent)
+{
 	unsigned int l_selection = p_cEvent.GetSelection();
 	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnItemDoubleClick(this, l_selection, m_pcPlaceChoiceCheckListBox->GetCount());
 }
 
-void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
+void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent)
+{
 	unsigned int l_selection = p_cEvent.GetSelection();
 	wxString l_RegExString = m_pcModelView->GetAttribute(wxT("RegEx"))->GetValueString();
-	if (l_RegExString != wxT("")) {
+	if (l_RegExString != wxT(""))
+	{
 		wxString l_sElementType = m_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
-		if (l_sElementType.IsSameAs(wxT("Place"))) {
+		if (l_sElementType.IsSameAs(wxT("Place")))
+		{
 			m_IsSelectedPlace[l_selection] = 1 - m_IsSelectedPlace[l_selection];
-		} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
-			m_IsSelectedTransition[l_selection] = 1 - m_IsSelectedTransition[l_selection];
 		}
+		else
+			if (l_sElementType.IsSameAs(wxT("Transition")))
+			{
+				m_IsSelectedTransition[l_selection] = 1 - m_IsSelectedTransition[l_selection];
+			}
 	}
 	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnItemCheckUncheck(l_selection, m_pcPlaceChoiceCheckListBox->IsChecked(l_selection));
 }
 
-void SP_DLG_ShowAllModelView::OnSelectClearAllItems(wxCommandEvent& p_cEvent) {
-	if (m_pcSelectClearAllChkBox->IsChecked()) {
+void SP_DLG_ShowAllModelView::OnSelectClearAllItems(wxCommandEvent& p_cEvent)
+{
+	if (m_pcSelectClearAllChkBox->IsChecked())
+	{
 		wxString l_RegExString = m_pcModelView->GetAttribute(wxT("RegEx"))->GetValueString();
-		if (l_RegExString != wxT("")) {
+		if (l_RegExString != wxT(""))
+		{
 			wxString l_sElementType = m_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
-			if (l_sElementType.IsSameAs(wxT("Place"))) {
+			if (l_sElementType.IsSameAs(wxT("Place")))
+			{
 				for (unsigned int i = 0; i < m_IsSelectedPlace.GetCount(); i++)
 					m_IsSelectedPlace[i] = 1;
-			} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
-				for (unsigned int i = 0; i < m_IsSelectedTransition.GetCount(); i++)
-					m_IsSelectedTransition[i] = 1;
 			}
+			else
+				if (l_sElementType.IsSameAs(wxT("Transition")))
+				{
+					for (unsigned int i = 0; i < m_IsSelectedTransition.GetCount(); i++)
+						m_IsSelectedTransition[i] = 1;
+				}
 		}
 		(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnClearPlaceList(true);
-	} else {
+	}
+	else
+	{
 		wxString l_RegExString = m_pcModelView->GetAttribute(wxT("RegEx"))->GetValueString();
-		if (l_RegExString != wxT("")) {
+		if (l_RegExString != wxT(""))
+		{
 			wxString l_sElementType = m_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
-			if (l_sElementType.IsSameAs(wxT("Place"))) {
+			if (l_sElementType.IsSameAs(wxT("Place")))
+			{
 				for (unsigned int i = 0; i < m_IsSelectedPlace.GetCount(); i++)
 					m_IsSelectedPlace[i] = 0;
-			} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
-				for (unsigned int i = 0; i < m_IsSelectedTransition.GetCount(); i++)
-					m_IsSelectedTransition[i] = 0;
 			}
+			else
+				if (l_sElementType.IsSameAs(wxT("Transition")))
+				{
+					for (unsigned int i = 0; i < m_IsSelectedTransition.GetCount(); i++)
+						m_IsSelectedTransition[i] = 0;
+				}
 		}
 		(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnClearPlaceList(false);
 	}
 }
 
-void SP_DLG_ShowAllModelView::OnEditViewerProperties(wxCommandEvent& p_cEvent) {
+void SP_DLG_ShowAllModelView::OnEditViewerProperties(wxCommandEvent& p_cEvent)
+{
 	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnEditViewerTypeProperties(this);
 
 	wxSize temp;
@@ -291,9 +324,12 @@ void SP_DLG_ShowAllModelView::OnEditViewerProperties(wxCommandEvent& p_cEvent) {
 	long l_ChartHeight = 0;
 	temp2.ToLong(&l_ChartHeight);
 
-	if (l_ChartHeight <= 633) {
+	if (l_ChartHeight <= 633)
+	{
 		l_ChartHeight += (633 - l_ChartHeight);
-	} else {
+	}
+	else
+	{
 		l_ChartHeight += 33;
 	}
 	temp.SetHeight(l_ChartHeight + 180);
@@ -302,28 +338,40 @@ void SP_DLG_ShowAllModelView::OnEditViewerProperties(wxCommandEvent& p_cEvent) {
 	this->SetSize(temp);
 }
 
-void SP_DLG_ShowAllModelView::OnChangeResultViewer(wxCommandEvent& event) {
+void SP_DLG_ShowAllModelView::OnChangeResultViewer(wxCommandEvent& event)
+{
 	unsigned int l_nLocation = m_pcOutputViewerType->GetSelection();
-	if (m_pcOutputViewerType->GetStringSelection() == wxT("Tabular")) {
+	if (m_pcOutputViewerType->GetStringSelection() == wxT("Tabular"))
+	{
 		m_pcOutputExportType->Delete(1);
 		m_pcXAxis->Enable(false);
 		m_pcOutputExportType->SetSelection(0);
-	} else if (m_pcOutputViewerType->GetStringSelection() == wxT("xyPlot")) {
-		m_pcXAxis->Enable(true);
-		if (m_pcOutputExportType->GetCount() != 2) {
-			m_pcOutputExportType->Append(wxT("Image Export"));
-		}
-	} else if (m_pcOutputViewerType->GetStringSelection() == wxT("Histogram")) {
-		if (m_pcOutputExportType->GetCount() != 2) {
-			m_pcOutputExportType->Append(wxT("Image Export"));
-		}
-		m_pcXAxis->Enable(false);
 	}
+	else
+		if (m_pcOutputViewerType->GetStringSelection() == wxT("xyPlot"))
+		{
+			m_pcXAxis->Enable(true);
+			if (m_pcOutputExportType->GetCount() != 2)
+			{
+				m_pcOutputExportType->Append(wxT("Image Export"));
+			}
+		}
+		else
+			if (m_pcOutputViewerType->GetStringSelection() == wxT("Histogram"))
+			{
+				if (m_pcOutputExportType->GetCount() != 2)
+				{
+					m_pcOutputExportType->Append(wxT("Image Export"));
+				}
+				m_pcXAxis->Enable(false);
+			}
 	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnChangingResultViewer(l_nLocation);
 }
 
-void SP_DLG_ShowAllModelView::OnExportClick(wxCommandEvent& event) {
-	if (m_pcOutputExportType->GetSelection() == 1) {
+void SP_DLG_ShowAllModelView::OnExportClick(wxCommandEvent& event)
+{
+	if (m_pcOutputExportType->GetSelection() == 1)
+	{
 		CHECK_POINTER(m_pcResultViewer, return);
 
 		CHECK_POINTER(m_pcModelView, return);
@@ -355,26 +403,34 @@ void SP_DLG_ShowAllModelView::OnExportClick(wxCommandEvent& event) {
 
 			l_pcSaveDlg->Destroy();
 		}
-	} else {
+	}
+	else
+	{
 		(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnExportClicked(this, m_pcOutputExportType->GetSelection());
 
 	}
 }
 
-void SP_DLG_ShowAllModelView::OnChangeXAxis(wxCommandEvent& event) {
+void SP_DLG_ShowAllModelView::OnChangeXAxis(wxCommandEvent& event)
+{
 	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnEditXAxis(this);
 }
 
-void SP_DLG_ShowAllModelView::OnEditNodeList(wxCommandEvent& event) {
+void SP_DLG_ShowAllModelView::OnEditNodeList(wxCommandEvent& event)
+{
 	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnEditOtherNodeList(this);
 }
 
-void SP_DLG_ShowAllModelView::OnShowHideNodeList(wxCommandEvent& event) {
+void SP_DLG_ShowAllModelView::OnShowHideNodeList(wxCommandEvent& event)
+{
 	m_bIsShown = !m_bIsShown;
-	if (m_bIsShown) {
+	if (m_bIsShown)
+	{
 		m_pcRightSizer->Show(true);
 		m_pcShowHideButton->SetLabel("Hide Node List");
-	} else {
+	}
+	else
+	{
 		m_pcRightSizer->Show(false);
 		m_pcShowHideButton->SetLabel("Show Node List");
 	}
@@ -396,69 +452,36 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 	wxString l_RegExString = p_pcModelView->GetAttribute(wxT("RegEx"))->GetValueString();
 	wxRegEx l_RegEx;
 
-	if (l_RegExString == wxT("")) {
+	if (l_RegExString == wxT(""))
+	{
 		for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
 		{
 			m_pcPlaceChoiceCheckListBox->Insert(l_pcCurveInfoList->GetCell(l_nRow, 6), m_pcPlaceChoiceCheckListBox->GetCount());
 			//show selected curves
 			LoadCurveSetting(p_pcResultViewer, l_pcCurveInfoList, l_nRow);
 		}
-	} else {
+	}
+	else
+	{
 		wxString l_RegExOutputType = m_pcModelView->GetAttribute(wxT("RegExOutputType"))->GetValueString();
-		if(l_RegEx.Compile(l_RegExString, wxRE_DEFAULT)) {
+		if (l_RegEx.Compile(l_RegExString, wxRE_DEFAULT))
+		{
 			wxArrayString l_ArrayPlaces, l_ArrayTranstions;
 
 			m_pcPlaceChoiceCheckListBox->Clear();
 			wxString l_sElementType = p_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
 			int l_nCurve = 0;
-			if (l_sElementType.IsSameAs(wxT("Place"))) {
-			//	SP_LOGMESSAGE("place");
-				if (l_RegExOutputType == wxT("Unfolded")) {
+			if (l_sElementType.IsSameAs(wxT("Place")))
+			{
+				//	SP_LOGMESSAGE("place");
+				if (l_RegExOutputType == wxT("Unfolded"))
+				{
 					l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnPlaces;
 					for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 					{
 						wxString l_sName = l_ArrayPlaces[l_nRow];
-						if (l_RegEx.Matches(l_sName)) {
-							m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
-							int l_nSelected = m_IsSelectedPlace[l_nCurve];
-
-							bool l_bIsSelected = l_nSelected > 0 ? true : false;
-							p_pcResultViewer->ShowCurve(l_nCurve, l_bIsSelected);
-							m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
-
-							p_pcResultViewer->SetCurveColor(l_nCurve, m_PlaceColor[l_nCurve]);
-							p_pcResultViewer->SetCurveLineWidth(l_nCurve, m_PlaceLineWidth[l_nCurve]);
-							p_pcResultViewer->SetCurveLineStyle(l_nCurve, m_PlaceLineStyle[l_nCurve]);
-							l_nCurve++;
-						}
-					}
-				} else if (l_RegExOutputType == wxT("Colored")) {
-					l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColPlaces;
-					for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
-					{
-
-						wxString l_sName = l_ArrayPlaces[l_nRow];
-						if (l_RegEx.Matches(l_sName)) {
-							m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
-							int l_nSelected = m_IsSelectedPlace[l_nCurve];
-
-							bool l_bIsSelected = l_nSelected > 0 ? true : false;
-							p_pcResultViewer->ShowCurve(l_nCurve, l_bIsSelected);
-							m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
-
-							p_pcResultViewer->SetCurveColor(l_nCurve, m_PlaceColor[l_nCurve]);
-							p_pcResultViewer->SetCurveLineWidth(l_nCurve, m_PlaceLineWidth[l_nCurve]);
-							p_pcResultViewer->SetCurveLineStyle(l_nCurve, m_PlaceLineStyle[l_nCurve]);
-							l_nCurve++;
-						}
-					}
-				} else {
-					l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxPlaces;
-					for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
-					{
-
-						wxString l_sName = l_ArrayPlaces[l_nRow];
-						if (l_RegEx.Matches(l_sName)) {
+						if (l_RegEx.Matches(l_sName))
+						{
 							m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
 							int l_nSelected = m_IsSelectedPlace[l_nCurve];
 
@@ -473,69 +496,128 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 						}
 					}
 				}
-
-			} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
-			//	SP_LOGMESSAGE("transition");
-				l_nCurve = 0;
-				if (l_RegExOutputType == wxT("Unfolded")) {
-					l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnTranstions;
-					for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
+				else
+					if (l_RegExOutputType == wxT("Colored"))
 					{
-						wxString l_sName = l_ArrayTranstions[l_nRow];
-						if (l_RegEx.Matches(l_sName)) {
-							m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
-							int l_nSelected = m_IsSelectedTransition[l_nCurve];
+						l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColPlaces;
+						for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
+						{
 
-							bool l_bIsSelected = l_nSelected > 0 ? true : false;
-							p_pcResultViewer->ShowCurve(l_nCurve, l_bIsSelected);
-							m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
+							wxString l_sName = l_ArrayPlaces[l_nRow];
+							if (l_RegEx.Matches(l_sName))
+							{
+								m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
+								int l_nSelected = m_IsSelectedPlace[l_nCurve];
 
-							p_pcResultViewer->SetCurveColor(l_nCurve, m_TransitionColor[l_nCurve]);
-							p_pcResultViewer->SetCurveLineWidth(l_nCurve, m_TransitionLineWidth[l_nCurve]);
-							p_pcResultViewer->SetCurveLineStyle(l_nCurve, m_TransitionLineStyle[l_nCurve]);
-							l_nCurve++;
+								bool l_bIsSelected = l_nSelected > 0 ? true : false;
+								p_pcResultViewer->ShowCurve(l_nCurve, l_bIsSelected);
+								m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
+
+								p_pcResultViewer->SetCurveColor(l_nCurve, m_PlaceColor[l_nCurve]);
+								p_pcResultViewer->SetCurveLineWidth(l_nCurve, m_PlaceLineWidth[l_nCurve]);
+								p_pcResultViewer->SetCurveLineStyle(l_nCurve, m_PlaceLineStyle[l_nCurve]);
+								l_nCurve++;
+							}
 						}
 					}
-				} else if (l_RegExOutputType == wxT("Unfolded")) {
-					l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColTranstions;
-					for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
+					else
 					{
-						wxString l_sName = l_ArrayTranstions[l_nRow];
-						if (l_RegEx.Matches(l_sName)) {
-							m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
-							int l_nSelected = m_IsSelectedTransition[l_nCurve];
+						l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxPlaces;
+						for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
+						{
 
-							bool l_bIsSelected = l_nSelected > 0 ? true : false;
-							p_pcResultViewer->ShowCurve(l_nCurve, l_bIsSelected);
-							m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
+							wxString l_sName = l_ArrayPlaces[l_nRow];
+							if (l_RegEx.Matches(l_sName))
+							{
+								m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
+								int l_nSelected = m_IsSelectedPlace[l_nCurve];
 
-							p_pcResultViewer->SetCurveColor(l_nCurve, m_TransitionColor[l_nCurve]);
-							p_pcResultViewer->SetCurveLineWidth(l_nCurve, m_TransitionLineWidth[l_nCurve]);
-							p_pcResultViewer->SetCurveLineStyle(l_nCurve, m_TransitionLineStyle[l_nCurve]);
-							l_nCurve++;
+								bool l_bIsSelected = l_nSelected > 0 ? true : false;
+								p_pcResultViewer->ShowCurve(l_nCurve, l_bIsSelected);
+								m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
+
+								p_pcResultViewer->SetCurveColor(l_nCurve, m_PlaceColor[l_nCurve]);
+								p_pcResultViewer->SetCurveLineWidth(l_nCurve, m_PlaceLineWidth[l_nCurve]);
+								p_pcResultViewer->SetCurveLineStyle(l_nCurve, m_PlaceLineStyle[l_nCurve]);
+								l_nCurve++;
+							}
 						}
 					}
-				} else {
-					l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxtranstions;
-					for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
-					{
-						wxString l_sName = l_ArrayTranstions[l_nRow];
-						if (l_RegEx.Matches(l_sName)) {
-							m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
-							int l_nSelected = m_IsSelectedTransition[l_nCurve];
 
-							bool l_bIsSelected = l_nSelected > 0 ? true : false;
-							p_pcResultViewer->ShowCurve(l_nCurve, l_bIsSelected);
-							m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
-
-							p_pcResultViewer->SetCurveColor(l_nCurve, m_TransitionColor[l_nCurve]);
-							p_pcResultViewer->SetCurveLineWidth(l_nCurve, m_TransitionLineWidth[l_nCurve]);
-							p_pcResultViewer->SetCurveLineStyle(l_nCurve, m_TransitionLineStyle[l_nCurve]);
-							l_nCurve++;
-						}
-					}
-				}
 			}
+			else
+				if (l_sElementType.IsSameAs(wxT("Transition")))
+				{
+					//	SP_LOGMESSAGE("transition");
+					l_nCurve = 0;
+					if (l_RegExOutputType == wxT("Unfolded"))
+					{
+						l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnTranstions;
+						for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
+						{
+							wxString l_sName = l_ArrayTranstions[l_nRow];
+							if (l_RegEx.Matches(l_sName))
+							{
+								m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
+								int l_nSelected = m_IsSelectedTransition[l_nCurve];
+
+								bool l_bIsSelected = l_nSelected > 0 ? true : false;
+								p_pcResultViewer->ShowCurve(l_nCurve, l_bIsSelected);
+								m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
+
+								p_pcResultViewer->SetCurveColor(l_nCurve, m_TransitionColor[l_nCurve]);
+								p_pcResultViewer->SetCurveLineWidth(l_nCurve, m_TransitionLineWidth[l_nCurve]);
+								p_pcResultViewer->SetCurveLineStyle(l_nCurve, m_TransitionLineStyle[l_nCurve]);
+								l_nCurve++;
+							}
+						}
+					}
+					else
+						if (l_RegExOutputType == wxT("Unfolded"))
+						{
+							l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColTranstions;
+							for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
+							{
+								wxString l_sName = l_ArrayTranstions[l_nRow];
+								if (l_RegEx.Matches(l_sName))
+								{
+									m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
+									int l_nSelected = m_IsSelectedTransition[l_nCurve];
+
+									bool l_bIsSelected = l_nSelected > 0 ? true : false;
+									p_pcResultViewer->ShowCurve(l_nCurve, l_bIsSelected);
+									m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
+
+									p_pcResultViewer->SetCurveColor(l_nCurve, m_TransitionColor[l_nCurve]);
+									p_pcResultViewer->SetCurveLineWidth(l_nCurve, m_TransitionLineWidth[l_nCurve]);
+									p_pcResultViewer->SetCurveLineStyle(l_nCurve, m_TransitionLineStyle[l_nCurve]);
+									l_nCurve++;
+								}
+							}
+						}
+						else
+						{
+							l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxtranstions;
+							for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
+							{
+								wxString l_sName = l_ArrayTranstions[l_nRow];
+								if (l_RegEx.Matches(l_sName))
+								{
+									m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
+									int l_nSelected = m_IsSelectedTransition[l_nCurve];
+
+									bool l_bIsSelected = l_nSelected > 0 ? true : false;
+									p_pcResultViewer->ShowCurve(l_nCurve, l_bIsSelected);
+									m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
+
+									p_pcResultViewer->SetCurveColor(l_nCurve, m_TransitionColor[l_nCurve]);
+									p_pcResultViewer->SetCurveLineWidth(l_nCurve, m_TransitionLineWidth[l_nCurve]);
+									p_pcResultViewer->SetCurveLineStyle(l_nCurve, m_TransitionLineStyle[l_nCurve]);
+									l_nCurve++;
+								}
+							}
+						}
+				}
 		}
 	}
 
@@ -596,19 +678,21 @@ void SP_DLG_ShowAllModelView::CreateResultViewer()
 	{
 		m_pcResultViewer = new SP_DS_TableViewer(this, m_pcViewerSizer);
 	}
-	else if (l_sViewerType.IsSameAs(wxT("xyPlot")))
-	{
-		m_pcResultViewer = new SP_DS_xyPlotViewer(this, m_pcViewerSizer);
-	}
-	else if (l_sViewerType.IsSameAs(wxT("Histogram")))
-	{
-		m_pcResultViewer = new SP_DS_HistogramPlotViewer(this, m_pcViewerSizer);
-	}
 	else
-	{
-		return;
+		if (l_sViewerType.IsSameAs(wxT("xyPlot")))
+		{
+			m_pcResultViewer = new SP_DS_xyPlotViewer(this, m_pcViewerSizer);
+		}
+		else
+			if (l_sViewerType.IsSameAs(wxT("Histogram")))
+			{
+				m_pcResultViewer = new SP_DS_HistogramPlotViewer(this, m_pcViewerSizer);
+			}
+			else
+			{
+				return;
 
-	}
+			}
 
 	m_pcResultViewer->Create();
 
@@ -666,15 +750,19 @@ void SP_DLG_ShowAllModelView::RefreshCurrentWindow(int p_nCurveIndex, wxString p
 	wxDELETE(m_pcResultViewer);
 
 	wxString l_sElementType = m_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
-	if (l_sElementType.IsSameAs(wxT("Transition"))) {
+	if (l_sElementType.IsSameAs(wxT("Transition")))
+	{
 		m_TransitionLineStyle[p_nCurveIndex] = p_nLineStyle;
 		m_TransitionLineWidth[p_nCurveIndex] = p_nLineWidth;
 		m_TransitionColor[p_nCurveIndex] = p_nColor;
-	} else if (l_sElementType.IsSameAs(wxT("Place"))) {
-		m_PlaceLineStyle[p_nCurveIndex] = p_nLineStyle;
-		m_PlaceLineWidth[p_nCurveIndex] = p_nLineWidth;
-		m_PlaceColor[p_nCurveIndex] = p_nColor;
 	}
+	else
+		if (l_sElementType.IsSameAs(wxT("Place")))
+		{
+			m_PlaceLineStyle[p_nCurveIndex] = p_nLineStyle;
+			m_PlaceLineWidth[p_nCurveIndex] = p_nLineWidth;
+			m_PlaceColor[p_nCurveIndex] = p_nColor;
+		}
 	CreateResultViewer();
 	LoadView(m_pcResultViewer, m_pcModelView);
 	m_pcResultViewer->SetCurveColor(p_nCurveIndex, p_nColor);
@@ -682,7 +770,6 @@ void SP_DLG_ShowAllModelView::RefreshCurrentWindow(int p_nCurveIndex, wxString p
 	m_pcResultViewer->SetCurveLineStyle(p_nCurveIndex, p_nLineStyle);
 	m_pcResultViewer->Update();
 }
-
 
 void SP_DLG_ShowAllModelView::OnWindowActivate(wxActivateEvent& event)
 {
@@ -721,7 +808,6 @@ void SP_DLG_ShowAllModelView::OnDisconnect(wxCommandEvent &event)
 		m_bIsDisconnected = true;
 		m_pcRefreshButton->Enable(false);
 		m_pcConnectButton->SetLabel(wxT("Connect"));
-
 
 		m_pcShowHideButton->Enable(false);
 		m_pcRightSizer->Show(false);
