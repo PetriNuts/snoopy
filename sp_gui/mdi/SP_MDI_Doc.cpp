@@ -301,6 +301,8 @@ void SP_MDI_Doc::SetFilename(const wxString& p_sName, bool p_bNotify)
 		(*l_Iter)->UpdateTitle();
 	}
 
+	wxFileName l_cFilename(p_sName);
+	wxDocument::SetTitle(l_cFilename.GetFullName());
 	wxDocument::SetFilename(p_sName, p_bNotify);
 
 	SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(GetFirstView());

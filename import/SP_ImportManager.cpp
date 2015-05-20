@@ -128,8 +128,11 @@ SP_ImportManager::DoImport()
 
 		if(res)
 		{
+			SP_MDI_Doc* l_pcDoc = SP_Core::Instance()->GetRootDocument();
+			l_pcDoc->SetFilename(fileName + wxT(".") + l_pcDoc->GetGraph()->GetNetclass()->GetExtension(), true);
+			l_pcDoc->Modify(true);
 			SP_DS_Transformer transform;
-			transform.Check(SP_Core::Instance()->GetRootDocument()->GetGraph());
+			transform.Check(l_pcDoc->GetGraph());
 		}
     }
   }
