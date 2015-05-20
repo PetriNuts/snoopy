@@ -61,7 +61,6 @@ protected:
 
 	//on initialize dialog
 	virtual void OnInitDialog(wxInitDialogEvent& event) =0;
-	virtual void OnCollapsePropertySizer(wxCollapsiblePaneEvent& event);
 
 public:
 	SP_DLG_BaseSimulation(wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), wxString p_sTitle = wxT("Simulationsssssss results"), long p_nStyle = wxDEFAULT_DIALOG_STYLE);

@@ -321,7 +321,7 @@ DECLARE_EVENT_TABLE()
 
 	virtual void OnExportToCSV();
 
-//	virtual void OnCollapsePropertySizer(wxCollapsiblePaneEvent& event);
+	virtual void OnCollapsePropertySizer(wxCollapsiblePaneEvent& event);
 	virtual void OnCollapseSetsSizer(wxCollapsiblePaneEvent& event);
 	virtual void OnCollapseDirectExportSizer(wxCollapsiblePaneEvent& event);
 	virtual void OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent);

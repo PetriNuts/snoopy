@@ -52,6 +52,7 @@
 #include "sp_gui/widgets/sp_plot/plot_zin.xpm"
 #include "sp_gui/widgets/sp_plot/plot_zot.xpm"
 #include <wx/collpane.h>
+#include <wx/statline.h>
 #include <wx/regex.h>
 #include <iostream>
 //#include "sp_gui/widgets/sp_plot/plot_up.xpm"
@@ -127,7 +128,7 @@ EVT_BUTTON( SP_ID_PRINT, SP_DLG_Simulation :: OnPrint )
 
 EVT_TIMER( SP_ID_TIMER_UPDATE_DIALOG, SP_DLG_Simulation :: OnTimer)
 
-//EVT_COLLAPSIBLEPANE_CHANGED(SP_ID_COLLAPSEPANEL_PROPERTY_SIZER, SP_DLG_Simulation :: OnCollapsePropertySizer)
+EVT_COLLAPSIBLEPANE_CHANGED(SP_ID_COLLAPSEPANEL_PROPERTY_SIZER, SP_DLG_Simulation :: OnCollapsePropertySizer)
 EVT_COLLAPSIBLEPANE_CHANGED(SP_ID_COLLAPSEPANEL_SETS_SIZER, SP_DLG_Simulation :: OnCollapseSetsSizer)
 EVT_COLLAPSIBLEPANE_CHANGED(SP_ID_COLLAPSEPANEL_DIRECT_EXPORT_SIZER, SP_DLG_Simulation :: OnCollapseDirectExportSizer)
 EVT_BUTTON( SP_ID_BUTTON_SHOW_SELECTED_VIEWS, SP_DLG_Simulation :: OnOpenSelectedGraphViews)
@@ -310,11 +311,12 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	m_pcPropertyWindowSetsSizer = m_pcCollpaneSetsSizer->GetPane();
 	m_pcPropertyWindowSetsSizer->SetSizerAndFit(m_pcSetsSizer);
 	m_pcSetsSizer->SetSizeHints(m_pcPropertyWindowSetsSizer);
-	m_pcSimulationControlSizer->Add(m_pcCollpaneSetsSizer, 0, wxALL | wxEXPAND, 5);
+	m_pcSimulationControlSizer->Add(m_pcCollpaneSetsSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_pcSimulationControlSizer->Add(new wxStaticLine(this), wxSizerFlags(0).Expand().Border(wxALL, 5));
 
-	/**********************Simulation Configuration starts********************
+	/**********************Simulation Configuration starts*********************/
 	m_pcCollpanePropertySizer = new wxCollapsiblePane(this, SP_ID_COLLAPSEPANEL_PROPERTY_SIZER, "Simulator Configuration");
-	m_pcPropertyWindowPropertySizer = m_pcCollpanePropertySizer->GetPane();*/
+	m_pcPropertyWindowPropertySizer = m_pcCollpanePropertySizer->GetPane();
 
     l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
     l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Interval start:")),
@@ -339,9 +341,11 @@ void SP_DLG_Simulation::SetMinimalLayout()
     m_pcResultPointCountTextCtrl = new wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, l_pcAttr->GetValueString(), wxDefaultPosition, wxDefaultSize, 0);
     l_pcRowSizer->Add(m_pcResultPointCountTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
     m_pcPropertySizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
-	/*m_pcPropertyWindowPropertySizer->SetSizerAndFit(m_pcPropertySizer);
+
+    m_pcPropertyWindowPropertySizer->SetSizerAndFit(m_pcPropertySizer);
 	m_pcPropertySizer->SetSizeHints(m_pcPropertyWindowPropertySizer);
-	m_pcSimulationControlSizer->Add(m_pcCollpanePropertySizer, 0, wxALL | wxEXPAND, 5);*/
+	m_pcSimulationControlSizer->Add(m_pcCollpanePropertySizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_pcSimulationControlSizer->Add(new wxStaticLine(this), wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 
 	/**********Export and import details starts************/
@@ -367,6 +371,7 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	m_pcPropertyWindowDirectExportSizer->SetSizerAndFit(m_pcDirectExportSizer);
 	m_pcDirectExportSizer->SetSizeHints(m_pcPropertyWindowDirectExportSizer);
 	m_pcSimulationControlSizer->Add(m_pcCollpaneDirectExportSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_pcSimulationControlSizer->Add(new wxStaticLine(this), wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 	m_pcOutputViewerType = new wxComboBox(m_pcPropertyWindowPropertySizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
 	m_pcOutputViewerType->Hide();
@@ -478,29 +483,29 @@ void SP_DLG_Simulation::SimulatorLogFunction(wxLogLevel p_nLogLevel, const wxStr
 
 }
 
-/*void SP_DLG_Simulation :: OnCollapsePropertySizer(wxCollapsiblePaneEvent& event) {
+void SP_DLG_Simulation :: OnCollapsePropertySizer(wxCollapsiblePaneEvent& event) {
 
 //		collpaneSimulationButtonSizer->Collapse(true);
-}*/
+}
 
 void SP_DLG_Simulation :: OnCollapseSetsSizer(wxCollapsiblePaneEvent& event) {
 
 //	cout << "screen size " << wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-	wxSize temp = m_pcMainSizer->GetSize();
-	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
+//	wxSize temp = m_pcMainSizer->GetSize();
+//	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
 //  cout << "Current size " << temp.GetHeight();
-	DoLayoutAdaptation();
-	this->SetSize(temp);
+//	DoLayoutAdaptation();
+//	this->SetSize(temp);
 }
 
 void SP_DLG_Simulation :: OnCollapseDirectExportSizer(wxCollapsiblePaneEvent& event) {
 
 //	cout << "screen size " << wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-	wxSize temp = m_pcMainSizer->GetSize();
-	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
+//	wxSize temp = m_pcMainSizer->GetSize();
+//	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
 //		cout << "Current size " << temp.GetHeight();
-	DoLayoutAdaptation();
-	this->SetSize(temp);
+//	DoLayoutAdaptation();
+//	this->SetSize(temp);
 }
 
 
