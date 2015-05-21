@@ -94,14 +94,18 @@ void SP_ImportSBML2cntPn::getSpecies()
 				SP_DS_Attribute* l_pcAttrComment = l_pcNode->GetAttribute(wxT("Comment"));
 				wxString l_comment = l_pcAttrComment->GetValueString();
 
-				wxString l_sCompartment = wxString(l_sbmlSpecies->getCompartment().c_str(), wxConvUTF8);
+				wxString l_sCompartment = l_sbmlSpecies->getCompartment();
 				if(!l_sCompartment.IsEmpty())
 				{
-					l_comment << wxT("compartment: ") << l_sCompartment << wxT("\n");
+					l_comment << wxT("compartment=\"") << l_sCompartment << wxT("\"\n");
 				}
 				if(!l_speciesName.IsEmpty())
 				{
-					l_comment << wxT("name: ") << l_speciesName << wxT("\n");
+					l_comment << wxT("name=\"") << l_speciesName << wxT("\"\n");
+				}
+				if(l_sbmlSpecies->isSetNotes())
+				{
+					l_comment << l_sbmlSpecies->getNotesString();
 				}
 				l_pcAttrComment->SetValueString(l_comment);
 				l_pcAttrComment->SetShow(false);
@@ -154,8 +158,19 @@ void SP_ImportSBML2cntPn::getReactions ()
 			l_pcAttrName->SetShow(true);
 
 			SP_DS_Attribute* l_pcAttrComment = l_reactionNode->GetAttribute(wxT("Comment"));
-			wxString l_comment = l_pcAttrComment->GetValueString();
-			l_pcAttrComment->SetValueString(l_comment);
+
+			if(!l_ReactionName.IsEmpty())
+			{
+				l_ReactionName = wxT("name=\"") + l_ReactionName + wxT("\"\n");
+			}
+
+			wxString l_sNotes;
+			if(l_sbmlReaction->isSetNotes())
+			{
+				l_sNotes = l_sbmlReaction->getNotesString();
+			}
+
+			l_pcAttrComment->SetValueString(l_ReactionName+l_sNotes);
 			l_pcAttrComment->SetShow(false);
 
 			// is reversible (0,1 for false,true) or 0 for default (false)

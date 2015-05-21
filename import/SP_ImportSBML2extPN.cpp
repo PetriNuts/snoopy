@@ -144,11 +144,15 @@ void SP_ImportSBML2extPN::getSpecies()
 				wxString l_sCompartment = l_sbmlSpecies->getCompartment();
 				if(!l_sCompartment.IsEmpty())
 				{
-					l_comment << wxT("compartment: ") << l_sCompartment << wxT("\n");
+					l_comment << wxT("compartment=\"") << l_sCompartment << wxT("\"\n");
 				}
 				if(!l_speciesName.IsEmpty())
 				{
-					l_comment << wxT("name: ") << l_speciesName << wxT("\n");
+					l_comment << wxT("name=\"") << l_speciesName << wxT("\"\n");
+				}
+				if(l_sbmlSpecies->isSetNotes())
+				{
+					l_comment << l_sbmlSpecies->getNotesString();
 				}
 				l_pcAttrComment->SetValueString(l_comment);
 				l_pcAttrComment->SetShow(false);
@@ -164,6 +168,8 @@ void SP_ImportSBML2extPN::getSpecies()
 					wxString l_sMarking = wxString::Format(wxT("%.0f"),l_sbmlSpecies->getInitialConcentration());
 					l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
 				}
+
+				wxString l_sBoundaryCondition = wxT("boundaryCondition=\"false\"");
 
 				if(m_CreateBoundaryConditions
 					&& l_sbmlSpecies->getBoundaryCondition()
@@ -181,6 +187,10 @@ void SP_ImportSBML2extPN::getSpecies()
 					l_outNode->GetGraphics()->front()->SetBrushColour(*wxGREEN);
 					l_outNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 					drawEdge(l_pcNode,l_outNode,wxT("Edge"),wxT("1"));
+				}
+				else if(l_sbmlSpecies->getBoundaryCondition())
+				{
+					l_sBoundaryCondition = wxT("boundaryCondition=\"true\"");
 				}
 
 				g_CompoundList.push_back(l_pcNode);
@@ -213,27 +223,31 @@ void SP_ImportSBML2extPN::getReactions ()
 			l_pcAttrName->SetShow(true);
 
 			SP_DS_Attribute* l_pcAttrComment = l_reactionNode->GetAttribute(wxT("Comment"));
-			wxString l_comment = l_pcAttrComment->GetValueString();
 
 			if(!l_ReactionName.IsEmpty())
 			{
-				l_comment << wxT("name: ") << l_ReactionName << wxT("\n");
+				l_ReactionName = wxT("name=\"") + l_ReactionName + wxT("\"\n");
 			}
 
+			wxString l_sKineticLaw;
 			if(l_sbmlReaction->isSetKineticLaw())
 			{
-				wxString l_kinetic(l_sbmlReaction->getKineticLaw()->getFormula().c_str(), wxConvUTF8);
-				l_comment << wxT("rate: ") << l_kinetic << wxT("\n");
+				l_sKineticLaw = wxT("<kineticLaw>\n") + l_sbmlReaction->getKineticLaw()->getFormula() + wxT("\n</kineticLaw>\n");
 			}
-			l_pcAttrComment->SetValueString(l_comment);
-			l_pcAttrComment->SetShow(false);
+			wxString l_sNotes;
+			if(l_sbmlReaction->isSetNotes())
+			{
+				l_sNotes = l_sbmlReaction->getNotesString();
+			}
 
 			// is reversible (0,1 for false,true) or 0 for default (false)
 			bool b_IsReversible = l_sbmlReaction->getReversible();
+			wxString l_sReversible = wxT("reversible=\"false\"\n");
 
 			if(b_IsReversible)
 			{
 				++numReverseReactions;
+				l_sReversible = wxT("reversible=\"true\"\n");
 			}
 
 			if(b_IsReversible && m_HighlightReversibleReactions)
@@ -245,12 +259,19 @@ void SP_ImportSBML2extPN::getReactions ()
 
 			if (b_IsReversible && m_CreateReverseReactions)
 			{
+				l_sReversible = wxT("reversible=\"false\"\n");
 				++yComRea;
 				l_revReactionNode = extTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
 				l_revReactionNode->GetAttribute(wxT("Name"))->SetValueString(wxT("re_")+l_ReactionId);
 				l_revReactionNode->GetGraphics()->front()->SetBrushColour(*wxRED);
 				l_revReactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
+				SP_DS_Attribute* l_pcAttrRevComment = l_revReactionNode->GetAttribute(wxT("Comment"));
+				l_pcAttrRevComment->SetValueString(l_sReversible+l_sKineticLaw);
+				l_pcAttrRevComment->SetShow(false);
 			}
+
+			l_pcAttrComment->SetValueString(l_ReactionName+l_sReversible+l_sKineticLaw+l_sNotes);
+			l_pcAttrComment->SetShow(false);
 
 			// get reactants, products and modifiers
 			const ListOfSpeciesReferences* rectants = l_sbmlReaction->getListOfReactants();
@@ -317,7 +338,7 @@ void SP_ImportSBML2extPN::getReactions ()
 								!l_reactionNode->IsTargetOf(l_pcNode))
 							{
 								drawEdge( l_pcNode, l_reactionNode, SP_DS_READ_EDGE, wxT("0"));
-								wxString l_sText = wxT("The semantics of reaction \"") + l_ReactionName +
+								wxString l_sText = wxT("The semantics of reaction \"") + l_ReactionId +
 									wxT("\" is defined by it's kinetic law\nand there is no known way to decide the structure in general.\n") +
 									wxT("Please check the resulting transition.");
 								SP_LOGWARNING( l_sText);

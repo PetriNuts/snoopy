@@ -108,11 +108,15 @@ void SP_ImportSBML2sPn::getSpecies()
 			wxString l_sCompartment = l_sbmlSpecies->getCompartment();
 			if(!l_sCompartment.IsEmpty())
 			{
-				l_comment << wxT("compartment: ") << l_sCompartment << wxT("\n");
+				l_comment << wxT("compartment=\"") << l_sCompartment << wxT("\"\n");
 			}
 			if(!l_speciesName.IsEmpty())
 			{
-				l_comment << wxT("name: ") << l_speciesName << wxT("\n");
+				l_comment << wxT("name=\"") << l_speciesName << wxT("\"\n");
+			}
+			if(l_sbmlSpecies->isSetNotes())
+			{
+				l_comment << l_sbmlSpecies->getNotesString();
 			}
 			l_pcAttrComment->SetValueString(l_comment);
 			l_pcAttrComment->SetShow(false);
@@ -262,14 +266,11 @@ void SP_ImportSBML2sPn::getReactions ()
 			l_pcAttrName->SetShow(true);
 
 			SP_DS_Attribute* l_pcAttrComment = l_reactionNode->GetAttribute(wxT("Comment"));
-			wxString l_comment = l_pcAttrComment->GetValueString();
 
 			if(!l_ReactionName.IsEmpty())
 			{
-				l_comment << wxT("name: ") << l_ReactionName << wxT("\n");
+				l_ReactionName = wxT("name=\"") + l_ReactionName + wxT("\"\n");
 			}
-			l_pcAttrComment->SetValueString(l_comment);
-			l_pcAttrComment->SetShow(false);
 
 			// get KineticLaw
 			wxString l_kinetic;
@@ -287,13 +288,20 @@ void SP_ImportSBML2sPn::getReactions ()
 				getReactionParameters(l_sbmlReaction);
 			}
 
+			wxString l_sNotes;
+			if(l_sbmlReaction->isSetNotes())
+			{
+				l_sNotes = l_sbmlReaction->getNotesString();
+			}
+
 			// is reversible (0,1 for false,true) or 0 for default (false)
 			bool b_IsReversible = l_sbmlReaction->getReversible();
+			wxString l_sReversible = wxT("reversible=\"false\"\n");
 
 			if(b_IsReversible)
 			{
 				++numReverseReactions;
-				SP_LOGWARNING( l_ReactionId + wxT(" has set reversible == true. Stochastic Petri Nets doesn't support reversible Transitions."));
+				l_sReversible = wxT("reversible=\"true\"\n");
 			}
 
 			if(b_IsReversible && m_HighlightReversibleReactions)
@@ -305,6 +313,7 @@ void SP_ImportSBML2sPn::getReactions ()
 
 			if (b_IsReversible && m_CreateReverseReactions)
 			{
+				l_sReversible = wxT("reversible=\"false\"\n");
 				++yComRea;
 				l_revReactionNode = l_pcNodeClass->NewElement(m_pcCanvas->GetNetnumber());
 				l_revReactionNode->GetAttribute(wxT("Name"))->SetValueString(wxT("re_")+l_ReactionId);
@@ -313,10 +322,16 @@ void SP_ImportSBML2sPn::getReactions ()
 				//set ratefunction the same as reversible transition, because we dont know it
 				l_pcFuncAttr->SetCell(0,1, l_kinetic);
 				l_revReactionNode->GetGraphics()->front()->SetBrushColour(*wxRED);
+				SP_DS_Attribute* l_pcAttrRevComment = l_revReactionNode->GetAttribute(wxT("Comment"));
+				l_pcAttrRevComment->SetValueString(l_sReversible);
+				l_pcAttrRevComment->SetShow(false);
 				l_revReactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 			}
 
-		 	// get reactants, products and modifiers
+			l_pcAttrComment->SetValueString(l_ReactionName+l_sReversible+l_sNotes);
+			l_pcAttrComment->SetShow(false);
+
+			// get reactants, products and modifiers
 			const ListOfSpeciesReferences* rectants = l_sbmlReaction->getListOfReactants();
 			const ListOfSpeciesReferences* products = l_sbmlReaction->getListOfProducts();
 			const ListOfSpeciesReferences* modifiers = l_sbmlReaction->getListOfModifiers();
