@@ -525,8 +525,8 @@ public:
 		} else {
 			m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), se));
 		}
-
 	}
+
 	virtual wxString GetApFormulae()
 	{
 		return m_sApFormulae;

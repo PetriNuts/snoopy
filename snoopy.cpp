@@ -949,6 +949,7 @@ bool Snoopy::OnInit()
 		wxDELETE(l_pcImport);
 	}
 
+	wxDialog::EnableLayoutAdaptation(true);
 
 	//create preferences (must be done before initializing any net classes
 	m_pcCanvasPrefs = new SP_GPR_Canvas();

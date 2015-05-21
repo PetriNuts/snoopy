@@ -425,15 +425,16 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	m_pcSimulationButtonSizer->SetSizeHints(m_pcPropertyWindowSimulationButtonSizer);
 	m_pcSimulationControlSizer->Add(m_pcPropertyWindowSimulationButtonSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
-	m_pcSimulationControlSizer->Add(new wxButton(this, wxID_CANCEL, wxT("Close")), wxSizerFlags(0).Border(wxALL, 5));
+	m_pcMainSizer->Add(new wxButton(this, wxID_CANCEL, wxT("Close")), wxSizerFlags(0).Border(wxALL, 5));
+
 	//create the viewers
 	InitializeResultViewer();
     SetSizerAndFit(m_pcMainSizer);
-
+/*
     wxSize temp = m_pcMainSizer->GetSize();
 	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
 	this->SetSize(temp);
-
+*/
 }
 
 void SP_DLG_Simulation::InitializeResultViewer()
@@ -483,29 +484,34 @@ void SP_DLG_Simulation::SimulatorLogFunction(wxLogLevel p_nLogLevel, const wxStr
 
 }
 
-void SP_DLG_Simulation :: OnCollapsePropertySizer(wxCollapsiblePaneEvent& event) {
-
-//		collpaneSimulationButtonSizer->Collapse(true);
+void SP_DLG_Simulation :: OnCollapsePropertySizer(wxCollapsiblePaneEvent& event)
+{
+//	cout << "screen size " << wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
+	wxSize temp = m_pcMainSizer->GetSize();
+//	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
+//  cout << "Current size " << temp.GetHeight();
+	DoLayoutAdaptation();
+	this->SetSize(temp);
 }
 
 void SP_DLG_Simulation :: OnCollapseSetsSizer(wxCollapsiblePaneEvent& event) {
 
 //	cout << "screen size " << wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-//	wxSize temp = m_pcMainSizer->GetSize();
+	wxSize temp = m_pcMainSizer->GetSize();
 //	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
 //  cout << "Current size " << temp.GetHeight();
-//	DoLayoutAdaptation();
-//	this->SetSize(temp);
+	DoLayoutAdaptation();
+	this->SetSize(temp);
 }
 
 void SP_DLG_Simulation :: OnCollapseDirectExportSizer(wxCollapsiblePaneEvent& event) {
 
 //	cout << "screen size " << wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-//	wxSize temp = m_pcMainSizer->GetSize();
+	wxSize temp = m_pcMainSizer->GetSize();
 //	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
 //		cout << "Current size " << temp.GetHeight();
-//	DoLayoutAdaptation();
-//	this->SetSize(temp);
+	DoLayoutAdaptation();
+	this->SetSize(temp);
 }
 
 
