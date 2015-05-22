@@ -173,6 +173,31 @@ bool SP_ImportSBML::existInReactionFormula(const wxString& p_sName, const ASTNod
 	return l_bReturn;
 }
 
+bool SP_ImportSBML::changeInReactionFormula(const wxString& p_sOld, const wxString& p_sNew, ASTNode* p_sbmlFormula)
+{
+	CHECK_POINTER(p_sbmlFormula, return false);
+
+	bool l_bReturn = false;
+	for(unsigned int i = 0; i < p_sbmlFormula->getNumChildren(); i++)
+	{
+		if(changeInReactionFormula(p_sOld, p_sNew, p_sbmlFormula->getChild(i)))
+		{
+			l_bReturn = true;
+		}
+	}
+
+	if(p_sbmlFormula->isName())
+	{
+		const char* l_sName = p_sbmlFormula->getName();
+		if(p_sOld == l_sName)
+		{
+			p_sbmlFormula->setName(p_sNew.mb_str());
+			l_bReturn = true;
+		}
+	}
+	return l_bReturn;
+}
+
 const ASTNode*
 SP_ImportSBML::getSBMLFormula(ASTNode* p_sbmlFormula)
 {

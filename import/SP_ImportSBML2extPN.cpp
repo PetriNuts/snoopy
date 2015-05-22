@@ -94,8 +94,22 @@ void SP_ImportSBML2extPN::getModelCompartments()
 		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_CompId);
 		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("compartment"));
 		l_constant->GetAttribute(wxT("Type"))->SetValueString(wxT("int"));
+
+		SP_DS_Attribute* l_pcAttrComment = l_constant->GetAttribute(wxT("Comment"));
+
 		if(!l_CompName.IsEmpty())
-			l_constant->GetAttribute(wxT("Comment"))->SetValueString(wxT("name: ")+l_CompName);
+		{
+			l_CompName = wxT("name=\"") + l_CompName + wxT("\"\n");
+		}
+
+		wxString l_sNotes;
+		if(l_sbmlCompartment->isSetNotes())
+		{
+			l_sNotes = l_sbmlCompartment->getNotesString();
+		}
+
+		l_pcAttrComment->SetValueString(l_CompName+l_sNotes);
+		l_pcAttrComment->SetShow(false);
 
 		wxString l_parameterValue;
 		if (l_sbmlCompartment->isSetSize())
@@ -150,14 +164,7 @@ void SP_ImportSBML2extPN::getSpecies()
 				{
 					l_comment << wxT("name=\"") << l_speciesName << wxT("\"\n");
 				}
-				if(l_sbmlSpecies->isSetNotes())
-				{
-					l_comment << l_sbmlSpecies->getNotesString();
-				}
-				l_pcAttrComment->SetValueString(l_comment);
-				l_pcAttrComment->SetShow(false);
 
-				l_pcNode->ShowOnCanvas(m_pcCanvas, FALSE, 50, yComRea,0);
 				if (l_sbmlSpecies->isSetInitialAmount())
 				{
 					wxString l_sMarking = wxString::Format(wxT("%.0f"),l_sbmlSpecies->getInitialAmount());
@@ -168,8 +175,6 @@ void SP_ImportSBML2extPN::getSpecies()
 					wxString l_sMarking = wxString::Format(wxT("%.0f"),l_sbmlSpecies->getInitialConcentration());
 					l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
 				}
-
-				wxString l_sBoundaryCondition = wxT("boundaryCondition=\"false\"");
 
 				if(m_CreateBoundaryConditions
 					&& l_sbmlSpecies->getBoundaryCondition()
@@ -190,8 +195,17 @@ void SP_ImportSBML2extPN::getSpecies()
 				}
 				else if(l_sbmlSpecies->getBoundaryCondition())
 				{
-					l_sBoundaryCondition = wxT("boundaryCondition=\"true\"");
+					l_comment << wxT("boundaryCondition=\"true\"\n");
 				}
+
+				if(l_sbmlSpecies->isSetNotes())
+				{
+					l_comment << l_sbmlSpecies->getNotesString();
+				}
+				l_pcAttrComment->SetValueString(l_comment);
+				l_pcAttrComment->SetShow(false);
+
+				l_pcNode->ShowOnCanvas(m_pcCanvas, FALSE, 50, yComRea,0);
 
 				g_CompoundList.push_back(l_pcNode);
 			}

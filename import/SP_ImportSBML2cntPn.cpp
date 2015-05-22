@@ -28,7 +28,6 @@ SP_ImportSBML2cntPn::~SP_ImportSBML2cntPn()
 bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 {
 	g_CompoundList.clear();
-	g_ParameterList.clear();
 	g_ReactionList.clear();
 
 	numReverseReactions = 0;
@@ -188,14 +187,14 @@ void SP_ImportSBML2cntPn::getReactions ()
 			{
 				KineticLaw* l_sbmlKineticLaw =  l_sbmlReaction->getKineticLaw();
 				ASTNode* l_sbmlMath = l_sbmlKineticLaw->getMath()->deepCopy();
+				//position is important, because we change id of reaction parameters
+				getReactionParameters(l_sbmlReaction, l_sbmlMath);
 
 				wxString l_kinetic =  formulaToString(getSBMLFormula(l_sbmlMath));
 				SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_reactionNode->GetAttribute(wxT("FunctionList")));
 				l_pcColAttr->SetCell(0, 1, l_kinetic);
 
 				wxDELETE(l_sbmlMath);
-
-				getReactionParameters(l_sbmlReaction);
 			}
 
 			l_reactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
@@ -291,6 +290,21 @@ void SP_ImportSBML2cntPn::getModelCompartments()
 		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("compartment"));
 		l_constant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
 
+		SP_DS_Attribute* l_pcAttrComment = l_constant->GetAttribute(wxT("Comment"));
+
+		if(!l_CompName.IsEmpty())
+		{
+			l_CompName = wxT("name=\"") + l_CompName + wxT("\"\n");
+		}
+
+		wxString l_sNotes;
+		if(l_sbmlCompartment->isSetNotes())
+		{
+			l_sNotes = l_sbmlCompartment->getNotesString();
+		}
+
+		l_pcAttrComment->SetValueString(l_CompName+l_sNotes);
+		l_pcAttrComment->SetShow(false);
 		wxString l_parameterValue;
 		if (l_sbmlCompartment->isSetSize())
 		{
@@ -306,8 +320,6 @@ void SP_ImportSBML2cntPn::getModelCompartments()
 		SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_CompId);
 		SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_parameterValue);
 		m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
-
-		g_ParameterList.push_back(l_constant);
 	}
 }
 
@@ -332,8 +344,22 @@ void SP_ImportSBML2cntPn::getModelParameters()
 		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_ParamId);
 		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("parameter"));
 		l_constant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
+
+		SP_DS_Attribute* l_pcAttrComment = l_constant->GetAttribute(wxT("Comment"));
+
 		if(!l_ParamName.IsEmpty())
-			l_constant->GetAttribute(wxT("Comment"))->SetValueString(wxT("name: ")+l_ParamName);
+		{
+			l_ParamName = wxT("name=\"") + l_ParamName + wxT("\"\n");
+		}
+
+		wxString l_sNotes;
+		if(l_sbmlParameter->isSetNotes())
+		{
+			l_sNotes = l_sbmlParameter->getNotesString();
+		}
+
+		l_pcAttrComment->SetValueString(l_ParamName+l_sNotes);
+		l_pcAttrComment->SetShow(false);
 
 		wxString l_parameterValue;
 		if (l_sbmlParameter->isSetValue())
@@ -350,15 +376,15 @@ void SP_ImportSBML2cntPn::getModelParameters()
 		SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_ParamId);
 		SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_parameterValue);
 		m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
-
-		g_ParameterList.push_back(l_constant);
 	}
 }
 
 
 // get reaction parameters, multiple parameters possible
-void SP_ImportSBML2cntPn::getReactionParameters(Reaction*  l_sbmlReaction)
+void SP_ImportSBML2cntPn::getReactionParameters(Reaction*  l_sbmlReaction, ASTNode* l_sbmlMath)
 {
+	wxString l_ReactionId = l_sbmlReaction->getId();
+
 	ListOfParameters* parameters = l_sbmlReaction->getKineticLaw()->getListOfParameters();
 	for (unsigned int j = 0; j < parameters->size(); ++j)
 	{
@@ -368,59 +394,35 @@ void SP_ImportSBML2cntPn::getReactionParameters(Reaction*  l_sbmlReaction)
 		wxString l_ParamName;
 		getSBMLParameterName(l_sbmlParameter, l_ParamId, l_ParamName);
 
-		// don't add multiple parameters
-		if (!existParameterNode(l_ParamId))
+		wxString l_ParamIdNew = l_ReactionId+wxT("_")+l_ParamId;
+		changeInReactionFormula(l_ParamId, l_ParamIdNew, l_sbmlMath);
+
+		// add Constant for Parameter
+		SP_DS_Metadataclass* l_pcMC = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+
+		SP_DS_Metadata* l_constant = l_pcMC->NewElement(1);
+
+		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_ParamIdNew);
+		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("parameter"));
+		l_constant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
+		if(!l_ParamName.IsEmpty())
+			l_constant->GetAttribute(wxT("Comment"))->SetValueString(wxT("name: ")+l_ParamName);
+
+		wxString l_parameterValue;
+		if (l_sbmlParameter->isSetValue())
 		{
-			// add Constant for Parameter
-			SP_DS_Metadataclass* l_pcMC = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
-
-			SP_DS_Metadata* l_constant = l_pcMC->NewElement(1);
-
-			l_constant->GetAttribute(wxT("Name"))->SetValueString(l_ParamId);
-			l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("parameter"));
-			l_constant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
-			if(!l_ParamName.IsEmpty())
-				l_constant->GetAttribute(wxT("Comment"))->SetValueString(wxT("name: ")+l_ParamName);
-
-			wxString l_parameterValue;
-			if (l_sbmlParameter->isSetValue())
-			{
-				l_parameterValue << l_sbmlParameter->getValue();
-			}
-			else
-			{
-				l_parameterValue = wxT("0");
-			}
-			SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
-			l_pcColAttr->SetCell(0, 1, l_parameterValue);
-
-			SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_ParamId);
-			SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_parameterValue);
-			m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
-
-			g_ParameterList.push_back(l_constant);
-		}
-	}
-}
-
-bool SP_ImportSBML2cntPn::existParameterNode(const wxString& l_parameterName)
-{
-	SP_ListMetadata::const_iterator pIt;
-	pIt = g_ParameterList.begin();
-	bool exists = false;
-	while (pIt != g_ParameterList.end())
-	{
-		wxString sId = (*pIt)->GetAttribute(wxT("Name"))->GetValueString();
-		if (sId == l_parameterName)
-		{
-			exists = true;
-			break;
+			l_parameterValue << l_sbmlParameter->getValue();
 		}
 		else
 		{
-			++pIt;
+			l_parameterValue = wxT("0");
 		}
-	}
-	return exists;
-}
+		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
+		l_pcColAttr->SetCell(0, 1, l_parameterValue);
 
+		SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_ParamIdNew);
+		SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_parameterValue);
+		m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
+
+	}
+}

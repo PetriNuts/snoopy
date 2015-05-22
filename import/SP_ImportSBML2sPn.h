@@ -19,8 +19,6 @@ private:
 	bool m_CreateReverseReactions;
 	bool m_CreateBoundaryConditions;
 
-	SP_ListMetadata g_ParameterList;
-
 	/**
 	\brief  Add model compartment as a parameter node to the a net
 
@@ -55,15 +53,7 @@ private:
 	\brief  Add all reaction parameters as a parameter node to the a net
 
 	 */
-	void getReactionParameters(Reaction*  l_sbmlReaction);
-
-	/**
-	\brief  Check for existing parameter node
-
-	\param		l_parameterName		the name of the parameter to check
-	*/
-	bool existParameterNode(const wxString& l_parameterName);
-
+	void getReactionParameters(Reaction*  l_sbmlReaction, ASTNode* l_sbmlMath);
 
 protected:
 

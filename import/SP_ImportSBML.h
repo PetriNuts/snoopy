@@ -46,9 +46,9 @@ public:
 	bool existInReactionList(const wxString& newName);
 	bool existInReactionFormula(const wxString& p_sName, const ASTNode* p_sbmlFormula);
 
-	bool ValidateSBML(SBMLDocument* p_sbmlDoc);
+	bool changeInReactionFormula(const wxString& p_sOld, const wxString& p_sNew, ASTNode* p_sbmlFormula);
 
-	bool ConvertIds2Names();
+	bool ValidateSBML(SBMLDocument* p_sbmlDoc);
 
 	SP_DS_Graph* m_pcGraph = nullptr;
 	Model* m_sbmlModel = nullptr;
