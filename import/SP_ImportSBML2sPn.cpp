@@ -151,6 +151,10 @@ void SP_ImportSBML2sPn::getSpecies()
 			{
 				l_comment << l_sbmlSpecies->getNotesString();
 			}
+			if(l_sbmlSpecies->isSetAnnotation())
+			{
+				l_comment << l_sbmlSpecies->getAnnotationString();
+			}
 			l_pcAttrComment->SetValueString(l_comment);
 			l_pcAttrComment->SetShow(false);
 
@@ -298,6 +302,12 @@ void SP_ImportSBML2sPn::getReactions ()
 				l_sNotes = l_sbmlReaction->getNotesString();
 			}
 
+			wxString l_sAnnotation;
+			if(l_sbmlReaction->isSetAnnotation())
+			{
+				l_sAnnotation = l_sbmlReaction->getAnnotationString();
+			}
+
 			// is reversible (0,1 for false,true) or 0 for default (false)
 			bool b_IsReversible = l_sbmlReaction->getReversible();
 			wxString l_sReversible = wxT("reversible=\"false\"\n");
@@ -332,7 +342,7 @@ void SP_ImportSBML2sPn::getReactions ()
 				l_revReactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 			}
 
-			l_pcAttrComment->SetValueString(l_ReactionName+l_sReversible+l_sNotes);
+			l_pcAttrComment->SetValueString(l_ReactionName+l_sReversible+l_sNotes+l_sAnnotation);
 			l_pcAttrComment->SetShow(false);
 
 			// get reactants, products and modifiers
@@ -459,7 +469,13 @@ void SP_ImportSBML2sPn::getModelCompartments()
 			l_sNotes = l_sbmlCompartment->getNotesString();
 		}
 
-		l_pcAttrComment->SetValueString(l_CompName+l_sNotes);
+		wxString l_sAnnotation;
+		if(l_sbmlCompartment->isSetAnnotation())
+		{
+			l_sAnnotation = l_sbmlCompartment->getAnnotationString();
+		}
+
+		l_pcAttrComment->SetValueString(l_CompName+l_sNotes+l_sAnnotation);
 		l_pcAttrComment->SetShow(false);
 
 		wxString l_parameterValue;
@@ -515,7 +531,13 @@ void SP_ImportSBML2sPn::getModelParameters()
 			l_sNotes = l_sbmlParameter->getNotesString();
 		}
 
-		l_pcAttrComment->SetValueString(l_ParamName+l_sNotes);
+		wxString l_sAnnotation;
+		if(l_sbmlParameter->isSetAnnotation())
+		{
+			l_sAnnotation = l_sbmlParameter->getAnnotationString();
+		}
+
+		l_pcAttrComment->SetValueString(l_ParamName+l_sNotes+l_sAnnotation);
 		l_pcAttrComment->SetShow(false);
 
 		wxString l_parameterValue;
@@ -576,7 +598,13 @@ void SP_ImportSBML2sPn::getReactionParameters(Reaction*  l_sbmlReaction, ASTNode
 			l_sNotes = l_sbmlParameter->getNotesString();
 		}
 
-		l_pcAttrComment->SetValueString(l_ParamName+l_sNotes);
+		wxString l_sAnnotation;
+		if(l_sbmlParameter->isSetAnnotation())
+		{
+			l_sAnnotation = l_sbmlParameter->getAnnotationString();
+		}
+
+		l_pcAttrComment->SetValueString(l_ParamName+l_sNotes+l_sAnnotation);
 		l_pcAttrComment->SetShow(false);
 
 		wxString l_parameterValue;

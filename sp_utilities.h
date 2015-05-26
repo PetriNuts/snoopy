@@ -111,4 +111,13 @@ bool SP_FormatWithComma(wxString& s);
 */
 wxString SP_NormalizeString (const wxString& p_sS);
 
+/**
+ * extract xml attribute from text
+ */
+wxString SP_ExtractAttribute(const wxString& p_sName, const wxString& p_sSource);
+/**
+ * extract xml node from text
+ */
+wxString SP_ExtractNode(const wxString& p_sName, const wxString& p_sSource);
+
 #endif //__SP_UTILITIES_H__

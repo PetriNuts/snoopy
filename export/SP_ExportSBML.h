@@ -41,7 +41,6 @@ protected:
 	bool WriteConstants();
 	bool WritePlaces();
 	bool WriteTransitions();
-	bool WriteParameters();
 	virtual bool DoWrite();
 
 	bool ValidateSBML();

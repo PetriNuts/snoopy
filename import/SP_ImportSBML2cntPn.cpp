@@ -106,6 +106,10 @@ void SP_ImportSBML2cntPn::getSpecies()
 				{
 					l_comment << l_sbmlSpecies->getNotesString();
 				}
+				if(l_sbmlSpecies->isSetAnnotation())
+				{
+					l_comment << l_sbmlSpecies->getAnnotationString();
+				}
 				l_pcAttrComment->SetValueString(l_comment);
 				l_pcAttrComment->SetShow(false);
 
@@ -169,7 +173,13 @@ void SP_ImportSBML2cntPn::getReactions ()
 				l_sNotes = l_sbmlReaction->getNotesString();
 			}
 
-			l_pcAttrComment->SetValueString(l_ReactionName+l_sNotes);
+			wxString l_sAnnotation;
+			if(l_sbmlReaction->isSetAnnotation())
+			{
+				l_sAnnotation = l_sbmlReaction->getAnnotationString();
+			}
+
+			l_pcAttrComment->SetValueString(l_ReactionName+l_sNotes+l_sAnnotation);
 			l_pcAttrComment->SetShow(false);
 
 			// is reversible (0,1 for false,true) or 0 for default (false)
@@ -303,7 +313,13 @@ void SP_ImportSBML2cntPn::getModelCompartments()
 			l_sNotes = l_sbmlCompartment->getNotesString();
 		}
 
-		l_pcAttrComment->SetValueString(l_CompName+l_sNotes);
+		wxString l_sAnnotation;
+		if(l_sbmlCompartment->isSetAnnotation())
+		{
+			l_sAnnotation = l_sbmlCompartment->getAnnotationString();
+		}
+
+		l_pcAttrComment->SetValueString(l_CompName+l_sNotes+l_sAnnotation);
 		l_pcAttrComment->SetShow(false);
 		wxString l_parameterValue;
 		if (l_sbmlCompartment->isSetSize())
@@ -358,7 +374,13 @@ void SP_ImportSBML2cntPn::getModelParameters()
 			l_sNotes = l_sbmlParameter->getNotesString();
 		}
 
-		l_pcAttrComment->SetValueString(l_ParamName+l_sNotes);
+		wxString l_sAnnotation;
+		if(l_sbmlParameter->isSetAnnotation())
+		{
+			l_sAnnotation = l_sbmlParameter->getAnnotationString();
+		}
+
+		l_pcAttrComment->SetValueString(l_ParamName+l_sNotes+l_sAnnotation);
 		l_pcAttrComment->SetShow(false);
 
 		wxString l_parameterValue;
@@ -405,8 +427,28 @@ void SP_ImportSBML2cntPn::getReactionParameters(Reaction*  l_sbmlReaction, ASTNo
 		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_ParamIdNew);
 		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("parameter"));
 		l_constant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
+
+		SP_DS_Attribute* l_pcAttrComment = l_constant->GetAttribute(wxT("Comment"));
+
 		if(!l_ParamName.IsEmpty())
-			l_constant->GetAttribute(wxT("Comment"))->SetValueString(wxT("name: ")+l_ParamName);
+		{
+			l_ParamName = wxT("name=\"") + l_ParamName + wxT("\"\n");
+		}
+
+		wxString l_sNotes;
+		if(l_sbmlParameter->isSetNotes())
+		{
+			l_sNotes = l_sbmlParameter->getNotesString();
+		}
+
+		wxString l_sAnnotation;
+		if(l_sbmlParameter->isSetAnnotation())
+		{
+			l_sAnnotation = l_sbmlParameter->getAnnotationString();
+		}
+
+		l_pcAttrComment->SetValueString(l_ParamName+l_sNotes+l_sAnnotation);
+		l_pcAttrComment->SetShow(false);
 
 		wxString l_parameterValue;
 		if (l_sbmlParameter->isSetValue())

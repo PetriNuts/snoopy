@@ -12,13 +12,45 @@
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 #include "sp_ds/extensions/continuous/SP_DS_ContinuousPlaceFormula.h"
 
-SP_ExportContPed2SBML::SP_ExportContPed2SBML()
+bool
+SP_ExportContPed2SBML::AddToDialog(SP_DLG_ExportProperties* p_pcDlg, SP_MDI_Doc* p_pcDoc)
 {
+	 SP_WDG_NotebookPage* l_pcNotebookPage = p_pcDlg->AddPage(wxT("SBML LEVELS"));
+
+	wxSizer* l_pcMainTablePropertiesSizer =	new wxStaticBoxSizer( new wxStaticBox( l_pcNotebookPage, -1,
+											wxT("Choose Your Option") ), wxVERTICAL );
+	wxSizer* l_pcRowSizer = new wxBoxSizer( wxVERTICAL );
+
+	m_pRadioButton1=new wxRadioButton(l_pcNotebookPage, -1, wxT("&SBML LEVEL2 V3"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	m_pRadioButton2=new wxRadioButton(l_pcNotebookPage, -1, wxT("&SBML LEVEL1 V2"), wxDefaultPosition, wxDefaultSize);
+	m_pRadioButton1->SetValue(true);
+
+	l_pcRowSizer->Add(m_pRadioButton1, 0, wxEXPAND | wxALL, 5);
+	l_pcRowSizer->Add(m_pRadioButton2, 0, wxEXPAND | wxALL, 5);
+	l_pcMainTablePropertiesSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALL, 5);
+
+	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
+
+	l_pcMainTablePropertiesSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALL, 5);
+
+	l_pcNotebookPage->AddControl(l_pcMainTablePropertiesSizer, 0, wxEXPAND | wxALL, 5);
+
+	 return true;
 }
 
-SP_ExportContPed2SBML::~SP_ExportContPed2SBML()
+bool
+SP_ExportContPed2SBML::OnDialogOk()
 {
+	if(m_pRadioButton1->GetValue())
+		level=2;
+	else if(m_pRadioButton2->GetValue())
+		level=1;
+	else     //else run sbml level 2 by default
+		level=2;
+
+	return true;
 }
+
 
 bool SP_ExportContPed2SBML::AcceptsDoc(SP_MDI_Doc* p_doc)
 {
@@ -30,17 +62,45 @@ bool SP_ExportContPed2SBML::AcceptsDoc(SP_MDI_Doc* p_doc)
 
 bool SP_ExportContPed2SBML::DoWrite()
 {
-	unsigned int l_nLevel = 2;
-	unsigned int l_nVersion = 3;
+	bool l_bReturn = true;
+	unsigned int l_nLevel;
+	unsigned int l_nVersion;
+	if(level==1)
+	{
+		l_nLevel=1;
+		l_nVersion=2;
+	}
+	else
+	{
+		l_nLevel=2;
+		l_nVersion=3;
+	}
+
 	m_pcSbmlDoc = new SBMLDocument(l_nLevel, l_nVersion);
 	CHECK_POINTER(m_pcSbmlDoc, return false);
-	wxString l_sModelname = m_fileName.AfterLast(wxT('/'));
-	l_sModelname = l_sModelname.AfterLast(wxT('\\'));
+	wxString l_sModelname = m_doc->GetUserReadableName();
 	l_sModelname.Replace(wxT("."), wxT("_"));
-	m_pcSbmlModel = m_pcSbmlDoc->createModel(l_sModelname.utf8_str().data());
+	std::string l_sModel = std::string(l_sModelname.mb_str());
+	m_pcSbmlModel = m_pcSbmlDoc->createModel(l_sModel);
 	CHECK_POINTER(m_pcSbmlModel, return false);
 
-	bool l_bReturn = WriteGraph();
+
+	//Unit Defination
+	UnitDefinition* l_pcUnitDefinition = m_pcSbmlModel->createUnitDefinition();
+	l_pcUnitDefinition->setId("substance");
+	Unit* l_pcUnit = m_pcSbmlModel->createUnit();
+	//UnitKind_t kind=item;
+	l_pcUnit->setKind(UNIT_KIND_ITEM);
+
+
+
+	Compartment* l_pcCompartment = m_pcSbmlModel->createCompartment();
+	l_pcCompartment->setId("compartment");
+	unsigned int l_nDimension = 0;
+	l_pcCompartment->setSpatialDimensions(l_nDimension);
+	//l_pcCompartment->setSize(1);
+
+	l_bReturn = WriteGraph();
 
 	if (ValidateSBML())
 	{
@@ -61,30 +121,51 @@ bool SP_ExportContPed2SBML::DoWrite()
 
 bool SP_ExportContPed2SBML::WritePlaces()
 {
+	const Compartment* l_pcCompartment = m_pcSbmlModel->getCompartment(0);
+
 	ContPlaceIdMap::iterator pIt;
 	SP_ContPlace* p;
 	for (pIt = m_contPlaceIdMap.begin(); pIt != m_contPlaceIdMap.end(); pIt++)
 	{
 		p = (*pIt).second;
 
-		wxString l_sCompId = wxT("compartment");
-		if(!p->m_node->GetAttribute(wxT("Comment"))->GetValueString().IsEmpty())
-		{
-			l_sCompId = p->m_node->GetAttribute(wxT("Comment"))->GetValueString();
-		}
-		Compartment* l_pcCompartment = m_pcSbmlModel->getCompartment(l_sCompId.utf8_str().data());
-		if(!l_pcCompartment)
-		{
-			l_pcCompartment = m_pcSbmlModel->getCompartment("compartment");
-		}
 		Species* l_pcSpecies = m_pcSbmlModel->createSpecies();
 
+		SP_DS_Attribute* l_pcAttrComment = p->m_node->GetAttribute(wxT("Comment"));
+		wxString comment = l_pcAttrComment->GetValueString();
+
+		wxString compartment = SP_ExtractAttribute(wxT("compartment"), comment);
+		if(compartment.IsEmpty())
+		{
+			l_pcSpecies->setCompartment(l_pcCompartment->getId());
+		}
+		else
+		{
+			l_pcSpecies->setCompartment(compartment);
+		}
+
 		l_pcSpecies->setCompartment(l_pcCompartment->getId());
-		l_pcSpecies->setId(p->m_name.utf8_str().data());
+		l_pcSpecies->setId(p->m_name);
+		wxString name = SP_ExtractAttribute(wxT("name"), comment);
+		if(!name.IsEmpty())
+		{
+			l_pcSpecies->setName(name);
+		}
 
 		l_pcSpecies->setInitialConcentration(p->m_marking);
 
 		l_pcSpecies->setBoundaryCondition(p->m_fixed);
+
+		wxString notes = SP_ExtractNode(wxT("notes"), comment);
+		if(!notes.IsEmpty())
+		{
+			l_pcSpecies->setNotes(notes);
+		}
+		wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
+		if(!annotation.IsEmpty())
+		{
+			l_pcSpecies->setAnnotation(annotation);
+		}
 	}
 	return TRUE;
 }
@@ -102,10 +183,41 @@ bool SP_ExportContPed2SBML::WriteTransitions()
 	wxString l_sEquation;
 	for (tIt = m_contTrIdMap.begin(); tIt != m_contTrIdMap.end(); tIt++)
 	{
-		Reaction* l_pcReaction = m_pcSbmlModel->createReaction();
 		t = (*tIt).second;
-		l_pcReaction->setId(t->m_name.utf8_str().data());
+		SP_DS_Attribute* l_pcAttrComment = t->m_node->GetAttribute(wxT("Comment"));
+		wxString comment = l_pcAttrComment->GetValueString();
+
+		Reaction* l_pcReaction = m_pcSbmlModel->createReaction();
+		l_pcReaction->setId(t->m_name);
 		l_pcReaction->setReversible(t->m_reversible);
+
+		wxString name = SP_ExtractAttribute(wxT("name"), comment);
+		if(!name.IsEmpty())
+		{
+			l_pcReaction->setName(name);
+		}
+
+		wxString notes = SP_ExtractNode(wxT("notes"), comment);
+		if(!notes.IsEmpty())
+		{
+			l_pcReaction->setNotes(notes);
+		}
+
+		wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
+		if(!annotation.IsEmpty())
+		{
+			l_pcReaction->setAnnotation(annotation);
+		}
+
+		l_sEquation = t->m_function;
+		if (!l_sEquation.IsEmpty())
+		{
+			SP_DS_ContinuousPlaceFormula l_pFormula(l_sEquation);
+			l_sEquation = l_pFormula.ReplacePatternInTransitionFormula(t->m_node);
+		}
+
+		KineticLaw* l_pcKineticLaw = l_pcReaction->createKineticLaw();
+		l_pcKineticLaw->setFormula(l_sEquation);
 
 		aList = m_preContTrMap[t->m_id];
 		l_nWrittenPrePostPlaces = 0;
@@ -164,16 +276,6 @@ bool SP_ExportContPed2SBML::WriteTransitions()
 			}
 		}
 
-		l_sEquation = t->m_function;
-		if (!l_sEquation.IsEmpty())
-		{
-			SP_DS_ContinuousPlaceFormula l_pFormula(l_sEquation);
-			l_sEquation = l_pFormula.ReplacePatternInTransitionFormula(t->m_node);
-		}
-
-		KineticLaw* l_pcKineticLaw = l_pcReaction->createKineticLaw();
-		l_pcKineticLaw->setFormula(l_sEquation.utf8_str().data());
-
 	}
 
 	return TRUE;
@@ -183,89 +285,73 @@ bool SP_ExportContPed2SBML::WriteGraph()
 {
 	bool l_bReturn = true;
 
-	l_bReturn = WriteCompartments();
+	l_bReturn = WriteConstants();
 	l_bReturn = WritePlaces();
-	l_bReturn = WriteParameters();
 	l_bReturn = WriteTransitions();
 
 	return l_bReturn;
 }
 
-bool SP_ExportContPed2SBML::WriteCompartments()
-{
-	bool l_bReturn = false;
-
-	ConstantIdMap::iterator l_itConst;
-	SP_Constant* l_pcConst;
-
-	for (l_itConst = m_constantIdMap.begin(); l_itConst != m_constantIdMap.end(); l_itConst++)
-	{
-		l_pcConst = l_itConst->second;
-		if(	l_pcConst->m_node->GetAttribute(wxT("Comment"))->GetValueString() == wxT("compartment"))
-		{
-			Compartment* l_sbmlComp = m_pcSbmlModel->createCompartment();
-			l_sbmlComp->setId(l_pcConst->m_name.utf8_str().data());
-			l_sbmlComp->setSize(l_pcConst->m_marking);
-			l_bReturn = true;
-		}
-	}
-
-	ParameterIdMap::iterator l_itParam;
-	SP_Parameter* l_pcParam;
-
-	for (l_itParam = m_parameterIdMap.begin(); l_itParam != m_parameterIdMap.end(); l_itParam++)
-	{
-		l_pcParam = l_itParam->second;
-		if(	l_pcParam->m_node->GetAttribute(wxT("Comment"))->GetValueString() == wxT("compartment"))
-		{
-			Compartment* l_sbmlComp = m_pcSbmlModel->createCompartment();
-			l_sbmlComp->setId(l_pcParam->m_name.utf8_str().data());
-			l_sbmlComp->setSize(l_pcParam->m_marking);
-			l_bReturn = true;
-		}
-	}
-	if(!l_bReturn)
-	{
-		Compartment* l_sbmlComp = m_pcSbmlModel->createCompartment();
-		l_sbmlComp->setId("compartment");
-		l_sbmlComp->setSize(1);
-		l_bReturn = true;
-	}
-
-	return l_bReturn;
-
-}
-
-bool SP_ExportContPed2SBML::WriteParameters()
+bool SP_ExportContPed2SBML::WriteConstants()
 {
 	bool l_bReturn = true;
+	ConstantMap::iterator l_itConst;
 
-	ConstantIdMap::iterator l_itConst;
-	SP_Constant* l_pcConst;
-
-	for (l_itConst = m_constantIdMap.begin(); l_itConst != m_constantIdMap.end(); l_itConst++)
+	for(l_itConst = m_constantNameMap.begin(); l_itConst != m_constantNameMap.end(); ++l_itConst)
 	{
-		l_pcConst = l_itConst->second;
-		Parameter* l_sbmlParam = m_pcSbmlModel->createParameter();
-		l_sbmlParam->setConstant(true);
-		l_sbmlParam->setId(l_pcConst->m_name.utf8_str().data());
-		l_sbmlParam->setValue(l_pcConst->m_marking);
-	}
+		SP_Constant *pa = l_itConst->second;
+		wxString id = NormalizeString(pa->m_name);
 
-	ParameterIdMap::iterator l_itParam;
-	SP_Parameter* l_pcParam;
+		SP_DS_Attribute* l_pcAttrComment = pa->m_node->GetAttribute(wxT("Comment"));
+		wxString comment = l_pcAttrComment->GetValueString();
 
-	for (l_itParam = m_parameterIdMap.begin(); l_itParam != m_parameterIdMap.end(); l_itParam++)
-	{
-		l_pcParam = l_itParam->second;
-		Parameter* l_sbmlParam = m_pcSbmlModel->createParameter();
-		l_sbmlParam->setConstant(true);
-		l_sbmlParam->setId(l_pcParam->m_name.utf8_str().data());
-		l_sbmlParam->setValue(l_pcParam->m_marking);
+		wxString name = SP_ExtractAttribute(wxT("name"), comment);
+		wxString notes = SP_ExtractNode(wxT("notes"), comment);
+		wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
+
+		if(pa->m_group.IsSameAs(wxT("compartment"), false))
+		{
+			Compartment* l_pcComp = m_pcSbmlModel->createCompartment();
+			l_pcComp->setConstant(true);
+
+			l_pcComp->setId(id);
+			l_pcComp->setSize(pa->m_marking);
+			if(!name.IsEmpty())
+			{
+				l_pcComp->setName(name);
+			}
+			if(!notes.IsEmpty())
+			{
+				l_pcComp->setNotes(notes);
+			}
+			if(!annotation.IsEmpty())
+			{
+				l_pcComp->setAnnotation(annotation);
+			}
+		}
+		else
+		{
+			Parameter* l_pcParam = m_pcSbmlModel->createParameter();
+			l_pcParam->setConstant(true);
+
+			l_pcParam->setId(id);
+			l_pcParam->setValue(pa->m_marking);
+			if(!name.IsEmpty())
+			{
+				l_pcParam->setName(name);
+			}
+			if(!notes.IsEmpty())
+			{
+				l_pcParam->setNotes(notes);
+			}
+			if(!annotation.IsEmpty())
+			{
+				l_pcParam->setAnnotation(annotation);
+			}
+		}
 	}
 
 	return l_bReturn;
-
 }
 
 bool SP_ExportContPed2SBML::ValidateSBML()

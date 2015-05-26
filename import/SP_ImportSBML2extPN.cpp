@@ -108,7 +108,13 @@ void SP_ImportSBML2extPN::getModelCompartments()
 			l_sNotes = l_sbmlCompartment->getNotesString();
 		}
 
-		l_pcAttrComment->SetValueString(l_CompName+l_sNotes);
+		wxString l_sAnnotation;
+		if(l_sbmlCompartment->isSetAnnotation())
+		{
+			l_sAnnotation = l_sbmlCompartment->getAnnotationString();
+		}
+
+		l_pcAttrComment->SetValueString(l_CompName+l_sNotes+l_sAnnotation);
 		l_pcAttrComment->SetShow(false);
 
 		wxString l_parameterValue;
@@ -202,6 +208,10 @@ void SP_ImportSBML2extPN::getSpecies()
 				{
 					l_comment << l_sbmlSpecies->getNotesString();
 				}
+				if(l_sbmlSpecies->isSetAnnotation())
+				{
+					l_comment << l_sbmlSpecies->getAnnotationString();
+				}
 				l_pcAttrComment->SetValueString(l_comment);
 				l_pcAttrComment->SetShow(false);
 
@@ -244,14 +254,21 @@ void SP_ImportSBML2extPN::getReactions ()
 			}
 
 			wxString l_sKineticLaw;
-			if(l_sbmlReaction->isSetKineticLaw())
+/*			if(l_sbmlReaction->isSetKineticLaw())
 			{
 				l_sKineticLaw = wxT("<kineticLaw>\n") + l_sbmlReaction->getKineticLaw()->getFormula() + wxT("\n</kineticLaw>\n");
 			}
+*/
 			wxString l_sNotes;
 			if(l_sbmlReaction->isSetNotes())
 			{
 				l_sNotes = l_sbmlReaction->getNotesString();
+			}
+
+			wxString l_sAnnotation;
+			if(l_sbmlReaction->isSetAnnotation())
+			{
+				l_sAnnotation = l_sbmlReaction->getAnnotationString();
 			}
 
 			// is reversible (0,1 for false,true) or 0 for default (false)
@@ -284,7 +301,7 @@ void SP_ImportSBML2extPN::getReactions ()
 				l_pcAttrRevComment->SetShow(false);
 			}
 
-			l_pcAttrComment->SetValueString(l_ReactionName+l_sReversible+l_sKineticLaw+l_sNotes);
+			l_pcAttrComment->SetValueString(l_ReactionName+l_sReversible+l_sKineticLaw+l_sNotes+l_sAnnotation);
 			l_pcAttrComment->SetShow(false);
 
 			// get reactants, products and modifiers

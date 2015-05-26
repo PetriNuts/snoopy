@@ -7,6 +7,7 @@
 #include <wx/filename.h>
 #include <wx/tokenzr.h>
 #include <wx/sstream.h>
+#include <wx/regex.h>
 
 #include "sp_core/base/SP_Graphic.h"
 
@@ -102,7 +103,6 @@ SP_ExportSBML::DoWrite()
 	//l_pcCompartment->setSize(1);
 
 	WriteConstants();
-	WriteParameters();
 	WritePlaces();
 	WriteTransitions();
 
@@ -129,26 +129,54 @@ bool SP_ExportSBML::WritePlaces()
 	const Compartment* l_pcCompartment = m_pcSbmlModel->getCompartment(0);
 
 	PlaceIdMap::iterator pIt;
-	SP_Place* p;
+
 	for (pIt = m_placeIdMap.begin(); pIt != m_placeIdMap.end(); pIt++)
 	{
-		p = (*pIt).second;
+		SP_Place* p = (*pIt).second;
+
+		SP_DS_Attribute* l_pcAttrComment = p->m_node->GetAttribute(wxT("Comment"));
+		wxString comment = l_pcAttrComment->GetValueString();
 
 		Species* l_pcSpecies = m_pcSbmlModel->createSpecies();
 
-		l_pcSpecies->setCompartment(l_pcCompartment->getId());
+		wxString compartment = SP_ExtractAttribute(wxT("compartment"), comment);
+		if(compartment.IsEmpty())
+		{
+			l_pcSpecies->setCompartment(l_pcCompartment->getId());
+		}
+		else
+		{
+			l_pcSpecies->setCompartment(compartment);
+		}
 		l_pcSpecies->setHasOnlySubstanceUnits(true);
 
-		wxString nName = NormalizeString(p->m_name);
-		if (p->m_name != nName)
-		{
-			SP_LOGWARNING(
-					wxString::Format(wxT("place name %s was changed to %s"),
-							p->m_name.c_str(), nName.c_str()));
-		}
-		l_pcSpecies->setId(nName.utf8_str().data());
+		wxString id = NormalizeString(p->m_name);
+		l_pcSpecies->setId(id);
 
 		l_pcSpecies->setInitialAmount(p->m_marking);
+
+		wxString name = SP_ExtractAttribute(wxT("name"), comment);
+		if(!name.IsEmpty())
+		{
+			l_pcSpecies->setName(name);
+		}
+		wxString boundaryCondition = SP_ExtractAttribute(wxT("boundaryCondition"), comment);
+		if(boundaryCondition.IsSameAs(wxT("true"), false))
+		{
+			l_pcSpecies->setBoundaryCondition(true);
+		}
+		wxString notes = SP_ExtractNode(wxT("notes"), comment);
+		if(!notes.IsEmpty())
+		{
+			l_pcSpecies->setNotes(notes);
+		}
+		wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
+		//SP_LOGMESSAGE(wxT("annotation: \n") + annotation);
+		if(!annotation.IsEmpty())
+		{
+			l_pcSpecies->setAnnotation(annotation);
+		}
+
 	}
 
 	return l_bReturn;
@@ -158,22 +186,47 @@ bool SP_ExportSBML::WriteTransitions()
 {
 	bool l_bReturn = true;
 	TransitionIdMap::iterator tIt;
-	SP_Transition* t;
+
 	for (tIt = m_trIdMap.begin(); tIt != m_trIdMap.end(); tIt++)
 	{
-		t = (*tIt).second;
+		SP_Transition* t = (*tIt).second;
+
+		SP_DS_Attribute* l_pcAttrComment = t->m_node->GetAttribute(wxT("Comment"));
+		wxString comment = l_pcAttrComment->GetValueString();
 
 		Reaction* l_pcReaction = m_pcSbmlModel->createReaction();
 		l_pcReaction->setReversible(false);
 
-		wxString nName = NormalizeString(t->m_name);
-		if (t->m_name != nName)
+		wxString id = NormalizeString(t->m_name);
+		l_pcReaction->setId(id);
+
+		wxString name = SP_ExtractAttribute(wxT("name"), comment);
+		if(!name.IsEmpty())
 		{
-			SP_LOGWARNING(
-					wxString::Format(wxT("tr name %s was changed to %s"),
-							t->m_name.c_str(), nName.c_str()));
+			l_pcReaction->setName(name);
 		}
-		l_pcReaction->setId(nName.utf8_str().data());
+
+		wxString reversible = SP_ExtractAttribute(wxT("reversible"), comment);
+		if(reversible.IsSameAs(wxT("true"), false))
+		{
+			l_pcReaction->setReversible(true);
+		}
+		else
+		{
+			l_pcReaction->setReversible(false);
+		}
+
+		wxString notes = SP_ExtractNode(wxT("notes"), comment);
+		if(!notes.IsEmpty())
+		{
+			l_pcReaction->setNotes(notes);
+		}
+
+		wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
+		if(!annotation.IsEmpty())
+		{
+			l_pcReaction->setAnnotation(annotation);
+		}
 
 		wxString l_sEquation = t->m_function;
 		//check for MassAction
@@ -260,32 +313,6 @@ bool SP_ExportSBML::WriteTransitions()
 	return l_bReturn;
 }
 
-bool SP_ExportSBML::WriteParameters()
-{
-	bool l_bReturn = true;
-	ParameterMap::iterator l_itParam;
-
-	for(l_itParam = m_parameterNameMap.begin(); l_itParam != m_parameterNameMap.end(); ++l_itParam)
-	{
-		SP_Parameter *pa = l_itParam->second;
-		wxString name = NormalizeString(pa->m_name);
-		if (pa->m_name != name)
-		{
-			SP_LOGWARNING(
-					wxString::Format(wxT("parameter name %s was changed to %s"),
-							pa->m_name.c_str(), name.c_str()));
-		}
-
-		Parameter* l_pcParam = m_pcSbmlModel->createParameter();
-		l_pcParam->setConstant(true);
-
-		l_pcParam->setId(name.utf8_str().data());
-		l_pcParam->setValue(pa->m_marking);
-	}
-
-	return l_bReturn;
-}
-
 bool SP_ExportSBML::WriteConstants()
 {
 	bool l_bReturn = true;
@@ -294,23 +321,60 @@ bool SP_ExportSBML::WriteConstants()
 	for(l_itConst = m_constantNameMap.begin(); l_itConst != m_constantNameMap.end(); ++l_itConst)
 	{
 		SP_Constant *pa = l_itConst->second;
-		wxString name = NormalizeString(pa->m_name);
-		if (pa->m_name != name)
+		wxString id = NormalizeString(pa->m_name);
+
+		SP_DS_Attribute* l_pcAttrComment = pa->m_node->GetAttribute(wxT("Comment"));
+		wxString comment = l_pcAttrComment->GetValueString();
+
+		wxString name = SP_ExtractAttribute(wxT("name"), comment);
+		wxString notes = SP_ExtractNode(wxT("notes"), comment);
+		wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
+
+		if(pa->m_group.IsSameAs(wxT("compartment"), false))
 		{
-			SP_LOGWARNING(
-					wxString::Format(wxT("constant name %s was changed to %s"),
-							pa->m_name.c_str(), name.c_str()));
+			Compartment* l_pcComp = m_pcSbmlModel->createCompartment();
+			l_pcComp->setConstant(true);
+
+			l_pcComp->setId(id);
+			l_pcComp->setSize(pa->m_marking);
+			if(!name.IsEmpty())
+			{
+				l_pcComp->setName(name);
+			}
+			if(!notes.IsEmpty())
+			{
+				l_pcComp->setNotes(notes);
+			}
+			if(!annotation.IsEmpty())
+			{
+				l_pcComp->setAnnotation(annotation);
+			}
 		}
+		else
+		{
+			Parameter* l_pcParam = m_pcSbmlModel->createParameter();
+			l_pcParam->setConstant(true);
 
-		Parameter* l_pcParam = m_pcSbmlModel->createParameter();
-		l_pcParam->setConstant(true);
-
-		l_pcParam->setId(name.utf8_str().data());
-		l_pcParam->setValue(pa->m_marking);
+			l_pcParam->setId(id);
+			l_pcParam->setValue(pa->m_marking);
+			if(!name.IsEmpty())
+			{
+				l_pcParam->setName(name);
+			}
+			if(!notes.IsEmpty())
+			{
+				l_pcParam->setNotes(notes);
+			}
+			if(!annotation.IsEmpty())
+			{
+				l_pcParam->setAnnotation(annotation);
+			}
+		}
 	}
 
 	return l_bReturn;
 }
+
 
 bool SP_ExportSBML::ValidateSBML()
 {

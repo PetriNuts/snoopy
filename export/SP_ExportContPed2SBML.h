@@ -9,25 +9,31 @@
 #include <sbml/SBMLTypes.h>
 
 #include "export/SP_ExportPT.h"
+#include "sp_gui/dialogs/SP_DLG_ExportProperties.h"
 
 class SP_ExportContPed2SBML: public SP_ExportPT
 {
 private:
+	wxRadioButton* m_pRadioButton1;
+	wxRadioButton* m_pRadioButton2;
+
+	//int m_nMode;
+	int level;
+
 	SBMLDocument* m_pcSbmlDoc;
 	Model* m_pcSbmlModel;
 
 protected:
 	bool WriteGraph();
-	bool WriteCompartments();
+	bool WriteConstants();
 	bool WritePlaces();
 	bool WriteTransitions();
-	bool WriteParameters();
 	virtual bool DoWrite();
 
 
 public:
-	SP_ExportContPed2SBML();
-	virtual ~SP_ExportContPed2SBML();
+	virtual bool OnDialogOk();
+	virtual bool AddToDialog(SP_DLG_ExportProperties* p_pcDlg, SP_MDI_Doc* p_pcDoc);
 
 	virtual bool AcceptsDoc(SP_MDI_Doc*);
 

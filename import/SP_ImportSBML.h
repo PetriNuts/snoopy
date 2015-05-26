@@ -17,8 +17,8 @@
 #include "sp_ds/extensions/SP_DS_NetCreater.h"
 
 class SP_ImportSBML: public SP_ImportRoutine,
-	public SP_Error,
-	public SP_DS_NetCreater
+						public SP_Error,
+						public SP_DS_NetCreater
 
 {
 

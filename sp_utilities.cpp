@@ -213,4 +213,27 @@ wxString SP_NormalizeString(const wxString& p_S)
 	return tmp;
 }
 
+wxString SP_ExtractAttribute(const wxString& p_sName, const wxString& p_sSource)
+{
+	wxString l_sPattern = p_sName+wxT("\\s*=\\s*\"([^\"]+)\"");
+	wxRegEx l_cRegEx(l_sPattern, wxRE_ADVANCED);
+	if(l_cRegEx.Matches(p_sSource))
+	{
+		return l_cRegEx.GetMatch(p_sSource, 1);
+	}
+	return {};
+}
+
+wxString SP_ExtractNode(const wxString& p_sName, const wxString& p_sSource)
+{
+	int l_Start = p_sSource.Find(wxT("<")+p_sName+wxT(">"));
+	int l_End = p_sSource.Find(wxT("</")+p_sName+wxT(">"));
+	//SP_LOGMESSAGE(wxString::Format(wxT("start: %i end: %i"), l_Start, l_End));
+	if(l_Start != wxNOT_FOUND && l_Start < l_End)
+	{
+		return p_sSource.Mid(l_Start, l_End - l_Start + p_sName.length() + 3) + wxT("\n");
+	}
+	return {};
+}
+
 
