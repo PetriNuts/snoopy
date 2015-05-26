@@ -16,6 +16,12 @@ class SP_ImportSBML2cntPn: public SP_ImportSBML
 private:
 
 	/**
+	\brief  Add model description
+
+	 */
+	void getModelDescription();
+
+	/**
 	\brief  Add model compartment as a parameter node to the a net
 
 	 */

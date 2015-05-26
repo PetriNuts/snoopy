@@ -76,6 +76,21 @@ bool SP_ExportContPed2SBML::DoWrite()
 		l_nVersion=3;
 	}
 
+	SP_DS_Metadataclass* l_pcMC = m_graph->GetMetadataclass(wxT("General"));
+	if(l_pcMC)
+	{
+		SP_DS_Metadata* l_pcGeneral = l_pcMC->GetElements()->front();
+		wxString description = l_pcGeneral->GetAttribute(wxT("Description"))->GetValueString();
+		wxString l_sLevel = SP_ExtractAttribute(wxT("level"), description);
+		wxString l_sVersion = SP_ExtractAttribute(wxT("version"), description);
+
+		if(l_sLevel.IsNumber() && l_sVersion.IsNumber())
+		{
+			l_sLevel.ToULong(&l_nLevel);
+			l_sVersion.ToULong(&l_nVersion);
+		}
+	}
+
 	m_pcSbmlDoc = new SBMLDocument(l_nLevel, l_nVersion);
 	CHECK_POINTER(m_pcSbmlDoc, return false);
 	wxString l_sModelname = m_doc->GetUserReadableName();

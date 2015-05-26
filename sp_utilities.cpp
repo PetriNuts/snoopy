@@ -231,7 +231,7 @@ wxString SP_ExtractNode(const wxString& p_sName, const wxString& p_sSource)
 	//SP_LOGMESSAGE(wxString::Format(wxT("start: %i end: %i"), l_Start, l_End));
 	if(l_Start != wxNOT_FOUND && l_Start < l_End)
 	{
-		return p_sSource.Mid(l_Start, l_End - l_Start + p_sName.length() + 3) + wxT("\n");
+		return p_sSource.Mid(l_Start, l_End - l_Start + p_sName.length() + 3);
 	}
 	return {};
 }

@@ -20,6 +20,12 @@ private:
 	bool m_CreateBoundaryConditions;
 
 	/**
+	\brief  Add model description
+
+	 */
+	void getModelDescription();
+
+	/**
 	\brief  Add model compartment as a parameter node to the a net
 
 	 */

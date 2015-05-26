@@ -65,8 +65,9 @@ bool
 SP_ExportSBML::DoWrite()
 {
 	bool l_bReturn = true;
-	unsigned int l_nLevel;
-	unsigned int l_nVersion;
+	unsigned long l_nLevel;
+	unsigned long l_nVersion;
+
 	if(level==1)
 	{
 		l_nLevel=1;
@@ -78,6 +79,21 @@ SP_ExportSBML::DoWrite()
 		l_nVersion=3;
 	}
 
+	SP_DS_Metadataclass* l_pcMC = m_graph->GetMetadataclass(wxT("General"));
+	if(l_pcMC)
+	{
+		SP_DS_Metadata* l_pcGeneral = l_pcMC->GetElements()->front();
+		wxString description = l_pcGeneral->GetAttribute(wxT("Description"))->GetValueString();
+		wxString l_sLevel = SP_ExtractAttribute(wxT("level"), description);
+		wxString l_sVersion = SP_ExtractAttribute(wxT("version"), description);
+
+		if(l_sLevel.IsNumber() && l_sVersion.IsNumber())
+		{
+			l_sLevel.ToULong(&l_nLevel);
+			l_sVersion.ToULong(&l_nVersion);
+		}
+	}
+
 	m_pcSbmlDoc = new SBMLDocument(l_nLevel, l_nVersion);
 	CHECK_POINTER(m_pcSbmlDoc, return false);
 	wxString l_sModelname = m_doc->GetUserReadableName();
@@ -86,6 +102,34 @@ SP_ExportSBML::DoWrite()
 	m_pcSbmlModel = m_pcSbmlDoc->createModel(l_sModel);
 	CHECK_POINTER(m_pcSbmlModel, return false);
 
+	/*
+	wxString name = SP_ExtractAttribute(wxT("name"), comment);
+	if(!name.IsEmpty())
+	{
+		m_pcSbmlModel->setName(name);
+	}
+	wxString metaid = SP_ExtractAttribute(wxT("metaid"), comment);
+	if(!metaid.IsEmpty())
+	{
+		m_pcSbmlModel->setMetaId(metaid);
+	}
+	wxString notes = SP_ExtractNode(wxT("notes"), comment);
+	if(!notes.IsEmpty())
+	{
+		if(m_pcSbmlModel->setNotes(notes) != LIBSBML_OPERATION_SUCCESS)
+		{
+			SP_LOGWARNING(id + wxT(" notes not exported!\n") + notes);
+		}
+	}
+	wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
+	if(!annotation.IsEmpty())
+	{
+		if(m_pcSbmlModel->setAnnotation(annotation) != LIBSBML_OPERATION_SUCCESS)
+		{
+			SP_LOGWARNING(id + wxT(" annotation not exported!\n") + annotation);
+		}
+	}
+	 */
 
 	//Unit Defination
 	UnitDefinition* l_pcUnitDefinition = m_pcSbmlModel->createUnitDefinition();
@@ -160,21 +204,32 @@ bool SP_ExportSBML::WritePlaces()
 		{
 			l_pcSpecies->setName(name);
 		}
+		wxString metaid = SP_ExtractAttribute(wxT("metaid"), comment);
+		if(!metaid.IsEmpty())
+		{
+			l_pcSpecies->setMetaId(metaid);
+		}
 		wxString boundaryCondition = SP_ExtractAttribute(wxT("boundaryCondition"), comment);
 		if(boundaryCondition.IsSameAs(wxT("true"), false))
 		{
 			l_pcSpecies->setBoundaryCondition(true);
 		}
+
 		wxString notes = SP_ExtractNode(wxT("notes"), comment);
 		if(!notes.IsEmpty())
 		{
-			l_pcSpecies->setNotes(notes);
+			if(l_pcSpecies->setNotes(notes) != LIBSBML_OPERATION_SUCCESS)
+			{
+				SP_LOGWARNING(id + wxT(" notes not exported!\n") + notes);
+			}
 		}
 		wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
-		//SP_LOGMESSAGE(wxT("annotation: \n") + annotation);
 		if(!annotation.IsEmpty())
 		{
-			l_pcSpecies->setAnnotation(annotation);
+			if(l_pcSpecies->setAnnotation(annotation) != LIBSBML_OPERATION_SUCCESS)
+			{
+				SP_LOGWARNING(id + wxT(" annotation not exported!\n") + annotation);
+			}
 		}
 
 	}
@@ -204,6 +259,11 @@ bool SP_ExportSBML::WriteTransitions()
 		if(!name.IsEmpty())
 		{
 			l_pcReaction->setName(name);
+		}
+		wxString metaid = SP_ExtractAttribute(wxT("metaid"), comment);
+		if(!metaid.IsEmpty())
+		{
+			l_pcReaction->setMetaId(metaid);
 		}
 
 		wxString reversible = SP_ExtractAttribute(wxT("reversible"), comment);
@@ -327,6 +387,7 @@ bool SP_ExportSBML::WriteConstants()
 		wxString comment = l_pcAttrComment->GetValueString();
 
 		wxString name = SP_ExtractAttribute(wxT("name"), comment);
+		wxString metaid = SP_ExtractAttribute(wxT("metaid"), comment);
 		wxString notes = SP_ExtractNode(wxT("notes"), comment);
 		wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
 
@@ -340,6 +401,11 @@ bool SP_ExportSBML::WriteConstants()
 			if(!name.IsEmpty())
 			{
 				l_pcComp->setName(name);
+			}
+
+			if(!metaid.IsEmpty())
+			{
+				l_pcComp->setMetaId(metaid);
 			}
 			if(!notes.IsEmpty())
 			{
@@ -360,6 +426,10 @@ bool SP_ExportSBML::WriteConstants()
 			if(!name.IsEmpty())
 			{
 				l_pcParam->setName(name);
+			}
+			if(!metaid.IsEmpty())
+			{
+				l_pcParam->setMetaId(metaid);
 			}
 			if(!notes.IsEmpty())
 			{

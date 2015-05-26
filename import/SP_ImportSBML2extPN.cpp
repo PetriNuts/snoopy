@@ -52,6 +52,7 @@ bool SP_ImportSBML2extPN::ReadFile(const wxString& p_sFile)
 		{
 			m_pcGraph = CreateDocument(SP_DS_EXTPN_CLASS);
 
+			getModelDescription();
 			getModelCompartments();
 			getSpecies();
 			getReactions();
@@ -72,6 +73,51 @@ bool SP_ImportSBML2extPN::ReadFile(const wxString& p_sFile)
 	}
 	l_cDlg.Destroy();
 	return false;
+}
+
+// get Model Description
+void SP_ImportSBML2extPN::getModelDescription()
+{
+	// add Constant for Compartment
+	SP_DS_Metadataclass* l_pcMC = m_pcGraph->GetMetadataclass(wxT("General"));
+
+	SP_DS_Metadata* l_general = l_pcMC->GetElements()->front();
+
+	wxString l_Id = m_sbmlModel->getId();
+
+	l_general->GetAttribute(wxT("Name"))->SetValueString(l_Id);
+
+	SP_DS_Attribute* l_pcAttrComment = l_general->GetAttribute(wxT("Description"));
+	wxString description = l_pcAttrComment->GetValueString();
+
+	wxString l_Name;
+	if(m_sbmlModel->isSetName())
+	{
+		l_Name = wxT("name=\"") + m_sbmlModel->getName() + wxT("\"\n");
+	}
+	wxString l_metaid;
+	if(m_sbmlModel->isSetMetaId())
+	{
+		l_metaid << wxT("metaid=\"") << m_sbmlModel->getMetaId() << wxT("\"\n");
+	}
+
+	wxString l_Level = wxT("level=\"") + wxString::Format(wxT("%u"), m_sbmlModel->getLevel()) + wxT("\"\n");
+	wxString l_Version = wxT("version=\"") + wxString::Format(wxT("%u"), m_sbmlModel->getVersion()) + wxT("\"\n");
+
+	wxString l_sNotes;
+	if(m_sbmlModel->isSetNotes())
+	{
+		l_sNotes = m_sbmlModel->getNotesString();
+	}
+
+	wxString l_sAnnotation;
+	if(m_sbmlModel->isSetAnnotation())
+	{
+		l_sAnnotation = m_sbmlModel->getAnnotationString();
+	}
+
+	l_pcAttrComment->SetValueString(l_Name+l_metaid+l_Level+l_Version+l_sNotes+l_sAnnotation);
+	l_pcAttrComment->SetShow(false);
 }
 
 // get Model Compartments
@@ -102,6 +148,12 @@ void SP_ImportSBML2extPN::getModelCompartments()
 			l_CompName = wxT("name=\"") + l_CompName + wxT("\"\n");
 		}
 
+		wxString l_metaid;
+		if(l_sbmlCompartment->isSetMetaId())
+		{
+			l_metaid << wxT("metaid=\"") << l_sbmlCompartment->getMetaId() << wxT("\"\n");
+		}
+
 		wxString l_sNotes;
 		if(l_sbmlCompartment->isSetNotes())
 		{
@@ -114,7 +166,7 @@ void SP_ImportSBML2extPN::getModelCompartments()
 			l_sAnnotation = l_sbmlCompartment->getAnnotationString();
 		}
 
-		l_pcAttrComment->SetValueString(l_CompName+l_sNotes+l_sAnnotation);
+		l_pcAttrComment->SetValueString(l_CompName+l_metaid+l_sNotes+l_sAnnotation);
 		l_pcAttrComment->SetShow(false);
 
 		wxString l_parameterValue;
@@ -169,6 +221,10 @@ void SP_ImportSBML2extPN::getSpecies()
 				if(!l_speciesName.IsEmpty())
 				{
 					l_comment << wxT("name=\"") << l_speciesName << wxT("\"\n");
+				}
+				if(l_sbmlSpecies->isSetMetaId())
+				{
+					l_comment << wxT("metaid=\"") << l_sbmlSpecies->getMetaId() << wxT("\"\n");
 				}
 
 				if (l_sbmlSpecies->isSetInitialAmount())
@@ -253,6 +309,12 @@ void SP_ImportSBML2extPN::getReactions ()
 				l_ReactionName = wxT("name=\"") + l_ReactionName + wxT("\"\n");
 			}
 
+			wxString l_metaid;
+			if(l_sbmlReaction->isSetMetaId())
+			{
+				l_metaid << wxT("metaid=\"") << l_sbmlReaction->getMetaId() << wxT("\"\n");
+			}
+
 			wxString l_sKineticLaw;
 /*			if(l_sbmlReaction->isSetKineticLaw())
 			{
@@ -301,7 +363,7 @@ void SP_ImportSBML2extPN::getReactions ()
 				l_pcAttrRevComment->SetShow(false);
 			}
 
-			l_pcAttrComment->SetValueString(l_ReactionName+l_sReversible+l_sKineticLaw+l_sNotes+l_sAnnotation);
+			l_pcAttrComment->SetValueString(l_ReactionName+l_metaid+l_sReversible+l_sKineticLaw+l_sNotes+l_sAnnotation);
 			l_pcAttrComment->SetShow(false);
 
 			// get reactants, products and modifiers
