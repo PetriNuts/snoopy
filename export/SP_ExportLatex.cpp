@@ -30,14 +30,17 @@ enum {
 	SP_ID_GENERAL_LATEXMK,
 
 	SP_ID_BASICS_UPDATE,
+	SP_ID_BASICS_CHECK,
 	SP_ID_BUTTON_BASICS_UP,
 	SP_ID_BUTTON_BASICS_DOWN,
 
 	SP_ID_DECLARATIONS_UPDATE,
+	SP_ID_DECLARATIONS_CHECK,
 	SP_ID_BUTTON_DECLARATIONS_UP,
 	SP_ID_BUTTON_DECLARATIONS_DOWN,
 
 	SP_ID_GRAPH_UPDATE,
+	SP_ID_GRAPH_CHECK,
 	SP_ID_BUTTON_GRAPH_UP,
 	SP_ID_BUTTON_GRAPH_DOWN,
 
@@ -893,7 +896,7 @@ SP_ExportLatex::AddGeneral()
 	//sizer for latex compiler browse
 	wxSizer* l_pcSizerPath1 = new wxBoxSizer( wxHORIZONTAL );
 
-	l_pcSizerPath1->Add(new wxStaticText( m_pcNotebookPageGeneral, -1, wxT("Latex Compiler Location:") ), 0, wxALL, 5);
+	l_pcSizerPath1->Add(new wxStaticText( m_pcNotebookPageGeneral, -1, wxT("Latex Compiler Location:") ), 0, wxALL | wxEXPAND, 5);
 
 
 	m_sCompilerPath = wxT("/usr/texbin/pdflatex");
@@ -937,6 +940,7 @@ SP_ExportLatex::AddBasics()
 	l_pcButtonDown = new wxButton( m_pcNotebookPageBasics, SP_ID_BUTTON_BASICS_DOWN, wxT("Down"), wxDefaultPosition, wxDefaultSize );
 
 	m_pcRearrangelist_basics->Bind(wxEVT_LISTBOX, &SP_ExportLatex::OnSelChange_Basics, this, SP_ID_BASICS_UPDATE);
+	m_pcRearrangelist_basics->Bind(wxEVT_CHECKLISTBOX, &SP_ExportLatex::OnCheckUncheck_Basics, this, SP_ID_BASICS_UPDATE);
 
 	l_pcButtonUp->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Basics_UpdateUI, this, SP_ID_BUTTON_BASICS_UP);
 	l_pcButtonDown->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Basics_UpdateUI, this, SP_ID_BUTTON_BASICS_DOWN);
@@ -1104,6 +1108,7 @@ SP_ExportLatex::AddGraphElements()
 	m_pcGraph_ButtonDown = new wxButton(m_pcNotebookPageGraph, SP_ID_BUTTON_GRAPH_DOWN, wxT("Down"), wxDefaultPosition, wxDefaultSize );
 
 	m_pcRearrangelist_Graph->Bind(wxEVT_LISTBOX, &SP_ExportLatex::OnSelChange_Graph, this, SP_ID_GRAPH_UPDATE);
+	m_pcRearrangelist_Graph->Bind(wxEVT_CHECKLISTBOX, &SP_ExportLatex::OnCheckUncheck_Graph, this, SP_ID_GRAPH_UPDATE);
 
 	m_pcGraph_ButtonUp->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Graph_UpdateUI, this, SP_ID_BUTTON_GRAPH_UP);
 	m_pcGraph_ButtonDown->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Graph_UpdateUI, this, SP_ID_BUTTON_GRAPH_DOWN);
@@ -1214,6 +1219,7 @@ SP_ExportLatex::AddDeclarations()
 	m_pcDeclarations_ButtonDown = new wxButton( m_pcNotebookPageDeclarations, SP_ID_BUTTON_DECLARATIONS_DOWN, wxT("Down"), wxDefaultPosition, wxDefaultSize );
 
 	m_pcRearrangelist_declarations->Bind(wxEVT_LISTBOX, &SP_ExportLatex::OnSelChange_Declarations, this, SP_ID_DECLARATIONS_UPDATE);
+	m_pcRearrangelist_declarations->Bind(wxEVT_CHECKLISTBOX, &SP_ExportLatex::OnCheckUncheck_Declarations, this, SP_ID_DECLARATIONS_UPDATE);
 
 	m_pcDeclarations_ButtonUp->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Declarations_UpdateUI, this, SP_ID_BUTTON_DECLARATIONS_UP);
 	m_pcDeclarations_ButtonDown->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Declarations_UpdateUI, this, SP_ID_BUTTON_DECLARATIONS_DOWN);
@@ -1669,10 +1675,93 @@ SP_ExportLatex::OnSelChange_Basics(wxCommandEvent& p_cEvent)
 }
 
 void
+SP_ExportLatex::OnCheckUncheck_Basics(wxCommandEvent& p_cEvent)
+{
+	int id = m_pcRearrangelist_basics->GetCurrentOrder()[ p_cEvent.GetInt() ];
+
+	bool show = m_pcRearrangelist_basics->IsChecked(id);
+
+	switch( id ) {
+
+		case 0:
+			SP_LOGMESSAGE("General Info Checkbox");
+
+			for(int i = 0; i < m_pcCheckBox_BasicsGeneral.size(); i++) {
+				m_pcCheckBox_BasicsGeneral[i]->Enable(show);
+			}
+
+			break;
+
+		case 1:
+			SP_LOGMESSAGE("Net Info Checkbox");
+
+			for(int i = 0; i < m_pcCheckBox_BasicsNet.size(); i++) {
+				m_pcCheckBox_BasicsNet[i]->Enable(show);
+			}
+
+			break;
+
+		case 2:
+			SP_LOGMESSAGE("Report Layout Checkbox");
+
+			m_pcBasics_Landscape->Enable(show);
+			m_pcBasics_Portrait->Enable(show);
+
+			m_pcTextCtrlHeaderFooter[0]->Enable(show);
+			m_pcTextCtrlHeaderFooter[1]->Enable(show);
+
+			for(int i = 0; i < m_pcCheckBox_BasicsLayout.size(); i++) {
+				m_pcCheckBox_BasicsLayout[i]->Enable(show);
+			}
+
+			break;
+
+		case 3:
+			SP_LOGMESSAGE("Report Typography Checkbox");
+
+			m_pcComboBox_FontFamily->Enable(show);
+			m_pcComboBox_PaperSize->Enable(show);
+			break;
+
+		default:
+			SP_LOGMESSAGE("Default prompt Checkbox");
+	}
+
+}
+
+
+void
 SP_ExportLatex::OnSelChange_Graph(wxCommandEvent& p_cEvent)
 {
 	m_nSelectionId_Graph = m_pcRearrangelist_Graph->GetCurrentOrder()[ p_cEvent.GetInt() ];
 	UpdateRightPanel_Graph( m_nSelectionId_Graph );
+}
+
+void
+SP_ExportLatex::OnCheckUncheck_Graph(wxCommandEvent& p_cEvent)
+{
+	int id = m_pcRearrangelist_Graph->GetCurrentOrder()[ p_cEvent.GetInt() ];
+
+	SP_LOGMESSAGE( wxT("id check:" ) + wxString::Format( wxT("%i"), id) );
+	bool show = m_pcRearrangelist_Graph->IsChecked(id);
+
+	wxString l_sCurrentNode = SP_Index2Node[ id ];   //node class
+    //SP_LOGMESSAGE( wxT("Node = ") + l_sCurrentNode );
+	SP_Node2AttributeCheckList[id]->Enable(show);
+
+	if( (l_sCurrentNode.Find( wxT("Edge") ) == wxNOT_FOUND) && l_sCurrentNode.Cmp("Comment") )  //if not an edge or comment
+    {
+		SP_Node2NodeCheckList[id]->Enable(show);
+		SP_Node2SelectClearAllCheckBox[id]->Enable(show);
+
+    } else if (l_sCurrentNode.Find( wxT("Edge") ) != wxNOT_FOUND) {  //is an edge
+
+    	m_pcOrderBySource->Enable(show);
+    	m_pcOrderbyTarget->Enable(show);
+    	m_pcGroupByPlace2Transition->Enable(show);
+    	m_pcGroupbyTransition2Place->Enable(show);
+    }
+
 }
 
 void
@@ -1682,6 +1771,17 @@ SP_ExportLatex::OnSelChange_Declarations(wxCommandEvent& p_cEvent)
 	UpdateRightPanel_Declarations( m_nSelectionId_Declarations );
 }
 
+void
+SP_ExportLatex::OnCheckUncheck_Declarations(wxCommandEvent& p_cEvent)
+{
+	int id =  m_pcRearrangelist_declarations->GetCurrentOrder()[ p_cEvent.GetInt() ];
+
+	bool show = m_pcRearrangelist_declarations->IsChecked(id);
+
+	SP_DecNode2AttributeCheckList[id]->Enable(show);
+	SP_DecNode2NodeCheckList[id]->Enable(show);
+	SP_DecNode2SelectClearAllCheckBox[id]->Enable(show);
+}
 
 void
 SP_ExportLatex::OnSelectClearAllItems_Graph(wxCommandEvent& p_cEvent)
@@ -2555,30 +2655,105 @@ SP_ExportLatex::WriteGraphElements()
 									if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
 										SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
 
-										for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++) {
 
-											for(unsigned k = 0; k < l_pcColAttr->GetRowCount(); k++)
+										if(l_pcColAttr->GetRowCount() >= 2) {
+
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
 											{
-												wxString l_sSetName = l_pcColAttr->GetCell(k, col);
+												wxString l_sSetName = l_pcColAttr->GetCell(row, 0);
 
 												if(!l_sSetName.IsEmpty()) {
 													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+													SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
 												}
 
-												if(col < 2) {
-													out += l_sSetName + wxT("&");
+												out += l_sSetName;
+
+												if( row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
 												} else {
-													out = out.BeforeLast('&');
-													out += wxT("; ") + l_sSetName + wxT("&");
+													out += wxT("&");
 												}
 											}
 
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
+											{
+												for(unsigned col = 1; col < l_pcColAttr->GetColCount(); col++)
+												{
+													wxString l_sSetName = l_pcColAttr->GetCell(row, col);
+
+													if(!l_sSetName.IsEmpty()) {
+														l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+														SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
+													}
+
+													if(col < 2) {
+														out += l_sSetName + wxT("&");
+													} else {
+														if(col == 2) {
+															out = out.BeforeLast('&');
+															out += wxT("; ");
+														}
+														out += l_sSetName + wxT("; ");
+													}
+												}
+
+												if(l_pcColAttr->GetColCount() > 2) {
+													out = out.BeforeLast(';');
+												} else {
+													out = out.BeforeLast('&');
+												}
+
+												if(row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
+
+										} else {    //single row
+
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
+											{
+												for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++)
+												{
+													wxString l_sSetName = l_pcColAttr->GetCell(row, col);
+
+													if(!l_sSetName.IsEmpty()) {
+														l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+														SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
+													}
+
+													if(col < 2) {
+														out += l_sSetName + wxT("&");
+													} else {
+														if(col == 2) {
+															out = out.BeforeLast('&');
+															out += wxT("; ");
+														}
+														out += l_sSetName + wxT("; ");
+													}
+												}
+
+												if(l_pcColAttr->GetColCount() > 2) {
+													out = out.BeforeLast(';');
+												} else {
+													out = out.BeforeLast('&');
+												}
+
+												if(row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
 										}
 
 									} else {
 										out += value + wxT("&");
 									}
 								}
+
 							} else if( name.compare( wxT("Cross Refs.") ) == 0 ) {
 								//add cross-refs here
 								wxString value = SP_NetNumber2Label[ wxString::Format(wxT("%i"), l_pcNode->GetNetnumber()) ];
@@ -2662,7 +2837,7 @@ SP_ExportLatex::WriteGraphElements()
 				int l_nEdgesCount2 = m_pEdgesTransition2Place.size();
 
 
-				if( l_nAttributes && ( l_nEdgesCount1 ||l_nEdgesCount2 ) ) {  //if non-zero number of attributes selected -> draw table
+				if( l_nAttributes && ( l_nEdgesCount1 || l_nEdgesCount2 ) ) {  //if non-zero number of attributes selected -> draw table
 
 					//order edges as per user-customized ordering and grouping
 					if( m_pcOrderBySource->GetValue() ) {
@@ -2675,8 +2850,14 @@ SP_ExportLatex::WriteGraphElements()
 						sort(m_pEdgesTransition2Place.begin(), m_pEdgesTransition2Place.end(), compareTarget);
 					}
 
+					wxString element_name;
+
 					//fetching one edge for reference
-					wxString element_name = m_pEdgesPlace2Transition[0].first + wxT("->") + m_pEdgesPlace2Transition[0].second;
+					if( l_nEdgesCount1 ) {
+						element_name = m_pEdgesPlace2Transition[0].first + wxT("->") + m_pEdgesPlace2Transition[0].second;
+					} else {
+						element_name = m_pEdgesTransition2Place[0].first + wxT("->") + m_pEdgesTransition2Place[0].second;
+					}
 					l_pcEdge = SP_Name2Edge[ element_name ];
 
 					wxFprintf(l_pstream1, wxT("\\begin{longtabu}") );
@@ -2716,6 +2897,7 @@ SP_ExportLatex::WriteGraphElements()
 						SP_DS_Attribute* sp = l_pcEdge->GetAttribute( l_sAttrNameMap[ name] );
 
 						if(sp) {
+
 							if(sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
 								SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
 
@@ -2753,14 +2935,14 @@ SP_ExportLatex::WriteGraphElements()
 
 									SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
 
-									for(unsigned int k = 0; k < l_pcColAttr->GetColCount(); k++) {
+									for(unsigned k = 0; k < l_pcColAttr->GetColCount(); k++) {
 										wxString l_sColLabel = l_pcColAttr->GetColLabel(k);
 
 										if(l_sColLabel.IsEmpty()) {
 											SP_LOGMESSAGE("Unnamed entry in COLLIST");
 										}
 
-										if(k < 2) {
+										if( k < 2 ) {
 											out += wxT("\\hspace{0pt}") + l_sColLabel.MakeUpper() + wxT(" & ");
 											l_ncols++;
 										} else {
@@ -2800,6 +2982,7 @@ SP_ExportLatex::WriteGraphElements()
 					wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 
 					if( m_pcGroupByPlace2Transition->GetValue() ) {
+						SP_LOGMESSAGE( wxT("Group By Place2Transition"));
 
 						//Place to Transition
 						for(int j = 0; j < l_nEdgesCount1; j++) {
@@ -2835,24 +3018,99 @@ SP_ExportLatex::WriteGraphElements()
 									if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
 										SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
 
-										for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++) {
+										if(l_pcColAttr->GetRowCount() >= 2) {
 
-											for(unsigned k = 0; k < l_pcColAttr->GetRowCount(); k++)
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
 											{
-												wxString l_sSetName = l_pcColAttr->GetCell(k, col);
+												wxString l_sSetName = l_pcColAttr->GetCell(row, 0);
 
 												if(!l_sSetName.IsEmpty()) {
 													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+													SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
 												}
 
-												if(col < 2) {
-													out += l_sSetName + wxT("&");
+												out += l_sSetName;
+
+												if( row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
+
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
+											{
+												for(unsigned col = 1; col < l_pcColAttr->GetColCount(); col++)
+												{
+													wxString l_sSetName = l_pcColAttr->GetCell(row, col);
+
+													if(!l_sSetName.IsEmpty()) {
+														l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+														SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
+													}
+
+													if(col < 2) {
+														out += l_sSetName + wxT("&");
+													} else {
+														if(col == 2) {
+															out = out.BeforeLast('&');
+															out += wxT("; ");
+														}
+														out += l_sSetName + wxT("; ");
+													}
+												}
+
+												if(l_pcColAttr->GetColCount() > 2) {
+													out = out.BeforeLast(';');
 												} else {
 													out = out.BeforeLast('&');
-													out += wxT("; ") + l_sSetName + wxT("&");
+												}
+
+												if(row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
+
+										} else {    //single row
+
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
+											{
+												for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++)
+												{
+													wxString l_sSetName = l_pcColAttr->GetCell(row, col);
+
+													if(!l_sSetName.IsEmpty()) {
+														l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+														SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
+													}
+
+													if(col < 2) {
+														out += l_sSetName + wxT("&");
+													} else {
+														if(col == 2) {
+															out = out.BeforeLast('&');
+															out += wxT("; ");
+														}
+														out += l_sSetName + wxT("; ");
+													}
+												}
+
+												if(l_pcColAttr->GetColCount() > 2) {
+													out = out.BeforeLast(';');
+												} else {
+													out = out.BeforeLast('&');
+												}
+
+												if(row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
 												}
 											}
 										}
+
 
 									} else {
 										value = EditStringforLatex( value );
@@ -2902,24 +3160,100 @@ SP_ExportLatex::WriteGraphElements()
 									if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
 										SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
 
-										 for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++) {
+										if(l_pcColAttr->GetRowCount() >= 2) {
 
-											for(unsigned k = 0; k < l_pcColAttr->GetRowCount(); k++)
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
 											{
-												wxString l_sSetName = l_pcColAttr->GetCell(k, col);
+												wxString l_sSetName = l_pcColAttr->GetCell(row, 0);
 
 												if(!l_sSetName.IsEmpty()) {
 													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+													SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
 												}
 
-												if(col < 2) {
-													out += l_sSetName + wxT("&");
+												out += l_sSetName;
+
+												if( row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
+
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
+											{
+												for(unsigned col = 1; col < l_pcColAttr->GetColCount(); col++)
+												{
+													wxString l_sSetName = l_pcColAttr->GetCell(row, col);
+
+													if(!l_sSetName.IsEmpty()) {
+														l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+														SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
+													}
+
+													if(col < 2) {
+														out += l_sSetName + wxT("&");
+													} else {
+														if(col == 2) {
+															out = out.BeforeLast('&');
+															out += wxT("; ");
+														}
+														out += l_sSetName + wxT("; ");
+													}
+												}
+
+												if(l_pcColAttr->GetColCount() > 2) {
+													out = out.BeforeLast(';');
 												} else {
 													out = out.BeforeLast('&');
-													out += wxT("; ") + l_sSetName + wxT("&");
+												}
+
+												if(row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
+
+										} else {    //single row
+
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
+											{
+												for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++)
+												{
+													wxString l_sSetName = l_pcColAttr->GetCell(row, col);
+
+													if(!l_sSetName.IsEmpty()) {
+														l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+														SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
+													}
+
+													if(col < 2) {
+														out += l_sSetName + wxT("&");
+													} else {
+														if(col == 2) {
+															out = out.BeforeLast('&');
+															out += wxT("; ");
+														}
+														out += l_sSetName + wxT("; ");
+													}
+												}
+
+												if(l_pcColAttr->GetColCount() > 2) {
+													out = out.BeforeLast(';');
+												} else {
+													out = out.BeforeLast('&');
+												}
+
+												if(row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
 												}
 											}
 										}
+
+
 									} else {
 										value = EditStringforLatex( value );
 										out += value + wxT("&");
@@ -2970,24 +3304,99 @@ SP_ExportLatex::WriteGraphElements()
 									if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
 										SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
 
-										 for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++) {
+										if(l_pcColAttr->GetRowCount() >= 2) {
 
-											for(unsigned k = 0; k < l_pcColAttr->GetRowCount(); k++)
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
 											{
-												wxString l_sSetName = l_pcColAttr->GetCell(k, col);
+												wxString l_sSetName = l_pcColAttr->GetCell(row, 0);
 
 												if(!l_sSetName.IsEmpty()) {
 													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+													SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
 												}
 
-												if(col < 2) {
-													out += l_sSetName + wxT("&");
+												out += l_sSetName;
+
+												if( row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
+
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
+											{
+												for(unsigned col = 1; col < l_pcColAttr->GetColCount(); col++)
+												{
+													wxString l_sSetName = l_pcColAttr->GetCell(row, col);
+
+													if(!l_sSetName.IsEmpty()) {
+														l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+														SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
+													}
+
+													if(col < 2) {
+														out += l_sSetName + wxT("&");
+													} else {
+														if(col == 2) {
+															out = out.BeforeLast('&');
+															out += wxT("; ");
+														}
+														out += l_sSetName + wxT("; ");
+													}
+												}
+
+												if(l_pcColAttr->GetColCount() > 2) {
+													out = out.BeforeLast(';');
 												} else {
 													out = out.BeforeLast('&');
-													out += wxT("; ") + l_sSetName + wxT("&");
+												}
+
+												if(row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
+
+										} else {    //single row
+
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
+											{
+												for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++)
+												{
+													wxString l_sSetName = l_pcColAttr->GetCell(row, col);
+
+													if(!l_sSetName.IsEmpty()) {
+														l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+														SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
+													}
+
+													if(col < 2) {
+														out += l_sSetName + wxT("&");
+													} else {
+														if(col == 2) {
+															out = out.BeforeLast('&');
+															out += wxT("; ");
+														}
+														out += l_sSetName + wxT("; ");
+													}
+												}
+
+												if(l_pcColAttr->GetColCount() > 2) {
+													out = out.BeforeLast(';');
+												} else {
+													out = out.BeforeLast('&');
+												}
+
+												if(row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
 												}
 											}
 										}
+
 
 									} else {
 										value = EditStringforLatex( value );
@@ -3037,24 +3446,100 @@ SP_ExportLatex::WriteGraphElements()
 									if (sp->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST) {
 										SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(sp);
 
-										 for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++) {
+										if(l_pcColAttr->GetRowCount() >= 2) {
 
-											for(unsigned k = 0; k < l_pcColAttr->GetRowCount(); k++)
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
 											{
-												wxString l_sSetName = l_pcColAttr->GetCell(k, col);
+												wxString l_sSetName = l_pcColAttr->GetCell(row, 0);
 
 												if(!l_sSetName.IsEmpty()) {
 													l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+													SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
 												}
 
-												if(col < 2) {
-													out += l_sSetName + wxT("&");
+												out += l_sSetName;
+
+												if( row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
+
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
+											{
+												for(unsigned col = 1; col < l_pcColAttr->GetColCount(); col++)
+												{
+													wxString l_sSetName = l_pcColAttr->GetCell(row, col);
+
+													if(!l_sSetName.IsEmpty()) {
+														l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+														SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
+													}
+
+													if(col < 2) {
+														out += l_sSetName + wxT("&");
+													} else {
+														if(col == 2) {
+															out = out.BeforeLast('&');
+															out += wxT("; ");
+														}
+														out += l_sSetName + wxT("; ");
+													}
+												}
+
+												if(l_pcColAttr->GetColCount() > 2) {
+													out = out.BeforeLast(';');
 												} else {
 													out = out.BeforeLast('&');
-													out += wxT("; ") + l_sSetName + wxT("&");
+												}
+
+												if(row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
+												}
+											}
+
+										} else {    //single row
+
+											for(unsigned row = 0; row < l_pcColAttr->GetRowCount(); row++)
+											{
+												for(unsigned col = 0; col < l_pcColAttr->GetColCount(); col++)
+												{
+													wxString l_sSetName = l_pcColAttr->GetCell(row, col);
+
+													if(!l_sSetName.IsEmpty()) {
+														l_sSetName = wxT("$") + EditStringforLatex(l_sSetName, false) + wxT("$");
+														SP_LOGMESSAGE( wxT("COLLIST:") + l_sSetName);
+													}
+
+													if(col < 2) {
+														out += l_sSetName + wxT("&");
+													} else {
+														if(col == 2) {
+															out = out.BeforeLast('&');
+															out += wxT("; ");
+														}
+														out += l_sSetName + wxT("; ");
+													}
+												}
+
+												if(l_pcColAttr->GetColCount() > 2) {
+													out = out.BeforeLast(';');
+												} else {
+													out = out.BeforeLast('&');
+												}
+
+												if(row < l_pcColAttr->GetRowCount()-1) {
+													out += wxT("\\linebreak\n");
+												} else {
+													out += wxT("&");
 												}
 											}
 										}
+
+
 									} else {
 										value = EditStringforLatex( value );
 										out += value + wxT("&");
@@ -4351,6 +4836,8 @@ SP_ExportLatex::WriteHierarchyFigure(FILE* l_pstream)
 	wxDELETE(pd);
 
 	wxFprintf(l_pstream, wxT("\\input{./HierarchyFigures.tex}\n") );
+
+	return true;
 }
 
 bool
@@ -4451,8 +4938,8 @@ SP_ExportLatex::WriteReferences()
 	wxFprintf(l_pstream, wxT("%s"), out.c_str());
 
 	wxFprintf(l_pstream, wxT("\\bibitem{Rohr:bi:2010}\n") );
-	out = wxT("C. Rohr, W. Marwan and M. Hiener.\n"
-			"Snoopy - a unifying Perti net framework to investigate biomolecular networks. \n"
+	out = wxT("C. Rohr, W. Marwan and M. Heiner.\n"
+			"Snoopy - a unifying Petri net framework to investigate biomolecular networks. \n"
 			"Bioinformatics, 26(7):974-975, 2010. \n\n");
 	wxFprintf(l_pstream, wxT("%s"), out.c_str());
 

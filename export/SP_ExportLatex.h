@@ -67,7 +67,7 @@ class SP_ExportLatex : public wxEvtHandler,
     void Basics_UpdateUI(wxUpdateUIEvent& p_cEvent);
     void OnSelChange_Basics(wxCommandEvent& p_cEvent);
     void UpdateRightPanel_Basics(int id);
-
+    void OnCheckUncheck_Basics(wxCommandEvent& p_cEvent);
 
     //Graph Elements tab
     void AddGraphElements();
@@ -77,6 +77,7 @@ class SP_ExportLatex : public wxEvtHandler,
     void Graph_UpdateUI(wxUpdateUIEvent& p_cEvent);
     void OnSelChange_Graph(wxCommandEvent& p_cEvent);
     void UpdateRightPanel_Graph(int id);
+    void OnCheckUncheck_Graph(wxCommandEvent& p_cEvent);
 
     //Declarations tab
     void AddDeclarations();
@@ -86,6 +87,7 @@ class SP_ExportLatex : public wxEvtHandler,
     void Declarations_UpdateUI(wxUpdateUIEvent& p_cEvent);
     void OnSelChange_Declarations(wxCommandEvent& p_cEvent);
     void UpdateRightPanel_Declarations(int id);
+    void OnCheckUncheck_Declarations(wxCommandEvent& p_cEvent);
 
     //Hierarchy tab
     void AddHierarchy();
