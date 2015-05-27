@@ -123,10 +123,9 @@ SP_DS_Transformer::CheckElements(SP_DS_Graph* p_pcVal)
 				wxString l_sOldName = l_pcAttr->GetValueString();
 				if(l_ReturnChoice == 0)
 				{
-					l_pcAttr->ReplaceProhibitedChars();
+					l_pcAttr->SetValueString(SP_NormalizeString(l_sOldName));
 				}
-				else
-				if(l_ReturnChoice == 1)
+				else if(l_ReturnChoice == 1)
 				{
 					l_pcAttr->SetValueString(l_sOldName);
 				}

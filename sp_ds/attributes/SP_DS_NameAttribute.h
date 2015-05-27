@@ -34,7 +34,6 @@ public:
     virtual SP_DS_Attribute* Clone(bool p_bCloneGr = TRUE);
 
     bool IsOk();
-    void ReplaceProhibitedChars();
 
 };
 

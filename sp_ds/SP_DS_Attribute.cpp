@@ -430,7 +430,7 @@ SP_DS_Attribute::MakeParentName()
 	if(GetParent() && GetParent()->GetClassObject())
 	{
 		SP_Data* l_pcParent = GetParent();
-		l_sName = wxT("_") + l_pcParent->GetClassName().Left(1) + wxT("_");
+		l_sName = wxT("_") + l_pcParent->GetClassObject()->GetAbbreviation() + wxT("_");
 		SP_DS_Attribute* l_pcIdAttr = NULL;
 		if(GetParent()->GetElementType() == SP_ELEMENT_NODE)
 		{

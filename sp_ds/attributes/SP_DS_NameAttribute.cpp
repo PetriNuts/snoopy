@@ -58,8 +58,8 @@ SP_DS_NameAttribute::SetValue(const wxString& p_pchVal)
     wxString l_sBackup = m_sValue;
     wxString l_sTemp(p_pchVal);
 
-    // special, if the param contains '*' as wildcard, we replace every occurance
-    // of '*' with the content of the old member value
+    // special, if the parameter contains '<*>' as wildcard, we replace every occurrence
+    // of '<*>' with the content of the old member value
     l_sTemp.Replace(SP_WILDCARD, m_sValue);
     m_sValue = l_sTemp;
     //TODO
@@ -130,21 +130,6 @@ SP_DS_NameAttribute::IsOk()
 	}
 #endif
 	return l_bReturn;
-}
-
-void
-SP_DS_NameAttribute::ReplaceProhibitedChars()
-{
-	wxString l_sNameRegEx = wxT("[^0-9a-zA-Z_]");
-	wxRegEx l_cRegEx;
-	if(l_cRegEx.Compile(l_sNameRegEx))
-	{
-		l_cRegEx.Replace(&m_sValue, wxT("_"));
-	}
-	if(!IsOk())
-	{
-		m_sValue.Prepend(wxT("_"));
-	}
 }
 
 wxString
