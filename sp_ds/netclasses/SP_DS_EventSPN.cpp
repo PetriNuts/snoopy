@@ -168,7 +168,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcNC = p_pcGraph->AddNodeclass( new SP_DS_Nodeclass( p_pcGraph,
 															wxT("Immediate Transition"),
 															p_pcGraph->GetNodeclass(wxT("Transition"))->GetIdCountPtr() ) );
-
+	l_pcNC->SetAbbreviation(wxT("IT"));
 	l_pcNC->SetShortcut( wxT("Shift+I") );
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name"), wxT("")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
@@ -234,7 +234,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcNC = p_pcGraph->AddNodeclass( new SP_DS_Nodeclass( p_pcGraph,
 															wxT("Deterministic Transition"),
 															p_pcGraph->GetNodeclass(wxT("Transition"))->GetIdCountPtr() ) );
-
+	l_pcNC->SetAbbreviation(wxT("DT"));
 	l_pcNC->SetShortcut( wxT("Shift+D") );
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name"), wxT("")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
@@ -299,7 +299,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcNC = p_pcGraph->AddNodeclass( new SP_DS_Nodeclass( p_pcGraph,
 															wxT("Scheduled Transition"),
 															p_pcGraph->GetNodeclass(wxT("Transition"))->GetIdCountPtr() ) );
-
+	l_pcNC->SetAbbreviation(wxT("ST"));
 	l_pcNC->SetShortcut( wxT("Shift+S") );
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name"), wxT("")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
@@ -363,6 +363,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->AddNodeclass( new SP_DS_Nodeclass( p_pcGraph, wxT("LookupTable") ) );
+	l_pcNC->SetAbbreviation(wxT("L"));
 	l_pcNC->SetShortcut( wxT("L") );
 
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute( wxT("Name") ) );
@@ -401,9 +402,11 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	//////////////////////////////////////////////////////////////////////////////
 	SP_DS_Edgeclass* l_pcEC = p_pcGraph->AddEdgeclass( new SP_DS_Edgeclass( p_pcGraph, wxT("Modifier Edge") ) );
+	l_pcEC->SetDisplayName(wxT("Modifier Arc"));
+	l_pcEC->SetAbbreviation(wxT("MA"));
+	l_pcEC->SetShortcut( wxT("M") );
 	l_pcEC->SetGraphic(new SP_GR_ExtendedEdge(l_pcEC->GetPrototype(),SP_EXTENDED_TYPE_DASHED_EDGE,1,
 								SP_EXTENDED_ARROW_TYPE_NONE_EDGE,10,SP_EXTENDED_ARROW_TYPE_ARROW_EDGE,10) );
-	l_pcEC->SetShortcut( wxT("M") );
 
 	l_pcEC->RegisterGraphicWidget( new SP_WDG_DialogExtendedGraphic( wxT("Graphic") ) );
 

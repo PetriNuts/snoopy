@@ -93,8 +93,10 @@ SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph)
 
 	//////////////////////////////////////////////////////////////////////////////////
 	ec = p_graph->AddEdgeclass(new SP_DS_Edgeclass(p_graph, wxT("Read Edge")));
+    ec->SetDisplayName(wxT("Read Arc"));
+    ec->SetAbbreviation(wxT("RA"));
+    ec->SetShortcut(wxT("R"));
 	ec->SetGraphic(new SP_GR_ArrowEdge(ec->GetPrototype(), ARROW_FILLED_CIRCLE, ARROW_POSITION_END, 7));
-	ec->SetShortcut(wxT("R"));
 	ec->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
 	attr=ec->AddAttribute(new SP_DS_MarkingDependentMultiplicity(wxT("Multiplicity"),wxT("1")));
@@ -112,8 +114,10 @@ SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph)
 
 	//////////////////////////////////////////////////////////////////////////////
 	ec = p_graph->AddEdgeclass(new SP_DS_Edgeclass(p_graph, wxT("Inhibitor Edge")));
+    ec->SetDisplayName(wxT("Inhibitor Arc"));
+    ec->SetAbbreviation(wxT("IA"));
+    ec->SetShortcut(wxT("I"));
 	ec->SetGraphic(new SP_GR_ArrowEdge(ec->GetPrototype(), ARROW_HOLLOW_CIRCLE, ARROW_POSITION_END, 7));
-	ec->SetShortcut(wxT("I"));
 	ec->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
 	attr=ec->AddAttribute(new SP_DS_MarkingDependentMultiplicity(wxT("Multiplicity"),wxT("1")));
@@ -131,12 +135,14 @@ SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph)
 
 	//////////////////////////////////////////////////////////////////////////////
 	ec = p_graph->AddEdgeclass(new SP_DS_Edgeclass(p_graph, wxT("Reset Edge")));
+    ec->SetDisplayName(wxT("Reset Arc"));
+    ec->SetAbbreviation(wxT("ZA"));
+    ec->SetShortcut(wxT("Z"));
 
 	SP_GR_ArrowEdge * ae = new SP_GR_ArrowEdge(ec->GetPrototype(), ARROW_ARROW, ARROW_POSITION_END, 7);
 	ae->AddAnotherArrow(ARROW_ARROW, ARROW_POSITION_END, 7);
 	ec->SetGraphic(ae);
 
-	ec->SetShortcut(wxT("Z"));
 	ec->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
 	attr = ec->AddAttribute(new SP_DS_TextAttribute(wxT("Comment"), wxT("")));
@@ -147,12 +153,14 @@ SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph)
 
 	//////////////////////////////////////////////////////////////////////////////
 	ec = p_graph->AddEdgeclass(new SP_DS_Edgeclass(p_graph, wxT("Equal Edge")));
+    ec->SetDisplayName(wxT("Equal Arc"));
+    ec->SetAbbreviation(wxT("EA"));
+    ec->SetShortcut(wxT("Q"));
 
 	ae = new SP_GR_ArrowEdge(ec->GetPrototype(), ARROW_FILLED_CIRCLE, ARROW_POSITION_END, 7);
 	ae->AddAnotherArrow(ARROW_FILLED_CIRCLE, ARROW_POSITION_END, 7);
 	ec->SetGraphic(ae);
 
-	ec->SetShortcut(wxT("Q"));
 	ec->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
 	attr=ec->AddAttribute(new SP_DS_MarkingDependentMultiplicity(wxT("Multiplicity"),wxT("1")));

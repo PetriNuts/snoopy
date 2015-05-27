@@ -117,6 +117,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
      */
 	l_pcNC = p_pcGraph->RenameNodeclass(wxT("Circle"), SP_DS_CONTINUOUS_PLACE);
 	l_pcNC->SetDisplayName(wxT("Continuous Place"));
+	l_pcNC->SetAbbreviation(wxT("PC"));
 	l_pcNC->SetShortcut(wxT("P"));
 	l_pcAttr = l_pcNC->GetPrototype()->GetAttribute(wxT("Name"));//Name
 	l_pcAttr->SetGlobalShow();
@@ -157,6 +158,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
      */
 	l_pcNC = p_pcGraph->RenameNodeclass(wxT("Rectangle"), SP_DS_CONTINUOUS_TRANS);
 	l_pcNC->SetDisplayName(wxT("Continuous Transition"));
+	l_pcNC->SetAbbreviation(wxT("TC"));
 	l_pcNC->SetShortcut(wxT("T"));
 
 	l_pcAttr = l_pcNC->GetPrototype()->GetAttribute(wxT("Name"));//Name
@@ -210,6 +212,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	///////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->AddNodeclass(new SP_DS_Nodeclass(p_pcGraph, SP_DS_COARSE_PLACE));
 	l_pcNC->SetDisplayName(wxT("Coarse Place"));
+	l_pcNC->SetAbbreviation(wxT("CP"));
 	l_pcNC->SetShortcut(wxT("Shift+P"));
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name"), wxT("")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
@@ -239,6 +242,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->AddNodeclass(new SP_DS_Nodeclass(p_pcGraph, SP_DS_COARSE_TRANSITION));
 	l_pcNC->SetDisplayName(wxT("Coarse Transition"));
+	l_pcNC->SetAbbreviation(wxT("CT"));
 	l_pcNC->SetShortcut(wxT("Shift+T"));
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
@@ -268,8 +272,9 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	///////////////////////////////////////////////////////////////////////////////
 	SP_DS_Edgeclass* l_pcEC = p_pcGraph->RenameEdgeclass(wxT("Edge"), SP_DS_EDGE);
-	l_pcEC->SetDisplayName(wxT("Edge"));
-	l_pcEC->SetShortcut(wxT("E"));
+	l_pcEC->SetDisplayName(wxT("Arc"));
+	l_pcEC->SetAbbreviation(wxT("A"));
+	l_pcEC->SetShortcut(wxT("A"));
 	l_pcAttr = l_pcEC->GetPrototype()->GetAttribute(wxT("Name"));
 	l_pcAttr->SetGlobalShow();
 
@@ -297,7 +302,8 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	///////////////////////////////////////////////////////////////////////////////
 	l_pcEC = p_pcGraph->AddEdgeclass(new SP_DS_Edgeclass(p_pcGraph, SP_DS_INHIBITOR_EDGE));
-	l_pcEC->SetDisplayName(wxT("Inhibitor Edge"));
+	l_pcEC->SetDisplayName(wxT("Inhibitor Arc"));
+	l_pcEC->SetAbbreviation(wxT("IA"));
 	l_pcEC->SetShortcut(wxT("I"));
 	l_pcEC->SetGraphic(new SP_GR_ArrowEdge(l_pcEC->GetPrototype(), ARROW_HOLLOW_CIRCLE, ARROW_POSITION_END, 6.0));
 	l_pcEC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
@@ -317,7 +323,8 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	///////////////////////////////////////////////////////////////////////////////
 	l_pcEC = p_pcGraph->AddEdgeclass(new SP_DS_Edgeclass(p_pcGraph, SP_DS_READ_EDGE));
-	l_pcEC->SetDisplayName(wxT("Test Edge"));
+	l_pcEC->SetDisplayName(wxT("Test Arc"));
+	l_pcEC->SetAbbreviation(wxT("TA"));
 	l_pcEC->SetShortcut(wxT("R"));
 	l_pcEC->SetGraphic(new SP_GR_ArrowEdge(l_pcEC->GetPrototype(), ARROW_FILLED_CIRCLE, ARROW_POSITION_END, 6.0));
 	l_pcEC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
@@ -338,9 +345,11 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	///////////////////////////////////////////////////////////////////////////////
 	l_pcEC = p_pcGraph->AddEdgeclass( new SP_DS_Edgeclass( p_pcGraph, SP_DS_MODIFIER_EDGE ) );
+	l_pcEC->SetDisplayName(wxT("Modifier Arc"));
+	l_pcEC->SetAbbreviation(wxT("MA"));
+	l_pcEC->SetShortcut( wxT("M") );
 	l_pcEC->SetGraphic(new SP_GR_ExtendedEdge(l_pcEC->GetPrototype(),SP_EXTENDED_TYPE_DASHED_EDGE,1,
 								SP_EXTENDED_ARROW_TYPE_NONE_EDGE,10,SP_EXTENDED_ARROW_TYPE_ARROW_EDGE,10) );
-	l_pcEC->SetShortcut( wxT("M") );
 
 	l_pcEC->RegisterGraphicWidget( new SP_WDG_DialogExtendedGraphic( wxT("Graphic") ) );
 
