@@ -25,16 +25,10 @@ private:
 		wxRadioButton* m_pRadioButton1;
 		wxRadioButton* m_pRadioButton2;
 
-		//int m_nMode;
 		int level;
-
-
 
 protected:
 
-	SP_MDI_Doc* m_pcDoc;
-	SP_DS_Graph* m_pcGraph;
-	wxString m_fileName;
 	SBMLDocument* m_pcSbmlDoc;
 	Model* m_pcSbmlModel;
 

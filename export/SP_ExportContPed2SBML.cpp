@@ -63,8 +63,9 @@ bool SP_ExportContPed2SBML::AcceptsDoc(SP_MDI_Doc* p_doc)
 bool SP_ExportContPed2SBML::DoWrite()
 {
 	bool l_bReturn = true;
-	unsigned int l_nLevel;
-	unsigned int l_nVersion;
+	unsigned long l_nLevel;
+	unsigned long l_nVersion;
+
 	if(level==1)
 	{
 		l_nLevel=1;
@@ -76,37 +77,62 @@ bool SP_ExportContPed2SBML::DoWrite()
 		l_nVersion=3;
 	}
 
-	SP_DS_Metadataclass* l_pcMC = m_graph->GetMetadataclass(wxT("General"));
-	if(l_pcMC)
-	{
-		SP_DS_Metadata* l_pcGeneral = l_pcMC->GetElements()->front();
-		wxString description = l_pcGeneral->GetAttribute(wxT("Description"))->GetValueString();
-		wxString l_sLevel = SP_ExtractAttribute(wxT("level"), description);
-		wxString l_sVersion = SP_ExtractAttribute(wxT("version"), description);
+	wxString l_sModelname = m_doc->GetUserReadableName();
+	l_sModelname.Replace(wxT("."), wxT("_"));
 
-		if(l_sLevel.IsNumber() && l_sVersion.IsNumber())
-		{
-			l_sLevel.ToULong(&l_nLevel);
-			l_sVersion.ToULong(&l_nVersion);
-		}
+	SP_DS_Metadataclass* l_pcMC = m_graph->GetMetadataclass(wxT("General"));
+	CHECK_POINTER(l_pcMC, return false);
+
+	SP_DS_Metadata* l_pcGeneral = l_pcMC->GetElements()->front();
+	wxString description = l_pcGeneral->GetAttribute(wxT("Description"))->GetValueString();
+	wxString l_sLevel = SP_ExtractAttribute(wxT("level"), description);
+	wxString l_sVersion = SP_ExtractAttribute(wxT("version"), description);
+
+	if(l_sLevel.IsNumber() && l_sVersion.IsNumber())
+	{
+		l_sLevel.ToULong(&l_nLevel);
+		l_sVersion.ToULong(&l_nVersion);
+	}
+
+	wxString l_sName = l_pcGeneral->GetAttribute(wxT("Name"))->GetValueString();
+	if(!l_sName.IsEmpty())
+	{
+		l_sModelname = l_sName;
 	}
 
 	m_pcSbmlDoc = new SBMLDocument(l_nLevel, l_nVersion);
 	CHECK_POINTER(m_pcSbmlDoc, return false);
-	wxString l_sModelname = m_doc->GetUserReadableName();
-	l_sModelname.Replace(wxT("."), wxT("_"));
-	std::string l_sModel = std::string(l_sModelname.mb_str());
-	m_pcSbmlModel = m_pcSbmlDoc->createModel(l_sModel);
+
+	m_pcSbmlModel = m_pcSbmlDoc->createModel(l_sModelname);
 	CHECK_POINTER(m_pcSbmlModel, return false);
 
-
-	//Unit Defination
-	UnitDefinition* l_pcUnitDefinition = m_pcSbmlModel->createUnitDefinition();
-	l_pcUnitDefinition->setId("substance");
-	Unit* l_pcUnit = m_pcSbmlModel->createUnit();
-	//UnitKind_t kind=item;
-	l_pcUnit->setKind(UNIT_KIND_ITEM);
-
+	// model description
+	wxString name = SP_ExtractAttribute(wxT("name"), description);
+	if(!name.IsEmpty())
+	{
+		m_pcSbmlModel->setName(name);
+	}
+	wxString metaid = SP_ExtractAttribute(wxT("metaid"), description);
+	if(!metaid.IsEmpty())
+	{
+		m_pcSbmlModel->setMetaId(metaid);
+	}
+	wxString notes = SP_ExtractNode(wxT("notes"), description);
+	if(!notes.IsEmpty())
+	{
+		if(m_pcSbmlModel->setNotes(notes) != LIBSBML_OPERATION_SUCCESS)
+		{
+			SP_LOGWARNING(wxT("model notes not exported!\n") + notes);
+		}
+	}
+	wxString annotation = SP_ExtractNode(wxT("annotation"), description);
+	if(!annotation.IsEmpty())
+	{
+		if(m_pcSbmlModel->setAnnotation(annotation) != LIBSBML_OPERATION_SUCCESS)
+		{
+			SP_LOGWARNING(wxT("model annotation not exported!\n") + annotation);
+		}
+	}
 
 
 	Compartment* l_pcCompartment = m_pcSbmlModel->createCompartment();
@@ -160,11 +186,19 @@ bool SP_ExportContPed2SBML::WritePlaces()
 		}
 
 		l_pcSpecies->setCompartment(l_pcCompartment->getId());
-		l_pcSpecies->setId(p->m_name);
+
+		wxString id = p->m_name;
+		l_pcSpecies->setId(id);
+
 		wxString name = SP_ExtractAttribute(wxT("name"), comment);
 		if(!name.IsEmpty())
 		{
 			l_pcSpecies->setName(name);
+		}
+		wxString metaid = SP_ExtractAttribute(wxT("metaid"), comment);
+		if(!metaid.IsEmpty())
+		{
+			l_pcSpecies->setMetaId(metaid);
 		}
 
 		l_pcSpecies->setInitialConcentration(p->m_marking);
@@ -174,12 +208,18 @@ bool SP_ExportContPed2SBML::WritePlaces()
 		wxString notes = SP_ExtractNode(wxT("notes"), comment);
 		if(!notes.IsEmpty())
 		{
-			l_pcSpecies->setNotes(notes);
+			if(l_pcSpecies->setNotes(notes) != LIBSBML_OPERATION_SUCCESS)
+			{
+				SP_LOGWARNING(id + wxT(" notes not exported!\n") + notes);
+			}
 		}
 		wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
 		if(!annotation.IsEmpty())
 		{
-			l_pcSpecies->setAnnotation(annotation);
+			if(l_pcSpecies->setAnnotation(annotation) != LIBSBML_OPERATION_SUCCESS)
+			{
+				SP_LOGWARNING(id + wxT(" annotation not exported!\n") + annotation);
+			}
 		}
 	}
 	return TRUE;
@@ -203,25 +243,39 @@ bool SP_ExportContPed2SBML::WriteTransitions()
 		wxString comment = l_pcAttrComment->GetValueString();
 
 		Reaction* l_pcReaction = m_pcSbmlModel->createReaction();
-		l_pcReaction->setId(t->m_name);
-		l_pcReaction->setReversible(t->m_reversible);
+
+		wxString id = t->m_name;
+		l_pcReaction->setId(id);
 
 		wxString name = SP_ExtractAttribute(wxT("name"), comment);
 		if(!name.IsEmpty())
 		{
 			l_pcReaction->setName(name);
 		}
+		wxString metaid = SP_ExtractAttribute(wxT("metaid"), comment);
+		if(!metaid.IsEmpty())
+		{
+			l_pcReaction->setMetaId(metaid);
+		}
+
+		l_pcReaction->setReversible(t->m_reversible);
 
 		wxString notes = SP_ExtractNode(wxT("notes"), comment);
 		if(!notes.IsEmpty())
 		{
-			l_pcReaction->setNotes(notes);
+			if(l_pcReaction->setNotes(notes) != LIBSBML_OPERATION_SUCCESS)
+			{
+				SP_LOGWARNING(id + wxT(" notes not exported!\n") + notes);
+			}
 		}
 
 		wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
 		if(!annotation.IsEmpty())
 		{
-			l_pcReaction->setAnnotation(annotation);
+			if(l_pcReaction->setAnnotation(annotation) != LIBSBML_OPERATION_SUCCESS)
+			{
+				SP_LOGWARNING(id + wxT(" annotation not exported!\n") + annotation);
+			}
 		}
 
 		l_sEquation = t->m_function;
@@ -321,6 +375,7 @@ bool SP_ExportContPed2SBML::WriteConstants()
 		wxString comment = l_pcAttrComment->GetValueString();
 
 		wxString name = SP_ExtractAttribute(wxT("name"), comment);
+		wxString metaid = SP_ExtractAttribute(wxT("metaid"), comment);
 		wxString notes = SP_ExtractNode(wxT("notes"), comment);
 		wxString annotation = SP_ExtractNode(wxT("annotation"), comment);
 
@@ -335,13 +390,23 @@ bool SP_ExportContPed2SBML::WriteConstants()
 			{
 				l_pcComp->setName(name);
 			}
+			if(!metaid.IsEmpty())
+			{
+				l_pcComp->setMetaId(metaid);
+			}
 			if(!notes.IsEmpty())
 			{
-				l_pcComp->setNotes(notes);
+				if(l_pcComp->setNotes(notes) != LIBSBML_OPERATION_SUCCESS)
+				{
+					SP_LOGWARNING(id + wxT(" notes not exported!\n") + notes);
+				}
 			}
 			if(!annotation.IsEmpty())
 			{
-				l_pcComp->setAnnotation(annotation);
+				if(l_pcComp->setAnnotation(annotation) != LIBSBML_OPERATION_SUCCESS)
+				{
+					SP_LOGWARNING(id + wxT(" annotation not exported!\n") + annotation);
+				}
 			}
 		}
 		else
@@ -355,13 +420,23 @@ bool SP_ExportContPed2SBML::WriteConstants()
 			{
 				l_pcParam->setName(name);
 			}
+			if(!metaid.IsEmpty())
+			{
+				l_pcParam->setMetaId(metaid);
+			}
 			if(!notes.IsEmpty())
 			{
-				l_pcParam->setNotes(notes);
+				if(l_pcParam->setNotes(notes) != LIBSBML_OPERATION_SUCCESS)
+				{
+					SP_LOGWARNING(id + wxT(" notes not exported!\n") + notes);
+				}
 			}
 			if(!annotation.IsEmpty())
 			{
-				l_pcParam->setAnnotation(annotation);
+				if(l_pcParam->setAnnotation(annotation) != LIBSBML_OPERATION_SUCCESS)
+				{
+					SP_LOGWARNING(id + wxT(" annotation not exported!\n") + annotation);
+				}
 			}
 		}
 	}
