@@ -111,13 +111,13 @@ void SP_ImportSBML2sPn::getModelDescription()
 	wxString l_sNotes;
 	if(m_sbmlModel->isSetNotes())
 	{
-		l_sNotes = m_sbmlModel->getNotesString();
+		l_sNotes = m_sbmlModel->getNotesString()+wxT("\n");
 	}
 
 	wxString l_sAnnotation;
 	if(m_sbmlModel->isSetAnnotation())
 	{
-		l_sAnnotation = m_sbmlModel->getAnnotationString();
+		l_sAnnotation = m_sbmlModel->getAnnotationString()+wxT("\n");
 	}
 
 	l_pcAttrComment->SetValueString(l_Name+l_metaid+l_Level+l_Version+l_sNotes+l_sAnnotation);
@@ -196,11 +196,11 @@ void SP_ImportSBML2sPn::getSpecies()
 
 			if(l_sbmlSpecies->isSetNotes())
 			{
-				l_comment << l_sbmlSpecies->getNotesString();
+				l_comment << l_sbmlSpecies->getNotesString()+wxT("\n");
 			}
 			if(l_sbmlSpecies->isSetAnnotation())
 			{
-				l_comment << l_sbmlSpecies->getAnnotationString();
+				l_comment << l_sbmlSpecies->getAnnotationString()+wxT("\n");
 			}
 			l_pcAttrComment->SetValueString(l_comment);
 			l_pcAttrComment->SetShow(false);
@@ -351,13 +351,13 @@ void SP_ImportSBML2sPn::getReactions ()
 			wxString l_sNotes;
 			if(l_sbmlReaction->isSetNotes())
 			{
-				l_sNotes = l_sbmlReaction->getNotesString();
+				l_sNotes = l_sbmlReaction->getNotesString()+wxT("\n");
 			}
 
 			wxString l_sAnnotation;
 			if(l_sbmlReaction->isSetAnnotation())
 			{
-				l_sAnnotation = l_sbmlReaction->getAnnotationString();
+				l_sAnnotation = l_sbmlReaction->getAnnotationString()+wxT("\n");
 			}
 
 			// is reversible (0,1 for false,true) or 0 for default (false)
@@ -524,13 +524,13 @@ void SP_ImportSBML2sPn::getModelCompartments()
 		wxString l_sNotes;
 		if(l_sbmlCompartment->isSetNotes())
 		{
-			l_sNotes = l_sbmlCompartment->getNotesString();
+			l_sNotes = l_sbmlCompartment->getNotesString()+wxT("\n");
 		}
 
 		wxString l_sAnnotation;
 		if(l_sbmlCompartment->isSetAnnotation())
 		{
-			l_sAnnotation = l_sbmlCompartment->getAnnotationString();
+			l_sAnnotation = l_sbmlCompartment->getAnnotationString()+wxT("\n");
 		}
 
 		l_pcAttrComment->SetValueString(l_CompName+l_metaid+l_sNotes+l_sAnnotation);
@@ -592,13 +592,13 @@ void SP_ImportSBML2sPn::getModelParameters()
 		wxString l_sNotes;
 		if(l_sbmlParameter->isSetNotes())
 		{
-			l_sNotes = l_sbmlParameter->getNotesString();
+			l_sNotes = l_sbmlParameter->getNotesString()+wxT("\n");
 		}
 
 		wxString l_sAnnotation;
 		if(l_sbmlParameter->isSetAnnotation())
 		{
-			l_sAnnotation = l_sbmlParameter->getAnnotationString();
+			l_sAnnotation = l_sbmlParameter->getAnnotationString()+wxT("\n");
 		}
 
 		l_pcAttrComment->SetValueString(l_ParamName+l_metaid+l_sNotes+l_sAnnotation);
@@ -665,13 +665,13 @@ void SP_ImportSBML2sPn::getReactionParameters(Reaction*  l_sbmlReaction, ASTNode
 		wxString l_sNotes;
 		if(l_sbmlParameter->isSetNotes())
 		{
-			l_sNotes = l_sbmlParameter->getNotesString();
+			l_sNotes = l_sbmlParameter->getNotesString()+wxT("\n");
 		}
 
 		wxString l_sAnnotation;
 		if(l_sbmlParameter->isSetAnnotation())
 		{
-			l_sAnnotation = l_sbmlParameter->getAnnotationString();
+			l_sAnnotation = l_sbmlParameter->getAnnotationString()+wxT("\n");
 		}
 
 		l_pcAttrComment->SetValueString(l_ParamName+l_metaid+l_sNotes+l_sAnnotation);
