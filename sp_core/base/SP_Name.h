@@ -21,10 +21,13 @@ class SP_Name
 {
 protected:
     wxString m_sNameVal;
-
     wxString m_sDisplayNameVal;
+    wxString m_sAbbreveation;
+
 public:
-    SP_Name(const wxString& p_pchValue):m_sNameVal(p_pchValue),m_sDisplayNameVal(p_pchValue) { }
+    SP_Name(const wxString& p_pchValue, const wxString& p_sAbbr = {}):
+    	m_sNameVal(p_pchValue),m_sDisplayNameVal(p_pchValue), m_sAbbreveation(p_sAbbr)
+	{}
     virtual ~SP_Name() {}
 
     virtual const wxString GetName() { return m_sNameVal; }
@@ -37,6 +40,9 @@ public:
 
     virtual const wxString GetDisplayName() { return m_sDisplayNameVal; }
     virtual wxString& SetDisplayName(const wxString& p_pchName) { m_sDisplayNameVal = p_pchName; return m_sDisplayNameVal; }
+
+    virtual const wxString GetAbbreveation() { return m_sAbbreveation.IsEmpty() ? m_sNameVal.at(0) : m_sAbbreveation; }
+    virtual wxString& SetAbbreveation(const wxString& p_pchName) { m_sAbbreveation = p_pchName; return m_sAbbreveation; }
 
 };
 
