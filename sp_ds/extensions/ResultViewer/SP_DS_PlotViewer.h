@@ -24,7 +24,8 @@ class SP_DS_PlotViewer: public SP_DS_ResultViewer, public wxEvtHandler
 protected :
 
 	      //Chart panel where the chart will be created
-	      wxChartPanel *m_pcChartPanel;
+
+	  wxChartPanel *m_pcChartPanel;
 
 	      //plot legend state
 	      bool m_bShowLegend;
@@ -34,6 +35,9 @@ protected :
 
 	      wxString m_sXAxisTitle;
 		  wxString m_sYAxisTitle;
+
+		  wxString m_ChartWidth;
+		  wxString m_ChartHeight;
 
 		  bool m_bShowXAxis;
 		  bool m_bShowYAxis;
@@ -54,7 +58,6 @@ protected:
 public:
 		  SP_DS_PlotViewer(wxWindow* p_pcParent,wxSizer* p_pcSizer);
 		  virtual ~SP_DS_PlotViewer();
-
 		  //Update a viewer
 		  virtual void Update();
 
