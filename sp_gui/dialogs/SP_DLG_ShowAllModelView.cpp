@@ -206,7 +206,7 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metada
 	SetSizerAndFit(l_pcMainSizer);
 
 	wxSize temp = l_pcMainSizer->GetSize();
-	cout << temp.GetWidth() << " " << temp.GetHeight() << endl;
+//	cout << temp.GetWidth() << " " << temp.GetHeight() << endl;
 	temp.SetHeight(wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
 
 	wxString temp1 = m_pcModelView->GetAttribute(wxT("ChartWidth"))->GetValueString();
@@ -224,8 +224,8 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metada
 	{
 		l_ChartHeight += 33;
 	}
-	temp.SetHeight(l_ChartHeight + 180);
-	temp.SetWidth(l_ChartWidth + 246);
+	temp.SetHeight(l_ChartHeight + 177);
+	temp.SetWidth(l_ChartWidth + 284);
 
 	this->SetSize(temp);
 
