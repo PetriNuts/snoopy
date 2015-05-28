@@ -158,8 +158,6 @@ class SP_ExportLatex : public wxEvtHandler,
   	SP_WDG_NotebookPage* m_pcNotebookPageDeclarations;
   	SP_WDG_NotebookPage* m_pcNotebookPageHierarchy;
 
-  	//wxProgressDialog* m_pcProgressDlg;
-
   	//graph elements mapping
     map<int, wxString> SP_Index2Node;
     map<int, wxArrayString > SP_Node2Attributes;

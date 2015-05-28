@@ -218,25 +218,7 @@ SP_ExportLatex::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
   CHECK_POINTER(p_doc, return FALSE);
   CHECK_BOOL((!p_fileName.IsEmpty()), return FALSE);
 
-   /*
-    wxProgressDialog pdialog( wxT("Export Progress"),
-	                              wxT("Exporting..."),
-	                              100,    // range
-	                              p_pcDlg,   // parent
-	                              wxSTAY_ON_TOP |
-	                              wxPD_ELAPSED_TIME
-	                              );
-
-	m_pcProgressDlg = &pdialog;
-
-	m_pcProgressDlg->CenterOnScreen(wxBOTH);
-	//m_pcProgressDlg->CenterOnParent(wxBOTH);
-	m_pcProgressDlg->Show(true);
-   */
-
   ///////////// Export to Latex ////////////////
-  //m_pcProgressDlg->Pulse( wxT("Exporting to Latex...") );
-
   wxPrintData *pd = new wxPrintData();
   m_printData = *pd;
 
@@ -248,7 +230,6 @@ SP_ExportLatex::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 
 
   ///////////// Export to PDF ////////////////
-  //m_pcProgressDlg->Pulse( wxT("Exporting to PDF...") );
 
   if(m_pcCheckBoxDirectPDF->IsChecked() ) {
 
@@ -288,15 +269,12 @@ SP_ExportLatex::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 	  if( m_rbPdfLatex->GetValue() ) {
 
 		  command = m_sCompilerPath + wxT(" -interaction=nonstopmode -output-directory ./AUX ") + l_sMainFileName;
-		  //m_pcProgressDlg->Pulse( wxT("Export to PDF: Execution round 1...") );
 		  l_pcLog = wxExecute(command, wxEXEC_SYNC);
 
 		  command = m_sCompilerPath + wxT(" -interaction=nonstopmode -output-directory ./AUX ") + l_sMainFileName;
-		  //m_pcProgressDlg->Pulse( wxT("Export to PDF: Execution round 2...") );
 		  l_pcLog = wxExecute(command, wxEXEC_SYNC);
 
 		  command = m_sCompilerPath + wxT(" -interaction=nonstopmode -output-directory ./AUX ") + l_sMainFileName;
-		  //m_pcProgressDlg->Pulse( wxT("Export to PDF: Execution round 3...") );
 		  l_pcLog = wxExecute(command, wxEXEC_SYNC);
 
 	  } else {
@@ -319,8 +297,6 @@ SP_ExportLatex::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 	  SP_LOGMESSAGE( wxT("Export to PDF complete...") );
 
   }
-
-  //m_pcProgressDlg->Destroy();
 
   return  !m_bError;
 }
@@ -454,7 +430,6 @@ SP_ExportLatex::LoadData()
         		{
         			arrays.Add( (*itAttr)->GetDisplayName() );
         			l_AttrNameMap.insert( pair<wxString, wxString> ( (*itAttr)->GetDisplayName(), (*itAttr)->GetName()));
-        			//SP_LOGMESSAGE( (*itAttr)->GetDisplayName() + wxT(" -> Meta") );
         		}
 
         		if( l_sMetaname.compare( wxT("Image") ) == 0) {
@@ -2993,6 +2968,8 @@ SP_ExportLatex::WriteGraphElements()
 
 							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
 							l_sSourceName = EditStringforLatex( l_sSourceName );
+
+							//wxString str = l_pcEdge->GetSource()->Get
 
 							out = wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sSourceName
