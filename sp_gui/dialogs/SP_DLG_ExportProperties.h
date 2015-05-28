@@ -32,7 +32,6 @@ private:
     wxBoxSizer* m_pcSizer;
     //! the notebook to have multiple pages, if needed
     SP_WDG_Notebook* m_pcNotebook;
-    wxStaticText* m_pcError;
     SP_ExportRoutine* m_pcExport;
     wxFilePickerCtrl* m_pcFilePickerCtrl;
     map<SP_DS_ColListAttribute*, wxComboBox*> m_mColListComboBoxes;

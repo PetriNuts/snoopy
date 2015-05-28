@@ -32,7 +32,6 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
                                                        long p_nStyle)
   : wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize,
 	     p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
-    m_pcError(NULL),
     m_pcExport(p_pcExport),
     m_pcDoc(p_pcDoc)
 {
@@ -180,14 +179,6 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-
-
-	m_pcError = new wxStaticText(this, -1, wxT("                                                  "));
-    m_pcError->SetForegroundColour(*wxRED);
-    m_pcSizer->Add(m_pcError, 0, wxALL, 5);
-
     /* Buttons in the lower right hand corner */
     wxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 5);
@@ -242,10 +233,6 @@ SP_DLG_ExportProperties::OnDlgOk(wxCommandEvent& p_cEvent)
 		SaveData();
         if (!m_pcExport->OnDialogOk())
         {
-            if (m_pcError)
-            {
-                m_pcError->Refresh();
-            }
             return;
         }
 
