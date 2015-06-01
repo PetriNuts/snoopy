@@ -17,6 +17,7 @@
 #include "sp_core/SP_Core.h"
 
 #include <wx/spinctrl.h>
+#include <wx/busyinfo.h>
 
 #include "spsim/helpers/parser.h"
 #include "spsim/helpers/utilities.h"
@@ -83,7 +84,9 @@ SP_DLG_CheckNet::SP_DLG_CheckNet( SP_MDI_View* p_pcView, wxWindow *p_parent, con
 		|| m_sNetClassName == SP_DS_COLCPN_CLASS 
 		|| m_sNetClassName == SP_DS_COLPN_CLASS 
 		|| m_sNetClassName == SP_DS_COLHPN_CLASS 
-		||  m_sNetClassName == SP_DS_SPN_CLASS)
+		|| m_sNetClassName == SP_DS_CONTINUOUSPED_CLASS
+		|| m_sNetClassName == SP_DS_HYBRIDPN_CLASS
+		|| m_sNetClassName == SP_DS_SPN_CLASS)
 	{
 		m_cbSyntax = new wxCheckBox(this, SP_ID_CHECKLISTBOX_SYNTAX, wxT("Check Syntax (Consistency)"));
 		m_cbSyntax->SetValue( 1 );
@@ -268,7 +271,9 @@ bool SP_DLG_CheckNet::Check()
 		}
 	}
 
-	if( m_sNetClassName == SP_DS_SPN_CLASS)
+	if( m_sNetClassName == SP_DS_SPN_CLASS
+		|| m_sNetClassName == SP_DS_HYBRIDPN_CLASS
+		|| m_sNetClassName == SP_DS_CONTINUOUSPED_CLASS)
 	{
 		if(m_cbSyntax->IsChecked())
 		{
@@ -294,6 +299,8 @@ bool SP_DLG_CheckNet::Check()
 
 void SP_DLG_CheckNet::OnDlgOk(wxCommandEvent& p_cEvent)
 {
+    wxWindowDisabler disableAll;
+    wxBusyInfo wait("Please wait, checking net...");
 
 	if (Validate() && TransferDataFromWindow())
 	{
@@ -330,8 +337,39 @@ bool SP_DLG_CheckNet :: CheckSPN( )
 
 	bool l_bNoError = true;
 	
+	spsim::Parser l_cParser;
+	SP_VectorString l_Constants;
 
-	l_pcNodeclass= m_graph->GetNodeclass( wxT("Transition") );
+	SP_DS_Metadataclass* mc = m_graph->GetMetadataclass(SP_DS_META_CONSTANT);
+	if(mc)
+	{
+		for(SP_DS_Metadata* l_pcMeta : *(mc->GetElements()))
+		{
+			wxString l_Name = dynamic_cast<SP_DS_NameAttribute*>(l_pcMeta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+			l_Constants.push_back(l_Name);
+		}
+		l_cParser.SetParameterNames(&l_Constants);
+	}
+
+	l_pcNodeclass = m_graph->GetNodeclass(SP_DS_STOCHASTIC_TRANS);
+	if( l_pcNodeclass )
+	{
+		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		{
+
+			SP_DS_Node* l_pcNode = *l_itElem;
+			l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("FunctionList")) );
+
+			for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+			{
+				l_sFormula = l_pcColList->GetCell(i, 1);
+				if( ! CheckRateFunction(l_cParser, l_sFormula,l_pcNode) )
+					l_bNoError = false;
+			}
+		}
+	}
+
+	l_pcNodeclass = m_graph->GetNodeclass(SP_DS_CONTINUOUS_TRANS);
 	if( l_pcNodeclass )
 	{
 		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
@@ -343,13 +381,13 @@ bool SP_DLG_CheckNet :: CheckSPN( )
 			for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 			{
 				l_sFormula = l_pcColList->GetCell(i, 1);
-				if( ! CheckRateFunction(l_sFormula,l_pcNode) )
+				if( ! CheckRateFunction(l_cParser, l_sFormula,l_pcNode) )
 					l_bNoError = false;
 			}
 		}
 	}
 
-	l_pcNodeclass= m_graph->GetNodeclass( wxT("Immediate Transition") );
+	l_pcNodeclass = m_graph->GetNodeclass(SP_DS_IMMEDIATE_TRANS);
 	if( l_pcNodeclass )
 	{
 		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
@@ -361,14 +399,14 @@ bool SP_DLG_CheckNet :: CheckSPN( )
 			for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 			{
 				l_sFormula = wxT("ImmediateFiring(") + l_pcColList->GetCell(i, 1) + wxT(")");
-				if( ! CheckRateFunction(l_sFormula,l_pcNode) )
+				if( ! CheckRateFunction(l_cParser, l_sFormula,l_pcNode) )
 					l_bNoError = false;
 			}
 		}
 
 	}
 
-	l_pcNodeclass= m_graph->GetNodeclass( wxT("Deterministic Transition") );
+	l_pcNodeclass= m_graph->GetNodeclass(SP_DS_DETERMINISTIC_TRANS);
 	if( l_pcNodeclass )
 	{
 		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
@@ -380,14 +418,14 @@ bool SP_DLG_CheckNet :: CheckSPN( )
 			for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 			{
 				l_sFormula = wxT("TimedFiring(")+ l_pcColList->GetCell(i, 1) +wxT(")");
-				if( ! CheckRateFunction(l_sFormula,l_pcNode) )
+				if( ! CheckRateFunction(l_cParser, l_sFormula,l_pcNode) )
 					l_bNoError = false;
 			}
 		}
 
 	}
 
-	l_pcNodeclass= m_graph->GetNodeclass( wxT("Scheduled Transition") );
+	l_pcNodeclass= m_graph->GetNodeclass(SP_DS_SCHEDULED_TRANS);
 	if( l_pcNodeclass )
 	{
 		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
@@ -402,7 +440,7 @@ bool SP_DLG_CheckNet :: CheckSPN( )
 				wxString l_Repetition=l_pcColList->GetCell(i, 2); 
 				wxString l_End=l_pcColList->GetCell(i, 3);
 				l_sFormula = wxT("FixedTimedFiring_Periodic(")+ l_Begin +wxT(",")+ l_Repetition+wxT(",")+l_End+wxT(")");
-				if( ! CheckRateFunction(l_sFormula,l_pcNode) )
+				if( ! CheckRateFunction(l_cParser, l_sFormula,l_pcNode) )
 					l_bNoError = false;
 			}
 		}
@@ -411,7 +449,7 @@ bool SP_DLG_CheckNet :: CheckSPN( )
 	return l_bNoError;
 }
 
-bool SP_DLG_CheckNet::CheckRateFunction(wxString p_sFormula,SP_DS_Node* p_pcNode )
+bool SP_DLG_CheckNet::CheckRateFunction(spsim::Parser& p_Parser, const wxString& p_sFormula, SP_DS_Node* p_pcNode )
 {
 #if 0
 	SP_DS_StParser l_cParser;
@@ -442,20 +480,7 @@ bool SP_DLG_CheckNet::CheckRateFunction(wxString p_sFormula,SP_DS_Node* p_pcNode
 
 	return true;
 #else
-	spsim::Parser l_cParser;
-	SP_VectorString l_Constants;
 	SP_VectorString l_Places;
-
-	SP_DS_Metadataclass* mc = m_graph->GetMetadataclass(SP_DS_META_CONSTANT);
-	if(mc)
-	{
-		for(SP_DS_Metadata* l_pcMeta : *(mc->GetElements()))
-		{
-			wxString l_Name = dynamic_cast<SP_DS_NameAttribute*>(l_pcMeta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-			l_Constants.push_back(l_Name);
-		}
-		l_cParser.SetParameterNames(&l_Constants);
-	}
     if(p_pcNode)
 	{
     	wxString l_sTransitionName = dynamic_cast<SP_DS_NameAttribute*>(p_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
@@ -467,10 +492,10 @@ bool SP_DLG_CheckNet::CheckRateFunction(wxString p_sFormula,SP_DS_Node* p_pcNode
 			if(SP_Find(l_Places, l_sPlaceName) == l_Places.end())
 				l_Places.push_back(l_sPlaceName);
 		}
-		l_cParser.SetPlaceNames(&l_Places);
+		p_Parser.SetPlaceNames(&l_Places);
 	}
 
-	return l_cParser.Parse(p_sFormula, static_cast<spsim::Transition*>(NULL));
+	return p_Parser.Parse(p_sFormula, static_cast<spsim::Transition*>(NULL));
 #endif
 }
 

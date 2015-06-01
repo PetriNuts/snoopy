@@ -11,6 +11,10 @@
 #include "sp_ds/SP_DS_Graph.h"
 #include "sp_gui/mdi/SP_MDI_View.h"
 
+namespace spsim
+{
+	class Parser;
+}
 
 class SP_DLG_CheckNet: public wxDialog, public SP_Error
 {
@@ -47,7 +51,7 @@ public:
 
 	bool Check();
 
-	bool CheckRateFunction(wxString p_sFormula,SP_DS_Node* p_pcNode );
+	bool CheckRateFunction(spsim::Parser& p_Parser, const wxString& p_sFormula, SP_DS_Node* p_pcNode );
 
 	bool CheckSPN();
 
