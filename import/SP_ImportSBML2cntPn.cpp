@@ -31,6 +31,7 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 	g_ReactionList.clear();
 
 	numReverseReactions = 0;
+	numBoundaryConditions = 0;
 
 	SBMLDocument* l_sbmlDocument;
 
@@ -53,7 +54,7 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 
 		m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
 
-		SP_LOGMESSAGE(wxString::Format(wxT("The imported SBML contains %u reversible reaction(s)."), numReverseReactions));
+		SP_LOGMESSAGE(wxString::Format(wxT("The imported SBML contains:\n\t - %u boundary condition(s),\n\t - %u reversible reaction(s)."), numBoundaryConditions, numReverseReactions));
 
 		DoVisualization();
 
@@ -174,6 +175,7 @@ void SP_ImportSBML2cntPn::getSpecies()
 				}
 
 				// if set BoundaryCondition (0,1 for false,true) or 0 for default (false)
+				numBoundaryConditions += l_sbmlSpecies->getBoundaryCondition();
 				l_pcNode->GetAttribute(wxT("Fixed"))->SetValueString(wxString::Format(wxT("%d"), l_sbmlSpecies->getBoundaryCondition()));
 				l_pcNode->ShowOnCanvas(m_pcCanvas, FALSE, 50, yComRea,0);
 

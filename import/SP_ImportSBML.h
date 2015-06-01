@@ -61,6 +61,7 @@ public:
 	int yPara;
 
 	size_t numReverseReactions = 0;
+	size_t numBoundaryConditions = 0;
 
 };
 
