@@ -194,6 +194,7 @@ class SP_ExportLatex : public wxEvtHandler,
     map<wxString, wxString> SP_HierarchyLabel2ID;
 
     map< pair<int, wxString>, wxString> SP_LatexReferencesIndex2Ref;
+    map< wxString, wxString> SP_LatexGlossaryAbbr2Full;
 
     map<wxString, SP_DS_Node*> SP_Name2Node;
     map<wxString, SP_DS_Edge*> SP_Name2Edge;

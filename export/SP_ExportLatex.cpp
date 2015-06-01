@@ -167,6 +167,7 @@ SP_ExportLatex::AddToDialog(SP_DLG_ExportProperties* p_pcDlg, SP_MDI_Doc* p_pcDo
     m_pcCheckBox_BasicsNet.clear();
 
     SP_LatexReferencesIndex2Ref.clear();
+    SP_LatexGlossaryAbbr2Full.clear();
     m_pcTextCtrlHeaderFooter.clear();
     SP_HierarchyLabel2ID.clear();
 
@@ -342,7 +343,7 @@ SP_ExportLatex::LoadData()
     		    l_AttrNameMap.insert( pair<wxString, wxString> ( (*itAttr)->GetDisplayName(), (*itAttr)->GetName()));
     		}
 
-    		if( l_pcNode->GetClassName() == wxT("Coarse Place") || l_pcNode->GetClassName() == wxT("Coarse Transition") )
+    		if( l_pcNode->GetClassName().Find( wxT("Coarse") ) != wxNOT_FOUND)   // coarse node
     		{
     			arrays.Add(wxT("Net number") );
     			l_AttrNameMap.insert( pair<wxString, wxString> ( wxT("Net number"), wxT("Net number") ));
@@ -949,6 +950,8 @@ SP_ExportLatex::AddAttributes_GraphElements()
 	for (itN = SP_Node2Attributes.begin(); itN != SP_Node2Attributes.end(); itN++)
 	{
 		wxString l_sCurrentNode = SP_Index2Node[ (*itN).first ];   //node class
+		//SP_DS_Node* l_pcNodeClass = SP_Name2Node[ l_sCurrentNode ];
+
 		SP_LOGMESSAGE( wxT("Current node adding sizer: ") + l_sCurrentNode );
 		wxSizer* l_pcRightSizer = new wxStaticBoxSizer(wxVERTICAL, m_pcNotebookPageGraph, l_sCurrentNode);
 
@@ -973,7 +976,10 @@ SP_ExportLatex::AddAttributes_GraphElements()
 
 		SP_Node2AttributeCheckList.insert(pair<int, wxCheckListBox* > ( (*itN).first, l_pcCheckList) );
 
-	    if( (l_sCurrentNode.Find( wxT("Edge") ) == wxNOT_FOUND) && l_sCurrentNode.Cmp("Comment") )  //if not an edge or comment
+
+		SP_DS_Edgeclass* edgeclass = m_pcGraph->GetEdgeclassByDisplayedName( l_sCurrentNode );
+
+	    if( (!edgeclass) && l_sCurrentNode.Cmp("Comment") )  //if not an edge or comment (in metadata)
 	    {
 	    	l_pcRightSizer->Add(5, 20);
 	    	l_pcRightSizer->Add(new wxStaticText( m_pcNotebookPageGraph, -1, wxT("RegEx") ), 0, wxALL, 5);
@@ -1005,7 +1011,7 @@ SP_ExportLatex::AddAttributes_GraphElements()
 	    }
 
 	    //Add ordering criteria for 'Edges'
-	    if( l_sCurrentNode.Find( wxT("Edge") ) != wxNOT_FOUND) {
+	    if( edgeclass ) {
 
 	    	 //Order By
 	    	 l_pcRightSizer->Add(0, 20);
@@ -1083,7 +1089,7 @@ SP_ExportLatex::AddGraphElements()
 	m_pcGraph_ButtonDown = new wxButton(m_pcNotebookPageGraph, SP_ID_BUTTON_GRAPH_DOWN, wxT("Down"), wxDefaultPosition, wxDefaultSize );
 
 	m_pcRearrangelist_Graph->Bind(wxEVT_LISTBOX, &SP_ExportLatex::OnSelChange_Graph, this, SP_ID_GRAPH_UPDATE);
-	m_pcRearrangelist_Graph->Bind(wxEVT_CHECKLISTBOX, &SP_ExportLatex::OnCheckUncheck_Graph, this, SP_ID_GRAPH_UPDATE);
+	//m_pcRearrangelist_Graph->Bind(wxEVT_CHECKLISTBOX, &SP_ExportLatex::OnCheckUncheck_Graph, this, SP_ID_GRAPH_UPDATE);
 
 	m_pcGraph_ButtonUp->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Graph_UpdateUI, this, SP_ID_BUTTON_GRAPH_UP);
 	m_pcGraph_ButtonDown->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Graph_UpdateUI, this, SP_ID_BUTTON_GRAPH_DOWN);
@@ -1194,7 +1200,7 @@ SP_ExportLatex::AddDeclarations()
 	m_pcDeclarations_ButtonDown = new wxButton( m_pcNotebookPageDeclarations, SP_ID_BUTTON_DECLARATIONS_DOWN, wxT("Down"), wxDefaultPosition, wxDefaultSize );
 
 	m_pcRearrangelist_declarations->Bind(wxEVT_LISTBOX, &SP_ExportLatex::OnSelChange_Declarations, this, SP_ID_DECLARATIONS_UPDATE);
-	m_pcRearrangelist_declarations->Bind(wxEVT_CHECKLISTBOX, &SP_ExportLatex::OnCheckUncheck_Declarations, this, SP_ID_DECLARATIONS_UPDATE);
+	//m_pcRearrangelist_declarations->Bind(wxEVT_CHECKLISTBOX, &SP_ExportLatex::OnCheckUncheck_Declarations, this, SP_ID_DECLARATIONS_UPDATE);
 
 	m_pcDeclarations_ButtonUp->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Declarations_UpdateUI, this, SP_ID_BUTTON_DECLARATIONS_UP);
 	m_pcDeclarations_ButtonDown->Bind(wxEVT_UPDATE_UI, &SP_ExportLatex::Declarations_UpdateUI, this, SP_ID_BUTTON_DECLARATIONS_DOWN);
@@ -2191,13 +2197,13 @@ SP_ExportLatex::WriteBasics()
 
 
 	wxFprintf(l_pstream, wxT("\\newpage\n") );
-	wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
+	//wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 	wxFprintf(l_pstream, wxT("\\section{Basics}\n") );
 	wxFprintf(l_pstream, wxT("This section contains basic information about the input net.") );
 
     //General Information
-	wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
+	//wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 	wxFprintf(l_pstream, wxT("\\subsection{General Informations}\n") );
 	wxFprintf(l_pstream, wxT("\\vspace{5mm}\n") );
@@ -2322,7 +2328,7 @@ SP_ExportLatex::WriteBasics()
 
 
 	//Net Information
-	wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
+	//wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 	wxFprintf(l_pstream, wxT("\\subsection{Net Informations}\n") );
 	wxFprintf(l_pstream, wxT("\\vspace{5mm}\n\n") );
@@ -2401,7 +2407,7 @@ SP_ExportLatex::WriteGraphElements()
 	}
 
 	wxFprintf(l_pstream, wxT("\\newpage\n") );
-	wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
+	//wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 	wxFprintf(l_pstream, wxT("\\section{Graph Elements}\n") );
 	wxFprintf(l_pstream, wxT("This section contains information related to graph elements specific to the net.\n") );
@@ -2414,7 +2420,13 @@ SP_ExportLatex::WriteGraphElements()
 			int order = m_pcRearrangelist_Graph->GetCurrentOrder()[ i ];
 
 			wxString l_sElementDisplayName = m_Options_Graph[ order ];
-			wxString element = l_sElementDisplayName + wxT("s");
+			wxString element = l_sElementDisplayName;
+
+			if( element.GetChar( element.size()-1) == 'y') {
+				element = element.BeforeLast('y') + wxT("ies");
+			} else {
+				element += wxT("s");
+			}
 
 			//m_pcProgressDlg->Pulse( wxT("Exporting to Latex...") + element );
 
@@ -2431,7 +2443,7 @@ SP_ExportLatex::WriteGraphElements()
 				return FALSE;
 			}
 
-			wxFprintf(l_pstream1, wxT("\\needspace{10\\baselineskip}\n\n") );
+			//wxFprintf(l_pstream1, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 			wxFprintf(l_pstream1, wxT("\\subsection{") + element + wxT("}\n") );
 			wxFprintf(l_pstream1, wxT("\\begin{center}\n") );
@@ -2969,18 +2981,27 @@ SP_ExportLatex::WriteGraphElements()
 							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
 							l_sSourceName = EditStringforLatex( l_sSourceName );
 
-							//wxString str = l_pcEdge->GetSource()->Get
+							wxString l_sAbbrSource = l_pcEdge->GetSource()->GetClassObject()->GetAbbreviation();
+							wxString l_sAbbrTarget = l_pcEdge->GetTarget()->GetClassObject()->GetAbbreviation();
+							wxString l_sSourceClass = l_pcEdge->GetSource()->GetClassName();
+							wxString l_sTargetClass = l_pcEdge->GetTarget()->GetClassName();
+
+							//For glossary
+							SP_LatexGlossaryAbbr2Full.insert(pair< wxString, wxString > (l_sAbbrSource, l_sSourceClass));
+							SP_LatexGlossaryAbbr2Full.insert(pair< wxString, wxString > (l_sAbbrTarget, l_sTargetClass));
 
 							out = wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sSourceName
-									+ wxT("} & P &");
+									+ wxT("} & ") + l_sAbbrSource + (" &");
 
 							l_slinklabel = EditStringforCrossRef(l_sTargetName);
 							l_sTargetName = EditStringforLatex( l_sTargetName );
 
 							out += wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sTargetName
-									+ wxT("} & T &");
+									+ wxT("} & ") + l_sAbbrTarget + (" &");
+
+
 
 							if(l_pcEdge) SP_LOGMESSAGE( element_name );
 
@@ -3113,16 +3134,25 @@ SP_ExportLatex::WriteGraphElements()
 							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
 							l_sSourceName = EditStringforLatex( l_sSourceName );
 
+							wxString l_sAbbrSource = l_pcEdge->GetSource()->GetClassObject()->GetAbbreviation();
+							wxString l_sAbbrTarget = l_pcEdge->GetTarget()->GetClassObject()->GetAbbreviation();
+							wxString l_sSourceClass = l_pcEdge->GetSource()->GetClassName();
+							wxString l_sTargetClass = l_pcEdge->GetTarget()->GetClassName();
+
+							//For glossary
+							SP_LatexGlossaryAbbr2Full.insert(pair< wxString, wxString > (l_sAbbrSource, l_sSourceClass));
+							SP_LatexGlossaryAbbr2Full.insert(pair< wxString, wxString > (l_sAbbrTarget, l_sTargetClass));
+
 							out = wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sSourceName
-									+ wxT("} & T &");
+									+ wxT("} & ") + l_sAbbrSource + (" &");
 
 							l_slinklabel = EditStringforCrossRef(l_sTargetName);
 							l_sTargetName = EditStringforLatex( l_sTargetName );
 
 							out += wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sTargetName
-									+ wxT("} & P &");
+									+ wxT("} & ") + l_sAbbrTarget + (" &");
 
 							if(l_pcEdge) SP_LOGMESSAGE( element_name );
 
@@ -3256,16 +3286,25 @@ SP_ExportLatex::WriteGraphElements()
 							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
 							l_sSourceName = EditStringforLatex( l_sSourceName );
 
+							wxString l_sAbbrSource = l_pcEdge->GetSource()->GetClassObject()->GetAbbreviation();
+							wxString l_sAbbrTarget = l_pcEdge->GetTarget()->GetClassObject()->GetAbbreviation();
+							wxString l_sSourceClass = l_pcEdge->GetSource()->GetClassName();
+							wxString l_sTargetClass = l_pcEdge->GetTarget()->GetClassName();
+
+							//For glossary
+							SP_LatexGlossaryAbbr2Full.insert(pair< wxString, wxString > (l_sAbbrSource, l_sSourceClass));
+							SP_LatexGlossaryAbbr2Full.insert(pair< wxString, wxString > (l_sAbbrTarget, l_sTargetClass));
+
 							out = wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sSourceName
-									+ wxT("} & T &");
+									+ wxT("} & ") + l_sAbbrSource + (" &");
 
 							l_slinklabel = EditStringforCrossRef(l_sTargetName);
 							l_sTargetName = EditStringforLatex( l_sTargetName );
 
 							out += wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sTargetName
-									+ wxT("} & P &");
+									+ wxT("} & ") + l_sAbbrTarget + (" &");
 
 
 							if(l_pcEdge) SP_LOGMESSAGE( element_name );
@@ -3399,16 +3438,25 @@ SP_ExportLatex::WriteGraphElements()
 							wxString l_slinklabel = EditStringforCrossRef(l_sSourceName);
 							l_sSourceName = EditStringforLatex( l_sSourceName );
 
+							wxString l_sAbbrSource = l_pcEdge->GetSource()->GetClassObject()->GetAbbreviation();
+							wxString l_sAbbrTarget = l_pcEdge->GetTarget()->GetClassObject()->GetAbbreviation();
+							wxString l_sSourceClass = l_pcEdge->GetSource()->GetClassName();
+							wxString l_sTargetClass = l_pcEdge->GetTarget()->GetClassName();
+
+							//For glossary
+							SP_LatexGlossaryAbbr2Full.insert(pair< wxString, wxString > (l_sAbbrSource, l_sSourceClass));
+							SP_LatexGlossaryAbbr2Full.insert(pair< wxString, wxString > (l_sAbbrTarget, l_sTargetClass));
+
 							out = wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sSourceName
-									+ wxT("} & P &");
+									+ wxT("} & ") + l_sAbbrSource + (" &");
 
 							l_slinklabel = EditStringforCrossRef(l_sTargetName);
 							l_sTargetName = EditStringforLatex( l_sTargetName );
 
 							out += wxT("\\hyperref[") + l_slinklabel
 									+ wxT("]{") + l_sTargetName
-									+ wxT("} & T &");
+									+ wxT("} & ") + l_sAbbrTarget + (" &");
 
 							if(l_pcEdge) SP_LOGMESSAGE( element_name );
 
@@ -3946,7 +3994,7 @@ SP_ExportLatex::WriteDeclarations_Colored()
 	wxArrayInt l_nArrayIntDecElements;
 
 	wxFprintf(l_pstream, wxT("\\newpage\n") );
-	wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
+	//wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 	wxFprintf(l_pstream, wxT("\\section{Declarations}\n") );
 	wxFprintf(l_pstream, wxT("This section contains information related to declarations specific to the net.") );
@@ -3976,7 +4024,7 @@ SP_ExportLatex::WriteDeclarations_Colored()
 				return FALSE;
 			}
 
-			wxFprintf(l_pstream1, wxT("\\needspace{10\\baselineskip}\n\n") );
+			//wxFprintf(l_pstream1, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 			wxFprintf(l_pstream1, wxT("\\subsection{") + element + wxT("}\n") );
 			wxFprintf(l_pstream1, wxT("\\begin{center}\n") );
@@ -4168,7 +4216,7 @@ SP_ExportLatex::WriteDeclarations()
 	wxArrayInt l_nArrayIntDecElements;
 
 	wxFprintf(l_pstream, wxT("\\newpage\n") );
-	wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
+	//wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 	wxFprintf(l_pstream, wxT("\\section{Declarations}\n") );
 	wxFprintf(l_pstream, wxT("This section contains information related to declarations specific to the net.") );
@@ -4198,7 +4246,7 @@ SP_ExportLatex::WriteDeclarations()
 				return FALSE;
 			}
 
-			wxFprintf(l_pstream1, wxT("\\needspace{10\\baselineskip}\n\n") );
+			//wxFprintf(l_pstream1, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 			wxFprintf(l_pstream1, wxT("\\subsection{") + element + wxT("}\n") );
 			wxFprintf(l_pstream1, wxT("\\begin{center}\n") );
@@ -4492,7 +4540,7 @@ SP_ExportLatex::WriteHierarchyTree(FILE* l_pstream)
 	}
 
 	wxFprintf(l_pstream1, wxT("\\newpage\n") );
-	wxFprintf(l_pstream1, wxT("\\needspace{10\\baselineskip}\n\n") );
+	//wxFprintf(l_pstream1, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 	wxFprintf(l_pstream1, wxT("\\subsection{Hierarchy Tree}\n\n") );
 	wxFprintf(l_pstream1, wxT("\\emph{This section contains the hierarchical tree structure for selected levels.}\n\n") );
@@ -4691,7 +4739,7 @@ SP_ExportLatex::WriteHierarchyFigure(FILE* l_pstream)
 	}
 
 	wxFprintf(l_pstream1, wxT("\\newpage\n") );
-	wxFprintf(l_pstream1, wxT("\\needspace{10\\baselineskip}\n\n") );
+	//wxFprintf(l_pstream1, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 	wxFprintf(l_pstream1, wxT("\\subsection{Hierarchy Figures}\n\n") );
 	wxFprintf(l_pstream1, wxT("\\emph{This section contains the hierarchical figures for selected levels.}\n\n") );
@@ -4848,7 +4896,7 @@ SP_ExportLatex::WriteHierarchy()
 	}
 
 	wxFprintf(l_pstream, wxT("\\newpage\n") );
-	wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
+	//wxFprintf(l_pstream, wxT("\\needspace{10\\baselineskip}\n\n") );
 
 	wxFprintf(l_pstream, wxT("\\section{Hierarchy}\n") );
 	wxFprintf(l_pstream, wxT("This section contains information about the net hierarchy.") );
@@ -4967,8 +5015,16 @@ SP_ExportLatex::WriteGlossary()
 	wxFprintf(l_pstream, wxT("\\item[MAR.] Marking\n\t") );
 	wxFprintf(l_pstream, wxT("\\item[MUL.] Multiplicity\n\t") );
 	wxFprintf(l_pstream, wxT("\\item[NET.] Net number\n\t") );
-	wxFprintf(l_pstream, wxT("\\item[P] Place\n\t") );
-	wxFprintf(l_pstream, wxT("\\item[T] Transition\n\t") );
+
+	wxString out;
+	map< wxString, wxString > :: iterator it;
+	it = SP_LatexGlossaryAbbr2Full.begin();
+
+	for(; it != SP_LatexGlossaryAbbr2Full.end(); it++) {
+		out = wxT("\\item[") + it->first + wxT("] ") + it->second + wxT("\n\t");
+		wxFprintf(l_pstream, wxT("%s"), out.c_str());
+	}
+
 	wxFprintf(l_pstream, wxT("\\end{description}\n") );
 
 	fclose( l_pstream );
