@@ -661,7 +661,7 @@ bool SP_CMD_Edit::UndoHide()
 
 			if (!m_pcSource->GetNetclass()->NodeRequirement(l_pcNode))
 			{
-				SP_MESSAGEBOX(wxT(" Undo not possible due to noderequirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
+				SP_MESSAGEBOX(wxT(" Undo not possible due to node requirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
 				return FALSE;
 			}
 			m_pcSource->AddElement(l_pcNode);
@@ -689,7 +689,7 @@ bool SP_CMD_Edit::UndoHide()
 
 			if (!m_pcSource->GetNetclass()->EdgeRequirement(l_pcEdgeclass, l_pcEdge->GetSource(), l_pcEdge->GetTarget()))
 			{
-				SP_MESSAGEBOX(wxT(" Undo not possible due to edgerequirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
+				SP_MESSAGEBOX(wxT(" Undo not possible due to edge requirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
 				return FALSE;
 			}
 			m_pcSource->AddElement(l_pcEdge);
@@ -716,7 +716,7 @@ bool SP_CMD_Edit::UndoHide()
 
 			if (!m_pcSource->GetNetclass()->MetadataRequirement(l_pcMetadata))
 			{
-				SP_MESSAGEBOX(wxT(" Undo not possible due to noderequirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
+				SP_MESSAGEBOX(wxT(" Undo not possible due to node requirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
 				return FALSE;
 			}
 			m_pcSource->AddElement(l_pcMetadata);
@@ -758,7 +758,7 @@ bool SP_CMD_Edit::DoUnHide()
 			SP_DS_Node* l_pcNode = dynamic_cast<SP_DS_Node*>(l_pcParent);
 			if (!m_pcSource->GetNetclass()->NodeRequirement(l_pcNode))
 			{
-				SP_MESSAGEBOX(wxT(" Unhide not possible due to noderequirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
+				SP_MESSAGEBOX(wxT(" Unhide not possible due to node requirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
 				return FALSE;
 			}
 			AppendCoarse(l_pcParent->GetCoarse());
@@ -789,7 +789,7 @@ bool SP_CMD_Edit::DoUnHide()
 			SP_DS_Metadata* l_pcMetadata = dynamic_cast<SP_DS_Metadata*>(l_pcParent);
 			if (!m_pcSource->GetNetclass()->MetadataRequirement(l_pcMetadata))
 			{
-				SP_MESSAGEBOX(wxT(" Unhide not possible due to metadatarequirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
+				SP_MESSAGEBOX(wxT(" Unhide not possible due to metadata requirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
 				return FALSE;
 			}
 			m_pcSource->AddElement(l_pcMetadata);

@@ -11,6 +11,7 @@
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_ds/SP_DS_Graph.h"
 #include "sp_ds/extensions/SP_DS_Transformer.h"
+#include "sp_core/tools/SP_StopWatch.h"
 
 #include <wx/filedlg.h>
 #include <wx/choicdlg.h>
@@ -121,9 +122,11 @@ SP_ImportManager::DoImport()
 		{
 			return FALSE ;
 		}
-		SP_LOGMESSAGE( wxString::Format(wxT("\n\nDoing %s: %s"),
-								impR->GetName().c_str(),
-								fileName.c_str()));
+		SP_StopWatch sw(wxString::Format(wxT("\n\nDoing %s: %s"),
+							impR->GetName().c_str(),
+							fileName.c_str()),
+						wxT("Finished import in"));
+
 		res &= impR->ReadFile(fileName);
 
 		if(res)

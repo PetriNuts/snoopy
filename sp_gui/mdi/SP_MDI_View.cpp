@@ -1354,28 +1354,53 @@ void SP_MDI_View::OnHide(wxCommandEvent& p_cEvent)
 	l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_Edit(SP_CMD_HIDE, &l_lGraphic, wxT("Hide Element(s)")));
 }
 
+void SP_MDI_View::DoHide(SP_ListGraphic& p_lSelectedGraphics)
+{
+	SP_ListGraphic::iterator l_itGr = p_lSelectedGraphics.begin();
+	SP_ListGraphic::iterator l_itGrNext = p_lSelectedGraphics.begin();
+
+	while(l_itGrNext != p_lSelectedGraphics.end())
+	{
+		l_itGr = l_itGrNext;
+		++l_itGrNext;
+		if((*l_itGr)->GetHide() == true)
+		{
+			p_lSelectedGraphics.erase(l_itGr);
+		}
+	}
+
+	SP_MDI_Doc *l_pcDoc = (dynamic_cast<SP_MDI_Doc*>(GetDocument()))->GetParentDoc();
+	//wxT("Hide")
+	l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_Edit(SP_CMD_HIDE, &p_lSelectedGraphics, wxT("Hide Element(s)")));
+}
+
 void SP_MDI_View::OnUnHide(wxCommandEvent& p_cEvent)
 {
 	SP_ListGraphic l_lGraphic;
 	FindSelectedGraphics(l_lGraphic, true);
 	SelectAll(false);
 
-	SP_ListGraphic::iterator l_itGr = l_lGraphic.begin();
-	SP_ListGraphic::iterator l_itGrNext = l_lGraphic.begin();
+	DoUnHide(l_lGraphic);
+}
 
-	while(l_itGrNext != l_lGraphic.end())
+void SP_MDI_View::DoUnHide(SP_ListGraphic& p_lSelectedGraphics)
+{
+	SP_ListGraphic::iterator l_itGr = p_lSelectedGraphics.begin();
+	SP_ListGraphic::iterator l_itGrNext = p_lSelectedGraphics.begin();
+
+	while(l_itGrNext != p_lSelectedGraphics.end())
 	{
 		l_itGr = l_itGrNext;
 		++l_itGrNext;
 		if((*l_itGr)->GetHide() == false)
 		{
-			l_lGraphic.erase(l_itGr);
+			p_lSelectedGraphics.erase(l_itGr);
 		}
 	}
 
 	SP_MDI_Doc *l_pcDoc = (dynamic_cast<SP_MDI_Doc*>(GetDocument()))->GetParentDoc();
 	//wxT("UnHide")
-	l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_Edit(SP_CMD_UNHIDE, &l_lGraphic, wxT("UnHide Element(s)")));
+	l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_Edit(SP_CMD_UNHIDE, &p_lSelectedGraphics, wxT("UnHide Element(s)")));
 }
 
 void SP_MDI_View::OnToggleAnim(wxCommandEvent& p_cEvent)

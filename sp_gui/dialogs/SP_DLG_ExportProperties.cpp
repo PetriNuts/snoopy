@@ -14,6 +14,7 @@
 #include "sp_gui/windows/SP_GUI_Mainframe.h"
 #include "sp_ds/SP_DS_Graph.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
+#include "sp_core/tools/SP_StopWatch.h"
 
 #include <wx/busyinfo.h>
 
@@ -214,6 +215,11 @@ SP_DLG_ExportProperties::OnDlgOk(wxCommandEvent& p_cEvent)
 	{
 		wxString l_sOutName = m_pcFilePickerCtrl->GetPath();
 
+		SP_StopWatch sw(wxString::Format(wxT("\nDoing %s: %s\n"),
+							m_pcExport->GetName().c_str(),
+							l_sOutName.c_str()),
+						wxT("Finished export in"));
+
 		//Add extension to the file name
 		if(!l_sOutName.EndsWith(wxT(".")+m_pcExport->GetExtension()))
 		    l_sOutName+=wxT(".")+m_pcExport->GetExtension();
@@ -246,9 +252,6 @@ SP_DLG_ExportProperties::OnDlgOk(wxCommandEvent& p_cEvent)
         	l_nReturn = wxID_CANCEL;
         }
 
-        SP_LOGMESSAGE( wxString::Format(wxT("\nFinished %s: %s\n"),
-											m_pcExport->GetName().c_str(),
-											l_sOutName.c_str()));
         if ( IsModal() )
             EndModal(l_nReturn);
         else

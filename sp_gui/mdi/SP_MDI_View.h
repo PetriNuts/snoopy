@@ -125,6 +125,9 @@ public:
     bool DoFlatten(SP_ListGraphic* p_plShapes);
     bool DoCoarse(SP_ListGraphic* p_plShapes, double p_nX, double p_nY, const wxString& p_sCoarseNode = wxT(""));
 
+    void DoHide(SP_ListGraphic& p_lSelectedGraphics);
+    void DoUnHide(SP_ListGraphic& p_lSelectedGraphics);
+
     // Do a general command
     void DoCmd(wxList& p_lShapes, wxList& p_lOldShapes, int p_nCmd, const wxString& p_sOp);
 

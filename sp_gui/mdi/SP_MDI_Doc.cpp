@@ -16,6 +16,7 @@
 #include "sp_gui/mdi/SP_MDI_CoarseDoc.h"
 #include "sp_core/SP_Core.h"
 #include "sp_core/SP_GPR_Canvas.h"
+#include "sp_core/tools/SP_StopWatch.h"
 #include "sp_defines.h"
 #include "sp_core/SP_Signer.h"
 #include <wx/file.h>
@@ -418,13 +419,28 @@ bool SP_MDI_Doc::OnSaveDocument(const wxString& p_sFile)
 {
 	if (m_pcGraph)
 	{
+		SP_StopWatch sw(wxT("Start saving file ") + p_sFile, wxT("Finished saving in"));
         wxWindowDisabler disableAll;
         wxBusyInfo wait("Please wait, saving...");
 
-		SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(GetFirstView());
-		l_pcView->SelectAll(true);
-		wxCommandEvent l_cEvent;
-		l_pcView->OnUnHide(l_cEvent);
+    	if (GetDiagram() && GetDiagram()->GetShapeList())
+    	{
+    		SP_ListGraphic l_lGraphics;
+            SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(GetFirstView());
+        	wxNode *l_pcNode = GetDiagram()->GetShapeList()->GetFirst();
+        	while (l_pcNode)
+        	{
+        		wxShape *l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
+        		SP_Graphic* l_pcGraphic = SP_Core::Instance()->ResolveExtern(l_pcShape);
+        		if(l_pcGraphic)
+        		{
+        			l_lGraphics.push_back(l_pcGraphic);
+        		}
+        		l_pcNode = l_pcNode->GetNext();
+        	}
+        	l_pcView->DoUnHide(l_lGraphics);
+    	}
+
 		m_pcGraph->SqueezeIdAttributes();
 		if (!m_pcGraph->OnSaveDocument(p_sFile))
 		{
@@ -442,6 +458,7 @@ bool SP_MDI_Doc::OnSaveDocument(const wxString& p_sFile)
 
 bool SP_MDI_Doc::OnOpenDocument(const wxString& p_sFile)
 {
+	SP_StopWatch sw(wxT("Start loading file ") + p_sFile, wxT("Finished loading in"));
 
 	// we are now right inside SP_GM_Docmanager::CreateDocument but
 	// before the initialising of the graph member, so we have to do it ourself
