@@ -122,7 +122,7 @@ SP_ImportManager::DoImport()
 		{
 			return FALSE ;
 		}
-		SP_StopWatch sw(wxString::Format(wxT("\n\nDoing %s: %s"),
+		SP_StopWatch sw(wxString::Format(wxT("Doing %s: %s"),
 							impR->GetName().c_str(),
 							fileName.c_str()),
 						wxT("Finished import in"));

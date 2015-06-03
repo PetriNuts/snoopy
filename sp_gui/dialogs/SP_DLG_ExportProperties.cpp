@@ -215,7 +215,7 @@ SP_DLG_ExportProperties::OnDlgOk(wxCommandEvent& p_cEvent)
 	{
 		wxString l_sOutName = m_pcFilePickerCtrl->GetPath();
 
-		SP_StopWatch sw(wxString::Format(wxT("\nDoing %s: %s\n"),
+		SP_StopWatch sw(wxString::Format(wxT("Doing %s: %s\n"),
 							m_pcExport->GetName().c_str(),
 							l_sOutName.c_str()),
 						wxT("Finished export in"));
