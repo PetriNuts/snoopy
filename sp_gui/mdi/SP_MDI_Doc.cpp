@@ -430,12 +430,17 @@ bool SP_MDI_Doc::OnSaveDocument(const wxString& p_sFile)
         	wxNode *l_pcNode = GetDiagram()->GetShapeList()->GetFirst();
         	while (l_pcNode)
         	{
-        		wxShape *l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
-        		SP_Graphic* l_pcGraphic = SP_Core::Instance()->ResolveExtern(l_pcShape);
-        		if(l_pcGraphic)
-        		{
-        			l_lGraphics.push_back(l_pcGraphic);
-        		}
+    			wxShape *l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
+    			if (l_pcShape && l_pcShape->GetParent() == NULL
+    				&& !l_pcShape->IsKindOf(CLASSINFO(wxControlPoint))
+					&& !l_pcShape->IsKindOf(CLASSINFO(wxLabelShape)))
+    			{
+    				SP_Graphic* l_pcGraphic = SP_Core::Instance()->ResolveExtern(l_pcShape);
+					if (l_pcGraphic && l_pcGraphic->GetParent())
+					{
+						l_lGraphics.push_back(l_pcGraphic);
+					}
+    			}
         		l_pcNode = l_pcNode->GetNext();
         	}
         	l_pcView->DoUnHide(l_lGraphics);
