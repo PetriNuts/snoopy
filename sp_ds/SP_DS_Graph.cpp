@@ -1222,22 +1222,17 @@ SP_DS_Graph::SetHide(SP_Data* p_pcData, bool p_bHide)
 
 	if(p_pcData->GetAttributes())
 	{
-		for(SP_ListAttribute::const_iterator itA = p_pcData->GetAttributes()->begin();
-			itA != p_pcData->GetAttributes()->end();
-			itA++)
+		for(SP_DS_Attribute* l_pcAttr : *(p_pcData->GetAttributes()))
 		{
-			SetHide(*itA, p_bHide);
+			SetHide(l_pcAttr, p_bHide);
 		}
 	}
 
-	for(SP_ListGraphic::const_iterator itGr = p_pcData->GetGraphics()->begin();
-		itGr != p_pcData->GetGraphics()->end();
-		itGr++)
+	for(SP_Graphic* l_pcGr : *(p_pcData->GetGraphics()))
 	{
-		SP_Graphic* l_pcGr = *itGr;
 		if(p_pcData->GetNetnumber() != l_pcGr->GetNetnumber())
 		{
-			SP_Data* l_pcNode =  GetCoarseNode(l_pcGr->GetNetnumber());
+			SP_Data* l_pcNode = GetCoarseNode(l_pcGr->GetNetnumber());
 			if(l_pcNode)
 			{
 				SP_DS_Coarse* l_pcCoarse = l_pcNode->GetCoarse();
@@ -1253,11 +1248,9 @@ SP_DS_Graph::SetHide(SP_Data* p_pcData, bool p_bHide)
 		}
 		l_pcGr->SetHide(p_bHide);
 
-		for(SP_ListGraphic::const_iterator itGr2 = l_pcGr->GetGraphicChildren()->begin();
-			itGr2 != l_pcGr->GetGraphicChildren()->end();
-			itGr2++)
+		for(SP_Graphic* l_pcGrChild : *(l_pcGr->GetGraphicChildren()))
 		{
-			SP_Data* l_pcNode =  GetCoarseNode((*itGr2)->GetNetnumber());
+			SP_Data* l_pcNode = GetCoarseNode(l_pcGrChild->GetNetnumber());
 			if(l_pcNode)
 			{
 				SP_DS_Coarse* l_pcCoarse = l_pcNode->GetCoarse();
@@ -1270,7 +1263,7 @@ SP_DS_Graph::SetHide(SP_Data* p_pcData, bool p_bHide)
 					l_pcCoarse->GetCoarseDoc()->Close();
 				}
 			}
-			(*itGr2)->SetHide(p_bHide);
+			l_pcGrChild->SetHide(p_bHide);
 		}
 	}
 

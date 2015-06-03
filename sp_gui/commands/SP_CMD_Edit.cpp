@@ -24,11 +24,11 @@ SP_CMD_Edit::SP_CMD_Edit(int p_nCmdId, SP_ListGraphic *p_graphics, const wxStrin
 				if (((*it)->GetGraphicType() == SP_GRAPHIC_NODE	||
 					 (*it)->GetGraphicType() == SP_GRAPHIC_METADATA))
 				{
-					m_lcGraphics.push_back(*it);
+					m_lcGraphics.push_front(*it);
 				}
 				else if ((*it)->GetGraphicType() == SP_GRAPHIC_EDGE)
 				{
-					m_lcGraphics.push_front(*it);
+					m_lcGraphics.push_back(*it);
 				}
 			}
 		}
@@ -592,7 +592,7 @@ bool SP_CMD_Edit::DoHide()
 		SP_Graphic* l_pcGr = *itG;
 		SP_Data *l_pcParent = l_pcGr->GetParent();
 		//every graphic should have a parent, so this shouldn't happen, but check it anyway
-		if (!l_pcParent || l_pcParent->GetHide() == true)
+		if (!l_pcParent || l_pcGr->GetHide() == true)
 			continue;
 
 		m_pcSource->SetHide(l_pcParent, true);
@@ -747,7 +747,7 @@ bool SP_CMD_Edit::DoUnHide()
 		SP_Graphic* l_pcGr = *itG;
 		SP_Data *l_pcParent = l_pcGr->GetParent();
 		//every graphic should have a parent, so this shouldn't happen, but check it anyway
-		if (!l_pcParent || l_pcParent->GetHide() == false)
+		if (!l_pcParent || l_pcGr->GetHide() == false)
 			continue;
 
 		m_pcSource->SetHide(l_pcParent, false);
