@@ -21,7 +21,7 @@ SP_DLG_BaseSimulation::SP_DLG_BaseSimulation(wxWindow* p_pcParent, wxString p_sH
 	m_pcMainSizer = new wxBoxSizer(wxVERTICAL);
 	m_pcContentSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	m_pcSimulationControlSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Simulation control")), wxVERTICAL);
+	m_pcSimulationControlSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
 	m_pcContentSizer->Add(m_pcSimulationControlSizer, wxSizerFlags(1).Expand().Border(wxALL, 2));
 
     m_pcMainSizer->Add(m_pcContentSizer, wxSizerFlags(1).Expand().Border(wxALL, 2));

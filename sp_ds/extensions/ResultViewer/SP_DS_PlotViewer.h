@@ -39,6 +39,9 @@ protected :
 		  wxString m_ChartWidth;
 		  wxString m_ChartHeight;
 
+		  wxString m_WindowWidth;
+		  wxString m_WindowHeight;
+
 		  bool m_bShowXAxis;
 		  bool m_bShowYAxis;
 

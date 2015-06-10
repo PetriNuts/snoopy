@@ -102,42 +102,42 @@ SP_DLG_ColStSimulationResults::SP_DLG_ColStSimulationResults(SP_DS_Graph* p_pcGr
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Marking set:")), 1, wxALL | wxEXPAND, 5);
 	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
-	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
+	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 1, wxALL, 5);
 	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Function set:")), 1, wxALL | wxEXPAND, 5);
 	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
-	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
+	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 1, wxALL, 5);
 	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Weight set:")), 1, wxALL | wxEXPAND, 5);
 	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
-	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
+	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 1, wxALL, 5);
 	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_WEIGHT_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Delay set:")), 1, wxALL | wxEXPAND, 5);
 	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
-	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
+	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 1, wxALL, 5);
 	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Schedule set:")), 1, wxALL | wxEXPAND, 5);
 	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
-	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
+	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 1, wxALL, 5);
 	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Parameter set:")), 1, wxALL | wxEXPAND, 5);
 	m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
-	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
+	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 1, wxALL, 5);
 	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 

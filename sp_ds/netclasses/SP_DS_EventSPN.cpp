@@ -470,6 +470,8 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("ViewTitle"), wxT("Untitled") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("ChartWidth"), wxT("600") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("ChartHeight"), wxT("600") ) );
+	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("WindowWidth"), wxT("600") ) );
+	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("WindowHeight"), wxT("600") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("XAxisTitle"), wxT("Time") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("YAxisTitle"), wxT("") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_NumberAttribute( wxT("DefaultLineWidth"), 2 ) );

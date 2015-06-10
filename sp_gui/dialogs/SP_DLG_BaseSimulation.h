@@ -63,7 +63,7 @@ protected:
 	virtual void OnInitDialog(wxInitDialogEvent& event) =0;
 
 public:
-	SP_DLG_BaseSimulation(wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), wxString p_sTitle = wxT("Simulationsssssss results"), long p_nStyle = wxDEFAULT_DIALOG_STYLE);
+	SP_DLG_BaseSimulation(wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), wxString p_sTitle = wxT("Simulation controls"), long p_nStyle = wxDEFAULT_DIALOG_STYLE);
 	virtual ~SP_DLG_BaseSimulation();
 };
 #endif

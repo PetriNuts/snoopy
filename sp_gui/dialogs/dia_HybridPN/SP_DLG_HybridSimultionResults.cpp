@@ -138,7 +138,7 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Continuous rate:")), 1, wxALL | wxEXPAND, 5);
 		m_pcFunctionSetComboBox = new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
-		l_pcRowSizer->Add(m_pcFunctionSetComboBox, 0, wxALL, 5);
+		l_pcRowSizer->Add(m_pcFunctionSetComboBox, 1, wxALL, 5);
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
@@ -146,7 +146,7 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Stochastic  rate:")), 1, wxALL | wxEXPAND, 5);
 		m_pcStochasticRateSetComboBox = new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_STOCHASTIC_RATE_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
-		l_pcRowSizer->Add(m_pcStochasticRateSetComboBox, 0, wxALL, 5);
+		l_pcRowSizer->Add(m_pcStochasticRateSetComboBox, 1, wxALL, 5);
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_STOCHASTIC_RATE_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
@@ -154,7 +154,7 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Immediate set:")), 1, wxALL | wxEXPAND, 5);
 		m_pcImmediateSetComboBox = new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_IMMEDIATE_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
-		l_pcRowSizer->Add(m_pcImmediateSetComboBox, 0, wxALL, 5);
+		l_pcRowSizer->Add(m_pcImmediateSetComboBox, 1, wxALL, 5);
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_IMMDIATE_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
@@ -162,7 +162,7 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Delay set:")), 1, wxALL | wxEXPAND, 5);
 		m_pcDelaySetComboBox = new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_DELAY_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
-		l_pcRowSizer->Add(m_pcDelaySetComboBox, 0, wxALL, 5);
+		l_pcRowSizer->Add(m_pcDelaySetComboBox, 1, wxALL, 5);
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
@@ -170,7 +170,7 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Scheduled set:")), 1, wxALL | wxEXPAND, 5);
 		m_pcScheduledSetComboBox = new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_SCHEDULED_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
-		l_pcRowSizer->Add(m_pcScheduledSetComboBox, 0, wxALL, 5);
+		l_pcRowSizer->Add(m_pcScheduledSetComboBox, 1, wxALL, 5);
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULED_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
@@ -182,7 +182,7 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 			l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 			l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, l_sGroup + wxT(':')), 1, wxALL | wxEXPAND, 5);
 			m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_MARKING_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup));
-			l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 0, wxALL, 5);
+			l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 1, wxALL, 5);
 			l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify")), 0, wxALL, 5);
 			m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 		}
@@ -203,7 +203,7 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 
 	//set default solving algorithm
 	m_pcContinuousSolver->SetSelection(m_nCurrentODESimulator);
-	l_pcRowSizer->Add(m_pcContinuousSolver, 0, wxALL, 5);
+	l_pcRowSizer->Add(m_pcContinuousSolver, 1, wxALL, 5);
 
 	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowPropertySizer, SP_ID_BUTTON_CONTINUOUS_SOLVER_PROPERTIES, wxT("Properties")), 0, wxALL, 5);
 
@@ -219,7 +219,7 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 	m_pcTimeSyncComboBox->Append(wxT("Continuous"));
 	m_pcTimeSyncComboBox->Append(wxT("Stochastic"));
 	m_pcTimeSyncComboBox->SetSelection(l_nSimulatorType);
-	l_pcRowSizer->Add(m_pcTimeSyncComboBox, 0, wxALL, 5);
+	l_pcRowSizer->Add(m_pcTimeSyncComboBox, 1, wxALL, 5);
 
 	m_pcSimulationProperites = new wxButton(m_pcPropertyWindowPropertySizer, SP_ID_BUTTON_SIMULATION_PROPERTIES, wxT("Properties"));
 	l_pcRowSizer->Add(m_pcSimulationProperites, 0, wxALL

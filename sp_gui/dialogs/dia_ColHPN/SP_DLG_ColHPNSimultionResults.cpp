@@ -131,7 +131,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Continuous rate:") ), 1, wxALL | wxEXPAND, 5 );
 	m_pcFunctionSetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
-	l_pcRowSizer->Add( m_pcFunctionSetComboBox, 0, wxALL, 5 );
+	l_pcRowSizer->Add( m_pcFunctionSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
 
@@ -139,7 +139,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Stochastic  rate:") ), 1, wxALL | wxEXPAND, 5 );
 	m_pcStochasticRateSetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_STOCHASTIC_RATE_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
-	l_pcRowSizer->Add( m_pcStochasticRateSetComboBox, 0, wxALL, 5 );
+	l_pcRowSizer->Add( m_pcStochasticRateSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_STOCHASTIC_RATE_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
 
@@ -147,7 +147,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Immediate set:") ), 1, wxALL | wxEXPAND, 5 );
 	m_pcImmediateSetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_IMMEDIATE_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
-	l_pcRowSizer->Add( m_pcImmediateSetComboBox, 0, wxALL, 5 );
+	l_pcRowSizer->Add( m_pcImmediateSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_IMMDIATE_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
 
@@ -155,7 +155,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Delay set:") ), 1, wxALL | wxEXPAND, 5 );
 	m_pcDelaySetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_DELAY_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
-	l_pcRowSizer->Add( m_pcDelaySetComboBox, 0, wxALL, 5 );
+	l_pcRowSizer->Add( m_pcDelaySetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
 
@@ -164,7 +164,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Scheduled set:") ), 1, wxALL | wxEXPAND, 5 );
 	m_pcScheduledSetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_SCHEDULED_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
-	l_pcRowSizer->Add( m_pcScheduledSetComboBox, 0, wxALL, 5 );
+	l_pcRowSizer->Add( m_pcScheduledSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULED_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
 
@@ -172,7 +172,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Parameter set:") ), 1, wxALL | wxEXPAND, 5 );
 	m_pcParameterSetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_PARAMETER_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
-	l_pcRowSizer->Add( m_pcParameterSetComboBox, 0, wxALL, 5 );
+	l_pcRowSizer->Add( m_pcParameterSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
 

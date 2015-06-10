@@ -534,15 +534,14 @@ void SP_DLG_Simulation :: OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent) {
 
 }
 
-void SP_DLG_Simulation::OnItemCheckUncheck(unsigned int p_nLocation, bool p_nCheck) {
+void SP_DLG_Simulation::OnItemCheckUncheck(unsigned int p_nListLocation, unsigned int p_nLocation, bool p_nCheck) {
     CHECK_POINTER(m_apcResultViewers[m_nCurrentViewer], return);
-    m_pcPlaceChoiceCheckListBox->Check(p_nLocation, p_nCheck);
+    m_pcPlaceChoiceCheckListBox->Check(p_nListLocation, p_nCheck);
     //get item index
     unsigned int l_nSelection = p_nLocation;
 
     //get check state
-    bool l_bCheckState = m_pcPlaceChoiceCheckListBox->IsChecked(l_nSelection);
-
+    bool l_bCheckState = m_pcPlaceChoiceCheckListBox->IsChecked(p_nListLocation);
     //update the curve state
     m_apcResultViewers[m_nCurrentViewer]->ShowCurve(l_nSelection, l_bCheckState);
 

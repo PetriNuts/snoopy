@@ -100,7 +100,7 @@ SP_DLG_ColCPNSimulationResults::SP_DLG_ColCPNSimulationResults(SP_DS_Graph* p_pc
 
 	m_pcMarkingSetComboBox = new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_MARKING_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
 
-	l_pcRowSizer->Add(m_pcMarkingSetComboBox, 0, wxALL, 5);
+	l_pcRowSizer->Add(m_pcMarkingSetComboBox, 1, wxALL, 5);
 
 	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
 
@@ -112,7 +112,7 @@ SP_DLG_ColCPNSimulationResults::SP_DLG_ColCPNSimulationResults(SP_DS_Graph* p_pc
 
 	m_pcFunctionSetComboBox = new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
 
-	l_pcRowSizer->Add(m_pcFunctionSetComboBox, 0, wxALL, 5);
+	l_pcRowSizer->Add(m_pcFunctionSetComboBox, 1, wxALL, 5);
 
 	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify")), 0, wxALL, 5);
 
@@ -124,7 +124,7 @@ SP_DLG_ColCPNSimulationResults::SP_DLG_ColCPNSimulationResults(SP_DS_Graph* p_pc
 
 	m_pcParameterSetComboBox = new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_PARAMETER_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
 
-	l_pcRowSizer->Add(m_pcParameterSetComboBox, 0, wxALL, 5);
+	l_pcRowSizer->Add(m_pcParameterSetComboBox, 1, wxALL, 5);
 
 	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify")), 0, wxALL, 5);
 

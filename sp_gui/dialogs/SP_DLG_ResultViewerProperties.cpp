@@ -18,7 +18,7 @@ BEGIN_EVENT_TABLE(SP_DLG_ResultViewerProperties,wxDialog)
 END_EVENT_TABLE()
 
 SP_DLG_ResultViewerProperties::SP_DLG_ResultViewerProperties(SP_DS_ResultViewer* p_pcResultViewer,wxWindow* p_pcParent)
-:wxDialog(p_pcParent, wxID_ANY,wxT("Result Viewer Properties"),wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE),
+:wxDialog(p_pcParent, wxID_ANY,wxT("Result Viewer Properties"),wxDefaultPosition,wxDefaultSize,wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE),
 m_pcResultViewer(p_pcResultViewer)
 {
 SP_VectorString::const_iterator l_itCategory;

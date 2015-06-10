@@ -105,7 +105,7 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 		l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Function set:") ), 1, wxALL | wxEXPAND, 5 );
 		m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
-		l_pcRowSizer->Add( m_apcComboBoxes[0], 0, wxALL, 5 );
+		l_pcRowSizer->Add( m_apcComboBoxes[0], 1, wxALL, 5 );
 		l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify") ), 0, wxALL, 5 );
 		m_pcSetsSizer->Add( l_pcRowSizer , 1, wxEXPAND);
 
@@ -117,7 +117,7 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 			l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 			l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, l_sGroup + wxT(':') ), 1, wxALL | wxEXPAND, 5 );
 			m_apcComboBoxes.push_back(new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_MARKING_SETS , wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
-			l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5 );
+			l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], 1, wxALL, 5 );
 			l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), 0, wxALL, 5 );
 			m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND);
 		}
@@ -146,7 +146,7 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 
 	//Set default solver type
 	m_pcSolverType->SetSelection(0);
-	l_pcRowSizer->Add(m_pcSolver, 0, wxALL, 5);
+	l_pcRowSizer->Add(m_pcSolver, 1, wxALL, 5);
 
 	m_pcSimulationProperites = new wxButton(m_pcPropertyWindowPropertySizer, SP_ID_BUTTON_SIMULATION_PROPERTIES, wxT("Properties"));
 	l_pcRowSizer->Add(m_pcSimulationProperites, 0, wxALL

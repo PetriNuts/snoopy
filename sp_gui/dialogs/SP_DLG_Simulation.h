@@ -440,7 +440,7 @@ protected:
 public:
 	virtual void OnClearPlaceList(bool p_nCheck);
 	virtual void OnItemDoubleClick(wxWindow *p_pcExternalWindowDialog, unsigned int p_nLocation, int p_nCount);
-	virtual void OnItemCheckUncheck(unsigned int p_nLocation, bool p_nCheck);
+	virtual void OnItemCheckUncheck(unsigned int p_nListLocation, unsigned int p_nLocation, bool p_nCheck);
 	virtual void OnEditViewerTypeProperties(wxWindow *p_pcExternalWindowDialog);
 	virtual void OnChangingResultViewer(unsigned int p_nLocation);
 	virtual void OnEditOtherNodeList(wxWindow *p_pcExternalWindowDialog);
@@ -450,7 +450,7 @@ protected:
 
 DECLARE_CLASS( SP_DLG_Simulation )
 public:
-	SP_DLG_Simulation(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), wxString p_sTitle = wxT("Simulation results"), long p_nStyle = wxDEFAULT_DIALOG_STYLE);
+	SP_DLG_Simulation(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), wxString p_sTitle = wxT("Simulation controls"), long p_nStyle = wxDEFAULT_DIALOG_STYLE);
 
 	virtual ~SP_DLG_Simulation();
 	virtual wxButton* GetStartButton()

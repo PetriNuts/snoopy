@@ -50,14 +50,24 @@ m_nMaxXValue(1),
 m_nMinYValue(0),
 m_nMaxYValue(1),
 m_ChartHeight(wxT("600")),
-m_ChartWidth(wxT("600"))
+m_ChartWidth(wxT("600")),
+m_WindowHeight(wxT("600")),
+m_WindowWidth(wxT("600"))
 {
 SP_DS_ViewerAttribute* l_pcAttribute;
 
-			SP_DS_ViewerAttributeText*  l_pcTextAttribute=new SP_DS_ViewerAttributeText(wxT("CHART_WIDTH"),wxT("General"),wxT("Chart Width"));
+			SP_DS_ViewerAttributeText*  l_pcTextAttribute=new SP_DS_ViewerAttributeText(wxT("WINDOW_WIDTH"),wxT("General"),wxT("Window Width"));
 			l_pcTextAttribute->SetValueString(wxT("600"));
 	        m_pcAttributeList->push_back(l_pcTextAttribute);
-			l_pcTextAttribute=new SP_DS_ViewerAttributeText(wxT("CHART_HEIGHT"),wxT("General"),wxT("Chart Height"));
+			l_pcTextAttribute=new SP_DS_ViewerAttributeText(wxT("WINDOW_HEIGHT"),wxT("General"),wxT("Window Height"));
+			l_pcTextAttribute->SetValueString(wxT("600"));
+
+			m_pcAttributeList->push_back(l_pcTextAttribute);
+
+			l_pcTextAttribute=new SP_DS_ViewerAttributeText(wxT("CHART_WIDTH"),wxT("General"),wxT("Export image Width"));
+			l_pcTextAttribute->SetValueString(wxT("600"));
+	        m_pcAttributeList->push_back(l_pcTextAttribute);
+			l_pcTextAttribute=new SP_DS_ViewerAttributeText(wxT("CHART_HEIGHT"),wxT("General"),wxT("Export image Height"));
 			l_pcTextAttribute->SetValueString(wxT("600"));
 
 			m_pcAttributeList->push_back(l_pcTextAttribute);
@@ -201,8 +211,19 @@ Chart* l_pcChart;
 void SP_DS_PlotViewer::UpdateAttributes()
 {
 	      SP_DS_ResultViewer::UpdateAttributes();
-	      // Chart height and width
 
+	      // window height and width
+	      if(GetAttributeByName(wxT("WINDOW_HEIGHT"))!=NULL)
+		  {
+			  m_WindowHeight = (dynamic_cast<SP_DS_ViewerAttributeText*>(GetAttributeByName(wxT("WINDOW_HEIGHT"))))->GetValueString();
+		  }
+		  if(GetAttributeByName(wxT("WINDOW_WIDTH"))!=NULL)
+		  {
+			  m_WindowWidth = (dynamic_cast<SP_DS_ViewerAttributeText*>(GetAttributeByName(wxT("WINDOW_WIDTH"))))->GetValueString();
+		  }
+
+
+	      // export image height and width
 	      if(GetAttributeByName(wxT("CHART_HEIGHT"))!=NULL)
 		  {
 			  m_ChartHeight=(dynamic_cast<SP_DS_ViewerAttributeText*>(GetAttributeByName(wxT("CHART_HEIGHT"))))->GetValueString();
@@ -318,6 +339,17 @@ void SP_DS_PlotViewer::UpdateAttributes()
 void SP_DS_PlotViewer::LoadCurrentAttributeValues()
 {
           SP_DS_ResultViewer::LoadCurrentAttributeValues();
+
+          //chart height and width
+          if(GetAttributeByName(wxT("WINDOW_HEIGHT"))!=NULL)
+		  {
+				(dynamic_cast<SP_DS_ViewerAttributeText*>(GetAttributeByName(wxT("WINDOW_HEIGHT"))))->SetValueString(m_WindowHeight);
+		  }
+			if(GetAttributeByName(wxT("WINDOW_WIDTH"))!=NULL)
+		  {
+				(dynamic_cast<SP_DS_ViewerAttributeText*>(GetAttributeByName(wxT("WINDOW_WIDTH"))))->SetValueString(m_WindowWidth);
+		  }
+
           //chart height and width
 
           if(GetAttributeByName(wxT("CHART_HEIGHT"))!=NULL)
@@ -610,6 +642,14 @@ void SP_DS_PlotViewer::SaveViewToSnoopyFormat(SP_DS_Metadata* p_pcView)
 		 CHECK_POINTER(l_pcAttribute,return);
 		 l_pcAttribute->SetValueString(m_ChartHeight);
 
+		 l_pcAttribute=p_pcView->GetAttribute(wxT("WindowWidth"));
+		 CHECK_POINTER(l_pcAttribute,return);
+		 l_pcAttribute->SetValueString(m_WindowWidth);
+
+		 l_pcAttribute=p_pcView->GetAttribute(wxT("WindowHeight"));
+		 CHECK_POINTER(l_pcAttribute,return);
+		 l_pcAttribute->SetValueString(m_WindowHeight);
+
 }
 void SP_DS_PlotViewer::LoadViewFromSnoopyFormat(SP_DS_Metadata* p_pcView)
 {
@@ -683,6 +723,14 @@ void SP_DS_PlotViewer::LoadViewFromSnoopyFormat(SP_DS_Metadata* p_pcView)
 		 CHECK_POINTER(l_pcAttribute,return);
 		 m_ChartHeight=l_pcAttribute->GetValueString();
 
+		 l_pcAttribute=p_pcView->GetAttribute(wxT("WindowWidth"));
+		 CHECK_POINTER(l_pcAttribute,return);
+		 m_WindowWidth=l_pcAttribute->GetValueString();
+
+		 l_pcAttribute=p_pcView->GetAttribute(wxT("WindowHeight"));
+		 CHECK_POINTER(l_pcAttribute,return);
+		 m_WindowHeight=l_pcAttribute->GetValueString();
+
 }
 
 void SP_DS_PlotViewer::ExportToImageFile(wxString& p_sFileName,const int& p_nFileType)
@@ -696,6 +744,17 @@ void SP_DS_PlotViewer::ExportToImageFile(wxString& p_sFileName,const int& p_nFil
 		p_sFileName = p_sFileName.BeforeLast(wxT('.'));
 	}
 
+	wxSize temp = m_pcChartPanel->GetSize();
+	wxSize temp1 = temp;
+	long l_ChartWidth = 0;
+	m_ChartWidth.ToLong(&l_ChartWidth);
+
+	long l_ChartHeight = 0;
+	m_ChartHeight.ToLong(&l_ChartHeight);
+
+	temp1.SetWidth(l_ChartWidth);
+	temp1.SetHeight(l_ChartHeight);
+	m_pcChartPanel->SetSize(temp1);
 	wxBitmap bitmap = m_pcChartPanel->CopyBackbuffer();
 
 	switch (p_nFileType)
@@ -726,5 +785,6 @@ void SP_DS_PlotViewer::ExportToImageFile(wxString& p_sFileName,const int& p_nFil
 	}
 
 	bitmap.SaveFile(p_sFileName, l_nExportType);
+	m_pcChartPanel->SetSize(temp);
 }
 
