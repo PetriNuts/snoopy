@@ -25,7 +25,7 @@ protected:
     wxString m_sAbbreviation;
 
 public:
-    SP_Name(const wxString& p_pchValue, const wxString& p_sAbbr = {}):
+    SP_Name(const wxString& p_pchValue, const wxString& p_sAbbr = wxEmptyString):
     	m_sNameVal(p_pchValue),m_sDisplayNameVal(p_pchValue), m_sAbbreviation(p_sAbbr)
 	{}
     virtual ~SP_Name() {}

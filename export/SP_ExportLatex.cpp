@@ -1945,11 +1945,11 @@ SP_ExportLatex::StartDoc(const wxString& p_fileName)
 				break;
 	}
 
-	out = wxT("\\newcommand{\\UnderscoreCommands}{ \n\t"
-			"\\do\\citeNP \\do\\citeA \\do\\citeANP \\do\\citeN \\do\\shortcite \n\t"
-			"\\do\\shortciteNP \\do\\shortciteA \\do\\shortciteANP \\do\\shortciteN \n\t"
-			"\\do\\citeyear \\do\\citeyearNP \n\t"
-			"} \n" );
+	out = wxT("\\newcommand{\\UnderscoreCommands}{ \n\t");
+	out += wxT("\\do\\citeNP \\do\\citeA \\do\\citeANP \\do\\citeN \\do\\shortcite \n\t");
+	out += wxT("\\do\\shortciteNP \\do\\shortciteA \\do\\shortciteANP \\do\\shortciteN \n\t");
+	out += wxT("\\do\\citeyear \\do\\citeyearNP \n\t");
+	out += wxT("} \n");
 
 	out += wxT("\\usepackage[strings]{underscore}");
 	wxFprintf(m_pstream, wxT("%s"), out.c_str());
@@ -1964,20 +1964,20 @@ SP_ExportLatex::StartDoc(const wxString& p_fileName)
 
 	wxFprintf(m_pstream, wxT("% thumbnail and appendix command\n") );
 
-	out = wxT("\\newcommand{\\thumbnailandappendix}[1]{\n\t"
-			"\\refstepcounter{thumbnail}\n\t"
-			"\\hypertarget{small\\thethumbnail}{}\n\t");
+	out = wxT("\\newcommand{\\thumbnailandappendix}[1]{\n\t");
+	out += wxT("\\refstepcounter{thumbnail}\n\t");
+	out += wxT("\\hypertarget{small\\thethumbnail}{}\n\t");
 	wxFprintf(m_pstream, wxT("%s"), out.c_str());
 
-	out = wxT("\\hyperlink{big\\thethumbnail}{\\includegraphics[width=1cm,height=1cm]{#1}}\n\t"
-			"\\global\\setbox\\savedimgs\\vbox{\n\t\t"
-			"\\unvbox\\savedimgs\n\t\t"
-			"\\bigskip\n\t\t"
-			"\\filbreak\n\t\t"
-			"\\noindent\n\t\t"
-			"\\hypertarget{big\\thethumbnail}{}\n\t\t"
-			"\\hyperlink{small\\thethumbnail}{\\includegraphics[width=10cm,height=10cm]{#1}}\n\t"
-			"}\n}\n");
+	out = wxT("\\hyperlink{big\\thethumbnail}{\\includegraphics[width=1cm,height=1cm]{#1}}\n\t");
+	out += wxT("\\global\\setbox\\savedimgs\\vbox{\n\t\t");
+	out += wxT("\\unvbox\\savedimgs\n\t\t");
+	out += wxT("\\bigskip\n\t\t");
+	out += wxT("\\filbreak\n\t\t");
+	out += wxT("\\noindent\n\t\t");
+	out += wxT("\\hypertarget{big\\thethumbnail}{}\n\t\t");
+	out += wxT("\\hyperlink{small\\thethumbnail}{\\includegraphics[width=10cm,height=10cm]{#1}}\n\t");
+	out += wxT("}\n}\n");
 	wxFprintf(m_pstream, wxT("%s"), out.c_str());
 	wxFprintf(m_pstream, wxT("\\let\\realwrite\\write\n\n") );
 
@@ -4576,11 +4576,11 @@ SP_ExportLatex::WriteHierarchyTree(FILE* l_pstream)
 				wxFprintf(l_pstream1, wxT("\\tikzstyle{every node}=[draw=black,thick,anchor=west]\n") );
 				wxFprintf(l_pstream1, wxT("\\maxsizebox{\\linewidth}{.99\\textheight}{\n") );
 
-				out = wxT("\\begin{tikzpicture}["
-						"grow via three points={one child at (0.5,-0.8) and "
-						"two children at (0.5,-0.8) and (0.5,-1.6)}, "
-						"edge from parent path={(\\tikzparentnode.south) "
-						"|- (\\tikzchildnode.west)}]\n\n");
+				out = wxT("\\begin{tikzpicture}[");
+				out += wxT("grow via three points={one child at (0.5,-0.8) and ");
+				out += wxT("two children at (0.5,-0.8) and (0.5,-1.6)}, ");
+				out += wxT("edge from parent path={(\\tikzparentnode.south) ");
+				out += wxT("|- (\\tikzchildnode.west)}]\n\n");
 				wxFprintf(l_pstream1, wxT("%s"), out.c_str());
 
 
@@ -4957,15 +4957,15 @@ SP_ExportLatex::WriteReferences()
 	//Two basic references
 
 	wxFprintf(l_pstream, wxT("\\bibitem{heiner:pn:2012}\n") );
-	wxString out = wxT("M. Heiner, M. Herajy, F. Liu, C. Rohr and M. Schwarick.\n"
-			"Snoopy a unifying Petri net tool. \n"
-			"Proc. PETRI NETS 2012, Volume 7347, Springer, June 2012, pages 398-407.\n\n");
+	wxString out = wxT("M. Heiner, M. Herajy, F. Liu, C. Rohr and M. Schwarick.\n");
+	out += wxT("Snoopy a unifying Petri net tool. \n");
+	out += wxT("Proc. PETRI NETS 2012, Volume 7347, Springer, June 2012, pages 398-407.\n\n");
 	wxFprintf(l_pstream, wxT("%s"), out.c_str());
 
 	wxFprintf(l_pstream, wxT("\\bibitem{Rohr:bi:2010}\n") );
-	out = wxT("C. Rohr, W. Marwan and M. Heiner.\n"
-			"Snoopy - a unifying Petri net framework to investigate biomolecular networks. \n"
-			"Bioinformatics, 26(7):974-975, 2010. \n\n");
+	out = wxT("C. Rohr, W. Marwan and M. Heiner.\n");
+	out += wxT("Snoopy - a unifying Petri net framework to investigate biomolecular networks. \n");
+	out += wxT("Bioinformatics, 26(7):974-975, 2010. \n\n");
 	wxFprintf(l_pstream, wxT("%s"), out.c_str());
 
 	//adding dynamic references

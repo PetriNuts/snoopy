@@ -45,7 +45,7 @@ bool SP_ExportCANDL_new::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 	SP_ColoredNetBuilder builder;
 	if(builder(m_graph))
 	{
-		dsszmc::candl::writer{builder.GetNet()}(m_fileName);
+		dsszmc::candl::writer{ builder.GetNet() }(m_fileName.ToStdString());
 	}
 	return !m_bError;
 }

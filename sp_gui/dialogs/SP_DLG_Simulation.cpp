@@ -11,6 +11,8 @@
 #include <wx/printdlg.h>
 #include <wx/filename.h>
 #include <wx/textfile.h>
+#include <wx/statline.h>
+#include <wx/regex.h>
 #include "export/SP_EPSDC.h"
 #include "import/SP_ImportCSV.h"
 #include "sp_ds/extensions/SP_DS_Simulation.h"

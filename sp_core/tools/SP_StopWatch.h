@@ -22,7 +22,7 @@ public:
 	 * @param afterMsg  message to output after the elapsed time
 	 */
 	SP_StopWatch(const wxString& startMsg,
-				const wxString& beforeMsg, const wxString& afterMsg = {});
+				const wxString& beforeMsg, const wxString& afterMsg = wxEmptyString);
 
 	/**
 	 * @brief Destructor, outputs the elapsed time and

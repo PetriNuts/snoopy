@@ -169,8 +169,8 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(WXWIN)/include;$(WXWIN)/lib/vc_x64_dll/mswu/;$(OGL)/include/;$(WXCODE)/components/freechart/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(BOOST_ROOT);$(CVODE)/include;$(CVODE)/builddir/include;$(GECODEDIR);$(SP_SIMULATOR)/include;$(SPSA_STEERINGAPI)/include;$(DSSZ_UTIL)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>__SNOOPY__;WIN32;NDEBUG;_WINDOWS;__WXMSW__;UNICODE;_LP64;WXUSINGDLL;wxDEBUG_LEVEL=0;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;SPSIM_USING_DLL;SPSA_STEERINGAPI_USING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(WXWIN)/include;$(WXWIN)/lib/vc_x64_dll/mswu/;$(OGL)/include/;$(WXCODE)/components/freechart/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(BOOST_ROOT);$(CVODE)/include;$(CVODE)/builddir/include;$(GECODEDIR);$(GECODEDIR)/$(Configuration);$(SP_SIMULATOR)/include;$(SPSA_STEERINGAPI)/include;$(DSSZ_UTIL)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__SNOOPY__;HAVE_NO_GMP;WIN32;NDEBUG;_WINDOWS;__WXMSW__;UNICODE;_LP64;WXUSINGDLL;wxDEBUG_LEVEL=0;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;SPSIM_USING_DLL;SPSA_STEERINGAPI_USING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -192,7 +192,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
       <AdditionalIncludeDirectories>$(WXWIN)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wsock32.lib;gdiplus.lib;Psapi.lib;wxbase30u.lib;wxbase30u_net.lib;wxbase30u_xml.lib;wxmsw30u_adv.lib;wxmsw30u_aui.lib;wxmsw30u_core.lib;wxmsw30u_html.lib;wxexpat.lib;wxregexu.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxzlib.lib;wxcode_msw30u_ogl.lib;wxcode_msw30u_freechart.lib;SPSA_SteeringAPI.lib;dssz_util.lib;spsim_dr.lib;libsbml.lib;ogdf.lib;GecodeSupport-3-7-3-r-x64.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wsock32.lib;gdiplus.lib;Psapi.lib;wxbase30u.lib;wxbase30u_net.lib;wxbase30u_xml.lib;wxmsw30u_adv.lib;wxmsw30u_aui.lib;wxmsw30u_core.lib;wxmsw30u_html.lib;wxexpat.lib;wxregexu.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxzlib.lib;wxcode_msw30u_ogl.lib;wxcode_msw30u_freechart.lib;SPSA_SteeringAPI.lib;dssz_util.lib;spsim_dr.lib;libsbml.lib;ogdf.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(WXWIN)/lib/vc_x64_dll/;$(OGL)/lib/vc_dll/;$(WXCODE)/components/freechart/lib/vc_dll/;$(LIBSBML)/builddir/src/$(Configuration);$(OGDF)/$(Platform)/$(Configuration);$(DSSZ_UTIL)/lib/$(Configuration);$(SP_SIMULATOR)/$(Configuration)/$(Platform);$(SPSA_STEERINGAPI)/$(Configuration)/$(Platform);$(GECODEDIR)/$(Configuration);$(CVODE)/builddir/src/cvode/$(Configuration);$(CVODE)/builddir/src/nvec_ser/$(Configuration);$(BOOST_ROOT)/stage/lib;$(IRRKLANG)/lib/Winx64-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -293,8 +293,8 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(WXWIN)/include;$(WXWIN)/lib/vc_x64_dll/mswud/;$(OGL)/include/;$(WXCODE)/components/freechart/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(BOOST_ROOT);$(CVODE)/include;$(CVODE)/builddir/include;$(GECODEDIR);$(SP_SIMULATOR)/include;$(SPSA_STEERINGAPI)/include;$(DSSZ_UTIL)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>__SNOOPY__;_DEBUG;WIN32;_LIB;__WIN32__;_WINDOWS;__WXMSW__;__WINDOWS__;__WXDEBUG__;UNICODE;_LP64;WXUSINGDLL;wxDEBUG_LEVEL=0;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;SPSIM_USING_DLL;SPSA_STEERINGAPI_USING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(WXWIN)/include;$(WXWIN)/lib/vc_x64_dll/mswud/;$(OGL)/include/;$(WXCODE)/components/freechart/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(BOOST_ROOT);$(CVODE)/include;$(CVODE)/builddir/include;$(GECODEDIR);$(GECODEDIR)/$(Configuration);$(SP_SIMULATOR)/include;$(SPSA_STEERINGAPI)/include;$(DSSZ_UTIL)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__SNOOPY__;HAVE_NO_GMP;_DEBUG;WIN32;_LIB;__WIN32__;_WINDOWS;__WXMSW__;__WINDOWS__;__WXDEBUG__;UNICODE;_LP64;WXUSINGDLL;wxDEBUG_LEVEL=0;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;SPSIM_USING_DLL;SPSA_STEERINGAPI_USING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -314,7 +314,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:LIB %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wsock32.lib;gdiplus.lib;Psapi.lib;wxbase30ud.lib;wxbase30ud_net.lib;wxbase30ud_xml.lib;wxmsw30ud_adv.lib;wxmsw30ud_aui.lib;wxmsw30ud_core.lib;wxmsw30ud_html.lib;wxexpat.lib;wxregexu.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxzlib.lib;wxcode_msw30ud_ogl.lib;wxcode_msw30ud_freechart.lib;SPSA_SteeringAPI.lib;dssz_util.lib;spsim_dd.lib;libsbml.lib;ogdf.lib;GecodeSupport-3-7-3-d-x64.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wsock32.lib;gdiplus.lib;Psapi.lib;wxbase30ud.lib;wxbase30ud_net.lib;wxbase30ud_xml.lib;wxmsw30ud_adv.lib;wxmsw30ud_aui.lib;wxmsw30ud_core.lib;wxmsw30ud_html.lib;wxexpat.lib;wxregexu.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxzlib.lib;wxcode_msw30ud_ogl.lib;wxcode_msw30ud_freechart.lib;SPSA_SteeringAPI.lib;dssz_util.lib;spsim_dd.lib;libsbml.lib;ogdf.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(WXWIN)/lib/vc_x64_dll/;$(OGL)/lib/vc_dll/;$(WXCODE)/components/freechart/lib/vc_dll/;$(LIBSBML)/builddir/src/$(Configuration);$(OGDF)/$(Platform)/$(Configuration);$(DSSZ_UTIL)/lib/$(Configuration);$(SP_SIMULATOR)/$(Configuration)/$(Platform);$(SPSA_STEERINGAPI)/$(Configuration)/$(Platform);$(GECODEDIR)/$(Configuration);$(CVODE)/builddir/src/cvode/$(Configuration);$(CVODE)/builddir/src/nvec_ser/$(Configuration);$(BOOST_ROOT)/stage/lib;$(IRRKLANG)/lib/Winx64-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -423,6 +423,8 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ResourceCompile Include="Snoopy.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="export\SP_ExportCANDL_new.h" />
+    <ClInclude Include="export\SP_ExportColPN2ANDL_new.h" />
     <ClInclude Include="export\SP_ExportColPN2SBML.h" />
     <ClInclude Include="export\SP_ExportColPN2SSC.h" />
     <ClInclude Include="sp_core\MD5HasherDefs.h" />
@@ -460,7 +462,10 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="sp_core\tools\sh_ptr.h" />
     <ClInclude Include="sp_core\tools\SP_ExpressionTree.h" />
     <ClInclude Include="sp_core\tools\SP_FTreeNodeColourizer.h" />
+    <ClInclude Include="sp_core\tools\SP_NetUnfolder.h" />
     <ClInclude Include="sp_core\tools\SP_NodeColourizer.h" />
+    <ClInclude Include="sp_core\tools\SP_SimpleNetBuilder.h" />
+    <ClInclude Include="sp_core\tools\SP_StopWatch.h" />
     <ClInclude Include="sp_core\tools\whitespace_parse.h" />
     <ClInclude Include="sp_core\vector\SP_VectorParser.h" />
     <ClInclude Include="sp_core\vector\SP_VectorReader.h" />
@@ -704,6 +709,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="sp_gr\metadata\SP_GR_MetaRectangle.h" />
     <ClInclude Include="sp_gr\metadata\SP_GR_PlotSymbol.h" />
     <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_CPNDeclaration.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_BaseSimulation.h" />
     <ClInclude Include="sp_gui\windows\SP_GUI_Canvas.h" />
     <ClInclude Include="sp_gui\windows\SP_GUI_Childframe.h" />
     <ClInclude Include="sp_gui\windows\SP_GUI_DevbarContainer.h" />
@@ -998,6 +1004,8 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="wx_intellisense.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="export\SP_ExportCANDL_new.cpp" />
+    <ClCompile Include="export\SP_ExportColPN2ANDL_new.cpp" />
     <ClCompile Include="export\SP_ExportColPN2SBML.cpp" />
     <ClCompile Include="export\SP_ExportColPN2SSC.cpp" />
     <ClCompile Include="sp_core\SP_Core.cpp" />
@@ -1027,7 +1035,10 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile Include="sp_core\tools\rfdag.cpp" />
     <ClCompile Include="sp_core\tools\SP_ExpressionTree.cpp" />
     <ClCompile Include="sp_core\tools\SP_FTreeNodeColourizer.cpp" />
+    <ClCompile Include="sp_core\tools\SP_NetUnfolder.cpp" />
     <ClCompile Include="sp_core\tools\SP_NodeColourizer.cpp" />
+    <ClCompile Include="sp_core\tools\SP_SimpleNetBuilder.cpp" />
+    <ClCompile Include="sp_core\tools\SP_StopWatch.cpp" />
     <ClCompile Include="sp_core\vector\SP_VectorParser.cpp" />
     <ClCompile Include="sp_core\vector\SP_VectorReader.cpp" />
     <ClCompile Include="sp_core\vector\SP_VectorScanner.cpp" />
@@ -1261,6 +1272,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile Include="sp_gr\metadata\SP_GR_MetaRectangle.cpp" />
     <ClCompile Include="sp_gr\metadata\SP_GR_PlotSymbol.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_CPNDeclaration.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_BaseSimulation.cpp" />
     <ClCompile Include="sp_gui\windows\SP_GUI_Canvas.cpp" />
     <ClCompile Include="sp_gui\windows\SP_GUI_Childframe.cpp" />
     <ClCompile Include="sp_gui\windows\SP_GUI_DevbarContainer.cpp" />

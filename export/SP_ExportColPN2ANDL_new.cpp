@@ -50,7 +50,7 @@ bool SP_ExportColPN2ANDL_new::Write(SP_MDI_Doc* p_doc, const wxString& p_fileNam
 	if(unfolder(m_graph))
 	{
 		dsszmc::andl::writer w(unfolder.GetUnfoldedNet());
-		w(m_fileName);
+		w(m_fileName.ToStdString());
 	}
 	else
 	{
