@@ -23,11 +23,11 @@ enum SP_VECTOR_TYPE
 class SP_VectorParser: public SP_Error
 {
 private:
-	SP_VectorScanner* m_pcScanner;
-  wxString m_sVecSetInfo;
+	SP_VectorScanner& m_pcScanner;
+	wxString m_sVecSetInfo;
 protected:
 public:
-    SP_VectorParser(SP_VectorScanner* p_pcScanner);
+    SP_VectorParser(SP_VectorScanner& p_pcScanner);
     ~SP_VectorParser();
 
 	// searches for the next occurrence of "transition" or "place"

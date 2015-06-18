@@ -19,16 +19,12 @@
 using namespace std;
 
 SP_VectorReader::SP_VectorReader(SP_DS_Graph* p_pcGraph):
-	m_pcParser(NULL), m_pcScanner(NULL), m_pcGraph(p_pcGraph),
-			m_pcMapNodeNum2VecNum(NULL)
+	m_pcGraph(p_pcGraph)
 {
 }
 
 SP_VectorReader::~SP_VectorReader()
 {
-	wxDELETE(m_pcParser);
-	wxDELETE(m_pcScanner);
-	wxDELETE(m_pcMapNodeNum2VecNum);
 }
 
 bool SP_VectorReader::Read(SP_DS_NodeVectorSystem *p_pcNvms,
@@ -37,19 +33,19 @@ bool SP_VectorReader::Read(SP_DS_NodeVectorSystem *p_pcNvms,
 	CHECK_POINTER(p_pcNvms, return FALSE);
 
 	// because the map<int, int > gives null back when it can't find the key
-	// and null is the first position, we add/substract l_ADDING at the rigth places
+	// and null is the first position, we add/subtract l_ADDING at the right places
 	const int l_ADDING = 1;
 
 	int l_minOcc = 0;
 	int l_maxOcc = 0;
 
-	m_pcScanner = new SP_VectorScanner();
-	if (m_pcScanner->Open(p_sFile))
+	SP_VectorScanner l_pcScanner;
+	if (l_pcScanner.Open(p_sFile))
 	{
-		m_pcParser = new SP_VectorParser(m_pcScanner);
+		SP_VectorParser l_pcParser(l_pcScanner);
 		// get type information and set nodelist
-		p_pcNvms->SetInformation(m_pcParser->GetVectorSetInformation());
-		SP_VECTOR_TYPE l_nType = m_pcParser->ReadVectorTypeInformation();
+		p_pcNvms->SetInformation(l_pcParser.GetVectorSetInformation());
+		SP_VECTOR_TYPE l_nType = l_pcParser.ReadVectorTypeInformation();
 		int l_len;
 		wxString l_sNodeclass(wxT(""));
 		if (l_nType == SP_TRANSITION_TYPE)
@@ -65,18 +61,23 @@ bool SP_VectorReader::Read(SP_DS_NodeVectorSystem *p_pcNvms,
 			return FALSE;
 		}
 
-		for(SP_ListNodeclass::const_iterator itNC = m_pcGraph->GetNodeclasses()->begin();
-			itNC != m_pcGraph->GetNodeclasses()->end();
-			++itNC)
+		//initialize Map to know which place of vector belongs to nodeNum
+		SP_MapInt2Int l_pcMapNodeNum2VecNum;
+		SP_MapString2Int l_pcMapNodeName2NodeNum;
+		int i = 0;
+		for(SP_DS_Nodeclass* l_pcNC : *(m_pcGraph->GetNodeclasses()))
 		{
-			if((*itNC)->GetName().Contains(l_sNodeclass)
-				&& !(*itNC)->GetName().Contains(wxT("Coarse")))
+			if(l_pcNC->GetName().Contains(l_sNodeclass)
+				&& !l_pcNC->GetName().Contains(wxT("Coarse")))
 			{
-				for(SP_ListNode::const_iterator itN = (*itNC)->GetElements()->begin();
-					itN != (*itNC)->GetElements()->end();
-					++itN)
+				for(SP_DS_Node* l_pcN : *(l_pcNC->GetElements()))
 				{
-					p_pcNvms->AddNodeToNodeList(*itN);
+					p_pcNvms->AddNodeToNodeList(l_pcN);
+					wxString name = dynamic_cast<SP_DS_NameAttribute*>(l_pcN->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+					int id = dynamic_cast<SP_DS_IdAttribute*>(l_pcN->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID))->GetValue();
+					l_pcMapNodeNum2VecNum.insert(std::make_pair(id, i+l_ADDING));
+					l_pcMapNodeName2NodeNum.insert(std::make_pair(name, id));
+					i++;
 				}
 			}
 		}
@@ -87,23 +88,9 @@ bool SP_VectorReader::Read(SP_DS_NodeVectorSystem *p_pcNvms,
 			return false;
 		}
 
-		//initialize Map to know which place of vector belongs to nodeNum
-		const SP_ListNode& l_pcNodes = p_pcNvms->GetNodes();
-		m_pcMapNodeNum2VecNum = new map<int,int>();
-		SP_ListNode::const_iterator l_itNode = l_pcNodes.begin();
-		int i = 0;
-		while (l_itNode != l_pcNodes.end())
-		{
-			m_pcMapNodeNum2VecNum->insert(pair<int, int>(
-					dynamic_cast<SP_DS_IdAttribute*>((*l_itNode)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID))->GetValue(), i +l_ADDING));
-
-			i++;
-			l_itNode++;
-		}
-
 		long actNum;
 		// read in vector informations
-		while (m_pcParser->ReadVectorNumber(actNum))
+		while (l_pcParser.ReadVectorNumber(actNum))
 		{
 			SP_DS_NodeVector *l_pcNodeVector = new SP_DS_NodeVector(m_pcGraph, p_pcNvms);
 			SP_DS_IdAttribute* l_pcAttr = new SP_DS_IdAttribute(wxT("ID"));
@@ -117,16 +104,20 @@ bool SP_VectorReader::Read(SP_DS_NodeVectorSystem *p_pcNvms,
 			long l_nodeNum = -1;
 			wxString s;
 			int l_nPosition = 0;
-			while (m_pcParser->ReadNodeData(l_nodeNum, s, l_val))
+			while (l_pcParser.ReadNodeData(l_nodeNum, s, l_val))
 			{
 				// string check is possible, but makes no sense when
 				// the string was shortened earlier - so its not implemented
-				l_nPosition = (*m_pcMapNodeNum2VecNum)[l_nodeNum];
+				if(l_nodeNum == -1)
+				{
+					l_nodeNum = l_pcMapNodeName2NodeNum[s];
+				}
+				l_nPosition = l_pcMapNodeNum2VecNum[l_nodeNum];
 				if (l_nPosition == 0)
 				{
 					return FALSE;
 				}
-				a_vector[(*m_pcMapNodeNum2VecNum)[l_nodeNum]-l_ADDING] = l_val;
+				a_vector[l_pcMapNodeNum2VecNum[l_nodeNum]-l_ADDING] = l_val;
 
 				if (l_minOcc == l_maxOcc && l_minOcc == 0 && l_val != 0)
 				{
@@ -153,7 +144,7 @@ bool SP_VectorReader::Read(SP_DS_NodeVectorSystem *p_pcNvms,
 		p_pcNvms->SetOccurrenceRangeMin(l_minOcc);
 
 		// read in names and additional comments to node vectors
-		while (m_pcParser->ReadVectorNumber(actNum) && actNum)
+		while (l_pcParser.ReadVectorNumber(actNum) && actNum)
 		{
 			SP_DS_NodeVector* nodeVector = p_pcNvms->GetNodeVectorById(actNum);
 			if (!nodeVector)
@@ -164,7 +155,7 @@ bool SP_VectorReader::Read(SP_DS_NodeVectorSystem *p_pcNvms,
 			}
 			wxString l_name;
 			wxString l_description;
-			m_pcParser->ReadVectorInformation(l_name, l_description);
+			l_pcParser.ReadVectorInformation(l_name, l_description);
 			if (nodeVector->GetAttribute(wxT("Name"))
 					&& nodeVector->GetAttribute(wxT("Comment")))
 			{
@@ -172,7 +163,7 @@ bool SP_VectorReader::Read(SP_DS_NodeVectorSystem *p_pcNvms,
 				dynamic_cast<SP_DS_TextAttribute*>(nodeVector->GetAttribute(wxT("Comment")))->SetValueString(l_description);
 			}
 		}
-		m_pcScanner->Close();
+		l_pcScanner.Close();
 		return TRUE;
 	}
 	else

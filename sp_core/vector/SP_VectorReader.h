@@ -22,10 +22,7 @@
 class SP_VectorReader: public SP_Error
 {
 private:
-	SP_VectorParser *m_pcParser;
-	SP_VectorScanner *m_pcScanner;
 	SP_DS_Graph *m_pcGraph;
-	SP_MapInt2Int *m_pcMapNodeNum2VecNum;
 
 protected:
 public:
