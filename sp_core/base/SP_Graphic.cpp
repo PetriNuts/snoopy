@@ -203,9 +203,17 @@ SP_Graphic::AddChildToCanvas(SP_Graphic* p_pcChild)
     // if not already added
     if (!p_pcChild->GetPrimitive()->GetCanvas())
     {
-    	//TODO check whats the difference here
-        //l_pcCanvas->AddShape(p_pcChild->GetPrimitive(), GetPrimitive());
-        l_pcCanvas->AddShape(p_pcChild->GetPrimitive());
+    	// METADATA is inserted at the beginning of the shape list,
+    	// so we have to look for it and add the child right after it,
+    	// instead of just appending them
+    	if(GetGraphicType() == SP_GRAPHIC_METADATA)
+    	{
+    		l_pcCanvas->AddShape(p_pcChild->GetPrimitive(), GetPrimitive());
+    	}
+    	else
+    	{
+    		l_pcCanvas->AddShape(p_pcChild->GetPrimitive());
+    	}
         // p_pcChild->GetPrimitive()->Show(p_pcChild->GetShow());
     }
 
