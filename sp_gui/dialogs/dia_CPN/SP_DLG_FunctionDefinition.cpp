@@ -265,8 +265,18 @@ void SP_DLG_FunctionDefinition::OnDeleteFunction( wxCommandEvent& p_cEvent )
 		return;
 	}
 
-	int l_nEditRowPos = m_pcGrid->GetGridCursorRow();
-	m_pcGrid->DeleteRows(l_nEditRowPos);
+	if ( m_pcGrid->IsSelection() )
+    {
+		m_pcGrid->BeginBatch();
+        for ( int n = 0; n < m_pcGrid->GetNumberRows(); )
+        {
+            if ( m_pcGrid->IsInSelection( n , 0 ) )
+            	m_pcGrid->DeleteRows( n, 1 );
+            else
+                n++;
+        }
+        m_pcGrid->EndBatch();
+    }
 }
 
 void SP_DLG_FunctionDefinition::OnAddFunction( wxCommandEvent& p_cEvent )

@@ -25,12 +25,12 @@
 #include <wx/artprov.h>
 
 #include "sp_gui/management/SP_GM_Docmanager.h"
-#include "sp_gui/windows/SP_GUI_LogWindow.h"
 
 //! include not possible
 class SP_GUI_DevbarContainer;
 class SP_WDG_Toolbar;
 class SP_GUI_Childframe;
+class SP_GUI_LogWindow;
 
 /**	\brief	The SP_GUI_Mainframe: class
 
@@ -127,8 +127,6 @@ private:
         within the creation process of the mainframe.
     */
     bool CreateDevbar();
-
-    bool CreateLogbar();
 
     /*
      * toggle steering mode

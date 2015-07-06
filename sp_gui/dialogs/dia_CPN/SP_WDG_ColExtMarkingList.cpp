@@ -422,28 +422,18 @@ void SP_WDG_ColExtMarkingList::OnAdd(wxCommandEvent& p_cEvent)
 
 void SP_WDG_ColExtMarkingList::OnDelete( wxCommandEvent& p_cEvent )
 {
-	//wxArrayInt l_Array = m_pcMarkingGrid->GetSelectedRows();
-	wxGridCellCoordsArray  l_GridCellCoordsArrayTop = m_pcMarkingGrid->GetSelectionBlockTopLeft();
-	wxGridCellCoordsArray  l_GridCellCoordsArrayBottom = m_pcMarkingGrid->GetSelectionBlockBottomRight();
-	
-	if(l_GridCellCoordsArrayTop.size()>0 || l_GridCellCoordsArrayBottom.size()>0)
-	{
-		int l_nRowUp = 0;
-		if(l_GridCellCoordsArrayTop.size()>0)
-			l_nRowUp = l_GridCellCoordsArrayTop[l_GridCellCoordsArrayTop.size()-1].GetRow();
-
-		int l_nRowBottom = m_pcMarkingGrid->GetNumberRows()-1;
-		if(l_GridCellCoordsArrayBottom.size()>0)
-			l_nRowBottom= l_GridCellCoordsArrayBottom[0].GetRow();
-		
-		for(int i= l_nRowUp; i <= l_nRowBottom; i++)
-		{
-			m_pcMarkingGrid->DeleteRows(i);
-		}
-	}
-
-	//int l_nEditRowPos = m_pcMarkingGrid->GetGridCursorRow();
-	//m_pcMarkingGrid->DeleteRows(l_nEditRowPos);
+	if ( m_pcMarkingGrid->IsSelection() )
+    {
+		m_pcMarkingGrid->BeginBatch();
+        for ( int n = 0; n < m_pcMarkingGrid->GetNumberRows(); )
+        {
+            if ( m_pcMarkingGrid->IsInSelection( n , 0 ) )
+            	m_pcMarkingGrid->DeleteRows( n, 1 );
+            else
+                n++;
+        }
+        m_pcMarkingGrid->EndBatch();
+    }
 }
 
 void SP_WDG_ColExtMarkingList::OnImport(wxCommandEvent& p_cEvent)

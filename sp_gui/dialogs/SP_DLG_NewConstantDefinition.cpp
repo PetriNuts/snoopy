@@ -302,33 +302,30 @@ void SP_DLG_NewConstantDefinition::OnDeleteSet(wxCommandEvent& p_cEvent)
 	{
 		return;
 	}
-
-	//by default delete selected rows
-	wxArrayInt l_anSelectedRows = m_pcConstantSetGrid->GetSelectedRows();
-
-	//if no row is selected, then delete the current editing row
-	if (l_anSelectedRows.Count() == 0)
-	{
-		int l_nEditRowPos = m_pcConstantSetGrid->GetGridCursorRow();
-
-		l_anSelectedRows.Add(l_nEditRowPos);
-	}
-
-	for(auto idx : l_anSelectedRows)
-	{
-		wxString l_sName = m_pcConstantSetGrid->GetCellValue(idx, NAME);
-		for (SP_DS_Metadata* l_pcMeta : *(m_pcConstants->GetElements()))
-		{
-			if(l_pcMeta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)->GetValueString()
-				== l_sName)
-			{
-				m_deleted.push_back(l_pcMeta);
-			}
-		}
-	}
-	//delete the selected rows
-	m_pcConstantSetGrid->DeleteRows(l_anSelectedRows[0], l_anSelectedRows.Count());
-
+    if ( m_pcConstantSetGrid->IsSelection() )
+    {
+        wxGridUpdateLocker locker(m_pcConstantSetGrid);
+        for ( int n = 0; n < m_pcConstantSetGrid->GetNumberRows(); )
+        {
+            if ( m_pcConstantSetGrid->IsInSelection( n , 0 ) )
+            {
+        		wxString l_sName = m_pcConstantSetGrid->GetCellValue(n, NAME);
+        		for (SP_DS_Metadata* l_pcMeta : *(m_pcConstants->GetElements()))
+        		{
+        			if(l_pcMeta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)->GetValueString()
+        				== l_sName)
+        			{
+        				m_deleted.push_back(l_pcMeta);
+        			}
+        		}
+            	m_pcConstantSetGrid->DeleteRows( n, 1 );
+            }
+            else
+            {
+            	++n;
+            }
+        }
+    }
 }
 
 void SP_DLG_NewConstantDefinition::OnAddSet(wxCommandEvent& p_cEvent)

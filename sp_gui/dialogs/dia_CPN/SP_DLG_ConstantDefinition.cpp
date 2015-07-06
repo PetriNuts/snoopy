@@ -244,8 +244,18 @@ void SP_DLG_ConstantDefinition::OnDeleteColorSet( wxCommandEvent& p_cEvent )
 		return;
 	}
 
-	int l_nEditRowPos = m_pcColorSetGrid->GetGridCursorRow();
-	m_pcColorSetGrid->DeleteRows(l_nEditRowPos);
+	if ( m_pcColorSetGrid->IsSelection() )
+    {
+		m_pcColorSetGrid->BeginBatch();
+        for ( int n = 0; n < m_pcColorSetGrid->GetNumberRows(); )
+        {
+            if ( m_pcColorSetGrid->IsInSelection( n , 0 ) )
+            	m_pcColorSetGrid->DeleteRows( n, 1 );
+            else
+                n++;
+        }
+        m_pcColorSetGrid->EndBatch();
+    }
 }
 
 void SP_DLG_ConstantDefinition::OnAddColorSet( wxCommandEvent& p_cEvent )

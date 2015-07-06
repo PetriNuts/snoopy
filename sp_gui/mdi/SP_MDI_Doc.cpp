@@ -13,6 +13,7 @@
 #include "sp_gui/dialogs/SP_DLG_ReduceFTree.h"
 #include "sp_gui/dialogs/SP_DLG_ChooseInvariant.h"
 #include "sp_gui/windows/SP_GUI_Mainframe.h"
+#include "sp_gui/windows/SP_GUI_LogWindow.h"
 #include "sp_gui/mdi/SP_MDI_CoarseDoc.h"
 #include "sp_core/SP_Core.h"
 #include "sp_core/SP_GPR_Canvas.h"

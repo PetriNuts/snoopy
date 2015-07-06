@@ -192,8 +192,18 @@ void SP_DLG_RandomMarking::OnDeleteColorSet( wxCommandEvent& p_cEvent )
 	if (m_pcColorGrid->GetNumberRows() == 0)
 		return;
 
-	int l_nEditRowPos = m_pcColorGrid->GetGridCursorRow();
-	m_pcColorGrid->DeleteRows(l_nEditRowPos);
+	if ( m_pcColorGrid->IsSelection() )
+    {
+		m_pcColorGrid->BeginBatch();
+        for ( int n = 0; n < m_pcColorGrid->GetNumberRows(); )
+        {
+            if ( m_pcColorGrid->IsInSelection( n , 0 ) )
+            	m_pcColorGrid->DeleteRows( n, 1 );
+            else
+                n++;
+        }
+        m_pcColorGrid->EndBatch();
+    }
 }
 
 void SP_DLG_RandomMarking::OnAddColorSet( wxCommandEvent& p_cEvent )

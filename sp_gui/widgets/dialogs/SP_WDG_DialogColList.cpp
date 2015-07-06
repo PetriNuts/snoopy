@@ -533,8 +533,18 @@ void SP_WDG_DialogColList::OnDelete( wxCommandEvent& p_cEvent )
 		return;
 	}
 
-	int l_nEditRowPos = m_pcValueGrid->GetGridCursorRow();
-	m_pcValueGrid->DeleteRows(l_nEditRowPos);
+	if ( m_pcValueGrid->IsSelection() )
+    {
+		m_pcValueGrid->BeginBatch();
+        for ( int n = 0; n < m_pcValueGrid->GetNumberRows(); )
+        {
+            if ( m_pcValueGrid->IsInSelection( n , 0 ) )
+            	m_pcValueGrid->DeleteRows( n, 1 );
+            else
+                n++;
+        }
+        m_pcValueGrid->EndBatch();
+    }
 
 }
 

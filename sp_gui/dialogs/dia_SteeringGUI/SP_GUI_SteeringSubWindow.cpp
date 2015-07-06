@@ -135,24 +135,23 @@ void SP_GUI_SteeringSubWindow::ShowSteeredItems(const SP_VectorString& p_asNames
 
 void SP_GUI_SteeringSubWindow::ChangeValue(const long& p_nPosition,const double& p_nValue)
 {    
-                 if(m_sSubWindowType==wxT("Places"))
-                 {
-                     m_pcGUIClient->ChangeCurrentPlaceValues(p_nPosition,p_nValue);
-                 }
-                 else
-                 {
-                      m_pcGUIClient->ChangeCurrentParameterValues(p_nPosition,p_nValue);
-                 }
-                  
-                 SP_LOGMESSAGE(wxT("Value Changed to: ")+wxString::Format(wxT("%g"),p_nValue));
+	if(m_sSubWindowType==wxT("Places"))
+	{
+	 m_pcGUIClient->ChangeCurrentPlaceValues(p_nPosition,p_nValue);
+	}
+	else
+	{
+	  m_pcGUIClient->ChangeCurrentParameterValues(p_nPosition,p_nValue);
+	}
 
-                 SP_GUI_LogWindow* l_pclogWindow = wxGetApp().GetMainframe()->GetExportLogWindow();
+	SP_LOGMESSAGE(wxT("Value Changed to: ")+wxString::Format(wxT("%g"),p_nValue));
 
-                 if(l_pclogWindow!=NULL)
-                 {
-                	 l_pclogWindow->Show(true);
-                 }
+	SP_GUI_LogWindow* l_pclogWindow = wxGetApp().GetMainframe()->GetExportLogWindow();
 
+	if(l_pclogWindow!=NULL)
+	{
+	 l_pclogWindow->Show(true);
+	}
 }
 
 void SP_GUI_SteeringSubWindow::OnSpinValueChanged(wxSpinEvent & event)

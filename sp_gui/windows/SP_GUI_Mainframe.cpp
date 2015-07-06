@@ -17,6 +17,7 @@
 #include "sp_gui/dialogs/SP_DLG_About.h"
 #include "sp_gui/dialogs/SP_DLG_CheckForUpdate.h"
 #include "sp_gui/dialogs/dia_SteeringGUI/SP_GUI_ConnectToServer.h"
+#include "sp_gui/windows/SP_GUI_LogWindow.h"
 
 #include "export/SP_ExportManager.h"
 #include "import/SP_ImportManager.h"
@@ -61,8 +62,6 @@ SP_GUI_Mainframe::SP_GUI_Mainframe(SP_GM_Docmanager* p_pcDocmanager,
     CreateToolbar();
 
     CreateDevbar();
-
-	CreateLogbar();
 
 	// tell the manager to wxT("commit") all the changes just made
     m_frameManager.Update();
@@ -117,13 +116,6 @@ SP_GUI_Mainframe::SP_GUI_Mainframe(SP_GM_Docmanager* p_pcDocmanager,
 
 SP_GUI_Mainframe::~SP_GUI_Mainframe()
 {
-
-	if (m_pcOldLogtarget)
-	{
-		wxLog* l_pcLog = wxLog::SetActiveTarget(m_pcOldLogtarget);
-		wxDELETE(l_pcLog);
-	}
-
 	//TODO: find out why this doesn't work
 	m_pHelpController->Quit();
 	delete m_pHelpController;
@@ -272,25 +264,6 @@ SP_GUI_Mainframe::CreateDevbar()
 }
 
 bool
-SP_GUI_Mainframe::CreateLogbar()
-{
-#if 0
-//#ifdef  __WXDEBUG__
-	m_pcLogWindow = new wxTextCtrl( this,
-									-1,
-									wxT(""),
-									wxDefaultPosition,
-									wxSize(400,200),
-									wxTE_MULTILINE | wxTE_READONLY);
-
-   	m_frameManager.AddPane(m_pcLogWindow, wxBOTTOM, wxT("LogWindow"));
-    m_pcOldLogtarget = wxLog::SetActiveTarget(new wxLogTextCtrl(m_pcLogWindow));
-
-#endif // __WXDEBUG__
-	return true;
-}
-
-bool
 SP_GUI_Mainframe::CreateToolbar()
 {
 	m_pcToolbar	 = new SP_WDG_Toolbar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_FLAT | wxTB_NODIVIDER);
@@ -429,15 +402,6 @@ SP_GUI_Mainframe::OnToggleBar(wxCommandEvent& p_cEvent)
 			m_frameManager.GetPane(m_pcHierarchyContainer).Show(false);
 		} else {
 			m_frameManager.GetPane(m_pcHierarchyContainer).Show(true);
-		}
-		  m_frameManager.Update();
-        break;
-
-    case SP_MENU_ITEM_TOGGLE_LOG_ID:
-		if (  m_frameManager.GetPane(m_pcLogWindow).IsShown()){
-			m_frameManager.GetPane(m_pcLogWindow).Show(false);
-		} else {
-			m_frameManager.GetPane(m_pcLogWindow).Show(true);
 		}
 		  m_frameManager.Update();
         break;
