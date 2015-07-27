@@ -451,35 +451,6 @@ bool SP_DLG_CheckNet :: CheckSPN( )
 
 bool SP_DLG_CheckNet::CheckRateFunction(spsim::Parser& p_Parser, const wxString& p_sFormula, SP_DS_Node* p_pcNode )
 {
-#if 0
-	SP_DS_StParser l_cParser;
-
-	wxString l_sTransitionName = dynamic_cast<SP_DS_NameAttribute*>(p_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-
-	wxArrayString* l_plMissingVariableList = 0;
-	if (!(l_cParser.CheckFormulaFunction(p_sFormula, p_pcNode)))
-	{
-		l_plMissingVariableList = l_cParser.GetMissingVariableList();
-
-		wxString l_sVariables = wxT("The formula \"");
-		l_sVariables += p_sFormula;
-		l_sVariables += wxT("\" is incorrect. \n\nOccured problems:\n\n");
-
-		for (unsigned int i = 0; i < l_plMissingVariableList->Count(); i++)
-		{
-			l_sVariables += (*l_plMissingVariableList)[i];
-			l_sVariables += wxT("\n");
-		}
-
-		l_sVariables = l_sTransitionName + wxT(": ") + l_sVariables;
-				
-		SP_LOGERROR(l_sVariables);
-
-		return false;
-	}
-
-	return true;
-#else
 	SP_VectorString l_Places;
     if(p_pcNode)
 	{
@@ -496,7 +467,6 @@ bool SP_DLG_CheckNet::CheckRateFunction(spsim::Parser& p_Parser, const wxString&
 	}
 
 	return p_Parser.Parse(p_sFormula, static_cast<spsim::Transition*>(NULL));
-#endif
 }
 
 void SP_DLG_CheckNet::OnCKBoxChange(wxCommandEvent& p_cEvent)

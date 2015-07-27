@@ -1588,10 +1588,32 @@ bool SP_MDI_View::DoPaste()
 
 bool SP_MDI_View::DoCopyInNewNet(SP_ListGraphic* p_plShapes)
 {
-	if(!DoCopy(p_plShapes))
+	if(p_plShapes->empty())
 		return false;
 
 	SP_MDI_Doc* l_pcDoc = dynamic_cast<SP_MDI_Doc*>(GetDocument());
+	SP_DS_Graph* l_pcGraph = l_pcDoc->GetGraph();
+
+	//add metadata to selected shapes, works only for metadata with graphics
+	for(SP_DS_Metadataclass* l_pcMC : *(l_pcGraph->GetMetadataclasses()))
+	{
+		if(!l_pcMC->GetShowInElementTree()
+			&& (l_pcMC->GetShowInDeclarationTreeOther() || l_pcMC->GetShowInDeclarationTreeColorSet())
+			&& !l_pcMC->GetPrototype()->GetGraphics()->empty())
+		{
+			for(SP_DS_Metadata* l_pcMeta : *(l_pcMC->GetElements()))
+			{
+				for(SP_Graphic* l_pcGr : *(l_pcMeta->GetGraphics()))
+				{
+					p_plShapes->push_back(l_pcGr);
+				}
+			}
+		}
+	}
+
+	if(!DoCopy(p_plShapes))
+		return false;
+
 	SP_GM_Docmanager* l_pcDM = wxGetApp().GetDocmanager();
 	SP_GM_DocTemplate* l_pcTemplate = l_pcDM->GetTemplate(l_pcDoc->GetGraph()->GetNetclass()->GetName());
 	SP_DS_Netclass* newClass = l_pcTemplate->GetNetclass();

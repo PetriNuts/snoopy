@@ -66,19 +66,23 @@ void SP_GUI_Canvas::AddShape(wxShape* p_pcShape, wxShape *addAfter)
 		if (GetDiagram() && p_pcShape)
 			if(GetDiagram()->GetShapeList())
 			{
-				auto nodeAfter = GetDiagram()->GetShapeList()->Find(addAfter);
+				auto nodeAfter = addAfter->GetShapeListIterator();
+				if(!nodeAfter)
+					nodeAfter = GetDiagram()->GetShapeList()->Find(addAfter);
+				decltype(nodeAfter) pos = NULL;
 				if (nodeAfter)
 				{
 					if (nodeAfter->GetNext())
-						GetDiagram()->GetShapeList()->Insert(nodeAfter->GetNext(), p_pcShape);
+						pos = GetDiagram()->GetShapeList()->Insert(nodeAfter->GetNext(), p_pcShape);
 					else
-						GetDiagram()->GetShapeList()->Append(p_pcShape);
+						pos = GetDiagram()->GetShapeList()->Append(p_pcShape);
 				}
 				else
 				{
-					GetDiagram()->GetShapeList()->Append(p_pcShape);
+					pos = GetDiagram()->GetShapeList()->Append(p_pcShape);
 				}
 				p_pcShape->SetCanvas(GetDiagram()->GetCanvas());
+				p_pcShape->SetShapeListIterator(pos);
 			}
 	}
 	else
@@ -92,19 +96,16 @@ void SP_GUI_Canvas::AddShape(wxShape* p_pcShape)
 	if (GetDiagram() && p_pcShape)
 		if(GetDiagram()->GetShapeList())
 		{
-			GetDiagram()->GetShapeList()->Append(p_pcShape);
+			auto pos = GetDiagram()->GetShapeList()->Append(p_pcShape);
 			p_pcShape->SetCanvas(GetDiagram()->GetCanvas());
+			p_pcShape->SetShapeListIterator(pos);
 		}
 }
 
 void SP_GUI_Canvas::InsertShape(wxShape* p_pcShape)
 {
 	if (GetDiagram() && p_pcShape)
-		if(GetDiagram()->GetShapeList())
-		{
-			GetDiagram()->GetShapeList()->Insert(p_pcShape);
-			p_pcShape->SetCanvas(GetDiagram()->GetCanvas());
-		}
+		GetDiagram()->InsertShape(p_pcShape);
 }
 
 void SP_GUI_Canvas::RemoveShape(wxShape *p_pcShape)
@@ -654,12 +655,39 @@ void SP_GUI_Canvas::OnEndDragLeft(double p_nX, double p_nY, int p_nKeys)
 
 		if (l_pcShape->GetParent() == NULL && !l_pcShape->IsKindOf(CLASSINFO(wxControlPoint)))
 		{
-			double l_nImageX = l_pcShape->GetX();
-			double l_nImageY = l_pcShape->GetY();
-			if (l_nImageX >= l_nMinX && l_nImageX <= l_nMaxX && l_nImageY
-					>= l_nMinY && l_nImageY <= l_nMaxY)
+			if(l_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
 			{
-				l_pcShape->Select(TRUE, &l_cDc);
+				wxNode* l_pcNode = dynamic_cast<wxLineShape*>(l_pcShape)->GetLineControlPoints()->GetFirst();
+				bool l_bIsSelected = false;
+				while (l_pcNode)
+				{
+					wxRealPoint* l_pcPoint = (wxRealPoint*)l_pcNode->GetData();
+					double l_nImageX = l_pcPoint->x;
+					double l_nImageY = l_pcPoint->y;
+					if (l_nImageX >= l_nMinX && l_nImageX <= l_nMaxX && l_nImageY
+							>= l_nMinY && l_nImageY <= l_nMaxY)
+					{
+						l_bIsSelected = true;
+					}
+					else
+					{
+						l_bIsSelected = false;
+						break;
+					}
+					l_pcNode = l_pcNode->GetNext();
+				}
+				if(l_bIsSelected)
+					l_pcShape->Select(true, &l_cDc);
+			}
+			else
+			{
+				double l_nImageX = l_pcShape->GetX();
+				double l_nImageY = l_pcShape->GetY();
+				if (l_nImageX >= l_nMinX && l_nImageX <= l_nMaxX && l_nImageY
+						>= l_nMinY && l_nImageY <= l_nMaxY)
+				{
+					l_pcShape->Select(true, &l_cDc);
+				}
 			}
 		}
 		l_pcNode = l_pcNode->GetNext();

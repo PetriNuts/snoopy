@@ -170,35 +170,20 @@ void SP_NodeColourizer::RestoreColours()
 
 		l_pcNode->Update(TRUE);
 
-		unsigned int netNr = l_pcNode->GetNetnumber();
-		SP_MDI_Doc *doc;
-		if (netNr <= 1)
-		{
-			// must be the top level document
-			doc = SP_Core::Instance()->GetRootDocument();
-			if (doc)
-			{
-				doc->ShowAll();
-			}
-		}
-		else
-		{
-			SP_Data *data = m_pcGraph->GetCoarseNode(netNr);
-			doc = data->GetCoarse()->GetCoarseDoc();
-		}
-
-		if (doc)
-		{
-			SP_MDI_View *l_pcView = dynamic_cast<SP_MDI_View*>(doc->GetFirstView());
-			l_pcView->SelectAll(false);
-			doc->Refresh();
-			doc->Modify(true);
-		}
 		l_pcIt++;
 		l_itStyle++;
 	}
 	m_pcMapNodeNum2wxColour->clear();
 	m_pcMapNodeNum2Style->clear();
+
+	SP_MDI_Doc *doc = SP_Core::Instance()->GetRootDocument();
+
+	if (doc)
+	{
+		doc->Refresh();
+		doc->Modify(true);
+	}
+
 }
 
 bool SP_NodeColourizer::ColourGraphic(SP_Graphic* p_pcNode, wxColour col, bool p_bColourCoarse)
