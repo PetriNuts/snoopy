@@ -698,8 +698,7 @@ bool SP_DS_StAnimation::AddToDialog(SP_DLG_AnimationProperties* p_pcDlg, wxSizer
 	if (!SP_DS_Animation::AddToDialog(p_pcDlg, p_pcSizer))
 		return FALSE;
 
-	wxString l_asChoices[] =
-	{ wxT("Maximum"), wxT("Intermediate"), wxT("Single") };
+	wxString l_asChoices[] = { wxT("Maximum"), wxT("Intermediate"), wxT("Single") };
 	m_pcChoice = new wxRadioBox(p_pcDlg, -1, wxT("Stepping"), wxDefaultPosition, wxDefaultSize, 3, l_asChoices, 1, wxRA_SPECIFY_ROWS);
 
 	m_pcChoice->SetSelection(m_nStepState - 1);

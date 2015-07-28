@@ -653,17 +653,16 @@ void SP_DLG_Simulation::OnItemDoubleClick(wxWindow *p_pcExternalWindowDialog, un
 	    m_bCanChangeCurrentView = true;
 }
 
-void SP_DLG_Simulation::RefreshCurrentExternalView(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle) {
-	std::list<wxWindow*>::iterator l_itWindow;
-
-	    //check if a view with the same name is already opened
-	for (l_itWindow = m_pcExternalWindows.begin(); l_itWindow != m_pcExternalWindows.end(); l_itWindow++)
+void SP_DLG_Simulation::RefreshCurrentExternalView(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle)
+{
+	//check if a view with the same name is already opened
+	for (auto l_itWindow : m_pcExternalWindows)
 	{
 
-		if (m_pcCurrentTablePlot == (dynamic_cast<SP_DLG_ShowAllModelView*>(*l_itWindow))->GetModelView())
+		if (m_pcCurrentTablePlot == l_itWindow->GetModelView())
 		{
 
-			(dynamic_cast<SP_DLG_ShowAllModelView*>(*l_itWindow))->RefreshCurrentWindow(p_nCurveIndex, p_nColor, p_nLineWidth, p_nLineStyle);
+			l_itWindow->RefreshCurrentWindow(p_nCurveIndex, p_nColor, p_nLineWidth, p_nLineStyle);
 
 			return;
 		}
@@ -1643,11 +1642,9 @@ void SP_DLG_Simulation::OnDlgCancel(wxCommandEvent& p_cEvent)
 
         //if (l_nAnswer == wxYES)
         {
-            std::list<wxWindow*>::iterator l_itWindow;
-
-            for (l_itWindow = m_pcExternalWindows.begin(); l_itWindow != m_pcExternalWindows.end(); l_itWindow++)
+        	for (auto l_itWindow : m_pcExternalWindows)
             {
-                (*l_itWindow)->Destroy();
+                l_itWindow->Destroy();
             }
 
             //clear pointers
@@ -2099,11 +2096,10 @@ SP_DLG_Simulation::~SP_DLG_Simulation()
     //delete the timer
     wxDELETE(m_pcTimer);
 
-    std::list<wxWindow*>::iterator l_itWindow;
     //set the pointer of external pointer to NULL
-    for (l_itWindow = m_pcExternalWindows.begin(); l_itWindow != m_pcExternalWindows.end(); l_itWindow++)
+	for (auto l_itWindow : m_pcExternalWindows)
     {
-        dynamic_cast<SP_DLG_ShowAllModelView*>((*l_itWindow))->RemoveExternalWindowsPointer();
+        l_itWindow->RemoveExternalWindowsPointer();
     }
 }
 
@@ -2464,14 +2460,10 @@ void SP_DLG_Simulation::OnSelectXAxis(wxCommandEvent& p_cEvent)
 
 void SP_DLG_Simulation::OpenViewInSeparateWindow(SP_DS_Metadata* p_pcModelView)
 {
-    SP_DLG_ShowAllModelView* l_pcShowModelViewsDlg;
-
-    std::list<wxWindow*>::iterator l_itWindow;
-
     //check if a view with the same name is already opened
-    for (l_itWindow = m_pcExternalWindows.begin(); l_itWindow != m_pcExternalWindows.end(); l_itWindow++)
+	for (auto l_itWindow : m_pcExternalWindows)
     {
-        if (p_pcModelView == (dynamic_cast<SP_DLG_ShowAllModelView*>(*l_itWindow))->GetModelView())
+        if (p_pcModelView == l_itWindow->GetModelView())
         {
             SP_LOGERROR( wxT("this view(") + GetViewAttributeValue(p_pcModelView, wxT("Name")) + wxT(") is already opened.  A view Can't be opened twice"));
 
@@ -2479,7 +2471,7 @@ void SP_DLG_Simulation::OpenViewInSeparateWindow(SP_DS_Metadata* p_pcModelView)
         }
     }
 
-    l_pcShowModelViewsDlg = new SP_DLG_ShowAllModelView(this, p_pcModelView);
+    SP_DLG_ShowAllModelView* l_pcShowModelViewsDlg = new SP_DLG_ShowAllModelView(this, p_pcModelView);
 
     // check if the window is created correctly
     if (l_pcShowModelViewsDlg != NULL)
@@ -2516,13 +2508,11 @@ void SP_DLG_Simulation::OnOpenAllViewsSeparately(wxCommandEvent& p_cEvent)
 }
 void SP_DLG_Simulation::RefreshExternalWindows()
 {
-    std::list<wxWindow*>::iterator l_itWindow;
-
-    for (l_itWindow = m_pcExternalWindows.begin(); l_itWindow != m_pcExternalWindows.end(); l_itWindow++)
+    for (auto l_itWindow : m_pcExternalWindows)
     {
-        if ((*l_itWindow) != NULL)
+        if (l_itWindow != NULL)
         {
-            (dynamic_cast<SP_DLG_ShowAllModelView*>((*l_itWindow)))->RefreshWindow();
+            l_itWindow->RefreshWindow();
         }
     }
 }

@@ -52,6 +52,8 @@ typedef enum
 
 class SP_DS_Simulation;
 class SP_DS_ResultViewer;
+class SP_DLG_ShowAllModelView;
+
 class SP_DLG_Simulation: public SP_DLG_BaseSimulation
 {
 protected:
@@ -189,7 +191,8 @@ protected:
 	wxTimer* m_pcTimer;
 
 	//a list of pointer to currently opened windows
-	std::list<wxWindow*> m_pcExternalWindows;
+	std::list<SP_DLG_ShowAllModelView*> m_pcExternalWindows;
+
 public:
 	wxArrayString m_ArrayUnPlaces, m_ArrayUnTranstions;
 	wxArrayString m_ArrayColPlaces, m_ArrayColTranstions;
@@ -261,7 +264,7 @@ public:
 	}
 
 	//remove an external window from the maintained external window list
-	void RemoveExternalWindow(wxWindow* p_pcWindow)
+	void RemoveExternalWindow(SP_DLG_ShowAllModelView* p_pcWindow)
 	{
 		m_pcExternalWindows.remove(p_pcWindow);
 	}

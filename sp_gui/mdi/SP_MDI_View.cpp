@@ -1626,6 +1626,8 @@ bool SP_MDI_View::DoCopyInNewNet(SP_ListGraphic* p_plShapes)
 		SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(l_pcNewDoc->GetFirstView());
 		if(l_pcView->DoPaste())
 		{
+			SP_DS_FunctionRegistry* l_pcFR = l_pcNewDoc->GetGraph()->GetFunctionRegistry();
+			l_pcFR->LoadFromNet(l_pcNewDoc->GetGraph());
 			l_pcNewDoc->Modify(true);
 			return true;
 		}
