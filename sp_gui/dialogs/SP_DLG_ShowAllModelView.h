@@ -36,7 +36,7 @@ private:
 	wxButton* m_pcConnectButton;
 
 	//pointer to parent window
-	wxWindow* m_pcParentWnd;
+	SP_DLG_Simulation* m_pcParentWnd;
 
 	bool m_bIsDisconnected;
 
@@ -61,6 +61,8 @@ protected:
 	void OnRefresh(wxCommandEvent& event);
 
 	void OnClose(wxCommandEvent& event);
+	void OnWindowClose(wxCloseEvent& event);
+	void DoClose();
 
 	void OnWindowActivate(wxActivateEvent& event);
 
@@ -85,7 +87,7 @@ protected:
 
 public:
 
-	SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metadata* p_pcModelView);
+	SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_DS_Metadata* p_pcModelView);
 	virtual ~SP_DLG_ShowAllModelView();
 
 	void RefreshWindow();

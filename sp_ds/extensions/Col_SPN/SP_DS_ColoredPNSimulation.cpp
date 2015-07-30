@@ -47,7 +47,6 @@ bool SP_DS_ColoredPNSimulation::LoadUnfoldingData()
     	return false;
     }
 
-
 	m_mnPlaceArrayPos_FromUnfolding = *(m_pcUnfoldedNet->GetPlaceArrayPos());
 	m_msPlaceNamesById_FromUnfolding = *(m_pcUnfoldedNet->GetPlaceNamesById());	
 	m_msPlaceNames = *(m_pcUnfoldedNet->GetPlaceNames());	

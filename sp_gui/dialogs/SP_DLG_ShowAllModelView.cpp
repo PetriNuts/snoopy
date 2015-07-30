@@ -38,33 +38,15 @@ enum
 	SP_ID_BUTTON_SHOW_HIDE_NODE_LIST
 };
 
-BEGIN_EVENT_TABLE(SP_DLG_ShowAllModelView,wxFrame)
-
-EVT_BUTTON(SP_ID_BUTTON_REFRESH,SP_DLG_ShowAllModelView::OnRefresh)
-EVT_BUTTON(wxID_CANCEL,SP_DLG_ShowAllModelView::OnClose)
-
-EVT_BUTTON(SP_ID_BUTTON_DISCONNECT,SP_DLG_ShowAllModelView::OnDisconnect)
-
-EVT_LISTBOX_DCLICK(SP_ID_CHECKLISTBOX_PLACE_CHOICE,SP_DLG_ShowAllModelView::OnItemDoubleClick)
-EVT_CHECKLISTBOX( SP_ID_CHECKLISTBOX_PLACE_CHOICE, SP_DLG_ShowAllModelView::OnPlaceCheckUncheck)
-EVT_CHECKBOX( SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS, SP_DLG_ShowAllModelView::OnSelectClearAllItems)
-EVT_COMBOBOX( SP_ID_COMBOBOX_RESULT_VIEWER_TYPE, SP_DLG_ShowAllModelView :: OnChangeResultViewer )
-EVT_BUTTON( SP_ID_BUTTON_EDIT_VIEWER_PROPERTIES, SP_DLG_ShowAllModelView :: OnEditViewerProperties)
-EVT_BUTTON( SP_ID_BUTTON_EXPORT, SP_DLG_ShowAllModelView :: OnExportClick)
-EVT_BUTTON( SP_ID_CHANGE_X_AXIS, SP_DLG_ShowAllModelView :: OnChangeXAxis)
-EVT_BUTTON( SP_ID_BUTTON_EDIT_NODE_LIST, SP_DLG_ShowAllModelView :: OnEditNodeList)
-EVT_BUTTON( SP_ID_BUTTON_SHOW_HIDE_NODE_LIST, SP_DLG_ShowAllModelView :: OnShowHideNodeList)
-
-EVT_ACTIVATE(SP_DLG_ShowAllModelView::OnWindowActivate)
+BEGIN_EVENT_TABLE( SP_DLG_ShowAllModelView, wxFrame )
 END_EVENT_TABLE()
-
 /*
  * some function in this class are defined in SP_DLG_Simulation.cpp file
  * please have a look
  */
 
-SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metadata* p_pcModelView) :
-		wxFrame(p_pcWnd, -1, wxT("Show all views"), wxPoint(700, 10), wxSize(800, 750), wxFRAME_FLOAT_ON_PARENT | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | wxCAPTION | wxCLOSE_BOX),
+SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_DS_Metadata* p_pcModelView) :
+		wxFrame(NULL, -1, wxT("Show all views"), wxPoint(700, 10), wxSize(800, 750), wxFRAME_FLOAT_ON_PARENT | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | wxCAPTION | wxCLOSE_BOX),
 		m_pcModelView(p_pcModelView), m_pcParentWnd(p_pcWnd), m_bIsDisconnected(false), m_bIsShown(true)
 {
 	if (m_pcModelView == NULL)
@@ -109,25 +91,25 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metada
 	int l_nSize, l_nSize1 = 0;
 	if (l_sElementType == wxT("Place"))
 	{
-		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnPlaces.GetCount();
+		l_nSize = m_pcParentWnd->m_ArrayUnPlaces.GetCount();
 		if (l_nSize > l_nSize1)
 			l_nSize1 = l_nSize;
-		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColPlaces.GetCount();
+		l_nSize = m_pcParentWnd->m_ArrayColPlaces.GetCount();
 		if (l_nSize > l_nSize1)
 			l_nSize1 = l_nSize;
-		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxPlaces.GetCount();
+		l_nSize = m_pcParentWnd->m_ArrayAuxPlaces.GetCount();
 		if (l_nSize > l_nSize1)
 			l_nSize1 = l_nSize;
 	}
 	else
 	{
-		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnTranstions.GetCount();
+		l_nSize = m_pcParentWnd->m_ArrayUnTranstions.GetCount();
 		if (l_nSize > l_nSize1)
 			l_nSize1 = l_nSize;
-		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColTranstions.GetCount();
+		l_nSize = m_pcParentWnd->m_ArrayColTranstions.GetCount();
 		if (l_nSize > l_nSize1)
 			l_nSize1 = l_nSize;
-		l_nSize = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxtranstions.GetCount();
+		l_nSize = m_pcParentWnd->m_ArrayAuxtranstions.GetCount();
 		if (l_nSize > l_nSize1)
 			l_nSize1 = l_nSize;
 	}
@@ -137,7 +119,7 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metada
 		m_IsSelectedPlace.Add(1);
 		m_PlaceLineStyle.Add(0);
 		m_PlaceLineWidth.Add(2);
-		m_PlaceColor.Add((dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->GetColourString(i));
+		m_PlaceColor.Add(m_pcParentWnd->GetColourString(i));
 	}
 
 	for (int i = 0; i < l_nSize1; i++)
@@ -145,7 +127,7 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metada
 		m_IsSelectedTransition.Add(1);
 		m_TransitionLineStyle.Add(0);
 		m_TransitionLineWidth.Add(2);
-		m_TransitionColor.Add((dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->GetColourString(i));
+		m_TransitionColor.Add(m_pcParentWnd->GetColourString(i));
 	}
 
 	m_pcViewerSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
@@ -229,6 +211,23 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(wxWindow* p_pcWnd, SP_DS_Metada
 	this->SetSize(temp);
 
 	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnClose, this, wxID_CANCEL);
+	Bind(wxEVT_CLOSE_WINDOW, &SP_DLG_ShowAllModelView::OnWindowClose, this);
+
+	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnRefresh, this, SP_ID_BUTTON_REFRESH);
+
+	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnDisconnect, this, SP_ID_BUTTON_DISCONNECT);
+
+	Bind(wxEVT_LISTBOX_DCLICK, &SP_DLG_ShowAllModelView::OnItemDoubleClick, this, SP_ID_CHECKLISTBOX_PLACE_CHOICE);
+	Bind(wxEVT_CHECKLISTBOX, &SP_DLG_ShowAllModelView::OnPlaceCheckUncheck, this, SP_ID_CHECKLISTBOX_PLACE_CHOICE);
+	Bind(wxEVT_CHECKBOX, &SP_DLG_ShowAllModelView::OnSelectClearAllItems, this, SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS);
+	Bind(wxEVT_COMBOBOX, &SP_DLG_ShowAllModelView::OnChangeResultViewer, this, SP_ID_COMBOBOX_RESULT_VIEWER_TYPE);
+	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnEditViewerProperties, this, SP_ID_BUTTON_EDIT_VIEWER_PROPERTIES);
+	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnExportClick, this, SP_ID_BUTTON_EXPORT);
+	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnChangeXAxis, this, SP_ID_CHANGE_X_AXIS);
+	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnEditNodeList, this, SP_ID_BUTTON_EDIT_NODE_LIST);
+	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnShowHideNodeList, this, SP_ID_BUTTON_SHOW_HIDE_NODE_LIST);
+
+	Bind(wxEVT_ACTIVATE, &SP_DLG_ShowAllModelView::OnWindowActivate, this);
 }
 
 SP_DLG_ShowAllModelView::~SP_DLG_ShowAllModelView()
@@ -243,7 +242,6 @@ SP_DLG_ShowAllModelView::~SP_DLG_ShowAllModelView()
 void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
 	wxString l_selection1 = p_cEvent.GetString();
 		unsigned int l_selection = p_cEvent.GetSelection();
-		unsigned int l_selection2 = p_cEvent.GetSelection();
 		wxArrayString l_ArrayPlaces, l_ArrayTranstions;
 		wxString l_RegExString = m_pcModelView->GetAttribute(wxT("RegEx"))->GetValueString();
 		if (l_RegExString != wxT("")) {
@@ -252,7 +250,7 @@ void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
 			if (l_sElementType.IsSameAs(wxT("Place"))) {
 			//	SP_LOGMESSAGE("place");
 				if (l_RegExOutputType == wxT("Unfolded")) {
-					l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnPlaces;
+					l_ArrayPlaces = m_pcParentWnd->m_ArrayUnPlaces;
 					for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 					{
 						wxString l_sName = l_ArrayPlaces[l_nRow];
@@ -262,7 +260,7 @@ void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
 						}
 					}
 				} else if (l_RegExOutputType == wxT("Colored")) {
-					l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColPlaces;
+					l_ArrayPlaces = m_pcParentWnd->m_ArrayColPlaces;
 					for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 					{
 
@@ -273,7 +271,7 @@ void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
 						}
 					}
 				} else {
-					l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxPlaces;
+					l_ArrayPlaces = m_pcParentWnd->m_ArrayAuxPlaces;
 					for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 					{
 
@@ -287,7 +285,7 @@ void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
 			} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
 			//	SP_LOGMESSAGE("transition");
 				if (l_RegExOutputType == wxT("Unfolded")) {
-					l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnTranstions;
+					l_ArrayTranstions = m_pcParentWnd->m_ArrayUnTranstions;
 					for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 					{
 						wxString l_sName = l_ArrayTranstions[l_nRow];
@@ -297,7 +295,7 @@ void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
 						}
 					}
 				} else if (l_RegExOutputType == wxT("Unfolded")) {
-					l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColTranstions;
+					l_ArrayTranstions = m_pcParentWnd->m_ArrayColTranstions;
 					for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 					{
 						wxString l_sName = l_ArrayTranstions[l_nRow];
@@ -307,7 +305,7 @@ void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
 						}
 					}
 				} else {
-					l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxtranstions;
+					l_ArrayTranstions = m_pcParentWnd->m_ArrayAuxtranstions;
 					for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 					{
 						wxString l_sName = l_ArrayTranstions[l_nRow];
@@ -319,7 +317,7 @@ void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
 				}
 			}
 		}
-	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnItemDoubleClick(this, l_selection, m_pcPlaceChoiceCheckListBox->GetCount());
+	m_pcParentWnd->OnItemDoubleClick(this, l_selection, m_pcPlaceChoiceCheckListBox->GetCount());
 }
 
 void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
@@ -334,7 +332,7 @@ void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
 		if (l_sElementType.IsSameAs(wxT("Place"))) {
 		//	SP_LOGMESSAGE("place");
 			if (l_RegExOutputType == wxT("Unfolded")) {
-				l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnPlaces;
+				l_ArrayPlaces = m_pcParentWnd->m_ArrayUnPlaces;
 				for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 				{
 					wxString l_sName = l_ArrayPlaces[l_nRow];
@@ -344,7 +342,7 @@ void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
 					}
 				}
 			} else if (l_RegExOutputType == wxT("Colored")) {
-				l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColPlaces;
+				l_ArrayPlaces = m_pcParentWnd->m_ArrayColPlaces;
 				for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 				{
 
@@ -355,7 +353,7 @@ void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
 					}
 				}
 			} else {
-				l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxPlaces;
+				l_ArrayPlaces = m_pcParentWnd->m_ArrayAuxPlaces;
 				for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 				{
 
@@ -371,7 +369,7 @@ void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
 		} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
 		//	SP_LOGMESSAGE("transition");
 			if (l_RegExOutputType == wxT("Unfolded")) {
-				l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnTranstions;
+				l_ArrayTranstions = m_pcParentWnd->m_ArrayUnTranstions;
 				for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 				{
 					wxString l_sName = l_ArrayTranstions[l_nRow];
@@ -381,7 +379,7 @@ void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
 					}
 				}
 			} else if (l_RegExOutputType == wxT("Unfolded")) {
-				l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColTranstions;
+				l_ArrayTranstions = m_pcParentWnd->m_ArrayColTranstions;
 				for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 				{
 					wxString l_sName = l_ArrayTranstions[l_nRow];
@@ -391,7 +389,7 @@ void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
 					}
 				}
 			} else {
-				l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxtranstions;
+				l_ArrayTranstions = m_pcParentWnd->m_ArrayAuxtranstions;
 				for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 				{
 					wxString l_sName = l_ArrayTranstions[l_nRow];
@@ -404,7 +402,7 @@ void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
 			m_IsSelectedTransition[l_selection] = 1 - m_IsSelectedTransition[l_selection];
 		}
 	}
-	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnItemCheckUncheck(l_selection2, l_selection, m_pcPlaceChoiceCheckListBox->IsChecked(l_selection2));
+	m_pcParentWnd->OnItemCheckUncheck(l_selection2, l_selection, m_pcPlaceChoiceCheckListBox->IsChecked(l_selection2));
 }
 
 void SP_DLG_ShowAllModelView::OnSelectClearAllItems(wxCommandEvent& p_cEvent)
@@ -427,7 +425,7 @@ void SP_DLG_ShowAllModelView::OnSelectClearAllItems(wxCommandEvent& p_cEvent)
 						m_IsSelectedTransition[i] = 1;
 				}
 		}
-		(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnClearPlaceList(true);
+		m_pcParentWnd->OnClearPlaceList(true);
 	}
 	else
 	{
@@ -447,13 +445,13 @@ void SP_DLG_ShowAllModelView::OnSelectClearAllItems(wxCommandEvent& p_cEvent)
 						m_IsSelectedTransition[i] = 0;
 				}
 		}
-		(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnClearPlaceList(false);
+		m_pcParentWnd->OnClearPlaceList(false);
 	}
 }
 
 void SP_DLG_ShowAllModelView::OnEditViewerProperties(wxCommandEvent& p_cEvent)
 {
-	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnEditViewerTypeProperties(this);
+	m_pcParentWnd->OnEditViewerTypeProperties(this);
 
 	wxSize temp;
 	wxString temp1 = m_pcModelView->GetAttribute(wxT("WindowWidth"))->GetValueString();
@@ -505,7 +503,7 @@ void SP_DLG_ShowAllModelView::OnChangeResultViewer(wxCommandEvent& event)
 				}
 				m_pcXAxis->Enable(false);
 			}
-	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnChangingResultViewer(l_nLocation);
+	m_pcParentWnd->OnChangingResultViewer(l_nLocation);
 }
 
 void SP_DLG_ShowAllModelView::OnExportClick(wxCommandEvent& event)
@@ -546,19 +544,19 @@ void SP_DLG_ShowAllModelView::OnExportClick(wxCommandEvent& event)
 	}
 	else
 	{
-		(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnExportClicked(this, m_pcOutputExportType->GetSelection());
+		m_pcParentWnd->OnExportClicked(this, m_pcOutputExportType->GetSelection());
 
 	}
 }
 
 void SP_DLG_ShowAllModelView::OnChangeXAxis(wxCommandEvent& event)
 {
-	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnEditXAxis(this);
+	m_pcParentWnd->OnEditXAxis(this);
 }
 
 void SP_DLG_ShowAllModelView::OnEditNodeList(wxCommandEvent& event)
 {
-	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->OnEditOtherNodeList(this);
+	m_pcParentWnd->OnEditOtherNodeList(this);
 }
 
 void SP_DLG_ShowAllModelView::OnShowHideNodeList(wxCommandEvent& event)
@@ -582,7 +580,7 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 
 	CHECK_POINTER(m_pcParentWnd, return false);
 
-	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->LoadData(p_pcResultViewer, p_pcModelView);
+	m_pcParentWnd->LoadData(p_pcResultViewer, p_pcModelView);
 
 	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(p_pcModelView->GetAttribute(wxT("CurveInfo")));
 	if (l_pcCurveInfoList == NULL)
@@ -616,7 +614,7 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 				//	SP_LOGMESSAGE("place");
 				if (l_RegExOutputType == wxT("Unfolded"))
 				{
-					l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnPlaces;
+					l_ArrayPlaces = m_pcParentWnd->m_ArrayUnPlaces;
 					for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 					{
 						wxString l_sName = l_ArrayPlaces[l_nRow];
@@ -640,7 +638,7 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 				else
 					if (l_RegExOutputType == wxT("Colored"))
 					{
-						l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColPlaces;
+						l_ArrayPlaces = m_pcParentWnd->m_ArrayColPlaces;
 						for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 						{
 
@@ -664,7 +662,7 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 					}
 					else
 					{
-						l_ArrayPlaces = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxPlaces;
+						l_ArrayPlaces = m_pcParentWnd->m_ArrayAuxPlaces;
 						for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 						{
 
@@ -695,7 +693,7 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 					l_nCurve = 0;
 					if (l_RegExOutputType == wxT("Unfolded"))
 					{
-						l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayUnTranstions;
+						l_ArrayTranstions = m_pcParentWnd->m_ArrayUnTranstions;
 						for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 						{
 							wxString l_sName = l_ArrayTranstions[l_nRow];
@@ -719,7 +717,7 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 					else
 						if (l_RegExOutputType == wxT("Unfolded"))
 						{
-							l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayColTranstions;
+							l_ArrayTranstions = m_pcParentWnd->m_ArrayColTranstions;
 							for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 							{
 								wxString l_sName = l_ArrayTranstions[l_nRow];
@@ -742,7 +740,7 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 						}
 						else
 						{
-							l_ArrayTranstions = (dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->m_ArrayAuxtranstions;
+							l_ArrayTranstions = m_pcParentWnd->m_ArrayAuxtranstions;
 							for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 							{
 								wxString l_sName = l_ArrayTranstions[l_nRow];
@@ -767,7 +765,7 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 		}
 	}
 
-	(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->CalculateXAxisValues(p_pcModelView, m_anXValues);
+	m_pcParentWnd->CalculateXAxisValues(p_pcModelView, m_anXValues);
 
 	p_pcResultViewer->SetXAxisValues(&m_anXValues);
 
@@ -825,34 +823,46 @@ void SP_DLG_ShowAllModelView::CreateResultViewer()
 		m_pcResultViewer = new SP_DS_TableViewer(this, m_pcViewerSizer);
 	}
 	else
-		if (l_sViewerType.IsSameAs(wxT("xyPlot")))
-		{
-			m_pcResultViewer = new SP_DS_xyPlotViewer(this, m_pcViewerSizer);
-		}
-		else
-			if (l_sViewerType.IsSameAs(wxT("Histogram")))
-			{
-				m_pcResultViewer = new SP_DS_HistogramPlotViewer(this, m_pcViewerSizer);
-			}
-			else
-			{
-				return;
+	if (l_sViewerType.IsSameAs(wxT("xyPlot")))
+	{
+		m_pcResultViewer = new SP_DS_xyPlotViewer(this, m_pcViewerSizer);
+	}
+	else
+	if (l_sViewerType.IsSameAs(wxT("Histogram")))
+	{
+		m_pcResultViewer = new SP_DS_HistogramPlotViewer(this, m_pcViewerSizer);
+	}
+	else
+	{
+		return;
 
-			}
+	}
 
 	m_pcResultViewer->Create();
 
 	m_pcResultViewer->SetXAxisValues(&m_anXValues);
 }
+
 void SP_DLG_ShowAllModelView::OnClose(wxCommandEvent& event)
+{
+	DoClose();
+	Close(true);
+}
+
+void SP_DLG_ShowAllModelView::OnWindowClose(wxCloseEvent& event)
+{
+	DoClose();
+	event.Skip();
+}
+
+void SP_DLG_ShowAllModelView::DoClose()
 {
 	if (m_pcParentWnd != NULL)
 	{
-		(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->RemoveExternalWindow(this);
+		m_pcParentWnd->RemoveExternalWindow(this);
 	}
-
-	Destroy();
 }
+
 void SP_DLG_ShowAllModelView::RemoveExternalWindowsPointer()
 {
 	//do not allow refresh
@@ -923,7 +933,7 @@ void SP_DLG_ShowAllModelView::OnWindowActivate(wxActivateEvent& event)
 	{
 		if (m_pcParentWnd != NULL)
 		{
-			(dynamic_cast<SP_DLG_Simulation*>(m_pcParentWnd))->ChangeViewTo(m_pcModelView);
+			m_pcParentWnd->ChangeViewTo(m_pcModelView);
 		}
 #ifndef __WXMSW__
 		Raise();

@@ -250,7 +250,6 @@ public:
 	virtual void ComputeEachSimulationAuxiliaryVars()
 	{
 	}
-	;
 
 	static wxString GetColourString(unsigned int p_nIndex);
 
@@ -442,7 +441,7 @@ protected:
 
 public:
 	virtual void OnClearPlaceList(bool p_nCheck);
-	virtual void OnItemDoubleClick(wxWindow *p_pcExternalWindowDialog, unsigned int p_nLocation, int p_nCount);
+	virtual void OnItemDoubleClick(wxWindow *p_pcExternalWindowDialog, unsigned int p_nLocation, unsigned int p_nCount);
 	virtual void OnItemCheckUncheck(unsigned int p_nListLocation, unsigned int p_nLocation, bool p_nCheck);
 	virtual void OnEditViewerTypeProperties(wxWindow *p_pcExternalWindowDialog);
 	virtual void OnChangingResultViewer(unsigned int p_nLocation);

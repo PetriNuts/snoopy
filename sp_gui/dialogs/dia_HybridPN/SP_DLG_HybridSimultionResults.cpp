@@ -38,8 +38,6 @@
 #include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 
-//by sl
-//#include "sp_ds/attributes/SP_DS_MarkingAttribute.h"
 #include "sp_ds/attributes/SP_DS_DoubleMarkingAttribute.h"
 #include "sp_ds/attributes/SP_DS_DoubleMarkingDependentMultiplicity.h"
 #include "sp_ds/attributes/SP_DS_TextAttribute.h"

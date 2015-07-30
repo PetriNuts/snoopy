@@ -26,7 +26,6 @@
 
 #include "sp_gui/dialogs/SP_DLG_NewConstantDefinition.h"
 
-
 #include "sp_gui/dialogs/SP_DLG_SimulationProperties.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_ds/SP_DS_Graph.h"

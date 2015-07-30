@@ -103,7 +103,6 @@ EVT_BUTTON( SP_ID_BUTTON_SAVE_ODE, SP_DLG_ColHPNSimultionResults :: SaveODE )
 EVT_THREAD(SP_SIMULATION_THREAD_EVENT,SP_DLG_HybridSimulationResults::OnSimulatorThreadEvent)
 
 END_EVENT_TABLE()
-//
 
 SP_DLG_ColHPNSimultionResults::SP_DLG_ColHPNSimultionResults(
 		SP_DS_Graph* p_pcGraph, SP_DS_ColPN_Unfolding* p_pcUnfoldedNet,wxWindow* p_pcParent,

@@ -309,15 +309,15 @@ void SP_DLG_Simulation::SetMinimalLayout()
     SP_DS_Attribute* l_pcAttr = NULL;
 
     /******************Model Configuration starts********************/
-	m_pcCollpaneSetsSizer = new wxCollapsiblePane(this, SP_ID_COLLAPSEPANEL_SETS_SIZER, "Model Configuration");
+	m_pcCollpaneSetsSizer = new wxCollapsiblePane(m_pcScrolledWindow, SP_ID_COLLAPSEPANEL_SETS_SIZER, "Model Configuration", wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
 	m_pcPropertyWindowSetsSizer = m_pcCollpaneSetsSizer->GetPane();
 	m_pcPropertyWindowSetsSizer->SetSizerAndFit(m_pcSetsSizer);
 	m_pcSetsSizer->SetSizeHints(m_pcPropertyWindowSetsSizer);
 	m_pcSimulationControlSizer->Add(m_pcCollpaneSetsSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	m_pcSimulationControlSizer->Add(new wxStaticLine(this), wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_pcSimulationControlSizer->Add(new wxStaticLine(m_pcScrolledWindow), wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 	/**********************Simulation Configuration starts*********************/
-	m_pcCollpanePropertySizer = new wxCollapsiblePane(this, SP_ID_COLLAPSEPANEL_PROPERTY_SIZER, "Simulator Configuration");
+	m_pcCollpanePropertySizer = new wxCollapsiblePane(m_pcScrolledWindow, SP_ID_COLLAPSEPANEL_PROPERTY_SIZER, "Simulator Configuration", wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
 	m_pcPropertyWindowPropertySizer = m_pcCollpanePropertySizer->GetPane();
 
     l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -347,11 +347,11 @@ void SP_DLG_Simulation::SetMinimalLayout()
     m_pcPropertyWindowPropertySizer->SetSizerAndFit(m_pcPropertySizer);
 	m_pcPropertySizer->SetSizeHints(m_pcPropertyWindowPropertySizer);
 	m_pcSimulationControlSizer->Add(m_pcCollpanePropertySizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	m_pcSimulationControlSizer->Add(new wxStaticLine(this), wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_pcSimulationControlSizer->Add(new wxStaticLine(m_pcScrolledWindow), wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 
 	/**********Export and import details starts************/
-	m_pcCollpaneDirectExportSizer = new wxCollapsiblePane(this, SP_ID_COLLAPSEPANEL_DIRECT_EXPORT_SIZER, "Import/Export Details");
+	m_pcCollpaneDirectExportSizer = new wxCollapsiblePane(m_pcScrolledWindow, SP_ID_COLLAPSEPANEL_DIRECT_EXPORT_SIZER, "Import/Export Details", wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
 	m_pcPropertyWindowDirectExportSizer = m_pcCollpaneDirectExportSizer->GetPane();
 
     // rows of direct export sizer
@@ -373,7 +373,7 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	m_pcPropertyWindowDirectExportSizer->SetSizerAndFit(m_pcDirectExportSizer);
 	m_pcDirectExportSizer->SetSizeHints(m_pcPropertyWindowDirectExportSizer);
 	m_pcSimulationControlSizer->Add(m_pcCollpaneDirectExportSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	m_pcSimulationControlSizer->Add(new wxStaticLine(this), wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_pcSimulationControlSizer->Add(new wxStaticLine(m_pcScrolledWindow), wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 	m_pcOutputViewerType = new wxComboBox(m_pcPropertyWindowPropertySizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
 	m_pcOutputViewerType->Hide();
@@ -381,7 +381,7 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
     /***************Simulator starts*********************/
 	// rows of control button#
-	m_pcPropertyWindowSimulationButtonSizer = new wxWindow(this, -1);
+	m_pcPropertyWindowSimulationButtonSizer = new wxWindow(m_pcScrolledWindow, -1);
 
 	// rows of control button#
 	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("Views")), wxVERTICAL);
@@ -488,35 +488,18 @@ void SP_DLG_Simulation::SimulatorLogFunction(wxLogLevel p_nLogLevel, const wxStr
 
 void SP_DLG_Simulation :: OnCollapsePropertySizer(wxCollapsiblePaneEvent& event)
 {
-//	cout << "screen size " << wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-	wxSize temp = m_pcMainSizer->GetSize();
-//	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
-//  cout << "Current size " << temp.GetHeight();
-	DoLayoutAdaptation();
-	this->SetSize(temp);
+	Layout();
 }
 
-void SP_DLG_Simulation :: OnCollapseSetsSizer(wxCollapsiblePaneEvent& event) {
-
-//	cout << "screen size " << wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-	wxSize temp = m_pcMainSizer->GetSize();
-//	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
-//  cout << "Current size " << temp.GetHeight();
-	DoLayoutAdaptation();
-	this->SetSize(temp);
+void SP_DLG_Simulation :: OnCollapseSetsSizer(wxCollapsiblePaneEvent& event)
+{
+	Layout();
 }
 
-void SP_DLG_Simulation :: OnCollapseDirectExportSizer(wxCollapsiblePaneEvent& event) {
-
-//	cout << "screen size " << wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-	wxSize temp = m_pcMainSizer->GetSize();
-//	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
-//		cout << "Current size " << temp.GetHeight();
-	DoLayoutAdaptation();
-	this->SetSize(temp);
+void SP_DLG_Simulation :: OnCollapseDirectExportSizer(wxCollapsiblePaneEvent& event)
+{
+	Layout();
 }
-
-
 
 
 void SP_DLG_Simulation :: OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent) {
@@ -604,53 +587,53 @@ void SP_DLG_Simulation::OnClearPlaceList(bool p_nCheck) {
 	RefreshExternalWindows();
 }
 
-void SP_DLG_Simulation::OnItemDoubleClick(wxWindow *p_pcExternalWindowDialog, unsigned int p_nLocation, int p_nCount) {
+void SP_DLG_Simulation::OnItemDoubleClick(wxWindow *p_pcExternalWindowDialog, unsigned int p_nLocation, unsigned int p_nCount) {
 
-	if (p_nLocation < 0 && (unsigned int) p_nLocation >= p_nCount)
-	    {
-	        return;
-	    }
+	if (p_nLocation >= p_nCount)
+	{
+		return;
+	}
 
-	    SP_DS_ResultViewer* l_pcCurrentResultViewer = m_apcResultViewers[m_nCurrentViewer];
+	SP_DS_ResultViewer* l_pcCurrentResultViewer = m_apcResultViewers[m_nCurrentViewer];
 
-	    m_bCanChangeCurrentView = false;
+	m_bCanChangeCurrentView = false;
 
-	    CHECK_POINTER(l_pcCurrentResultViewer, return);
+	CHECK_POINTER(l_pcCurrentResultViewer, return);
 
-	    int l_nCurveIndex = p_nLocation;
-	    wxString l_RegExString = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
+	int l_nCurveIndex = p_nLocation;
+	wxString l_RegExString = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
 
 
-	    wxString l_sColor = l_pcCurrentResultViewer->GetCurveColor(l_nCurveIndex);
-	    int l_nLineWidth = l_pcCurrentResultViewer->GetCurveLineWidth(l_nCurveIndex);
-	    int l_nLineStyle = l_pcCurrentResultViewer->GetCurveLineStyle(l_nCurveIndex);
+	wxString l_sColor = l_pcCurrentResultViewer->GetCurveColor(l_nCurveIndex);
+	int l_nLineWidth = l_pcCurrentResultViewer->GetCurveLineWidth(l_nCurveIndex);
+	int l_nLineStyle = l_pcCurrentResultViewer->GetCurveLineStyle(l_nCurveIndex);
 
-	    SP_DLG_ChangeCurveAttributes l_dial(p_pcExternalWindowDialog, l_sColor, l_nLineWidth, l_nLineStyle);
+	SP_DLG_ChangeCurveAttributes l_dial(p_pcExternalWindowDialog, l_sColor, l_nLineWidth, l_nLineStyle);
 
-	    if (l_dial.ShowModal() == wxID_OK)
-	    {
-	        l_pcCurrentResultViewer->SetCurveLineWidth(l_nCurveIndex, l_dial.GetLineWidth());
+	if (l_dial.ShowModal() == wxID_OK)
+	{
+		l_pcCurrentResultViewer->SetCurveLineWidth(l_nCurveIndex, l_dial.GetLineWidth());
 
-	        l_pcCurrentResultViewer->SetCurveLineStyle(l_nCurveIndex, l_dial.GetLineStyle());
+		l_pcCurrentResultViewer->SetCurveLineStyle(l_nCurveIndex, l_dial.GetLineStyle());
 
-	        wxColour l_nColor = l_dial.GetLineColor();
-	        int l_nLineWidth = l_dial.GetLineWidth();
-	        int l_nLineStyle = l_dial.GetLineStyle();
+		wxColour l_nColor = l_dial.GetLineColor();
+		int l_nLineWidth = l_dial.GetLineWidth();
+		int l_nLineStyle = l_dial.GetLineStyle();
 
-	        l_pcCurrentResultViewer->SetCurveColor(l_nCurveIndex, l_nColor.GetAsString(wxC2S_HTML_SYNTAX));
+		l_pcCurrentResultViewer->SetCurveColor(l_nCurveIndex, l_nColor.GetAsString(wxC2S_HTML_SYNTAX));
 
-	        SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo")));
-	        if (l_RegExString == wxT("")) {
-				l_pcCurveInfoList->SetCell(l_nCurveIndex, 3, l_nColor.GetAsString(wxC2S_HTML_SYNTAX));
-				l_pcCurveInfoList->SetCell(l_nCurveIndex, 4, wxString::Format(wxT("%i"), l_nLineWidth));
-				l_pcCurveInfoList->SetCell(l_nCurveIndex, 5, wxString::Format(wxT("%i"), l_nLineStyle));
-	        }
-	        //Update the current viewer
-	        UpdateViewer();
-	        RefreshCurrentExternalView(l_nCurveIndex, l_nColor.GetAsString(wxC2S_HTML_SYNTAX), l_dial.GetLineWidth(), l_dial.GetLineStyle());
-	    }
+		SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo")));
+		if (l_RegExString == wxT("")) {
+			l_pcCurveInfoList->SetCell(l_nCurveIndex, 3, l_nColor.GetAsString(wxC2S_HTML_SYNTAX));
+			l_pcCurveInfoList->SetCell(l_nCurveIndex, 4, wxString::Format(wxT("%i"), l_nLineWidth));
+			l_pcCurveInfoList->SetCell(l_nCurveIndex, 5, wxString::Format(wxT("%i"), l_nLineStyle));
+		}
+		//Update the current viewer
+		UpdateViewer();
+		RefreshCurrentExternalView(l_nCurveIndex, l_nColor.GetAsString(wxC2S_HTML_SYNTAX), l_dial.GetLineWidth(), l_dial.GetLineStyle());
+	}
 
-	    m_bCanChangeCurrentView = true;
+	m_bCanChangeCurrentView = true;
 }
 
 void SP_DLG_Simulation::RefreshCurrentExternalView(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle)
@@ -2099,7 +2082,8 @@ SP_DLG_Simulation::~SP_DLG_Simulation()
     //set the pointer of external pointer to NULL
 	for (auto l_itWindow : m_pcExternalWindows)
     {
-        l_itWindow->RemoveExternalWindowsPointer();
+        l_itWindow->Close(true);
+//        l_itWindow->RemoveExternalWindowsPointer();
     }
 }
 

@@ -96,9 +96,7 @@ EVT_THREAD(SP_SIMULATION_THREAD_EVENT, SP_DLG_StSimulationResults::OnSimulatorTh
 END_EVENT_TABLE()
 
 SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText, const wxString& p_sTitle, long p_nStyle)
-
-:
-SP_DLG_Simulation(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle)
+: SP_DLG_Simulation(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle)
 {
 
 	int l_nSimulatorType = LoadSimulatorProperties();
