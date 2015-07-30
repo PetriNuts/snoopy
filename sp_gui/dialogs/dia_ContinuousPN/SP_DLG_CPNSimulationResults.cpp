@@ -126,8 +126,8 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 	wxString l_sChoices[] =
 	{ wxT("Stiff"), wxT("Unstiff") };
 	wxString l_asStiffSolverChoices[] =
-	{ wxT("BDF"), wxT("Rosenbrock-Method of Shampine"), wxT("Rosenbrock-Method GRK4T of Kaps-Rentrop"), wxT("Rosenbrock-Method GRK4A of Kaps-Rentrop"),
-			wxT("Rosenbrock-Method of Van Veldhuizen [gamma = 1/2]"), wxT("Rosenbrock-Method of Van Veldhuizen [D-stable]"), wxT("an L-stable Rosenbrock-Method") };
+	{ wxT("BDF"), wxT("Shampine, Rosenbrock-Method"), wxT("[GRK4T] Kaps-Rentrop, Rosenbrock-Method"), wxT("[GRK4A] Kaps-Rentrop, Rosenbrock-Method"),
+			wxT("[gamma = 1/2] Van Veldhuizen, Rosenbrock-Method"), wxT("[D-stable] Van Veldhuizen, Rosenbrock-Method"), wxT("[L-stable], Rosenbrock-Method") };
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Solver Type")), 1, wxALL | wxEXPAND, 5);
 	m_pcSolverType = new wxRadioBox(m_pcPropertyWindowPropertySizer, SP_ID_RADIOBOX_SOLVER_TYPE, wxT(""), wxDefaultPosition, wxDefaultSize, 2, l_sChoices, 2, wxRA_SPECIFY_COLS);
 	l_pcRowSizer->Add(m_pcSolverType);
@@ -392,8 +392,8 @@ void SP_DLG_CPNSimulationResults::OnSolverTypeChanged(wxCommandEvent& p_cEven)
 	{ wxT("ADAMS"), wxT("Euler (fixed step size)"), wxT("Modificated Euler (fixed step size)"), wxT("Classic Runge-Kutta (fixed step size)"), wxT("Kuntzmann 4th order (fixed step size)"),
 			wxT("Runge-Kutta-Fehlberg-4(5) (dynamic step size)"), wxT("Dormand-Prince-5(4) (dynamic step size)") };
 	wxString l_asStiffSolverChoices[] =
-	{ wxT("BDF"), wxT("Rosenbrock-Method of Shampine"), wxT("Rosenbrock-Method GRK4T of Kaps-Rentrop"), wxT("Rosenbrock-Method GRK4A of Kaps-Rentrop"),
-			wxT("Rosenbrock-Method of Van Veldhuizen [gamma = 1/2]"), wxT("Rosenbrock-Method of Van Veldhuizen [D-stable]"), wxT("an L-stable Rosenbrock-Method") };
+	{ wxT("BDF"), wxT("Shampine, Rosenbrock-Method"), wxT("[GRK4T] Kaps-Rentrop, Rosenbrock-Method"), wxT("[GRK4A] Kaps-Rentrop, Rosenbrock-Method"),
+			wxT("[gamma = 1/2] Van Veldhuizen, Rosenbrock-Method"), wxT("[D-stable] Van Veldhuizen, Rosenbrock-Method"), wxT("[L-stable], Rosenbrock-Method") };
 	if (p_cEven.GetEventType() == wxEVT_COMMAND_RADIOBOX_SELECTED)
 	{
 		m_pcSolver->Clear();

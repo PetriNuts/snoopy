@@ -45,6 +45,8 @@ class SP_DLG_NewConstantDefinition : public wxDialog
 
 	SP_ListMetadata m_deleted;
 
+	SP_SetString m_Places;
+
   private:
 
 	bool SaveData();
@@ -57,8 +59,8 @@ class SP_DLG_NewConstantDefinition : public wxDialog
 	bool ExistSetName(const wxString& p_sName);
 	bool ExistConstant(const wxString& p_sName, const int row);
 
-	bool LoadPlaces(const wxString& p_sConstant);
-	bool LoadPlaceOfType(const wxString& p_sPlaceType, const wxString& p_sConstant);
+	void LoadPlaces();
+	void LoadPlaceOfType(const wxString& p_sPlaceType);
 
 	bool FindCycle();
 

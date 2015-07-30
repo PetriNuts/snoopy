@@ -115,6 +115,7 @@ SP_DLG_NewConstantDefinition::SP_DLG_NewConstantDefinition(wxWindow* p_pcParent,
 	l_bWhite = false;
 	LoadSetNames();
 	LoadData();
+	LoadPlaces();
 
 	SP_AutoSizeRowLabelSize(m_pcConstantSetGrid);
 
@@ -686,7 +687,7 @@ void SP_DLG_NewConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 			return;
 		}
 
-		if (LoadPlaces(l_sCellValue))
+		if (m_Places.find(l_sCellValue) != m_Places.end())
 		{
 			SP_MESSAGEBOX(wxT("the constant '") + l_sCellValue + wxT("' already exists as place!"), wxT("Error"), wxOK | wxICON_ERROR);
 			//SP_LOG(wxLOG_Error, wxT("constant name already exists as place"));
@@ -741,18 +742,22 @@ void SP_DLG_NewConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 		}
 
 		wxString l_sConstName = m_pcConstantSetGrid->GetCellValue(row, NAME);
-		if (l_sCellValue.Contains(l_sConstName))
+		double d;
+		if(!l_sCellValue.ToDouble(&d))
 		{
-			SP_MESSAGEBOX(wxT("the constant '") + l_sConstName + wxT("' is not allowed in the expression: ") + l_sCellValue, wxT("Error"), wxOK | wxICON_ERROR);
-			m_pcConstantSetGrid->SetCellValue(row, col, m_sOldCellValue);
-			return;
-		}
+			if (l_sCellValue.Contains(l_sConstName))
+			{
+				SP_MESSAGEBOX(wxT("the constant '") + l_sConstName + wxT("' is not allowed in the expression: ") + l_sCellValue, wxT("Error"), wxOK | wxICON_ERROR);
+				m_pcConstantSetGrid->SetCellValue(row, col, m_sOldCellValue);
+				return;
+			}
 
-		if (FindCycle())
-		{
-			SP_MESSAGEBOX(wxT("cycle in definition detected"), wxT("Error"), wxOK | wxICON_ERROR);
-			m_pcConstantSetGrid->SetCellValue(row, col, m_sOldCellValue);
-			return;
+			if (FindCycle())
+			{
+				SP_MESSAGEBOX(wxT("cycle in definition detected"), wxT("Error"), wxOK | wxICON_ERROR);
+				m_pcConstantSetGrid->SetCellValue(row, col, m_sOldCellValue);
+				return;
+			}
 		}
 
 		wxString l_sConstType = m_pcConstantSetGrid->GetCellValue(row, TYPE);
@@ -1038,40 +1043,29 @@ void SP_DLG_NewConstantDefinition::OnEditorShown(wxGridEvent& ev)
 	ev.Skip();
 }
 
-bool SP_DLG_NewConstantDefinition::LoadPlaces(const wxString& p_sConstant)
+void SP_DLG_NewConstantDefinition::LoadPlaces()
 {
-	//bool l_bool = false;
-
 	//load discrete places
-	if (LoadPlaceOfType(SP_DS_DISCRETE_PLACE, p_sConstant))
-		return true;
-	//load continuous places
-	if (LoadPlaceOfType(SP_DS_CONTINUOUS_PLACE, p_sConstant))
-		return true;
+	LoadPlaceOfType(SP_DS_DISCRETE_PLACE);
 
-	return false;
+	//load continuous places
+	LoadPlaceOfType(SP_DS_CONTINUOUS_PLACE);
 }
 
-bool SP_DLG_NewConstantDefinition::LoadPlaceOfType(const wxString& p_sPlaceType, const wxString& p_sConstant)
+void SP_DLG_NewConstantDefinition::LoadPlaceOfType(const wxString& p_sPlaceType)
 {
-
 	SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(p_sPlaceType);
 
 	if (l_pcNodeclass == NULL)
 	{
-		return false;
+		return;
 	}
 
 	SP_ListNode::const_iterator l_itElem;
 	for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
 	{
 		wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-		if (l_sPlaceName.IsSameAs(p_sConstant))
-		{
-			return true;
-		}
+		m_Places.insert(l_sPlaceName);
 	}
-
-	return false;
 }
 
