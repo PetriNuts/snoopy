@@ -281,8 +281,13 @@ SP_XmlReader::~SP_XmlReader()
 bool
 SP_XmlReader::Read(SP_DS_Graph* p_pcGraph, const wxString& p_sFile)
 {
-    wxFileSystem fs;
-    std::shared_ptr<wxFSFile> f(fs.OpenFile(p_sFile + wxT("#zip:model.xml")));
+	wxFileSystem fs;
+    std::shared_ptr<wxFSFile> f;
+    {
+    	// wxFileSystem.OpenFile() normally complains if file can't be opened, we don't want it
+    	wxLogNull logNo;
+    	f.reset(fs.OpenFile(p_sFile + wxT("#zip:model.xml")));
+    }
     if (f)
     {
     	p_pcGraph->GetParentDoc()->SetCompress(true);

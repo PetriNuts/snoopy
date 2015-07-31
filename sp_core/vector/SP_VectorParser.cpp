@@ -75,14 +75,13 @@ bool SP_VectorParser::ReadNodeData(long& p_nNodeNumber, wxString& p_sNodeName,
 		{
 			m_pcScanner.GetNumber(p_nNodeNumber);
 		}
-		l_nToken = m_pcScanner.GetNextToken() ;
+		l_nToken = m_pcScanner.GetNextToken();
 		if (l_nToken == SP_SCANNER_DOT)
 		{
 			if (!ReadNodeName(p_sNodeName))
 			{
 				return FALSE;
 			}
-
 		}
 		else if (l_nToken == SP_SCANNER_COLON)
 		{
