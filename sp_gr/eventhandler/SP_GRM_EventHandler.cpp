@@ -51,6 +51,9 @@ SP_GRM_EventHandler::UnSelectAll(int p_nKeys)
 void
 SP_GRM_EventHandler::OnLeftClick(double p_nX, double p_nY, int p_nKeys, int p_nAttach)
 {
+	if(SP_Core::Instance()->GetSimulationMode())
+		return;
+
     if (SP_Core::Instance()->GetAnim())
     {
         SP_Graphic* l_pcGraphic = SP_Core::Instance()->ResolveExtern(GetShape());
@@ -114,6 +117,9 @@ SP_GRM_EventHandler::OnLeftDoubleClick(double p_nX, double p_nY, int p_nKeys, in
 void
 SP_GRM_EventHandler::OnRightClick(double p_nX, double p_nY, int p_nKeys, int p_nAttach)
 {
+	if(SP_Core::Instance()->GetSimulationMode())
+		return;
+
     if (SP_Core::Instance()->GetAnim())
     {
         SP_Graphic* l_pcGraphic = SP_Core::Instance()->ResolveExtern(GetShape());
@@ -216,7 +222,7 @@ SP_GRM_EventHandler::OnEndDragLeft(double p_nX, double p_nY, int p_nKeys, int p_
 void
 SP_GRM_EventHandler::OnBeginDragRight(double p_nX, double p_nY, int p_nKeys, int p_nAttach)
 {
-    if (SP_Core::Instance()->GetAnimMode())
+    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return;
 
     wxShapeEvtHandler::OnBeginDragRight(p_nX, p_nY, p_nKeys, p_nAttach);
@@ -225,7 +231,7 @@ SP_GRM_EventHandler::OnBeginDragRight(double p_nX, double p_nY, int p_nKeys, int
 void
 SP_GRM_EventHandler::OnDragRight(bool p_bDraw, double p_nX, double p_nY, int p_nKeys, int p_nAttach)
 {
-    if (SP_Core::Instance()->GetAnimMode())
+    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return;
 
     wxShapeEvtHandler::OnDragRight(p_bDraw, p_nX, p_nY, p_nKeys, p_nAttach);
@@ -234,7 +240,7 @@ SP_GRM_EventHandler::OnDragRight(bool p_bDraw, double p_nX, double p_nY, int p_n
 void
 SP_GRM_EventHandler::OnEndDragRight(double p_nX, double p_nY, int p_nKeys, int p_nAttach)
 {
-    if (SP_Core::Instance()->GetAnimMode())
+    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return;
 
     wxShapeEvtHandler::OnEndDragRight(p_nX, p_nY, p_nKeys, p_nAttach);
@@ -245,7 +251,7 @@ void
 SP_GRM_EventHandler::OnSizingBeginDragLeft(wxControlPoint* p_pcCP,
                                            double p_nX, double p_nY, int p_nKeys, int p_nAttach)
 {
-    if (SP_Core::Instance()->GetAnimMode())
+    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return;
 
     wxShapeEvtHandler::OnSizingBeginDragLeft(p_pcCP, p_nX, p_nY, p_nKeys, p_nAttach);
@@ -255,7 +261,7 @@ void
 SP_GRM_EventHandler::OnSizingDragLeft(wxControlPoint* p_pcCP, bool p_bDraw,
                                       double p_nX, double p_nY, int p_nKeys, int p_nAttach)
 {
-    if (SP_Core::Instance()->GetAnimMode())
+    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return;
 
     wxShapeEvtHandler::OnSizingDragLeft(p_pcCP, p_bDraw, p_nX, p_nY, p_nKeys, p_nAttach);
@@ -265,7 +271,7 @@ void
 SP_GRM_EventHandler::OnSizingEndDragLeft(wxControlPoint* p_pcCP,
                                          double p_nX, double p_nY, int p_nKeys, int p_nAttach)
 {
-    if (SP_Core::Instance()->GetAnimMode())
+    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return;
 
     wxShapeEvtHandler::OnSizingEndDragLeft(p_pcCP, p_nX, p_nY, p_nKeys, p_nAttach);
@@ -275,7 +281,7 @@ SP_GRM_EventHandler::OnSizingEndDragLeft(wxControlPoint* p_pcCP,
 void
 SP_GRM_EventHandler::OnSize(double p_nX, double p_nY)
 {
-    if (SP_Core::Instance()->GetAnimMode())
+    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return;
 
     wxShapeEvtHandler::OnSize(p_nX, p_nY);

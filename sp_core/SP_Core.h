@@ -120,6 +120,8 @@ private:
 
     bool m_bDocumentReactivatingFlag;
 
+    bool m_bSimulationMode;
+
 protected:
     /**	\brief	Constructor, intentionally declared as protected
 
@@ -375,6 +377,9 @@ public:
     SP_DS_Animation* GetAnim() const {return m_pcAnimation; }
     void SetAnimMode(bool p_bVal, SP_DS_Graph* p_pcGraph);
     bool CleanUpAnimation();
+
+    void SetSimulationMode(bool p_bVal);
+    bool GetSimulationMode() const;
 
     bool RegisterAnimator(const wxString& p_sKey, SP_DS_Animator* p_pcAnimator);
     bool RegisterAnimator(SP_DS_Node* p_pcNode, SP_DS_Animator* p_pcAnimator);

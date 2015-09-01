@@ -29,7 +29,7 @@ SP_GRM_EdgeHandler::SP_GRM_EdgeHandler(wxShapeEvtHandler* p_pcPrev, wxShape* p_p
 void
 SP_GRM_EdgeHandler::OnLeftClick(double p_nX, double p_nY, int p_nKeys, int p_nAttach)
 {
-    if (SP_Core::Instance()->GetAnimMode())
+    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return;
 
     if (p_nKeys == KEY_CTRL)
@@ -63,7 +63,7 @@ SP_GRM_EdgeHandler::OnSizingBeginDragLeft(wxControlPoint* p_pcCP,
                                           double p_nX, double p_nY,
                                           int p_nKeys, int p_nAttach)
 {
-    if (!GetShape() || SP_Core::Instance()->GetAnimMode())
+    if (!GetShape() || SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return;
 
     SP_GUI_Canvas* l_pcCanvas = dynamic_cast<SP_GUI_Canvas*>(GetShape()->GetCanvas());
@@ -118,7 +118,7 @@ SP_GRM_EdgeHandler::OnSizingDragLeft(wxControlPoint* p_pcCP, bool p_bDraw,
                                      double p_nX, double p_nY,
                                      int p_nKeys, int p_nAttach)
 {
-    if (!GetShape() || SP_Core::Instance()->GetAnimMode())
+    if (!GetShape() || SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return;
 
     wxLineControlPoint* l_pcCP = dynamic_cast<wxLineControlPoint*>(p_pcCP);
@@ -163,7 +163,7 @@ SP_GRM_EdgeHandler::OnSizingEndDragLeft(wxControlPoint* p_pcCP,
                                           double p_nX, double p_nY,
                                           int p_nKeys, int p_nAttach)
 {
-    if (!GetShape() || !p_pcCP || SP_Core::Instance()->GetAnimMode())
+    if (!GetShape() || !p_pcCP || SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return;
 
     wxLineControlPoint* l_pcCP = dynamic_cast<wxLineControlPoint*>(p_pcCP);
@@ -201,7 +201,7 @@ SP_GRM_EdgeHandler::OnSizingEndDragLeft(wxControlPoint* p_pcCP,
 bool
 SP_GRM_EdgeHandler::OnMoveMiddleControlPoint(wxLineControlPoint* p_pcCP, double p_nX, double p_nY)
 {
-    if (!GetShape() || !p_pcCP || SP_Core::Instance()->GetAnimMode())
+    if (!GetShape() || !p_pcCP || SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return FALSE;
 
     wxRealPoint* l_pcTempPoint = NULL;
@@ -249,7 +249,7 @@ SP_GRM_EdgeHandler::OnMoveMiddleControlPoint(wxLineControlPoint* p_pcCP, double 
 bool
 SP_GRM_EdgeHandler::OnMoveLineEndPoint(wxLineControlPoint* p_pcCP, double p_nX, double p_nY)
 {
-    if (!GetShape() || !p_pcCP || SP_Core::Instance()->GetAnimMode())
+    if (!GetShape() || !p_pcCP || SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return FALSE;
 
     wxLineShape* l_pcShape = dynamic_cast<wxLineShape*>(GetShape());

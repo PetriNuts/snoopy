@@ -168,6 +168,12 @@ wxDocument* SP_GM_Docmanager::CreateDocument(const wxString& p_sPath,
 		}
 	}
 
+	if(SP_Core::Instance()->GetSimulationMode())
+	{
+		SP_MESSAGEBOX(wxT("Currently running simulation!?"), wxT("Warning"), wxOK | wxICON_EXCLAMATION);
+		return NULL;
+	}
+
 	l_pcDoc = wxDocManager::CreateDocument(p_sPath, p_nFlags);
 
 	// p_nFlags == 0 means, we pass by from SP_MDI_Doc::OnOpenDocument
@@ -445,35 +451,35 @@ wxDocTemplate* SP_GM_Docmanager::SelectDocumentPath(
 
 void SP_GM_Docmanager::OnUpdateFileOpen(wxUpdateUIEvent& p_cEvent)
 {
-	p_cEvent.Enable(!SP_Core::Instance()->GetAnimMode());
+	p_cEvent.Enable(!(SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode()));
 }
 
 void SP_GM_Docmanager::OnUpdateFileClose(wxUpdateUIEvent& p_cEvent)
 {
 	wxDocument *doc = GetCurrentDocument();
-	p_cEvent.Enable( (doc != (wxDocument*) NULL) && !SP_Core::Instance()->GetAnimMode());
+	p_cEvent.Enable( (doc != (wxDocument*) NULL) && !(SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode()));
 }
 
 void SP_GM_Docmanager::OnUpdateFileRevert(wxUpdateUIEvent& p_cEvent)
 {
 	wxDocument *doc = GetCurrentDocument();
-	p_cEvent.Enable( (doc != (wxDocument*) NULL) && !SP_Core::Instance()->GetAnimMode());
+	p_cEvent.Enable( (doc != (wxDocument*) NULL) && !(SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode()));
 }
 
 void SP_GM_Docmanager::OnUpdateFileNew(wxUpdateUIEvent& p_cEvent)
 {
-	p_cEvent.Enable( !SP_Core::Instance()->GetAnimMode() );
+	p_cEvent.Enable( !(SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode()));
 }
 
 void SP_GM_Docmanager::OnUpdateFileSave(wxUpdateUIEvent& p_cEvent)
 {
 	wxDocument *doc = GetCurrentDocument();
-	p_cEvent.Enable(doc && doc->IsModified() && !SP_Core::Instance()->GetAnimMode());
+	p_cEvent.Enable(doc && doc->IsModified() && !(SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode()));
 }
 
 void SP_GM_Docmanager::OnUpdateFileSaveAs(wxUpdateUIEvent& p_cEvent)
 {
 	wxDocument *doc = GetCurrentDocument();
-	p_cEvent.Enable( (doc != (wxDocument*) NULL) && !SP_Core::Instance()->GetAnimMode() );
+	p_cEvent.Enable( (doc != (wxDocument*) NULL) && !(SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode()));
 }
 

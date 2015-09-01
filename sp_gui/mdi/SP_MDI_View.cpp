@@ -260,7 +260,7 @@ void SP_MDI_View::OnUpdateUI(wxUpdateUIEvent& p_cEvent)
 		}
 		break;
 	default:
-		p_cEvent.Enable(!SP_Core::Instance()->GetAnimMode());
+		p_cEvent.Enable(!(SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode()));
 	    break;
 	}
 }
@@ -269,6 +269,10 @@ bool SP_MDI_View::OnClose(bool p_bDeleteWindow)
 {
 	// animation mode active?
 	if (SP_Core::Instance()->GetAnimMode())
+		return FALSE;
+
+	// simulation mode active?
+	if (SP_Core::Instance()->GetSimulationMode())
 		return FALSE;
 
 	// no document?! or the document (the user) vetoes the closing
@@ -1888,20 +1892,20 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 			}
 			if(l_sName == SP_DS_COLSPN_CLASS)
 			{
-				l_pcDlg = new SP_DLG_ColStSimulationResults( l_pcGraph,l_pcUnfoldedNet, m_pcCanvas );
+				l_pcDlg = new SP_DLG_ColStSimulationResults( l_pcGraph,l_pcUnfoldedNet, m_pcFrame );
 			}
 			else if(l_sName == SP_DS_COLCPN_CLASS)
 			{
-				l_pcDlg = new SP_DLG_ColCPNSimulationResults( l_pcGraph,l_pcUnfoldedNet, m_pcCanvas );
+				l_pcDlg = new SP_DLG_ColCPNSimulationResults( l_pcGraph,l_pcUnfoldedNet, m_pcFrame );
 			}
 			else if(l_sName == SP_DS_COLHPN_CLASS)
 			{
-				l_pcDlg = new SP_DLG_ColHPNSimultionResults( l_pcGraph,l_pcUnfoldedNet, m_pcCanvas );
+				l_pcDlg = new SP_DLG_ColHPNSimultionResults( l_pcGraph,l_pcUnfoldedNet, m_pcFrame );
 			}
 		}
 		else if(l_sName == SP_DS_SPN_CLASS)
 		{
-			l_pcDlg = new SP_DLG_StSimulationResults( l_pcGraph, m_pcCanvas );
+			l_pcDlg = new SP_DLG_StSimulationResults( l_pcGraph, m_pcFrame );
 		}
 		else if(l_sName == SP_DS_CONTINUOUSPED_CLASS)
 		{
@@ -1916,7 +1920,7 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 				 return; //there is error in one of the transitions rate functions
 			 }
 	*/
-			l_pcDlg = new SP_DLG_CPNSimulationResults( l_pcGraph, m_pcCanvas );
+			l_pcDlg = new SP_DLG_CPNSimulationResults( l_pcGraph, m_pcFrame );
 		}
 		else if(l_sName == SP_DS_HYBRIDPN_CLASS)
 		{
@@ -1931,7 +1935,7 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 				 return; //there is error in one of the transitions rate functions
 			 }
 	*/
-			l_pcDlg = new SP_DLG_HybridSimulationResults( l_pcGraph, m_pcCanvas );
+			l_pcDlg = new SP_DLG_HybridSimulationResults( l_pcGraph, m_pcFrame );
 		}
 
 		if(l_pcDlg != NULL)

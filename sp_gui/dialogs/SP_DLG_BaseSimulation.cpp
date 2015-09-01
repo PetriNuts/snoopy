@@ -5,6 +5,7 @@
 #include <iostream>
 #include "sp_gui/dialogs/SP_DLG_BaseSimulation.h"
 #include "sp_ds/SP_DS_Graph.h"
+#include "sp_core/SP_Core.h"
 
 
 IMPLEMENT_CLASS(SP_DLG_BaseSimulation, wxDialog )
@@ -40,9 +41,11 @@ SP_DLG_BaseSimulation::SP_DLG_BaseSimulation(wxWindow* p_pcParent, wxString p_sH
 
 	Bind(wxEVT_INIT_DIALOG, &SP_DLG_BaseSimulation::OnInitDialog, this);
 
+	SP_Core::Instance()->SetSimulationMode(true);
 }
 
 SP_DLG_BaseSimulation::~SP_DLG_BaseSimulation()
 {
+    SP_Core::Instance()->SetSimulationMode(false);
 }
 

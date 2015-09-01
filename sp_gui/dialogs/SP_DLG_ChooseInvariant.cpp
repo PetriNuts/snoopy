@@ -63,7 +63,6 @@ SP_DLG_ChooseInvariant::SP_DLG_ChooseInvariant(SP_DS_Graph *p_pcGraph,
 	m_pcNodeColourizer = new SP_NodeColourizer(m_pcGraph);
 	m_nodeList = new SP_ListNode();
 	InitGUI();
-
 }
 
 SP_DLG_ChooseInvariant::~SP_DLG_ChooseInvariant()
@@ -76,7 +75,6 @@ SP_DLG_ChooseInvariant::~SP_DLG_ChooseInvariant()
 
 void SP_DLG_ChooseInvariant::UpdateList()
 {
-
 	m_pcListBox->Clear();
 
 	if (!m_pcListBoxValues.IsEmpty())
@@ -87,7 +85,6 @@ void SP_DLG_ChooseInvariant::UpdateList()
 
 void SP_DLG_ChooseInvariant::InitGUI()
 {
-
 	m_pcMapListNum2NodeVectorNum->clear();
 
 	m_pcListBox = new wxListBox(this, SP_ID_LISTBOX_VEC, wxDefaultPosition,

@@ -77,7 +77,8 @@ m_pcCopyGraph(NULL),
 m_bAnimMode(FALSE),
 m_pcAnimControl(NULL),
 m_pcAnimation(NULL),
-m_bDocumentReactivatingFlag( false )
+m_bDocumentReactivatingFlag( false ),
+m_bSimulationMode(false)
 {
 }
 
@@ -870,3 +871,16 @@ SP_Core::ManageDocChange(SP_MDI_Doc* p_pcDoc) {
 	return true;
 
 }
+
+void
+SP_Core::SetSimulationMode(bool p_bVal)
+{
+	m_bSimulationMode = p_bVal;
+}
+
+bool
+SP_Core::GetSimulationMode() const
+{
+	return m_bSimulationMode;
+}
+

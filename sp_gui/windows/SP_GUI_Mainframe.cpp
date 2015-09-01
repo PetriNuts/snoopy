@@ -430,7 +430,7 @@ SP_GUI_Mainframe::OnUpdateUI(wxUpdateUIEvent& p_cEvent)
         break;
     case wxID_EXIT:
     case SP_ID_GRAPHTREE_CTRL_ID:
-        p_cEvent.Enable(!SP_Core::Instance()->GetAnimMode());
+        p_cEvent.Enable(!(SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode()));
         break;
     case SP_ID_COARSETREE_CTRL_ID:
         p_cEvent.Enable(!SP_Core::Instance()->GetAnimRunning());
@@ -453,7 +453,7 @@ SP_GUI_Mainframe::OnExit( wxCommandEvent &p_cEvent )
 void
 SP_GUI_Mainframe::OnCloseWindow( wxCloseEvent &p_cEvent )
 {
-    if (SP_Core::Instance()->GetAnimMode())
+    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
     {
         p_cEvent.Veto();
         return;

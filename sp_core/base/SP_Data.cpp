@@ -398,7 +398,7 @@ SP_Data::OnDoubleClick(SP_Graphic* p_pcTarget, int p_nKeys)
     if (m_pcCoarse && p_nKeys == KEY_SHIFT)
         return m_pcCoarse->Show();
 
-    if (SP_Core::Instance()->GetAnimMode())
+    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
         return TRUE;
 
     return FALSE;

@@ -278,7 +278,7 @@ SP_GUI_Canvas::DrawOutlineShapes(double p_nOffsetX, double p_nOffsetY)
 
 void SP_GUI_Canvas::OnLeftClick(double p_nX, double p_nY, int p_nKeys)
 {
-	if (!m_pcEditElement || SP_Core::Instance()->GetAnimMode())
+	if (!m_pcEditElement || SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
 	{
 		UnSelectAll(p_nKeys);
 	}
@@ -321,7 +321,7 @@ bool SP_GUI_Canvas::DrawAllElements(SP_DS_Graph* p_pcGraph, bool p_bLocalOnly)
 bool SP_GUI_Canvas::OnBeginDragLeftShape(wxShape* p_pcShape, double p_nX,
 		double p_nY, int p_nKeys, int p_nAttach)
 {
-	if (!m_pcEditElement || SP_Core::Instance()->GetAnimMode())
+	if (!m_pcEditElement || SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
 		return FALSE;
 
 	Modify(TRUE);
@@ -340,7 +340,7 @@ bool SP_GUI_Canvas::OnBeginDragLeftShape(wxShape* p_pcShape, double p_nX,
 bool SP_GUI_Canvas::OnDragLeftShape(wxShape* p_pcShape, double p_nX,
 		double p_nY, int p_nKeys, int p_nAttach)
 {
-	if (!m_pcEditElement || SP_Core::Instance()->GetAnimMode())
+	if (!m_pcEditElement || SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
 		return FALSE;
 
 	Modify(TRUE);
@@ -504,7 +504,7 @@ bool SP_GUI_Canvas::MergeAll(SP_ListGraphic* p_plShapes,
 bool SP_GUI_Canvas::OnClickOnShape(wxShape* p_pcShape, double p_nX,
 		double p_nY, int p_nKeys, int p_nAttach)
 {
-	if (!m_pcEditElement || SP_Core::Instance()->GetAnimMode())
+	if (!m_pcEditElement || SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
 		return FALSE;
 
 	bool l_bReturn= FALSE;
@@ -597,7 +597,7 @@ void SP_GUI_Canvas::OnRightClick(double x, double y, int keys)
 
 void SP_GUI_Canvas::OnBeginDragLeft(double p_nX, double p_nY, int p_nKeys)
 {
-	if (m_pcControlPoints || SP_Core::Instance()->GetAnimMode())
+	if (m_pcControlPoints || SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
 		return;
 
 	UnSelectAll(p_nKeys);
@@ -614,7 +614,7 @@ void SP_GUI_Canvas::OnBeginDragLeft(double p_nX, double p_nY, int p_nKeys)
 void SP_GUI_Canvas::OnDragLeft(bool p_bDraw, double p_nX, double p_nY,
 		int p_nKeys)
 {
-	if (m_pcControlPoints || SP_Core::Instance()->GetAnimMode())
+	if (m_pcControlPoints || SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
 		return;
 
 	DrawOutline(g_nStartX, g_nStartY, p_nX, p_nY);
@@ -622,7 +622,7 @@ void SP_GUI_Canvas::OnDragLeft(bool p_bDraw, double p_nX, double p_nY,
 
 void SP_GUI_Canvas::OnEndDragLeft(double p_nX, double p_nY, int p_nKeys)
 {
-	if (SP_Core::Instance()->GetAnimMode())
+	if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
 		return;
 
 	if (m_pcControlPoints)
@@ -804,7 +804,7 @@ void SP_GUI_Canvas::OnKeyEvent(wxKeyEvent& p_cEvent)
 	if(p_cEvent.ShiftDown())
 	{
 		//check if are we in the edit mode?
-		if (!m_pcControlPoints || !SP_Core::Instance()->GetAnimMode())
+		if (!m_pcControlPoints || !SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
 		{
           double offsetX=0,offsetY=0;
 		  switch(p_cEvent.GetKeyCode())
