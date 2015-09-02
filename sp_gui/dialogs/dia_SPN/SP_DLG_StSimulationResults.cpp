@@ -14,7 +14,6 @@
 #include <wx/regex.h>
 #include "export/SP_EPSDC.h"
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StSimulationResults.h"
-#include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStEditTablePlot.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStMarkingOverview.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStFunctionOverview.h"
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StDirectExportProperties.h"

@@ -45,7 +45,6 @@
 #include "sp_ds/extensions/Col_CPN/SP_DS_ColPlaceODE.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStMarkingOverview.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStFunctionOverview.h"
-#include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStEditTablePlot.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColPlacesSelection.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColTraceAnalyzer.h"
 

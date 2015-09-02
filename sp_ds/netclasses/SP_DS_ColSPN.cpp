@@ -599,17 +599,10 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	SP_DS_Metadataclass* l_pcMC;
 
-
-
-
 	l_pcMC = p_pcGraph->GetMetadataclass(wxT("Plot"));
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("OutputType"), wxT("Colored") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("RegEx"), wxT("") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("RegExOutputType"), wxT("Unfolded") ) );
-
-	l_pcMC = p_pcGraph->GetMetadataclass(wxT("Table"));
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("OutputType"), wxT("Colored") ) );	
-
 
 	//////////////////////////////////////////////////////////////////////////////
     //basic color set

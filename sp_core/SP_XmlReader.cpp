@@ -505,7 +505,7 @@ SP_XmlReader::ReadClasses(SP_DS_Graph* p_pcVal, wxXmlNode* p_pcRoot)
     		   continue;
     	   }
 
-    	   if(l_bMetaDataIgnore==true && (l_pchName== wxT("Plot") || l_pchName== wxT("Table")))
+    	   if(l_bMetaDataIgnore==true && l_pchName == wxT("Plot"))
     	   {
     		   l_pcNode = GetNextSibling(l_pcNode);
     		   continue;
@@ -528,7 +528,7 @@ SP_XmlReader::ReadClasses(SP_DS_Graph* p_pcVal, wxXmlNode* p_pcRoot)
 		   }
 		}
 
-    	if( (l_pchName == wxT("Comment") || l_pchName == wxT("Plot") || l_pchName == wxT("Table"))
+    	if( (l_pchName == wxT("Comment") || l_pchName == wxT("Plot"))
     			&& l_pcNode->GetName() != wxT("metadataclass") )
 		{
 		   l_pcNode->SetName(wxT("metadataclass"));

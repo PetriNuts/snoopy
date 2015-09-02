@@ -32,7 +32,6 @@
 #include "sp_ds/extensions/ResultViewer/SP_DS_PlotViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_TableViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_xyPlotViewer.h"
-#include "sp_gui/dialogs/dia_SPN/SP_DLG_StEditTablePlot.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_HistogramPlotViewer.h"
 #include "sp_gui/dialogs/SP_DLG_SelectXAxisVariable.h"
 #include "sp_gui/dialogs/SP_DLG_ResultViewerProperties.h"
@@ -707,7 +706,7 @@ void SP_DLG_Simulation::OnAddingNewModalView(wxCommandEvent& p_cEvent) {
 	SetViewAttributeValue(m_pcCurrentTablePlot, wxT("IsCurrent"), wxT("0"));
 
 	//set the new metadata as the current one
-	m_pcCurrentTablePlot = CreateNewView(l_sViewName, true);
+	m_pcCurrentTablePlot = CreateNewView(l_sViewName);//, true);
 
 	CHECK_POINTER(m_pcCurrentTablePlot, return);
 
@@ -1201,14 +1200,15 @@ void SP_DLG_Simulation::LoadSelectedCurves()
     SP_DS_Nodeclass* l_pcNodeclass;
 	SP_ListNode::const_iterator l_itElem;
 	SP_DS_ColPN_Unfolding *l_pcUnfoldedNet;
-	vector<wxString>* l_vAuxVar;
 
 	long l_nPos = 0;
 	wxString l_TempClassName = m_pcGraph->GetNetclass()->GetName();
 
 //	SP_LOGMESSAGE(l_TempClassName);
 
-	if (l_TempClassName == SP_DS_COLSPN_CLASS || l_TempClassName == SP_DS_COLCPN_CLASS || l_TempClassName == SP_DS_COLHPN_CLASS) {
+	if (l_TempClassName == SP_DS_COLSPN_CLASS || l_TempClassName == SP_DS_COLCPN_CLASS || l_TempClassName == SP_DS_COLHPN_CLASS)
+	{
+		vector<wxString>* l_vAuxVar = nullptr;
 
 		if (l_TempClassName == SP_DS_COLSPN_CLASS) {
 			l_pcUnfoldedNet = dynamic_cast<SP_DLG_ColStSimulationResults*>(this)->GetUnfoldedNet();

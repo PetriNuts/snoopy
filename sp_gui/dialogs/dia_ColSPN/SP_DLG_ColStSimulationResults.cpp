@@ -16,7 +16,6 @@
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStSimulationResults.h"
 #include "sp_ds/extensions/ext_SPN/SP_DS_StSimGillespie.h"
 #include "sp_ds/extensions/ext_SPN/SP_DS_StSimFAU.h"
-#include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStEditTablePlot.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStMarkingOverview.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStFunctionOverview.h"

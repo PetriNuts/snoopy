@@ -434,7 +434,6 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 
 	//////////////////////////////////////////////////////////////////////////////
-	//SP_DS_Metadataclass* l_pcMC = p_pcGraph->AddMetadataclass( new SP_DS_Metadataclass( p_pcGraph, wxT("Plot") ) );
 	l_pcMC = p_pcGraph->AddMetadataclass( new SP_DS_Metadataclass( p_pcGraph, wxT("Plot") ) );
 
 	l_pcMC->SetShowInElementTree( false );
@@ -512,22 +511,6 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_NumberAttribute( wxT("HistogramFrequencyType"), 0) );
 
 	//////////////////////////////////////////////////////////////////////////////
-	l_pcMC = p_pcGraph->AddMetadataclass( new SP_DS_Metadataclass( p_pcGraph, wxT("Table") ) );
-
-	l_pcMC->SetShowInElementTree( false );
-
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("Name") ) );
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_IdAttribute( wxT("ID") ) );
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("Comment"), wxT("") ) );
-
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("Nodeclass"), wxT("Place") ) );
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("Results"), wxT("Marking") ) );
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("PlaceList"), SP_COLLIST_UNSIGNED_INTEGER, 1 ) );
-
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_BoolAttribute( wxT("SumOfNodes"), false ) );
-
-
-	//////////////////////////////////////////////////////////////////////////////
 	l_pcMC = p_pcGraph->AddMetadataclass( new SP_DS_Metadataclass( p_pcGraph, wxT("Simulation Properties") ) );
 
 	l_pcMC->SetShowInElementTree( false );
@@ -573,14 +556,6 @@ SP_DS_EventSPN::CreateInitialElements(SP_DS_Graph* p_pcGraph)
 	SP_DS_ExtPT::CreateInitialElements(p_pcGraph);
 
 	SP_DS_Metadataclass* l_pcMC;
-	l_pcMC = p_pcGraph->GetMetadataclass(wxT("Plot"));
-	SP_DS_Metadata* l_pcMainPlot = l_pcMC->NewElement( 1 );
-	if(l_pcMainPlot)
-	{
-		l_pcMainPlot->GetAttribute( wxT("Name") )->SetValueString( wxT("Default View") );
-		l_pcMainPlot->GetAttribute( wxT("Comment") )->SetValueString( wxT("Default View") );
-		l_pcMainPlot->GetAttribute( wxT("IsCurrent") )->SetValueString( wxT("1") );
-	}
 
 	l_pcMC = p_pcGraph->GetMetadataclass(wxT("Simulation Properties"));
 	l_pcMC->NewElement( 1 );
@@ -668,7 +643,7 @@ SP_DS_EventSPN::MetadataRequirement( SP_DS_Metadata* p_pcMetadata )
     }
 
     wxString l_sName = p_pcMetadata->GetClassName();
-	if ((l_sName == wxT("Plot") || l_sName == wxT("Table") || l_sName == wxT("Simulation Properties") || l_sName == wxT("Simulation Results") )
+	if ((l_sName == wxT("Simulation Properties") || l_sName == wxT("Simulation Results") )
 		&& !p_pcMetadata->GetMetadataclass()->GetElements()->empty())
 	{
 		return false;

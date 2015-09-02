@@ -40,7 +40,6 @@
 #include "sp_ds/extensions/Col_CPN/SP_DS_ColPlaceODE.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStMarkingOverview.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStFunctionOverview.h"
-#include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStEditTablePlot.h"
 
 #include "spsim/spsim.h"
 
