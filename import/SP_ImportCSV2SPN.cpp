@@ -10,6 +10,7 @@
 #include "SP_ImportCSV2SPN.h"
 #include "snoopy.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 
 SP_ImportCSV2SPN::SP_ImportCSV2SPN()
@@ -86,23 +87,16 @@ SP_ImportCSV2SPN::ParseLine(const wxString& p_sValue)
 
 	wxStringTokenizer l_cTokenizer(l_sValue, wxT(";"), wxTOKEN_RET_EMPTY_ALL);
 
-	SP_VectorString l_vLine;
+	m_sClassname = l_cTokenizer.GetNextToken();
 
+	SP_VectorString l_vLine;
 	while(l_cTokenizer.HasMoreTokens())
 	{
-		wxString l_sToken = l_cTokenizer.GetNextToken();
-
-		if(l_sToken == SP_DS_DISCRETE_PLACE
-			|| l_sToken == SP_DS_DISCRETE_TRANS
-			|| l_sToken == SP_DS_PARAM
-			|| l_sToken == SP_DS_META_CONSTANT)
-		{
-			m_sClassname = l_sToken;
-		}
-		l_vLine.push_back(l_sToken);
+		l_vLine.push_back(l_cTokenizer.GetNextToken());
 	}
 
-	m_mImportValues[m_sClassname].push_back(l_vLine);
+	if(!m_sClassname.IsEmpty())
+		m_mImportValues[m_sClassname].push_back(l_vLine);
 }
 
 void
@@ -118,6 +112,8 @@ SP_ImportCSV2SPN::CheckImportValues()
 		return;
 	}
 
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+
 	SP_MapImportCSV::const_iterator l_itImport;
 	for(l_itImport = m_mImportValues.begin();
 		l_itImport != m_mImportValues.end();
@@ -127,7 +123,7 @@ SP_ImportCSV2SPN::CheckImportValues()
 		if(l_sClassname != SP_DS_DISCRETE_PLACE
 			&& l_sClassname != SP_DS_DISCRETE_TRANS
 			&& l_sClassname != SP_DS_PARAM
-			&& l_sClassname != SP_DS_META_CONSTANT)
+			&& !SP_DS_META_CONSTANT.StartsWith(l_sClassname))
 		{
 			wxString l_sMsg = wxT("Error: unknown classname \"");
 			l_sMsg << l_sClassname << wxT("\"!");
@@ -165,18 +161,16 @@ SP_ImportCSV2SPN::CheckImportValues()
 					l_bError = true;
 				}
 			}
-			else if(l_sClassname == SP_DS_PARAM)
+			else if(l_sClassname == SP_DS_PARAM
+					|| SP_DS_META_CONSTANT.StartsWith(l_sClassname))
 			{
 				if(m_mParameters.find(l_vRow[0]) == m_mParameters.end())
 				{
-					l_bError = true;
-				}
-			}
-			else if(l_sClassname == SP_DS_META_CONSTANT)
-			{
-				if(m_mParameters.find(l_vRow[0]) == m_mParameters.end())
-				{
-					l_bError = true;
+					if (mc)
+					{
+						SP_DS_Metadata* l_constant = mc->NewElement(1);
+						l_constant->GetAttribute(wxT("Name"))->SetValueString(l_vRow[0]);
+					}
 				}
 			}
 			if(l_bError)
@@ -263,9 +257,9 @@ SP_ImportCSV2SPN::SetImportValues()
 								wxString l_sNewValue = l_sValue.AfterFirst('(');
 								l_pcAttr->SetCell(l_nRow, 1, l_sNewValue.BeforeFirst(','));
 								l_sNewValue = l_sNewValue.AfterFirst(',');
-								l_pcAttr->SetCell(l_nRow, 1, l_sNewValue.BeforeFirst(','));
+								l_pcAttr->SetCell(l_nRow, 2, l_sNewValue.BeforeFirst(','));
 								l_sNewValue = l_sNewValue.AfterFirst(',');
-								l_pcAttr->SetCell(l_nRow, 1, l_sNewValue.BeforeFirst(')'));
+								l_pcAttr->SetCell(l_nRow, 3, l_sNewValue.BeforeFirst(')'));
 							}
 							else
 							{
@@ -281,6 +275,9 @@ SP_ImportCSV2SPN::SetImportValues()
 			}
 		}
 	}
+	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+	l_pcFR->LoadFromNet(m_pcGraph);
+
 	m_pcGraph->GetParentDoc()->Modify(true);
 }
 

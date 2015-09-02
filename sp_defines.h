@@ -327,134 +327,134 @@ enum SP_ORDERING_MODE
  * names of elements of each netclass
  */
 // SP_DS_SimpleGraph
-#define SP_DS_SIMPLEGRAPH_CLASS				wxT("Simple Graph")
+const wxString SP_DS_SIMPLEGRAPH_CLASS = wxT("Simple Graph");
 
 // SP_DS_BipartGraph
-#define SP_DS_BIPARTGRAPH_CLASS				wxT("Bipart Graph")
+const wxString SP_DS_BIPARTGRAPH_CLASS = wxT("Bipart Graph");
 
 // SP_DS_SimplePed
-#define SP_DS_PN_CLASS						wxT("Petri Net")
+const wxString SP_DS_PN_CLASS = wxT("Petri Net");
 
 // SP_DS_ExtPT
-#define SP_DS_EXTPN_CLASS					wxT("Extended Petri Net")
+const wxString SP_DS_EXTPN_CLASS = wxT("Extended Petri Net");
 
 // SP_DS_ContinuousPed
-#define SP_DS_CONTINUOUSPED_CLASS			wxT("Continuous Petri Net")
+const wxString SP_DS_CONTINUOUSPED_CLASS = wxT("Continuous Petri Net");
 
-#define SP_DS_COARSE_PLACE                  wxT("Coarse Place")
-#define SP_DS_COARSE_TRANSITION             wxT("Coarse Transition")
-#define SP_DS_COARSE_PARAMETER              wxT("Coarse Parameter")
+const wxString SP_DS_COARSE_PLACE = wxT("Coarse Place");
+const wxString SP_DS_COARSE_TRANSITION = wxT("Coarse Transition");
+const wxString SP_DS_COARSE_PARAMETER = wxT("Coarse Parameter");
 
 
 // SP_DS_EventSPN
-#define SP_DS_SPN_CLASS						wxT("Stochastic Petri Net")
+const wxString SP_DS_SPN_CLASS = wxT("Stochastic Petri Net");
 
 // SP_DS_TimePT
-#define SP_DS_TIMEPN_CLASS					wxT("Time Petri Net")
+const wxString SP_DS_TIMEPN_CLASS = wxT("Time Petri Net");
 
 // SP_DS_Metadataclass constants
-#define SP_DS_META_CONSTANT					wxT("Constant Class")
-#define SP_DS_META_FUNCTION					wxT("Function Class")
+const wxString SP_DS_META_CONSTANT = wxT("Constant Class");
+const wxString SP_DS_META_FUNCTION = wxT("Function Class");
 
 // SP_DS_Colored Petri Nets
-#define SP_DS_COLEPN_CLASS					wxT("Colored Extended Petri Net")
-#define SP_DS_CPN_MARKINGLIST			    wxT("MarkingList")
-#define SP_DS_CPN_COLORSETNAME				wxT("Colorset")
-#define SP_DS_CPN_BASICCOLORSETCLASS		wxT("Basic Colorset Class")
-#define SP_DS_CPN_STRUCTUREDCOLORSETCLASS	wxT("Structured Colorset Class")
-#define SP_DS_CPN_ALIASCOLORSETCLASS		wxT("Alias Colorset Class")
-#define SP_DS_CPN_CONSTANTCLASS				wxT("Constant Class")
-#define SP_DS_CPN_VARIABLECLASS				wxT("Variable Class")
-#define SP_DS_CPN_GUARDLIST					wxT("GuardList")
-#define SP_DS_CPN_INSCRIPTION				wxT("ExpressionList")
-#define SP_DS_CPN_FUNCTIONCLASS				wxT("Function Class")
-#define SP_DS_CPN_RATEFUNCTIONLIST			wxT("Function List")
-#define SP_DS_CPN_AUXILIARVARIABLESCLASS	wxT("Auxiliary Variables Class")
+const wxString SP_DS_COLEPN_CLASS = wxT("Colored Extended Petri Net");
+const wxString SP_DS_CPN_MARKINGLIST = wxT("MarkingList");
+const wxString SP_DS_CPN_COLORSETNAME = wxT("Colorset");
+const wxString SP_DS_CPN_BASICCOLORSETCLASS = wxT("Basic Colorset Class");
+const wxString SP_DS_CPN_STRUCTUREDCOLORSETCLASS = wxT("Structured Colorset Class");
+const wxString SP_DS_CPN_ALIASCOLORSETCLASS = wxT("Alias Colorset Class");
+const wxString SP_DS_CPN_CONSTANTCLASS = wxT("Constant Class");
+const wxString SP_DS_CPN_VARIABLECLASS = wxT("Variable Class");
+const wxString SP_DS_CPN_GUARDLIST = wxT("GuardList");
+const wxString SP_DS_CPN_INSCRIPTION = wxT("ExpressionList");
+const wxString SP_DS_CPN_FUNCTIONCLASS = wxT("Function Class");
+const wxString SP_DS_CPN_RATEFUNCTIONLIST = wxT("Function List");
+const wxString SP_DS_CPN_AUXILIARVARIABLESCLASS = wxT("Auxiliary Variables Class");
 
 //Continuous - Stochastic Petri Net
-#define SP_DS_HYBRIDPN_CLASS                wxT("Hybrid Petri Net")
+const wxString SP_DS_HYBRIDPN_CLASS = wxT("Hybrid Petri Net");
 //Extension
-#define SP_DS_HYBRIDPN_EXT                  wxT("hpn")
+const wxString SP_DS_HYBRIDPN_EXT = wxT("hpn");
 
 //SP_DS_ColPN
-#define SP_DS_COLPN_CLASS					wxT("Colored Petri Net")
+const wxString SP_DS_COLPN_CLASS = wxT("Colored Petri Net");
 
 //SP_DS_ColSPN
-#define SP_DS_COLSPN_CLASS					wxT("Colored Stochastic Petri Net")
+const wxString SP_DS_COLSPN_CLASS = wxT("Colored Stochastic Petri Net");
 
 //SP_DS_ColCPN
-#define SP_DS_COLCPN_CLASS					wxT("Colored Continuous Petri Net")
+const wxString SP_DS_COLCPN_CLASS = wxT("Colored Continuous Petri Net");
 
 //SP_DS_ColHPN
-#define SP_DS_COLHPN_CLASS					wxT("Colored Hybrid Petri Net")
+const wxString SP_DS_COLHPN_CLASS = wxT("Colored Hybrid Petri Net");
 
 //SP_DS_ModuloNets
-#define SP_DS_MODULOPN_CLASS				wxT("Modulo Petri Net")
+const wxString SP_DS_MODULOPN_CLASS = wxT("Modulo Petri Net");
 
 // SP_DS_MusicPed
-#define SP_DS_MUSICPN_CLASS					wxT("Music Petri Net")
+const wxString SP_DS_MUSICPN_CLASS = wxT("Music Petri Net");
 
 // SP_DS_ReachabilityGraph
-#define SP_DS_REACHABILITY_CLASS			wxT("Reachability Graph")
+const wxString SP_DS_REACHABILITY_CLASS = wxT("Reachability Graph");
 
 // SP_DS_FaultTree
-#define SP_DS_FAULTTREE_CLASS				wxT("Fault Tree")
+const wxString SP_DS_FAULTTREE_CLASS = wxT("Fault Tree");
 
 // SP_DS_ExtendedFaultTree
-#define SP_DS_EXTFAULTTREE_CLASS			wxT("Extended Fault Tree")
+const wxString SP_DS_EXTFAULTTREE_CLASS = wxT("Extended Fault Tree");
 
 // SP_DS_Freestyle
-#define SP_DS_FREESTYLE_CLASS				wxT("Freestyle Net")
+const wxString SP_DS_FREESTYLE_CLASS = wxT("Freestyle Net");
 
 // SP_DS_MTBDD
-#define SP_DS_MTBDD_CLASS					wxT("MTBDD")
+const wxString SP_DS_MTBDD_CLASS = wxT("MTBDD");
 
 // SP_DS_MTIDD
-#define SP_DS_MTIDD_CLASS					wxT("MTIDD")
+const wxString SP_DS_MTIDD_CLASS = wxT("MTIDD");
 
 //Continuous place
-#define SP_DS_CONTINUOUS_PLACE             wxT("Place, Continuous")
+const wxString SP_DS_CONTINUOUS_PLACE = wxT("Place, Continuous");
 
 //Continuous Transition
-#define SP_DS_CONTINUOUS_TRANS			   wxT("Transition, Continuous")
+const wxString SP_DS_CONTINUOUS_TRANS = wxT("Transition, Continuous");
 
 //Discrete Place
-#define SP_DS_DISCRETE_PLACE               wxT("Place")
+const wxString SP_DS_DISCRETE_PLACE = wxT("Place");
 
 //Discrete Transition
-#define SP_DS_DISCRETE_TRANS               wxT("Transition")
+const wxString SP_DS_DISCRETE_TRANS = wxT("Transition");
 
 //discrete param
-#define SP_DS_PARAM                        wxT("Parameter")
+const wxString SP_DS_PARAM = wxT("Parameter");
 
 //Immediate Transition
-#define SP_DS_IMMEDIATE_TRANS              wxT("Immediate Transition")
+const wxString SP_DS_IMMEDIATE_TRANS = wxT("Immediate Transition");
 
 //deterministic Transition
-#define SP_DS_DETERMINISTIC_TRANS          wxT("Deterministic Transition")
+const wxString SP_DS_DETERMINISTIC_TRANS = wxT("Deterministic Transition");
 
 //scheduled transition
-#define SP_DS_SCHEDULED_TRANS              wxT("Scheduled Transition")
+const wxString SP_DS_SCHEDULED_TRANS = wxT("Scheduled Transition");
 
 //Stochastic Transition
-#define SP_DS_STOCHASTIC_TRANS             wxT("Transition")
+const wxString SP_DS_STOCHASTIC_TRANS = wxT("Transition");
 
 // Normal Edge
-#define SP_DS_EDGE                         wxT("Edge")
+const wxString SP_DS_EDGE = wxT("Edge");
 
 //Inhibitor Edge
-#define SP_DS_INHIBITOR_EDGE               wxT("Inhibitor Edge")
+const wxString SP_DS_INHIBITOR_EDGE = wxT("Inhibitor Edge");
 
 //Read Edge
-#define SP_DS_READ_EDGE                    wxT("Read Edge")
+const wxString SP_DS_READ_EDGE = wxT("Read Edge");
 
 //Equal
-#define SP_DS_EQUAL_EDGE                  wxT("Equal Edge")
+const wxString SP_DS_EQUAL_EDGE = wxT("Equal Edge");
 
 //Reset Edge
-#define SP_DS_RESET_EDGE                  wxT("Reset Edge")
+const wxString SP_DS_RESET_EDGE = wxT("Reset Edge");
 
 //Modifier Edge
-#define SP_DS_MODIFIER_EDGE               wxT("Modifier Edge")
+const wxString SP_DS_MODIFIER_EDGE = wxT("Modifier Edge");
 
 #endif // __SP_DEFINES_H__

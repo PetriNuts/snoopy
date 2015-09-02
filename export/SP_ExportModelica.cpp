@@ -422,7 +422,7 @@ wxString SP_ExportModelica::GetNodeArcsWeights(SP_DS_Node* p_pcNode)
     	}
     	else
     	if(!CheckForExistingEdge(dynamic_cast<SP_DS_Node*>((*l_itEdge)->GetSource()),p_pcNode) &&
-    			(l_sArcType==SP_DS_INHIBITOR_EDGE ||SP_DS_READ_EDGE))
+    			(l_sArcType == SP_DS_INHIBITOR_EDGE || l_sArcType == SP_DS_READ_EDGE))
     	 {
     		l_sResult+= wxT("sub")+wxString::Format(wxT("%d"),l_nArcsCount)+wxT("=0")+wxT(",")+GetExtendedArcsMultiplicity(l_nArcsCount,dynamic_cast<SP_DS_Node*>((*l_itEdge)->GetSource()),p_pcNode);
     	    l_nArcsCount++;
