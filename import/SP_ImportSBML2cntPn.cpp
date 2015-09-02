@@ -38,11 +38,11 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 	l_sbmlDocument = readSBML(p_sFile.mb_str());
 	CHECK_POINTER(l_sbmlDocument, return FALSE);
 
-	m_sbmlModel = l_sbmlDocument->getModel();
-	CHECK_POINTER(m_sbmlModel, return FALSE);
-
 	if(ValidateSBML(l_sbmlDocument))
 	{
+		m_sbmlModel = l_sbmlDocument->getModel();
+		CHECK_POINTER(m_sbmlModel, return FALSE);
+
 		m_pcGraph = CreateDocument(SP_DS_CONTINUOUSPED_CLASS);
 
 		getModelDescription();

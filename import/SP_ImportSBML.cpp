@@ -264,5 +264,5 @@ bool SP_ImportSBML::ValidateSBML(SBMLDocument* p_sbmlDoc)
 		}
 	}
 
-	return !l_nSeriousErrors;
+	return l_nSeriousErrors == 0;
 }
