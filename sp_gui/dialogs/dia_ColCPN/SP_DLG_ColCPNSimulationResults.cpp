@@ -147,7 +147,7 @@ bool SP_DLG_ColCPNSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcView
 {
 	wxString l_sName;
 	long l_nPos = 0;
-	SP_LOGMESSAGE(wxT("colorcontinous load viewer data"));
+	//SP_LOGMESSAGE(wxT("colorcontinous load viewer data"));
 	CHECK_POINTER(p_pcView, return false);
 
 	//get the current nodeclass type
