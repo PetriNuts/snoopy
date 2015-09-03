@@ -10,6 +10,7 @@
 wxString
 SP_ImportSBML::formulaToString(const ASTNode* p_Math)
 {
+	CHECK_POINTER(p_Math, return wxEmptyString);
 	char* formula = SBML_formulaToString(p_Math);
 	wxString ret = wxString(formula, wxConvUTF8);
 	free(formula);

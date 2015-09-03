@@ -72,10 +72,15 @@ bool SP_ImportSBML2sPn::ReadFile(const wxString& p_sFile)
 			SP_MESSAGEBOX(wxT("The SBML import is experimental!\nPlease note: rules, events and functions are not supported yet.\nPlease check the result!"),wxT("Notice"), wxOK | wxICON_INFORMATION);
 
 			m_pcMyDoc->Modify(true);
-		}
-		wxDELETE(l_sbmlDocument);
 
-		return true;
+			wxDELETE(l_sbmlDocument);
+			return true;
+		}
+		else
+		{
+			wxDELETE(l_sbmlDocument);
+			return false;
+		}
 	}
 	return false;
 }
@@ -339,14 +344,20 @@ void SP_ImportSBML2sPn::getReactions ()
 			if (l_sbmlReaction->isSetKineticLaw())
 			{
 				KineticLaw* l_sbmlKineticLaw =  l_sbmlReaction->getKineticLaw();
-				ASTNode* l_sbmlMath = l_sbmlKineticLaw->getMath()->deepCopy();
+				ASTNode* l_sbmlMath = nullptr;
+				if(l_sbmlKineticLaw->getMath())
+				{
+					l_sbmlMath = l_sbmlKineticLaw->getMath()->deepCopy();
+				}
 				//position is important, because we change id of reaction parameters
 				getReactionParameters(l_sbmlReaction, l_sbmlMath);
 
 				l_kinetic = formulaToString(getSBMLFormula(l_sbmlMath));
-				SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_reactionNode->GetAttribute(wxT("FunctionList")));
-				l_pcColAttr->SetCell(0, 1, l_kinetic);
-
+				if(!l_kinetic.IsEmpty())
+				{
+					SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_reactionNode->GetAttribute(wxT("FunctionList")));
+					l_pcColAttr->SetCell(0, 1, l_kinetic);
+				}
 				wxDELETE(l_sbmlMath);
 			}
 
@@ -388,7 +399,10 @@ void SP_ImportSBML2sPn::getReactions ()
 				l_revReactionNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
 				SP_DS_ColListAttribute* l_pcFuncAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_revReactionNode->GetAttribute(wxT("FunctionList")));
 				//set ratefunction the same as reversible transition, because we dont know it
-				l_pcFuncAttr->SetCell(0,1, l_kinetic);
+				if(!l_kinetic.IsEmpty())
+				{
+					l_pcFuncAttr->SetCell(0,1, l_kinetic);
+				}
 				l_revReactionNode->GetGraphics()->front()->SetBrushColour(*wxRED);
 				SP_DS_Attribute* l_pcAttrRevComment = l_revReactionNode->GetAttribute(wxT("Comment"));
 				l_pcAttrRevComment->SetValueString(l_sReversible);

@@ -68,12 +68,16 @@ bool SP_ImportSBML2extPN::ReadFile(const wxString& p_sFile)
 			SP_MESSAGEBOX(wxT("The SBML import is experimental!\nPlease note: rules, events and functions are not supported yet.\nPlease check the result!"),wxT("Notice"), wxOK | wxICON_INFORMATION);
 
 			m_pcMyDoc->Modify(true);
+
+			wxDELETE(l_sbmlDocument);
+			return true;
 		}
-		wxDELETE(l_sbmlDocument);
-		l_cDlg.Destroy();
-		return true;
+		else
+		{
+			wxDELETE(l_sbmlDocument);
+			return false;
+		}
 	}
-	l_cDlg.Destroy();
 	return false;
 }
 
