@@ -5,6 +5,8 @@
 // Short Description: dialog to search for nodes by id
 //////////////////////////////////////////////////////////////////////
 
+#include <wx/regex.h>
+
 #include "sp_gui/dialogs/SP_DLG_SearchId.h"
 
 #include "sp_ds/extensions/SP_DS_Coarse.h"
@@ -12,6 +14,7 @@
 #include "sp_gui/mdi/SP_MDI_CoarseDoc.h"
 #include "sp_gui/mdi/SP_MDI_View.h"
 #include "sp_ds/attributes/SP_DS_IdAttribute.h"
+#include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 #include "sp_core/SP_Core.h"
 #include "snoopy.h"
 #include "sp_core/SP_GPR_Canvas.h"
@@ -29,7 +32,7 @@ END_EVENT_TABLE()
 
 SP_DLG_SearchId::SP_DLG_SearchId(SP_DS_Graph *p_graph, wxWindow *p_parent, const wxString& p_title) :
 	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
-	m_title(p_title), m_nSelect(0), m_sSelect(wxT("")), m_id(-1), m_sName(wxT("")), m_graph(p_graph), m_nodeList(NULL), m_grList(NULL)
+	m_title(p_title), m_nSelect(0), m_sSelect(wxT("")), m_id(-1), m_sName(wxT("")), m_graph(p_graph), m_edgeList(nullptr), m_nodeList(nullptr)
 {
 	wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer* elemSizer = new wxBoxSizer(wxVERTICAL);
@@ -44,7 +47,7 @@ SP_DLG_SearchId::SP_DLG_SearchId(SP_DS_Graph *p_graph, wxWindow *p_parent, const
 
 	SP_DS_Metadataclass* mc = m_graph->GetMetadataclass(SP_DS_META_CONSTANT);
 	if (mc != NULL)
-		choices.Add(mc->GetDisplayName());
+		choices.Add(wxT("Constants"));
 
 	m_select = new wxRadioBox(this, SP_ID_RADIOBOX_SELECT, wxT("Search"), wxDefaultPosition, wxDefaultSize, choices, 1, wxRA_SPECIFY_COLS);
 	elemSizer->Add(m_select, 0, wxALL | wxEXPAND, 5);
@@ -142,31 +145,25 @@ void SP_DLG_SearchId::OnDlgOk(wxCommandEvent& p_cEvent)
 
 void SP_DLG_SearchId::OnNext(wxCommandEvent& p_cEvent)
 {
-	CHECK_POINTER(m_grList, return);
-
-
 	wxString l_sSelect = m_select->GetStringSelection();
 
 
-	if (m_grIt != m_grList->end())
+	if (m_grIt != m_grList.end())
 		m_grIt++;
-	if (m_grIt == m_grList->end())
+	if (m_grIt == m_grList.end())
 	{
 		m_pcNext->Enable(false);
 		m_pcPrev->Enable(true);
 
-
-		if (l_sSelect.IsSameAs(wxT("Constants"))) {
-
-			if (m_grConstIt != m_grConst.end()) {
-				m_grConstIt++;
-				m_grList = *m_grConstIt;
-				m_grIt = m_grList->begin();
+		if (l_sSelect.IsSameAs(wxT("Constants")))
+		{
+			if(!SearchAllElements())
+			{
+				return;
 			}
-
-
-
-		} else {
+		}
+		else
+		{
 			if (!FindNextNode())
 			{
 				return;
@@ -179,23 +176,12 @@ void SP_DLG_SearchId::OnNext(wxCommandEvent& p_cEvent)
 
 void SP_DLG_SearchId::OnPrev(wxCommandEvent& p_cEvent)
 {
-	CHECK_POINTER(m_grList, return);
-	//CHECK_BOOL((m_grIt != m_grList->begin()), return);
-
 	wxString l_sSelect = m_select->GetStringSelection();
 
-	if (l_sSelect.IsSameAs(wxT("Constants"))) {
-		if (m_grConstIt != m_grConst.begin()) {
-			m_grConstIt--;
-			m_grList = *m_grConstIt;
-			m_grIt = m_grList->begin();
-		}
-	} else {
-		if (m_grIt == m_grList->end())
-			m_grIt--;
-		if (m_grIt != m_grList->begin())
-			m_grIt--;
-	}
+	if (m_grIt == m_grList.end())
+		m_grIt--;
+	if (m_grIt != m_grList.begin())
+		m_grIt--;
 
 	ShowFound();
 }
@@ -209,19 +195,14 @@ void SP_DLG_SearchId::OnFind(wxCommandEvent& p_cEvent)
 	m_sSelect = m_select->GetStringSelection();
 
 
-
+	m_grList.clear();
 
 	if (m_sSelect.IsSameAs(wxT("Constants"))) {
-		l_itNC = m_graph->GetNodeclasses()->begin();
-		l_itEC = m_graph->GetEdgeclasses()->begin();
+		m_itNC = m_graph->GetNodeclasses()->begin();
+		m_itEC = m_graph->GetEdgeclasses()->begin();
 
-		m_grConst.clear();
-		m_grList = NULL;
 		if (SearchAllElements())
 		{
-			m_grConstIt = m_grConst.begin();
-			m_grList = *m_grConstIt;
-			m_grIt = m_grList->begin();
 			ShowFound();
 		}
 		else
@@ -235,7 +216,6 @@ void SP_DLG_SearchId::OnFind(wxCommandEvent& p_cEvent)
 		m_nodeList = m_graph->GetNodeclassByDisplayedName(m_nclass)->GetElements();
 		m_nodeIt = m_nodeList->begin();
 
-		m_grList = NULL;
 		if (FindNextNode())
 		{
 			ShowFound();
@@ -246,27 +226,23 @@ void SP_DLG_SearchId::OnFind(wxCommandEvent& p_cEvent)
 			m_pcPrev->Enable(false);
 			SP_MESSAGEBOX(wxT("Node not found"), wxT("Search"), wxOK | wxICON_INFORMATION );
 		}
-
 	}
-
-
 }
 
 
 bool
 SP_DLG_SearchId::SearchAllElements() {
 
-	bool b_lReturn = false;
+	if (!SearchNodeClasses())
+	{
+		if (!SearchEdgeClasses())
+		{
+			return false;
+		}
+	}
 
-	if (SearchNodeClasses())
-		b_lReturn = true;
 
-	if (SearchEdgeClasses())
-		b_lReturn = true;
-
-
-
-	return b_lReturn;
+	return true;
 }
 
 
@@ -275,57 +251,41 @@ SP_DLG_SearchId::SearchAllElements() {
 bool
 SP_DLG_SearchId::SearchNodeClasses() {
 
-	bool l_bReturn = false;
-
-
-	for(; l_itNC != m_graph->GetNodeclasses()->end(); ++l_itNC)
+	for(; m_itNC != m_graph->GetNodeclasses()->end(); ++m_itNC)
 	{
-		wxString l_sNodeName = (*l_itNC)->GetDisplayName();
+		wxString l_sNodeName = (*m_itNC)->GetDisplayName();
 		SP_LOGDEBUG(l_sNodeName);
 
-		if (l_sNodeName.Cmp(wxT("Place")) == 0)
-			l_sAttribute = wxT("Marking");
-
-		if (l_sNodeName.Cmp(wxT("Immediate Transition")) == 0)
-			l_sAttribute = wxT("Weight");
-
-		if (l_sNodeName.Cmp(wxT("Deterministic Transition")) == 0)
-			l_sAttribute = wxT("Delay");
-
-		if (l_sNodeName.Cmp(wxT("Scheduled Transition")) == 0)
-			l_sAttribute = wxT("Begin");
-
-		if (l_sNodeName.Cmp(wxT("Transition")) == 0)
-			continue;
-
-
-		m_nodeList = (*l_itNC)->GetElements();
-		m_nodeIt = m_nodeList->begin();
+		if(!m_nodeList)
+		{
+			m_nodeList = (*m_itNC)->GetElements();
+			m_nodeIt = m_nodeList->begin();
+		}
 		if (FindNextElement())
-			l_bReturn = true;
+			return true;
 	}
 
-	return l_bReturn;
+	return false;
 }
 
 bool
 SP_DLG_SearchId::SearchEdgeClasses() {
-	bool l_bReturn = false;
 
-	for(; l_itEC != m_graph->GetEdgeclasses()->end(); ++l_itEC)
+	for(; m_itEC != m_graph->GetEdgeclasses()->end(); ++m_itEC)
 	{
-		wxString l_sNodeName = (*l_itEC)->GetDisplayName();
+		wxString l_sNodeName = (*m_itEC)->GetDisplayName();
 		SP_LOGDEBUG(l_sNodeName);
-		if (l_sNodeName.Cmp(wxT("Edge")) == 0)
-				l_sAttribute = wxT("Multiplicity");
 
-		m_edgeList = (*l_itEC)->GetElements();
-		m_edgeIt = m_edgeList->begin();
+		if(!m_edgeList)
+		{
+			m_edgeList = (*m_itEC)->GetElements();
+			m_edgeIt = m_edgeList->begin();
+		}
 		if (FindNextEdge())
-			l_bReturn = true;
+			return true;
 	}
 
-	return l_bReturn;
+	return false;
 }
 
 bool SP_DLG_SearchId::FindNextNode()
@@ -337,7 +297,7 @@ bool SP_DLG_SearchId::FindNextNode()
 	for (; m_nodeIt != m_nodeList->end(); m_nodeIt++)
 	{
 		attr = (*m_nodeIt)->GetAttribute(m_sSelect);
-		if(!m_nSelect)
+		if(m_nSelect == 0)
 		{
 			bool l_bFound = false;
 			if (m_exactName->IsChecked())
@@ -346,14 +306,14 @@ bool SP_DLG_SearchId::FindNextNode()
 			}
 			else
 			{
-				l_bFound = (attr)->GetValueString().Contains(m_sName);
+				wxRegEx regex(m_sName);
+				l_bFound = regex.Matches((attr)->GetValueString());
 			}
 
 			if(l_bFound)
 			{
 				SP_LOGDEBUG(wxT("found node"));
-				m_grList = (*m_nodeIt)->GetGraphics();
-				m_grIt = m_grList->begin();
+				m_grIt = m_grList.insert(m_grList.end(), (*m_nodeIt)->GetGraphics()->begin(), (*m_nodeIt)->GetGraphics()->end());
 
 				// ok, we can start next search from the next node
 				m_nodeIt++;
@@ -365,8 +325,7 @@ bool SP_DLG_SearchId::FindNextNode()
 			if (m_id == dynamic_cast<SP_DS_IdAttribute*> (attr)->GetValue())
 			{
 				SP_LOGDEBUG(wxT("found node"));
-				m_grList = (*m_nodeIt)->GetGraphics();
-				m_grIt = m_grList->begin();
+				m_grIt = m_grList.insert(m_grList.end(), (*m_nodeIt)->GetGraphics()->begin(), (*m_nodeIt)->GetGraphics()->end());
 
 				// ok, we can start next search from the next node
 				m_nodeIt++;
@@ -383,103 +342,99 @@ SP_DLG_SearchId::FindNextElement() {
 
 	CHECK_POINTER(m_nodeList, return false);
 
-	SP_DS_Attribute* attr;
-	SP_DS_Attribute* attr2;
-	SP_DS_Attribute* attr3;
-
-
-
-
-	bool l_bReturn = false;
-
-	for (; m_nodeIt != m_nodeList->end(); m_nodeIt++)
+	for (; m_nodeIt != m_nodeList->end(); ++m_nodeIt)
 	{
-		attr = (*m_nodeIt)->GetAttribute(l_sAttribute);
-
-		if (l_sAttribute.Cmp(wxT("Begin")) == 0) {
-			attr2 = (*m_nodeIt)->GetAttribute(wxT("Repetition"));
-			attr3 = (*m_nodeIt)->GetAttribute(wxT("End"));
-		}
-
-
-		bool l_bFound = false;
-		if (m_exactName->IsChecked())
-		{
-			l_bFound = (attr)->GetValueString().IsSameAs(m_sName);
-			if (l_sAttribute.Cmp(wxT("Begin")) == 0) {
-				l_bFound = (attr2)->GetValueString().IsSameAs(m_sName);
-				l_bFound = (attr3)->GetValueString().IsSameAs(m_sName);
-			}
-		}
-		else
-		{
-			l_bFound = (attr)->GetValueString().Contains(m_sName);
-			if (l_sAttribute.Cmp(wxT("Begin")) == 0) {
-				l_bFound = (attr2)->GetValueString().Contains(m_sName);
-				l_bFound = (attr3)->GetValueString().Contains(m_sName);
-			}
-		}
-
-		if(l_bFound)
+		if(SearchAttributes((*m_nodeIt)->GetAttributes()))
 		{
 			SP_LOGDEBUG((*m_nodeIt)->GetAttribute(wxT("Name"))->GetValueString());
-			l_bReturn = true;
 
 			SP_LOGDEBUG(wxT("found node"));
-			m_grList = (*m_nodeIt)->GetGraphics();
-			m_grConst.push_back(m_grList);
+			m_grIt = m_grList.insert(m_grList.end(), (*m_nodeIt)->GetGraphics()->begin(), (*m_nodeIt)->GetGraphics()->end());
 
+			// ok, we can start next search from the next node
+			++m_nodeIt;
+			return true;
 		}
-
-
 	}
-	return l_bReturn;
+	if(m_nodeIt == m_nodeList->end())
+	{
+		m_nodeList = nullptr;
+	}
+	return false;
 }
 
 bool SP_DLG_SearchId::FindNextEdge() {
 	CHECK_POINTER(m_edgeList, return false);
 
-	SP_DS_Attribute* attr;
-
-	bool l_bReturn = false;
-
-	for (; m_edgeIt != m_edgeList->end(); m_edgeIt++)
+	for (; m_edgeIt != m_edgeList->end(); ++m_edgeIt)
 	{
-
-		attr = (*m_edgeIt)->GetAttribute(l_sAttribute);
-
-		bool l_bFound = false;
-		if (m_exactName->IsChecked())
+		if(SearchAttributes((*m_edgeIt)->GetAttributes()))
 		{
-			l_bFound = (attr)->GetValueString().IsSameAs(m_sName);
+			SP_LOGDEBUG(wxT("found edge"));
+
+			m_grIt = m_grList.insert(m_grList.end(), (*m_edgeIt)->GetGraphics()->begin(), (*m_edgeIt)->GetGraphics()->end());
+
+			// ok, we can start next search from the next edge
+			++m_edgeIt;
+			return true;
+		}
+	}
+	if(m_edgeIt == m_edgeList->end())
+	{
+		m_edgeList = nullptr;
+	}
+	return false;
+}
+
+bool SP_DLG_SearchId::SearchAttributes(const SP_ListAttribute* attributes)
+{
+	bool l_bFound = false;
+	for(SP_DS_Attribute* attr : *(attributes))
+	{
+		if(attr->GetName() == wxT("Name") || attr->GetName() == wxT("ID"))
+		{
+			continue;
+		}
+		if(attr->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST)
+		{
+			SP_DS_ColListAttribute* attrCol = static_cast<SP_DS_ColListAttribute*>(attr);
+			for(unsigned i = 0; i < attrCol->GetRowCount(); ++i)
+			{
+				for(unsigned k = 0; k < attrCol->GetColCount(); ++k)
+				{
+					if (m_exactName->IsChecked())
+					{
+						l_bFound = (attrCol)->GetCell(i,k).IsSameAs(m_sName);
+					}
+					else
+					{
+						wxRegEx regex(m_sName);
+						l_bFound = regex.Matches((attrCol)->GetCell(i,k));
+					}
+					if(l_bFound) return true;
+				}
+			}
 		}
 		else
 		{
-			l_bFound = (attr)->GetValueString().Contains(m_sName);
+			if (m_exactName->IsChecked())
+			{
+				l_bFound = (attr)->GetValueString().IsSameAs(m_sName);
+			}
+			else
+			{
+				wxRegEx regex(m_sName);
+				l_bFound = regex.Matches((attr)->GetValueString());
+			}
+			if(l_bFound) return true;
 		}
-
-		if(l_bFound)
-		{
-
-
-			l_bReturn = true;
-			SP_LOGDEBUG(wxT("found edge"));
-
-			m_grList = (*m_edgeIt)->GetGraphics();
-			m_grConst.push_back(m_grList);
-
-		}
-
-
 	}
-	return l_bReturn;
+	return false;
 }
 
-
-bool SP_DLG_SearchId::ShowFound()
+bool SP_DLG_SearchId::ShowFound(bool all)
 {
-	CHECK_POINTER(m_grList, return false);
-	CHECK_BOOL((m_grIt != m_grList->end()), return false);
+	CHECK_BOOL((m_grIt != m_grList.end()), return false);
 
 	unsigned int netNr = (*m_grIt)->GetNetnumber();
 	SP_LOGDEBUG(wxString::Format(wxT("found graphic, netnumber %d"), netNr));
@@ -501,7 +456,9 @@ bool SP_DLG_SearchId::ShowFound()
 	SP_MDI_View *view = dynamic_cast<SP_MDI_View*> (doc->GetFirstView());
 	wxList& views = doc->GetViews();
 	SP_LOGDEBUG(wxString::Format(wxT("views: %lu"), views.GetCount()));
-	view->SelectAll(false);
+	if(!all) {
+		view->SelectAll(false);
+	}
 	(*m_grIt)->Select(true);
 
 	//make the node visible
@@ -525,8 +482,10 @@ bool SP_DLG_SearchId::ShowFound()
 
 	// in other cases not needed?
 	if (!data)
+	{
 		doc->Refresh();
-	if (m_grIt == m_grList->begin())
+	}
+	if (m_grIt == m_grList.begin())
 	{
 		m_pcPrev->Enable(false);
 	}
@@ -534,7 +493,7 @@ bool SP_DLG_SearchId::ShowFound()
 	{
 		m_pcPrev->Enable(true);
 	}
-	if (m_grIt == m_grList->end())
+	if (m_grIt == m_grList.end())
 	{
 		m_pcNext->Enable(false);
 	}
@@ -542,21 +501,6 @@ bool SP_DLG_SearchId::ShowFound()
 	{
 		m_pcNext->Enable(true);
 	}
-
-	if (m_sSelect.IsSameAs(wxT("Constants") )){
-		m_pcNext->Enable(true);
-		m_pcPrev->Enable(true);
-
-		if (m_grConstIt == m_grConst.begin() ) {
-			m_pcPrev->Enable(false);
-		}
-
-		if (m_grConstIt == m_grConst.end() ) {
-			m_pcNext->Enable(false);
-		}
-
-	}
-
 
 	this->Raise();
 
@@ -566,6 +510,12 @@ bool SP_DLG_SearchId::ShowFound()
 void SP_DLG_SearchId::OnChangedSelect(wxCommandEvent& p_cEvent)
 {
 	wxString l_sSelect = m_select->GetStringSelection();
+
+	if(m_sSelect != l_sSelect){
+		m_grList.clear();
+		m_pcNext->Enable(false);
+		m_pcPrev->Enable(false);
+	}
 
 	if (l_sSelect.IsSameAs(wxT("Constants") ) ){
 		m_idSpinCtrl->Show(false);

@@ -25,16 +25,8 @@ protected:
 	wxSpinCtrl* m_idSpinCtrl;
 	wxTextCtrl* m_NameTextCtrl;
 
-	//by sl
-	wxString m_sConstant;
-	wxString l_sAttribute;
-	const SP_ListEdge* m_edgeList;
-	SP_ListEdge::const_iterator m_edgeIt;
-
-	SP_ListNodeclass::const_iterator l_itNC;
-	SP_ListEdgeclass::const_iterator l_itEC;
-
-
+	SP_ListNodeclass::const_iterator m_itNC;
+	SP_ListEdgeclass::const_iterator m_itEC;
 
 	wxCheckBox* m_exactName;
 
@@ -52,12 +44,12 @@ protected:
 	wxString m_nclass;
 
 	SP_DS_Graph* m_graph;
+	const SP_ListEdge* m_edgeList;
+	SP_ListEdge::const_iterator m_edgeIt;
 	const SP_ListNode* m_nodeList;
 	SP_ListNode::const_iterator m_nodeIt;
 
-	list<SP_ListGraphic*>::const_iterator m_grConstIt;
-	list<SP_ListGraphic*> m_grConst;
-	SP_ListGraphic* m_grList;
+	SP_ListGraphic m_grList;
 	SP_ListGraphic::const_iterator m_grIt;
 
 public:
@@ -74,7 +66,7 @@ public:
 	void SetTitlePrefix(const wxString& p_val);
 	wxString GetTitlePrefix();
 
-	bool ShowFound();
+	bool ShowFound(bool all = false);
 	bool FindNextNode();
 
 	bool FindNextElement();
@@ -82,6 +74,7 @@ public:
 	bool SearchNodeClasses();
 	bool SearchEdgeClasses();
 	bool SearchAllElements();
+	bool SearchAttributes(const SP_ListAttribute* attributes);
 
 };
 
