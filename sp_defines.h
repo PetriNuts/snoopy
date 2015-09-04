@@ -210,6 +210,7 @@ enum
     SP_ID_BUTTON_FIND,
     SP_ID_BUTTON_NEXT,
     SP_ID_BUTTON_PREV,
+    SP_ID_BUTTON_ALL,
 
 	// invariant analysis
 	SP_MENU_ITEM_LOAD_INVARIANT_FILE,
