@@ -29,10 +29,12 @@ protected:
 	SP_ListEdgeclass::const_iterator m_itEC;
 
 	wxCheckBox* m_exactName;
+	wxCheckBox* m_invert;
 
 	wxButton* m_pcFind;
 	wxButton* m_pcNext;
 	wxButton* m_pcPrev;
+	wxButton* m_pcAll;
 
 	wxString m_title;
 	wxString m_titlePrefix;
@@ -62,6 +64,7 @@ public:
 	void OnFind(wxCommandEvent& p_cEvent);
 	void OnNext(wxCommandEvent& p_cEvent);
 	void OnPrev(wxCommandEvent& p_cEvent);
+	void OnAll(wxCommandEvent& p_cEvent);
 
 	void SetTitlePrefix(const wxString& p_val);
 	wxString GetTitlePrefix();

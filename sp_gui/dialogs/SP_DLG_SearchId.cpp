@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include <wx/regex.h>
+#include <wx/busyinfo.h>
 
 #include "sp_gui/dialogs/SP_DLG_SearchId.h"
 
@@ -28,6 +29,7 @@ BEGIN_EVENT_TABLE(SP_DLG_SearchId, wxDialog)
 	EVT_BUTTON(SP_ID_BUTTON_FIND, SP_DLG_SearchId::OnFind)
 	EVT_BUTTON(SP_ID_BUTTON_NEXT, SP_DLG_SearchId::OnNext)
 	EVT_BUTTON(SP_ID_BUTTON_PREV, SP_DLG_SearchId::OnPrev)
+	EVT_BUTTON(SP_ID_BUTTON_ALL, SP_DLG_SearchId::OnAll)
 END_EVENT_TABLE()
 
 SP_DLG_SearchId::SP_DLG_SearchId(SP_DS_Graph *p_graph, wxWindow *p_parent, const wxString& p_title) :
@@ -52,9 +54,14 @@ SP_DLG_SearchId::SP_DLG_SearchId(SP_DS_Graph *p_graph, wxWindow *p_parent, const
 	m_select = new wxRadioBox(this, SP_ID_RADIOBOX_SELECT, wxT("Search"), wxDefaultPosition, wxDefaultSize, choices, 1, wxRA_SPECIFY_COLS);
 	elemSizer->Add(m_select, 0, wxALL | wxEXPAND, 5);
 
-
+	wxBoxSizer* checkSizer = new wxBoxSizer(wxHORIZONTAL);
 	m_exactName = new wxCheckBox(this, -1, wxT("exact name"));
-	elemSizer->Add(m_exactName, 0, wxALL | wxEXPAND, 5);
+	checkSizer->Add(m_exactName, 0, wxALL | wxEXPAND, 5);
+
+	m_invert = new wxCheckBox(this, -1, wxT("invert"));
+	checkSizer->Add(m_invert, 0, wxALL | wxEXPAND, 5);
+
+	elemSizer->Add(checkSizer, 0, wxALL | wxEXPAND, 0);
 
 	m_idSpinCtrl = new wxSpinCtrl(this, -1, wxT("0"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, INT_MAX, 0);
 	elemSizer->Add(m_idSpinCtrl, 0, wxALL | wxEXPAND, 5);
@@ -114,6 +121,8 @@ SP_DLG_SearchId::SP_DLG_SearchId(SP_DS_Graph *p_graph, wxWindow *p_parent, const
 		buttonSizer->Add(m_pcNext, 0, wxLEFT | wxRIGHT | wxTOP, 5);
 		m_pcPrev = new wxButton(this, SP_ID_BUTTON_PREV, wxT("&Prev"));
 		buttonSizer->Add(m_pcPrev, 0, wxLEFT | wxRIGHT | wxTOP, 5);
+		m_pcAll = new wxButton(this, SP_ID_BUTTON_ALL, wxT("&All"));
+		buttonSizer->Add(m_pcAll, 0, wxLEFT | wxRIGHT | wxTOP, 5);
 
 		m_pcNext->Enable(false);
 		m_pcPrev->Enable(false);
@@ -201,6 +210,9 @@ void SP_DLG_SearchId::OnFind(wxCommandEvent& p_cEvent)
 		m_itNC = m_graph->GetNodeclasses()->begin();
 		m_itEC = m_graph->GetEdgeclasses()->begin();
 
+		m_nodeList = nullptr;
+		m_edgeList = nullptr;
+
 		if (SearchAllElements())
 		{
 			ShowFound();
@@ -229,6 +241,62 @@ void SP_DLG_SearchId::OnFind(wxCommandEvent& p_cEvent)
 	}
 }
 
+void SP_DLG_SearchId::OnAll(wxCommandEvent& p_cEvent)
+{
+	m_id = m_idSpinCtrl->GetValue();
+	m_nclass = m_choice->GetStringSelection();
+	m_sName = m_NameTextCtrl->GetValue();
+	m_nSelect = m_select->GetSelection();
+	m_sSelect = m_select->GetStringSelection();
+
+	m_pcNext->Enable(false);
+	m_pcPrev->Enable(false);
+
+    wxWindowDisabler disableAll;
+    wxBusyInfo wait("Please wait, searching...");
+
+    for(SP_Graphic* l_pcGr : m_grList)
+	{
+		l_pcGr->Select(false);
+	}
+	m_grList.clear();
+
+	if (m_sSelect.IsSameAs(wxT("Constants"))) {
+		m_itNC = m_graph->GetNodeclasses()->begin();
+		m_itEC = m_graph->GetEdgeclasses()->begin();
+
+		m_nodeList = nullptr;
+		m_edgeList = nullptr;
+
+		while (SearchAllElements())
+		{
+			for(; m_grIt != m_grList.end(); ++m_grIt)
+			{
+				ShowFound(true);
+			}
+		}
+		if(m_grList.empty())
+		{
+			SP_MESSAGEBOX(wxT("Constant not found"), wxT("Search"), wxOK | wxICON_INFORMATION );
+		}
+
+	} else {
+		m_nodeList = m_graph->GetNodeclassByDisplayedName(m_nclass)->GetElements();
+		m_nodeIt = m_nodeList->begin();
+
+		while (FindNextNode())
+		{
+			for(; m_grIt != m_grList.end(); ++m_grIt)
+			{
+				ShowFound(true);
+			}
+		}
+		if(m_grList.empty())
+		{
+			SP_MESSAGEBOX(wxT("Node not found"), wxT("Search"), wxOK | wxICON_INFORMATION );
+		}
+	}
+}
 
 bool
 SP_DLG_SearchId::SearchAllElements() {
@@ -309,7 +377,10 @@ bool SP_DLG_SearchId::FindNextNode()
 				wxRegEx regex(m_sName);
 				l_bFound = regex.Matches((attr)->GetValueString());
 			}
-
+			if(m_invert->IsChecked())
+			{
+				l_bFound = !l_bFound;
+			}
 			if(l_bFound)
 			{
 				SP_LOGDEBUG(wxT("found node"));
@@ -391,42 +462,57 @@ bool SP_DLG_SearchId::SearchAttributes(const SP_ListAttribute* attributes)
 	bool l_bFound = false;
 	for(SP_DS_Attribute* attr : *(attributes))
 	{
-		if(attr->GetName() == wxT("Name") || attr->GetName() == wxT("ID"))
+		if(attr->GetName() == wxT("Marking")
+			|| attr->GetName() == wxT("Multiplicity")
+			|| attr->GetName() == wxT("MarkingList")
+			|| attr->GetName() == wxT("FunctionList")
+			|| attr->GetName() == wxT("DelayList")
+			|| attr->GetName() == wxT("PeriodicList")
+			|| attr->GetName() == wxT("Duration")
+			|| attr->GetName() == wxT("Interval")
+			)
 		{
-			continue;
-		}
-		if(attr->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST)
-		{
-			SP_DS_ColListAttribute* attrCol = static_cast<SP_DS_ColListAttribute*>(attr);
-			for(unsigned i = 0; i < attrCol->GetRowCount(); ++i)
+			if(attr->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST)
 			{
-				for(unsigned k = 0; k < attrCol->GetColCount(); ++k)
+				SP_DS_ColListAttribute* attrCol = static_cast<SP_DS_ColListAttribute*>(attr);
+				for(unsigned i = 0; i < attrCol->GetRowCount(); ++i)
 				{
-					if (m_exactName->IsChecked())
+					for(unsigned k = 1; k < attrCol->GetColCount(); ++k)
 					{
-						l_bFound = (attrCol)->GetCell(i,k).IsSameAs(m_sName);
+						if (m_exactName->IsChecked())
+						{
+							l_bFound = (attrCol)->GetCell(i,k).IsSameAs(m_sName);
+						}
+						else
+						{
+							wxRegEx regex(m_sName);
+							l_bFound = regex.Matches((attrCol)->GetCell(i,k));
+						}
+						if(m_invert->IsChecked())
+						{
+							l_bFound = !l_bFound;
+						}
+						if(l_bFound) return true;
 					}
-					else
-					{
-						wxRegEx regex(m_sName);
-						l_bFound = regex.Matches((attrCol)->GetCell(i,k));
-					}
-					if(l_bFound) return true;
 				}
-			}
-		}
-		else
-		{
-			if (m_exactName->IsChecked())
-			{
-				l_bFound = (attr)->GetValueString().IsSameAs(m_sName);
 			}
 			else
 			{
-				wxRegEx regex(m_sName);
-				l_bFound = regex.Matches((attr)->GetValueString());
+				if (m_exactName->IsChecked())
+				{
+					l_bFound = (attr)->GetValueString().IsSameAs(m_sName);
+				}
+				else
+				{
+					wxRegEx regex(m_sName);
+					l_bFound = regex.Matches((attr)->GetValueString());
+				}
+				if(m_invert->IsChecked())
+				{
+					l_bFound = !l_bFound;
+				}
+				if(l_bFound) return true;
 			}
-			if(l_bFound) return true;
 		}
 	}
 	return false;
@@ -462,24 +548,26 @@ bool SP_DLG_SearchId::ShowFound(bool all)
 	(*m_grIt)->Select(true);
 
 	//make the node visible
-	double l_nPosX=0, l_nPosY=0;
-	(*m_grIt)->GetPosXY(&l_nPosX, &l_nPosY);
-	int l_nSize = wxGetApp().GetCanvasPrefs()->GetGridSpacing(doc->GetNetclassName());
-	wxRect l_Rect;
-	view->GetCanvas()->GetViewStart(&(l_Rect.x), &(l_Rect.y));
-	l_Rect.x *= l_nSize;
-	l_Rect.y *= l_nSize;
-	view->GetCanvas()->GetClientSize(&l_Rect.width, &l_Rect.height);
-	if(l_Rect.GetX() > l_nPosX || l_nPosX > (l_Rect.GetX() + l_Rect.GetWidth())
-		|| l_Rect.GetY() > l_nPosY || l_nPosY > (l_Rect.GetY() + l_Rect.GetHeight()))
+	if(!all)
 	{
-		int l_nX = (l_nPosX-(l_Rect.GetWidth()/2))/l_nSize;
-		int l_nY = (l_nPosY-(l_Rect.GetHeight()/2))/l_nSize;
-		l_nX = (l_nX < 0) ? 0 : l_nX;
-		l_nY = (l_nY < 0) ? 0 : l_nY;
-		view->GetCanvas()->Scroll(l_nX, l_nY);
+		double l_nPosX=0, l_nPosY=0;
+		(*m_grIt)->GetPosXY(&l_nPosX, &l_nPosY);
+		int l_nSize = wxGetApp().GetCanvasPrefs()->GetGridSpacing(doc->GetNetclassName());
+		wxRect l_Rect;
+		view->GetCanvas()->GetViewStart(&(l_Rect.x), &(l_Rect.y));
+		l_Rect.x *= l_nSize;
+		l_Rect.y *= l_nSize;
+		view->GetCanvas()->GetClientSize(&l_Rect.width, &l_Rect.height);
+		if(l_Rect.GetX() > l_nPosX || l_nPosX > (l_Rect.GetX() + l_Rect.GetWidth())
+			|| l_Rect.GetY() > l_nPosY || l_nPosY > (l_Rect.GetY() + l_Rect.GetHeight()))
+		{
+			int l_nX = (l_nPosX-(l_Rect.GetWidth()/2))/l_nSize;
+			int l_nY = (l_nPosY-(l_Rect.GetHeight()/2))/l_nSize;
+			l_nX = (l_nX < 0) ? 0 : l_nX;
+			l_nY = (l_nY < 0) ? 0 : l_nY;
+			view->GetCanvas()->Scroll(l_nX, l_nY);
+		}
 	}
-
 	// in other cases not needed?
 	if (!data)
 	{
@@ -512,6 +600,10 @@ void SP_DLG_SearchId::OnChangedSelect(wxCommandEvent& p_cEvent)
 	wxString l_sSelect = m_select->GetStringSelection();
 
 	if(m_sSelect != l_sSelect){
+		for(SP_Graphic* l_pcGr : m_grList)
+		{
+			l_pcGr->Select(false);
+		}
 		m_grList.clear();
 		m_pcNext->Enable(false);
 		m_pcPrev->Enable(false);
@@ -521,6 +613,7 @@ void SP_DLG_SearchId::OnChangedSelect(wxCommandEvent& p_cEvent)
 		m_idSpinCtrl->Show(false);
 		m_NameTextCtrl->Show(true);
 		m_exactName->Show(true);
+		m_invert->Show(true);
 		m_choice->Show(false);
 		m_NameTextCtrl->Refresh();
 	}
@@ -529,6 +622,7 @@ void SP_DLG_SearchId::OnChangedSelect(wxCommandEvent& p_cEvent)
 		m_idSpinCtrl->Show(false);
 		m_NameTextCtrl->Show(true);
 		m_exactName->Show(true);
+		m_invert->Show(true);
 		m_choice->Show(true);
 		m_NameTextCtrl->Refresh();
 	}
@@ -538,6 +632,7 @@ void SP_DLG_SearchId::OnChangedSelect(wxCommandEvent& p_cEvent)
 		m_idSpinCtrl->Refresh();
 		m_NameTextCtrl->Show(false);
 		m_exactName->Show(false);
+		m_invert->Show(false);
 		m_choice->Show(true);
 	}
 }
