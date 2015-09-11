@@ -235,7 +235,7 @@ bool SP_ImportSBML::ValidateSBML(SBMLDocument* p_sbmlDoc)
 {
 	CHECK_POINTER(p_sbmlDoc, return false);
 
-	p_sbmlDoc->checkL2v3Compatibility();
+	p_sbmlDoc->checkL2v4Compatibility();
 
 	unsigned int l_nErrors = p_sbmlDoc->getNumErrors();
 	bool l_nSeriousErrors = false;

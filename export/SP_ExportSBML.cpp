@@ -28,7 +28,7 @@ SP_ExportSBML::AddToDialog(SP_DLG_ExportProperties* p_pcDlg, SP_MDI_Doc* p_pcDoc
 											wxT("Choose Your Option") ), wxVERTICAL );
 	wxSizer* l_pcRowSizer = new wxBoxSizer( wxVERTICAL );
 
-	m_pRadioButton1=new wxRadioButton(l_pcNotebookPage, -1, wxT("&SBML LEVEL2 V3"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	m_pRadioButton1=new wxRadioButton(l_pcNotebookPage, -1, wxT("&SBML LEVEL2 V4"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	m_pRadioButton2=new wxRadioButton(l_pcNotebookPage, -1, wxT("&SBML LEVEL1 V2"), wxDefaultPosition, wxDefaultSize);
 	m_pRadioButton1->SetValue(true);
 
@@ -76,7 +76,7 @@ SP_ExportSBML::DoWrite()
 	else
 	{
 		l_nLevel=2;
-		l_nVersion=3;
+		l_nVersion=4;
 	}
 
 	wxString l_sModelname = m_doc->GetUserReadableName();
