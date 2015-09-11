@@ -89,7 +89,6 @@ protected :
     virtual void DirectSingleExactExportToCSV(long p_nSimulatinRunNumber , double p_nTimepoint, const SP_VectorDouble& p_anMarking, const SP_VectorDouble& p_anHazardValues, long p_nCurrentTimePoint);
    // virtual void LoadResults();
     
-	virtual void OnEditOtherView(wxCommandEvent& p_cEvent);
 	virtual bool ComputeAuxiliaryVars();
 	virtual void ComputeAverageAuxiliaryVars(long p_nSimulationRunNumber, long p_nSimulationRunCount);
 	virtual void ComputeEachSimulationAuxiliaryVars();

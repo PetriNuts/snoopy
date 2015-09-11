@@ -672,8 +672,6 @@ SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	l_pcMC = p_pcGraph->GetMetadataclass(wxT("Plot"));
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("OutputType"), wxT("Colored") ) );
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("RegEx"), wxT("") ) );
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("RegExOutputType"), wxT("Unfolded") ) );
 
 	//////////////////////////////////////////////////////////////////////////////
     //basic color set

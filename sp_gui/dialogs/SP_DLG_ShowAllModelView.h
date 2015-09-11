@@ -56,6 +56,8 @@ private:
 
 	bool m_bIsShown;
 	wxSizer *m_pcContentSizer;
+
+	bool m_bIsColouredSimulation;
 protected:
 
 	void OnRefresh(wxCommandEvent& event);

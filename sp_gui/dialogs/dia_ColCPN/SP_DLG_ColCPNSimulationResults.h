@@ -47,9 +47,6 @@ class SP_DLG_ColCPNSimulationResults : public SP_DS_ColoredPNSimulation, public 
 
 private:
 
-	     virtual void OnEditOtherView(wxCommandEvent& p_cEvent);
-	
-
 	    virtual void AddNewMarkingSet(const wxString& p_sMarkingSetName,const int& p_nRow);
 	    virtual bool IsMarkingSetNameExist(const wxString& p_sName);
 

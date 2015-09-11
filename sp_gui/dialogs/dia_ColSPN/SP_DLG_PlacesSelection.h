@@ -51,7 +51,7 @@ protected:
 	wxStaticBox* m_pcFourthColumStaticBox;
 	wxString m_sPlaceTransition;    //get the string for the place or tansition list box
 
-	 wxTextCtrl* m_pcNameTextCtrl;
+	wxTextCtrl* m_pcNameTextCtrl;
 	wxRadioBox* m_pcPlaceTransitionRadioBox;
 	wxRadioBox* m_pcPlaceResultsRadioBox;
 
@@ -89,13 +89,14 @@ protected:
 			
 	vector<SP_ColPN_Position_OutputType> m_vmSelectedNodes;
 
-	 SP_DS_Metadata* m_pcEditMetadata;
+	SP_DS_Metadata* m_pcEditMetadata;
 
-	 wxString m_sPlotName;
-
+	wxString m_sPlotName;
 public:
-	 wxTextCtrl *m_pcPlaceChoiceRegex;
-	 wxTextCtrl *m_pcPlaceChoiceOutRegex;
+	wxTextCtrl *m_pcPlaceChoiceRegex;
+	wxTextCtrl *m_pcPlaceChoiceOutRegex;
+	wxCheckBox *m_pcPlaceChoiceRegexInvert;
+
 	 wxString m_sOutputType;
 protected:
 
@@ -104,8 +105,7 @@ protected:
 
 public:
 	
-	//p_sNodeType: place or transition
-    SP_DLG_PlacesSelection(wxString p_sNodeType, SP_DS_Metadata* p_pcEditMetadata, wxWindow* p_pcParent,
+    SP_DLG_PlacesSelection(SP_DS_Metadata* p_pcEditMetadata, wxWindow* p_pcParent,
     const wxString& p_sTitle = wxT("Edit"),
     long p_nStyle = wxDEFAULT_DIALOG_STYLE );
 
@@ -147,7 +147,6 @@ protected:
 	virtual void OnChangedOutType( wxCommandEvent& p_cEvent );
 
 	void OnRegexSelection(wxCommandEvent& p_cEvent );
-	void OnLoadingPlacesAccordingToRegex(wxCommandEvent& p_cEvent);
 	void NodesThroughRegEx();
 	DECLARE_CLASS( SP_DLG_PlacesSelection )
 	DECLARE_EVENT_TABLE()

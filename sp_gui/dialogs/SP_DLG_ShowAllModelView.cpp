@@ -14,6 +14,7 @@
 #include "sp_gui/dialogs/SP_DLG_Simulation.h"
 
 #include "sp_gui/dialogs/SP_DLG_ShowAllModelView.h"
+#include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 
 #include "sp_ds/extensions/ResultViewer/SP_DS_PlotViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_TableViewer.h"
@@ -46,11 +47,23 @@ END_EVENT_TABLE()
  */
 
 SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_DS_Metadata* p_pcModelView) :
-		wxFrame(NULL, -1, wxT("Show all views"), wxPoint(700, 10), wxSize(800, 750), wxFRAME_FLOAT_ON_PARENT | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | wxCAPTION | wxCLOSE_BOX),
+		wxFrame(NULL, -1, wxT("Show all views"),
+				wxDefaultPosition,
+				wxSize(800, 750),
+				wxFRAME_FLOAT_ON_PARENT | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | wxCAPTION | wxCLOSE_BOX),
 		m_pcModelView(p_pcModelView), m_pcParentWnd(p_pcWnd), m_bIsDisconnected(false), m_bIsShown(true)
 {
 	if (m_pcModelView == NULL)
 		return;
+
+	//use this to check for coloured simulation
+	m_bIsColouredSimulation = m_pcModelView->GetAttribute(wxT("OutputType")) != nullptr;
+
+	wxPoint pos = p_pcWnd->GetPosition();
+	wxSize size = p_pcWnd->GetSize();
+	pos.x += size.GetX() + 10;
+	SetPosition(pos);
+
 	wxSizer* l_pcMainSizer = new wxBoxSizer(wxVERTICAL);
 	m_pcContentSizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -86,7 +99,6 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	SetTitle(l_sViewName);
 	m_IsSelectedPlace.Clear();
 	m_IsSelectedTransition.Clear();
-	wxString l_RegExOutputType = m_pcModelView->GetAttribute(wxT("RegExOutputType"))->GetValueString();
 	wxString l_sElementType = m_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
 	int l_nSize, l_nSize1 = 0;
 	if (l_sElementType == wxT("Place"))
@@ -241,96 +253,15 @@ SP_DLG_ShowAllModelView::~SP_DLG_ShowAllModelView()
 
 void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
 	wxString l_selection1 = p_cEvent.GetString();
-		unsigned int l_selection = p_cEvent.GetSelection();
-		wxArrayString l_ArrayPlaces, l_ArrayTranstions;
-		wxString l_RegExString = m_pcModelView->GetAttribute(wxT("RegEx"))->GetValueString();
-		if (l_RegExString != wxT("")) {
-			wxString l_sElementType = m_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
-			wxString l_RegExOutputType = m_pcModelView->GetAttribute(wxT("RegExOutputType"))->GetValueString();
-			if (l_sElementType.IsSameAs(wxT("Place"))) {
-			//	SP_LOGMESSAGE("place");
-				if (l_RegExOutputType == wxT("Unfolded")) {
-					l_ArrayPlaces = m_pcParentWnd->m_ArrayUnPlaces;
-					for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
-					{
-						wxString l_sName = l_ArrayPlaces[l_nRow];
-						if (l_selection1 == l_sName) {
-							l_selection	= l_nRow;
-							break;
-						}
-					}
-				} else if (l_RegExOutputType == wxT("Colored")) {
-					l_ArrayPlaces = m_pcParentWnd->m_ArrayColPlaces;
-					for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
-					{
-
-						wxString l_sName = l_ArrayPlaces[l_nRow];
-						if (l_selection1 == l_sName) {
-							l_selection	= l_nRow;
-							break;
-						}
-					}
-				} else {
-					l_ArrayPlaces = m_pcParentWnd->m_ArrayAuxPlaces;
-					for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
-					{
-
-						wxString l_sName = l_ArrayPlaces[l_nRow];
-						if (l_selection1 == l_sName) {
-							l_selection	= l_nRow;
-							break;
-						}
-					}
-				}
-			} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
-			//	SP_LOGMESSAGE("transition");
-				if (l_RegExOutputType == wxT("Unfolded")) {
-					l_ArrayTranstions = m_pcParentWnd->m_ArrayUnTranstions;
-					for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
-					{
-						wxString l_sName = l_ArrayTranstions[l_nRow];
-						if (l_selection1 == l_sName) {
-							l_selection	= l_nRow;
-							break;
-						}
-					}
-				} else if (l_RegExOutputType == wxT("Unfolded")) {
-					l_ArrayTranstions = m_pcParentWnd->m_ArrayColTranstions;
-					for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
-					{
-						wxString l_sName = l_ArrayTranstions[l_nRow];
-						if (l_selection1 == l_sName) {
-							l_selection	= l_nRow;
-							break;
-						}
-					}
-				} else {
-					l_ArrayTranstions = m_pcParentWnd->m_ArrayAuxtranstions;
-					for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
-					{
-						wxString l_sName = l_ArrayTranstions[l_nRow];
-						if (l_selection1 == l_sName) {
-							l_selection	= l_nRow;
-							break;
-						}
-					}
-				}
-			}
-		}
-	m_pcParentWnd->OnItemDoubleClick(this, l_selection, m_pcPlaceChoiceCheckListBox->GetCount());
-}
-
-void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
-	wxString l_selection1 = p_cEvent.GetString();
 	unsigned int l_selection = p_cEvent.GetSelection();
-	unsigned int l_selection2 = p_cEvent.GetSelection();
 	wxArrayString l_ArrayPlaces, l_ArrayTranstions;
 	wxString l_RegExString = m_pcModelView->GetAttribute(wxT("RegEx"))->GetValueString();
 	if (l_RegExString != wxT("")) {
 		wxString l_sElementType = m_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
-		wxString l_RegExOutputType = m_pcModelView->GetAttribute(wxT("RegExOutputType"))->GetValueString();
+		wxString l_RegExOutputType = m_bIsColouredSimulation
+				? m_pcModelView->GetAttribute(wxT("OutputType"))->GetValueString()
+				: wxT("Unfolded");
 		if (l_sElementType.IsSameAs(wxT("Place"))) {
-		//	SP_LOGMESSAGE("place");
 			if (l_RegExOutputType == wxT("Unfolded")) {
 				l_ArrayPlaces = m_pcParentWnd->m_ArrayUnPlaces;
 				for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
@@ -345,7 +276,6 @@ void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
 				l_ArrayPlaces = m_pcParentWnd->m_ArrayColPlaces;
 				for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 				{
-
 					wxString l_sName = l_ArrayPlaces[l_nRow];
 					if (l_selection1 == l_sName) {
 						l_selection	= l_nRow;
@@ -356,7 +286,86 @@ void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
 				l_ArrayPlaces = m_pcParentWnd->m_ArrayAuxPlaces;
 				for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 				{
+					wxString l_sName = l_ArrayPlaces[l_nRow];
+					if (l_selection1 == l_sName) {
+						l_selection	= l_nRow;
+						break;
+					}
+				}
+			}
+		} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
+			if (l_RegExOutputType == wxT("Unfolded")) {
+				l_ArrayTranstions = m_pcParentWnd->m_ArrayUnTranstions;
+				for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
+				{
+					wxString l_sName = l_ArrayTranstions[l_nRow];
+					if (l_selection1 == l_sName) {
+						l_selection	= l_nRow;
+						break;
+					}
+				}
+			} else if (l_RegExOutputType == wxT("Unfolded")) {
+				l_ArrayTranstions = m_pcParentWnd->m_ArrayColTranstions;
+				for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
+				{
+					wxString l_sName = l_ArrayTranstions[l_nRow];
+					if (l_selection1 == l_sName) {
+						l_selection	= l_nRow;
+						break;
+					}
+				}
+			} else {
+				l_ArrayTranstions = m_pcParentWnd->m_ArrayAuxtranstions;
+				for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
+				{
+					wxString l_sName = l_ArrayTranstions[l_nRow];
+					if (l_selection1 == l_sName) {
+						l_selection	= l_nRow;
+						break;
+					}
+				}
+			}
+		}
+	}
+	m_pcParentWnd->OnItemDoubleClick(this, l_selection, m_pcPlaceChoiceCheckListBox->GetCount());
+}
 
+void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
+	wxString l_selection1 = p_cEvent.GetString();
+	unsigned int l_selection = p_cEvent.GetSelection();
+	unsigned int l_selection2 = p_cEvent.GetSelection();
+	wxArrayString l_ArrayPlaces, l_ArrayTranstions;
+	wxString l_RegExString = m_pcModelView->GetAttribute(wxT("RegEx"))->GetValueString();
+	if (l_RegExString != wxT("")) {
+		wxString l_sElementType = m_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
+		wxString l_RegExOutputType = m_bIsColouredSimulation
+				? m_pcModelView->GetAttribute(wxT("OutputType"))->GetValueString()
+				: wxT("Unfolded");
+		if (l_sElementType.IsSameAs(wxT("Place"))) {
+			if (l_RegExOutputType == wxT("Unfolded")) {
+				l_ArrayPlaces = m_pcParentWnd->m_ArrayUnPlaces;
+				for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
+				{
+					wxString l_sName = l_ArrayPlaces[l_nRow];
+					if (l_selection1 == l_sName) {
+						l_selection	= l_nRow;
+						break;
+					}
+				}
+			} else if (l_RegExOutputType == wxT("Colored")) {
+				l_ArrayPlaces = m_pcParentWnd->m_ArrayColPlaces;
+				for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
+				{
+					wxString l_sName = l_ArrayPlaces[l_nRow];
+					if (l_selection1 == l_sName) {
+						l_selection	= l_nRow;
+						break;
+					}
+				}
+			} else {
+				l_ArrayPlaces = m_pcParentWnd->m_ArrayAuxPlaces;
+				for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
+				{
 					wxString l_sName = l_ArrayPlaces[l_nRow];
 					if (l_selection1 == l_sName) {
 						l_selection	= l_nRow;
@@ -367,7 +376,6 @@ void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
 			m_IsSelectedPlace[l_selection] = 1 - m_IsSelectedPlace[l_selection];
 
 		} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
-		//	SP_LOGMESSAGE("transition");
 			if (l_RegExOutputType == wxT("Unfolded")) {
 				l_ArrayTranstions = m_pcParentWnd->m_ArrayUnTranstions;
 				for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
@@ -588,6 +596,7 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 	m_pcPlaceChoiceCheckListBox->Clear();
 
 	wxString l_RegExString = p_pcModelView->GetAttribute(wxT("RegEx"))->GetValueString();
+	bool l_RegExInvert = static_cast<SP_DS_BoolAttribute*>(p_pcModelView->GetAttribute(wxT("RegExInvert")))->GetValue();
 	wxRegEx l_RegEx;
 
 	if (l_RegExString == wxT(""))
@@ -601,24 +610,27 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 	}
 	else
 	{
-		wxString l_RegExOutputType = m_pcModelView->GetAttribute(wxT("RegExOutputType"))->GetValueString();
+		wxString l_RegExOutputType = m_bIsColouredSimulation
+				? m_pcModelView->GetAttribute(wxT("OutputType"))->GetValueString()
+				: wxT("Unfolded");
 		if (l_RegEx.Compile(l_RegExString, wxRE_DEFAULT))
 		{
-			wxArrayString l_ArrayPlaces, l_ArrayTranstions;
+			wxSortedArrayString l_ArrayPlaces, l_ArrayTranstions;
 
 			m_pcPlaceChoiceCheckListBox->Clear();
 			wxString l_sElementType = p_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
 			int l_nCurve = 0;
 			if (l_sElementType.IsSameAs(wxT("Place")))
 			{
-				//	SP_LOGMESSAGE("place");
 				if (l_RegExOutputType == wxT("Unfolded"))
 				{
 					l_ArrayPlaces = m_pcParentWnd->m_ArrayUnPlaces;
 					for (unsigned int l_nRow = 0; l_nRow < l_ArrayPlaces.GetCount(); l_nRow++)
 					{
 						wxString l_sName = l_ArrayPlaces[l_nRow];
-						if (l_RegEx.Matches(l_sName))
+						bool match = l_RegEx.Matches(l_sName);
+						if(l_RegExInvert) { match = !match; }
+						if(match)
 						{
 							m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
 							int l_nSelected = m_IsSelectedPlace[l_nRow];
@@ -643,7 +655,9 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 						{
 
 							wxString l_sName = l_ArrayPlaces[l_nRow];
-							if (l_RegEx.Matches(l_sName))
+							bool match = l_RegEx.Matches(l_sName);
+							if(l_RegExInvert) { match = !match; }
+							if(match)
 							{
 								m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
 								int l_nSelected = m_IsSelectedPlace[l_nRow];
@@ -656,7 +670,6 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 								p_pcResultViewer->SetCurveLineWidth(l_nRow, m_PlaceLineWidth[l_nRow]);
 								p_pcResultViewer->SetCurveLineStyle(l_nRow, m_PlaceLineStyle[l_nRow]);
 								l_nCurve++;
-
 							}
 						}
 					}
@@ -667,7 +680,9 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 						{
 
 							wxString l_sName = l_ArrayPlaces[l_nRow];
-							if (l_RegEx.Matches(l_sName))
+							bool match = l_RegEx.Matches(l_sName);
+							if(l_RegExInvert) { match = !match; }
+							if(match)
 							{
 								m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
 								int l_nSelected = m_IsSelectedPlace[l_nRow];
@@ -689,7 +704,6 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 			else
 				if (l_sElementType.IsSameAs(wxT("Transition")))
 				{
-					//	SP_LOGMESSAGE("transition");
 					l_nCurve = 0;
 					if (l_RegExOutputType == wxT("Unfolded"))
 					{
@@ -697,7 +711,9 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 						for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 						{
 							wxString l_sName = l_ArrayTranstions[l_nRow];
-							if (l_RegEx.Matches(l_sName))
+							bool match = l_RegEx.Matches(l_sName);
+							if(l_RegExInvert) { match = !match; }
+							if(match)
 							{
 								m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
 								int l_nSelected = m_IsSelectedTransition[l_nRow];
@@ -721,7 +737,9 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 							for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 							{
 								wxString l_sName = l_ArrayTranstions[l_nRow];
-								if (l_RegEx.Matches(l_sName))
+								bool match = l_RegEx.Matches(l_sName);
+								if(l_RegExInvert) { match = !match; }
+								if(match)
 								{
 									m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
 									int l_nSelected = m_IsSelectedTransition[l_nRow];
@@ -744,7 +762,9 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 							for (unsigned int l_nRow = 0; l_nRow < l_ArrayTranstions.GetCount(); l_nRow++)
 							{
 								wxString l_sName = l_ArrayTranstions[l_nRow];
-								if (l_RegEx.Matches(l_sName))
+								bool match = l_RegEx.Matches(l_sName);
+								if(l_RegExInvert) { match = !match; }
+								if(match)
 								{
 									m_pcPlaceChoiceCheckListBox->Insert(l_sName, m_pcPlaceChoiceCheckListBox->GetCount());
 									int l_nSelected = m_IsSelectedTransition[l_nRow];

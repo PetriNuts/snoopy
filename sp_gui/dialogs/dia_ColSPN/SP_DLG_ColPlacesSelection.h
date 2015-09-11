@@ -43,7 +43,7 @@ private:
   
 public:
 	
-    SP_DLG_ColPlacesSelection(SP_DLG_Simulation* p_pcColSimulationResults, wxString p_sNodeType, SP_DS_Metadata* p_pcEditMetadata, wxWindow* p_pcParent,
+    SP_DLG_ColPlacesSelection(SP_DLG_Simulation* p_pcColSimulationResults, SP_DS_Metadata* p_pcEditMetadata, wxWindow* p_pcParent,
     const wxString& p_sTitle = wxT("Edit"),
     long p_nStyle = wxDEFAULT_DIALOG_STYLE );
 

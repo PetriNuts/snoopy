@@ -54,8 +54,6 @@ class SP_DLG_ColHPNSimultionResults : public SP_DS_ColoredPNSimulation, public S
 
  protected: 	  
 
-		virtual void OnEditOtherView(wxCommandEvent& p_cEvent); // to be 
-
 		//virtual void AddNewMarkingSet(const wxString& p_sMarkingSetName,const int& p_nRow); // to be 
 		//virtual bool IsMarkingSetNameExist(const wxString& p_sName); // to be
 

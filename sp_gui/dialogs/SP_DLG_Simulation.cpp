@@ -192,6 +192,9 @@ void SP_DLG_Simulation::OnInitDialog(wxInitDialogEvent& event)
     //load the marking, rate, and parameter sets
     LoadSets();
 
+    //show default view
+    //OpenViewInSeparateWindow(m_pcCurrentTablePlot);
+
     //TODO: add general methods here
 }
 
@@ -661,9 +664,6 @@ void SP_DLG_Simulation::OnEditViewerTypeProperties(wxWindow *p_pcExternalWindowD
 
 void SP_DLG_Simulation::OnAddingNewModalView(wxCommandEvent& p_cEvent) {
 
-//	SP_DS_Attribute *l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"));
-//	SP_LOGMESSAGE(wxT("name ") + l_pcAttribute->GetValueString());
-
 	wxTextEntryDialog* l_pcModelViewDlg;
 	wxString l_sViewName;
 
@@ -809,49 +809,38 @@ void SP_DLG_Simulation::DoEditViewerProperties(wxWindow *p_pcExternalWindowDialo
     l_pcViewerProperties->Destroy();
 }
 
-void SP_DLG_Simulation::OnEditOtherNodeList(wxWindow *p_pcExternalWindowDialog) {
+void SP_DLG_Simulation::OnEditOtherNodeList(wxWindow *p_pcExternalWindowDialog)
+{
 	wxString l_TempClassName = m_pcGraph->GetNetclass()->GetName();
 
-	if (l_TempClassName == SP_DS_COLSPN_CLASS || l_TempClassName == SP_DS_COLCPN_CLASS || l_TempClassName == SP_DS_COLHPN_CLASS) {
-		SP_DS_Attribute* l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("Nodeclass"));
-		CHECK_POINTER(l_pcAttribute, return);
-
-		wxString l_sElementType = l_pcAttribute->GetValueString();
-		l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"));
+	if (l_TempClassName == SP_DS_COLSPN_CLASS
+			|| l_TempClassName == SP_DS_COLCPN_CLASS
+			|| l_TempClassName == SP_DS_COLHPN_CLASS)
+	{
 		SaveCurrentView();
 
-		SP_DLG_ColPlacesSelection* l_pcDlg = new SP_DLG_ColPlacesSelection(this, l_sElementType, m_pcCurrentTablePlot, p_pcExternalWindowDialog);
+		SP_DLG_ColPlacesSelection* l_pcDlg = new SP_DLG_ColPlacesSelection(this, m_pcCurrentTablePlot, p_pcExternalWindowDialog);
 
 		if (l_pcDlg->ShowModal() == wxID_OK)
 		{
-			l_pcAttribute->SetValueString(l_pcDlg->m_pcPlaceChoiceOutRegex->GetValue());
-			l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("RegExOutputType"));
-			l_pcAttribute->SetValueString(l_pcDlg->m_sOutputType);
-
+			InitializeViews();
 			LoadData(true);
 		}
 
 		l_pcDlg->Destroy();
-	} else {
-		SP_DS_Attribute* l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("Nodeclass"));
-		CHECK_POINTER(l_pcAttribute, return);
-		wxString l_sElementType = l_pcAttribute->GetValueString();
-
-		l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"));
-
+	}
+	else
+	{
 		SaveCurrentView();
 
-		SP_DLG_PlacesSelection* l_pcDlg = new SP_DLG_PlacesSelection(l_sElementType, m_pcCurrentTablePlot, p_pcExternalWindowDialog);
+		SP_DLG_PlacesSelection* l_pcDlg = new SP_DLG_PlacesSelection(m_pcCurrentTablePlot, p_pcExternalWindowDialog);
 
 		if (l_pcDlg->ShowModal() == wxID_OK)
 		{
-			l_pcAttribute->SetValueString(l_pcDlg->m_pcPlaceChoiceOutRegex->GetValue());
-			l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("RegExOutputType"));
-			l_pcAttribute->SetValueString(l_pcDlg->m_sOutputType);
 			InitializeViews();
 			LoadData(true);
 		}
-    l_pcDlg->Destroy();
+		l_pcDlg->Destroy();
 	}
 }
 
@@ -928,12 +917,9 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
 		m_ArrayUnTranstions.Add(m_asTransitionNames[i]);
 	}
 
-    wxString l_RegExString;
-    SP_DS_Attribute* l_RegExAttr = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"));
-    if(l_RegExAttr)
-    {
-    	l_RegExString = l_RegExAttr->GetValueString();
-    }
+    wxString l_RegExString =  m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
+	bool l_RegExInvert = static_cast<SP_DS_BoolAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("RegExInvert")))->GetValue();
+
     if (l_RegExString == wxT("")) {
     	for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
 		{
@@ -990,7 +976,9 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
 				{
 					wxString l_sName = m_ArrayUnPlaces[l_nRow];
 					p_pcViewer->AddCurve(l_sName, l_sPosition, &m_anResultMatrix);
-					if (l_RegEx.Matches(l_sName)) {
+					bool match = l_RegEx.Matches(l_sName);
+					if(l_RegExInvert) { match = !match; }
+					if(match) {
 						p_asPlaces.Add(l_sName);
 					}
 					l_sPosition++;
@@ -1001,7 +989,9 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
 				{
 					wxString l_sName = m_ArrayUnTranstions[l_nRow];
 					p_pcViewer->AddCurve(l_sName, l_sPosition, &m_anResultMatrix);
-					if (l_RegEx.Matches(l_sName)) {
+					bool match = l_RegEx.Matches(l_sName);
+					if(l_RegExInvert) { match = !match; }
+					if(match) {
 						p_asPlaces.Add(l_sName);
 					}
 					l_sPosition++;
@@ -1365,7 +1355,8 @@ void SP_DLG_Simulation::LoadSelectedCurves()
 			}
 		}
 	}
-    wxString l_RegExString = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
+    wxString l_RegExString =  m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
+	bool l_RegExInvert = static_cast<SP_DS_BoolAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("RegExInvert")))->GetValue();
     wxRegEx l_RegEx;
 	if (l_RegExString == wxT("")) {
 		for (unsigned int l_nCurve = 0; l_nCurve < l_pcPlaceIdList->GetRowCount(); l_nCurve++)
@@ -1417,7 +1408,9 @@ void SP_DLG_Simulation::LoadSelectedCurves()
 				for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnPlaces.GetCount(); l_nRow++)
 				{
 					wxString l_sName = m_ArrayUnPlaces[l_nRow];
-					if (l_RegEx.Matches(l_sName)) {
+					bool match = l_RegEx.Matches(l_sName);
+					if(l_RegExInvert) { match = !match; }
+					if(match) {
 						m_pcPlaceChoiceCheckListBox->Check(l_nCurve, true);
 						m_apcResultViewers[m_nCurrentViewer]->ShowCurve(l_nCurve, true);
 						m_apcResultViewers[m_nCurrentViewer]->SetCurveColor(l_nCurve, GetColourString(l_nCurve));
@@ -1431,7 +1424,9 @@ void SP_DLG_Simulation::LoadSelectedCurves()
 				for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnTranstions.GetCount(); l_nRow++)
 				{
 					wxString l_sName = m_ArrayUnTranstions[l_nRow];
-					if (l_RegEx.Matches(l_sName)) {
+					bool match = l_RegEx.Matches(l_sName);
+					if(l_RegExInvert) { match = !match; }
+					if(match) {
 						m_pcPlaceChoiceCheckListBox->Check(l_nCurve, true);
 						m_apcResultViewers[m_nCurrentViewer]->ShowCurve(l_nCurve, true);
 						m_apcResultViewers[m_nCurrentViewer]->SetCurveColor(l_nCurve, GetColourString(l_nCurve));
@@ -2332,7 +2327,7 @@ void SP_DLG_Simulation::InitializeViews()
 
             m_pcListboxShowAllGraphViewName->SetSelection(l_nPos);
         }
-
+/*
         //check if the view is empty, initialize it with the default values
         SP_DS_Attribute* l_pcAttribute = (*l_itElem)->GetAttribute(wxT("CurveInfo"));
 
@@ -2344,7 +2339,7 @@ void SP_DLG_Simulation::InitializeViews()
         {
             InitializeEmptyView((*l_itElem));
         }
-
+*/
         l_nPos++;
     }
 
@@ -2530,8 +2525,6 @@ SP_DS_Metadata* SP_DLG_Simulation::CreateNewView(const wxString& p_sName, bool p
     l_pcNewMetadata->GetAttribute(wxT("Name"))->SetValueString(p_sName);
 
     (l_pcNewMetadata->GetAttribute(wxT("ViewTitle")))->SetValueString(p_sName);
-
-    l_pcNewMetadata->GetAttribute(wxT("RegEx"))->SetValueString(wxT(""));
 
     return l_pcNewMetadata;
 }

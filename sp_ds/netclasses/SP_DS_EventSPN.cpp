@@ -446,7 +446,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("ViewerType"), wxT("xyPlot") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("Results"), wxT("Marking") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("RegEx"), wxT("") ) );
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("RegExOutputType"), wxT("Unfolded") ) );
+	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_BoolAttribute( wxT("RegExInvert"), false ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("PlaceList"), SP_COLLIST_UNSIGNED_INTEGER, 1 ) );
 	
     /*

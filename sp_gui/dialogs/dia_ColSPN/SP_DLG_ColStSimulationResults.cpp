@@ -275,7 +275,7 @@ bool SP_DLG_ColStSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewe
 			p_asPlaces.Add(l_sName);
 		}
 	} else {
-		wxString l_RegExOutputType = m_pcCurrentTablePlot->GetAttribute(wxT("RegExOutputType"))->GetValueString();
+		wxString l_RegExOutputType = m_pcCurrentTablePlot->GetAttribute(wxT("OutputType"))->GetValueString();
 		if (l_RegEx.Compile(l_RegExString, wxRE_DEFAULT)) {
 			unsigned l_sPosition = 0;
 			if (l_sElementType.IsSameAs(wxT("Place"))) {
@@ -936,25 +936,6 @@ bool SP_DLG_ColStSimulationResults::IsMarkingSetNameExist(const wxString& p_sNam
 
 	return false;
 
-}
-
-void SP_DLG_ColStSimulationResults::OnEditOtherView(wxCommandEvent& p_cEvent)
-{
-	SP_DS_Attribute* l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("Nodeclass"));
-	CHECK_POINTER(l_pcAttribute, return);
-
-	wxString l_sElementType = l_pcAttribute->GetValueString();
-
-	SaveCurrentView();
-
-	SP_DLG_ColPlacesSelection* l_pcDlg = new SP_DLG_ColPlacesSelection(this, l_sElementType, m_pcCurrentTablePlot, this);
-
-	if (l_pcDlg->ShowModal() == wxID_OK)
-	{
-		LoadData(true);
-	}
-
-	l_pcDlg->Destroy();
 }
 
 bool SP_DLG_ColStSimulationResults::ComputeAuxiliaryVars()

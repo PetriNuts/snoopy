@@ -39,9 +39,9 @@ END_EVENT_TABLE()
 
 
 
-SP_DLG_ColPlacesSelection::SP_DLG_ColPlacesSelection(SP_DLG_Simulation* p_pcColSimulationResults,  wxString p_sNodeType, 
+SP_DLG_ColPlacesSelection::SP_DLG_ColPlacesSelection(SP_DLG_Simulation* p_pcColSimulationResults,
 													 SP_DS_Metadata* p_pcEditMetadata, wxWindow* p_pcParent,const wxString& p_sTitle, long p_nStyle) 
-		:SP_DLG_PlacesSelection(p_sNodeType,p_pcEditMetadata,p_pcParent,p_sTitle,p_nStyle),
+		:SP_DLG_PlacesSelection(p_pcEditMetadata,p_pcParent,p_sTitle,p_nStyle),
 		m_pcColSimulationResults(p_pcColSimulationResults)		
 {
 
@@ -179,6 +179,7 @@ void SP_DLG_ColPlacesSelection::LoadData()
 	  m_pListBoxIn->InsertItems(m_ArrayString,0);
     }
 
+	NodesThroughRegEx();
 }
 
 
@@ -229,7 +230,7 @@ void SP_DLG_ColPlacesSelection::OnEditAuxVariable(wxCommandEvent& p_cEvent )
 	m_msaCurLBInStrings[wxT("Place:Auxiliary variables")] = m_ArrayPlaceAuxVar;
 
 	LoadData();	
-	
+
 }
 
 void SP_DLG_ColPlacesSelection::GetSelResults()
@@ -352,10 +353,7 @@ void SP_DLG_ColPlacesSelection::OnChangedOutType(wxCommandEvent& p_cEvent)
 	}
 	
 	LoadData();
-	wxString l_RegExString = m_pcEditMetadata->GetAttribute(wxT("RegEx"))->GetValueString();
-	if (l_RegExString != wxT("")) {
-		NodesThroughRegEx();
-	}
+
 }
 
 
@@ -412,10 +410,6 @@ void SP_DLG_ColPlacesSelection::OnChangedPlaceTransition(wxCommandEvent& p_cEven
 		
 	LoadData();
 
-	wxString l_RegExString = m_pcEditMetadata->GetAttribute(wxT("RegEx"))->GetValueString();
-	if (l_RegExString != wxT("")) {
-		NodesThroughRegEx();
-	}
 }
 
 void SP_DLG_ColPlacesSelection::AddtoCurLBInStrings(wxString p_sName)
@@ -504,5 +498,5 @@ void SP_DLG_ColPlacesSelection::OnColPlaceSel( wxCommandEvent& p_cEvent )
 	}
 
 	LoadData();
-	
+
 }
