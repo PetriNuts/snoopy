@@ -214,6 +214,7 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 	m_pcTimeSyncComboBox = new wxComboBox(m_pcPropertyWindowPropertySizer, SP_ID_COMBOBOX_TIME_SYNC, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
 	m_pcTimeSyncComboBox->Append(wxT("Static"));
 	m_pcTimeSyncComboBox->Append(wxT("Dynamic"));
+	m_pcTimeSyncComboBox->Append(wxT("Approximate"));
 	m_pcTimeSyncComboBox->Append(wxT("Continuous"));
 	m_pcTimeSyncComboBox->Append(wxT("Stochastic"));
 	m_pcTimeSyncComboBox->SetSelection(l_nSimulatorType);
@@ -816,10 +817,13 @@ spsim::Simulator* SP_DLG_HybridSimulationResults::CreateSimulator(const int& p_n
 	case 1: //dynamic
 		m_sSimulatorType = wxT("Dynamic");
 		return new spsim::HybridDynamic();
-	case 2: //continuous
+	case 2: //approximate
+		m_sSimulatorType = wxT("Approximate");
+		return new spsim::HybridApproximate();
+	case 3: //continuous
 		m_sSimulatorType = wxT("Continuous");
 		return new spsim::HybridStatic();
-	case 3: //stochastic
+	case 4: //stochastic
 		m_sSimulatorType = wxT("Stochastic");
 		return new spsim::Gillespie();
 	}
@@ -1107,11 +1111,19 @@ void SP_DLG_HybridSimulationResults::UpdateSimulationMatrix()
 
 	if (m_pcWorkerThread->GetRunCount() > 1)
 	{
+		double l_nRunCount=(double) (m_pcWorkerThread->GetCurrentRunCount());
+
+		//we need to account for the current run
+		if(m_pcMainSimulator->IsSimulationRunning())
+		{
+			l_nRunCount+=1;
+		}
+
 		//get the average values
 		for (unsigned int l_nRow = 0; l_nRow < m_anResultMatrix.size(); l_nRow++)
 			for (unsigned int l_nCol = 0; l_nCol < l_nColCount; l_nCol++)
 			{
-				m_anResultMatrix[l_nRow][l_nCol] /= (double) (m_pcWorkerThread->GetCurrentRunCount() + 1);
+				m_anResultMatrix[l_nRow][l_nCol] /= l_nRunCount;
 			}
 	}
 
