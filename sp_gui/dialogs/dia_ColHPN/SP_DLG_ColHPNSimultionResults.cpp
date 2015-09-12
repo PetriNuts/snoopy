@@ -413,13 +413,22 @@ void SP_DLG_ColHPNSimultionResults::LoadColAuxResults()
 
 	unsigned int l_nColCount=0;
 	l_nColCount = m_msColoredPlaceNames.size();
+
+	double l_nRunCount=(double) (m_pcWorkerThread->GetCurrentRunCount());
+
+	//we need to account for the current run
+	if(m_pcMainSimulator->IsSimulationRunning())
+	{
+		l_nRunCount+=1;
+	}
+
 	if(m_pcWorkerThread->GetRunCount()>1)
 	{
 	    //get the average values
 		for(unsigned int l_nRow=0;l_nRow<m_aanColPlaceResults.size();l_nRow++)
 			for(unsigned int l_nCol=0;l_nCol<l_nColCount;l_nCol++)
 			{
-				m_aanColPlaceResults[l_nRow][l_nCol]/=(double)(m_pcWorkerThread->GetCurrentRunCount()+1);
+				m_aanColPlaceResults[l_nRow][l_nCol]/=l_nRunCount;
 			}
 	 }
 	
@@ -430,7 +439,7 @@ void SP_DLG_ColHPNSimultionResults::LoadColAuxResults()
 		for(unsigned int l_nRow=0;l_nRow<m_aanColTransResults.size();l_nRow++)
 			for(unsigned int l_nCol=0;l_nCol<l_nColCount;l_nCol++)
 			{
-				m_aanColTransResults[l_nRow][l_nCol]/=(double)(m_pcWorkerThread->GetCurrentRunCount()+1);
+				m_aanColTransResults[l_nRow][l_nCol]/=l_nRunCount;
 			}
 	  }
 
@@ -447,7 +456,7 @@ void SP_DLG_ColHPNSimultionResults::LoadColAuxResults()
 		for(unsigned int l_nRow=0;l_nRow<m_aanAuxPLVarsResults.size();l_nRow++)
 			for(unsigned int l_nCol=0;l_nCol<l_nColCount;l_nCol++)
 			{
-				m_aanAuxPLVarsResults[l_nRow][l_nCol]/=(double)(m_pcWorkerThread->GetCurrentRunCount()+1);
+				m_aanAuxPLVarsResults[l_nRow][l_nCol]/=l_nRunCount;
 			}
 	  }
 
