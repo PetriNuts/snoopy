@@ -210,8 +210,6 @@ bool SP_DLG_ColHPNSimultionResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewe
 
 	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*> (p_pcView->GetAttribute(wxT("CurveInfo")));
 	CHECK_POINTER(l_pcCurveInfoList,return false);
-	wxString l_RegExString = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
-	wxRegEx l_RegEx;
 
 	m_ArrayUnPlaces.Clear();
 	m_ArrayUnTranstions.Clear();
@@ -243,166 +241,91 @@ bool SP_DLG_ColHPNSimultionResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewe
 	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayColTranstions.GetCount()));
 	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnPlaces.GetCount()));
 	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnTranstions.GetCount()));*/
-	if (l_RegExString == wxT("")) {
-		for(unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
+
+	CreateViewerDataFromRegex();
+
+	for(unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
+	{
+		wxString l_sPosition = l_pcCurveInfoList->GetCell(l_nRow,0);
+		unsigned long l_nPosition=0;
+		if(!l_sPosition.ToULong(&l_nPosition))
 		{
-			wxString l_sPosition = l_pcCurveInfoList->GetCell(l_nRow,0);
-			unsigned long l_nPosition=0;
-			if(!l_sPosition.ToULong(&l_nPosition))
-			{
-			  return false;
-			}
-
-			wxString l_sOutType = l_pcCurveInfoList->GetCell(l_nRow,1);
-
-
-			if( l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition<m_msPlaceNames.size()) //unfolded place
-			{
-				l_sName=m_msPlaceNames[l_nPosition];
-
-				p_pcViewer->AddCurve(l_sName,l_nPosition,&m_anResultMatrix);
-			}
-			else if( l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition<m_msTransitionNames.size()) //unfolded transition
-			{
-				l_sName=m_msTransitionNames[l_nPosition];
-
-				 p_pcViewer->AddCurve(l_sName,l_nPosition,&m_anResultMatrix);
-			}
-			else if( l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition<m_msColoredPlaceNames.size())//colored  place
-			{
-			   l_sName=m_msColoredPlaceNames[l_nPosition];
-
-			   p_pcViewer->AddCurve(l_sName,l_nPosition,&m_aanColPlaceResults);
-			}
-			else if( l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition<m_msColoredTransitionNames.size()) //colored transition
-			{
-				l_sName=m_msColoredTransitionNames[l_nPosition];
-
-				p_pcViewer->AddCurve(l_sName,l_nPosition,&m_aanColTransResults);
-			}
-			else if( l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition<m_vAuxPLVars.size()) //Auxiliary variables place
-			{
-				l_sName=m_vAuxPLVars[l_nPosition];
-
-				p_pcViewer->AddCurve(l_sName,l_nPosition,&m_aanAuxPLVarsResults);
-			}
-			else if( l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition<m_vAuxTRVars.size()) //Auxiliary variables transition
-			{
-				l_sName=m_vAuxTRVars[l_nPosition];
-
-				p_pcViewer->AddCurve(l_sName,l_nPosition,&m_aanAuxTRVarsResults);
-			}
-			else
-			{
-				SP_LOGERROR(wxT("Invalid node names, we stop loading the rest of the file"));
-
-				//invalid row index, therefore we ignore the remaining rows
-				l_pcCurveInfoList->RemoveRemainingRows(l_nRow);
-
-				break;
-			}
-
-			wxString l_sOrignialName=l_pcCurveInfoList->GetCell(l_nRow,6);
-
-			if(l_sOrignialName!=l_sName)
-			{
-				SP_LOGWARNING(wxT("Name for position (")+wxString::Format(wxT("%d"),l_nRow) +wxT(") is changed to ")+l_sName);
-			}
-
-			//update curve name
-			l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);
-
-			p_asPlaces.Add(l_sName);
+		  return false;
 		}
-	}  else {
-		wxString l_RegExOutputType = m_pcCurrentTablePlot->GetAttribute(wxT("OutputType"))->GetValueString();
-		if (l_RegEx.Compile(l_RegExString, wxRE_DEFAULT)) {
-			unsigned l_sPosition = 0;
-			if (l_sElementType.IsSameAs(wxT("Place"))) {
-				if (l_RegExOutputType == wxT("Unfolded")) {
-					l_sPosition = 0;
-					for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnPlaces.GetCount(); l_nRow++)
-					{
-						wxString l_sName = m_ArrayUnPlaces[l_nRow];
-						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_anResultMatrix);
-						if (l_RegEx.Matches(l_sName)) {
-							p_asPlaces.Add(l_sName);
-						}
-						l_sPosition++;
-					}
-				} else if (l_RegExOutputType == wxT("Colored")) {
-					l_sPosition = 0;
-					for (unsigned int l_nRow = 0; l_nRow < m_ArrayColPlaces.GetCount(); l_nRow++)
-					{
-						wxString l_sName = m_ArrayColPlaces[l_nRow];
-						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_aanColPlaceResults);
-						if (l_RegEx.Matches(l_sName)) {
-							p_asPlaces.Add(l_sName);
-						}
-						l_sPosition++;
-					}
-				} else {
-					l_sPosition = 0;
-					for (unsigned int l_nRow = 0; l_nRow < m_ArrayAuxPlaces.GetCount(); l_nRow++)
-					{
-						wxString l_sName = m_ArrayAuxPlaces[l_nRow];
-						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_aanAuxPLVarsResults);
-						if (l_RegEx.Matches(l_sName)) {
-							p_asPlaces.Add(l_sName);
-						}
-						l_sPosition++;
-					}
-				}
-			} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
-				if (l_RegExOutputType == wxT("Unfolded")) {
-					l_sPosition = 0;
-					for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnTranstions.GetCount(); l_nRow++)
-					{
-						wxString l_sName = m_ArrayUnTranstions[l_nRow];
-						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_anResultMatrix);
-						if (l_RegEx.Matches(l_sName)) {
-							p_asPlaces.Add(l_sName);
-						}
-						l_sPosition++;
-					}
-				} else if (l_RegExOutputType == wxT("Colored")) {
-					l_sPosition = 0;
-					for (unsigned int l_nRow = 0; l_nRow < m_ArrayColTranstions.GetCount(); l_nRow++)
-					{
-						wxString l_sName = m_ArrayColTranstions[l_nRow];
-						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_aanColTransResults);
-						if (l_RegEx.Matches(l_sName)) {
-							p_asPlaces.Add(l_sName);
-						}
-						l_sPosition++;
-					}
-				} else {
-					l_sPosition = 0;
-					for (unsigned int l_nRow = 0; l_nRow < m_ArrayAuxtranstions.GetCount(); l_nRow++)
-					{
-						wxString l_sName = m_ArrayAuxtranstions[l_nRow];
-						p_pcViewer->AddCurve(l_sName, l_sPosition, &m_aanAuxTRVarsResults);
-						if (l_RegEx.Matches(l_sName)) {
-							p_asPlaces.Add(l_sName);
-						}
-						l_sPosition++;
-					}
-				}
-			}
+
+		wxString l_sOutType = l_pcCurveInfoList->GetCell(l_nRow,1);
+
+
+		if( l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition<m_msPlaceNames.size()) //unfolded place
+		{
+			l_sName=m_msPlaceNames[l_nPosition];
+
+			p_pcViewer->AddCurve(l_sName,l_nPosition,&m_anResultMatrix);
 		}
+		else if( l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition<m_msTransitionNames.size()) //unfolded transition
+		{
+			l_sName=m_msTransitionNames[l_nPosition];
+
+			 p_pcViewer->AddCurve(l_sName,l_nPosition,&m_anResultMatrix);
+		}
+		else if( l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition<m_msColoredPlaceNames.size())//colored  place
+		{
+		   l_sName=m_msColoredPlaceNames[l_nPosition];
+
+		   p_pcViewer->AddCurve(l_sName,l_nPosition,&m_aanColPlaceResults);
+		}
+		else if( l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition<m_msColoredTransitionNames.size()) //colored transition
+		{
+			l_sName=m_msColoredTransitionNames[l_nPosition];
+
+			p_pcViewer->AddCurve(l_sName,l_nPosition,&m_aanColTransResults);
+		}
+		else if( l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition<m_vAuxPLVars.size()) //Auxiliary variables place
+		{
+			l_sName=m_vAuxPLVars[l_nPosition];
+
+			p_pcViewer->AddCurve(l_sName,l_nPosition,&m_aanAuxPLVarsResults);
+		}
+		else if( l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition<m_vAuxTRVars.size()) //Auxiliary variables transition
+		{
+			l_sName=m_vAuxTRVars[l_nPosition];
+
+			p_pcViewer->AddCurve(l_sName,l_nPosition,&m_aanAuxTRVarsResults);
+		}
+		else
+		{
+			SP_LOGERROR(wxT("Invalid node names, we stop loading the rest of the file"));
+
+			//invalid row index, therefore we ignore the remaining rows
+			l_pcCurveInfoList->RemoveRemainingRows(l_nRow);
+
+			break;
+		}
+
+		wxString l_sOrignialName=l_pcCurveInfoList->GetCell(l_nRow,6);
+
+		if(l_sOrignialName!=l_sName)
+		{
+			SP_LOGWARNING(wxT("Name for position (")+wxString::Format(wxT("%d"),l_nRow) +wxT(") is changed to ")+l_sName);
+		}
+
+		//update curve name
+		l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);
+
+		p_asPlaces.Add(l_sName);
 	}
 	 
- return true;
+	return true;
 }
 
 void SP_DLG_ColHPNSimultionResults::LoadResults()
 {
-			//Load colored or auxiliary variables
-			LoadColAuxResults();
+	//Load colored or auxiliary variables
+	LoadColAuxResults();
 
-			UpdateViewer();
+	UpdateViewer();
 
-			RefreshExternalWindows();
+	RefreshExternalWindows();
 }
 
 

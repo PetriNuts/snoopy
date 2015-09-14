@@ -603,8 +603,6 @@ void SP_DLG_Simulation::OnItemDoubleClick(wxWindow *p_pcExternalWindowDialog, un
 	CHECK_POINTER(l_pcCurrentResultViewer, return);
 
 	int l_nCurveIndex = p_nLocation;
-	wxString l_RegExString = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
-
 
 	wxString l_sColor = l_pcCurrentResultViewer->GetCurveColor(l_nCurveIndex);
 	int l_nLineWidth = l_pcCurrentResultViewer->GetCurveLineWidth(l_nCurveIndex);
@@ -625,11 +623,10 @@ void SP_DLG_Simulation::OnItemDoubleClick(wxWindow *p_pcExternalWindowDialog, un
 		l_pcCurrentResultViewer->SetCurveColor(l_nCurveIndex, l_nColor.GetAsString(wxC2S_HTML_SYNTAX));
 
 		SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo")));
-		if (l_RegExString == wxT("")) {
-			l_pcCurveInfoList->SetCell(l_nCurveIndex, 3, l_nColor.GetAsString(wxC2S_HTML_SYNTAX));
-			l_pcCurveInfoList->SetCell(l_nCurveIndex, 4, wxString::Format(wxT("%i"), l_nLineWidth));
-			l_pcCurveInfoList->SetCell(l_nCurveIndex, 5, wxString::Format(wxT("%i"), l_nLineStyle));
-		}
+		l_pcCurveInfoList->SetCell(l_nCurveIndex, 3, l_nColor.GetAsString(wxC2S_HTML_SYNTAX));
+		l_pcCurveInfoList->SetCell(l_nCurveIndex, 4, wxString::Format(wxT("%i"), l_nLineWidth));
+		l_pcCurveInfoList->SetCell(l_nCurveIndex, 5, wxString::Format(wxT("%i"), l_nLineStyle));
+
 		//Update the current viewer
 		UpdateViewer();
 		RefreshCurrentExternalView(l_nCurveIndex, l_nColor.GetAsString(wxC2S_HTML_SYNTAX), l_dial.GetLineWidth(), l_dial.GetLineStyle());
@@ -884,6 +881,231 @@ void SP_DLG_Simulation::OnExportClicked(wxWindow *p_pcExternalWindowDialog, int 
 	}
 }
 
+bool SP_DLG_Simulation::CreateViewerDataFromRegex()
+{
+	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*> (m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo")));
+	if(l_pcCurveInfoList->GetRowCount() > 0)
+	{
+		//curveinfo already created
+		return false;
+	}
+
+	SP_DS_Attribute* l_pcRegExAttr = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"));
+    CHECK_POINTER(l_pcRegExAttr, return false);
+
+    wxString l_RegExString = l_pcRegExAttr->GetValueString();
+    if(l_RegExString.IsEmpty())
+    {
+    	return false;
+    }
+
+	bool l_RegExInvert = static_cast<SP_DS_BoolAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("RegExInvert")))->GetValue();
+	wxString l_RegExOutputType = wxT("Unfolded");
+	SP_DS_Attribute* l_pcAttr =	m_pcCurrentTablePlot->GetAttribute(wxT("OutputType"));
+	if(l_pcAttr)
+	{
+		l_RegExOutputType = l_pcAttr->GetValueString();
+	}
+
+	SP_VectorString l_asColours;
+
+	//get the current nodeclass type
+	SP_DS_Attribute* l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("Nodeclass"));
+	CHECK_POINTER(l_pcAttribute,return false);
+	wxString l_sElementType = l_pcAttribute->GetValueString();
+
+	if(l_sElementType==wxT("Place"))
+	{
+		 LoadNodeColours(SP_DS_CONTINUOUS_PLACE,l_asColours);
+		 LoadNodeColours(SP_DS_DISCRETE_PLACE,l_asColours);
+	}
+	else if(l_sElementType==wxT("Transition"))
+	{
+		LoadNodeColours(SP_DS_CONTINUOUS_TRANS,l_asColours);
+		LoadNodeColours(SP_DS_DISCRETE_TRANS,l_asColours);
+	}
+
+	wxString l_sCheckState = wxT("1");
+	wxString l_sCurveColor;
+	wxString l_sLinewidth;
+	l_sLinewidth <<-1;
+	wxString l_sLineStype;
+	l_sLineStype << -1;
+
+	wxRegEx l_RegEx;
+	if (l_RegEx.Compile(l_RegExString)) {
+		unsigned l_nPosition = 0;
+		if (l_sElementType.IsSameAs(wxT("Place"))) {
+			if (l_RegExOutputType == wxT("Unfolded")) {
+				for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnPlaces.GetCount(); l_nRow++)
+				{
+					wxString l_sName = m_ArrayUnPlaces[l_nRow];
+					bool match = l_RegEx.Matches(l_sName);
+					if(l_RegExInvert) { match = !match; }
+					if(match) {
+						//get either the node colour or assign an arbitrary colour
+						if(l_nPosition < l_asColours.size() && l_asColours[l_nPosition] != wxT(""))
+						{
+							l_sCurveColor = l_asColours[l_nPosition];
+						}
+						else
+						{
+							l_sCurveColor = SP_DLG_Simulation::GetColourString(l_nPosition);
+						}
+						unsigned int l_nRow = l_pcCurveInfoList->AppendEmptyRow();
+						l_pcCurveInfoList->SetCell(l_nRow,0,wxString::Format(wxT("%u"),l_nPosition));
+						l_pcCurveInfoList->SetCell(l_nRow,1,l_RegExOutputType);
+						l_pcCurveInfoList->SetCell(l_nRow,2,l_sCheckState);
+						l_pcCurveInfoList->SetCell(l_nRow,3,l_sCurveColor);
+						l_pcCurveInfoList->SetCell(l_nRow,4,l_sLinewidth);
+						l_pcCurveInfoList->SetCell(l_nRow,5,l_sLineStype);
+						l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);
+					}
+					l_nPosition++;
+				}
+			} else if (l_RegExOutputType == wxT("Colored")) {
+				for (unsigned int l_nRow = 0; l_nRow < m_ArrayColPlaces.GetCount(); l_nRow++)
+				{
+					wxString l_sName = m_ArrayColPlaces[l_nRow];
+					bool match = l_RegEx.Matches(l_sName);
+					if(l_RegExInvert) { match = !match; }
+					if(match) {
+						//get either the node colour or assign an arbitrary colour
+						if(l_nPosition < l_asColours.size() && l_asColours[l_nPosition] != wxT(""))
+						{
+							l_sCurveColor = l_asColours[l_nPosition];
+						}
+						else
+						{
+							l_sCurveColor = SP_DLG_Simulation::GetColourString(l_nPosition);
+						}
+						unsigned int l_nRow = l_pcCurveInfoList->AppendEmptyRow();
+						l_pcCurveInfoList->SetCell(l_nRow,0,wxString::Format(wxT("%u"),l_nPosition));
+						l_pcCurveInfoList->SetCell(l_nRow,1,l_RegExOutputType);
+						l_pcCurveInfoList->SetCell(l_nRow,2,l_sCheckState);
+						l_pcCurveInfoList->SetCell(l_nRow,3,l_sCurveColor);
+						l_pcCurveInfoList->SetCell(l_nRow,4,l_sLinewidth);
+						l_pcCurveInfoList->SetCell(l_nRow,5,l_sLineStype);
+						l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);
+					}
+					l_nPosition++;
+				}
+			} else {
+				for (unsigned int l_nRow = 0; l_nRow < m_ArrayAuxPlaces.GetCount(); l_nRow++)
+				{
+					wxString l_sName = m_ArrayAuxPlaces[l_nRow];
+					bool match = l_RegEx.Matches(l_sName);
+					if(l_RegExInvert) { match = !match; }
+					if(match) {
+						//get either the node colour or assign an arbitrary colour
+						if(l_nPosition < l_asColours.size() && l_asColours[l_nPosition] != wxT(""))
+						{
+							l_sCurveColor = l_asColours[l_nPosition];
+						}
+						else
+						{
+							l_sCurveColor = SP_DLG_Simulation::GetColourString(l_nPosition);
+						}
+						unsigned int l_nRow = l_pcCurveInfoList->AppendEmptyRow();
+						l_pcCurveInfoList->SetCell(l_nRow,0,wxString::Format(wxT("%u"),l_nPosition));
+						l_pcCurveInfoList->SetCell(l_nRow,1,l_RegExOutputType);
+						l_pcCurveInfoList->SetCell(l_nRow,2,l_sCheckState);
+						l_pcCurveInfoList->SetCell(l_nRow,3,l_sCurveColor);
+						l_pcCurveInfoList->SetCell(l_nRow,4,l_sLinewidth);
+						l_pcCurveInfoList->SetCell(l_nRow,5,l_sLineStype);
+						l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);
+					}
+					l_nPosition++;
+				}
+			}
+		} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
+			if (l_RegExOutputType == wxT("Unfolded")) {
+				for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnTranstions.GetCount(); l_nRow++)
+				{
+					wxString l_sName = m_ArrayUnTranstions[l_nRow];
+					bool match = l_RegEx.Matches(l_sName);
+					if(l_RegExInvert) { match = !match; }
+					if(match) {
+						//get either the node colour or assign an arbitrary colour
+						if(l_nPosition < l_asColours.size() && l_asColours[l_nPosition] != wxT(""))
+						{
+							l_sCurveColor = l_asColours[l_nPosition];
+						}
+						else
+						{
+							l_sCurveColor = SP_DLG_Simulation::GetColourString(l_nPosition);
+						}
+						unsigned int l_nRow = l_pcCurveInfoList->AppendEmptyRow();
+						l_pcCurveInfoList->SetCell(l_nRow,0,wxString::Format(wxT("%u"),l_nPosition));
+						l_pcCurveInfoList->SetCell(l_nRow,1,l_RegExOutputType);
+						l_pcCurveInfoList->SetCell(l_nRow,2,l_sCheckState);
+						l_pcCurveInfoList->SetCell(l_nRow,3,l_sCurveColor);
+						l_pcCurveInfoList->SetCell(l_nRow,4,l_sLinewidth);
+						l_pcCurveInfoList->SetCell(l_nRow,5,l_sLineStype);
+						l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);
+					}
+					l_nPosition++;
+				}
+			} else if (l_RegExOutputType == wxT("Colored")) {
+				for (unsigned int l_nRow = 0; l_nRow < m_ArrayColTranstions.GetCount(); l_nRow++)
+				{
+					wxString l_sName = m_ArrayColTranstions[l_nRow];
+					bool match = l_RegEx.Matches(l_sName);
+					if(l_RegExInvert) { match = !match; }
+					if(match) {
+						//get either the node colour or assign an arbitrary colour
+						if(l_nPosition < l_asColours.size() && l_asColours[l_nPosition] != wxT(""))
+						{
+							l_sCurveColor = l_asColours[l_nPosition];
+						}
+						else
+						{
+							l_sCurveColor = SP_DLG_Simulation::GetColourString(l_nPosition);
+						}
+						unsigned int l_nRow = l_pcCurveInfoList->AppendEmptyRow();
+						l_pcCurveInfoList->SetCell(l_nRow,0,wxString::Format(wxT("%u"),l_nPosition));
+						l_pcCurveInfoList->SetCell(l_nRow,1,l_RegExOutputType);
+						l_pcCurveInfoList->SetCell(l_nRow,2,l_sCheckState);
+						l_pcCurveInfoList->SetCell(l_nRow,3,l_sCurveColor);
+						l_pcCurveInfoList->SetCell(l_nRow,4,l_sLinewidth);
+						l_pcCurveInfoList->SetCell(l_nRow,5,l_sLineStype);
+						l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);
+					}
+					l_nPosition++;
+				}
+			} else {
+				for (unsigned int l_nRow = 0; l_nRow < m_ArrayAuxtranstions.GetCount(); l_nRow++)
+				{
+					wxString l_sName = m_ArrayAuxtranstions[l_nRow];
+					bool match = l_RegEx.Matches(l_sName);
+					if(l_RegExInvert) { match = !match; }
+					if(match) {
+						//get either the node colour or assign an arbitrary colour
+						if(l_nPosition < l_asColours.size() && l_asColours[l_nPosition] != wxT(""))
+						{
+							l_sCurveColor = l_asColours[l_nPosition];
+						}
+						else
+						{
+							l_sCurveColor = SP_DLG_Simulation::GetColourString(l_nPosition);
+						}
+						unsigned int l_nRow = l_pcCurveInfoList->AppendEmptyRow();
+						l_pcCurveInfoList->SetCell(l_nRow,0,wxString::Format(wxT("%u"),l_nPosition));
+						l_pcCurveInfoList->SetCell(l_nRow,1,l_RegExOutputType);
+						l_pcCurveInfoList->SetCell(l_nRow,2,l_sCheckState);
+						l_pcCurveInfoList->SetCell(l_nRow,3,l_sCurveColor);
+						l_pcCurveInfoList->SetCell(l_nRow,4,l_sLinewidth);
+						l_pcCurveInfoList->SetCell(l_nRow,5,l_sLineStype);
+						l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);
+					}
+					l_nPosition++;
+				}
+			}
+		}
+	}
+	return true;
+}
+
 bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Metadata* p_pcView, wxArrayString& p_asPlaces)
 {
     wxString l_sName;
@@ -905,6 +1127,8 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
     //remove shown curves
     p_pcViewer->ClearShownCurves();
 
+    CreateViewerDataFromRegex();
+
     SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(p_pcView->GetAttribute(wxT("CurveInfo")));
     CHECK_POINTER(l_pcCurveInfoList, return false);
 
@@ -917,88 +1141,51 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
 		m_ArrayUnTranstions.Add(m_asTransitionNames[i]);
 	}
 
-    wxString l_RegExString =  m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
-	bool l_RegExInvert = static_cast<SP_DS_BoolAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("RegExInvert")))->GetValue();
-
-    if (l_RegExString == wxT("")) {
-    	for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
+	for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
+	{
+		wxString l_sPosition = l_pcCurveInfoList->GetCell(l_nRow, 0);
+		unsigned long l_nPosition = 0;
+		if (!l_sPosition.ToULong(&l_nPosition))
 		{
-			wxString l_sPosition = l_pcCurveInfoList->GetCell(l_nRow, 0);
-			unsigned long l_nPosition = 0;
-			if (!l_sPosition.ToULong(&l_nPosition))
-			{
-				return false;
-			}
+			return false;
+		}
 
-			wxString l_sOutType = l_pcCurveInfoList->GetCell(l_nRow, 1);
+		wxString l_sOutType = l_pcCurveInfoList->GetCell(l_nRow, 1);
 
-			if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_asPlaceNames.size()) //unfolded place
+		if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_asPlaceNames.size()) //unfolded place
+		{
+			l_sName = m_asPlaceNames[l_nPosition];
+
+			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
+		}
+		else if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_asTransitionNames.size()) //unfolded place
 			{
-				l_sName = m_asPlaceNames[l_nPosition];
+				l_sName = m_asTransitionNames[l_nPosition];
 
 				p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
-			}
-			else if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_asTransitionNames.size()) //unfolded place
-				{
-					l_sName = m_asTransitionNames[l_nPosition];
-
-					p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
-			}
-			else
-			{
-				SP_LOGERROR( wxT("Invalid node names, we stop loading the rest of the file"));
-
-				//invalid row index, therefore we ignore the remaining rows
-				l_pcCurveInfoList->RemoveRemainingRows(l_nRow);
-
-				break;
-			}
-
-			wxString l_sOrignialName = l_pcCurveInfoList->GetCell(l_nRow, 6);
-
-			if (l_sOrignialName != l_sName)
-			{
-				SP_LOGWARNING( l_sOrignialName + wxT("  ") + l_sName + wxT("Name for position (") + wxString::Format(wxT("%d"), l_nRow) + wxT(") is changed to ") + l_sName);
-			}
-
-			//update curve name
-			l_pcCurveInfoList->SetCell(l_nRow, 6, l_sName);
-			p_asPlaces.Add(l_sName);
 		}
-    } else {
+		else
+		{
+			SP_LOGERROR( wxT("Invalid node names, we stop loading the rest of the file"));
 
-//		SP_LOGMESSAGE(wxT("simulation LoadviewerData"));
-        wxRegEx l_RegEx;
-		if (l_RegEx.Compile(l_RegExString, wxRE_DEFAULT)) {
-			if (l_sElementType.IsSameAs(wxT("Place"))) {
-				unsigned l_sPosition = 0;
-				for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnPlaces.GetCount(); l_nRow++)
-				{
-					wxString l_sName = m_ArrayUnPlaces[l_nRow];
-					p_pcViewer->AddCurve(l_sName, l_sPosition, &m_anResultMatrix);
-					bool match = l_RegEx.Matches(l_sName);
-					if(l_RegExInvert) { match = !match; }
-					if(match) {
-						p_asPlaces.Add(l_sName);
-					}
-					l_sPosition++;
-				}
-			} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
-				unsigned l_sPosition = 0;
-				for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnTranstions.GetCount(); l_nRow++)
-				{
-					wxString l_sName = m_ArrayUnTranstions[l_nRow];
-					p_pcViewer->AddCurve(l_sName, l_sPosition, &m_anResultMatrix);
-					bool match = l_RegEx.Matches(l_sName);
-					if(l_RegExInvert) { match = !match; }
-					if(match) {
-						p_asPlaces.Add(l_sName);
-					}
-					l_sPosition++;
-				}
-			}
+			//invalid row index, therefore we ignore the remaining rows
+			l_pcCurveInfoList->RemoveRemainingRows(l_nRow);
+
+			break;
 		}
-    }
+
+		wxString l_sOrignialName = l_pcCurveInfoList->GetCell(l_nRow, 6);
+
+		if (l_sOrignialName != l_sName)
+		{
+			SP_LOGWARNING( l_sOrignialName + wxT("  ") + l_sName + wxT("Name for position (") + wxString::Format(wxT("%d"), l_nRow) + wxT(") is changed to ") + l_sName);
+		}
+
+		//update curve name
+		l_pcCurveInfoList->SetCell(l_nRow, 6, l_sName);
+		p_asPlaces.Add(l_sName);
+	}
+
 
     return true;
 }
@@ -1355,89 +1542,48 @@ void SP_DLG_Simulation::LoadSelectedCurves()
 			}
 		}
 	}
-    wxString l_RegExString =  m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
-	bool l_RegExInvert = static_cast<SP_DS_BoolAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("RegExInvert")))->GetValue();
-    wxRegEx l_RegEx;
-	if (l_RegExString == wxT("")) {
-		for (unsigned int l_nCurve = 0; l_nCurve < l_pcPlaceIdList->GetRowCount(); l_nCurve++)
+
+	for (unsigned int l_nCurve = 0; l_nCurve < l_pcPlaceIdList->GetRowCount(); l_nCurve++)
+	{
+
+		//if the index is out of range, then continue
+		if (l_nCurve >= m_pcPlaceChoiceCheckListBox->GetCount())
+			continue;
+
+		//Get the item ID
+		wxString l_sItemID = l_pcPlaceIdList->GetCell(l_nCurve, 0);
+
+		//load the user selection
+		wxString l_sSelectionStr = l_pcPlaceIdList->GetCell(l_nCurve, 2);
+		long l_nSelected = 0;
+		l_sSelectionStr.ToLong(&l_nSelected);
+
+		bool l_bIsSelected = l_nSelected > 0 ? true : false;
+
+		m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
+		m_apcResultViewers[m_nCurrentViewer]->ShowCurve(l_nCurve, l_bIsSelected);
+
+		//load Curve color
+		wxString l_sColor = l_pcPlaceIdList->GetCell(l_nCurve, 3);
+		if (l_sColor == wxT(""))
 		{
-
-			//if the index is out of range, then continue
-			if (l_nCurve >= m_pcPlaceChoiceCheckListBox->GetCount())
-				continue;
-
-			//Get the item ID
-			wxString l_sItemID = l_pcPlaceIdList->GetCell(l_nCurve, 0);
-
-			//load the user selection
-			wxString l_sSelectionStr = l_pcPlaceIdList->GetCell(l_nCurve, 2);
-			long l_nSelected = 0;
-			l_sSelectionStr.ToLong(&l_nSelected);
-
-			bool l_bIsSelected = l_nSelected > 0 ? true : false;
-
-			m_pcPlaceChoiceCheckListBox->Check(l_nCurve, l_bIsSelected);
-			m_apcResultViewers[m_nCurrentViewer]->ShowCurve(l_nCurve, l_bIsSelected);
-
-			//load Curve color
-			wxString l_sColor = l_pcPlaceIdList->GetCell(l_nCurve, 3);
-			if (l_sColor == wxT(""))
-			{
-				l_sColor = GetColourString(l_nCurve);
-			}
-			m_apcResultViewers[m_nCurrentViewer]->SetCurveColor(l_nCurve, l_sColor);
-
-			//load Line width
-			wxString l_sLineWidthStr = l_pcPlaceIdList->GetCell(l_nCurve, 4);
-			long l_nLineWidth = 0;
-			l_sLineWidthStr.ToLong(&l_nLineWidth);
-			m_apcResultViewers[m_nCurrentViewer]->SetCurveLineWidth(l_nCurve, l_nLineWidth);
-
-			//load Line width
-			wxString l_sLineStyleStr = l_pcPlaceIdList->GetCell(l_nCurve, 5);
-			long l_nLineStyle = 0;
-			l_sLineStyleStr.ToLong(&l_nLineStyle);
-			m_apcResultViewers[m_nCurrentViewer]->SetCurveLineStyle(l_nCurve, l_nLineStyle);
+			l_sColor = GetColourString(l_nCurve);
 		}
-	} else {
-		wxString l_sElementType = m_pcCurrentTablePlot->GetAttribute(wxT("Nodeclass"))->GetValueString();
-//		SP_LOGMESSAGE("size " + wxString::Format(wxT("%d"), m_ArrayUnPlaces.GetCount()));
-		if (l_RegEx.Compile(l_RegExString, wxRE_DEFAULT)) {
-			int l_nCurve = 0;
-			if (l_sElementType.IsSameAs(wxT("Place"))) {
-				for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnPlaces.GetCount(); l_nRow++)
-				{
-					wxString l_sName = m_ArrayUnPlaces[l_nRow];
-					bool match = l_RegEx.Matches(l_sName);
-					if(l_RegExInvert) { match = !match; }
-					if(match) {
-						m_pcPlaceChoiceCheckListBox->Check(l_nCurve, true);
-						m_apcResultViewers[m_nCurrentViewer]->ShowCurve(l_nCurve, true);
-						m_apcResultViewers[m_nCurrentViewer]->SetCurveColor(l_nCurve, GetColourString(l_nCurve));
-						m_apcResultViewers[m_nCurrentViewer]->SetCurveLineWidth(l_nCurve, 2);
-						m_apcResultViewers[m_nCurrentViewer]->SetCurveLineStyle(l_nCurve, 0);
-						l_nCurve++;
-					}
-				}
-			} else if (l_sElementType.IsSameAs(wxT("Transition"))) {
-				l_nCurve = 0;
-				for (unsigned int l_nRow = 0; l_nRow < m_ArrayUnTranstions.GetCount(); l_nRow++)
-				{
-					wxString l_sName = m_ArrayUnTranstions[l_nRow];
-					bool match = l_RegEx.Matches(l_sName);
-					if(l_RegExInvert) { match = !match; }
-					if(match) {
-						m_pcPlaceChoiceCheckListBox->Check(l_nCurve, true);
-						m_apcResultViewers[m_nCurrentViewer]->ShowCurve(l_nCurve, true);
-						m_apcResultViewers[m_nCurrentViewer]->SetCurveColor(l_nCurve, GetColourString(l_nCurve));
-						m_apcResultViewers[m_nCurrentViewer]->SetCurveLineWidth(l_nCurve, 2);
-						m_apcResultViewers[m_nCurrentViewer]->SetCurveLineStyle(l_nCurve, 0);
-						l_nCurve++;
-					}
-				}
-			}
-		}
+		m_apcResultViewers[m_nCurrentViewer]->SetCurveColor(l_nCurve, l_sColor);
+
+		//load Line width
+		wxString l_sLineWidthStr = l_pcPlaceIdList->GetCell(l_nCurve, 4);
+		long l_nLineWidth = 0;
+		l_sLineWidthStr.ToLong(&l_nLineWidth);
+		m_apcResultViewers[m_nCurrentViewer]->SetCurveLineWidth(l_nCurve, l_nLineWidth);
+
+		//load Line width
+		wxString l_sLineStyleStr = l_pcPlaceIdList->GetCell(l_nCurve, 5);
+		long l_nLineStyle = 0;
+		l_sLineStyleStr.ToLong(&l_nLineStyle);
+		m_apcResultViewers[m_nCurrentViewer]->SetCurveLineStyle(l_nCurve, l_nLineStyle);
 	}
+
 }
 
 
@@ -2071,8 +2217,18 @@ SP_DLG_Simulation::~SP_DLG_Simulation()
         wxDELETE(m_apcResultViewers[l_nViewer]);
     }
 
-    //delete the timer
-    wxDELETE(m_pcTimer);
+     //read all views
+     for (SP_DS_Metadata* l_pcMeta : *m_pcGraph->GetMetadataclass(wxT("Plot"))->GetElements())
+     {
+    	 // clear curveinfo, if we have regex
+         if (!l_pcMeta->GetAttribute(wxT("RegEx"))->GetValueString().IsEmpty())
+         {
+             static_cast<SP_DS_ColListAttribute*>(l_pcMeta->GetAttribute(wxT("CurveInfo")))->Clear();
+         }
+     }
+
+     //delete the timer
+     wxDELETE(m_pcTimer);
 
     //set the pointer of external pointer to NULL
 	for (auto l_itWindow : m_pcExternalWindows)
@@ -2625,10 +2781,8 @@ void SP_DLG_Simulation::SaveCurrentView()
     l_pcAttribute->SetValueString(GetCurrentViewerType(m_nCurrentViewer));
 
     //Save the user selection
-    wxString l_RegExString = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"))->GetValueString();
-    if (l_RegExString == wxT("")) {
-    	SaveSelectedCurves();
-	}
+   	SaveSelectedCurves();
+
     CHECK_POINTER(m_apcResultViewers[m_nCurrentViewer], return);
 
     m_apcResultViewers[m_nCurrentViewer]->SaveViewToSnoopyFormat(m_pcCurrentTablePlot);

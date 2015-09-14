@@ -424,6 +424,8 @@ protected:
 
 	virtual void ChangeCurrentView(SP_DS_Metadata* p_pcView);
 
+	bool CreateViewerDataFromRegex();
+
 	//load view curves
 	virtual bool LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Metadata* p_pcView, wxArrayString& p_asPlaces);
 

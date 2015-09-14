@@ -586,63 +586,60 @@ void SP_DLG_PlacesSelection::SaveMetaData()
 	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*> (m_pcEditMetadata->GetAttribute(wxT("CurveInfo")));
 	l_pcCurveInfoList->Clear();
 
-	if (l_nRegexString == wxT(""))
+	SP_VectorString l_asColours;
+
+	if(m_sNodeType==wxT("Place"))
 	{
-		SP_VectorString l_asColours;
-	
-		if(m_sNodeType==wxT("Place"))
+		 LoadNodeColours(SP_DS_CONTINUOUS_PLACE,l_asColours);
+		 LoadNodeColours(SP_DS_DISCRETE_PLACE,l_asColours);
+	}
+	else if(m_sNodeType==wxT("Transition"))
+	{
+		LoadNodeColours(SP_DS_CONTINUOUS_TRANS,l_asColours);
+		LoadNodeColours(SP_DS_DISCRETE_TRANS,l_asColours);
+	}
+
+	for(unsigned int i = 0; i < m_vmSelectedNodes.size(); i++)
+	{
+		wxString l_sPos;
+		l_sPos  = wxString::Format(wxT("%ld"),m_vmSelectedNodes[i].m_nPosition);
+		wxString l_sType;
+		l_sType =  m_vmSelectedNodes[i].m_OutputType;
+		wxString l_sCheckState;
+		l_sCheckState << true;
+		wxString l_sCurveColor;
+
+		unsigned long l_nPos=m_vmSelectedNodes[i].m_nPosition;
+
+		//get either the node colour or assign an arbitrary colour
+		if(l_bColouredNet == false && l_nPos < l_asColours.size() && l_asColours[l_nPos] != wxT(""))
 		{
-			 LoadNodeColours(SP_DS_CONTINUOUS_PLACE,l_asColours);
-			 LoadNodeColours(SP_DS_DISCRETE_PLACE,l_asColours);
+			l_sCurveColor << l_asColours[l_nPos];
 		}
-		else if(m_sNodeType==wxT("Transition"))
+		else if( l_sType == wxT("Colored") && l_nPos < l_asColours.size() && l_asColours[l_nPos] != wxT(""))
 		{
-			LoadNodeColours(SP_DS_CONTINUOUS_TRANS,l_asColours);
-			LoadNodeColours(SP_DS_DISCRETE_TRANS,l_asColours);
+			l_sCurveColor << l_asColours[l_nPos];
 		}
-
-		for(unsigned int i = 0; i < m_vmSelectedNodes.size(); i++)
+		else
 		{
-			wxString l_sPos;
-			l_sPos  = wxString::Format(wxT("%ld"),m_vmSelectedNodes[i].m_nPosition);
-			wxString l_sType;
-			l_sType =  m_vmSelectedNodes[i].m_OutputType;
-			wxString l_sCheckState;
-			l_sCheckState << true;
-			wxString l_sCurveColor;
-
-			unsigned long l_nPos=m_vmSelectedNodes[i].m_nPosition;
-
-			//get either the node colour or assign an arbitrary colour
-			if(l_bColouredNet == false && l_nPos < l_asColours.size() && l_asColours[l_nPos] != wxT(""))
-			{
-				l_sCurveColor << l_asColours[l_nPos];
-			}
-			else if( l_sType == wxT("Colored") && l_nPos < l_asColours.size() && l_asColours[l_nPos] != wxT(""))
-			{
-				l_sCurveColor << l_asColours[l_nPos];
-			}
-			else
-			{
-				l_sCurveColor << SP_DLG_Simulation::GetColourString(i);
-			}
-
-			wxString l_sLinewidth;
-			l_sLinewidth <<-1;
-			wxString l_sLineStype;
-			l_sLineStype << -1;
-
-			wxString l_sName=m_vmSelectedNodes[i].m_sName;
-
-			unsigned int l_nRow = l_pcCurveInfoList->AppendEmptyRow();
-			l_pcCurveInfoList->SetCell(l_nRow,0,l_sPos);
-			l_pcCurveInfoList->SetCell(l_nRow,1,l_sType);
-			l_pcCurveInfoList->SetCell(l_nRow,2,l_sCheckState);
-			l_pcCurveInfoList->SetCell(l_nRow,3,l_sCurveColor);
-			l_pcCurveInfoList->SetCell(l_nRow,4,l_sLinewidth);
-			l_pcCurveInfoList->SetCell(l_nRow,5,l_sLineStype);
-			l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);
+			l_sCurveColor << SP_DLG_Simulation::GetColourString(i);
 		}
+
+		wxString l_sLinewidth;
+		l_sLinewidth <<-1;
+		wxString l_sLineStype;
+		l_sLineStype << -1;
+
+		wxString l_sName=m_vmSelectedNodes[i].m_sName;
+
+		unsigned int l_nRow = l_pcCurveInfoList->AppendEmptyRow();
+		l_pcCurveInfoList->SetCell(l_nRow,0,l_sPos);
+		l_pcCurveInfoList->SetCell(l_nRow,1,l_sType);
+		l_pcCurveInfoList->SetCell(l_nRow,2,l_sCheckState);
+		l_pcCurveInfoList->SetCell(l_nRow,3,l_sCurveColor);
+		l_pcCurveInfoList->SetCell(l_nRow,4,l_sLinewidth);
+		l_pcCurveInfoList->SetCell(l_nRow,5,l_sLineStype);
+		l_pcCurveInfoList->SetCell(l_nRow,6,l_sName);
 	}
 	
 }
