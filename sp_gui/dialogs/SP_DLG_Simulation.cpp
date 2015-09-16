@@ -173,6 +173,8 @@ SP_DLG_Simulation::SP_DLG_Simulation(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParen
     //give the simulator a pointer to Snoopy log
     spsim::Simulator::SetLogFunction(SimulatorLogFunction);
 
+	SetMinimalLayout();
+
     Bind(wxEVT_CLOSE_WINDOW, &SP_DLG_Simulation::OnCloseWindow, this);
 }
 

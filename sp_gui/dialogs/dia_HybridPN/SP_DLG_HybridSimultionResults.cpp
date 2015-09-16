@@ -119,8 +119,6 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 
 	int l_nSimulatorType = LoadSimulatorProperties();
 
-	//Call the parent class layout
-	SetMinimalLayout();
 	//Add special UI element for Continuous class
 	wxSizer* l_pcRowSizer = NULL;
 

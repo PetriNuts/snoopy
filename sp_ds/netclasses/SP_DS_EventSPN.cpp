@@ -523,8 +523,6 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_NumberAttribute( wxT("simulator"), 0 ));
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("simulator properties"), SP_COLLIST_STRING, 2 ) );
 
-//	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_NumberAttribute( wxT("simulator"), 100 ) );
-//	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("simulator properties"), SP_COLLIST_STRING, 2 ) );
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcMC = p_pcGraph->AddMetadataclass( new SP_DS_Metadataclass( p_pcGraph, wxT("Simulation Results") ) );

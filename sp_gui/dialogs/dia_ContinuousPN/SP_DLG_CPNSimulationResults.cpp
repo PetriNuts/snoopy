@@ -87,9 +87,6 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 //	int l_nSimulatorType =
 			LoadSimulatorProperties();
 
-	//Call the parent class layout
-	SetMinimalLayout();
-
 	wxSizer* l_pcRowSizer = NULL;
 
 	if(!m_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")))
