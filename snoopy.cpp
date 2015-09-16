@@ -26,6 +26,7 @@
 #include "export/SP_ExportEPS.h"
 #include "export/SP_ExportXfig.h"
 #include "export/SP_ExportLatex.h"
+#include "export/SP_ExportReport.h"
 #include "export/SP_ExportAPNN.h"
 #include "export/SP_ExportANDL.h"
 #include "export/SP_ExportCANDL.h"
@@ -271,6 +272,12 @@ bool Snoopy::OnInit()
 	}
 
 	l_pcExport = new SP_ExportLatex();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	l_pcExport = new SP_ExportReport();
 	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
 	{
 		wxDELETE(l_pcExport);
