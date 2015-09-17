@@ -29,7 +29,9 @@ enum {
 	SP_CMD_DELETE,
 	SP_CMD_DELETE_ALL,
 	SP_CMD_HIDE,
+	SP_CMD_HIDE_ALL,
 	SP_CMD_UNHIDE,
+	SP_CMD_UNHIDE_ALL,
 };
 
 
@@ -46,7 +48,7 @@ private:
 	//we need the association to their parent so we can re-add them in Undo()
 	map<SP_Graphic*, SP_Data*> m_mGraphic2Parent;
 
-	//next six function are used for SP_CMD_DELETE
+	//next functions are used for SP_CMD_DELETE
 	//this takes care of possibly loose edges after deleting nodes
 	//if the second param is passed, only graphics connected to it are checked
 	void AppendEdges(const SP_ListEdge *p_pcEdges, SP_Graphic *p_pcGrNode = 0);
@@ -60,6 +62,9 @@ private:
 	//this function removes coarse nodes from coarse tree and deletes their documents
 	void CleanUpCoarseNodes();
 
+	void AppendHiddenEdges(SP_Graphic *p_pcGrNode);
+	void AppendHiddenEdges(SP_Data *p_pcNode);
+
 protected:
 	//list of graphics to delete
 	SP_ListGraphic m_lcGraphics;
@@ -69,9 +74,9 @@ protected:
 	//self-explanatory
 	bool DoDelete(bool p_bDeleteAll = false);
 	bool UndoDelete();
-	bool DoHide();
+	bool DoHide(bool p_bHideAll = false);
 	bool UndoHide();
-	bool DoUnHide();
+	bool DoUnHide(bool p_bUnHideAll = false);
 	bool UndoUnHide();
 
 public:

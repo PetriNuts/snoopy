@@ -230,7 +230,9 @@ SP_GUI_Childframe::CreateMenuBar(wxMenu** p_ppcEditMenu)
 			 wxT("Delete all graphics of the selected elements"));
     m_pcEditMenu->AppendSeparator();
     m_pcEditMenu->Append(SP_EDIT_HIDE_ID, wxT("Hide\tCtrl+H"));
+    m_pcEditMenu->Append(SP_EDIT_HIDEALL_ID, wxT("Hide all"));
     m_pcEditMenu->Append(SP_EDIT_UNHIDE_ID, wxT("UnHide\tShift+Ctrl+H"));
+    m_pcEditMenu->Append(SP_EDIT_UNHIDEALL_ID, wxT("UnHide all"));
     m_pcEditMenu->AppendSeparator();
     m_pcEditMenu->Append(SP_EDIT_PROPERTIES_ID,
 			 wxT("&Edit selected elements\tCtrl+E"));

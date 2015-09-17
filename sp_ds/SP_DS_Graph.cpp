@@ -1216,7 +1216,7 @@ SP_DS_Graph::GetParentDoc()
 }
 
 void
-SP_DS_Graph::SetHide(SP_Data* p_pcData, bool p_bHide)
+SP_DS_Graph::SetHide(SP_Data* p_pcData, bool p_bHide, bool p_bIncludeGraphics)
 {
 	p_pcData->SetHide(p_bHide);
 
@@ -1228,45 +1228,47 @@ SP_DS_Graph::SetHide(SP_Data* p_pcData, bool p_bHide)
 		}
 	}
 
-	for(SP_Graphic* l_pcGr : *(p_pcData->GetGraphics()))
+	if(p_bIncludeGraphics)
 	{
-		if(p_pcData->GetNetnumber() != l_pcGr->GetNetnumber())
+		for(SP_Graphic* l_pcGr : *(p_pcData->GetGraphics()))
 		{
-			SP_Data* l_pcNode = GetCoarseNode(l_pcGr->GetNetnumber());
-			if(l_pcNode)
+			if(p_pcData->GetNetnumber() != l_pcGr->GetNetnumber())
 			{
-				SP_DS_Coarse* l_pcCoarse = l_pcNode->GetCoarse();
-				if(!l_pcCoarse->GetCoarseDoc())
+				SP_Data* l_pcNode = GetCoarseNode(l_pcGr->GetNetnumber());
+				if(l_pcNode)
 				{
-					l_pcCoarse->SetUpdate(false);
-					l_pcCoarse->Show();
-					l_pcCoarse->GetCoarseDoc()->SetClose(false);
-					l_pcCoarse->GetCoarseDoc()->Modify(FALSE);
-					l_pcCoarse->GetCoarseDoc()->Close();
+					SP_DS_Coarse* l_pcCoarse = l_pcNode->GetCoarse();
+					if(!l_pcCoarse->GetCoarseDoc())
+					{
+						l_pcCoarse->SetUpdate(false);
+						l_pcCoarse->Show();
+						l_pcCoarse->GetCoarseDoc()->SetClose(false);
+						l_pcCoarse->GetCoarseDoc()->Modify(FALSE);
+						l_pcCoarse->GetCoarseDoc()->Close();
+					}
 				}
 			}
-		}
-		l_pcGr->SetHide(p_bHide);
+			l_pcGr->SetHide(p_bHide);
 
-		for(SP_Graphic* l_pcGrChild : *(l_pcGr->GetGraphicChildren()))
-		{
-			SP_Data* l_pcNode = GetCoarseNode(l_pcGrChild->GetNetnumber());
-			if(l_pcNode)
+			for(SP_Graphic* l_pcGrChild : *(l_pcGr->GetGraphicChildren()))
 			{
-				SP_DS_Coarse* l_pcCoarse = l_pcNode->GetCoarse();
-				if(!l_pcCoarse->GetCoarseDoc())
+				SP_Data* l_pcNode = GetCoarseNode(l_pcGrChild->GetNetnumber());
+				if(l_pcNode)
 				{
-					l_pcCoarse->SetUpdate(false);
-					l_pcCoarse->Show();
-					l_pcCoarse->GetCoarseDoc()->SetClose(false);
-					l_pcCoarse->GetCoarseDoc()->Modify(FALSE);
-					l_pcCoarse->GetCoarseDoc()->Close();
+					SP_DS_Coarse* l_pcCoarse = l_pcNode->GetCoarse();
+					if(!l_pcCoarse->GetCoarseDoc())
+					{
+						l_pcCoarse->SetUpdate(false);
+						l_pcCoarse->Show();
+						l_pcCoarse->GetCoarseDoc()->SetClose(false);
+						l_pcCoarse->GetCoarseDoc()->Modify(FALSE);
+						l_pcCoarse->GetCoarseDoc()->Close();
+					}
 				}
+				l_pcGrChild->SetHide(p_bHide);
 			}
-			l_pcGrChild->SetHide(p_bHide);
 		}
 	}
-
 	p_pcData->Update(false);
 }
 

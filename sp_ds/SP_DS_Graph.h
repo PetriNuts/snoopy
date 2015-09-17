@@ -164,7 +164,7 @@ public:
 	SP_MDI_Doc *GetParentDoc();
 
 	//Sets hide to @param and all graphics
-	void SetHide(SP_Data* p_pcData, bool p_bHide);
+	void SetHide(SP_Data* p_pcData, bool p_bHide, bool p_bIncludeGraphics = true);
 
 	//update the whole graph
 	bool Update();

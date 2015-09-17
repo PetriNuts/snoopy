@@ -89,8 +89,12 @@ bool SP_CMD_Edit::Do()
 		return DoDelete(true);
 	case SP_CMD_HIDE:
 		return DoHide();
+	case SP_CMD_HIDE_ALL:
+		return DoHide(true);
 	case SP_CMD_UNHIDE:
 		return DoUnHide();
+	case SP_CMD_UNHIDE_ALL:
+		return DoUnHide(true);
 	}
 
 	return false;
@@ -142,10 +146,11 @@ bool SP_CMD_Edit::DoDelete(bool p_bDeleteAll)
 	m_pcDelGraph->SetIsCopy(true);
 	m_mGraphic2Parent.clear();
 
-	SP_ListGraphic::iterator itG, itG2;
+	SP_ListGraphic::iterator itG;
 	for (itG = m_lcGraphics.begin(); itG != m_lcGraphics.end(); ++itG)
 	{
-		SP_Data *l_pcParent = (*itG)->GetParent();
+		SP_Graphic* l_pcGr = *itG;
+		SP_Data *l_pcParent = l_pcGr->GetParent();
 		//every graphic should have a parent, so this shouldn't happen, but check it anyway
 		if (!l_pcParent)
 			continue;
@@ -156,39 +161,39 @@ bool SP_CMD_Edit::DoDelete(bool p_bDeleteAll)
 			//and remember the connection to its parent
 
 			//if the graphic represents an edge
-			if((*itG)->GetGraphicType() == SP_GRAPHIC_EDGE)
+			if(l_pcGr->GetGraphicType() == SP_GRAPHIC_EDGE)
 			{
 				//has a parent outside the coarse node
 				//has any graphics in coarse nodes they should be deleted, too
-				if ((*itG)->GetGraphicState() == SP_STATE_COARSEBORDERDOWN
-					|| (*itG)->GetGraphicState() == SP_STATE_COARSEBORDERTOP)
+				if (l_pcGr->GetGraphicState() == SP_STATE_COARSEBORDERDOWN
+					|| l_pcGr->GetGraphicState() == SP_STATE_COARSEBORDERTOP)
 				{
-					for (itG2 = l_pcParent->GetGraphics()->begin(); itG2 != l_pcParent->GetGraphics()->end(); ++itG2)
+					for (SP_Graphic* l_pcGr2 : *l_pcParent->GetGraphics())
 					{
-						if (((*itG2)->GetGraphicState() == SP_STATE_COARSEBORDERTOP
-							|| (*itG2)->GetGraphicState() == SP_STATE_COARSEBORDERDOWN)
-							&& SP_Find(m_lcGraphics, *itG2) == m_lcGraphics.end())
+						if ((l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERTOP
+							|| l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERDOWN)
+							&& SP_Find(m_lcGraphics, l_pcGr2) == m_lcGraphics.end())
 						{
-							m_lcGraphics.push_back(*itG2);
+							m_lcGraphics.push_back(l_pcGr2);
 						} //end if
 					} //end for
 				} //end if
 			}
-			else if((*itG)->GetGraphicType() == SP_GRAPHIC_NODE)
+			else if(l_pcGr->GetGraphicType() == SP_GRAPHIC_NODE)
 			{
 				//loose edges are not allowed, so we remove them
-				AppendEdges(dynamic_cast<SP_DS_Node*> (l_pcParent)->GetSourceEdges(), *itG);
-				AppendEdges(dynamic_cast<SP_DS_Node*> (l_pcParent)->GetTargetEdges(), *itG);
+				AppendEdges(dynamic_cast<SP_DS_Node*> (l_pcParent)->GetSourceEdges(), l_pcGr);
+				AppendEdges(dynamic_cast<SP_DS_Node*> (l_pcParent)->GetTargetEdges(), l_pcGr);
 
-				for (itG2 = l_pcParent->GetGraphics()->begin(); itG2 != l_pcParent->GetGraphics()->end(); ++itG2)
+				for (SP_Graphic* l_pcGr2 : *l_pcParent->GetGraphics())
 				{
-					if ((*itG2)->GetGraphicState() == SP_STATE_COARSEBORDERDOWN
-						|| (*itG2)->GetGraphicState() == SP_STATE_COARSEBORDERTOP)
+					if (l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERDOWN
+						|| l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERTOP)
 					{
-						if (!(*itG2)->HasUndeletedEdges()
-							&& SP_Find(m_lcGraphics, *itG2) == m_lcGraphics.end())
+						if (!l_pcGr2->HasUndeletedEdges()
+							&& SP_Find(m_lcGraphics, l_pcGr2) == m_lcGraphics.end())
 						{
-							m_lcGraphics.push_back(*itG2);
+							m_lcGraphics.push_back(l_pcGr2);
 						} //end if
 					} //end for
 				}
@@ -199,9 +204,9 @@ bool SP_CMD_Edit::DoDelete(bool p_bDeleteAll)
 
 			if (l_pcParent->GetLogical())
 			{
-			    for(auto itC = (*itG)->GetGraphicChildren()->begin();
-			    		itC != (*itG)->GetGraphicChildren()->end();
-			    		itC = (*itG)->GetGraphicChildren()->begin())
+			    for(auto itC = l_pcGr->GetGraphicChildren()->begin();
+			    		itC != l_pcGr->GetGraphicChildren()->end();
+			    		itC = l_pcGr->GetGraphicChildren()->begin())
 				{
 			    	SP_Graphic* l_pcGraphicChild = *itC;
 					if (l_pcGraphicChild)
@@ -217,9 +222,9 @@ bool SP_CMD_Edit::DoDelete(bool p_bDeleteAll)
 			} // end if
 
 			//finally removing the graphic itself
-			m_mGraphic2Parent[*itG] = l_pcParent;
-			(*itG)->RemoveFromCanvas();
-			l_pcParent->RemoveGraphic(*itG, false);
+			m_mGraphic2Parent[l_pcGr] = l_pcParent;
+			l_pcGr->RemoveFromCanvas();
+			l_pcParent->RemoveGraphic(l_pcGr, false);
 
 		}
 		else
@@ -388,20 +393,13 @@ void SP_CMD_Edit::AppendEdges(const SP_ListEdge *p_pcEdges, SP_Graphic *p_pcGrNo
 	if (!p_pcEdges)
 		return;
 
-	SP_ListEdge::const_iterator it;
-	SP_ListGraphic *l_pcGraphics;
-	SP_ListGraphic::iterator itg, itG2;
-
-	for (it = p_pcEdges->begin(); it != p_pcEdges->end(); ++it)
+	for (SP_DS_Edge* l_pcEdge : *p_pcEdges)
 	{
-		if (EdgeInGraph(*it))
+		if(EdgeInGraph(l_pcEdge))
 		{
 			//if this edge is still part of the graph append all its graphics to the delete-list
-			l_pcGraphics = (*it)->GetGraphics();
-
-			for (itg = l_pcGraphics->begin(); itg != l_pcGraphics->end(); ++itg)
+			for (SP_Graphic* l_pcGr : *l_pcEdge->GetGraphics())
 			{
-				SP_Graphic* l_pcGr = *itg;
 				SP_GR_Edge* l_pcEdgeGraphic = dynamic_cast<SP_GR_Edge*>(l_pcGr);
 				SP_Graphic* l_pcSourceGraphic = l_pcEdgeGraphic->GetSource();
 				SP_Graphic* l_pcTargetGraphic = l_pcEdgeGraphic->GetTarget();
@@ -427,13 +425,13 @@ void SP_CMD_Edit::AppendEdges(const SP_ListEdge *p_pcEdges, SP_Graphic *p_pcGrNo
 						if (!l_pcParent)
 							continue;
 
-						for (itG2 = l_pcParent->GetGraphics()->begin(); itG2 != l_pcParent->GetGraphics()->end(); ++itG2)
+						for (SP_Graphic* l_pcGr2 : *l_pcParent->GetGraphics())
 						{
-							if ((*itG2)->GetGraphicState() == SP_STATE_COARSEBORDERDOWN
-								&& SP_Find(m_lcGraphics, *itG2) == m_lcGraphics.end())
+							if (l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERDOWN
+								&& SP_Find(m_lcGraphics, l_pcGr2) == m_lcGraphics.end())
 							{
-								m_lcGraphics.push_back(*itG2);
-								SP_GR_Edge* l_pcGraphicEdge = dynamic_cast<SP_GR_Edge*> (*itG2);
+								m_lcGraphics.push_back(l_pcGr2);
+								SP_GR_Edge* l_pcGraphicEdge = dynamic_cast<SP_GR_Edge*> (l_pcGr2);
 								if(l_bIsSource)
 								{
 									if(SP_Find(m_lcGraphics, l_pcGraphicEdge->GetSource()) == m_lcGraphics.end())
@@ -457,6 +455,32 @@ void SP_CMD_Edit::AppendEdges(const SP_ListEdge *p_pcEdges, SP_Graphic *p_pcGrNo
 	} //end for
 } //end AppendEdges
 
+void SP_CMD_Edit::AppendHiddenEdges(SP_Graphic *p_pcGrNode)
+{
+	wxNode* l_pcNode = p_pcGrNode->GetPrimitive()->GetLines().GetFirst();
+	wxLineShape* l_pcLine;
+	SP_GR_Edge* edge;
+	while (l_pcNode)
+	{
+		l_pcLine = (wxLineShape*)l_pcNode->GetData();
+		edge = dynamic_cast<SP_GR_Edge*>(SP_Core::Instance()->ResolveExtern(l_pcLine));
+
+		if(edge->GetHide())
+		{
+			m_lcGraphics.push_back(edge);
+		}
+
+		l_pcNode = l_pcNode->GetNext();
+	}
+}
+
+void SP_CMD_Edit::AppendHiddenEdges(SP_Data *p_pcNode)
+{
+	for(SP_Graphic* l_pcGr : *p_pcNode->GetGraphics())
+	{
+		AppendHiddenEdges(l_pcGr);
+	}
+}
 
 void SP_CMD_Edit::AppendCoarse(SP_DS_Coarse *p_pcCoarse)
 {
@@ -481,11 +505,11 @@ void SP_CMD_Edit::AppendCoarse(SP_DS_Coarse *p_pcCoarse)
 	//retrieving graphics in coarse node
 	p_pcCoarse->GetParent()->GetClassObject()->GetParentGraph()->GetGraphicsInNet(&l_lCoarseGraphics, p_pcCoarse->GetNetnumber(), SP_ELEMENT_NODE | SP_ELEMENT_EDGE);
 
-	for (SP_ListGraphic::iterator it = l_lCoarseGraphics.begin(); it != l_lCoarseGraphics.end(); ++it)
+	for (SP_Graphic* l_pcGr : l_lCoarseGraphics)
 	{
 		//appending the just collected graphics to the delete-list
-		if (SP_Find(m_lcGraphics, *it) == m_lcGraphics.end())
-			m_lcGraphics.push_back(*it);
+		if (SP_Find(m_lcGraphics, l_pcGr) == m_lcGraphics.end())
+			m_lcGraphics.push_back(l_pcGr);
 	}
 }
 
@@ -496,13 +520,11 @@ void SP_CMD_Edit::RemoveGraphicsFromCanvas(SP_Data *p_pcData)
 	if (!p_pcData || !p_pcData->GetGraphics())
 		return;
 
-	SP_ListGraphic::iterator it, it2;
-
 	//we don't actually remove any graphics from the graph
 	//we just remove them from canvas
-	for (it = p_pcData->GetGraphics()->begin(); it != p_pcData->GetGraphics()->end(); ++it)
+	for (SP_Graphic* l_pcGr : *p_pcData->GetGraphics())
 	{
-		RemoveGraphicFromCanvas(*it);
+		RemoveGraphicFromCanvas(l_pcGr);
 	}
 }
 
@@ -516,9 +538,9 @@ void SP_CMD_Edit::RemoveGraphicFromCanvas(SP_Graphic *p_pcGraphic)
 	if (!gr)
 		return;
 	SP_ListGraphic::iterator itg;
-	for (itg = gr->begin(); itg != gr->end(); ++itg)
+	for (SP_Graphic* l_pcGr : *gr)
 	{
-		RemoveGraphicFromCanvas(*itg);
+		RemoveGraphicFromCanvas(l_pcGr);
 	}
 }
 
@@ -535,10 +557,9 @@ bool SP_CMD_Edit::EdgeInGraph(SP_DS_Edge *p_pcEdge)
 	if (!l_pcEC)
 		return false;
 
-	SP_ListEdge::const_iterator it;
-	for (it = l_pcEC->GetElements()->begin(); it != l_pcEC->GetElements()->end(); ++it)
+	for (SP_DS_Edge* l_pcEdge : *l_pcEC->GetElements())
 	{
-		if (*it == p_pcEdge)
+		if (l_pcEdge == p_pcEdge)
 		{
 			return true;
 		}
@@ -549,16 +570,13 @@ bool SP_CMD_Edit::EdgeInGraph(SP_DS_Edge *p_pcEdge)
 
 void SP_CMD_Edit::CleanUpCoarseNodes()
 {
-
-	list<SP_DS_Coarse*>::iterator itC;
-
-	for (itC = m_lCoarseNodes.begin(); itC != m_lCoarseNodes.end(); ++itC)
+	for (SP_DS_Coarse* l_pcCoarse : m_lCoarseNodes)
 	{
 		//removing the deleted coarse node from the coarse tree...
-		wxTreeItemId l_nCoarseId = (*itC)->GetCoarseId();
+		wxTreeItemId l_nCoarseId = l_pcCoarse->GetCoarseId();
 		m_pcSource->CreateCoarseTree()->InvalidateAllChildren(l_nCoarseId);
 		m_pcSource->CreateCoarseTree()->Delete(l_nCoarseId);
-		SP_MDI_CoarseDoc *l_pcCoarseDoc = (*itC)->GetCoarseDoc();
+		SP_MDI_CoarseDoc *l_pcCoarseDoc = l_pcCoarse->GetCoarseDoc();
 		//... and closing the associated document
 		if (l_pcCoarseDoc)
 		{
@@ -566,14 +584,12 @@ void SP_CMD_Edit::CleanUpCoarseNodes()
 			l_pcCoarseDoc->Modify(FALSE);
 			l_pcCoarseDoc->Close();
 			l_pcCoarseDoc->DeleteAllViews();
-			(*itC)->SetCoarseDoc(0);
+			l_pcCoarse->SetCoarseDoc(0);
 		}
-
 	}
-
 }
 
-bool SP_CMD_Edit::DoHide()
+bool SP_CMD_Edit::DoHide(bool p_bHideAll)
 {
 	SP_LOGDEBUG(wxT("entered DoHide()..."));
 
@@ -586,7 +602,7 @@ bool SP_CMD_Edit::DoHide()
 		return false;
 	m_pcDelGraph->SetIsCopy(true);
 
-	SP_ListGraphic::iterator itG, itG2;
+	SP_ListGraphic::iterator itG;
 	for (itG = m_lcGraphics.begin(); itG != m_lcGraphics.end(); ++itG)
 	{
 		SP_Graphic* l_pcGr = *itG;
@@ -595,45 +611,111 @@ bool SP_CMD_Edit::DoHide()
 		if (!l_pcParent || l_pcGr->GetHide() == true)
 			continue;
 
-		m_pcSource->SetHide(l_pcParent, true);
-		switch (l_pcParent->GetElementType())
+		if (!p_bHideAll && (l_pcParent->GetGraphics()->size() > 1) )
 		{
-		case SP_ELEMENT_NODE:
+			//if there is more than one graphic, we just hide the current one...
+			//and remember the connection to its parent
+
+			//if the graphic represents an edge
+			if(l_pcGr->GetGraphicType() == SP_GRAPHIC_EDGE)
+			{
+				//has a parent outside the coarse node
+				//has any graphics in coarse nodes they should be hidden, too
+				if (l_pcGr->GetGraphicState() == SP_STATE_COARSEBORDERDOWN
+					|| l_pcGr->GetGraphicState() == SP_STATE_COARSEBORDERTOP)
+				{
+					for (SP_Graphic* l_pcGr2 : *l_pcParent->GetGraphics())
+					{
+						if ((l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERTOP
+							|| l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERDOWN)
+							&& SP_Find(m_lcGraphics, l_pcGr2) == m_lcGraphics.end())
+						{
+							m_lcGraphics.push_back(l_pcGr2);
+						} //end if
+					} //end for
+				} //end if
+			}
+			else if(l_pcGr->GetGraphicType() == SP_GRAPHIC_NODE)
+			{
+				//loose edges are not allowed, so we hide them
+				AppendEdges(dynamic_cast<SP_DS_Node*> (l_pcParent)->GetSourceEdges(), l_pcGr);
+				AppendEdges(dynamic_cast<SP_DS_Node*> (l_pcParent)->GetTargetEdges(), l_pcGr);
+
+				for (SP_Graphic* l_pcGr2 : *l_pcParent->GetGraphics())
+				{
+					if (l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERDOWN
+						|| l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERTOP)
+					{
+						if (!l_pcGr2->HasUndeletedEdges()
+							&& SP_Find(m_lcGraphics, l_pcGr2) == m_lcGraphics.end())
+						{
+							m_lcGraphics.push_back(l_pcGr2);
+						} //end if
+					} //end for
+				}
+			}
+
+			//when a node is logical, then hide the current graphic of the node only
+			//and hide the graphics from the child attributes too
+
+			if (l_pcParent->GetLogical())
+			{
+			    for(SP_Graphic* l_pcGraphicChild : *l_pcGr->GetGraphicChildren())
+				{
+					if (l_pcGraphicChild)
+					{
+						l_pcGraphicChild->SetHide(true);
+					}
+				}
+			} // end if
+
+			//finally hide the graphic itself
+			l_pcGr->SetHide(true);
+
+		}
+		else
 		{
-			SP_DS_Node *l_pcNodeCopy = dynamic_cast<SP_DS_Node*> (l_pcParent);
-			AppendEdges(l_pcNodeCopy->GetSourceEdges());
-			AppendEdges(l_pcNodeCopy->GetTargetEdges());
-			//if we talk about coarse, append its subelements as well
-			AppendCoarse(l_pcParent->GetCoarse());
-			//transfer the data element to our DelGraph
-			m_pcDelGraph->AddElement(l_pcNodeCopy);
-			break;
-		}
-		case SP_ELEMENT_EDGE:
-		{
-			SP_DS_Edge *l_pcEdgeCopy = dynamic_cast<SP_DS_Edge*> (l_pcParent);
+			//wxT("hide all") means we hide the parent element completely (including all graphics)
+			//the same applies if the current graphic is the only one of its parent
+			m_pcSource->SetHide(l_pcParent, true);
+			switch (l_pcParent->GetElementType())
+			{
+			case SP_ELEMENT_NODE:
+			{
+				SP_DS_Node *l_pcNodeCopy = dynamic_cast<SP_DS_Node*> (l_pcParent);
+				AppendEdges(l_pcNodeCopy->GetSourceEdges());
+				AppendEdges(l_pcNodeCopy->GetTargetEdges());
+				//if we talk about coarse, append its subelements as well
+				AppendCoarse(l_pcParent->GetCoarse());
+				//transfer the data element to our DelGraph
+				m_pcDelGraph->AddElement(l_pcNodeCopy);
+				break;
+			}
+			case SP_ELEMENT_EDGE:
+			{
+				SP_DS_Edge *l_pcEdgeCopy = dynamic_cast<SP_DS_Edge*> (l_pcParent);
 
-			SP_Data* l_pcSource = l_pcEdgeCopy->GetSource();
-			l_pcSource->RemoveSourceEdge(l_pcEdgeCopy);
-			l_pcEdgeCopy->SetSource(l_pcSource);
+				SP_Data* l_pcSource = l_pcEdgeCopy->GetSource();
+				l_pcSource->RemoveSourceEdge(l_pcEdgeCopy);
+				l_pcEdgeCopy->SetSource(l_pcSource);
 
-			SP_Data* l_pcTarget = l_pcEdgeCopy->GetTarget();
-			l_pcTarget->RemoveTargetEdge(l_pcEdgeCopy);
-			l_pcEdgeCopy->SetTarget(l_pcTarget);
+				SP_Data* l_pcTarget = l_pcEdgeCopy->GetTarget();
+				l_pcTarget->RemoveTargetEdge(l_pcEdgeCopy);
+				l_pcEdgeCopy->SetTarget(l_pcTarget);
 
-			m_pcDelGraph->AddElement(l_pcEdgeCopy);
-			break;
+				m_pcDelGraph->AddElement(l_pcEdgeCopy);
+				break;
+			}
+			case SP_ELEMENT_METADATA:
+			{
+				//transfer the data element to our DelGraph
+				m_pcDelGraph->AddElement(l_pcParent);
+				break;
+			}
+			default:
+				break;
+			}
 		}
-		case SP_ELEMENT_METADATA:
-		{
-			//transfer the data element to our DelGraph
-			m_pcDelGraph->AddElement(l_pcParent);
-			break;
-		}
-		default:
-			break;
-		}
-
 	}
 
 	m_pcSource->GetParentDoc()->DrawAllElements(false, true);
@@ -734,14 +816,14 @@ bool SP_CMD_Edit::UndoHide()
 	return true;
 }
 
-bool SP_CMD_Edit::DoUnHide()
+bool SP_CMD_Edit::DoUnHide(bool p_bUnHideAll)
 {
 	SP_LOGDEBUG(wxT("entered DoUnHide()..."));
 
 	if (!m_pcSource)
 		return false;
 
-	SP_ListGraphic::iterator itG, itG2;
+	SP_ListGraphic::iterator itG;
 	for (itG = m_lcGraphics.begin(); itG != m_lcGraphics.end(); ++itG)
 	{
 		SP_Graphic* l_pcGr = *itG;
@@ -750,55 +832,130 @@ bool SP_CMD_Edit::DoUnHide()
 		if (!l_pcParent || l_pcGr->GetHide() == false)
 			continue;
 
-		m_pcSource->SetHide(l_pcParent, false);
-		switch (l_pcParent->GetElementType())
+		if (!p_bUnHideAll && (l_pcParent->GetGraphics()->size() > 1) )
 		{
-		case SP_ELEMENT_NODE:
-		{
-			SP_DS_Node* l_pcNode = dynamic_cast<SP_DS_Node*>(l_pcParent);
-			if (!m_pcSource->GetNetclass()->NodeRequirement(l_pcNode))
-			{
-				SP_MESSAGEBOX(wxT(" Unhide not possible due to node requirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
-				return FALSE;
-			}
-			AppendCoarse(l_pcParent->GetCoarse());
-			m_pcSource->AddElement(l_pcNode);
-			//if we got a coarse node we need to reset it
-			SP_DS_Coarse *l_pcCoarse = l_pcNode->GetCoarse();
-			if (l_pcCoarse)
-			{
-				l_pcCoarse->SetUpdate(false);
-				l_pcCoarse->Update(false, false);
-			}
-			break;
-		}
-		case SP_ELEMENT_EDGE:
-		{
-			SP_DS_Edge *l_pcEdge = dynamic_cast<SP_DS_Edge*> (l_pcParent);
-			m_pcSource->AddElement(l_pcEdge);
-			// set the links to this edge in the corresponding nodes.
-			SP_DS_Node* l_pcNode = dynamic_cast<SP_DS_Node*> (l_pcEdge->GetSource());
-			l_pcNode->AddSourceEdge(l_pcEdge);
+			//if there is more than one graphic, we just unhide the current one...
+			//and remember the connection to its parent
 
-			l_pcNode = dynamic_cast<SP_DS_Node*> (l_pcEdge->GetTarget());
-			l_pcNode->AddTargetEdge(l_pcEdge);
-			break;
-		}
-		case SP_ELEMENT_METADATA:
-		{
-			SP_DS_Metadata* l_pcMetadata = dynamic_cast<SP_DS_Metadata*>(l_pcParent);
-			if (!m_pcSource->GetNetclass()->MetadataRequirement(l_pcMetadata))
+			//if the graphic represents an edge
+			if(l_pcGr->GetGraphicType() == SP_GRAPHIC_EDGE)
 			{
-				SP_MESSAGEBOX(wxT(" Unhide not possible due to metadata requirement in netclass"), wxT("Error"), wxOK | wxICON_ERROR);
-				return FALSE;
+				//has a parent outside the coarse node
+				//has any graphics in coarse nodes they should be unhide, too
+				if (l_pcGr->GetGraphicState() == SP_STATE_COARSEBORDERDOWN
+					|| l_pcGr->GetGraphicState() == SP_STATE_COARSEBORDERTOP)
+				{
+					for (SP_Graphic* l_pcGr2 : *l_pcParent->GetGraphics())
+					{
+						if ((l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERTOP
+							|| l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERDOWN)
+							&& SP_Find(m_lcGraphics, l_pcGr2) == m_lcGraphics.end())
+						{
+							m_lcGraphics.push_back(l_pcGr2);
+						} //end if
+					} //end for
+				} //end if
 			}
-			m_pcSource->AddElement(l_pcMetadata);
-			break;
-		}
-		default:
-			break;
-		}
+			else if(l_pcGr->GetGraphicType() == SP_GRAPHIC_NODE)
+			{
+				AppendHiddenEdges(l_pcGr);
 
+				for (SP_Graphic* l_pcGr2 : *l_pcParent->GetGraphics())
+				{
+					if (l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERDOWN
+						|| l_pcGr2->GetGraphicState() == SP_STATE_COARSEBORDERTOP)
+					{
+						if (!l_pcGr2->HasUndeletedEdges()
+							&& SP_Find(m_lcGraphics, l_pcGr2) == m_lcGraphics.end())
+						{
+							m_lcGraphics.push_back(l_pcGr2);
+						} //end if
+					} //end for
+				}
+			}
+
+			//when a node is logical, then unhide the current graphic of the node only
+			//and unhide the graphics from the child attributes too
+
+			if (l_pcParent->GetLogical())
+			{
+			    for(SP_Graphic* l_pcGraphicChild : *l_pcGr->GetGraphicChildren())
+				{
+					if (l_pcGraphicChild)
+					{
+						l_pcGraphicChild->SetHide(false);
+					}
+				}
+			} // end if
+
+			//finally unhide the graphic itself
+			l_pcGr->SetHide(false);
+
+			//if the parent is hidden, add it to the graph and unhide
+			if(l_pcParent->GetHide())
+			{
+				m_pcSource->AddElement(l_pcParent);
+				m_pcSource->SetHide(l_pcParent, false, false);
+			}
+		}
+		else
+		{
+			switch (l_pcParent->GetElementType())
+			{
+			case SP_ELEMENT_NODE:
+			{
+				SP_DS_Node* l_pcNode = dynamic_cast<SP_DS_Node*>(l_pcParent);
+				if (!m_pcSource->GetNetclass()->NodeRequirement(l_pcNode))
+				{
+					SP_LOGERROR(wxT(" Unhide not possible due to node requirement in netclass"));
+					return FALSE;
+				}
+				AppendCoarse(l_pcParent->GetCoarse());
+				AppendHiddenEdges(l_pcParent);
+				m_pcSource->AddElement(l_pcNode);
+				//if we got a coarse node we need to reset it
+				SP_DS_Coarse *l_pcCoarse = l_pcNode->GetCoarse();
+				if (l_pcCoarse)
+				{
+					l_pcCoarse->SetUpdate(false);
+					l_pcCoarse->Update(false, false);
+				}
+				break;
+			}
+			case SP_ELEMENT_EDGE:
+			{
+				SP_DS_Edge *l_pcEdge = dynamic_cast<SP_DS_Edge*> (l_pcParent);
+				SP_DS_Node* l_pcSource = dynamic_cast<SP_DS_Node*> (l_pcEdge->GetSource());
+				SP_DS_Node* l_pcTarget = dynamic_cast<SP_DS_Node*> (l_pcEdge->GetTarget());
+
+				if (!m_pcSource->GetNetclass()->EdgeRequirement(l_pcEdge->GetEdgeclass(), l_pcSource, l_pcTarget)
+					|| l_pcSource->GetHide() || l_pcTarget->GetHide())
+				{
+					SP_LOGERROR(wxT(" Unhide not possible due to edge requirement in netclass"));
+					return FALSE;
+				}
+				m_pcSource->AddElement(l_pcEdge);
+				// set the links to this edge in the corresponding nodes.
+				l_pcSource->AddSourceEdge(l_pcEdge);
+				l_pcTarget->AddTargetEdge(l_pcEdge);
+				break;
+			}
+			case SP_ELEMENT_METADATA:
+			{
+				SP_DS_Metadata* l_pcMetadata = dynamic_cast<SP_DS_Metadata*>(l_pcParent);
+				if (!m_pcSource->GetNetclass()->MetadataRequirement(l_pcMetadata))
+				{
+					SP_LOGERROR(wxT(" Unhide not possible due to metadata requirement in netclass"));
+					return FALSE;
+				}
+				m_pcSource->AddElement(l_pcMetadata);
+				break;
+			}
+			default:
+				break;
+			}
+			m_pcSource->SetHide(l_pcParent, false);
+		}
 	}
 
 	m_pcSource->GetParentDoc()->DrawAllElements(false, true);

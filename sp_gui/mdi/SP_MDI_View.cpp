@@ -76,7 +76,9 @@ EVT_MENU(SP_EDIT_TRANSFORM_ID, SP_MDI_View::OnTransformShapes)
 EVT_MENU(SP_ID_DELETE, SP_MDI_View::OnDelete)
 EVT_MENU(SP_MENU_ITEM_DELETE_ALL, SP_MDI_View::OnDeleteAll)
 EVT_MENU(SP_EDIT_HIDE_ID, SP_MDI_View::OnHide)
+EVT_MENU(SP_EDIT_HIDEALL_ID, SP_MDI_View::OnHide)
 EVT_MENU(SP_EDIT_UNHIDE_ID, SP_MDI_View::OnUnHide)
+EVT_MENU(SP_EDIT_UNHIDEALL_ID, SP_MDI_View::OnUnHide)
 // special, generated from inside the tree control that holds the graph elements
 EVT_MENU(SP_MENU_ITEM_TREE_SELECT_ALL, SP_MDI_View::OnSelectAllClass)
 EVT_MENU(SP_MENU_ITEM_TREE_EDIT_PROPERTIES, SP_MDI_View::OnEditPropertiesClass)
@@ -1340,25 +1342,10 @@ void SP_MDI_View::OnHide(wxCommandEvent& p_cEvent)
 	FindSelectedGraphics(l_lGraphic, true);
 	SelectAll(false);
 
-	SP_ListGraphic::iterator l_itGr = l_lGraphic.begin();
-	SP_ListGraphic::iterator l_itGrNext = l_lGraphic.begin();
-
-	while(l_itGrNext != l_lGraphic.end())
-	{
-		l_itGr = l_itGrNext;
-		++l_itGrNext;
-		if((*l_itGr)->GetHide() == true)
-		{
-			l_lGraphic.erase(l_itGr);
-		}
-	}
-
-	SP_MDI_Doc *l_pcDoc = (dynamic_cast<SP_MDI_Doc*>(GetDocument()))->GetParentDoc();
-	//wxT("Hide")
-	l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_Edit(SP_CMD_HIDE, &l_lGraphic, wxT("Hide Element(s)")));
+	DoHide(l_lGraphic, (p_cEvent.GetId() == SP_EDIT_HIDEALL_ID));
 }
 
-void SP_MDI_View::DoHide(SP_ListGraphic& p_lSelectedGraphics)
+void SP_MDI_View::DoHide(SP_ListGraphic& p_lSelectedGraphics, bool p_bAll)
 {
 	SP_ListGraphic::iterator l_itGr = p_lSelectedGraphics.begin();
 	SP_ListGraphic::iterator l_itGrNext = p_lSelectedGraphics.begin();
@@ -1375,7 +1362,10 @@ void SP_MDI_View::DoHide(SP_ListGraphic& p_lSelectedGraphics)
 
 	SP_MDI_Doc *l_pcDoc = (dynamic_cast<SP_MDI_Doc*>(GetDocument()))->GetParentDoc();
 	//wxT("Hide")
-	l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_Edit(SP_CMD_HIDE, &p_lSelectedGraphics, wxT("Hide Element(s)")));
+	if(p_bAll)
+		l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_Edit(SP_CMD_HIDE_ALL, &p_lSelectedGraphics, wxT("Hide Element(s)")));
+	else
+		l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_Edit(SP_CMD_HIDE, &p_lSelectedGraphics, wxT("Hide Element(s)")));
 }
 
 void SP_MDI_View::OnUnHide(wxCommandEvent& p_cEvent)
@@ -1384,10 +1374,10 @@ void SP_MDI_View::OnUnHide(wxCommandEvent& p_cEvent)
 	FindSelectedGraphics(l_lGraphic, true);
 	SelectAll(false);
 
-	DoUnHide(l_lGraphic);
+	DoUnHide(l_lGraphic, (p_cEvent.GetId() == SP_EDIT_UNHIDEALL_ID));
 }
 
-void SP_MDI_View::DoUnHide(SP_ListGraphic& p_lSelectedGraphics)
+void SP_MDI_View::DoUnHide(SP_ListGraphic& p_lSelectedGraphics, bool p_bAll)
 {
 	SP_ListGraphic::iterator l_itGr = p_lSelectedGraphics.begin();
 	SP_ListGraphic::iterator l_itGrNext = p_lSelectedGraphics.begin();
@@ -1404,7 +1394,10 @@ void SP_MDI_View::DoUnHide(SP_ListGraphic& p_lSelectedGraphics)
 
 	SP_MDI_Doc *l_pcDoc = (dynamic_cast<SP_MDI_Doc*>(GetDocument()))->GetParentDoc();
 	//wxT("UnHide")
-	l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_Edit(SP_CMD_UNHIDE, &p_lSelectedGraphics, wxT("UnHide Element(s)")));
+	if(p_bAll)
+		l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_Edit(SP_CMD_UNHIDE_ALL, &p_lSelectedGraphics, wxT("UnHide Element(s)")));
+	else
+		l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_Edit(SP_CMD_UNHIDE, &p_lSelectedGraphics, wxT("UnHide Element(s)")));
 }
 
 void SP_MDI_View::OnToggleAnim(wxCommandEvent& p_cEvent)
