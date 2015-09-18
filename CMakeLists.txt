@@ -17,6 +17,20 @@ else()
     message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+#snoopy
+if(NOT WIN32)
+    #Generate position-independent code (PIC)
+    add_definitions( -fPIC )
+endif(NOT WIN32)
+add_definitions( -D__SNOOPY__ )
+add_definitions( -D_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_ )
+if(APPLE)
+    add_definitions( -mmacosx-version-min=10.8 )
+endif()
+add_definitions( -Wno-deprecated )
+add_definitions( -Wno-overloaded-virtual )
+add_definitions( -Wno-new-returns-null )
+
 #wxWidgets
 find_package(wxWidgets REQUIRED base core aui adv net xml html)
 include(${wxWidgets_USE_FILE})
@@ -70,7 +84,7 @@ include_directories(${SUNDIALS_INCLUDE_DIRS})
 list(APPEND LIBS ${SUNDIALS_LIBRARIES})
 
 #gecode
-find_package(GECODE REQUIRED driver int kernel minimodel search set support)
+find_package(GECODE REQUIRED driver int float kernel minimodel search set support)
 include_directories(${GECODE_INCLUDE_DIRS})
 list(APPEND LIBS ${GECODE_LIBRARIES})
 
@@ -78,6 +92,16 @@ list(APPEND LIBS ${GECODE_LIBRARIES})
 find_package(IRRKLANG REQUIRED)
 include_directories(${IRRKLANG_INCLUDE_DIRS})
 list(APPEND LIBS ${IRRKLANG_LIBRARIES})
+
+#gmplib
+find_package(GMP)
+if(GMP_FOUND)
+    include_directories(GMP_INCLUDE_DIR)
+    list(APPEND LIBS ${GMP_LIBRARIES})
+    #SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-no_pie" )
+else(GMP_FOUND)
+    add_definitions( -DHAVE_NO_GMP )
+endif(GMP_FOUND)
 
 #dssz_util
 find_package(DSSZ_UTIL REQUIRED)
@@ -94,15 +118,6 @@ find_package(Snoopy_Simulator REQUIRED)
 include_directories(${Snoopy_Simulator_INCLUDE_DIRS})
 list(APPEND LIBS ${Snoopy_Simulator_LIBRARIES})
 
-#snoopy
-add_definitions( -D__SNOOPY__ )
-add_definitions( -D_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_ )
-if(APPLE)
-  add_definitions( -mmacosx-version-min=10.8 )
-endif()
-add_definitions( -Wno-deprecated )
-add_definitions( -Wno-overloaded-virtual )
-add_definitions( -Wno-new-returns-null )
 
 #set(BIN ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 set(INC ${CMAKE_CURRENT_SOURCE_DIR})
