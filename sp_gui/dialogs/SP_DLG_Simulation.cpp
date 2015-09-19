@@ -2900,7 +2900,7 @@ int SP_DLG_Simulation::LoadSimulatorProperties()
 
     if (l_pcProperties->size() != l_pcSimulatorProperties->GetRowCount())
     {
-        return 0;
+        return l_nSimulatorType;
     }
 
     for (l_itProperty = l_pcProperties->begin(); l_itProperty != l_pcProperties->end(); l_itProperty++, l_nCount++)

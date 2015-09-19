@@ -84,7 +84,7 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 		SP_DLG_Simulation(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle), m_bIsSimulatorInitialized(false), m_nRedraw(true)
 {
 
-//	int l_nSimulatorType =
+int l_nSimulatorIndex =
 			LoadSimulatorProperties();
 
 	wxSizer* l_pcRowSizer = NULL;
@@ -122,9 +122,7 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	wxString l_sChoices[] =
 	{ wxT("Stiff"), wxT("Unstiff") };
-	wxString l_asStiffSolverChoices[] =
-	{ wxT("BDF"), wxT("Shampine, Rosenbrock-Method"), wxT("[GRK4T] Kaps-Rentrop, Rosenbrock-Method"), wxT("[GRK4A] Kaps-Rentrop, Rosenbrock-Method"),
-			wxT("[gamma = 1/2] Van Veldhuizen, Rosenbrock-Method"), wxT("[D-stable] Van Veldhuizen, Rosenbrock-Method"), wxT("[L-stable], Rosenbrock-Method") };
+
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Solver Type")), 1, wxALL | wxEXPAND, 5);
 	m_pcSolverType = new wxRadioBox(m_pcPropertyWindowPropertySizer, SP_ID_RADIOBOX_SOLVER_TYPE, wxT(""), wxDefaultPosition, wxDefaultSize, 2, l_sChoices, 2, wxRA_SPECIFY_COLS);
 	l_pcRowSizer->Add(m_pcSolverType);
@@ -134,14 +132,37 @@ SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph,
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Simulator")), 1, wxALL | wxEXPAND, 5);
 	m_pcSolver = new wxComboBox(m_pcPropertyWindowPropertySizer, SP_ID_COMBOBOX_SOLVER, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
 	m_pcSolver->Clear();
-	for (int i = 0; i < 7; i++)
-		m_pcSolver->Append(l_asStiffSolverChoices[i]);
+
+	//decode the solver type index
+	int l_nSolverType=l_nSimulatorIndex/7;
+
+	int L_nSolverAlgorithm=l_nSimulatorIndex-l_nSolverType*7;
+
+
+	 wxString l_asStiffSolverChoices[] =
+			{ wxT("BDF"), wxT("Shampine, Rosenbrock-Method"), wxT("[GRK4T] Kaps-Rentrop, Rosenbrock-Method"), wxT("[GRK4A] Kaps-Rentrop, Rosenbrock-Method"),
+					wxT("[gamma = 1/2] Van Veldhuizen, Rosenbrock-Method"), wxT("[D-stable] Van Veldhuizen, Rosenbrock-Method"), wxT("[L-stable], Rosenbrock-Method") };
+
+	 wxString l_asUnStiffSolverChoices[] =
+			{ wxT("ADAMS"), wxT("Euler (fixed step size)"), wxT("Modificated Euler (fixed step size)"), wxT("Classic Runge-Kutta (fixed step size)"), wxT("Kuntzmann 4th order (fixed step size)"),
+					wxT("Runge-Kutta-Fehlberg-4(5) (dynamic step size)"), wxT("Dormand-Prince-5(4) (dynamic step size)") };
+
+	//for stiff solver
+	if (l_nSolverType==0){
+	   for (int i = 0; i < 7; i++)
+		  m_pcSolver->Append(l_asStiffSolverChoices[i]);
+	}//for unstiff solver
+	else
+	{
+		for (int i = 0; i < 7; i++)
+			m_pcSolver->Append(l_asUnStiffSolverChoices[i]);
+	}
 
 	//set default solving algorithm
-	m_pcSolver->SetSelection(0);
+	m_pcSolver->SetSelection(L_nSolverAlgorithm);
 
 	//Set default solver type
-	m_pcSolverType->SetSelection(0);
+	m_pcSolverType->SetSelection(l_nSolverType);
 	l_pcRowSizer->Add(m_pcSolver, 1, wxALL, 5);
 
 	m_pcSimulationProperites = new wxButton(m_pcPropertyWindowPropertySizer, SP_ID_BUTTON_SIMULATION_PROPERTIES, wxT("Properties"));
@@ -729,13 +750,13 @@ void SP_DLG_CPNSimulationResults::OnSolverChanged(wxCommandEvent& p_cEven)
 int SP_DLG_CPNSimulationResults::GetCureentSelectedSimulator()
 {
 	//Solver Algorithm
-	/*int l_nSolverIndex=m_pcSolver->GetSelection();
+	int l_nSolverAlgorithm=m_pcSolver->GetSelection();
 
 	 //Stiff/unstiff
 	 int l_nSolverType=m_pcSolverType->GetSelection();
-	 int l_nSolver=l_nSolverType*7+l_nSolverIndex;*/
+	 int l_nSolver=l_nSolverType*7+l_nSolverAlgorithm;
 
-	return 0;
+	return l_nSolver;
 }
 
 spsim::Simulator* SP_DLG_CPNSimulationResults::CreateSimulator(const int& p_nSimulatorType)
