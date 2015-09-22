@@ -293,7 +293,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(WXWIN)/include;$(WXWIN)/lib/vc_x64_dll/mswud/;$(OGL)/include/;$(WXCODE)/components/freechart/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(BOOST_ROOT);$(CVODE)/include;$(CVODE)/builddir/include;$(GECODEDIR);$(GECODEDIR)/$(Configuration);$(SP_SIMULATOR)/include;$(SPSA_STEERINGAPI)/include;$(DSSZ_UTIL)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(WXWIN)/include;$(WXWIN)/lib/vc_x64_dll/mswud/;$(OGL)/include/;$(WXCODE)/components/freechart/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(BOOST_ROOT);$(CVODE)/include;$(CVODE)/builddir/include;$(GECODEDIR);$(GECODEDIR)/$(Configuration);$(SP_SIMULATOR)/include;$(SPSA_STEERINGAPI)/include;$(DSSZ_UTIL)/include;$(GECODEDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>__SNOOPY__;HAVE_NO_GMP;_DEBUG;WIN32;_LIB;__WIN32__;_WINDOWS;__WXMSW__;__WINDOWS__;__WXDEBUG__;UNICODE;_LP64;WXUSINGDLL;wxDEBUG_LEVEL=0;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;SPSIM_USING_DLL;SPSA_STEERINGAPI_USING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -317,7 +317,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
       <AdditionalDependencies>comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wsock32.lib;gdiplus.lib;Psapi.lib;wxbase30ud.lib;wxbase30ud_net.lib;wxbase30ud_xml.lib;wxmsw30ud_adv.lib;wxmsw30ud_aui.lib;wxmsw30ud_core.lib;wxmsw30ud_html.lib;wxexpat.lib;wxregexu.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxzlib.lib;wxcode_msw30ud_ogl.lib;wxcode_msw30ud_freechart.lib;SPSA_SteeringAPI.lib;dssz_util.lib;spsim_dd.lib;libsbml.lib;ogdf.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(WXWIN)/lib/vc_x64_dll/;$(OGL)/lib/vc_dll/;$(WXCODE)/components/freechart/lib/vc_dll/;$(LIBSBML)/builddir/src/$(Configuration);$(OGDF)/$(Platform)/$(Configuration);$(DSSZ_UTIL)/lib/$(Configuration);$(SP_SIMULATOR)/$(Configuration)/$(Platform);$(SPSA_STEERINGAPI)/$(Configuration)/$(Platform);$(GECODEDIR)/$(Configuration);$(CVODE)/builddir/src/cvode/$(Configuration);$(CVODE)/builddir/src/nvec_ser/$(Configuration);$(BOOST_ROOT)/stage/lib;$(IRRKLANG)/lib/Winx64-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(WXWIN)/lib/vc_x64_dll/;$(OGL)/lib/vc_dll/;$(WXCODE)/components/freechart/lib/vc_dll/;$(LIBSBML)/builddir/src/$(Configuration);$(OGDF)/$(Platform)/$(Configuration);$(DSSZ_UTIL)/lib/$(Configuration);$(SP_SIMULATOR)/$(Configuration)/$(Platform);$(SPSA_STEERINGAPI)/$(Configuration)/$(Platform);$(GECODEDIR)/$(Configuration);$(CVODE)/builddir/src/cvode/$(Configuration);$(CVODE)/builddir/src/nvec_ser/$(Configuration);$(BOOST_ROOT)/stage/lib;$(IRRKLANG)/lib/Winx64-visualStudio;$(GECODEDIR)/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -790,7 +790,6 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="sp_gui\dialogs\SP_DLG_SortNodes.h" />
     <ClInclude Include="sp_gui\dialogs\SP_DLG_TransformGraphic.h" />
     <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StDirectExportProperties.h" />
-    <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StEditTablePlot.h" />
     <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StFunctionAssistent.h" />
     <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StFunctionOverview.h" />
     <ClInclude Include="sp_gui\dialogs\dia_SPN\SP_DLG_StMarkingOverview.h" />
@@ -818,7 +817,6 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_WDG_DeclarationTreectrl.h" />
     <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_WDG_Guard.h" />
     <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColPlacesSelection.h" />
-    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStEditTablePlot.h" />
     <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStFunctionOverview.h" />
     <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStMarkingOverview.h" />
     <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStSimulationResults.h" />
@@ -1352,7 +1350,6 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile Include="sp_gui\dialogs\SP_DLG_SortNodes.cpp" />
     <ClCompile Include="sp_gui\dialogs\SP_DLG_TransformGraphic.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StDirectExportProperties.cpp" />
-    <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StEditTablePlot.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StFunctionAssistent.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StFunctionOverview.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_SPN\SP_DLG_StMarkingOverview.cpp" />
@@ -1380,7 +1377,6 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_WDG_DeclarationTreectrl.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_WDG_Guard.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColPlacesSelection.cpp" />
-    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStEditTablePlot.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStFunctionOverview.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStMarkingOverview.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_ColStSimulationResults.cpp" />

@@ -126,6 +126,7 @@ struct SP_CPN_UnfoldedArcInfo
 	wxString m_sColor;
 	long     m_nMultiplicity;
 	double   m_dMultiplicity;
+	wxString m_sMultiplicity;
 	wxString m_sArcType;
 	wxString m_sDiscContType;
 };
@@ -263,7 +264,7 @@ protected:
 	//places
 	bool Initialize();
 	bool UnfoldPlaceNodeClass(wxString p_sPlaceNodeClass);
-	bool UnfoldPlaces();	
+	bool UnfoldPlaces();		
 	bool GetTransitions();
 	virtual bool ProcessResult();
 	wxString FormatByComma(wxString p_sNumber);
@@ -284,7 +285,8 @@ protected:
 	void SetContInputArcDeltaVector(long p_nTransArrayPos, vector<SP_CPN_UnfoldedArcInfo>& m_vArcs);
 	void SetContOutputArcDeltaVector(long p_nTransArrayPos, vector<SP_CPN_UnfoldedArcInfo>& m_vArcs);
 
-
+public:
+	bool UnfoldPlacesForMarkingDependent(); //for marking-dependent arcs, added by Fei, 09.2015
 
 protected:
 	//places
@@ -292,6 +294,7 @@ protected:
     SP_VectorString m_msPlaceNames;	
 	SP_VectorString m_msColorsOfPlace; 
 	SP_VectorString m_msColoredPlaceNames;
+	map<wxString, vector<wxString> > m_svColored2UnColoredPlaceNames; //for marking-dependent arcs, added by Fei, 09.2015
     SP_MapString2String m_msPlaceNamesById;
 	SP_MapString2String m_msColPlName2ColSet;
 	map<long, SP_CPN_CountInterval> m_nsPlaceCountById;
@@ -355,6 +358,8 @@ public:
 	SP_VectorString* GetColorsOfPlace(){ return &m_msColorsOfPlace;}
 	SP_MapString2String* GetColPlName2ColSet() { return &m_msColPlName2ColSet; }
 	map<long, SP_CPN_CountInterval>* GetPlaceCountById(){ return &m_nsPlaceCountById ;}
+
+	map<wxString, vector<wxString> >* GetsvColored2UnColoredPlaceNames(){ return &m_svColored2UnColoredPlaceNames; }
 
 	//workaround to get the number of continuous places
     unsigned int GetContinuousPlaceCount(){return m_anColCPNNetMarkings.size();}

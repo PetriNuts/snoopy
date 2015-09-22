@@ -246,6 +246,10 @@ bool SP_DS_ColPN_Unfolding::Start()
 		if( ! UnfoldPlaces() )
 				return false;
 
+		//for marking-dependent arcs testing	
+		if (!UnfoldPlacesForMarkingDependent())
+			return false;
+
 		if( ! StartThreadUnfolding() )
 			return false;
 
@@ -352,6 +356,75 @@ bool SP_DS_ColPN_Unfolding::UnfoldPlaces()
 	//for both colored continuous and hybrid PNs
 	if(!UnfoldPlaceNodeClass(SP_DS_CONTINUOUS_PLACE))
 		return false;	
+	return true;
+}
+
+bool SP_DS_ColPN_Unfolding::UnfoldPlacesForMarkingDependent()
+{
+	m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+
+	if (!m_ValueAssign.InitializeColorset(m_ColorSetClass))
+		return false;
+
+	SP_DS_Nodeclass* l_pcNodeclass;
+	SP_ListNode::const_iterator l_itElem;
+
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		{
+			SP_DS_Node* l_pcNode = *l_itElem;
+			wxString l_sColPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+
+			//get the color set
+			SP_DS_TextAttribute* l_pcCSAttibute = dynamic_cast<SP_DS_TextAttribute*>(l_pcNode->GetAttribute(SP_DS_CPN_COLORSETNAME));
+			CHECK_POINTER(l_pcCSAttibute, return false);
+			wxString l_sColorSetName = l_pcCSAttibute->GetValue();
+			vector<wxString> l_ColorVector;
+			SP_CPN_ColorSet* l_pcColorSet = m_ColorSetClass.LookupColorSet(l_sColorSetName);
+			CHECK_POINTER(l_pcColorSet, return false);
+			l_ColorVector = l_pcColorSet->GetStringValue();
+			vector<wxString> l_vsUncoloredPlaces;
+			for (unsigned int l_nPos = 0; l_nPos < l_ColorVector.size(); l_nPos++)
+			{
+				wxString l_sColor = l_ColorVector[l_nPos];
+				ModifyName(l_sColor);
+				wxString l_sUnColoredPlaceName = l_sColPlaceName + wxT("_") + l_sColor;
+				l_vsUncoloredPlaces.push_back(l_sUnColoredPlaceName);
+			}
+			m_svColored2UnColoredPlaceNames[l_sColPlaceName] = l_vsUncoloredPlaces;
+		}
+	}
+			
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		{
+			SP_DS_Node* l_pcNode = *l_itElem;
+			wxString l_sColPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+
+			//get the color set
+			SP_DS_TextAttribute* l_pcCSAttibute = dynamic_cast<SP_DS_TextAttribute*>(l_pcNode->GetAttribute(SP_DS_CPN_COLORSETNAME));
+			CHECK_POINTER(l_pcCSAttibute, return false);
+			wxString l_sColorSetName = l_pcCSAttibute->GetValue();
+			vector<wxString> l_ColorVector;
+			SP_CPN_ColorSet* l_pcColorSet = m_ColorSetClass.LookupColorSet(l_sColorSetName);
+			CHECK_POINTER(l_pcColorSet, return false);
+			l_ColorVector = l_pcColorSet->GetStringValue();
+			vector<wxString> l_vsUncoloredPlaces;
+			for (unsigned int l_nPos = 0; l_nPos < l_ColorVector.size(); l_nPos++)
+			{
+				wxString l_sColor = l_ColorVector[l_nPos];
+				ModifyName(l_sColor);
+				wxString l_sUnColoredPlaceName = l_sColPlaceName + wxT("_") + l_sColor;
+				l_vsUncoloredPlaces.push_back(l_sUnColoredPlaceName);
+			}
+			m_svColored2UnColoredPlaceNames[l_sColPlaceName] = l_vsUncoloredPlaces;
+		}
+	}
+	
 	return true;
 }
 
@@ -1062,10 +1135,12 @@ void SP_DS_ColPN_Unfolding::SetContInputArcDeltaVector(long p_nTransArrayPos, ve
 		//SP_MESSAGEBOX(wxString::Format(wxT("trans(%ld) arc(%d)"), p_nTransArrayPos, i));
 
 		wxString l_sMultiplicity;		
-		if(l_sPlaceType == wxT("Place"))
-			l_sMultiplicity = wxString::Format(wxT("%ld"), l_ArcInfo.m_nMultiplicity);
+		if (l_sPlaceType == wxT("Place"))
+			//l_sMultiplicity = wxString::Format(wxT("%ld"), l_ArcInfo.m_nMultiplicity);
+			l_sMultiplicity = l_ArcInfo.m_sMultiplicity;
 		else
-			l_sMultiplicity = wxString::Format(wxT("%g"), l_ArcInfo.m_dMultiplicity);
+			//l_sMultiplicity = wxString::Format(wxT("%g"), l_ArcInfo.m_dMultiplicity);
+			l_sMultiplicity = l_ArcInfo.m_sMultiplicity;
 
 		SP_CPN_ContinuousArc l_structContinuousArc;
 		l_structContinuousArc.m_nTranPos = p_nTransArrayPos;
@@ -1128,9 +1203,11 @@ void SP_DS_ColPN_Unfolding::SetContOutputArcDeltaVector(long p_nTransArrayPos, v
 
 		wxString l_sMultiplicity;		
 		if(l_sPlaceType == wxT("Place"))
-			l_sMultiplicity << l_ArcInfo.m_nMultiplicity;
+			//l_sMultiplicity << l_ArcInfo.m_nMultiplicity;
+			l_sMultiplicity = l_ArcInfo.m_sMultiplicity;
 		else
-			l_sMultiplicity << l_ArcInfo.m_dMultiplicity;
+			//l_sMultiplicity << l_ArcInfo.m_dMultiplicity;
+			l_sMultiplicity = l_ArcInfo.m_sMultiplicity;
 
 		SP_CPN_ContinuousArc l_structContinuousArc;
 		l_structContinuousArc.m_nTranPos = p_nTransArrayPos;
@@ -1354,6 +1431,7 @@ void SP_DS_ColPN_Unfolding::GetTransInstances(SP_CPN_UnfoldedTransition & p_mUnf
 				SP_CPN_UnfoldedArcInfo l_stUnfoldedArcInfo;
 				l_stUnfoldedArcInfo.m_dMultiplicity = itMap2->second.m_vInputArcs[k].m_dMultiplicity;
 				l_stUnfoldedArcInfo.m_nMultiplicity = itMap2->second.m_vInputArcs[k].m_nMultiplicity;
+				l_stUnfoldedArcInfo.m_sMultiplicity = itMap2->second.m_vInputArcs[k].m_sMultiplicity;
 				l_stUnfoldedArcInfo.m_sArcType = wxString(itMap2->second.m_vInputArcs[k].m_sArcType.c_str());
 				l_stUnfoldedArcInfo.m_sColor = wxString(itMap2->second.m_vInputArcs[k].m_sColor.c_str());
 				l_stUnfoldedArcInfo.m_sColPlaceName = wxString(itMap2->second.m_vInputArcs[k].m_sColPlaceName.c_str());
@@ -1368,6 +1446,7 @@ void SP_DS_ColPN_Unfolding::GetTransInstances(SP_CPN_UnfoldedTransition & p_mUnf
 				SP_CPN_UnfoldedArcInfo l_stUnfoldedArcInfo;
 				l_stUnfoldedArcInfo.m_dMultiplicity = itMap2->second.m_vOutputArcs[k].m_dMultiplicity;
 				l_stUnfoldedArcInfo.m_nMultiplicity = itMap2->second.m_vOutputArcs[k].m_nMultiplicity;
+				l_stUnfoldedArcInfo.m_sMultiplicity = itMap2->second.m_vOutputArcs[k].m_sMultiplicity;
 				l_stUnfoldedArcInfo.m_sArcType = wxString(itMap2->second.m_vOutputArcs[k].m_sArcType.c_str());
 				l_stUnfoldedArcInfo.m_sColor = wxString(itMap2->second.m_vOutputArcs[k].m_sColor.c_str());
 				l_stUnfoldedArcInfo.m_sColPlaceName = wxString(itMap2->second.m_vOutputArcs[k].m_sColPlaceName.c_str());
@@ -2131,7 +2210,8 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::BuildParserTree()
 
 		if(itVector->m_eExprType == CPN_INPUT_EXPR || itVector->m_eExprType ==	CPN_OUTPUT_EXPR)	
 		{
-			l_pParseContext->SetColorSetName(itVector->m_sColorSetName);			
+			l_pParseContext->SetColorSetName(itVector->m_sColorSetName);
+			l_pParseContext->SetColored2UnColoredPlaceNames(m_pcColPNUnfolding->GetsvColored2UnColoredPlaceNames());
 		}
 		else if( itVector->m_eExprType == CPN_RATEFUNCTION_EXPR  )
 		{
@@ -2801,7 +2881,7 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::ProcessArcs()
 				
 					if(l_sPlaceNodeClass == SP_DS_DISCRETE_PLACE)
 					{
-						if(itEvalVector->m_Multiplicity == 0)
+						if (!itEvalVector->m_bPlaceFlag && itEvalVector->m_Multiplicity == 0)
 						{
 							// multiplicity == 0 -> no arc
 							continue;
@@ -2809,11 +2889,15 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::ProcessArcs()
 						else
 						{
 							l_scOneArcInfo.m_nMultiplicity = itEvalVector->m_Multiplicity;
+							if (itEvalVector->m_bPlaceFlag)
+								l_scOneArcInfo.m_sMultiplicity = itEvalVector->m_stringMultiplicity;
+							else
+								l_scOneArcInfo.m_sMultiplicity = wxString::Format(wxT("%d"), itEvalVector->m_Multiplicity);
 						}
 					}
 					else
 					{
-						if(itEvalVector->m_DoubleMultiplicity == 0.0)
+						if (!itEvalVector->m_bPlaceFlag && itEvalVector->m_DoubleMultiplicity == 0.0)
 						{
 							// multiplicity == 0 -> no arc
 							continue;
@@ -2821,6 +2905,10 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::ProcessArcs()
 						else
 						{
 							l_scOneArcInfo.m_dMultiplicity = itEvalVector->m_DoubleMultiplicity;
+							if (itEvalVector->m_bPlaceFlag)
+								l_scOneArcInfo.m_sMultiplicity = itEvalVector->m_stringMultiplicity;
+							else
+								l_scOneArcInfo.m_sMultiplicity = wxString::Format(wxT("%f"), itEvalVector->m_DoubleMultiplicity);
 						}
 					}
 

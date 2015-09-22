@@ -453,7 +453,7 @@ SP_GUI_Mainframe::OnExit( wxCommandEvent &p_cEvent )
 void
 SP_GUI_Mainframe::OnCloseWindow( wxCloseEvent &p_cEvent )
 {
-    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
+    if (SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
     {
         p_cEvent.Veto();
         return;

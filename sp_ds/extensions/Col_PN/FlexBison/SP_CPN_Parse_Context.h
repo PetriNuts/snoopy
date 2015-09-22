@@ -21,6 +21,7 @@
 #include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ColorSetClass.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColCSPSovler.h"
 
+//#include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
 ////////////define the structs for parser//////////
 
 // Define the node types of parse trees
@@ -62,7 +63,8 @@ enum SP_CPN_NODETYPE
 	CPN_BRACKET_NODE,
 	CPN_SEPERATOR_NODE,
 	CPN_PREDICATE_NODE,
-	CPN_CONNECTOR_NODE
+	CPN_CONNECTOR_NODE,
+	CPN_PLACE_NODE
 };
 
 // Define the pattern types for bindings
@@ -126,12 +128,15 @@ struct SP_CPN_Var_Color
 struct SP_CPN_EvaluatedSingleValue
 {
 	wxString						m_ColorValue;
-	union
+	struct
 	{
 		int							m_Multiplicity;
 		double						m_DoubleMultiplicity;
+		wxString		m_stringMultiplicity;	//for marking-dependent arcs, added by Fei, 09.2015
 	};
 	bool							m_Predicate;
+
+	bool					m_bPlaceFlag;	//for marking-dependent arcs, added by Fei, 09.2015
 };
 
 // Define the information of each parse node
@@ -150,7 +155,9 @@ struct SP_CPN_ParseNode_Info
 	  
 	  SP_CPN_NODETYPE		m_NodeType; 
 	  
-	 //wxString				m_Bracket;			// for comma node to generate product
+	  bool					m_bSeparaterExpression; // evaluate if an expression is a part of separator expression?
+	  bool					m_bPlaceFlag;		//for marking-dependent arcs, added by Fei, 09.2015
+	  wxString				m_sColoredPlaceName;//for marking-dependent arcs, added by Fei, 09.2015
 
 	  struct
 	  {
@@ -159,6 +166,7 @@ struct SP_CPN_ParseNode_Info
 		  {
 			  int			m_Multiplicity;
 			  double		m_DoubleMultiplicity;
+			  wxString		m_stringMultiplicity;	//for marking-dependent arcs, added by Fei, 09.2015
 		  };
 	  };
      
@@ -196,6 +204,7 @@ protected:
 	wxString m_sNetClassName;					//net class name //will use node class replace
 	wxString m_sErrorPosition;
 	wxString m_sPlaceType;
+	map<wxString, vector<wxString> > *m_psvColored2UnColoredPlaceNames;
 
 public:
 	void SetColorSetName(wxString p_ColorSetName){m_ColorSetName = p_ColorSetName;}
@@ -205,6 +214,7 @@ public:
 	void SetPlaceType(wxString p_sPlaceType){m_sPlaceType = p_sPlaceType;}
 	void SetFunctionFlag(bool p_bFunctionFlag){m_bFunctionFlag = p_bFunctionFlag;}
 	void SetFunctionName(wxString p_sFunctionName){m_sFunctionName = p_sFunctionName;}	
+	void SetColored2UnColoredPlaceNames(map<wxString, vector<wxString> > *p_psvColored2UnColoredPlaceNames){ m_psvColored2UnColoredPlaceNames = p_psvColored2UnColoredPlaceNames;}
 
 public:    
 
@@ -219,6 +229,8 @@ public:
 		m_ParseNode_Info.m_Predicate = true;
 		m_ParseNode_Info.m_CheckedString = wxT("");
 		m_ParseNode_Info.m_EvalResults.clear();
+		m_ParseNode_Info.m_bPlaceFlag = false; //for marking-dependent arcs, added by Fei, 09.2015
+		m_ParseNode_Info.m_bSeparaterExpression = false;
 		
 	}
 
@@ -320,6 +332,10 @@ public:
 
 	virtual bool check()
 	{
+		if (m_ParseNode_Info.m_bSeparaterExpression)
+		{			
+			m_ParseNode_Info.m_DoubleMultiplicity = m_ParseNode_Info.m_DoubleValue;			
+		}
 		return true;
 	}
 
@@ -410,7 +426,20 @@ public:
 	virtual SP_CPN_ParseNode_Info evaluate() 
     {
 		SetValue();
-		CollectResult();
+		if(m_ParseNode_Info.m_NodeType != CPN_PLACE_NODE)
+			CollectResult();
+
+		if (m_ParseNode_Info.m_DataType == CPN_INTEGER && m_ParseNode_Info.m_NodeType == CPN_VARIABLE_NODE)
+		{
+			if (m_ParseNode_Info.m_bSeparaterExpression)
+			{
+				if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+					m_ParseNode_Info.m_DoubleMultiplicity = m_ParseNode_Info.m_IntegerValue;
+				else
+					m_ParseNode_Info.m_Multiplicity = m_ParseNode_Info.m_IntegerValue;
+			}
+		}
+
 		return m_ParseNode_Info;
     }
 
@@ -964,14 +993,57 @@ public:
 
     virtual SP_CPN_ParseNode_Info evaluate() 
     {
-		wxString l_LeftString = *(m_pLeft->evaluate().m_StringValue);
-		int l_nRight = m_pRight->evaluate().m_IntegerValue;
-		wxString l_RightString = wxString::Format(wxT("%d"),l_nRight);
-		m_String = l_LeftString + wxT("[") +l_RightString + wxT("]");
+		m_pLeft->evaluate();
+		m_pRight->evaluate();
+		SP_CPN_ParseNode_Info* l_LeftNodeInfo =  m_pLeft->GetParseNodeInfo();
+		SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-		m_ParseNode_Info.m_StringValue = &m_String;
+		if (m_ParseNode_Info.m_bPlaceFlag == true)
+		{
+			wxString l_sColorValue;
+			if (l_RightNodeInfo->m_DataType == CPN_INTEGER)
+			{
+				l_sColorValue = wxString::Format(wxT("%d"), l_RightNodeInfo->m_IntegerValue);
+			}
 
-		CollectResult();
+			if (l_RightNodeInfo->m_DataType == CPN_BOOLEAN)
+			{
+				if (l_RightNodeInfo->m_BooleanValue)
+					l_sColorValue = wxT("true");
+				else
+					l_sColorValue = wxT("false");
+			}
+
+			if (l_RightNodeInfo->m_DataType == CPN_STRING ||
+				l_RightNodeInfo->m_DataType == CPN_INDEX ||
+				l_RightNodeInfo->m_DataType == CPN_DOT ||
+				l_RightNodeInfo->m_DataType == CPN_PRODUCT ||
+				l_RightNodeInfo->m_DataType == CPN_ENUM)
+			{				
+				l_sColorValue = *(l_RightNodeInfo->m_StringValue);
+
+				l_sColorValue.Replace(wxT("("), wxT("_"));
+				l_sColorValue.Replace(wxT(")"), wxT("_"));
+				l_sColorValue.Replace(wxT(","), wxT("_"));
+			}
+
+			wxString l_sPlaceName = l_LeftNodeInfo->m_sColoredPlaceName;
+			l_sPlaceName = l_sPlaceName + wxT("_") + l_sColorValue; // get an uncolored place name
+			m_ParseNode_Info.m_stringMultiplicity = l_sPlaceName;
+		}
+
+
+		if (l_LeftNodeInfo->m_NodeType == CPN_INDEXNAME_NODE)
+		{
+			wxString l_LeftString = *(l_LeftNodeInfo->m_StringValue);
+			int l_nRight = l_RightNodeInfo->m_IntegerValue;
+			wxString l_RightString = wxString::Format(wxT("%d"), l_nRight);
+			m_String = l_LeftString + wxT("[") + l_RightString + wxT("]");
+
+			m_ParseNode_Info.m_StringValue = &m_String;
+
+			CollectResult();
+		}
 
 		return m_ParseNode_Info;
     }
@@ -1022,24 +1094,66 @@ public:
 		m_ParseNode_Info.m_DataType = l_LeftNodeInfo.m_DataType;
 		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo.m_ColorSet;
 
-		if(l_LeftNodeInfo.m_DataType == CPN_INTEGER && l_RightNodeInfo.m_DataType == CPN_INTEGER)
+		if (!m_ParseNode_Info.m_bSeparaterExpression)
 		{
-			m_ParseNode_Info.m_IntegerValue = l_LeftNodeInfo.m_IntegerValue + l_RightNodeInfo.m_IntegerValue;
+			if (l_LeftNodeInfo.m_DataType == CPN_INTEGER && l_RightNodeInfo.m_DataType == CPN_INTEGER)
+			{
+				m_ParseNode_Info.m_IntegerValue = l_LeftNodeInfo.m_IntegerValue + l_RightNodeInfo.m_IntegerValue;
+			}
+			if (l_LeftNodeInfo.m_DataType == CPN_STRING && l_RightNodeInfo.m_DataType == CPN_STRING)
+			{
+				wxString l_LeftString = *(l_LeftNodeInfo.m_StringValue);
+				l_LeftString = l_LeftString.BeforeLast('\"');
+				wxString l_RightString = *(l_RightNodeInfo.m_StringValue);
+				l_RightString = l_RightString.AfterFirst('\"');
+
+				m_String = l_LeftString + l_RightString;
+				m_ParseNode_Info.m_StringValue = &m_String;
+			}
+			CollectResult();
 		}
-
-		
-		if(l_LeftNodeInfo.m_DataType == CPN_STRING && l_RightNodeInfo.m_DataType == CPN_STRING)
+		else
 		{
-			wxString l_LeftString = *(l_LeftNodeInfo.m_StringValue);
-			l_LeftString = l_LeftString.BeforeLast('\"');
-			wxString l_RightString = *(l_RightNodeInfo.m_StringValue);
-			l_RightString = l_RightString.AfterFirst('\"');
-
-			m_String = l_LeftString +l_RightString;
-			m_ParseNode_Info.m_StringValue = &m_String;
-		}		
-
-		CollectResult();
+			//for marking-dependent arcs -- multiplicity
+			if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+			{
+				if (l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					m_ParseNode_Info.m_stringMultiplicity = l_LeftNodeInfo.m_stringMultiplicity + wxT("+") + l_RightNodeInfo.m_stringMultiplicity;					
+				}
+				else if (l_LeftNodeInfo.m_bPlaceFlag &&  !l_RightNodeInfo.m_bPlaceFlag)
+				{
+					m_ParseNode_Info.m_stringMultiplicity = l_LeftNodeInfo.m_stringMultiplicity +wxT("+") + wxString::Format(wxT("%f"), l_RightNodeInfo.m_DoubleMultiplicity);
+				}
+				else if (!l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%f"), l_LeftNodeInfo.m_DoubleMultiplicity) + wxT("+") + l_RightNodeInfo.m_stringMultiplicity;
+				}
+				else
+				{
+					m_ParseNode_Info.m_DoubleMultiplicity = l_LeftNodeInfo.m_DoubleMultiplicity + l_RightNodeInfo.m_DoubleMultiplicity;
+				}
+			}
+			else
+			{
+				if (l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					m_ParseNode_Info.m_stringMultiplicity = l_LeftNodeInfo.m_stringMultiplicity + wxT("+") + l_RightNodeInfo.m_stringMultiplicity;					
+				}
+				else if (l_LeftNodeInfo.m_bPlaceFlag &&  !l_RightNodeInfo.m_bPlaceFlag)
+				{
+					m_ParseNode_Info.m_stringMultiplicity = l_LeftNodeInfo.m_stringMultiplicity +wxT("+") + wxString::Format(wxT("%d"), l_RightNodeInfo.m_Multiplicity);
+				}
+				else if (!l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%d"), l_LeftNodeInfo.m_Multiplicity) + wxT("+") + l_RightNodeInfo.m_stringMultiplicity;
+				}
+				else
+				{
+					m_ParseNode_Info.m_DoubleMultiplicity = l_LeftNodeInfo.m_Multiplicity + l_RightNodeInfo.m_Multiplicity;
+				}
+			}
+		}
 
 		return m_ParseNode_Info;
 	}
@@ -2187,7 +2301,16 @@ public:
 		if(!m_pLeft->check())
 			return false;
 		if(!m_pRight->check())
-			return false;		
+			return false;	
+
+		SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
+		SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
+
+		if (l_LeftNodeInfo->m_bPlaceFlag == true || l_RightNodeInfo->m_bPlaceFlag == true)
+		{
+			m_ParseNode_Info.m_bPlaceFlag = true;
+		}
+
 		return true;
 	}  
 
@@ -2221,6 +2344,10 @@ private:
 	wxString m_sNetClassName;					//net class name //will use node class replace
 	wxString m_sErrorPosition;
 	wxString m_sPlaceType;
+
+	map<wxString, vector<wxString> > *m_psvColored2UnColoredPlaceNames;
+	
+
 private:
 	void Configuration(SP_CPN_ParseNode* p_pcNode);
 	void ConfigurationColorSets(SP_CPN_ParseNode* p_pcNode,SP_CPN_ColorSetClass *p_pColorSetClass);
@@ -2264,6 +2391,8 @@ public:
 	void SetErrorPosition(wxString p_sErrorPosition);
 	void SetNetClassName(wxString p_sNetClassName);	
 	void SetPlaceType(wxString p_sPlaceType);
+
+	void SetColored2UnColoredPlaceNames(map<wxString, vector<wxString> > *p_psvColored2UnColoredPlaceNames = NULL){ m_psvColored2UnColoredPlaceNames = p_psvColored2UnColoredPlaceNames; }
 
 	void SetFunctionFlag(bool p_bFunctionFlag);
 	void SetFunctionName(wxString p_sFunctionName);	

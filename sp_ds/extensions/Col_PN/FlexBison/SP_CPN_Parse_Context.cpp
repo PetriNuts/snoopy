@@ -48,6 +48,14 @@ void SP_CPN_ParseNode::CollectResult()
 
 bool SP_CPN_Parse_Integer_Node::check()
 {	
+	if (m_ParseNode_Info.m_bSeparaterExpression)
+	{
+		if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+			m_ParseNode_Info.m_DoubleMultiplicity = m_ParseNode_Info.m_IntegerValue;
+		else
+			m_ParseNode_Info.m_Multiplicity = m_ParseNode_Info.m_IntegerValue;
+	}
+
 	if(m_ParseNode_Info.m_CheckColorSet != wxT(""))
 	{
 		SP_CPN_ColorSet* l_pcColorSet = m_pColorSetClass->LookupColorSet(m_ParseNode_Info.m_CheckColorSet);
@@ -200,7 +208,7 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 			SP_CPN_DATATYPE l_DataType  = m_pColorSetClass->GetVariableMap()->find(m_VariableName)->second.m_DataType;
 			m_ParseNode_Info.m_ColorSet = m_pColorSetClass->GetVariableMap()->find(m_VariableName)->second.m_ColorSet;
 			m_ParseNode_Info.m_DataType = l_DataType;		
-			m_ParseNode_Info.m_NodeType = CPN_VARIABLE_NODE; // Labeled as a variable node			
+			m_ParseNode_Info.m_NodeType = CPN_VARIABLE_NODE; // Labeled as a variable node				
 
 			if(l_DataType == CPN_UNION)
 			{
@@ -216,8 +224,9 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 
 			return true;
 		} 
+
 		//Lookup in the function table
-		else if(m_pColorSetClass->GetFunctionMap()&&
+		if(m_pColorSetClass->GetFunctionMap()&&
 			m_pColorSetClass->GetFunctionMap()->find(m_VariableName) != m_pColorSetClass->GetFunctionMap()->end())
 		{
 			m_ParseNode_Info.m_DataType = CPN_STRING; // another special case
@@ -225,8 +234,9 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 			m_ParseNode_Info.m_NodeType = CPN_FUNCTIONNAME_NODE;
 			return true;
 		}
+
 		// Lookup in the constant table
-		else if( m_pColorSetClass->GetConstantMap() &&
+		if( m_pColorSetClass->GetConstantMap() &&
 				 m_pColorSetClass->GetConstantMap()->find(m_VariableName) != m_pColorSetClass->GetConstantMap()->end())
 		{
 			SP_CPN_DATATYPE l_DataType = m_pColorSetClass->GetConstantMap()->find(m_VariableName)->second.m_DataType;
@@ -238,8 +248,19 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 			if( m_ParseNode_Info.m_sColorSetList == wxT("") )
 				m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;	
 
-			if(l_DataType == CPN_INTEGER)
+			if (l_DataType == CPN_INTEGER)
+			{
 				m_ParseNode_Info.m_IntegerValue = m_pColorSetClass->GetConstantMap()->find(m_VariableName)->second.m_IntegerValue;
+
+				if (m_ParseNode_Info.m_bSeparaterExpression)
+				{
+					if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+						m_ParseNode_Info.m_DoubleMultiplicity = m_ParseNode_Info.m_IntegerValue;
+					else
+						m_ParseNode_Info.m_Multiplicity = m_ParseNode_Info.m_IntegerValue;
+				}
+			}
+				
 			
 			if(l_DataType == CPN_BOOLEAN)
 				m_ParseNode_Info.m_BooleanValue = m_pColorSetClass->GetConstantMap()->find(m_VariableName)->second.m_BooeanValue;
@@ -258,8 +279,22 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 			}
 			return true;
 		}
+
+		//Look up the colored place names
+		if (m_psvColored2UnColoredPlaceNames)
+		{
+			if (m_psvColored2UnColoredPlaceNames->find(m_VariableName) != m_psvColored2UnColoredPlaceNames->end())
+			{
+				//deal with this place
+				m_ParseNode_Info.m_NodeType = CPN_PLACE_NODE;
+				m_ParseNode_Info.m_sColoredPlaceName = m_VariableName;
+				m_ParseNode_Info.m_bPlaceFlag = true;
+				return true;
+			}
+		}
+
 		// Lookup the black token "dot"
-		else if(m_VariableName == wxT("dot"))
+		if(m_VariableName == wxT("dot"))
 		{
 			m_ParseNode_Info.m_NodeType = CPN_CONSTANT_NODE;
 			m_ParseNode_Info.m_DataType = CPN_DOT;
@@ -270,8 +305,9 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 			m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;	
 			return true;
 		}
+		
 		// Lookup the boolean values: true or false
-		else if(m_VariableName == wxT("false")||m_VariableName == wxT("true"))  //deal with bool constant
+		if(m_VariableName == wxT("false")||m_VariableName == wxT("true"))  //deal with bool constant
 		{
 			m_ParseNode_Info.m_NodeType = CPN_CONSTANT_NODE;
 			m_ParseNode_Info.m_DataType = CPN_BOOLEAN;
@@ -286,25 +322,24 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 
 			return true;
 		}	
-		else
+		
+		//Check if it is an index name						
+		vector<SP_CPN_ColorSet*>::iterator it;
+		if( !m_pColorSetClass->GetColorSetVector())
+			return false;
+		for(it = m_pColorSetClass->GetColorSetVector()->begin(); it != m_pColorSetClass->GetColorSetVector()->end(); it++)
 		{
-			//Check if it is an index name						
-			vector<SP_CPN_ColorSet*>::iterator it;
-			if( !m_pColorSetClass->GetColorSetVector())
-				return false;
-
-			for(it = m_pColorSetClass->GetColorSetVector()->begin(); it != m_pColorSetClass->GetColorSetVector()->end(); it++)
-			{
-				if((*it)->GetIndexName() == m_VariableName)
-				{				
-					m_ParseNode_Info.m_NodeType = CPN_INDEXNAME_NODE;
-					m_ParseNode_Info.m_DataType = CPN_STRING; // a special case
-					m_ParseNode_Info.m_StringValue = &m_VariableName;
-					return true;
-				}
-			}				
-			//Check enum color set if the variable name is a enum value			
-			for(it = m_pColorSetClass->GetColorSetVector()->begin(); it != m_pColorSetClass->GetColorSetVector()->end(); it++)
+			if((*it)->GetIndexName() == m_VariableName)
+			{				
+				m_ParseNode_Info.m_NodeType = CPN_INDEXNAME_NODE;
+				m_ParseNode_Info.m_DataType = CPN_STRING; // a special case
+				m_ParseNode_Info.m_StringValue = &m_VariableName;
+				return true;
+			}
+		}				
+		
+		//Check enum color set if the variable name is a enum value				
+		for(it = m_pColorSetClass->GetColorSetVector()->begin(); it != m_pColorSetClass->GetColorSetVector()->end(); it++)
 			{
 				if((*it)->GetDataType()== CPN_ENUM)
 				{
@@ -326,12 +361,11 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 				}
 			}
 
-			//for other cases, we report errors			
-			wxString l_sError;				
-			l_sError << wxT("Variable, constant or color: ") << m_VariableName << wxT(" is not defined. Position: ") << m_sErrorPosition;
-			SP_LOGERROR(l_sError);
-			return false;			
-		}
+		//for other cases, we report errors			
+		wxString l_sError;				
+		l_sError << wxT("Variable, constant or color: ") << m_VariableName << wxT(" is not defined. Position: ") << m_sErrorPosition;
+		SP_LOGERROR(l_sError);
+		return false;		
 	}
 
 	return false;
@@ -341,8 +375,23 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 void SP_CPN_Parse_Variable_Node::SetValue()
 {
 	//for user-defined functions
-	if( m_ParseNode_Info.m_NodeType != CPN_VARIABLE_NODE )
+	if (!(m_ParseNode_Info.m_NodeType == CPN_VARIABLE_NODE || m_ParseNode_Info.m_NodeType == CPN_PLACE_NODE))
 		return;
+
+	if (m_ParseNode_Info.m_NodeType == CPN_PLACE_NODE)
+	{
+		vector<wxString> *l_pvsUncoloredPlaceName = &(m_psvColored2UnColoredPlaceNames->find(m_VariableName)->second);
+		wxString l_sValue;
+		l_sValue = wxT("");
+		for (unsigned i = 0; i < l_pvsUncoloredPlaceName->size(); i++)
+		{
+			l_sValue = l_sValue + wxT("+") + (*l_pvsUncoloredPlaceName)[i];
+		}
+		l_sValue = l_sValue.AfterFirst('+');
+		m_ParseNode_Info.m_stringMultiplicity = l_sValue;
+		return;
+	}
+		
 
 	if( m_bFunctionFlag )
 	{
@@ -1200,53 +1249,77 @@ bool SP_CPN_Parse_Index_Node::check()
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	//m_ParseNode_Info.m_CheckedString = l_LeftNodeInfo->m_CheckedString + wxT("[") + l_RightNodeInfo->m_CheckedString + wxT("]");
-
-	if( l_RightNodeInfo->m_DataType != CPN_INTEGER || l_LeftNodeInfo->m_NodeType != CPN_INDEXNAME_NODE)   // Only for index type
+	if( l_RightNodeInfo->m_DataType == CPN_INTEGER && l_LeftNodeInfo->m_NodeType == CPN_INDEXNAME_NODE)   // Only for index type
 	{
-		wxString l_sError;					
-		l_sError = wxT("Operands of index error. Position: ") +m_sErrorPosition;
-		SP_LOGERROR(l_sError);
-		return false;
+		return true;
 	}
-	return true;
+	
+	if (l_LeftNodeInfo->m_bPlaceFlag == true)
+	{
+		m_ParseNode_Info.m_bPlaceFlag = true;
+		return true;
+	}
+
+	wxString l_sError;
+	l_sError = wxT("Operands of index error. Position: ") + m_sErrorPosition;
+	SP_LOGERROR(l_sError);
+	return false;
 }
 
 
 
 bool SP_CPN_Parse_Add_Node::check()
 {
+	if (m_ParseNode_Info.m_bSeparaterExpression)
+	{
+		m_pLeft->GetParseNodeInfo()->m_bSeparaterExpression = true;
+		m_pRight->GetParseNodeInfo()->m_bSeparaterExpression = true;
+	}
+	
 	if(!m_pLeft->check())
 		return false;
 	if(!m_pRight->check())
-		return false;
+		return false;	
 
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if(!((l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER) ||		
-	   (l_LeftNodeInfo->m_DataType == CPN_STRING && l_RightNodeInfo->m_DataType == CPN_STRING)))
+	if (l_LeftNodeInfo->m_bPlaceFlag == true || l_RightNodeInfo->m_bPlaceFlag == true)
 	{
-		wxString l_sError;					
-		l_sError = wxT("Operands of the Add operator error. Position: ") +m_sErrorPosition;
-		SP_LOGERROR(l_sError);
-		return false;
-	}	
-	
-	m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
+		m_ParseNode_Info.m_bPlaceFlag = true;		
+	}
 
-	if(l_LeftNodeInfo->m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
+	if (! m_ParseNode_Info.m_bSeparaterExpression)
+	{
+		if (!((l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER) ||
+			  (l_LeftNodeInfo->m_DataType == CPN_STRING  && l_RightNodeInfo->m_DataType == CPN_STRING)))
+		{
+			wxString l_sError;
+			l_sError = wxT("Operands of the Add operator error. Position: ") + m_sErrorPosition;
+			SP_LOGERROR(l_sError);
+			return false;
+		}
 
-	if(l_RightNodeInfo->m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
+		m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
 
-	if(m_ParseNode_Info.m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;	
+		if (l_LeftNodeInfo->m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
+
+		if (l_RightNodeInfo->m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
+
+		if (m_ParseNode_Info.m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
+		else
+		{
+			m_ParseNode_Info.m_sColorSetList = wxT("");
+			m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+		}
+	}
 	else
 	{
-		m_ParseNode_Info.m_sColorSetList = wxT("");
-		m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+		//if the add expression is a part of a separator expression
+		//will add the check codes
 	}
 	
 	return true;
@@ -1707,55 +1780,73 @@ SP_CPN_ParseNode_Info SP_CPN_Parse_Seperator_Node::evaluate()
 		SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
 		SP_CPN_ParseNode_Info l_RightNodeInfo = m_pRight->evaluate();
 		
-		int l_nMultiplicity;
-		double l_dMultiplicity;
+		m_ParseNode_Info.m_DataType = l_RightNodeInfo.m_DataType;
+		m_ParseNode_Info.m_ColorSet = l_RightNodeInfo.m_ColorSet;
 
-		if( m_sPlaceType == SP_DS_CONTINUOUS_PLACE )
+		if (m_ParseNode_Info.m_bPlaceFlag == false)
 		{
-			if( l_LeftNodeInfo.m_NodeType == CPN_INTEGERCONSTANT_NODE)
-				m_ParseNode_Info.m_DoubleMultiplicity = l_LeftNodeInfo.m_IntegerValue;
-			else
-				m_ParseNode_Info.m_DoubleMultiplicity = l_LeftNodeInfo.m_DoubleValue;
-			l_dMultiplicity = m_ParseNode_Info.m_DoubleMultiplicity;
-		}
-		else
-		{
-			m_ParseNode_Info.m_Multiplicity = l_LeftNodeInfo.m_IntegerValue;
-			l_nMultiplicity = m_ParseNode_Info.m_Multiplicity;
-		}
-		
-		m_ParseNode_Info.m_DataType     = l_RightNodeInfo.m_DataType;
-		m_ParseNode_Info.m_ColorSet     = l_RightNodeInfo.m_ColorSet;
-/*
-		if(l_RightNodeInfo.m_DataType == CPN_INTEGER )
-			m_ParseNode_Info.m_IntegerValue = l_RightNodeInfo.m_IntegerValue;
-		else if(l_RightNodeInfo.m_DataType == CPN_BOOLEAN )
-			m_ParseNode_Info.m_BooleanValue = l_RightNodeInfo.m_BooleanValue;		
-		else
-		{
-			m_String = *(l_RightNodeInfo.m_StringValue);
-			m_ParseNode_Info.m_StringValue = &m_String;
-		}
-
-		CollectResult();
-*/
-		//for the all() function
-		m_ParseNode_Info.m_EvalResults.clear();
-		for(unsigned i = 0; i < l_RightNodeInfo.m_EvalResults.size(); i++)
-		{
-			SP_CPN_EvaluatedSingleValue l_stEvalRes;
-			l_stEvalRes.m_ColorValue = l_RightNodeInfo.m_EvalResults[i].m_ColorValue;
-			l_stEvalRes.m_Predicate = l_RightNodeInfo.m_EvalResults[i].m_Predicate;
-			if( m_sPlaceType == SP_DS_CONTINUOUS_PLACE )
+			int l_nMultiplicity;
+			double l_dMultiplicity;
+			if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
 			{
-				l_stEvalRes.m_DoubleMultiplicity = l_dMultiplicity * l_RightNodeInfo.m_EvalResults[i].m_DoubleMultiplicity;
+				if (l_LeftNodeInfo.m_NodeType == CPN_INTEGERCONSTANT_NODE)
+					m_ParseNode_Info.m_DoubleMultiplicity = l_LeftNodeInfo.m_IntegerValue;
+				else
+					m_ParseNode_Info.m_DoubleMultiplicity = l_LeftNodeInfo.m_DoubleValue;
+				l_dMultiplicity = m_ParseNode_Info.m_DoubleMultiplicity;
 			}
 			else
 			{
-				l_stEvalRes.m_Multiplicity = l_nMultiplicity * l_RightNodeInfo.m_EvalResults[i].m_Multiplicity;
-			}
+				m_ParseNode_Info.m_Multiplicity = l_LeftNodeInfo.m_IntegerValue;
+				l_nMultiplicity = m_ParseNode_Info.m_Multiplicity;
+			}			
 
-			m_ParseNode_Info.m_EvalResults.push_back(l_stEvalRes);
+			//for the all() function
+			m_ParseNode_Info.m_EvalResults.clear();
+			for (unsigned i = 0; i < l_RightNodeInfo.m_EvalResults.size(); i++)
+			{
+				SP_CPN_EvaluatedSingleValue l_stEvalRes;
+				l_stEvalRes.m_bPlaceFlag = false;
+				l_stEvalRes.m_ColorValue = l_RightNodeInfo.m_EvalResults[i].m_ColorValue;
+				l_stEvalRes.m_Predicate = l_RightNodeInfo.m_EvalResults[i].m_Predicate;
+				if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+				{
+					l_stEvalRes.m_DoubleMultiplicity = l_dMultiplicity * l_RightNodeInfo.m_EvalResults[i].m_DoubleMultiplicity;
+				}
+				else
+				{
+					l_stEvalRes.m_Multiplicity = l_nMultiplicity * l_RightNodeInfo.m_EvalResults[i].m_Multiplicity;
+				}
+
+				m_ParseNode_Info.m_EvalResults.push_back(l_stEvalRes);
+			}
+		}
+		else
+		{
+			wxString l_stringMultiplicity = l_LeftNodeInfo.m_stringMultiplicity;
+			l_stringMultiplicity = wxT("(") + l_stringMultiplicity + wxT(")");
+
+			//for the all() function
+			m_ParseNode_Info.m_EvalResults.clear();
+			for (unsigned i = 0; i < l_RightNodeInfo.m_EvalResults.size(); i++)
+			{
+				SP_CPN_EvaluatedSingleValue l_stEvalRes;
+				l_stEvalRes.m_bPlaceFlag = true;
+				l_stEvalRes.m_ColorValue = l_RightNodeInfo.m_EvalResults[i].m_ColorValue;
+				l_stEvalRes.m_Predicate = l_RightNodeInfo.m_EvalResults[i].m_Predicate;
+				if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+				{
+					wxString l_String = wxString::Format(wxT("%f"), l_RightNodeInfo.m_EvalResults[i].m_DoubleMultiplicity);
+					l_stEvalRes.m_stringMultiplicity = l_stringMultiplicity + wxT("*") + l_String;
+				}
+				else
+				{
+					wxString l_String = wxString::Format(wxT("%d"), l_RightNodeInfo.m_EvalResults[i].m_Multiplicity);
+					l_stEvalRes.m_stringMultiplicity = l_stringMultiplicity + wxT("*") + l_String;
+				}
+
+				m_ParseNode_Info.m_EvalResults.push_back(l_stEvalRes);
+			}
 		}
 
 		return m_ParseNode_Info;
@@ -1764,6 +1855,7 @@ SP_CPN_ParseNode_Info SP_CPN_Parse_Seperator_Node::evaluate()
 
 bool SP_CPN_Parse_Seperator_Node::check()
 {
+	m_pLeft->GetParseNodeInfo()->m_bSeparaterExpression = true;
 	if(!m_pLeft->check())
 		return false;
 	if(!m_pRight->check())
@@ -1771,11 +1863,17 @@ bool SP_CPN_Parse_Seperator_Node::check()
 
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();	
+	
 
+	if (l_LeftNodeInfo->m_bPlaceFlag == true)
+	{
+		m_ParseNode_Info.m_bPlaceFlag = true;
+	}
+	
 
 	if( m_sPlaceType != SP_DS_CONTINUOUS_PLACE)
 	{
-		if( l_LeftNodeInfo->m_DataType != CPN_INTEGER)
+		if (l_LeftNodeInfo->m_DataType != CPN_INTEGER && !m_ParseNode_Info.m_bPlaceFlag)
 		{
 			wxString l_sError;					
 			l_sError = wxT("The multiplicity should be an integer type. Position: ") +m_sErrorPosition;
@@ -1786,7 +1884,7 @@ bool SP_CPN_Parse_Seperator_Node::check()
 
 	if( m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
 	{
-		if( !(l_LeftNodeInfo->m_DataType == CPN_INTEGER || l_LeftNodeInfo->m_NodeType == CPN_DOUBLECONSTANT_NODE) )
+		if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER || l_LeftNodeInfo->m_NodeType == CPN_DOUBLECONSTANT_NODE) && !m_ParseNode_Info.m_bPlaceFlag)
 		{
 			wxString l_sError;					
 			l_sError = wxT("The multiplicity should be an integer or double type. Position: ") +m_sErrorPosition;
@@ -1818,7 +1916,12 @@ bool SP_CPN_Parse_Predicate_Node::check()
 		return false;
 
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
-	//SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
+	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
+
+	if (l_RightNodeInfo->m_bPlaceFlag == true)
+	{
+		m_ParseNode_Info.m_bPlaceFlag = true;
+	}
 
 	if( l_LeftNodeInfo->m_DataType != CPN_BOOLEAN )
 	{
@@ -1862,10 +1965,28 @@ void SP_CPN_Parse_CNN_Node::SetEvalResult(SP_CPN_EvaluatedSingleValue p_SingleEv
 			wxString l_sExistColor = m_ParseNode_Info.m_EvalResults[i].m_ColorValue;
 			if(l_sNewColor == l_sExistColor)
 			{
-				if( m_sPlaceType == SP_DS_CONTINUOUS_PLACE )
-					m_ParseNode_Info.m_EvalResults[i].m_DoubleMultiplicity = m_ParseNode_Info.m_EvalResults[i].m_DoubleMultiplicity + p_SingleEvalResult.m_DoubleMultiplicity;
+				if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+				{
+					if (m_ParseNode_Info.m_EvalResults[i].m_bPlaceFlag && p_SingleEvalResult.m_bPlaceFlag)
+						m_ParseNode_Info.m_EvalResults[i].m_stringMultiplicity = m_ParseNode_Info.m_EvalResults[i].m_stringMultiplicity + wxT("+") + p_SingleEvalResult.m_stringMultiplicity;
+					else if (m_ParseNode_Info.m_EvalResults[i].m_bPlaceFlag && !p_SingleEvalResult.m_bPlaceFlag)
+						m_ParseNode_Info.m_EvalResults[i].m_stringMultiplicity = m_ParseNode_Info.m_EvalResults[i].m_stringMultiplicity + wxT("+") + wxString::Format(wxT("%f"), p_SingleEvalResult.m_DoubleMultiplicity);
+					else if (!m_ParseNode_Info.m_EvalResults[i].m_bPlaceFlag && p_SingleEvalResult.m_bPlaceFlag)
+						m_ParseNode_Info.m_EvalResults[i].m_stringMultiplicity = wxString::Format(wxT("%f"), m_ParseNode_Info.m_EvalResults[i].m_DoubleMultiplicity) + wxT("+") + p_SingleEvalResult.m_stringMultiplicity;
+					else
+						m_ParseNode_Info.m_EvalResults[i].m_DoubleMultiplicity = m_ParseNode_Info.m_EvalResults[i].m_DoubleMultiplicity + p_SingleEvalResult.m_DoubleMultiplicity;
+				}					
 				else
-					m_ParseNode_Info.m_EvalResults[i].m_Multiplicity = m_ParseNode_Info.m_EvalResults[i].m_Multiplicity + p_SingleEvalResult.m_Multiplicity;
+				{
+					if (m_ParseNode_Info.m_EvalResults[i].m_bPlaceFlag && p_SingleEvalResult.m_bPlaceFlag)
+						m_ParseNode_Info.m_EvalResults[i].m_stringMultiplicity = m_ParseNode_Info.m_EvalResults[i].m_stringMultiplicity + wxT("+") + p_SingleEvalResult.m_stringMultiplicity;
+					else if (m_ParseNode_Info.m_EvalResults[i].m_bPlaceFlag && !p_SingleEvalResult.m_bPlaceFlag)
+						m_ParseNode_Info.m_EvalResults[i].m_stringMultiplicity = m_ParseNode_Info.m_EvalResults[i].m_stringMultiplicity + wxT("+") + wxString::Format(wxT("%d"), p_SingleEvalResult.m_Multiplicity);
+					else if (!m_ParseNode_Info.m_EvalResults[i].m_bPlaceFlag && p_SingleEvalResult.m_bPlaceFlag)
+						m_ParseNode_Info.m_EvalResults[i].m_stringMultiplicity = wxString::Format(wxT("%d"), m_ParseNode_Info.m_EvalResults[i].m_Multiplicity) + wxT("+") + p_SingleEvalResult.m_stringMultiplicity;
+					else
+						m_ParseNode_Info.m_EvalResults[i].m_Multiplicity = m_ParseNode_Info.m_EvalResults[i].m_Multiplicity + p_SingleEvalResult.m_Multiplicity;
+				}
 				
 				l_bFound = true;
 				break;
@@ -1888,6 +2009,11 @@ SP_CPN_Parse_Context::SP_CPN_Parse_Context()
 	clearExpressions();
 	m_bFunctionFlag = false;
 	m_sErrorPosition = wxT("");
+	m_psvColored2UnColoredPlaceNames = NULL;
+	/*SP_DS_ColPN_Unfolding l_unfolding;
+	l_unfolding.UnfoldPlacesForMarkingDependent();
+	m_psvColored2UnColoredPlaceNames = l_unfolding.GetsvColored2UnColoredPlaceNames();
+	*/
 
 }
 
@@ -3347,6 +3473,7 @@ void SP_CPN_Parse_Context::Configuration(SP_CPN_ParseNode* p_pcNode)
 	l_pParseNode->SetErrorPosition(m_sErrorPosition);
 	l_pParseNode->SetFunctionFlag(m_bFunctionFlag);
 	l_pParseNode->SetFunctionName(m_sFunctionName);
+	l_pParseNode->SetColored2UnColoredPlaceNames(m_psvColored2UnColoredPlaceNames);
 	//l_pParseNode->SetNetClassName(m_sNetClassName);
 	l_pParseNode->SetPlaceType(m_sPlaceType);
 

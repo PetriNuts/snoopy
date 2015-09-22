@@ -202,6 +202,9 @@ bool SP_CPN_SyntaxChecking::CheckArcExpression(SP_DS_Node* p_pcPlaceNode,SP_DS_E
 
 bool SP_CPN_SyntaxChecking::CheckExpression(wxString p_sExpression, wxString p_sErrorPosition, wxString p_sColorSetName,wxString p_sPlaceType, bool p_bFunctionFlag, bool p_bGuardFlag)
 {
+	SP_DS_ColPN_Unfolding l_cColPN_Unfolding;
+	l_cColPN_Unfolding.UnfoldPlacesForMarkingDependent();
+
 	//Prepare to parse and check arc expression
 	SP_CPN_Parse_Context_ptr l_pcParseContext;
 	SP_CPN_Driver_ptr  l_pcDriver;
@@ -215,7 +218,7 @@ bool SP_CPN_SyntaxChecking::CheckExpression(wxString p_sExpression, wxString p_s
 	l_pcParseContext->SetColorSetName(p_sColorSetName);	
 	l_pcParseContext->SetFunctionFlag(p_bFunctionFlag);	
 	l_pcParseContext->SetPlaceType(p_sPlaceType);
-	
+	l_pcParseContext->SetColored2UnColoredPlaceNames(l_cColPN_Unfolding.GetsvColored2UnColoredPlaceNames());
 
 	std::string l_ParseString;
 	l_ParseString = string( p_sExpression.mb_str());
