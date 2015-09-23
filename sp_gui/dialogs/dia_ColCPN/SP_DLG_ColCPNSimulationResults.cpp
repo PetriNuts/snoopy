@@ -138,9 +138,9 @@ SP_DLG_ColCPNSimulationResults::~SP_DLG_ColCPNSimulationResults()
 	wxDELETE(m_pcMarkingSetComboBox);
 	wxDELETE(m_pcFunctionSetComboBox);
 	wxDELETE(m_pcParameterSetComboBox);
-	wxDELETE(m_pcSolver);
-	wxDELETE(m_pcSolverType);
-	wxDELETE(m_pcSimulationProperites);
+	//wxDELETE(m_pcSolver);
+	//wxDELETE(m_pcSolverType);
+	//wxDELETE(m_pcSimulationProperites);
 }
 
 bool SP_DLG_ColCPNSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Metadata* p_pcView, wxArrayString& p_asPlaces)
