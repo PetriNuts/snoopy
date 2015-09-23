@@ -715,36 +715,62 @@ void SP_DLG_ColCPNSimulationResults::LoadTransitions()
 
 void SP_DLG_ColCPNSimulationResults::LoadConnections()
 {
-	vector<SP_CPN_ContinuousArc>* l_pcPreConnection;
-	vector<SP_CPN_ContinuousArc>* l_pcPostConnection;
-	vector<SP_CPN_ContinuousArc>::const_iterator l_itConnection;
+vector<SP_CPN_ContinuousArc>* l_pcPreConnection;
+vector<SP_CPN_ContinuousArc>* l_pcPostConnection;
+vector<SP_CPN_ContinuousArc>::const_iterator l_itConnection;
 
-	//Map transition name to their positions
-	m_pcMainSimulator->MapTransitionNames2Positions();
+		//Map transition name to their positions
+		m_pcMainSimulator->MapTransitionNames2Positions();
 
-	m_pcMainSimulator->MapPlaceNames2Positions();
+		m_pcMainSimulator->MapPlaceNames2Positions();
 
-	//Load transitions' pre place
-	l_pcPreConnection = m_pcUnfoldedNet->GetArcs_Place2Transition();
-	for (l_itConnection = l_pcPreConnection->begin(); l_itConnection != l_pcPreConnection->end(); l_itConnection++)
-	{
-		double l_nWeight = 0;
+		//Load transitions' pre place
+		l_pcPreConnection = m_pcUnfoldedNet->GetArcs_Place2Transition();
+		for (l_itConnection = l_pcPreConnection->begin(); l_itConnection != l_pcPreConnection->end(); l_itConnection++)
+		{
+			double l_nNumericArcWeight = 0;
 
-		l_itConnection->m_sMultiplicity.ToDouble(&l_nWeight);
+			wxString l_sArcWeight=l_itConnection->m_sMultiplicity;
 
-		m_pcMainSimulator->SetPreTransitionConnection(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID, GetConnectionType(l_itConnection->m_sArcClass), l_nWeight);
-	}
+			//l_itConnection->m_sMultiplicity.ToDouble(&l_nWeight);
 
-	//Load transitions' post place
-	l_pcPostConnection = m_pcUnfoldedNet->GetArcs_Transition2Place();
-	for (l_itConnection = l_pcPostConnection->begin(); l_itConnection != l_pcPostConnection->end(); l_itConnection++)
-	{
-		double l_nWeight = 0;
+			spsim::ConnectionType l_nArcType=GetConnectionType(l_itConnection->m_sArcClass);
 
-		l_itConnection->m_sMultiplicity.ToDouble(&l_nWeight);
+			if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+			{
+				m_pcMainSimulator->SetPreTransitionConnection(l_itConnection->m_nTranPos,l_itConnection->m_nPlaceID, l_nArcType, l_nNumericArcWeight);
+			}
+			else
+			{
+				m_pcMainSimulator->SetPreSelfModifyingWeights(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID,l_nArcType, l_sArcWeight);
+			}
 
-		m_pcMainSimulator->SetPostTransitionConnection(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID, l_nWeight);
-	}
+			SP_LOGMESSAGE(l_itConnection->m_sMultiplicity);
+
+			//m_pcMainSimulator->SetPreTransitionConnection(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID, GetConnectionType(l_itConnection->m_sArcClass), l_nWeight);
+		}
+
+		//Load transitions' post place
+		l_pcPostConnection = m_pcUnfoldedNet->GetArcs_Transition2Place();
+		for (l_itConnection = l_pcPostConnection->begin(); l_itConnection != l_pcPostConnection->end(); l_itConnection++)
+		{
+			double l_nNumericArcWeight = 0;
+
+			wxString l_sArcWeight=l_itConnection->m_sMultiplicity;
+
+			//l_itConnection->m_sMultiplicity.ToDouble(&l_nWeight);
+
+			if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+			{
+				m_pcMainSimulator->SetPostTransitionConnection(l_itConnection->m_nTranPos,l_itConnection->m_nPlaceID,l_nNumericArcWeight);
+			}
+			else
+			{
+				m_pcMainSimulator->SetPostSelfModifyingWeights(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID,l_sArcWeight);
+			}
+
+			//m_pcMainSimulator->SetPostTransitionConnection(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID, l_nWeight);
+		}
 }
 
 spsim::ConnectionType SP_DLG_ColCPNSimulationResults::GetConnectionType(const wxString& p_sConnectionType)
