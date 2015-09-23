@@ -73,6 +73,8 @@ protected :
 	  virtual void LoadColAuxResults();
 
 	  virtual void UpdateXAxisValues();
+
+	  bool IsConstantArcWeight(const wxString& p_sWeight, double& p_nReturnValue);
 	 
   public:
 	DECLARE_CLASS( SP_DLG_ColStSimulationResults )
