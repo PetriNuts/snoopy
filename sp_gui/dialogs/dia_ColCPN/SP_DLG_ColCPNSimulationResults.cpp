@@ -199,7 +199,7 @@ bool SP_DLG_ColCPNSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcView
 	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnPlaces.GetCount()));
 	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnTranstions.GetCount()));*/
 
-	CreateViewerDataFromRegex();
+	CreateViewerDataFromRegex(p_pcView);
 
 	for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
 	{

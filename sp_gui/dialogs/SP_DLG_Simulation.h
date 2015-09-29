@@ -97,10 +97,6 @@ protected:
 	//ApFormulae used with SPN
 	wxString m_sApFormulae;
 
-	//Available result viewer
-	SP_VectorViewer m_apcResultViewers;
-	unsigned int m_nCurrentViewer;
-
 	//a vector to store the x axis values
 	SP_VectorDouble m_anXAxisValues;
 
@@ -182,9 +178,6 @@ protected:
 
 	wxComboBox* m_pcViewBox;
 
-	//list different viewers
-	wxComboBox* m_pcOutputViewerType;
-
 	wxCheckBox* m_pcSelectClearAllChkBox;
 
 	//A timer to update the simulation dialog periodically
@@ -197,6 +190,26 @@ public:
 	wxArrayString m_ArrayUnPlaces, m_ArrayUnTranstions;
 	wxArrayString m_ArrayColPlaces, m_ArrayColTranstions;
 	wxArrayString m_ArrayAuxPlaces, m_ArrayAuxtranstions;
+
+
+	//initialize views
+	virtual void InitializeViews();
+
+	/*
+	 * This methods must be defined in the child class.
+	 * Load and initialize the Dialog data.
+	 * See SP_DLG_CPNSimulationResults for an example
+	 */
+	virtual void LoadData(bool p_bCreateNewTree = true);
+
+	//TODO: implement it in your derived class
+	virtual void UpdateViewer()=0;
+
+	virtual void SetViewAttributeValue(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName, const wxString& p_sValue);
+
+//update the x axis values base on the user selection
+virtual void UpdateXAxisValues()=0;
+
 protected:
 	/*
 	 * net information
@@ -277,12 +290,6 @@ public:
 
 protected:
 DECLARE_EVENT_TABLE()
-	/*
-	 * This methods must be defined in the child class.
-	 * Load and initialize the Dialog data.
-	 * See SP_DLG_CPNSimulationResults for an example
-	 */
-	virtual void LoadData(bool p_bCreateNewTree = true);
 
 	virtual void LoadSets();
     virtual void LoadParameters();
@@ -309,13 +316,6 @@ DECLARE_EVENT_TABLE()
 	virtual void OnPlotZoomHV_Out(wxCommandEvent& p_cEvent);
 	virtual void OnPlotZoomCentral(wxCommandEvent& p_cEvent);
 	virtual void OnPlotSaveArea(wxCommandEvent& p_cEvent);
-
-//	virtual void OnEditViewerProperties(wxCommandEvent& p_cEvent);
-
-	virtual void OnSelectXAxis(wxCommandEvent& p_cEvent);
-
-//	virtual void OnChangeResultViewer(wxCommandEvent & envent);
-
 
 	virtual void OnPrint(wxCommandEvent& p_cEvent);
 
@@ -361,27 +361,11 @@ protected:
 	virtual SP_DS_ColListAttribute* GetOneMakingAttribute();
 	virtual bool IsMarkingSetNameExist(const wxString& p_sName);
 
-	//initialize views
-	virtual void InitializeViews();
-
-	//make necessary initialization
-	virtual void InitializeResultViewer();
-
-	virtual void ChangeCurrentViewerType();
-
-	//TODO: implement it in your derived class
-	virtual void UpdateViewer()=0;
-
 	//specify how we get a reference to the result matrices
 	virtual void UpdateSimulationMatrix()=0;
 
 	//load the net information first time the dialog is opened
 	virtual void LoadNetInformation()=0;
-
-	//update the x axis values base on the user selection
-	virtual void UpdateXAxisValues()=0;
-
-	virtual void DoEditViewerProperties(wxWindow *p_pcExternalWindowDialog);
 
 	//check for existence of a view with a certain name
 	virtual bool IsViewNameExist(const wxString& p_sViewName);
@@ -389,25 +373,12 @@ protected:
 	//find a view with a certain name
 	virtual SP_DS_Metadata* FindView(const wxString& p_sViewName);
 
-	virtual void SaveCurrentView();
-
-	virtual void LoadViewProperties();
-
-	//save the selected curves options
-	virtual void SaveSelectedCurves();
-
-	//load the selected curves options
-	virtual void LoadSelectedCurves();
-
-	virtual wxString GetCurrentViewerType(const unsigned int& p_nType);
-
 	//Create a new view
 	SP_DS_Metadata* CreateNewView(const wxString& p_sName, bool p_bCloneCurrent = false);
 
 	//initialize empty view with data
 	virtual void InitializeEmptyView(SP_DS_Metadata* p_pcView)=0;
 
-	virtual void SetViewAttributeValue(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName, const wxString& p_sValue);
 	virtual wxString GetViewAttributeValue(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName);
 
 	//Refresh currently opened window
@@ -424,7 +395,7 @@ protected:
 
 	virtual void ChangeCurrentView(SP_DS_Metadata* p_pcView);
 
-	bool CreateViewerDataFromRegex();
+	bool CreateViewerDataFromRegex(SP_DS_Metadata* p_pcView);
 
 	//load view curves
 	virtual bool LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Metadata* p_pcView, wxArrayString& p_asPlaces);
@@ -443,11 +414,7 @@ protected:
 
 public:
 	virtual void OnClearPlaceList(bool p_nCheck);
-	virtual void OnItemDoubleClick(wxWindow *p_pcExternalWindowDialog, unsigned int p_nLocation, unsigned int p_nCount);
 	virtual void OnItemCheckUncheck(unsigned int p_nListLocation, unsigned int p_nLocation, bool p_nCheck);
-	virtual void OnEditViewerTypeProperties(wxWindow *p_pcExternalWindowDialog);
-	virtual void OnChangingResultViewer(unsigned int p_nLocation);
-	virtual void OnEditOtherNodeList(wxWindow *p_pcExternalWindowDialog);
 	virtual void OnEditXAxis(wxWindow *p_pcExternalWindowDialog);
 	virtual void OnExportClicked(wxWindow *p_pcExternalWindowDialog, int p_nSelection);
 protected:

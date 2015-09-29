@@ -90,7 +90,7 @@ EVT_BUTTON( SP_ID_BUTTON_CHECK_ILFORMULAE_MENU, SP_DLG_StSimulationResults :: On
 
 EVT_GRID_LABEL_RIGHT_DCLICK(SP_DLG_StSimulationResults::OnLabelRightDClick)
 
-EVT_THREAD(SP_SIMULATION_THREAD_EVENT, SP_DLG_StSimulationResults::OnSimulatorThreadEvent)
+EVT_SIMTHREAD(SP_SIMULATION_THREAD_EVENT, SP_DLG_StSimulationResults::OnSimulatorThreadEvent)
 
 END_EVENT_TABLE()
 
@@ -973,9 +973,6 @@ void SP_DLG_StSimulationResults::UpdateViewer()
 	//select the suited matrix to view (rate/marking)
 	UpdateSimulationMatrix();
 
-	m_apcResultViewers[m_nCurrentViewer]->SetXAxisValues(&m_anXAxisValues);
-
-	m_apcResultViewers[m_nCurrentViewer]->Update();
 }
 
 void SP_DLG_StSimulationResults::UpdateSimulationMatrix()

@@ -81,7 +81,7 @@ EVT_MENU( SP_ID_BUTTON_LOAD_ILFORMULAE, SP_DLG_ColStSimulationResults :: OnLoadA
 EVT_MENU( SP_ID_BUTTON_ENTER_ILFORMULAE, SP_DLG_ColStSimulationResults :: OnEnterApFormulae )
 EVT_MENU( SP_ID_BUTTON_CHECK_ILFORMULAE, SP_DLG_ColStSimulationResults :: CheckApFormulae )
 EVT_BUTTON( SP_ID_BUTTON_CHECK_ILFORMULAE_MENU, SP_DLG_ColStSimulationResults :: OnCheckFormulaMenu )
-EVT_THREAD(SP_SIMULATION_THREAD_EVENT,SP_DLG_StSimulationResults::OnSimulatorThreadEvent)
+EVT_SIMTHREAD(SP_SIMULATION_THREAD_EVENT,SP_DLG_StSimulationResults::OnSimulatorThreadEvent)
 END_EVENT_TABLE()
 
 SP_DLG_ColStSimulationResults::SP_DLG_ColStSimulationResults(SP_DS_Graph* p_pcGraph, SP_DS_ColPN_Unfolding* p_pcUnfoldedNet, wxWindow* p_pcParent, wxString p_sHelpText, const wxString& p_sTitle,
@@ -198,7 +198,7 @@ bool SP_DLG_ColStSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewe
 	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnPlaces.GetCount()));
 	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnTranstions.GetCount()));*/
 
-	CreateViewerDataFromRegex();
+	CreateViewerDataFromRegex(p_pcView);
 
 	for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
 	{

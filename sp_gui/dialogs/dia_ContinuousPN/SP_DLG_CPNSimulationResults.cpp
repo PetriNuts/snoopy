@@ -1175,9 +1175,6 @@ void SP_DLG_CPNSimulationResults::UpdateViewer()
 	//select the suited matrix to view (rate/marking)
 	UpdateSimulationMatrix();
 
-	m_apcResultViewers[m_nCurrentViewer]->SetXAxisValues(&m_anXAxisValues);
-
-	m_apcResultViewers[m_nCurrentViewer]->Update();
 }
 
 void SP_DLG_CPNSimulationResults::UpdateSimulationMatrix()

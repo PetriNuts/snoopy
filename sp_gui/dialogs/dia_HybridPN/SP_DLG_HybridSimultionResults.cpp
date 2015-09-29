@@ -103,7 +103,7 @@ EVT_BUTTON( SP_ID_BUTTON_SIMULATION_PROPERTIES, SP_DLG_HybridSimulationResults :
 EVT_BUTTON( SP_ID_BUTTON_CONTINUOUS_SOLVER_PROPERTIES, SP_DLG_HybridSimulationResults :: OnODESolverProperties )
 EVT_BUTTON( SP_ID_BUTTON_SAVE_ODE, SP_DLG_HybridSimulationResults :: SaveODE )
 
-EVT_THREAD(SP_SIMULATION_THREAD_EVENT,SP_DLG_HybridSimulationResults::OnSimulatorThreadEvent)
+EVT_SIMTHREAD(SP_SIMULATION_THREAD_EVENT,SP_DLG_HybridSimulationResults::OnSimulatorThreadEvent)
 
 END_EVENT_TABLE()
 //
@@ -1076,9 +1076,6 @@ void SP_DLG_HybridSimulationResults::UpdateViewer()
 
 	UpdateSimulationMatrix();
 
-	m_apcResultViewers[m_nCurrentViewer]->SetXAxisValues(&m_anXAxisValues);
-
-	m_apcResultViewers[m_nCurrentViewer]->Update();
 }
 
 void SP_DLG_HybridSimulationResults::UpdateSimulationMatrix()

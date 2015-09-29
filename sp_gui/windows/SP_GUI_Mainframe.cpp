@@ -91,15 +91,10 @@ SP_GUI_Mainframe::SP_GUI_Mainframe(SP_GM_Docmanager* p_pcDocmanager,
     Bind(wxEVT_MENU, &SP_GUI_Mainframe::OnToggleBar, this, SP_MENU_ITEM_TOGGLE_DEV_ID, SP_MENU_ITEM_TOGGLE_LOG_ID);
 
     Bind(wxEVT_UPDATE_UI, &SP_GUI_Mainframe::OnUpdateUI, this, SP_TOOL_EDIT_ID);
-
     Bind(wxEVT_UPDATE_UI, &SP_GUI_Mainframe::OnUpdateUI, this, SP_MENU_ITEM_EXPORT_MGR);
     Bind(wxEVT_UPDATE_UI, &SP_GUI_Mainframe::OnUpdateUI, this, SP_MENU_ITEM_SEARCHID);
-
     Bind(wxEVT_UPDATE_UI, &SP_GUI_Mainframe::OnUpdateUI, this, SP_MENU_ITEM_TOGGLEANIM);
-
-    //by sl
     Bind(wxEVT_UPDATE_UI, &SP_GUI_Mainframe::OnUpdateUI, this, SP_MENU_ITEM_HIGHMARKING);
-
     Bind(wxEVT_UPDATE_UI, &SP_GUI_Mainframe::OnUpdateUI, this, SP_ID_GRAPHTREE_CTRL_ID);
     Bind(wxEVT_UPDATE_UI, &SP_GUI_Mainframe::OnUpdateUI, this, wxID_EXIT);
     // log window toggling

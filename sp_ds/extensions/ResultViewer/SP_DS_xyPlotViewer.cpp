@@ -173,29 +173,27 @@ Chart* SP_DS_xyPlotViewer::CreateChart()
 
 void SP_DS_xyPlotViewer::OnMouseMotion(wxMouseEvent& event)
 {
-	/*wxCoord l_XPosition, l_YPosition;
+/*
+	wxCoord l_XPosition, l_YPosition;
 
-	 CHECK_POINTER(m_pcChartPanel,return);
+	CHECK_POINTER(m_pcChartPanel,return);
 
-	 event.GetPosition(&l_XPosition,&l_YPosition);
+	event.GetPosition(&l_XPosition,&l_YPosition);
 
-	 CHECK_POINTER(m_pcChart,return);
+	wxPaintDC dc(m_pcChartPanel);
 
-	 XYPlot* l_pcPlot;//=dynamic_cast<XYPlot*> (m_pcChart->GetPlot());
+	wxRect rc;
 
-	 wxPaintDC dc(m_pcChartPanel);
+	m_pcChartPanel->GetChart()->CalcPlotRect(dc,rc);
 
-	 wxRect rc;
+	double l_nX,l_nY;
+	XYPlot* l_pcPlot = dynamic_cast<XYPlot*> (m_pcChartPanel->GetChart()->GetPlot());
+	l_pcPlot->ToDataCoords(1,dc,rc,l_XPosition,l_YPosition,&l_nX,&l_nY);
 
-	 m_pcChart->CalcPlotRect(dc,rc);
+	wxString l_sInfo = wxString::Format(wxT("%f,%f"), l_nX, l_nY);
 
-	 double l_nX,l_nY;
-
-	 l_pcPlot->ToDataCoords(1,dc,rc,l_XPosition,l_YPosition,&l_nX,&l_nY);
-
-	 wxString l_sInfo=SP_NUMBER_TO_STR(l_nX,wxT("%f"))+wxT(",")+SP_NUMBER_TO_STR(l_nY,wxT("%f"));
-
-	 SP_LOG(wxLOG_Message,l_sInfo);*/
+	SP_LOGMESSAGE(l_sInfo);
+ */
 }
 
 void SP_DS_xyPlotViewer::UpdateAttributes()

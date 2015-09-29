@@ -96,6 +96,7 @@ public:
 	wxTextCtrl *m_pcPlaceChoiceRegex;
 	wxTextCtrl *m_pcPlaceChoiceOutRegex;
 	wxCheckBox *m_pcPlaceChoiceRegexInvert;
+	wxCheckBox *m_pcPlaceChoiceColour;
 
 	 wxString m_sOutputType;
 protected:

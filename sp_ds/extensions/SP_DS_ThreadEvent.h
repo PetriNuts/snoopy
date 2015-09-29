@@ -52,7 +52,7 @@ typedef void (wxEvtHandler::*spThreadEventFunction)(SP_DS_ThreadEvent&);
 #define spThreadEventHandler(func) \
     (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(spThreadEventFunction, &func)
 
-#define EVT_THREAD(id, func) \
+#define EVT_SIMTHREAD(id, func) \
     wx__DECLARE_EVT1(spEVT_THREAD, id, spThreadEventHandler(func))
 
 

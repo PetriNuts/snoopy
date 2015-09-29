@@ -16,15 +16,17 @@
 class SP_DLG_ResultViewerProperties: public wxDialog
 {
 private:
-	      SP_DS_ResultViewer* m_pcResultViewer;
-	      wxNotebook* m_pcNoteBook;
+	SP_DS_ResultViewer* m_pcResultViewer;
+	wxNotebook* m_pcNoteBook;
 protected:
-	      void OnUpdateViewerAttributes(wxCommandEvent& event);
-public:
-		  SP_DLG_ResultViewerProperties(SP_DS_ResultViewer* p_pcResultViewer,wxWindow* p_pcParent);
-		  virtual ~SP_DLG_ResultViewerProperties();
+	void OnDlgOk( wxCommandEvent& p_cEvent );
+	void OnDlgCancel( wxCommandEvent& p_cEvent );
 
-		  DECLARE_EVENT_TABLE()
+public:
+	SP_DLG_ResultViewerProperties(SP_DS_ResultViewer* p_pcResultViewer,wxWindow* p_pcParent);
+	virtual ~SP_DLG_ResultViewerProperties();
+
+	DECLARE_EVENT_TABLE()
 };
 
 #endif /* SP_DLG_RESULTVIEWERPROPERTIES_H_ */

@@ -34,8 +34,6 @@
 #include "sp_ds/extensions/ResultViewer/SP_DS_xyPlotViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_HistogramPlotViewer.h"
 #include "sp_gui/dialogs/SP_DLG_SelectXAxisVariable.h"
-#include "sp_gui/dialogs/SP_DLG_ResultViewerProperties.h"
-#include "sp_gui/dialogs/dia_SteeringGUI/SP_DLG_ChangeCurveAttributes.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_PlacesSelection.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColPlacesSelection.h"
 #include "sp_gui/dialogs/SP_DLG_ShowAllModelView.h"
@@ -154,7 +152,6 @@ SP_DLG_Simulation::SP_DLG_Simulation(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParen
         m_bCompressExact(false),
         m_sNodeclass(SP_DS_CONTINUOUS_PLACE),
         m_bSumOfNodes(false),
-        m_nCurrentViewer(1), //xy plot
         m_bCanChangeCurrentView(true),
         m_pcPlaceChoiceSizerLabel(NULL),
         m_bComAuxVarSingleRun(false)
@@ -189,7 +186,7 @@ void SP_DLG_Simulation::OnInitDialog(wxInitDialogEvent& event)
     InitializeViews();
 
     //load the current view
-    LoadData();
+    //LoadData();
 
     //load the marking, rate, and parameter sets
     LoadSets();
@@ -222,90 +219,11 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
     wxSizer* l_pcRowSizer;
 
-    //Main Sizer
-//    m_pcMainSizer = new wxBoxSizer(wxVERTICAL);
-//    wxSizer* m_pcContentSizer = new wxBoxSizer(wxHORIZONTAL);
-
-    //Controls
- //   wxSizer* l_pcLeftSizer = new wxBoxSizer(wxVERTICAL);
- //   wxSizer* l_pcMiddleSizer = new wxBoxSizer(wxVERTICAL);
-//    m_pcMainSizer->Add(m_pcContentSizer, 1, wxEXPAND);
-
-//    m_pcMainSizer->Add(new wxButton(this, wxID_CANCEL, wxT("Close")), 0, wxALL, 5);
-//   m_pcContentSizer->Add(l_pcLeftSizer, 1, wxDOWN | wxEXPAND, 5);
-//    l_pcContentSizer->Add(l_pcMiddleSizer, 1, wxALL | wxEXPAND, 5);
-
-//    m_pcSimulationControlSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Simulation control")), wxVERTICAL);
-
-
-//   l_pcLeftSizer->Add(m_pcSimulationControlSizer, 1, wxDOWN | wxEXPAND, 5);
-    m_pcOutputSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
-
-//    l_pcMiddleSizer->Add(m_pcOutputSizer, 1, wxEXPAND);
-
-    /*
-    //control bar
-    m_pcTableControlSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1,wxT("") ), wxHORIZONTAL );
-    l_pcMiddleSizer->Add( m_pcTableControlSizer, 0, wxEXPAND | wxALL, 2 );
-    */
-
-   /* wxSizer* l_pcPlaceChoiceSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Select an item to view")), wxVERTICAL);
-    wxSizer* l_pcSelectDeselecteSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
-    //l_pcRightSizer->Add(m_pcModelViewsSizer);
-    l_pcRightSizer->Add(l_pcPlaceChoiceSizer, 1, wxEXPAND);
-    l_pcRightSizer->Add(l_pcSelectDeselecteSizer, 0, wxEXPAND);*/
 
     // place choice
     m_pcPlaceChoiceCheckListBox = new wxCheckListBox(this, -1, wxDefaultPosition, wxSize(200, 200));
 //    l_pcPlaceChoiceSizer->Add(m_pcPlaceChoiceCheckListBox, 1, wxLEFT | wxEXPAND, 5);
     m_pcPlaceChoiceCheckListBox->Hide();
-    //select/deselect all
-//    m_pcSelectClearAllChkBox = new wxCheckBox(this, -1, wxT("Select/deselect all"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE);
-//    l_pcSelectDeselecteSizer->Add(m_pcSelectClearAllChkBox, 1, wxEXPAND);
-//    m_pcSelectClearAllChkBox->Hide();
-//    m_pcSelectClearAllChkBox->Set3StateValue(wxCHK_UNDETERMINED);
-
-    /*
-     m_pcPlotStatusText = new wxStaticText( this, SP_ID_TEXT_PLOT_STATUS, wxT("                                       ") );
-     m_pcPlotStatusText->SetLabel( wxT("Place: -   Timepoint: -   Value: -") );
-     //l_pcPlotStatusSizer->Add( m_pcPlotStatusText, 0, wxALL, 2 );
-     m_pcPlotStatusText->Show( false );
-
-     m_pcPlotControlSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1,wxT("") ), wxHORIZONTAL );
-     m_pcPlotControlSizer->Add( new wxBitmapButton( this, SP_ID_BUTTON_PLOT_ZOOM_V_IN, GetShrinkBitmap(), wxDefaultPosition, wxSize( 30, 30 ) ), 0, wxALL, 2 );
-     m_pcPlotControlSizer->Add( new wxBitmapButton( this, SP_ID_BUTTON_PLOT_ZOOM_V_OUT, GetEnlargeBitmap(), wxDefaultPosition, wxSize( 30, 30 ) ), 0, wxALL, 2 );
-
-     m_pcPlotControlSizer->Add( new wxBitmapButton( this, SP_ID_BUTTON_PLOT_ZOOM_H_IN, GetZoomInBitmap(), wxDefaultPosition, wxSize( 30, 30 ) ), 0, wxALL, 2 );
-     m_pcPlotControlSizer->Add( new wxBitmapButton( this, SP_ID_BUTTON_PLOT_ZOOM_H_OUT, GetZoomOutBitmap(), wxDefaultPosition, wxSize( 30, 30 ) ), 0, wxALL, 2 );
-
-     m_pcPlotControlSizer->Add( new wxButton( this, SP_ID_BUTTON_PLOT_ZOOM_HV_IN, wxT("+"), wxDefaultPosition, wxSize( 30, 30 ) ), 0, wxALL, 2 );
-     m_pcPlotControlSizer->Add( new wxButton( this, SP_ID_BUTTON_PLOT_ZOOM_HV_OUT, wxT("-"), wxDefaultPosition, wxSize( 30, 30 ) ), 0, wxALL, 2 );
-
-     m_pcPlotControlSizer->Add( new wxButton( this, SP_ID_BUTTON_PLOT_ZOOM_CENTRAL, wxT("C"), wxDefaultPosition, wxSize( 30, 30 ) ), 0, wxALL, 2 );
-     //  m_pcPlotControlSizer->Add( new wxButton( this, SP_ID_BUTTON_PLOT_SAVE_AREA, wxT("S"), wxDefaultPosition, wxSize( 30, 30 ) ), 0, wxEXPAND | wxALL, 2 );
-     m_pcPlotControlSizer->Add( new wxButton( this, SP_ID_PRINT, wxT("Print..."), wxDefaultPosition, wxSize( -1, 30 ) ), 0, wxALL, 2 );
-
-     m_pcPlotControlSizer->Add( new wxButton( this, SP_ID_BUTTON_EXPORT_CSV, wxT("CSV-Export"), wxDefaultPosition, wxSize( -1, 30 ) ), 0, wxALL, 2 );
-     m_pcPlotControlSizer->Show( false );
-
-     l_pcMiddleSizer->Add( m_pcPlotControlSizer, 0, wxALL | wxEXPAND, 2 );
-     */
-
-    //Controls the flag parameter is set to include any border f
-//    m_pcSetsSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
-//    m_pcPropertySizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
-//    m_pcDirectExportSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
-//    m_pcSimulationButtonSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
-//    l_pcSimulationControlSizer->Add(m_pcSetsSizer, SP_ID_COMBOBOX_RESULT_VIEWER_TYPE0, wxLEFT | wxRIGHT | wxEXPAND, 5);
-//    l_pcSimulationControlSizer->Add(m_pcPropertySizer, 0, wxLOnCollapseSetsSizerEFT | wxRIGHT | wxEXPAND, 5);
-//    l_pcSimulationControlSizer->Add(m_pcDirectExportSizer, 0, wxLEFT | wxRIGHT | wxEXPAND, 5);
-//    l_pcSimulationControlSizer->Add(m_pcSimulationButtonSizer, 0, wxLEFT | wxRIGHT | wxEXPAND, 5);
-
-    /*m_pcPropertySizer = new wxBoxSizer(wxVERTICAL);
-    m_pcSimulationButtonSizer = new wxBoxSizer(wxVERTICAL);
-    m_pcSetsSizer = new wxBoxSizer(wxVERTICAL);
-    m_pcDirectExportSizer = new wxBoxSizer(wxVERTICAL);
-    m_pcModelViewsSizer = new wxBoxSizer(wxVERTICAL);*/
 
 
     //Simulation Parameters
@@ -379,10 +297,6 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	m_pcSimulationControlSizer->Add(m_pcCollpaneDirectExportSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 	m_pcSimulationControlSizer->Add(new wxStaticLine(m_pcScrolledWindow), wxSizerFlags(0).Expand().Border(wxALL, 5));
 
-	m_pcOutputViewerType = new wxComboBox(m_pcPropertyWindowPropertySizer, -1, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
-	m_pcOutputViewerType->Hide();
-
-
     /***************Simulator starts*********************/
 	// rows of control button#
 	m_pcPropertyWindowSimulationButtonSizer = new wxWindow(m_pcScrolledWindow, -1);
@@ -422,10 +336,6 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	m_pcSimulationStopWatch = new wxStaticText(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("0.000 s"));
 	l_pcRowSizer->Add(m_pcSimulationStopWatch, wxSizerFlags(0).Expand().Border(wxALL, 5));
 	m_pcSimulationButtonSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
-/*
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("")), 0, wxALL, 5);
-	m_pcSimulationButtonSizer->Add(l_pcRowSizer, 1, wxTOP, 0);*/
 
 	m_pcPropertyWindowSimulationButtonSizer->SetSizerAndFit(m_pcSimulationButtonSizer);
 	m_pcSimulationButtonSizer->SetSizeHints(m_pcPropertyWindowSimulationButtonSizer);
@@ -433,44 +343,8 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
 	m_pcMainSizer->Add(new wxButton(this, wxID_CANCEL, wxT("Close")), wxSizerFlags(0).Border(wxALL, 5));
 
-	//create the viewers
-	InitializeResultViewer();
     SetSizerAndFit(m_pcMainSizer);
-/*
-    wxSize temp = m_pcMainSizer->GetSize();
-	temp.SetHeight( wxSystemSettings::GetMetric(wxSYS_SCREEN_X));
-	this->SetSize(temp);
-*/
-}
 
-void SP_DLG_Simulation::InitializeResultViewer()
-{
-    SP_DS_ResultViewer* l_pcResultViewer;
-    SP_VectorViewer::const_iterator l_itViewer;
-
-    //Create the different viewers. Add more viewers here
-    //Table viewer
-    l_pcResultViewer = new SP_DS_TableViewer(this, m_pcOutputSizer);
-    m_apcResultViewers.push_back(l_pcResultViewer);
-
-    //xy plot viewer
-    l_pcResultViewer = new SP_DS_xyPlotViewer(this, m_pcOutputSizer);
-    m_apcResultViewers.push_back(l_pcResultViewer);
-
-    //histogram
-    l_pcResultViewer = new SP_DS_HistogramPlotViewer(this, m_pcOutputSizer);
-    m_apcResultViewers.push_back(l_pcResultViewer);
-
-    //Add all the viewers to the list
-    m_pcOutputViewerType->Clear();
-    for (l_itViewer = m_apcResultViewers.begin(); l_itViewer != m_apcResultViewers.end(); l_itViewer++)
-    {
-        m_pcOutputViewerType->Append((*l_itViewer)->GetName());
-    }
-
-    m_apcResultViewers[m_nCurrentViewer]->Create();
-
-    m_pcOutputViewerType->SetSelection(m_nCurrentViewer);
 }
 
 void SP_DLG_Simulation::SimulatorLogFunction(wxLogLevel p_nLogLevel, const wxString& p_sLogMsg)
@@ -517,22 +391,20 @@ void SP_DLG_Simulation :: OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent) {
 	for (size_t i = 0; i < tmp; ++i) {
 		// get a pointer to the view
 		l_pcView = FindView(m_pcListboxShowAllGraphViewName->GetString(currentSelections[i]));
-		ChangeCurrentView(l_pcView);
 		OpenViewInSeparateWindow(l_pcView);
+        ChangeCurrentView(l_pcView);
 	}
 
 }
 
 void SP_DLG_Simulation::OnItemCheckUncheck(unsigned int p_nListLocation, unsigned int p_nLocation, bool p_nCheck) {
-    CHECK_POINTER(m_apcResultViewers[m_nCurrentViewer], return);
+
     m_pcPlaceChoiceCheckListBox->Check(p_nListLocation, p_nCheck);
     //get item index
     unsigned int l_nSelection = p_nLocation;
 
     //get check state
     bool l_bCheckState = m_pcPlaceChoiceCheckListBox->IsChecked(p_nListLocation);
-    //update the curve state
-    m_apcResultViewers[m_nCurrentViewer]->ShowCurve(l_nSelection, l_bCheckState);
 
     //save the user choice
     CHECK_POINTER(m_pcCurrentTablePlot, return);
@@ -561,9 +433,6 @@ void SP_DLG_Simulation::OnClearPlaceList(bool p_nCheck) {
 
 	SP_DS_ColListAttribute* l_pcCurveInfo = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttribute);
 
-	CHECK_POINTER(m_apcResultViewers[m_nCurrentViewer], return);
-
-	m_apcResultViewers[m_nCurrentViewer]->ClearShownCurves();
 	if (p_nCheck)
 	{
 		for (unsigned int l_nCurve = 0; l_nCurve < l_pcCurveInfo->GetRowCount(); l_nCurve++)
@@ -571,16 +440,13 @@ void SP_DLG_Simulation::OnClearPlaceList(bool p_nCheck) {
 			l_pcCurveInfo->SetCell(l_nCurve, 2, wxT("1"));
 
 			m_pcPlaceChoiceCheckListBox->Check(l_nCurve, true);
-
-			m_apcResultViewers[m_nCurrentViewer]->ShowCurve(l_nCurve, true);
-		}
+        }
 	}
 	else if (!p_nCheck)
 		{
 			for (unsigned int l_nCurve = 0; l_nCurve < l_pcCurveInfo->GetRowCount(); l_nCurve++)
 			{
 				l_pcCurveInfo->SetCell(l_nCurve, 2, wxT("0"));
-				m_apcResultViewers[m_nCurrentViewer]->ShowCurve(l_nCurve, false);
 
 				m_pcPlaceChoiceCheckListBox->Check(l_nCurve, false);
 			}
@@ -589,52 +455,6 @@ void SP_DLG_Simulation::OnClearPlaceList(bool p_nCheck) {
 	//Update the current viewer
 	UpdateViewer();
 	RefreshExternalWindows();
-}
-
-void SP_DLG_Simulation::OnItemDoubleClick(wxWindow *p_pcExternalWindowDialog, unsigned int p_nLocation, unsigned int p_nCount) {
-
-	if (p_nLocation >= p_nCount)
-	{
-		return;
-	}
-
-	SP_DS_ResultViewer* l_pcCurrentResultViewer = m_apcResultViewers[m_nCurrentViewer];
-
-	m_bCanChangeCurrentView = false;
-
-	CHECK_POINTER(l_pcCurrentResultViewer, return);
-
-	int l_nCurveIndex = p_nLocation;
-
-	wxString l_sColor = l_pcCurrentResultViewer->GetCurveColor(l_nCurveIndex);
-	int l_nLineWidth = l_pcCurrentResultViewer->GetCurveLineWidth(l_nCurveIndex);
-	int l_nLineStyle = l_pcCurrentResultViewer->GetCurveLineStyle(l_nCurveIndex);
-
-	SP_DLG_ChangeCurveAttributes l_dial(p_pcExternalWindowDialog, l_sColor, l_nLineWidth, l_nLineStyle);
-
-	if (l_dial.ShowModal() == wxID_OK)
-	{
-		l_pcCurrentResultViewer->SetCurveLineWidth(l_nCurveIndex, l_dial.GetLineWidth());
-
-		l_pcCurrentResultViewer->SetCurveLineStyle(l_nCurveIndex, l_dial.GetLineStyle());
-
-		wxColour l_nColor = l_dial.GetLineColor();
-		int l_nLineWidth = l_dial.GetLineWidth();
-		int l_nLineStyle = l_dial.GetLineStyle();
-
-		l_pcCurrentResultViewer->SetCurveColor(l_nCurveIndex, l_nColor.GetAsString(wxC2S_HTML_SYNTAX));
-
-		SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo")));
-		l_pcCurveInfoList->SetCell(l_nCurveIndex, 3, l_nColor.GetAsString(wxC2S_HTML_SYNTAX));
-		l_pcCurveInfoList->SetCell(l_nCurveIndex, 4, wxString::Format(wxT("%i"), l_nLineWidth));
-		l_pcCurveInfoList->SetCell(l_nCurveIndex, 5, wxString::Format(wxT("%i"), l_nLineStyle));
-
-		//Update the current viewer
-		UpdateViewer();
-		RefreshCurrentExternalView(l_nCurveIndex, l_nColor.GetAsString(wxC2S_HTML_SYNTAX), l_dial.GetLineWidth(), l_dial.GetLineStyle());
-	}
-
-	m_bCanChangeCurrentView = true;
 }
 
 void SP_DLG_Simulation::RefreshCurrentExternalView(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle)
@@ -651,14 +471,6 @@ void SP_DLG_Simulation::RefreshCurrentExternalView(int p_nCurveIndex, wxString p
 			return;
 		}
 	}
-}
-
-void SP_DLG_Simulation::OnEditViewerTypeProperties(wxWindow *p_pcExternalWindowDialog) {
-	 m_bCanChangeCurrentView = false;
-
-	 DoEditViewerProperties(p_pcExternalWindowDialog);
-
-	 m_bCanChangeCurrentView = true;
 }
 
 void SP_DLG_Simulation::OnAddingNewModalView(wxCommandEvent& p_cEvent) {
@@ -700,7 +512,7 @@ void SP_DLG_Simulation::OnAddingNewModalView(wxCommandEvent& p_cEvent) {
 	}
 
 	//Save the current view
-	SaveCurrentView();
+	//SaveCurrentView();
 
 	SetViewAttributeValue(m_pcCurrentTablePlot, wxT("IsCurrent"), wxT("0"));
 
@@ -772,79 +584,15 @@ void SP_DLG_Simulation::OnRemovingModalViews(wxCommandEvent& p_cEvent) {
 
 }
 
-void SP_DLG_Simulation::OnChangingResultViewer(unsigned int p_nLocation) {
-	SaveCurrentView();
-	m_pcOutputViewerType->SetSelection(p_nLocation);
-	//Change the current view viewer
-	SP_DS_Attribute* l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("ViewerType"));
-	CHECK_POINTER(l_pcAttribute, return);
-
-	unsigned int l_nSelectedViewer = p_nLocation;
-
-	l_pcAttribute->SetValueString(GetCurrentViewerType(l_nSelectedViewer));
-
-	ChangeCurrentViewerType();
-
-	LoadData(false);
-
-	//update viewer matrix
-	UpdateViewer();
-}
-
-void SP_DLG_Simulation::DoEditViewerProperties(wxWindow *p_pcExternalWindowDialog)
-{
-    SP_DLG_ResultViewerProperties* l_pcViewerProperties = new SP_DLG_ResultViewerProperties(m_apcResultViewers[m_nCurrentViewer], p_pcExternalWindowDialog);
-
-    if (l_pcViewerProperties->ShowModal() == wxID_OK)
-    {
-        UpdateViewer();
-
-        SaveCurrentView();
-
-        //refresh
-        RefreshExternalWindows();
-    }
-
-    l_pcViewerProperties->Destroy();
-}
-
-void SP_DLG_Simulation::OnEditOtherNodeList(wxWindow *p_pcExternalWindowDialog)
-{
-	wxString l_TempClassName = m_pcGraph->GetNetclass()->GetName();
-
-	if (l_TempClassName == SP_DS_COLSPN_CLASS
-			|| l_TempClassName == SP_DS_COLCPN_CLASS
-			|| l_TempClassName == SP_DS_COLHPN_CLASS)
-	{
-		SaveCurrentView();
-
-		SP_DLG_ColPlacesSelection* l_pcDlg = new SP_DLG_ColPlacesSelection(this, m_pcCurrentTablePlot, p_pcExternalWindowDialog);
-
-		if (l_pcDlg->ShowModal() == wxID_OK)
-		{
-			InitializeViews();
-			LoadData(true);
-		}
-
-		l_pcDlg->Destroy();
-	}
-	else
-	{
-		SaveCurrentView();
-
-		SP_DLG_PlacesSelection* l_pcDlg = new SP_DLG_PlacesSelection(m_pcCurrentTablePlot, p_pcExternalWindowDialog);
-
-		if (l_pcDlg->ShowModal() == wxID_OK)
-		{
-			InitializeViews();
-			LoadData(true);
-		}
-		l_pcDlg->Destroy();
-	}
-}
-
 void SP_DLG_Simulation::OnEditXAxis(wxWindow *p_pcExternalWindowDialog) {
     CHECK_POINTER(m_pcCurrentTablePlot, return);
+    CHECK_POINTER(m_pcMainSimulator, return);
+
+    if(m_pcMainSimulator->GetResultMatrix().empty())
+    {
+        //no results so far
+        return;
+    }
 
     m_bCanChangeCurrentView = false;
 
@@ -865,8 +613,6 @@ void SP_DLG_Simulation::OnEditXAxis(wxWindow *p_pcExternalWindowDialog) {
 
         SetViewAttributeValue(m_pcCurrentTablePlot, wxT("XAxisTitle"), l_pcDialog->GetSelectedSubCategory());
 
-        m_apcResultViewers[m_nCurrentViewer]->LoadViewFromSnoopyFormat(m_pcCurrentTablePlot);
-
         UpdateXAxisValues();
 
         UpdateViewer();
@@ -883,16 +629,18 @@ void SP_DLG_Simulation::OnExportClicked(wxWindow *p_pcExternalWindowDialog, int 
 	}
 }
 
-bool SP_DLG_Simulation::CreateViewerDataFromRegex()
+bool SP_DLG_Simulation::CreateViewerDataFromRegex(SP_DS_Metadata* p_pcView)
 {
-	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*> (m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo")));
+    CHECK_POINTER(p_pcView,return false);
+
+	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*> (p_pcView->GetAttribute(wxT("CurveInfo")));
 	if(l_pcCurveInfoList->GetRowCount() > 0)
 	{
 		//curveinfo already created
 		return false;
 	}
 
-	SP_DS_Attribute* l_pcRegExAttr = m_pcCurrentTablePlot->GetAttribute(wxT("RegEx"));
+	SP_DS_Attribute* l_pcRegExAttr = p_pcView->GetAttribute(wxT("RegEx"));
     CHECK_POINTER(l_pcRegExAttr, return false);
 
     wxString l_RegExString = l_pcRegExAttr->GetValueString();
@@ -901,9 +649,9 @@ bool SP_DLG_Simulation::CreateViewerDataFromRegex()
     	return false;
     }
 
-	bool l_RegExInvert = static_cast<SP_DS_BoolAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("RegExInvert")))->GetValue();
+	bool l_RegExInvert = static_cast<SP_DS_BoolAttribute*>(p_pcView->GetAttribute(wxT("RegExInvert")))->GetValue();
 	wxString l_RegExOutputType = wxT("Unfolded");
-	SP_DS_Attribute* l_pcAttr =	m_pcCurrentTablePlot->GetAttribute(wxT("OutputType"));
+	SP_DS_Attribute* l_pcAttr =	p_pcView->GetAttribute(wxT("OutputType"));
 	if(l_pcAttr)
 	{
 		l_RegExOutputType = l_pcAttr->GetValueString();
@@ -912,7 +660,7 @@ bool SP_DLG_Simulation::CreateViewerDataFromRegex()
 	SP_VectorString l_asColours;
 
 	//get the current nodeclass type
-	SP_DS_Attribute* l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("Nodeclass"));
+	SP_DS_Attribute* l_pcAttribute = p_pcView->GetAttribute(wxT("Nodeclass"));
 	CHECK_POINTER(l_pcAttribute,return false);
 	wxString l_sElementType = l_pcAttribute->GetValueString();
 
@@ -1129,8 +877,6 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
     //remove shown curves
     p_pcViewer->ClearShownCurves();
 
-    CreateViewerDataFromRegex();
-
     SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(p_pcView->GetAttribute(wxT("CurveInfo")));
     CHECK_POINTER(l_pcCurveInfoList, return false);
 
@@ -1143,7 +889,9 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
 		m_ArrayUnTranstions.Add(m_asTransitionNames[i]);
 	}
 
-	for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
+    CreateViewerDataFromRegex(p_pcView);
+
+    for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
 	{
 		wxString l_sPosition = l_pcCurveInfoList->GetCell(l_nRow, 0);
 		unsigned long l_nPosition = 0;
@@ -1203,13 +951,13 @@ void SP_DLG_Simulation::LoadData(bool p_bCreateNewTree)
 {
     wxArrayString l_asPlaces;
 
-    LoadViewerData(m_apcResultViewers[m_nCurrentViewer], m_pcCurrentTablePlot, l_asPlaces);
+    //LoadViewerData(m_apcResultViewers[m_nCurrentViewer], m_pcCurrentTablePlot, l_asPlaces);
 
     //Add the loaded items to the list
     m_pcPlaceChoiceCheckListBox->Set(l_asPlaces);
 
     //load old setting
-    LoadViewProperties();
+    //LoadViewProperties();
 }
 
 void SP_DLG_Simulation::LoadSets()
@@ -1320,7 +1068,7 @@ void SP_DLG_Simulation::LoadParameters()
     m_pcMainSimulator->SetParameterNames(l_asParameterNames);
     m_pcMainSimulator->SetParameterValues(l_anParameterValue);
 }
-
+/*
 void SP_DLG_Simulation::SaveSelectedCurves()
 {
     CHECK_POINTER(m_pcCurrentTablePlot, return);
@@ -1330,8 +1078,6 @@ void SP_DLG_Simulation::SaveSelectedCurves()
     CHECK_POINTER(l_pcAttribute, return);
 
     SP_DS_ColListAttribute* l_pcPlaceIdList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttribute);
-
-    CHECK_POINTER(m_apcResultViewers[m_nCurrentViewer], return);
 
     for (unsigned int l_nCurve = 0; l_nCurve < l_pcPlaceIdList->GetRowCount(); l_nCurve++)
     {
@@ -1445,10 +1191,6 @@ void SP_DLG_Simulation::LoadSelectedCurves()
 			m_ArrayColTranstions.Add(l_sTransName);
 		}
 
-/*		SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayColPlaces.GetCount()));
-		SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayColTranstions.GetCount()));
-		SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnPlaces.GetCount()));
-		SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnTranstions.GetCount()));*/
 	} else {
 
 		m_ArrayUnPlaces.Clear();
@@ -1567,7 +1309,8 @@ void SP_DLG_Simulation::LoadSelectedCurves()
 
 		//load Curve color
 		wxString l_sColor = l_pcPlaceIdList->GetCell(l_nCurve, 3);
-		if (l_sColor == wxT(""))
+
+        if (l_sColor == wxT(""))
 		{
 			l_sColor = GetColourString(l_nCurve);
 		}
@@ -1587,7 +1330,7 @@ void SP_DLG_Simulation::LoadSelectedCurves()
 	}
 
 }
-
+*/
 
 void SP_DLG_Simulation::OnColourClick(wxGridEvent& p_cEvent)
 {
@@ -2203,7 +1946,7 @@ void SP_DLG_Simulation::OnLoadData(wxCommandEvent& p_cEvent)
 SP_DLG_Simulation::~SP_DLG_Simulation()
 {
     //Save the current view
-    SaveCurrentView();
+    //SaveCurrentView();
 
     wxDELETE(m_pcMainSimulator);
 
@@ -2212,12 +1955,6 @@ SP_DLG_Simulation::~SP_DLG_Simulation()
     wxDELETE(m_pcExport);
     wxDELETE(m_pcExportBufferdOutputStream);
     wxDELETE(m_pcExportFileOutputStream);
-
-    //delete the viewers
-    for (unsigned int l_nViewer = 0; l_nViewer < m_apcResultViewers.size(); l_nViewer++)
-    {
-        wxDELETE(m_apcResultViewers[l_nViewer]);
-    }
 
      //read all views
      for (SP_DS_Metadata* l_pcMeta : *m_pcGraph->GetMetadataclass(wxT("Plot"))->GetElements())
@@ -2485,19 +2222,7 @@ void SP_DLG_Simulation::InitializeViews()
 
             m_pcListboxShowAllGraphViewName->SetSelection(l_nPos);
         }
-/*
-        //check if the view is empty, initialize it with the default values
-        SP_DS_Attribute* l_pcAttribute = (*l_itElem)->GetAttribute(wxT("CurveInfo"));
 
-        CHECK_POINTER(l_pcAttribute, return);
-
-        SP_DS_ColListAttribute* l_pcPlaceIdList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttribute);
-
-        if (l_pcPlaceIdList->GetRowCount() == 0)
-        {
-            InitializeEmptyView((*l_itElem));
-        }
-*/
         l_nPos++;
     }
 
@@ -2510,89 +2235,6 @@ void SP_DLG_Simulation::InitializeViews()
 
         m_pcListboxShowAllGraphViewName->SetSelection(0);
     }
-    //change the current viewer type
-    ChangeCurrentViewerType();
-}
-
-void SP_DLG_Simulation::ChangeCurrentViewerType()
-{
-    unsigned int l_nNewCurrentView = 0;
-
-    CHECK_POINTER(m_pcCurrentTablePlot, return);
-
-    wxString l_sViewerType = GetViewAttributeValue(m_pcCurrentTablePlot, wxT("ViewerType"));
-
-    //set the current viewer type
-    if (l_sViewerType.IsSameAs(wxT("Tabular")))
-    {
-        l_nNewCurrentView = 0;
-    }
-    else
-        if (l_sViewerType.IsSameAs(wxT("xyPlot")))
-        {
-            l_nNewCurrentView = 1;
-        }
-        else
-            if (l_sViewerType.IsSameAs(wxT("Histogram")))
-            {
-                l_nNewCurrentView = 2;
-            }
-            else
-            {
-                l_nNewCurrentView = 1;
-            }
-
-    if (l_nNewCurrentView < m_apcResultViewers.size())
-    {
-        //Destroy old viewer
-        m_apcResultViewers[m_nCurrentViewer]->Destroy();
-
-        //Get the index of the new selected viewer
-        m_nCurrentViewer = l_nNewCurrentView;
-
-        m_apcResultViewers[m_nCurrentViewer]->Create();
-    }
-
-    //Change the box selection
-    m_pcOutputViewerType->SetSelection(m_nCurrentViewer);
-    RefreshExternalWindows();
-
-}
-
-
-void SP_DLG_Simulation::OnSelectXAxis(wxCommandEvent& p_cEvent)
-{
-    CHECK_POINTER(m_pcCurrentTablePlot, return);
-
-    m_bCanChangeCurrentView = false;
-
-    wxString l_sCategory = GetViewAttributeValue(m_pcCurrentTablePlot, wxT("XAxisVariable"));
-    wxString l_sSubCategory = GetViewAttributeValue(m_pcCurrentTablePlot, wxT("XAxisVariableName"));
-
-    SP_VectorString l_asTimeVector;
-    l_asTimeVector.push_back(wxT("Simulation Time"));
-    l_asTimeVector.push_back(wxT("Run Time"));
-    m_pcXAxisChoices[wxT("Time")] = &l_asTimeVector;
-
-    SP_DLG_SelectXAxisVariable* l_pcDialog = new SP_DLG_SelectXAxisVariable(this, m_pcXAxisChoices, l_sCategory, l_sSubCategory);
-
-    if (l_pcDialog->ShowModal() == wxID_OK)
-    {
-        SetViewAttributeValue(m_pcCurrentTablePlot, wxT("XAxisVariable"), l_pcDialog->GetSelectedCategory());
-        SetViewAttributeValue(m_pcCurrentTablePlot, wxT("XAxisVariableName"), l_pcDialog->GetSelectedSubCategory());
-
-        SetViewAttributeValue(m_pcCurrentTablePlot, wxT("XAxisTitle"), l_pcDialog->GetSelectedSubCategory());
-
-        m_apcResultViewers[m_nCurrentViewer]->LoadViewFromSnoopyFormat(m_pcCurrentTablePlot);
-
-        UpdateXAxisValues();
-
-        UpdateViewer();
-    }
-
-    l_pcDialog->Destroy();
-
-    m_bCanChangeCurrentView = true;
 }
 
 void SP_DLG_Simulation::OpenViewInSeparateWindow(SP_DS_Metadata* p_pcModelView)
@@ -2608,7 +2250,7 @@ void SP_DLG_Simulation::OpenViewInSeparateWindow(SP_DS_Metadata* p_pcModelView)
         }
     }
 
-    SP_DLG_ShowAllModelView* l_pcShowModelViewsDlg = new SP_DLG_ShowAllModelView(this, p_pcModelView);
+    SP_DLG_ShowAllModelView* l_pcShowModelViewsDlg = new SP_DLG_ShowAllModelView(this, p_pcModelView, m_pcGraph);
 
     // check if the window is created correctly
     if (l_pcShowModelViewsDlg != NULL)
@@ -2709,7 +2351,7 @@ bool SP_DLG_Simulation::IsViewNameExist(const wxString& p_sViewName)
 void SP_DLG_Simulation::ChangeCurrentView(SP_DS_Metadata* p_pcView)
 {
     //Save the current view
-    SaveCurrentView();
+    //SaveCurrentView();
 
     CHECK_POINTER(p_pcView, return);
 
@@ -2720,7 +2362,7 @@ void SP_DLG_Simulation::ChangeCurrentView(SP_DS_Metadata* p_pcView)
     SetViewAttributeValue(m_pcCurrentTablePlot, wxT("IsCurrent"), wxT("1"));
 
     //change the current view
-    ChangeCurrentViewerType();
+    //ChangeCurrentViewerType();
 
     //call loadData to add the curves to the viewer
     LoadData(false);
@@ -2770,52 +2412,6 @@ SP_DS_Metadata* SP_DLG_Simulation::FindView(const wxString& p_sViewName)
 
     //if we didn't find it, return NULL
     return NULL;
-}
-
-
-void SP_DLG_Simulation::SaveCurrentView()
-{
-
-    //get the current viewer type
-    SP_DS_Attribute* l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("ViewerType"));
-    CHECK_POINTER(l_pcAttribute, return);
-
-    l_pcAttribute->SetValueString(GetCurrentViewerType(m_nCurrentViewer));
-
-    //Save the user selection
-   	SaveSelectedCurves();
-
-    CHECK_POINTER(m_apcResultViewers[m_nCurrentViewer], return);
-
-    m_apcResultViewers[m_nCurrentViewer]->SaveViewToSnoopyFormat(m_pcCurrentTablePlot);
-
-    SP_Core::Instance()->GetRootDocument()->Modify(true);
-}
-wxString SP_DLG_Simulation::GetCurrentViewerType(const unsigned int& p_nType)
-{
-    switch (p_nType)
-    {
-    case 0:
-        return wxT("Tabular");
-    case 1:
-        return wxT("xyPlot");
-    case 2:
-        return wxT("Histogram");
-    default:
-        return wxT("xyPlot");
-    }
-}
-
-void SP_DLG_Simulation::LoadViewProperties()
-{
-    //load selected curves options
-    LoadSelectedCurves();
-
-    CHECK_POINTER(m_apcResultViewers[m_nCurrentViewer], return);
-
-    m_apcResultViewers[m_nCurrentViewer]->LoadViewFromSnoopyFormat(m_pcCurrentTablePlot);
-
-    UpdateViewer();
 }
 
 void SP_DLG_Simulation::SetViewAttributeValue(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName, const wxString& p_sValue)
@@ -2972,6 +2568,8 @@ void SP_DLG_Simulation::LoadNodeColours(const wxString& p_nNodeName, SP_VectorSt
 
     CHECK_POINTER(l_pcNodeList, return);
 
+    bool l_UseNodeColour = static_cast<SP_DS_BoolAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("NodeColour")))->GetValue();
+
     for (l_itNode = l_pcNodeList->begin(); l_itNode != l_pcNodeList->end(); l_itNode++)
     {
         SP_ListGraphic* l_pcGraphics = (*l_itNode)->GetGraphics();
@@ -2989,7 +2587,7 @@ void SP_DLG_Simulation::LoadNodeColours(const wxString& p_nNodeName, SP_VectorSt
             }
         }
 
-        if (l_cColour != *wxWHITE)
+        if (l_cColour != *wxWHITE && l_UseNodeColour)
         {
             p_asColours.push_back(l_cColour.GetAsString(wxC2S_HTML_SYNTAX));
         }

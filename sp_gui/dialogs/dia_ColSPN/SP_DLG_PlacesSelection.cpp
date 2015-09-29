@@ -37,7 +37,8 @@ enum
 	SP_ID_OUTPUTTYPERADIOBOX,
 	SP_ID_CHECKLISTBOX_PLACE_CHOICE,
 	SP_ID_BUTTON_REGEX_COMPILE_SELECT,
-	SP_ID_CHECKBOX_REGEX_INVERT_COMPILE
+	SP_ID_CHECKBOX_REGEX_INVERT_COMPILE,
+	SP_ID_CHECKBOX_NODE_COLOUR
 };
 
 BEGIN_EVENT_TABLE( SP_DLG_PlacesSelection, wxDialog )
@@ -158,6 +159,11 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 	{
 		m_pcPlaceTransitionRadioBox->SetSelection(1);
 	}
+
+	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Colour")), wxHORIZONTAL);
+	m_pcPlaceChoiceColour = new wxCheckBox(this, SP_ID_CHECKBOX_NODE_COLOUR, wxT("Use node colour"));
+	l_pcRowSizer->Add(m_pcPlaceChoiceColour, 1, wxALL | wxEXPAND, 5);
+	l_pcLeftContentSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
 	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("RegEx")), wxHORIZONTAL);
 	m_pcPlaceChoiceRegexInvert = new wxCheckBox(this, SP_ID_CHECKBOX_REGEX_INVERT_COMPILE, wxT("Invert"));
@@ -530,36 +536,44 @@ void SP_DLG_PlacesSelection::GetSelResults()
 
 void SP_DLG_PlacesSelection::LoadNodeColours(const wxString& p_nNodeName,SP_VectorString& p_asColours)
 {
-	 SP_DS_Nodeclass* l_pcNodeclass;
-	 const SP_ListNode* l_pcNodeList;
+	SP_DS_Nodeclass *l_pcNodeclass;
+	const SP_ListNode *l_pcNodeList;
 
-	 SP_ListNode::const_iterator l_itNode;
+	SP_ListNode::const_iterator l_itNode;
 
-	  l_pcNodeclass = m_pcGraph->GetNodeclass(p_nNodeName);
+	l_pcNodeclass = m_pcGraph->GetNodeclass(p_nNodeName);
 
-	  if(l_pcNodeclass==NULL) return;
+	if (l_pcNodeclass == NULL) return;
 
-	  l_pcNodeList=l_pcNodeclass->GetElements();
+	l_pcNodeList = l_pcNodeclass->GetElements();
 
-	  if(l_pcNodeList==NULL) return;
+	if (l_pcNodeList == NULL) return;
 
-	  for(l_itNode=l_pcNodeList->begin();l_itNode!=l_pcNodeList->end();l_itNode++)
-	  {
-		  SP_ListGraphic* l_pcGraphics=(*l_itNode)->GetGraphics();
+	bool l_bUseNodeColour = m_pcPlaceChoiceColour->GetValue();
 
-		  if(l_pcGraphics==NULL) return;
+	for (l_itNode = l_pcNodeList->begin(); l_itNode != l_pcNodeList->end(); l_itNode++) {
+		SP_ListGraphic *l_pcGraphics = (*l_itNode)->GetGraphics();
 
-		  wxColour l_cColour=(*l_pcGraphics->begin())->GetBrush()->GetColour();
+		if (l_pcGraphics == NULL) return;
 
-		  if(l_cColour!=wxColour(255,255,255))
-		  {
-			  p_asColours.push_back(l_cColour.GetAsString(wxC2S_HTML_SYNTAX));
-		  }
-		  else
-		  {
-			  p_asColours.push_back(wxT(""));
-		  }
-	  }
+		wxColour l_cColour = *wxWHITE;
+		for(SP_ListGraphic::const_iterator itG = l_pcGraphics->begin();
+			itG != l_pcGraphics->end() && l_cColour == *wxWHITE; ++itG)
+		{
+			if((*itG)->GetGraphicState() == SP_STATE_NORMAL ||
+			   (*itG)->GetGraphicState() == SP_STATE_COARSEBORDERTOP)
+			{
+				l_cColour = (*itG)->GetBrush()->GetColour();
+			}
+		}
+
+		if (l_cColour != *wxWHITE && l_bUseNodeColour) {
+			p_asColours.push_back(l_cColour.GetAsString(wxC2S_HTML_SYNTAX));
+		}
+		else {
+			p_asColours.push_back(wxT(""));
+		}
+	}
 }
 
 
@@ -572,6 +586,8 @@ void SP_DLG_PlacesSelection::SaveMetaData()
 	wxString l_nRegexString = m_pcPlaceChoiceOutRegex->GetValue();
 	m_pcEditMetadata->GetAttribute(wxT("RegEx"))->SetValueString(l_nRegexString);
 	static_cast<SP_DS_BoolAttribute*>(m_pcEditMetadata->GetAttribute(wxT("RegExInvert")))->SetValue(m_pcPlaceChoiceRegexInvert->GetValue());
+
+	static_cast<SP_DS_BoolAttribute*>(m_pcEditMetadata->GetAttribute(wxT("NodeColour")))->SetValue(m_pcPlaceChoiceColour->GetValue());
 
 	//check if this net is a coloured one
 	bool l_bColouredNet=false;
@@ -825,7 +841,10 @@ void SP_DLG_PlacesSelection::InitilizeFromMetaData()
 	m_pcNameTextCtrl->SetValue((m_pcEditMetadata->GetAttribute(wxT("Name")))->GetValueString());
 
 	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*> (m_pcEditMetadata->GetAttribute(wxT("CurveInfo")));
-	
+
+
+	bool l_UseNodeColour = static_cast<SP_DS_BoolAttribute*>(m_pcEditMetadata->GetAttribute(wxT("NodeColour")))->GetValue();
+	m_pcPlaceChoiceColour->SetValue(l_UseNodeColour);
 
 	//load data to listboxout
 	wxString l_RegExString = m_pcEditMetadata->GetAttribute(wxT("RegEx"))->GetValueString();

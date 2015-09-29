@@ -99,7 +99,7 @@ EVT_BUTTON( SP_ID_BUTTON_SIMULATION_PROPERTIES, SP_DLG_ColHPNSimultionResults ::
 EVT_BUTTON( SP_ID_BUTTON_CONTINUOUS_SOLVER_PROPERTIES, SP_DLG_ColHPNSimultionResults :: OnODESolverProperties )
 EVT_BUTTON( SP_ID_BUTTON_SAVE_ODE, SP_DLG_ColHPNSimultionResults :: SaveODE )
 
-EVT_THREAD(SP_SIMULATION_THREAD_EVENT,SP_DLG_HybridSimulationResults::OnSimulatorThreadEvent)
+EVT_SIMTHREAD(SP_SIMULATION_THREAD_EVENT,SP_DLG_HybridSimulationResults::OnSimulatorThreadEvent)
 
 END_EVENT_TABLE()
 
@@ -242,7 +242,7 @@ bool SP_DLG_ColHPNSimultionResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewe
 	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnPlaces.GetCount()));
 	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnTranstions.GetCount()));*/
 
-	CreateViewerDataFromRegex();
+	CreateViewerDataFromRegex(p_pcView);
 
 	for(unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
 	{

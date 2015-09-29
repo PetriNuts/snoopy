@@ -25,22 +25,22 @@ SP_DS_ViewerAttributeCheckBox::~SP_DS_ViewerAttributeCheckBox()
 }
 void SP_DS_ViewerAttributeCheckBox::Create(wxWindow* p_pcParent,wxSizer* p_pcSizer)
 {
-	       wxBoxSizer* l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( p_pcParent,wxID_ANY,wxT("") ), wxHORIZONTAL);
+    wxBoxSizer* l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( p_pcParent,wxID_ANY,wxT("") ), wxHORIZONTAL);
 
-	       //create a check box control to hold the attribute value
-	        m_pcValueCheckBox=new wxCheckBox(p_pcParent,wxID_ANY,m_sDisplayName);
-	        l_pcRowSizer->Add(m_pcValueCheckBox,0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    //create a check box control to hold the attribute value
+	m_pcValueCheckBox=new wxCheckBox(p_pcParent,wxID_ANY,m_sDisplayName);
+	l_pcRowSizer->Add(m_pcValueCheckBox,0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 
-	        m_pcValueCheckBox->SetValue(m_bValue);
+	m_pcValueCheckBox->SetValue(m_bValue);
 
-	        p_pcSizer->Add(l_pcRowSizer,0, wxALL, 5);
+	p_pcSizer->Add(l_pcRowSizer,0, wxALL, 5);
 }
 
 void SP_DS_ViewerAttributeCheckBox::Update()
 {
-            if(m_pcValueCheckBox!=NULL)
-            {
-            	m_bValue=m_pcValueCheckBox->GetValue();
-            }
+	if(m_pcValueCheckBox!=NULL)
+	{
+		m_bValue = m_pcValueCheckBox->GetValue();
+	}
 }
 

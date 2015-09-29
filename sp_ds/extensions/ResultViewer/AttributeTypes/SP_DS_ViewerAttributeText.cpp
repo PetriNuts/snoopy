@@ -23,21 +23,21 @@ SP_DS_ViewerAttributeText::~SP_DS_ViewerAttributeText()
 
 void SP_DS_ViewerAttributeText::Create(wxWindow* p_pcParent,wxSizer* p_pcSizer)
 {
-	        wxBoxSizer* l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( p_pcParent,wxID_ANY,wxT("") ), wxHORIZONTAL);
+	wxBoxSizer* l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( p_pcParent,wxID_ANY,wxT("") ), wxHORIZONTAL);
 
-	        //create a text control to hold the attribute value
-	        m_pcValueTxtCtrl=new wxTextCtrl(p_pcParent,wxID_ANY,m_sValue);
+	//create a text control to hold the attribute value
+	m_pcValueTxtCtrl=new wxTextCtrl(p_pcParent,wxID_ANY,m_sValue);
 
-	        l_pcRowSizer->Add(new wxStaticText(p_pcParent,wxID_ANY,m_sDisplayName),0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
-	        l_pcRowSizer->Add(m_pcValueTxtCtrl,0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+	l_pcRowSizer->Add(new wxStaticText(p_pcParent,wxID_ANY,m_sDisplayName),0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+	l_pcRowSizer->Add(m_pcValueTxtCtrl,0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 
-	        p_pcSizer->Add(l_pcRowSizer,0, wxALL, 5);
+	p_pcSizer->Add(l_pcRowSizer,0, wxALL, 5);
 }
 
 void SP_DS_ViewerAttributeText::Update()
 {
-            if(m_pcValueTxtCtrl!=NULL)
-            {
-            	m_sValue=m_pcValueTxtCtrl->GetValue();
-            }
+	if(m_pcValueTxtCtrl!=NULL)
+	{
+		m_sValue=m_pcValueTxtCtrl->GetValue();
+	}
 }

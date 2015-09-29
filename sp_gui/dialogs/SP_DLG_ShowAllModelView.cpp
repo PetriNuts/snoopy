@@ -10,16 +10,21 @@
 #include "sp_ds/SP_DS_Graph.h"
 #include "sp_ds/SP_DS_Node.h"
 
-#include "sp_ds/extensions/SP_DS_Simulation.h"
-#include "sp_gui/dialogs/SP_DLG_Simulation.h"
-
-#include "sp_gui/dialogs/SP_DLG_ShowAllModelView.h"
 #include "sp_ds/attributes/SP_DS_BoolAttribute.h"
+#include "sp_ds/extensions/SP_DS_Simulation.h"
+
+#include "sp_gui/dialogs/SP_DLG_Simulation.h"
+#include "sp_gui/dialogs/dia_ColSPN/SP_DLG_PlacesSelection.h"
+#include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColPlacesSelection.h"
+#include "sp_gui/dialogs/dia_SteeringGUI/SP_DLG_ChangeCurveAttributes.h"
+#include "sp_gui/dialogs/SP_DLG_ShowAllModelView.h"
+#include "sp_gui/dialogs/SP_DLG_ResultViewerProperties.h"
 
 #include "sp_ds/extensions/ResultViewer/SP_DS_PlotViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_TableViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_xyPlotViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_HistogramPlotViewer.h"
+
 #include <wx/scrolwin.h>
 #include <wx/regex.h>
 
@@ -46,23 +51,19 @@ END_EVENT_TABLE()
  * please have a look
  */
 
-SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_DS_Metadata* p_pcModelView) :
+SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_DS_Metadata* p_pcModelView, SP_DS_Graph* p_pcGraph) :
 		wxFrame(NULL, -1, wxT("Show all views"),
 				wxDefaultPosition,
 				wxSize(800, 750),
 				wxFRAME_FLOAT_ON_PARENT | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | wxCAPTION | wxCLOSE_BOX),
-		m_pcModelView(p_pcModelView), m_pcParentWnd(p_pcWnd), m_bIsDisconnected(false), m_bIsShown(true)
+		m_pcModelView(p_pcModelView), m_pcParentWnd(p_pcWnd), m_pcGraph(p_pcGraph),
+		m_bIsDisconnected(false), m_bIsShown(true)
 {
 	if (m_pcModelView == NULL)
 		return;
 
 	//use this to check for coloured simulation
 	m_bIsColouredSimulation = m_pcModelView->GetAttribute(wxT("OutputType")) != nullptr;
-
-	wxPoint pos = p_pcWnd->GetPosition();
-	wxSize size = p_pcWnd->GetSize();
-	pos.x += size.GetX() + 10;
-	SetPosition(pos);
 
 	wxSizer* l_pcMainSizer = new wxBoxSizer(wxVERTICAL);
 	m_pcContentSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -222,6 +223,11 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 
 	this->SetSize(temp);
 
+	wxPoint pos = p_pcWnd->GetPosition();
+	wxSize size = p_pcWnd->GetSize();
+	pos.x += size.GetX() + 10;
+	SetPosition(pos);
+
 	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnClose, this, wxID_CANCEL);
 	Bind(wxEVT_CLOSE_WINDOW, &SP_DLG_ShowAllModelView::OnWindowClose, this);
 
@@ -252,8 +258,30 @@ SP_DLG_ShowAllModelView::~SP_DLG_ShowAllModelView()
 }
 
 void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
-	unsigned int l_selection = p_cEvent.GetSelection();
-	m_pcParentWnd->OnItemDoubleClick(this, l_selection, m_pcPlaceChoiceCheckListBox->GetCount());
+	int l_nCurveIndex = p_cEvent.GetSelection();
+
+	wxString l_sColor = m_pcResultViewer->GetCurveColor(l_nCurveIndex);
+	int l_nLineWidth = m_pcResultViewer->GetCurveLineWidth(l_nCurveIndex);
+	int l_nLineStyle = m_pcResultViewer->GetCurveLineStyle(l_nCurveIndex);
+
+	SP_DLG_ChangeCurveAttributes l_dial(this, l_sColor, l_nLineWidth, l_nLineStyle);
+
+	if (l_dial.ShowModal() == wxID_OK)
+	{
+
+		wxColour l_nColor = l_dial.GetLineColor();
+		int l_nLineWidth = l_dial.GetLineWidth();
+		int l_nLineStyle = l_dial.GetLineStyle();
+
+		SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(m_pcModelView->GetAttribute(wxT("CurveInfo")));
+		l_pcCurveInfoList->SetCell(l_nCurveIndex, 3, l_nColor.GetAsString(wxC2S_HTML_SYNTAX));
+		l_pcCurveInfoList->SetCell(l_nCurveIndex, 4, wxString::Format(wxT("%i"), l_nLineWidth));
+		l_pcCurveInfoList->SetCell(l_nCurveIndex, 5, wxString::Format(wxT("%i"), l_nLineStyle));
+
+		//Update the current viewer
+		m_pcParentWnd->UpdateViewer();
+		RefreshCurrentWindow(l_nCurveIndex, l_nColor.GetAsString(wxC2S_HTML_SYNTAX), l_dial.GetLineWidth(), l_dial.GetLineStyle());
+	}
 }
 
 void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
@@ -275,7 +303,17 @@ void SP_DLG_ShowAllModelView::OnSelectClearAllItems(wxCommandEvent& p_cEvent)
 
 void SP_DLG_ShowAllModelView::OnEditViewerProperties(wxCommandEvent& p_cEvent)
 {
-	m_pcParentWnd->OnEditViewerTypeProperties(this);
+	SP_DLG_ResultViewerProperties* l_pcViewerProperties = new SP_DLG_ResultViewerProperties(m_pcResultViewer, this);
+
+	if (l_pcViewerProperties->ShowModal() == wxID_OK)
+	{
+		m_pcParentWnd->UpdateViewer();
+		m_pcResultViewer->SaveViewToSnoopyFormat(m_pcModelView);
+		RefreshWindow();
+		SP_Core::Instance()->GetRootDocument()->Modify(true);
+	}
+
+	l_pcViewerProperties->Destroy();
 
 	wxSize temp;
 	wxString temp1 = m_pcModelView->GetAttribute(wxT("WindowWidth"))->GetValueString();
@@ -302,32 +340,42 @@ void SP_DLG_ShowAllModelView::OnEditViewerProperties(wxCommandEvent& p_cEvent)
 
 void SP_DLG_ShowAllModelView::OnChangeResultViewer(wxCommandEvent& event)
 {
+	//Change the current view viewer
+	SP_DS_Attribute* l_pcAttribute = m_pcModelView->GetAttribute(wxT("ViewerType"));
+	CHECK_POINTER(l_pcAttribute, return);
 	unsigned int l_nLocation = m_pcOutputViewerType->GetSelection();
 	if (m_pcOutputViewerType->GetStringSelection() == wxT("Tabular"))
 	{
 		m_pcOutputExportType->Delete(1);
 		m_pcXAxis->Enable(false);
 		m_pcOutputExportType->SetSelection(0);
+		l_pcAttribute->SetValueString(wxT("Tabular"));
 	}
 	else
-		if (m_pcOutputViewerType->GetStringSelection() == wxT("xyPlot"))
+	if (m_pcOutputViewerType->GetStringSelection() == wxT("xyPlot"))
+	{
+		m_pcXAxis->Enable(true);
+		if (m_pcOutputExportType->GetCount() != 2)
 		{
-			m_pcXAxis->Enable(true);
-			if (m_pcOutputExportType->GetCount() != 2)
-			{
-				m_pcOutputExportType->Append(wxT("Image Export"));
-			}
+			m_pcOutputExportType->Append(wxT("Image Export"));
 		}
-		else
-			if (m_pcOutputViewerType->GetStringSelection() == wxT("Histogram"))
-			{
-				if (m_pcOutputExportType->GetCount() != 2)
-				{
-					m_pcOutputExportType->Append(wxT("Image Export"));
-				}
-				m_pcXAxis->Enable(false);
-			}
-	m_pcParentWnd->OnChangingResultViewer(l_nLocation);
+		l_pcAttribute->SetValueString(wxT("xyPlot"));
+	}
+	else
+	if (m_pcOutputViewerType->GetStringSelection() == wxT("Histogram"))
+	{
+		if (m_pcOutputExportType->GetCount() != 2)
+		{
+			m_pcOutputExportType->Append(wxT("Image Export"));
+		}
+		m_pcXAxis->Enable(false);
+		l_pcAttribute->SetValueString(wxT("Histogram"));
+	}
+
+	m_pcParentWnd->LoadData(false);
+	//update viewer matrix
+	m_pcParentWnd->UpdateViewer();
+	RefreshWindow();
 }
 
 void SP_DLG_ShowAllModelView::OnExportClick(wxCommandEvent& event)
@@ -376,11 +424,46 @@ void SP_DLG_ShowAllModelView::OnExportClick(wxCommandEvent& event)
 void SP_DLG_ShowAllModelView::OnChangeXAxis(wxCommandEvent& event)
 {
 	m_pcParentWnd->OnEditXAxis(this);
+	RefreshWindow();
 }
 
 void SP_DLG_ShowAllModelView::OnEditNodeList(wxCommandEvent& event)
 {
-	m_pcParentWnd->OnEditOtherNodeList(this);
+	wxString l_TempClassName = m_pcGraph->GetNetclass()->GetName();
+
+	if (l_TempClassName == SP_DS_COLSPN_CLASS
+		|| l_TempClassName == SP_DS_COLCPN_CLASS
+		|| l_TempClassName == SP_DS_COLHPN_CLASS)
+	{
+		//m_pcParentWnd->SaveCurrentView();
+
+		SP_DLG_ColPlacesSelection* l_pcDlg = new SP_DLG_ColPlacesSelection(m_pcParentWnd, m_pcModelView, this);
+
+		if (l_pcDlg->ShowModal() == wxID_OK)
+		{
+			m_pcParentWnd->InitializeViews();
+			m_pcParentWnd->LoadData(true);
+			RefreshWindow();
+			SP_Core::Instance()->GetRootDocument()->Modify(true);
+		}
+
+		l_pcDlg->Destroy();
+	}
+	else
+	{
+		//m_pcParentWnd->SaveCurrentView();
+
+		SP_DLG_PlacesSelection* l_pcDlg = new SP_DLG_PlacesSelection(m_pcModelView, this);
+
+		if (l_pcDlg->ShowModal() == wxID_OK)
+		{
+			m_pcParentWnd->InitializeViews();
+			m_pcParentWnd->LoadData(true);
+			RefreshWindow();
+			SP_Core::Instance()->GetRootDocument()->Modify(true);
+		}
+		l_pcDlg->Destroy();
+	}
 }
 
 void SP_DLG_ShowAllModelView::OnShowHideNodeList(wxCommandEvent& event)

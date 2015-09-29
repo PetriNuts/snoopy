@@ -26,6 +26,8 @@ private:
 
 	SP_DS_ResultViewer* m_pcResultViewer;
 
+	SP_DS_Graph* m_pcGraph;
+
 	SP_VectorDouble m_anXValues;
 
 	//viewer sizer
@@ -89,7 +91,7 @@ protected:
 
 public:
 
-	SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_DS_Metadata* p_pcModelView);
+	SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_DS_Metadata* p_pcModelView, SP_DS_Graph* p_pcGraph);
 	virtual ~SP_DLG_ShowAllModelView();
 
 	void RefreshWindow();

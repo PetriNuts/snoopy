@@ -101,6 +101,8 @@ SP_DLG_GlobalPreferences::SP_DLG_GlobalPreferences(wxWindow* p_pcParent)
     SetSizerAndFit(m_pcMainSizer);
 
     Centre(wxBOTH);
+
+	SP_LOGDEBUG(wxT("Config path: ") + wxFileConfig::GetLocalFileName(SP_APP_SHORT_NAME));
 }
 
 SP_DLG_GlobalPreferences::~SP_DLG_GlobalPreferences()
