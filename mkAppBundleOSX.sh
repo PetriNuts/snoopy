@@ -59,10 +59,10 @@ echo "### check other dependencies ###"
 checkMore=true
 until [[ "$checkMore" == false ]] ;
 do
-	checkMore=false
-	for val in * ; do
-		if [[ -e "${val}" && ! -h "${val}" ]]
-		then
+  checkMore=false
+  for val in * ; do
+    if [[ -e "${val}" && ! -h "${val}" ]]
+    then
       while read -d $'\n' f ; do
         if [[ "$f" == "/usr/local/"*".dylib"* || "$f" == "${HOME}"*".dylib"* ]]
         then
@@ -93,22 +93,26 @@ do
             echo "copied ${filebase}"
           fi
         fi
-			done< <(otool -L "$val")
-		fi
-	done
+      done< <(otool -L "$val")
+    fi
+  done
 done
 
 cd ../../..
 
-echo "#### create .dmg ####"
 
-cp ../snoopy.dmg .
-hdiutil convert snoopy.dmg -format UDSP -o snoopy
-rm snoopy.dmg
-hdiutil resize -size 100m snoopy.sparseimage
-hdiutil mount snoopy.sparseimage
-cp -R "${BuildArtifactFileName}".app /Volumes/Snoopy/
-hdiutil eject /Volumes/Snoopy
-hdiutil convert snoopy.sparseimage -format UDBZ -o snoopy.dmg
-rm snoopy.sparseimage
-mv snoopy.dmg snoopy-"${Release}"-macosx-intel-"${BUILDDATE}".dmg
+if [[ -e "../snoopy.dmg" ]]
+then
+  echo "#### create .dmg ####"
+
+  cp ../snoopy.dmg .
+  hdiutil convert snoopy.dmg -format UDSP -o snoopy
+  rm snoopy.dmg
+  hdiutil resize -size 100m snoopy.sparseimage
+  hdiutil mount snoopy.sparseimage
+  cp -R "${BuildArtifactFileName}".app /Volumes/Snoopy/
+  hdiutil eject /Volumes/Snoopy
+  hdiutil convert snoopy.sparseimage -format UDBZ -o snoopy.dmg
+  rm snoopy.sparseimage
+  mv snoopy.dmg snoopy-"${Release}"-macosx-intel-"${BUILDDATE}".dmg
+fi

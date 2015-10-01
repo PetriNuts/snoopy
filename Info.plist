@@ -2,6 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSPrincipalClass</key>
+	<string>wxNSApplication</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleIdentifier</key>
+	<string>de.tu-cottbus.dssz.snoopy</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>crohr</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>CFBundleExecutable</key>
+	<string>snoopy</string>
+	<key>CFBundleIconFile</key>
+	<string>snoopy.icns</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDocumentTypes</key>
@@ -54,19 +70,5 @@
 			<string>Default</string>
 		</dict>
 	</array>
-	<key>CFBundleExecutable</key>
-	<string>snoopy</string>
-	<key>CFBundleIconFile</key>
-	<string>snoopy.icns</string>
-	<key>CFBundleIdentifier</key>
-	<string>de.tu-cottbus.dssz.snoopy</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleSignature</key>
-	<string>crohr</string>
-	<key>CFBundleVersion</key>
-	<string>1.0</string>
 </dict>
 </plist>

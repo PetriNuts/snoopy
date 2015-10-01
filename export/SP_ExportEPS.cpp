@@ -29,7 +29,7 @@ SP_ExportEPS::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 
   wxPrintData *pd = new wxPrintData();
   pd->SetFilename(p_fileName);
-  pd->SetPaperId(wxPAPER_NONE);
+  pd->SetPaperId(wxPAPER_A0);
   pd->SetPrintMode(wxPRINT_MODE_FILE);
   SP_EPSDC epsDC (*pd);
 #if wxABI_VERSION < 30000

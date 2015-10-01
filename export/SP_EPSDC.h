@@ -51,7 +51,6 @@ class SP_EPSDCImpl: public wxPostScriptDCImpl,  public SP_Error
 
   // methods with corrected calls of CalcBoundingBox
   void DoDrawBitmap(const wxBitmap& bitmap, wxCoord x, wxCoord y, bool useMask = false);
-  void DoDrawLines (int n, wxPoint points[], wxCoord xoffset, wxCoord yoffset);
   void DoDrawText( const wxString& text, wxCoord x, wxCoord y );
   void DoDrawEllipse (wxCoord x, wxCoord y, wxCoord width, wxCoord height);
   void DoDrawRectangle (wxCoord x, wxCoord y, wxCoord width, wxCoord height);
@@ -62,7 +61,7 @@ class SP_EPSDCImpl: public wxPostScriptDCImpl,  public SP_Error
  protected:
   wxString m_origFilename;
 
-  // store here the wxT("real") bounding box
+  // store here the "real" bounding box
   wxCoord m_x1, m_y1, m_x2, m_y2;
 
  private:

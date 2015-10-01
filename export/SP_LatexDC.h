@@ -78,7 +78,7 @@ public:
 
   void DoDrawEllipse(wxCoord x, wxCoord y, wxCoord width, wxCoord height);
 
-  void DoDrawSpline(const wxList *points);
+  void DoDrawSpline(const wxPointList *points);
 
   bool DoBlit(wxCoord xdest, wxCoord ydest, wxCoord width,
 	      wxCoord height, wxDC *source, wxCoord xsrc,

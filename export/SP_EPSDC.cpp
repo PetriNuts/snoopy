@@ -76,6 +76,10 @@ SP_EPSDCImpl::Init()
 	// gets printed at all
 	SetGraphicsContext( wxGraphicsContext::Create());
 #endif
+
+    //TODO: dirty hack, please review wxPostScriptDCImpl for future changes
+    double scale = GetResolution()/72.0;
+    SetLogicalScale(scale, scale);
 }
 
 #define BUFSIZE 1024
@@ -84,7 +88,7 @@ void SP_EPSDCImpl::EndDoc ()
 {
   wxPostScriptDCImpl::EndDoc();
 
-  FILE* tfile = wxFopen(m_printData.GetFilename().c_str(), wxT("r")); // TODO readonly open
+  FILE* tfile = wxFopen(m_printData.GetFilename().c_str(), wxT("r"));
   CHECK_POINTER(tfile, return);
 
   // buffer to read
@@ -109,17 +113,17 @@ void SP_EPSDCImpl::EndDoc ()
   CHECK_POINTER(m_pstream, return);
 
   // write our own comments
-  wxFprintf(m_pstream, wxT("%%!PS-Adobe-2.0 EPSF-2.0\n") );
+  wxFprintf(m_pstream, wxT("%!PS-Adobe-2.0 EPSF-2.0\n") );
   wxFprintf(m_pstream, wxT("%%%%Title: %s\n"), wxT("none"));//m_title.c_str() );
-  wxFprintf(m_pstream, wxT("%%%%Creator: wxWindows PostScript renderer + Snoopy\n") );
+  wxFprintf(m_pstream, wxT("%%Creator: wxWidgets PostScript renderer + Snoopy\n") );
   wxFprintf(m_pstream, wxT("%%%%CreationDate: %s\n"), wxNow().c_str() );
   if (m_printData.GetOrientation() == wxLANDSCAPE)
-    wxFprintf( m_pstream, wxT("%%%%Orientation: Landscape\n") );
+    wxFprintf( m_pstream, wxT("%%Orientation: Landscape\n") );
   else
-    wxFprintf(m_pstream, wxT("%%%%Orientation: Portrait\n") );
+    wxFprintf(m_pstream, wxT("%%Orientation: Portrait\n") );
   wxFprintf(m_pstream, wxT("%%%%BoundingBox: %d %d %d %d\n"),
 	  m_x1, m_y1, m_x2+1, m_y2+1);
-  wxFprintf(m_pstream, wxT("%%%%EndComments\n\n") );
+  wxFprintf(m_pstream, wxT("%%EndComments\n\n") );
 
 
   // now just copy everything from the old to the new file
@@ -165,11 +169,14 @@ SP_EPSDCImpl::SetBrush( const wxBrush& brush )
 void
 SP_EPSDCImpl::CalcBoundingBox(wxCoord x, wxCoord y)
 {
-  if (LogicalToDeviceX(x) < m_x1) m_x1 = LogicalToDeviceX(x);
-  if (LogicalToDeviceX(x) > m_x2) m_x2 = LogicalToDeviceX(x);
-  if (LogicalToDeviceY(y) < m_y1) m_y1 = LogicalToDeviceY(y);
-  if (LogicalToDeviceY(y) > m_y2) m_y2 = LogicalToDeviceY(y);
-  wxPostScriptDCImpl::CalcBoundingBox(x, y);
+    //TODO: dirty hack, please review wxPostScriptDCImpl for future changes
+    int dx = wxRound(static_cast<double>(LogicalToDeviceX(x)) * 72.0 / GetResolution());
+    int dy = wxRound((m_pageHeight - static_cast<double>(LogicalToDeviceY(y))) * 72.0 / GetResolution());
+    if (dx < m_x1) m_x1 = dx;
+    if (dx > m_x2) m_x2 = dx;
+    if (dy < m_y1) m_y1 = dy;
+    if (dy > m_y2) m_y2 = dy;
+    wxPostScriptDCImpl::CalcBoundingBox(x, y);
 }
 
 void
@@ -180,47 +187,6 @@ SP_EPSDCImpl::DoDrawBitmap(const wxBitmap& bitmap, wxCoord x, wxCoord y, bool us
     wxPostScriptDCImpl::DoDrawBitmap(bitmap, x, y, useMask);
     CalcBoundingBox(x, y);
     CalcBoundingBox(x + bitmap.GetWidth(), y + bitmap.GetHeight());
-}
-
-void
-SP_EPSDCImpl::DoDrawLines (int n, wxPoint points[], wxCoord xoffset, wxCoord yoffset)
-{
-    wxCHECK_RET( m_ok && m_pstream, wxT("invalid postscript dc") );
-
-    if (m_pen.GetStyle() == wxTRANSPARENT) return;
-
-    if (n <= 0) return;
-
-    SetPen (m_pen);
-
-    int i;
-    for ( i =0; i < n ; i++ )
-    {
-      CalcBoundingBox( points[i].x+xoffset,
-		       points[i].y+yoffset);
-
-    //	was bug in wxPostscriptDC!
-    //         CalcBoundingBox( LogicalToDeviceX(points[i].x+xoffset),
-    // 			 LogicalToDeviceY(points[i].y+yoffset));
-    }
-
-    wxString psData;
-    psData.Printf(wxT("newpath\n")
-				 wxT("%d %d moveto\n"),
-				 LogicalToDeviceX(points[0].x+xoffset),
-				 LogicalToDeviceY(points[0].y+yoffset));
-    PsPrint(psData);
-
-    for (i = 1; i < n; i++)
-    {
-    	psData.Printf(
-		 wxT("%d %d lineto\n"),
-		 LogicalToDeviceX(points[i].x+xoffset),
-		 LogicalToDeviceY(points[i].y+yoffset) );
-        PsPrint(psData);
-    }
-
-    PsPrint( wxT("stroke\n") );
 }
 
 void
@@ -329,7 +295,7 @@ void SP_EPSDC::EndDoc ()
 {
   wxPostScriptDC::EndDoc();
 
-  FILE* tfile = wxFopen(m_printData.GetFilename().c_str(), wxT("r")); // TODO readonly open
+  FILE* tfile = wxFopen(m_printData.GetFilename().c_str(), wxT("r"));
   CHECK_POINTER(tfile, return);
 
   // buffer to read
@@ -354,17 +320,17 @@ void SP_EPSDC::EndDoc ()
   CHECK_POINTER(m_pstream, return);
 
   // write our own comments
-  wxFprintf(m_pstream, wxT("%%!PS-Adobe-2.0 EPSF-2.0\n") );
+  wxFprintf(m_pstream, wxT("%!PS-Adobe-2.0 EPSF-2.0\n") );
   wxFprintf(m_pstream, wxT("%%%%Title: %s\n"), m_title.c_str() );
-  wxFprintf(m_pstream, wxT("%%%%Creator: wxWindows PostScript renderer + Snoopy\n") );
+  wxFprintf(m_pstream, wxT("%%Creator: wxWindows PostScript renderer + Snoopy\n") );
   wxFprintf(m_pstream, wxT("%%%%CreationDate: %s\n"), wxNow().c_str() );
   if (m_printData.GetOrientation() == wxLANDSCAPE)
-    wxFprintf( m_pstream, wxT("%%%%Orientation: Landscape\n") );
+    wxFprintf( m_pstream, wxT("%%Orientation: Landscape\n") );
   else
-    wxFprintf(m_pstream, wxT("%%%%Orientation: Portrait\n") );
+    wxFprintf(m_pstream, wxT("%%Orientation: Portrait\n") );
   wxFprintf(m_pstream, wxT("%%%%BoundingBox: %d %d %d %d\n"),
 	  m_x1, m_y1, m_x2+1, m_y2+1);
-  wxFprintf(m_pstream, wxT("%%%%EndComments\n\n") );
+  wxFprintf(m_pstream, wxT("%%EndComments\n\n") );
 
 
   // now just copy everything from the old to the new file

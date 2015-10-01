@@ -773,7 +773,7 @@ void SP_LatexDCImpl::DoDrawRoundedRectangle(wxCoord x, wxCoord y, wxCoord width,
 	}
 }
 
-void SP_LatexDCImpl::DoDrawSpline(const wxList *points)
+void SP_LatexDCImpl::DoDrawSpline(const wxPointList *points)
 {
 //	SP_LOGDEBUG(wxT("DoDrawSpline"));
 	wxCHECK_RET( m_ok && m_pstream, wxT("invalid latex dc"));
@@ -783,13 +783,13 @@ void SP_LatexDCImpl::DoDrawSpline(const wxList *points)
 	    double c, d, x1, y1, x2, y2, x3, y3;
 	    wxPoint *p, *q;
 
-	    wxList::compatibility_iterator node = points->GetFirst();
-	    p = (wxPoint *)node->GetData();
+	    wxPointList::compatibility_iterator node = points->GetFirst();
+	    p = node->GetData();
 	    x1 = p->x;
 	    y1 = p->y;
 
 	    node = node->GetNext();
-	    p = (wxPoint *)node->GetData();
+	    p = node->GetData();
 	    c = p->x;
 	    d = p->y;
 	    x3 = (double)(x1 + c) / 2;
@@ -809,7 +809,7 @@ void SP_LatexDCImpl::DoDrawSpline(const wxList *points)
 		node = node->GetNext();
 	    while (node)
 	    {
-	        q = (wxPoint *)node->GetData();
+	        q = node->GetData();
 
 	        x1 = x3;
 	        y1 = y3;
