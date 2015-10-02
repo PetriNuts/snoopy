@@ -176,14 +176,13 @@ SP_DLG_ColorSetSetting::SP_DLG_ColorSetSetting( wxWindow* p_pcParent,SP_CPN_Grid
 
 	
 	// command control
-	wxStaticBox* l_pcButtonBox = new wxStaticBox( l_pcNotebookPage, -1, wxT("") );
-	wxSizer* l_pcButtonSizer = new wxStaticBoxSizer( l_pcButtonBox, wxHORIZONTAL );
+	wxSizer* l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 
-	l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_ADD, wxT("Add colorset") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);	
-	l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_DELETE, wxT("Delete colorset") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);	
-	l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_CHECK, wxT("Check colorsets") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
+	l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_ADD, wxT("Add colorset") ), 1, wxALL, 5);
+	l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_DELETE, wxT("Delete colorset") ), 1, wxALL, 5);
+	l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_CHECK, wxT("Check colorsets") ), 1, wxALL, 5);
 
-	//l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_EXPORTDECLARATION, wxT("Export declaration") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
+	//l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_EXPORTDECLARATION, wxT("Export declaration") ), 1, wxALL, 5);
 
     l_pcNotebookPage->AddControl(l_pcButtonSizer, 0, wxALL | wxEXPAND, 5);
 
@@ -245,12 +244,11 @@ SP_DLG_ColorSetSetting::SP_DLG_ColorSetSetting( wxWindow* p_pcParent,SP_CPN_Grid
 
 	
 	// command control
-	wxStaticBox* l_pcButtonBox2 = new wxStaticBox( l_pcNotebookPage2, -1, wxT("") );
-	wxSizer* l_pcButtonSizer2 = new wxStaticBoxSizer( l_pcButtonBox2, wxHORIZONTAL );
+	wxSizer* l_pcButtonSizer2 = new wxBoxSizer( wxHORIZONTAL );
 
-	l_pcButtonSizer2->Add(new wxButton(l_pcNotebookPage2, SP_ID_BUTTON_ADD2, wxT("Add colorset") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);	
-	l_pcButtonSizer2->Add(new wxButton(l_pcNotebookPage2, SP_ID_BUTTON_DELETE2, wxT("Delete colorset") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);	
-	l_pcButtonSizer2->Add(new wxButton(l_pcNotebookPage2, SP_ID_BUTTON_CHECK, wxT("Check colorset") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
+	l_pcButtonSizer2->Add(new wxButton(l_pcNotebookPage2, SP_ID_BUTTON_ADD2, wxT("Add colorset") ), 1, wxALL, 5);
+	l_pcButtonSizer2->Add(new wxButton(l_pcNotebookPage2, SP_ID_BUTTON_DELETE2, wxT("Delete colorset") ), 1, wxALL, 5);
+	l_pcButtonSizer2->Add(new wxButton(l_pcNotebookPage2, SP_ID_BUTTON_CHECK, wxT("Check colorset") ), 1, wxALL, 5);
 	
     l_pcNotebookPage2->AddControl(l_pcButtonSizer2, 0, wxALL | wxEXPAND, 5);
 
@@ -295,26 +293,18 @@ SP_DLG_ColorSetSetting::SP_DLG_ColorSetSetting( wxWindow* p_pcParent,SP_CPN_Grid
 
 	
 	// command control
-	wxStaticBox* l_pcButtonBox4 = new wxStaticBox( l_pcNotebookPage4, -1, wxT("") );
-	wxSizer* l_pcButtonSizer4 = new wxStaticBoxSizer( l_pcButtonBox4, wxHORIZONTAL );
+	wxSizer* l_pcButtonSizer4 = new wxBoxSizer( wxHORIZONTAL );
 
-	l_pcButtonSizer4->Add(new wxButton(l_pcNotebookPage4, SP_ID_BUTTON_ADD4, wxT("Add colorset") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
-	l_pcButtonSizer4->Add(new wxButton(l_pcNotebookPage4, SP_ID_BUTTON_DELETE4, wxT("Delete colorset") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);	
-	l_pcButtonSizer4->Add(new wxButton(l_pcNotebookPage4, SP_ID_BUTTON_CHECK, wxT("Check colorset") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
+	l_pcButtonSizer4->Add(new wxButton(l_pcNotebookPage4, SP_ID_BUTTON_ADD4, wxT("Add colorset") ), 1, wxALL, 5);
+	l_pcButtonSizer4->Add(new wxButton(l_pcNotebookPage4, SP_ID_BUTTON_DELETE4, wxT("Delete colorset") ), 1, wxALL, 5);
+	l_pcButtonSizer4->Add(new wxButton(l_pcNotebookPage4, SP_ID_BUTTON_CHECK, wxT("Check colorset") ), 1, wxALL, 5);
 	
     l_pcNotebookPage4->AddControl(l_pcButtonSizer4, 0, wxALL | wxEXPAND, 5);
 
 	//The end of Page 4
 
-	wxSizer* l_pcTopSizer =	new wxBoxSizer(wxHORIZONTAL);
-	l_pcTopSizer->Add(0, 50, 0);
-	m_pcSizer->Add(l_pcTopSizer, 0, wxALIGN_RIGHT);
-
 	// OK and Cancel command for the whole dialogue
-	wxStaticBox *l_pcBottomButtonBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcBottomButtonSizer = new wxStaticBoxSizer( l_pcBottomButtonBox, wxHORIZONTAL );
-	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxALL, 5);
-	l_pcBottomButtonSizer->Add(new wxButton(this,wxID_APPLY,wxT("Apply")), 0, wxALL, 5);
+	wxStdDialogButtonSizer* l_pcBottomButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 	
 	
 	m_pcSizer->Add(l_pcBottomButtonSizer, 0, wxALIGN_RIGHT);

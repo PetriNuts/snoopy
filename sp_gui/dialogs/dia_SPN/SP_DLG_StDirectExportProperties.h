@@ -30,7 +30,7 @@ class SP_DLG_StDirectExportProperties : public wxDialog
   
     SP_DS_StExportCSVEditDlgType m_eDlgType;
 
-    wxComboBox* m_pcSpacerComboBox;
+    wxChoice* m_pcSpacerChoice;
     wxBoxSizer* m_pcMainSizer;
     wxFilePickerCtrl* m_pcFilePickerCtrl;
     wxCheckBox* m_pcCompressCheckBox;

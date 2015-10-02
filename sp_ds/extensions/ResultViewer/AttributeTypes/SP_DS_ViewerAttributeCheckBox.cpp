@@ -25,7 +25,7 @@ SP_DS_ViewerAttributeCheckBox::~SP_DS_ViewerAttributeCheckBox()
 }
 void SP_DS_ViewerAttributeCheckBox::Create(wxWindow* p_pcParent,wxSizer* p_pcSizer)
 {
-    wxBoxSizer* l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( p_pcParent,wxID_ANY,wxT("") ), wxHORIZONTAL);
+    wxBoxSizer* l_pcRowSizer= new wxBoxSizer(wxHORIZONTAL);
 
     //create a check box control to hold the attribute value
 	m_pcValueCheckBox=new wxCheckBox(p_pcParent,wxID_ANY,m_sDisplayName);

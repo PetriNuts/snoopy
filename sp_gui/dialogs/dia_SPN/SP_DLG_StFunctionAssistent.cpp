@@ -78,7 +78,7 @@ SP_DLG_StFunctionAssistent::SP_DLG_StFunctionAssistent(
 	m_pcSizer = new wxBoxSizer(wxVERTICAL);
 
 	//formula
-	wxStaticBoxSizer* l_pcFormulaSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
+	wxBoxSizer* l_pcFormulaSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcFormulaSizer->Add(new wxStaticText(this, -1, l_sTypeLabel), 0, wxALL | wxALIGN_CENTER | wxEXPAND, 5);
 	m_pcFormulaTextCtrl = new wxTextCtrl(this, SP_ID_TEXTCTRL_FORMULA, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 	l_pcFormulaSizer->Add(m_pcFormulaTextCtrl, 1, wxALL | wxEXPAND, 5);
@@ -86,7 +86,7 @@ SP_DLG_StFunctionAssistent::SP_DLG_StFunctionAssistent(
 	m_pcSizer->Add(l_pcFormulaSizer, 1, wxALL | wxEXPAND, 1);
 
 	//listboxes
-	wxStaticBoxSizer* l_pcListBoxesSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
+	wxBoxSizer* l_pcListBoxesSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	wxStaticBoxSizer* l_pcPlaceListBoxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, l_sPlaceLabel), wxHORIZONTAL);
 	m_pcPlaceListCtrl = new SP_DLG_StFunctionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_PLACE, wxDefaultPosition,
@@ -108,7 +108,7 @@ SP_DLG_StFunctionAssistent::SP_DLG_StFunctionAssistent(
 	m_pcSizer->Add(l_pcListBoxesSizer, 2, wxALL | wxEXPAND, 1);
 
 	//buttons
-	wxStaticBoxSizer* l_pcButtonSizer =	new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
+	wxBoxSizer* l_pcButtonSizer =	new wxBoxSizer(wxHORIZONTAL);
 	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK | wxCANCEL), 0, wxALL, 5);
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxALL | wxALIGN_RIGHT, 1);
 	LoadData();

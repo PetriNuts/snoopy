@@ -54,7 +54,7 @@ SP_DLG_TwinNetSetting::SP_DLG_TwinNetSetting(wxWindow *p_parent, const wxString&
 	wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);	
 
 	//Set color set and variable
-	wxStaticBoxSizer* l_pcColorSetSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1, wxT("") ), wxVERTICAL );	
+	wxBoxSizer* l_pcColorSetSizer = new wxBoxSizer( wxVERTICAL );
 
 	wxBoxSizer* l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add(new wxStaticText( this, -1, wxT("Set a Color Set Name:") ), 0, wxEXPAND | wxALL, 5);
@@ -89,7 +89,7 @@ SP_DLG_TwinNetSetting::SP_DLG_TwinNetSetting(wxWindow *p_parent, const wxString&
 
 	if( p_title == wxT("Settings for generating twin nets") )
 	{
-		wxStaticBoxSizer* l_pcNodesSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1, wxT("") ), wxVERTICAL );	
+		wxBoxSizer* l_pcNodesSizer = new wxBoxSizer( wxVERTICAL );
 
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 		l_pcRowSizer->Add(new wxStaticText( this, -1, wxT("Set a Name for the Fusion Place:") ), 0, wxEXPAND | wxALL, 5);
@@ -114,7 +114,7 @@ SP_DLG_TwinNetSetting::SP_DLG_TwinNetSetting(wxWindow *p_parent, const wxString&
 
 
 
-		wxStaticBoxSizer* l_pcNewNodeSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1, wxT("") ), wxVERTICAL );	
+		wxBoxSizer* l_pcNewNodeSizer = new wxBoxSizer( wxVERTICAL );
 
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 		l_pcRowSizer->Add(new wxStaticText( this, -1, wxT("Set Names for new Places:") ), 0, wxEXPAND | wxALL, 5);
@@ -132,7 +132,7 @@ SP_DLG_TwinNetSetting::SP_DLG_TwinNetSetting(wxWindow *p_parent, const wxString&
 
 
 		//Set parameter name and value
-		wxStaticBoxSizer* l_pcParaSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1, wxT("") ), wxVERTICAL );	
+		wxBoxSizer* l_pcParaSizer = new wxBoxSizer( wxVERTICAL );
 
 		wxBoxSizer* l_pcParaRowSizer = new wxBoxSizer( wxHORIZONTAL );
 		l_pcParaRowSizer->Add(new wxStaticText( this, -1, wxT("Set a parameter Name:") ), 0, wxEXPAND | wxALL, 5);
@@ -149,7 +149,7 @@ SP_DLG_TwinNetSetting::SP_DLG_TwinNetSetting(wxWindow *p_parent, const wxString&
 
 
 		//generate side conditions for all transitions
-		wxStaticBoxSizer* l_pcSideConditionSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1, wxT("") ), wxVERTICAL );	
+		wxBoxSizer* l_pcSideConditionSizer = new wxBoxSizer( wxVERTICAL );
 
 		wxBoxSizer* l_pcSideConditionRowSizer = new wxBoxSizer( wxHORIZONTAL );
 		m_cbGenerateSideConditions = new wxCheckBox(this, SP_ID_GENSIDECONDITIONCHECKLIST, wxT("Generate side conditions for all transitions."));
@@ -163,7 +163,7 @@ SP_DLG_TwinNetSetting::SP_DLG_TwinNetSetting(wxWindow *p_parent, const wxString&
 
 
 	/////////////////////////////////////////////////////////////////////	
-	wxStaticBoxSizer* l_pcOKCancelSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1, wxT("") ), wxVERTICAL );
+	wxBoxSizer* l_pcOKCancelSizer = new wxBoxSizer( wxVERTICAL );
 	l_pcOKCancelSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxALL, 5);
 
 	topSizer->Add(l_pcOKCancelSizer, 0, wxALL | wxEXPAND, 1);

@@ -80,8 +80,7 @@ SP_DLG_ColorSetSelection::SP_DLG_ColorSetSelection(wxArrayString& p_ArrayString,
 	l_pcRowSizer->Add(l_pcRowSizerleft, 1, wxEXPAND | wxALL, 5);
 	l_pcRowSizer->Add(l_pcRowSizerforrever, 1, wxEXPAND | wxALL, 5);
 
-	wxStaticBox *l_pcBottomButtonBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcBottomButtonSizer = new wxStaticBoxSizer( l_pcBottomButtonBox, wxHORIZONTAL );
+	wxSizer *l_pcBottomButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL, 5);
 
 	

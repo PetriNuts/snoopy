@@ -109,9 +109,7 @@ SP_DLG_SortNodes::SP_DLG_SortNodes(SP_DS_Graph *p_graph, wxWindow *p_parent, con
 
 	topSizer->Prepend(UserdefiningSizer, 1, wxALL, 5);
 
-	wxBoxSizer* l_pcButtonSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxALL, 5);
-	l_pcButtonSizer->Add(new wxButton(this,wxID_APPLY,wxT("Apply")), 0, wxALL, 5);
+	wxStdDialogButtonSizer* l_pcButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 
 	topSizer->Add(l_pcButtonSizer, 0, wxALL | wxEXPAND, 1);
 

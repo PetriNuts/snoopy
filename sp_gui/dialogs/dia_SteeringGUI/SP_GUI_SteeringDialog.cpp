@@ -188,7 +188,7 @@ SP_GUI_SteeringDialog::SP_GUI_SteeringDialog(wxWindow* p_pcParent, spsa::Steerin
 
 void SP_GUI_SteeringDialog::CreateControlButtonBar(wxSizer* p_pcParentSizer)
 {
-	wxBoxSizer* l_pcBottomSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
+	wxBoxSizer* l_pcBottomSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	//Control Buttons
 	l_pcBottomSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_START_BUTTON, wxT("&Start")), 0, wxEXPAND | wxALL | wxALIGN_CENTER, 5);
@@ -228,7 +228,7 @@ void SP_GUI_SteeringDialog::CreatModelViewsBar(wxSizer* p_pcParentSizer)
 
 void SP_GUI_SteeringDialog::CreatStatisticBar(wxSizer* p_pcParentSizer)
 {
-	wxBoxSizer* l_pcStatisticsSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("")), wxHORIZONTAL);
+	wxBoxSizer* l_pcStatisticsSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	//Statistic bar
 	m_pcSimulatorState = new wxStaticText(this, wxID_ANY, wxT("Stopped"));
@@ -302,7 +302,7 @@ void SP_GUI_SteeringDialog::CreateEditValuesBar(wxSizer* p_pcParentSizer)
 }
 void SP_GUI_SteeringDialog::CreateOutputCtrlBar(wxSizer* p_pcParentSizer)
 {
-	m_pcOutputSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("")), wxVERTICAL);
+	m_pcOutputSizer = new wxBoxSizer(wxVERTICAL);
 	p_pcParentSizer->Add(m_pcOutputSizer, 1, wxEXPAND | wxALIGN_CENTER);
 
 }
@@ -342,11 +342,11 @@ void SP_GUI_SteeringDialog::CreateSimulatorBar(wxSizer* p_pcParentSizer)
 void SP_GUI_SteeringDialog::CreateSimulationIntervalBar(wxSizer* p_pcParentSizer)
 {
 	//Right Sizer
-	wxBoxSizer* l_pcIntervalsSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("")), wxVERTICAL);
+	wxBoxSizer* l_pcIntervalsSizer = new wxBoxSizer(wxVERTICAL);
 	p_pcParentSizer->Add(l_pcIntervalsSizer, 0, wxLEFT | wxRIGHT | wxEXPAND);
 
 	//Intervals
-	wxBoxSizer* l_pcSubIntervalsSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("")), wxVERTICAL);
+	wxBoxSizer* l_pcSubIntervalsSizer = new wxBoxSizer(wxVERTICAL);
 	l_pcIntervalsSizer->Add(l_pcSubIntervalsSizer, 1, wxLEFT | wxRIGHT | wxEXPAND);
 	wxBoxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Output start point:")), 1, wxALL);
@@ -388,7 +388,7 @@ void SP_GUI_SteeringDialog::CreateChoiceListBar(wxSizer* p_pcParentSizer)
 	m_pcItemsChoiceCheckListBox = new wxCheckListBox(this, SP_ID_GUI_STEERING_DIALOG_ITEMCHANGED_CHOICELISTBOX, wxDefaultPosition, wxSize(50, 50));
 	l_pcItemChoiceSizer->Add(m_pcItemsChoiceCheckListBox, 1, wxEXPAND);
 
-	wxSizer* l_pcSelectDeselecteSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
+	wxSizer* l_pcSelectDeselecteSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcItemChoiceSizer->Add(l_pcSelectDeselecteSizer, 0, wxEXPAND);
 
 	//select/deselect all

@@ -25,7 +25,7 @@ m_pcResultViewer(p_pcResultViewer)
 {
 	wxSizer* l_pcMainSizer = new wxBoxSizer( wxVERTICAL );
 
-	m_pcNoteBook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize,wxNB_TOP);
+	m_pcNoteBook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxNB_TOP);
 
 	if(m_pcResultViewer==NULL || m_pcResultViewer->GetAttributes()==NULL)
 	{
@@ -50,11 +50,11 @@ m_pcResultViewer(p_pcResultViewer)
 		  m_pcNoteBook->AddPage(l_pcPage,l_Category);
 	}
 
-	l_pcMainSizer->Add(m_pcNoteBook, 1, wxEXPAND | wxALIGN_LEFT);
+	l_pcMainSizer->Add(m_pcNoteBook, 1, wxEXPAND | wxALIGN_LEFT | wxALL, 5);
 
-	wxBoxSizer* l_pcBottonsSizer = new wxStaticBoxSizer( new wxStaticBox( this,wxID_ANY,wxT("") ), wxHORIZONTAL);
+	wxBoxSizer* l_pcBottonsSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	l_pcMainSizer->Add(l_pcBottonsSizer, 0, wxEXPAND | wxALIGN_CENTER);
+	l_pcMainSizer->Add(l_pcBottonsSizer, 0, wxEXPAND | wxALIGN_CENTER | wxALL, 5);
 
 	l_pcBottonsSizer->Add(new wxButton( this, wxID_OK, wxT("&Ok") ), 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 	l_pcBottonsSizer->Add(new wxButton( this, wxID_CANCEL, wxT("&Cancel") ), 0, wxEXPAND | wxALL|wxALIGN_CENTER, 5);

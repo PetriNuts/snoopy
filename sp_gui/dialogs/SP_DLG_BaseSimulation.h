@@ -28,9 +28,6 @@ private:
 
 protected:
 
-#ifdef __WXGTK__
-	wxWindowDisabler m_WindowDisabler;
-#endif
 	wxScrolledWindow* m_pcScrolledWindow;
 	wxBoxSizer* m_pcMainSizer;
 	wxSizer* m_pcSimulationControlSizer;

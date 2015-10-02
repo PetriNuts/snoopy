@@ -63,9 +63,9 @@ SP_DLG_SelectNodes::SP_DLG_SelectNodes(wxWindow* p_pcParentWnd, spsa::Model * p_
 
 	wxSizer* l_pcMainSizer = new wxBoxSizer(wxVERTICAL);
 	wxSizer* l_pcSelectorSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxSizer* l_pcColorUncolorSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("")), wxHORIZONTAL);
+	wxSizer* l_pcColorUncolorSizer = new wxBoxSizer(wxHORIZONTAL);
 	wxSizer* l_pcNodeTypeSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxSizer* l_pcButtonSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("")), wxHORIZONTAL);
+	wxSizer* l_pcButtonSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	//add sub sizer
 	l_pcMainSizer->Add(l_pcSelectorSizer, 1, wxEXPAND | wxALL);

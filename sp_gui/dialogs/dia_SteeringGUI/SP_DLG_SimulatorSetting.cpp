@@ -21,32 +21,32 @@ m_pcGUIClient(p_pcGUIClient),
 m_bInitialised(false),
 m_sSimulatorName(p_sSimName)
 {
-wxSizer* l_pcButtonSizer=new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY,wxT("") ),wxHORIZONTAL);
+	wxSizer* l_pcButtonSizer=new wxBoxSizer(wxHORIZONTAL);
 
-          m_pcSizer=new wxBoxSizer(wxVERTICAL);
+	m_pcSizer=new wxBoxSizer(wxVERTICAL);
 
-	      m_pcSimulatorAttribute=new spsa::SimulatorAttribute();
+	m_pcSimulatorAttribute=new spsa::SimulatorAttribute();
 
-	      m_pcSimulatorAttribute->Clear();
+	m_pcSimulatorAttribute->Clear();
 
-	      if((m_pcGUIClient->ReceiveSimulatorSetting(p_sSimName,m_pcSimulatorAttribute))!=spsa::SUCCESS)
-	      {
-	    	  Close();
-	    	  return;
-	      }
+	if((m_pcGUIClient->ReceiveSimulatorSetting(p_sSimName,m_pcSimulatorAttribute))!=spsa::SUCCESS)
+	{
+	  Close();
+	  return;
+	}
 
-	      CreateCtrls();
+	CreateCtrls();
 
-	      m_bInitialised=true;
+	m_bInitialised=true;
 
-	      m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
 
-		  l_pcButtonSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALIGN_CENTER);
+	l_pcButtonSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALIGN_CENTER);
 
 
-		  //alignment the sizer
-		  SetSizerAndFit(m_pcSizer);
-		  Center();
+	//alignment the sizer
+	SetSizerAndFit(m_pcSizer);
+	Center();
 }
 
 SP_DLG_SimulatorSetting::~SP_DLG_SimulatorSetting()

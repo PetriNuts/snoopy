@@ -102,7 +102,7 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 
 	m_pcMainSizer = new wxBoxSizer(wxVERTICAL);
 
-	wxSizer* l_pcMainContentSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
+	wxSizer* l_pcMainContentSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	wxSizer* l_pcControlButtonSizer = new wxBoxSizer(wxHORIZONTAL);  //for save and cancel buttons
 
@@ -192,6 +192,9 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 			m_pcOutputTypeRadioBox->SetSelection(2);
 		}
 		l_pcRowSizer->Add(m_pcOutputTypeRadioBox, 1, wxALL | wxEXPAND, 5);
+		l_pcLeftContentSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		l_pcRowSizer->Add(new wxButton( this, SP_ID_BUTTON_EDITAUXVAR, wxT( "Edit Auxilary" ) ), 0, wxALL | wxEXPAND, 5);
 		l_pcLeftContentSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 	}
 

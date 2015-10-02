@@ -93,7 +93,7 @@ SP_DLG_NewConstantDefinition::SP_DLG_NewConstantDefinition(wxWindow* p_pcParent,
 
 	// set / name components
 	wxBoxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxSizer* l_pcGridSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
+	wxSizer* l_pcGridSizer = new wxBoxSizer(wxVERTICAL);
 
 	// new row
 	m_pcConstantSetGrid = new wxGrid(this, SP_ID_GRID_MARKING, wxDefaultPosition, wxSize(700, 300), wxSUNKEN_BORDER);
@@ -123,43 +123,28 @@ SP_DLG_NewConstantDefinition::SP_DLG_NewConstantDefinition(wxWindow* p_pcParent,
 
 	wxBoxSizer* l_pcButtonSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
-	wxStaticBox *l_pcBottomButtonBox1 = new wxStaticBox(this, -1, wxT(""));
-	wxSizer *l_pcSizer = new wxStaticBoxSizer(l_pcBottomButtonBox1, wxHORIZONTAL);
+	wxSizer *l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ADD, wxT("Add constant")), 1, wxLEFT | wxRIGHT , 5);
-	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_DELETE, wxT("Delete constant")), 1, wxLEFT | wxRIGHT , 5);
-	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check constant")), 1, wxLEFT | wxRIGHT , 5);
-	l_pcSizer->Add(new wxButton(this, SP_ID_NEWGROUP, wxT("New Group")), 1, wxLEFT | wxRIGHT , 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ADD, wxT("Add constant")), 1, wxALL , 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_DELETE, wxT("Delete constant")), 1, wxALL , 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check constant")), 1, wxALL , 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_NEWGROUP, wxT("New Group")), 1, wxALL , 5);
 
-	//bysl
-	wxStaticBox *l_pcBottomButtonBox2 = new wxStaticBox(this, -1, wxT(""));
-	wxSizer *l_pcSizer2 = new wxStaticBoxSizer(l_pcBottomButtonBox2, wxHORIZONTAL);
+	wxSizer *l_pcSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
-	l_pcSizer2->Add(new wxButton(this, SP_ID_VALUESET_ADD, wxT("New Value Set")), 1, wxLEFT | wxRIGHT , 5);
-	l_pcSizer2->Add(new wxButton(this, SP_ID_VALUESET_DELETE, wxT("Delete Value Set")), 1, wxLEFT | wxRIGHT , 5);
-	l_pcSizer2->Add(new wxButton(this, SP_ID_BUTTON_RENAMESET, wxT("Rename Value Set")), 1, wxLEFT | wxRIGHT , 5);
+	l_pcSizer2->Add(new wxButton(this, SP_ID_VALUESET_ADD, wxT("New Value Set")), 1, wxALL , 5);
+	l_pcSizer2->Add(new wxButton(this, SP_ID_VALUESET_DELETE, wxT("Delete Value Set")), 1, wxALL , 5);
+	l_pcSizer2->Add(new wxButton(this, SP_ID_BUTTON_RENAMESET, wxT("Rename Value Set")), 1, wxALL , 5);
 
-#if wxABI_VERSION < 30000
-	wxStaticBox *l_pcBottomButtonBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcBottomButtonSizer = new wxStaticBoxSizer( l_pcBottomButtonBox, wxHORIZONTAL );
-
-	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL, 5);
-	l_pcBottomButtonSizer->Add(new wxButton(this,wxID_APPLY,wxT("Apply")), 0, wxALL, 5);
-#else
     wxStdDialogButtonSizer* l_pcBottomButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
-#endif
 
-	wxBoxSizer* l_pcSpaceSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcSpaceSizer->Add(30, 0, 0);
+	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND);
+	l_pcButtonSizer2->Add(l_pcSizer2, 0, wxEXPAND);
+	l_pcButtonSizer2->Add(l_pcBottomButtonSizer, 0, wxEXPAND);
 
-	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_LEFT);
-	l_pcButtonSizer2->Add(l_pcSizer2, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_LEFT);
-	l_pcButtonSizer2->Add(l_pcSpaceSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_LEFT);
-	l_pcButtonSizer2->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_RIGHT);
-
-	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND | wxALIGN_RIGHT);
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
-	m_pcSizer->Add(l_pcButtonSizer2, 0, wxEXPAND | wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND);
+	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND);
+	m_pcSizer->Add(l_pcButtonSizer2, 0, wxEXPAND);
 
 	SetAutoLayout(TRUE);
 	SetSizer(m_pcSizer);

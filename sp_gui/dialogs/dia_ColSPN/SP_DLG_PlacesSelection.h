@@ -58,7 +58,6 @@ protected:
 	bool m_bComSingleRun;
 
 	wxListBox * m_pListBoxIn;
-	//wxCheckListBox* m_pcPlaceChoiceCheckListBox;
 
 	wxRadioBox* m_pcOutputTypeRadioBox;
 	
@@ -93,7 +92,6 @@ protected:
 
 	wxString m_sPlotName;
 public:
-	wxTextCtrl *m_pcPlaceChoiceRegex;
 	wxTextCtrl *m_pcPlaceChoiceOutRegex;
 	wxCheckBox *m_pcPlaceChoiceRegexInvert;
 	wxCheckBox *m_pcPlaceChoiceColour;

@@ -65,8 +65,7 @@ SP_DLG_FuncParaDecl::SP_DLG_FuncParaDecl( wxString p_sFunctionName, wxString p_s
 
 	// set / name components
 	wxBoxSizer* l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
-	wxSizer* l_pcGridSizer = new wxStaticBoxSizer( new wxStaticBox( this,
-					-1, wxT("") ), wxVERTICAL );
+	wxSizer* l_pcGridSizer = new wxBoxSizer( wxVERTICAL );
 
 	// new row
 	m_pcColorSetGrid = new wxGrid( this, SP_ID_GRID_MARKING,
@@ -116,15 +115,13 @@ SP_DLG_FuncParaDecl::SP_DLG_FuncParaDecl( wxString p_sFunctionName, wxString p_s
 
 	wxBoxSizer* l_pcButtonSizer = new wxBoxSizer(wxHORIZONTAL );
 
-	wxStaticBox *l_pcBottomButtonBox1 = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcSizer = new wxStaticBoxSizer( l_pcBottomButtonBox1, wxHORIZONTAL );
+	wxSizer *l_pcSizer = new wxBoxSizer( wxHORIZONTAL );
 	
 
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ADD, wxT("Add parameter") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_DELETE, wxT("Delete parameter") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
 	
-	wxStaticBox *l_pcBottomButtonBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcBottomButtonSizer = new wxStaticBoxSizer( l_pcBottomButtonBox, wxHORIZONTAL );
+	wxSizer *l_pcBottomButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL, 5);
 	

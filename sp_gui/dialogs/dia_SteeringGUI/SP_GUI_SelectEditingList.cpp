@@ -50,7 +50,7 @@ m_pcCurrentValues(p_pcCurrentValues)
 {
 		     wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 		     wxSizer* l_pcSelectorSizer=new wxBoxSizer(wxHORIZONTAL);
-		     wxSizer* l_pcButtonSizer=new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY,wxT("") ),wxHORIZONTAL);
+		     wxSizer* l_pcButtonSizer=new wxBoxSizer(wxHORIZONTAL);
 
 		     //add sub sizer
 		     l_pcMainSizer->Add(l_pcSelectorSizer, 1, wxEXPAND | wxALL);

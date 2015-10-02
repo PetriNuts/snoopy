@@ -24,24 +24,24 @@ SP_DS_ViewerAttributeList::~SP_DS_ViewerAttributeList()
 
 void SP_DS_ViewerAttributeList::Create(wxWindow* p_pcParent,wxSizer* p_pcSizer)
 {
-SP_VectorString::const_iterator l_itValue; ;
+	SP_VectorString::const_iterator l_itValue; ;
 
-            wxBoxSizer* l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( p_pcParent,wxID_ANY,wxT("") ), wxHORIZONTAL);
+	wxBoxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 
-            //create a text control to hold the attribute value
-	        m_pcPossibleValuesBox=new wxComboBox( p_pcParent, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(150,-1), 0, NULL, wxCB_READONLY );
+	//create a text control to hold the attribute value
+	m_pcPossibleValuesBox=new wxComboBox( p_pcParent, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(150,-1), 0, NULL, wxCB_READONLY );
 
-	        l_pcRowSizer->Add(new wxStaticText(p_pcParent,wxID_ANY,m_sDisplayName),0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
-	        l_pcRowSizer->Add(m_pcPossibleValuesBox,0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+	l_pcRowSizer->Add(new wxStaticText(p_pcParent,wxID_ANY,m_sDisplayName),0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+	l_pcRowSizer->Add(m_pcPossibleValuesBox,0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 
-	        for(l_itValue=m_asPossibleValues.begin();l_itValue!=m_asPossibleValues.end();l_itValue++)
-	        {
-	        	m_pcPossibleValuesBox->Append((*l_itValue));
-	        }
+	for(l_itValue=m_asPossibleValues.begin();l_itValue!=m_asPossibleValues.end();l_itValue++)
+	{
+		m_pcPossibleValuesBox->Append((*l_itValue));
+	}
 
-	        m_pcPossibleValuesBox->SetSelection(m_nSelection);
+	m_pcPossibleValuesBox->SetSelection(m_nSelection);
 
-	        p_pcSizer->Add(l_pcRowSizer,0, wxALL, 5);
+	p_pcSizer->Add(l_pcRowSizer,0, wxALL, 5);
 }
 
 void SP_DS_ViewerAttributeList::Update()

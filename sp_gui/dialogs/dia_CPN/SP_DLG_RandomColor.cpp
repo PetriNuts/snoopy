@@ -31,7 +31,7 @@ SP_DLG_RandomColor::SP_DLG_RandomColor(vector<wxString>* p_pvColors, wxWindow *p
 	wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);	
 
 	//Set color set and variable
-	wxStaticBoxSizer* l_pcColorSetSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1, wxT("") ), wxVERTICAL );	
+	wxBoxSizer* l_pcColorSetSizer = new wxBoxSizer( wxVERTICAL );
 
 	wxBoxSizer* l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 
@@ -58,7 +58,7 @@ SP_DLG_RandomColor::SP_DLG_RandomColor(vector<wxString>* p_pvColors, wxWindow *p
 
 
 	
-	wxStaticBoxSizer* l_pcOKCancelSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1, wxT("") ), wxVERTICAL );
+	wxBoxSizer* l_pcOKCancelSizer = new wxBoxSizer( wxVERTICAL );
 	l_pcOKCancelSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxALL, 5);
 
 	topSizer->Add(l_pcOKCancelSizer, 0, wxALL | wxEXPAND, 1);

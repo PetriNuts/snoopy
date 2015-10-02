@@ -219,13 +219,6 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
     wxSizer* l_pcRowSizer;
 
-
-    // place choice
-    m_pcPlaceChoiceCheckListBox = new wxCheckListBox(this, -1, wxDefaultPosition, wxSize(200, 200));
-//    l_pcPlaceChoiceSizer->Add(m_pcPlaceChoiceCheckListBox, 1, wxLEFT | wxEXPAND, 5);
-    m_pcPlaceChoiceCheckListBox->Hide();
-
-
     //Simulation Parameters
     SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("Simulation Properties"))->GetElements()->begin());
     SP_DS_Attribute* l_pcAttr = NULL;
@@ -322,7 +315,7 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
 	m_pcSimulationButtonSizer->Add(l_pcRowSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
-	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("")), wxHORIZONTAL);
+	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	m_pcStartButton = new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_START_SIMULATION, wxT("Start Simulation"));
 	m_pcStartButton->SetBackgroundColour(*wxGREEN);
 	l_pcRowSizer->Add(m_pcStartButton, wxSizerFlags(0).Expand().Border(wxALL, 5));
@@ -395,66 +388,6 @@ void SP_DLG_Simulation :: OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent) {
         ChangeCurrentView(l_pcView);
 	}
 
-}
-
-void SP_DLG_Simulation::OnItemCheckUncheck(unsigned int p_nListLocation, unsigned int p_nLocation, bool p_nCheck) {
-
-    m_pcPlaceChoiceCheckListBox->Check(p_nListLocation, p_nCheck);
-    //get item index
-    unsigned int l_nSelection = p_nLocation;
-
-    //get check state
-    bool l_bCheckState = m_pcPlaceChoiceCheckListBox->IsChecked(p_nListLocation);
-
-    //save the user choice
-    CHECK_POINTER(m_pcCurrentTablePlot, return);
-
-    SP_DS_Attribute* l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo"));
-
-    CHECK_POINTER(l_pcAttribute, return);
-
-    SP_DS_ColListAttribute* l_pcPlaceIdList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttribute);
-
-    l_pcPlaceIdList->SetCell(l_nSelection, 2, wxString::Format(wxT("%d"), l_bCheckState));
-
-    //update the viewer
-    UpdateViewer();
-
-    RefreshExternalWindows();
-}
-
-void SP_DLG_Simulation::OnClearPlaceList(bool p_nCheck) {
-
-	CHECK_POINTER(m_pcCurrentTablePlot, return);
-
-	SP_DS_Attribute* l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo"));
-
-	CHECK_POINTER(l_pcAttribute, return);
-
-	SP_DS_ColListAttribute* l_pcCurveInfo = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttribute);
-
-	if (p_nCheck)
-	{
-		for (unsigned int l_nCurve = 0; l_nCurve < l_pcCurveInfo->GetRowCount(); l_nCurve++)
-		{
-			l_pcCurveInfo->SetCell(l_nCurve, 2, wxT("1"));
-
-			m_pcPlaceChoiceCheckListBox->Check(l_nCurve, true);
-        }
-	}
-	else if (!p_nCheck)
-		{
-			for (unsigned int l_nCurve = 0; l_nCurve < l_pcCurveInfo->GetRowCount(); l_nCurve++)
-			{
-				l_pcCurveInfo->SetCell(l_nCurve, 2, wxT("0"));
-
-				m_pcPlaceChoiceCheckListBox->Check(l_nCurve, false);
-			}
-		}
-
-	//Update the current viewer
-	UpdateViewer();
-	RefreshExternalWindows();
 }
 
 void SP_DLG_Simulation::RefreshCurrentExternalView(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle)
@@ -952,9 +885,6 @@ void SP_DLG_Simulation::LoadData(bool p_bCreateNewTree)
     wxArrayString l_asPlaces;
 
     //LoadViewerData(m_apcResultViewers[m_nCurrentViewer], m_pcCurrentTablePlot, l_asPlaces);
-
-    //Add the loaded items to the list
-    m_pcPlaceChoiceCheckListBox->Set(l_asPlaces);
 
     //load old setting
     //LoadViewProperties();
@@ -1778,34 +1708,6 @@ wxString SP_DLG_Simulation::GetSpacer(int p_nSpacer)
     }
 
     return l_sSpacer;
-}
-
-wxString SP_DLG_Simulation::GetCurveName(long p_nCurveIndex)
-{
-
-    int l_nIndex = 0;
-
-    for (unsigned int i = 0; i < m_pcPlaceChoiceCheckListBox->GetCount(); i++)
-    {
-
-        if (l_nIndex == p_nCurveIndex)
-        {
-
-            return m_pcPlaceChoiceCheckListBox->GetString(i);
-
-        }
-
-        if (m_pcPlaceChoiceCheckListBox->IsChecked(i))
-        {
-
-            l_nIndex++;
-
-        }
-
-    }
-
-    return wxT("");
-
 }
 
 void SP_DLG_Simulation::OpenExportFile()

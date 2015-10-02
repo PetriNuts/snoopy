@@ -28,7 +28,7 @@ wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 		  l_pcMainSizer->Add(l_pcBottomSizer, 0, wxEXPAND);
 		  
 
-		  wxBoxSizer* l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( this,wxID_ANY,wxT("") ), wxHORIZONTAL);
+		  wxBoxSizer* l_pcRowSizer= new wxBoxSizer(wxHORIZONTAL);
 		  l_pcRowSizer->Add(new wxStaticText(this,wxID_ANY,wxT("Curve color")),0, wxALL, 5);
 		  wxColour l_Colour(p_sColor);
 		  m_pcColourPickerCtrl = new wxColourPickerCtrl(this,  wxID_ANY, l_Colour,wxDefaultPosition, wxDefaultSize,wxCLRP_DEFAULT_STYLE);
@@ -36,7 +36,7 @@ wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 		  l_pcTopSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 		  m_nOldLineColor=m_pcColourPickerCtrl->GetColour();
 
-		  l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( this,wxID_ANY,wxT("") ), wxHORIZONTAL);
+		  l_pcRowSizer= new wxBoxSizer(wxHORIZONTAL);
 		  //Curve width
 		  m_pcLineWidthBox=new wxComboBox( this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
 
@@ -54,7 +54,7 @@ wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 		  l_pcTopSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 		  //Curve style
-		  l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( this,wxID_ANY,wxT("") ), wxHORIZONTAL);
+		  l_pcRowSizer= new wxBoxSizer(wxHORIZONTAL);
 
 		  m_pcLineStyleBox=new wxComboBox( this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
 

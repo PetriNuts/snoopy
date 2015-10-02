@@ -58,15 +58,8 @@ SP_DLG_ShapeProperties::Init()
     m_pcSizer->Add(m_pcNotebook, 1, wxEXPAND | wxALL, 5);
 
     /* Buttons in the lower right hand corner */
-#if wxABI_VERSION < 30000
-	wxBoxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
-
-    //TODO: change when wx3.0 is out to wxOK|wxCANCEL|wxAPPLY and remove custom button
-	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 5);
-	l_pcButtonSizer->Add(new wxButton(this,wxID_APPLY,wxT("Apply")), 0, wxALL, 5);
-#else
     wxStdDialogButtonSizer* l_pcButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
-#endif
+
     m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT);
 
     SetSizerAndFit(m_pcSizer);

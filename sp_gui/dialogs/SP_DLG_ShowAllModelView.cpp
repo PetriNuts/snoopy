@@ -77,10 +77,7 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	m_pcContentSizer->Add(m_pcRightSizer, 0, wxALL | wxEXPAND, 5);
 
 	wxSizer* l_pcPlaceChoiceSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Select an item to view")), wxVERTICAL);
-	wxSizer* l_pcSelectDeselecteSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
-
 	m_pcRightSizer->Add(l_pcPlaceChoiceSizer, 1, wxEXPAND);
-	m_pcRightSizer->Add(l_pcSelectDeselecteSizer, 0, wxEXPAND);
 
 	m_pcPlaceChoiceCheckListBox = new wxCheckListBox(this, SP_ID_CHECKLISTBOX_PLACE_CHOICE, wxDefaultPosition, wxSize(200, 200));
 	l_pcPlaceChoiceSizer->Add(m_pcPlaceChoiceCheckListBox, 1, wxALL | wxEXPAND, 5);
@@ -88,7 +85,7 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	//select/deselect all
 	m_pcSelectClearAllChkBox = new wxCheckBox(this, SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS, wxT("Select/deselect all"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE);
 	m_pcSelectClearAllChkBox->Set3StateValue(wxCHK_UNDETERMINED);
-	l_pcSelectDeselecteSizer->Add(m_pcSelectClearAllChkBox, 1, wxEXPAND);
+	l_pcPlaceChoiceSizer->Add(m_pcSelectClearAllChkBox, 0, wxEXPAND);
 
 	SP_DS_Attribute* l_pcAttribute = m_pcModelView->GetAttribute(wxT("Name"));
 
@@ -143,7 +140,7 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 		m_TransitionColor.Add(m_pcParentWnd->GetColourString(i));
 	}
 
-	m_pcViewerSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
+	m_pcViewerSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Viewer")), wxVERTICAL);
 
 	l_pcLeftSizer->Add(m_pcViewerSizer, 1, wxALL | wxEXPAND);
 
@@ -161,22 +158,8 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 
 	l_pcRowSizer->Add(m_pcOutputViewerType, 0, wxALL, 1);
 	m_pcViewerTypeButton = new wxButton(this, SP_ID_BUTTON_EDIT_VIEWER_PROPERTIES, wxT("Edit"));
-
 	l_pcRowSizer->Add(m_pcViewerTypeButton, 0, wxALL, 1);
 	l_pcViewSizer->Add(l_pcRowSizer, 0, wxALL, 5);
-
-	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
-	m_pcXAxis = new wxButton(this, SP_ID_CHANGE_X_AXIS, wxT("Change X Axis"));
-	l_pcRowSizer->Add(m_pcXAxis, 0, wxALL, 1);
-	m_pcEditNodeListButton = new wxButton(this, SP_ID_BUTTON_EDIT_NODE_LIST, wxT("Edit Node List"));
-	l_pcRowSizer->Add(m_pcEditNodeListButton, 0, wxALL, 1);
-	m_pcShowHideButton = new wxButton(this, SP_ID_BUTTON_SHOW_HIDE_NODE_LIST, wxT("Hide Node List"), wxDefaultPosition, wxSize(125, -1), 0);
-	l_pcRowSizer->Add(m_pcShowHideButton, 0, wxALL, 1);
-
-	l_pcViewSizer->Add(l_pcRowSizer, 0, wxALL, 5);
-	l_pcMainSizer->Add(l_pcViewSizer, 0, wxALL, 1);
-
-	l_pcViewSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Export")), wxHORIZONTAL);
 	m_pcOutputExportType = new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY);
@@ -187,8 +170,18 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_EXPORT, wxT("Export")), 0, wxALL, 1);
 
 	l_pcViewSizer->Add(l_pcRowSizer, 0, wxALL, 5);
+	l_pcMainSizer->Add(l_pcViewSizer, 0, wxALL, 1);
 
-	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
+	l_pcViewSizer = new wxBoxSizer(wxHORIZONTAL);
+
+//	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
+	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+	m_pcXAxis = new wxButton(this, SP_ID_CHANGE_X_AXIS, wxT("Change X Axis"));
+	l_pcRowSizer->Add(m_pcXAxis, 0, wxALL, 1);
+	m_pcEditNodeListButton = new wxButton(this, SP_ID_BUTTON_EDIT_NODE_LIST, wxT("Edit Node List"));
+	l_pcRowSizer->Add(m_pcEditNodeListButton, 0, wxALL, 1);
+	m_pcShowHideButton = new wxButton(this, SP_ID_BUTTON_SHOW_HIDE_NODE_LIST, wxT("Hide Node List"), wxDefaultPosition, wxSize(125, -1), 0);
+	l_pcRowSizer->Add(m_pcShowHideButton, 0, wxALL, 1);
 	m_pcRefreshButton = new wxButton(this, SP_ID_BUTTON_REFRESH, wxT("Refresh"));
 	l_pcRowSizer->Add(m_pcRefreshButton, 0, wxALL, 1);
 	m_pcConnectButton = new wxButton(this, SP_ID_BUTTON_DISCONNECT, wxT("Disconnect"));
@@ -285,20 +278,52 @@ void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
 }
 
 void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
-	unsigned int l_selection = p_cEvent.GetSelection();
-	m_pcParentWnd->OnItemCheckUncheck(l_selection, l_selection, m_pcPlaceChoiceCheckListBox->IsChecked(l_selection));
+	//get item index
+	unsigned int l_nSelection = p_cEvent.GetSelection();
+
+	//get check state
+	bool l_bCheckState = m_pcPlaceChoiceCheckListBox->IsChecked(l_nSelection);
+
+	SP_DS_Attribute* l_pcAttribute = m_pcModelView->GetAttribute(wxT("CurveInfo"));
+
+	CHECK_POINTER(l_pcAttribute, return);
+
+	SP_DS_ColListAttribute* l_pcPlaceIdList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttribute);
+
+	l_pcPlaceIdList->SetCell(l_nSelection, 2, wxString::Format(wxT("%d"), l_bCheckState));
+
+	//update the viewer
+	m_pcParentWnd->UpdateViewer();
+
+	RefreshWindow();
 }
 
 void SP_DLG_ShowAllModelView::OnSelectClearAllItems(wxCommandEvent& p_cEvent)
 {
+	SP_DS_Attribute* l_pcAttribute = m_pcModelView->GetAttribute(wxT("CurveInfo"));
+
+	CHECK_POINTER(l_pcAttribute, return);
+
+	SP_DS_ColListAttribute* l_pcCurveInfo = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttribute);
+
 	if (m_pcSelectClearAllChkBox->IsChecked())
 	{
-		m_pcParentWnd->OnClearPlaceList(true);
+		for (unsigned int l_nCurve = 0; l_nCurve < l_pcCurveInfo->GetRowCount(); l_nCurve++)
+		{
+			l_pcCurveInfo->SetCell(l_nCurve, 2, wxT("1"));
+		}
 	}
 	else
 	{
-		m_pcParentWnd->OnClearPlaceList(false);
+		for (unsigned int l_nCurve = 0; l_nCurve < l_pcCurveInfo->GetRowCount(); l_nCurve++)
+		{
+			l_pcCurveInfo->SetCell(l_nCurve, 2, wxT("0"));
+		}
 	}
+
+	//Update the current viewer
+	m_pcParentWnd->UpdateViewer();
+	RefreshWindow();
 }
 
 void SP_DLG_ShowAllModelView::OnEditViewerProperties(wxCommandEvent& p_cEvent)

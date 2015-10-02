@@ -69,8 +69,7 @@ SP_DLG_InscriptionOverview::SP_DLG_InscriptionOverview(wxWindow* p_pcParent,
 	// set / name components
 	wxBoxSizer* l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 
-	wxSizer* l_pcGridSizer = new wxStaticBoxSizer( new wxStaticBox( this,
-					-1, wxT("") ), wxVERTICAL );
+	wxSizer* l_pcGridSizer = new wxBoxSizer( wxVERTICAL );
 
 	// new row
 
@@ -96,12 +95,10 @@ SP_DLG_InscriptionOverview::SP_DLG_InscriptionOverview(wxWindow* p_pcParent,
 
 	wxBoxSizer* l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 
-	wxStaticBox *l_pcTopButtonBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcTopButtonSizer = new wxStaticBoxSizer( l_pcTopButtonBox, wxHORIZONTAL );
+	wxSizer *l_pcTopButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 
 
-	wxStaticBox *l_pcBottomButtonBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcBottomButtonSizer = new wxStaticBoxSizer( l_pcBottomButtonBox, wxHORIZONTAL );
+	wxSizer *l_pcBottomButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,
 			wxEXPAND | wxALL, 5);

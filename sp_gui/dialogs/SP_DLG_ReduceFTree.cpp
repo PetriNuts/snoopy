@@ -65,8 +65,7 @@ SP_DLG_ReduceFTree::SP_DLG_ReduceFTree( SP_DS_Graph *p_graph,
     m_grList(NULL)
 {
 
-	wxStaticBox* itemStaticBoxSizer3Static = new wxStaticBox(this, wxID_ANY,
-                                                           _("Select some options"));
+	wxStaticBox* itemStaticBoxSizer3Static = new wxStaticBox(this, wxID_ANY, _("Select some options"));
 	wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
 
 	wxBoxSizer* elemSizer = new wxBoxSizer(wxVERTICAL);

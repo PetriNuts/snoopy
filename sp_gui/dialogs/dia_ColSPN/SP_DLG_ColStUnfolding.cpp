@@ -44,7 +44,7 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 	m_pcSizer = new wxBoxSizer( wxVERTICAL );
 
 	//first row
-	wxSizer* l_pcSourceSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1,wxT("") ), wxVERTICAL );
+	wxSizer* l_pcSourceSizer = new wxBoxSizer( wxVERTICAL );
 	
 	m_pcUnfoldRadioBut = new wxRadioButton(this,SP_ID_UNFOLD_RADIO_BUTTON,wxT("Unfold"),wxDefaultPosition, wxDefaultSize,wxRB_GROUP);
 	m_pcLoadRadioBut = new wxRadioButton(this,SP_ID_LOAD_RADIO_BUTTON,wxT("Load a file"),wxDefaultPosition, wxDefaultSize);
@@ -67,7 +67,7 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 
 
 	//second row
-	wxSizer* l_pcWriteSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1,wxT("") ), wxHORIZONTAL );
+	wxSizer* l_pcWriteSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	m_pcWriteCheckBox = new wxCheckBox( this, -1, wxT("Write to a file"), wxDefaultPosition, wxDefaultSize, 0 );
 	//l_pcWriteSizer->Add(new wxStaticText( this, -1, wxT("Filename:") ), 0, wxALL | wxEXPAND, 5);
@@ -81,7 +81,7 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 
 
 	//third row
-	//wxSizer* l_pcCSPSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1,wxT("") ), wxVERTICAL );
+	//wxSizer* l_pcCSPSizer = new wxBoxSizer( wxVERTICAL );
 
 	//m_pcCSPCheckBox =  new wxCheckBox( this, -1, wxT("CSP solver"), wxDefaultPosition, wxDefaultSize, 0 );
 	//m_pcCSPCheckBox->SetValue(true);
@@ -97,7 +97,7 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 	m_pcSizer->Add( m_pcUnfolderRadioBox, 0, wxALL| wxEXPAND, 5 );
 
 	//fourth row
-	wxSizer* l_pcThreadSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1,wxT("") ), wxHORIZONTAL );
+	wxSizer* l_pcThreadSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcThreadSizer->Add( new wxStaticText( this, -1, wxT("Thread count") ), 0 , wxALL, 5 );
 	m_pcThreadCountComboBox = new wxComboBox( this, -1 , wxT(""), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN | wxCB_READONLY );
 	int l_nCPUCount = wxThread::GetCPUCount();
@@ -111,7 +111,7 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 	m_pcSizer->Add( l_pcThreadSizer, 0, wxALL| wxEXPAND, 5 );
 
 	//fifth row 
-	wxSizer* l_pcStartSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1,wxT("") ), wxHORIZONTAL );
+	wxSizer* l_pcStartSizer = new wxBoxSizer( wxHORIZONTAL );
     m_pcStartButton = new wxButton( this, wxID_OK, wxT("Start"), wxDefaultPosition, wxDefaultSize, 0 );
     m_pcStartButton->SetBackgroundColour( *wxGREEN );
     l_pcStartSizer->Add( m_pcStartButton, 1, wxALL | wxEXPAND, 5 );
@@ -124,11 +124,11 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 
 
 	//sixth row
-	wxSizer* l_TimeProgressSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1,wxT("") ), wxVERTICAL );
+	wxSizer* l_TimeProgressSizer = new wxBoxSizer( wxVERTICAL );
 	m_pcUnfoldingProgressGauge = new wxGauge( this, -1, 100, wxDefaultPosition, wxDefaultSize, 0 );
     l_TimeProgressSizer->Add( m_pcUnfoldingProgressGauge, 1, wxALL | wxEXPAND, 5 );	
 
-	wxSizer* l_TimeSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1,wxT("") ), wxHORIZONTAL );
+	wxSizer* l_TimeSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_TimeSizer->Add(new wxStaticText(this, -1, wxT("Unfolding run time: ")), 0, wxALL | wxEXPAND, 5);
 	m_pcUnfoldingStopWatch = new wxStaticText(this, -1, wxT("0,0 sec"));
 	l_TimeSizer->Add(m_pcUnfoldingStopWatch, 1, wxALL | wxEXPAND, 5);
@@ -138,7 +138,7 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 
 
     //close
-	wxSizer* l_pcCloseSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1,wxT("") ), wxHORIZONTAL );
+	wxSizer* l_pcCloseSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcCloseSizer->Add( new wxButton( this, wxID_CANCEL, wxT("Close") ), 0, wxALL, 5 );
 	m_pcSizer->Add( l_pcCloseSizer, 0, wxALL | wxEXPAND, 5 );
 

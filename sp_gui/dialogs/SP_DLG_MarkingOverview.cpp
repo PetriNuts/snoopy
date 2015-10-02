@@ -60,8 +60,7 @@ SP_DLG_MarkingOverview::SP_DLG_MarkingOverview(wxWindow* p_pcParent, const wxStr
 	// set / name components
 	wxBoxSizer* l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 
-	wxSizer* l_pcGridSizer = new wxStaticBoxSizer( new wxStaticBox( this,
-					-1, wxT("") ), wxVERTICAL );
+	wxSizer* l_pcGridSizer = new wxBoxSizer( wxVERTICAL );
 
 	// new row
 

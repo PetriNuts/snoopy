@@ -23,7 +23,7 @@ SP_DS_ViewerAttributeText::~SP_DS_ViewerAttributeText()
 
 void SP_DS_ViewerAttributeText::Create(wxWindow* p_pcParent,wxSizer* p_pcSizer)
 {
-	wxBoxSizer* l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( p_pcParent,wxID_ANY,wxT("") ), wxHORIZONTAL);
+	wxBoxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	//create a text control to hold the attribute value
 	m_pcValueTxtCtrl=new wxTextCtrl(p_pcParent,wxID_ANY,m_sValue);

@@ -49,8 +49,8 @@ wxBoxSizer* l_pcSizer = new wxBoxSizer( wxVERTICAL );
 			    wxBoxSizer* l_pcBottomSizer=new wxBoxSizer( wxHORIZONTAL);
 			    l_pcSizer->Add(l_pcTopSizer, 0, wxEXPAND | wxALIGN_CENTER);
 			    l_pcSizer->Add(l_pcBottomSizer, 0, wxEXPAND | wxALIGN_CENTER);
-				wxBoxSizer* l_pcLeftSizer=new wxStaticBoxSizer( new wxStaticBox( this,wxID_ANY,wxT("") ), wxVERTICAL );
-				wxBoxSizer* l_pcRightSizer=new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY,wxT("") ), wxVERTICAL );
+				wxBoxSizer* l_pcLeftSizer=new wxBoxSizer( wxVERTICAL );
+				wxBoxSizer* l_pcRightSizer=new wxBoxSizer( wxVERTICAL );
 
 				l_pcBottomSizer->Add(l_pcLeftSizer, 0, wxEXPAND | wxALIGN_CENTER);
 				l_pcBottomSizer->Add(l_pcRightSizer, 0, wxEXPAND | wxALIGN_CENTER);
@@ -88,7 +88,7 @@ wxBoxSizer* l_pcSizer = new wxBoxSizer( wxVERTICAL );
 		}
 		else
 		{
-			    wxBoxSizer* l_pcBottomSizer=new wxStaticBoxSizer( new wxStaticBox( this,wxID_ANY,wxT("") ), wxHORIZONTAL );
+			    wxBoxSizer* l_pcBottomSizer=new wxBoxSizer( wxHORIZONTAL );
 			    l_pcSizer->Add(l_pcBottomSizer, 0, wxEXPAND | wxALIGN_CENTER);
 
 			    m_pcExistingModelBox=new wxComboBox( this, SP_ID_COMBOBOX_MODEL_NAMES, wxT(""), wxDefaultPosition, wxSize(200,-1), 0, NULL, wxCB_READONLY );

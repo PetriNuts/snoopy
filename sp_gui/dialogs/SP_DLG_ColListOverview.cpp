@@ -61,8 +61,7 @@ m_sAttrName(p_sAttrName), m_chSeperator(wxT(':'))
 
 	m_pcSizer = new wxBoxSizer( wxVERTICAL );
 
-	wxSizer* l_pcGridSizer = new wxStaticBoxSizer( new wxStaticBox( this,
-					-1, wxT("") ), wxVERTICAL );
+	wxSizer* l_pcGridSizer = new wxBoxSizer( wxVERTICAL );
 
 	m_pcValueGrid = new wxGrid( this, SP_ID_GRID_MARKING,
 			wxDefaultPosition, wxSize( 780, 550 ), wxSUNKEN_BORDER );
@@ -84,8 +83,7 @@ m_sAttrName(p_sAttrName), m_chSeperator(wxT(':'))
 
 	wxBoxSizer* l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 
-	wxStaticBox *l_pcTopButtonBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcTopButtonSizer = new wxStaticBoxSizer( l_pcTopButtonBox, wxHORIZONTAL );
+	wxSizer *l_pcTopButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	l_pcTopButtonSizer->Add(new wxButton( this, SP_ID_BUTTON_ADDSET, wxT("Add List") ), 0, wxEXPAND | wxALL, 5);
 
@@ -93,8 +91,7 @@ m_sAttrName(p_sAttrName), m_chSeperator(wxT(':'))
 
 	l_pcTopButtonSizer->Add(new wxButton( this, SP_ID_BUTTON_RENAMESET, wxT("Rename List") ), 0, wxEXPAND | wxALL, 5);
 
-	wxStaticBox *l_pcBottomButtonBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcBottomButtonSizer = new wxStaticBoxSizer( l_pcBottomButtonBox, wxHORIZONTAL );
+	wxSizer *l_pcBottomButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 

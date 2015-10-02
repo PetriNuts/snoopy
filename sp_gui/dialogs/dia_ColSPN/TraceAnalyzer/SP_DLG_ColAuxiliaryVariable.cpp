@@ -78,8 +78,7 @@ SP_DLG_ColAuxiliaryVariable::SP_DLG_ColAuxiliaryVariable( wxWindow* p_pcParent,c
 	m_pcSizer = new wxBoxSizer( wxVERTICAL );
 
 	// grid
-	wxStaticBox *l_pcGridBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcGridSizer = new wxStaticBoxSizer( l_pcGridBox, wxHORIZONTAL );	
+	wxSizer *l_pcGridSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	m_pcGrid = new wxGrid( this, SP_ID_GRID_TRACER, wxDefaultPosition, wxSize( 700, 300 ), wxSUNKEN_BORDER );
 	m_pcGrid->CreateGrid( 0, 0);
@@ -106,11 +105,10 @@ SP_DLG_ColAuxiliaryVariable::SP_DLG_ColAuxiliaryVariable( wxWindow* p_pcParent,c
 	l_pcGridSizer->Add(m_pcGrid, 1, wxALL | wxEXPAND, 2);
     SP_AutoSizeRowLabelSize(m_pcGrid);
 
-	m_pcSizer->Add(l_pcGridSizer, 0, wxEXPAND | wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcGridSizer, 0, wxEXPAND);
 
 	//checkbox
-	wxStaticBox *l_pcCheckBoxBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcCheckBoxSizer = new wxStaticBoxSizer( l_pcCheckBoxBox, wxHORIZONTAL );	
+	wxSizer *l_pcCheckBoxSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	m_cbComSingleRun = new wxCheckBox(this, -1, wxT("Compute for each simulation run"));
 	m_cbComSingleRun->SetValue(false);
@@ -122,29 +120,20 @@ SP_DLG_ColAuxiliaryVariable::SP_DLG_ColAuxiliaryVariable( wxWindow* p_pcParent,c
 	//bottons
 	wxBoxSizer* l_pcButtonSizer = new wxBoxSizer(wxHORIZONTAL );
 
-	wxStaticBox *l_pcBottomButtonBox1 = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcSizer = new wxStaticBoxSizer( l_pcBottomButtonBox1, wxHORIZONTAL );	
+	wxSizer *l_pcSizer = new wxBoxSizer( wxHORIZONTAL );
 
-	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ADD, wxT("Add") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);	
-	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_DELETE, wxT("Delete") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
-	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
-	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ASSISTENT, wxT("Assistant") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ADD, wxT("Add") ), 1, wxALL, 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_DELETE, wxT("Delete") ), 1, wxALL, 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check") ), 1, wxALL, 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ASSISTENT, wxT("Assistant") ), 1, wxALL, 5);
 	
-	wxStaticBox *l_pcBottomButtonBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcBottomButtonSizer = new wxStaticBoxSizer( l_pcBottomButtonBox, wxHORIZONTAL );
-
-	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL, 5);
-	//l_pcBottomButtonSizer->Add(new wxButton(this,wxID_APPLY,wxT("Apply")), 0, wxALL, 5);
+	wxStdDialogButtonSizer* l_pcBottomButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 	
-	wxBoxSizer* l_pcSpaceSizer = new wxBoxSizer(wxHORIZONTAL );
-	l_pcSpaceSizer->Add(30,0,0);
-
-	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_LEFT);
-	l_pcButtonSizer->Add(l_pcSpaceSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_LEFT);
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_RIGHT);
+	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND);
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
 
 	
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND);
 
 	SetAutoLayout( TRUE);
 	SetSizer(m_pcSizer);
@@ -161,8 +150,9 @@ SP_DLG_ColAuxiliaryVariable::SP_DLG_ColAuxiliaryVariable( wxWindow* p_pcParent,c
 
 
 void SP_DLG_ColAuxiliaryVariable::OnDlgApply( wxCommandEvent& p_cEvent )
-{		
-	SaveData();	
+{
+	m_bComSingleRun = m_cbComSingleRun->GetValue();
+	SaveData();
 }
 
 void SP_DLG_ColAuxiliaryVariable::OnDlgOk(wxCommandEvent& p_cEvent)

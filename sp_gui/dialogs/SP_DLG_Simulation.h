@@ -131,41 +131,19 @@ protected:
 
 	wxCheckBox* m_pcImmediatelyOutputCheckBox;
 
-//	wxBoxSizer* m_pcMainSizer;
-
-	/*wxSizer* m_pcPropertySizer;
-	wxSizer* m_pcSetsSizer;
-	wxSizer* m_pcDirectExportSizer;
-	wxSizer* m_pcSimulationButtonSizer;
-	wxSizer* m_pcModelViewsSizer;*/
-
 	bool m_nlayoutAdaptaion;
 
 
 	wxComboBox* m_pcShowGraphViewBox;
-
-	/*wxWindow *m_pcPropertyWindowSimulationButtonSizer;
-	wxWindow *m_pcPropertyWindowPropertySizer;
-	wxWindow *m_pcPropertyWindowDirectExportSizer;
-	wxWindow *m_pcPropertyWindowSetsSizer;
-
-	wxCollapsiblePane *m_pcCollpaneDirectExportSizer;
-	wxCollapsiblePane *m_pcCollpanePropertySizer;
-	wxCollapsiblePane *m_pcCollpaneSetsSizer;*/
 
 	wxListBox *m_pcListboxShowAllGraphViewName;
 
 	wxDialogLayoutAdapter *m_pLayoutAdapter;
 
 
-
-
-
 	wxStaticBoxSizer* m_pcOutputSizer;
 
 	wxStaticBox* m_pcPlaceChoiceSizerLabel;
-
-	wxCheckListBox* m_pcPlaceChoiceCheckListBox;
 
 	wxSizer* m_pcPlotControlSizer;
 	wxSizer* m_pcTableControlSizer;
@@ -350,7 +328,6 @@ protected:
 	virtual wxBitmap GetZoomInBitmap();
 	virtual wxBitmap GetZoomOutBitmap();
 
-	virtual wxString GetCurveName(long p_nCurveIndex);
 	virtual wxString GetSpacer(int p_nSpacer);
 	/*
 	 * Minimal Dialog layout. Do not use it, if you want to design your dialog
@@ -413,8 +390,6 @@ protected:
 	virtual void OnLoadData(wxCommandEvent& p_cEvent);
 
 public:
-	virtual void OnClearPlaceList(bool p_nCheck);
-	virtual void OnItemCheckUncheck(unsigned int p_nListLocation, unsigned int p_nLocation, bool p_nCheck);
 	virtual void OnEditXAxis(wxWindow *p_pcExternalWindowDialog);
 	virtual void OnExportClicked(wxWindow *p_pcExternalWindowDialog, int p_nSelection);
 protected:

@@ -51,8 +51,7 @@ SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 
 	}
 
-	m_pcMainSizer = new wxStaticBoxSizer( new wxStaticBox( this, -1,
-					wxT("") ), wxVERTICAL );
+	m_pcMainSizer = new wxBoxSizer(wxVERTICAL);
 
 	wxSizer* l_pcMainTablePropertiesSizer =	new wxStaticBoxSizer( new wxStaticBox( this, -1,
 											wxT("Export properties for main table") ), wxVERTICAL );
@@ -76,15 +75,10 @@ SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 
 	l_pcRowSizer->Add(new wxStaticText( this, -1, wxT("Spacer:") ), 1, wxALL | wxEXPAND, 5);
 
-	m_pcSpacerComboBox = new wxComboBox( this, -1, wxT(""), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+	wxString choices[4] = {wxT("Colon"), wxT("Comma"), wxT("SemiColon"), wxT("Tabulator")};
+	m_pcSpacerChoice = new wxChoice( this, -1 , wxDefaultPosition, wxDefaultSize, 4, choices);
 
-	
-	m_pcSpacerComboBox->Insert(wxT("Colon"), 0);
-	m_pcSpacerComboBox->Insert(wxT("Comma"), 1);
-	m_pcSpacerComboBox->Insert(wxT("SemiColon"), 2);
-	m_pcSpacerComboBox->Insert(wxT("Tabulator"), 3);
-
-	l_pcRowSizer->Add(m_pcSpacerComboBox, 1, wxALL | wxEXPAND, 5);
+	l_pcRowSizer->Add(m_pcSpacerChoice, 1, wxALL | wxEXPAND, 5);
 
 	l_pcMainTablePropertiesSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND);
 
@@ -92,7 +86,7 @@ SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 	{
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 
-		m_pcCompressCheckBox = new wxCheckBox( this, -1, wxT("Compress Exact Output"), wxDefaultPosition, wxDefaultSize, 0 );
+		m_pcCompressCheckBox = new wxCheckBox( this, -1, wxT("Compress Exact Output") );
 
 		l_pcRowSizer->Add( m_pcCompressCheckBox, 1, wxALL | wxEXPAND, 5 );
 
@@ -158,7 +152,7 @@ void SP_DLG_StDirectExportProperties::LoadData()
 {
 
 	m_pcFilePickerCtrl->SetPath( *m_psFilename);
-	m_pcSpacerComboBox->SetSelection( *m_pnSpacer);
+	m_pcSpacerChoice->SetSelection( *m_pnSpacer);
 	if (m_eDlgType == SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT)
 		m_pcCompressCheckBox->SetValue(*m_pbCompressExact);
 
@@ -182,7 +176,7 @@ bool SP_DLG_StDirectExportProperties::SaveData()
 	}
 
 	*m_psFilename = l_sOutName;
-	*m_pnSpacer = m_pcSpacerComboBox->GetSelection();
+	*m_pnSpacer = m_pcSpacerChoice->GetSelection();
 	if (m_eDlgType == SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT)
 		*m_pbCompressExact = m_pcCompressCheckBox->GetValue();
 

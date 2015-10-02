@@ -66,8 +66,7 @@ SP_DLG_VariableDefinition::SP_DLG_VariableDefinition( wxWindow* p_pcParent,
 
 	// set / name components
 	wxBoxSizer* l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
-	wxSizer* l_pcGridSizer = new wxStaticBoxSizer( new wxStaticBox( this,
-					-1, wxT("") ), wxVERTICAL );
+	wxSizer* l_pcGridSizer = new wxBoxSizer( wxVERTICAL );
 
 	// new row
 	m_pcColorSetGrid = new wxGrid( this, SP_ID_GRID_MARKING,
@@ -105,29 +104,17 @@ SP_DLG_VariableDefinition::SP_DLG_VariableDefinition( wxWindow* p_pcParent,
 
 	wxBoxSizer* l_pcButtonSizer = new wxBoxSizer(wxHORIZONTAL );
 
-	wxStaticBox *l_pcBottomButtonBox1 = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcSizer = new wxStaticBoxSizer( l_pcBottomButtonBox1, wxHORIZONTAL );
+	wxSizer *l_pcSizer = new wxBoxSizer( wxHORIZONTAL );
 	
 
-	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ADD, wxT("Add variable") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);	
-	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_DELETE, wxT("Delete variable") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
-	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check variables") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
-	
-	wxStaticBox *l_pcBottomButtonBox = new wxStaticBox( this, -1, wxT("") );
-	wxSizer *l_pcBottomButtonSizer = new wxStaticBoxSizer( l_pcBottomButtonBox, wxHORIZONTAL );
+	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ADD, wxT("Add variable") ), 1,wxALL, 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_DELETE, wxT("Delete variable") ), 1, wxALL, 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check variables") ), 1, wxALL, 5);
 
+	wxStdDialogButtonSizer* l_pcBottomButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 
-	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL, 5);
-	l_pcBottomButtonSizer->Add(new wxButton(this,wxID_APPLY,wxT("Apply")), 0, wxALL, 5);
-	
-
-	//for separating two boxes
-	wxBoxSizer* l_pcSpaceSizer = new wxBoxSizer(wxHORIZONTAL );
-	l_pcSpaceSizer->Add(30,0,0);		
-
-	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_CENTER);
-	l_pcButtonSizer->Add(l_pcSpaceSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_LEFT);
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_CENTER);
+	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_LEFT);
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_RIGHT);
 
 	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND | wxALIGN_RIGHT);
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);

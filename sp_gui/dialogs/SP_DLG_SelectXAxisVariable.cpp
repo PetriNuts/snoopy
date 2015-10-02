@@ -20,26 +20,26 @@ SP_DLG_SelectXAxisVariable::SP_DLG_SelectXAxisVariable(wxWindow* p_pcParent, con
 		m_sSelectedSubCategory(p_sCurrentSelectedSubCategory),
 		m_mChoices(p_mChoices)
 {
-	wxSizer* l_pcMainSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
+	wxSizer* l_pcMainSizer = new wxBoxSizer(wxVERTICAL);
 
 	//add variable type combobox
 	wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxSizer* l_pcTopSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxVERTICAL);
-	l_pcMainSizer->Add(l_pcTopSizer, 0, wxEXPAND | wxALIGN_CENTER);
+	wxSizer* l_pcTopSizer = new wxBoxSizer(wxVERTICAL);
+	l_pcMainSizer->Add(l_pcTopSizer, 0, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
 
-	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Variable type:")), 1, wxEXPAND | wxALL);
+	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Variable type:")), 1, wxEXPAND | wxALL, 5);
 	m_pcVariableTypeBox = new wxComboBox(this, SP_DLG_SELECT_X_AXIS_CHANGE_TYPE, wxT(""), wxDefaultPosition, wxSize(150, -1), 0, NULL, wxCB_READONLY);
-	l_pcRowSizer->Add(m_pcVariableTypeBox, 1, wxEXPAND | wxALIGN_CENTER, 5);
-	l_pcTopSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALIGN_CENTER, 5);
+	l_pcRowSizer->Add(m_pcVariableTypeBox, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
+	l_pcTopSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
 	l_pcTopSizer->AddSpacer(10);
 
 	//select variable name
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Name:")), 1, wxEXPAND | wxALL);
+	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Name:")), 1, wxEXPAND | wxALL, 5);
 	m_pcVariableNameBox = new wxComboBox(this, SP_DLG_SELECT_X_AXIS_CHANGE_NAME, wxT(""), wxDefaultPosition, wxSize(150, -1), 0, NULL, wxCB_READONLY);
 
-	l_pcRowSizer->Add(m_pcVariableNameBox, 1, wxEXPAND | wxALIGN_CENTER, 5);
-	l_pcTopSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALIGN_CENTER, 5);
+	l_pcRowSizer->Add(m_pcVariableNameBox, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
+	l_pcTopSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
 
 	SP_MapString2VectorString::const_iterator l_itChoice;
 	for (l_itChoice = m_mChoices.begin(); l_itChoice != m_mChoices.end(); l_itChoice++)
@@ -51,7 +51,7 @@ SP_DLG_SelectXAxisVariable::SP_DLG_SelectXAxisVariable(wxWindow* p_pcParent, con
 	AddItemNames();
 	m_pcVariableNameBox->SetStringSelection(m_sSelectedSubCategory);
 
-	l_pcMainSizer->Add(CreateSeparatedButtonSizer(wxOK | wxCANCEL), 0, wxEXPAND | wxALIGN_CENTER);
+	l_pcMainSizer->Add(CreateSeparatedButtonSizer(wxOK | wxCANCEL), 0, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
 
 	SetSizerAndFit(l_pcMainSizer);
 	Center();
