@@ -1118,16 +1118,36 @@ public:
 			if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
 			{
 				if (l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
-				{
-					m_ParseNode_Info.m_stringMultiplicity = l_LeftNodeInfo.m_stringMultiplicity + wxT("+") + l_RightNodeInfo.m_stringMultiplicity;					
+				{					
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("+") + l_sRightMul;
 				}
 				else if (l_LeftNodeInfo.m_bPlaceFlag &&  !l_RightNodeInfo.m_bPlaceFlag)
 				{
-					m_ParseNode_Info.m_stringMultiplicity = l_LeftNodeInfo.m_stringMultiplicity +wxT("+") + wxString::Format(wxT("%f"), l_RightNodeInfo.m_DoubleMultiplicity);
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("+") + wxString::Format(wxT("%f"), l_RightNodeInfo.m_DoubleMultiplicity);
 				}
 				else if (!l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
 				{
-					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%f"), l_LeftNodeInfo.m_DoubleMultiplicity) + wxT("+") + l_RightNodeInfo.m_stringMultiplicity;
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%f"), l_LeftNodeInfo.m_DoubleMultiplicity) + wxT("+") + l_sRightMul;
 				}
 				else
 				{
@@ -1138,19 +1158,39 @@ public:
 			{
 				if (l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
 				{
-					m_ParseNode_Info.m_stringMultiplicity = l_LeftNodeInfo.m_stringMultiplicity + wxT("+") + l_RightNodeInfo.m_stringMultiplicity;					
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("+") + l_sRightMul;
 				}
 				else if (l_LeftNodeInfo.m_bPlaceFlag &&  !l_RightNodeInfo.m_bPlaceFlag)
 				{
-					m_ParseNode_Info.m_stringMultiplicity = l_LeftNodeInfo.m_stringMultiplicity +wxT("+") + wxString::Format(wxT("%d"), l_RightNodeInfo.m_Multiplicity);
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("+") + wxString::Format(wxT("%d"), l_RightNodeInfo.m_Multiplicity);
 				}
 				else if (!l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
 				{
-					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%d"), l_LeftNodeInfo.m_Multiplicity) + wxT("+") + l_RightNodeInfo.m_stringMultiplicity;
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%d"), l_LeftNodeInfo.m_Multiplicity) + wxT("+") + l_sRightMul;
 				}
 				else
 				{
-					m_ParseNode_Info.m_DoubleMultiplicity = l_LeftNodeInfo.m_Multiplicity + l_RightNodeInfo.m_Multiplicity;
+					m_ParseNode_Info.m_Multiplicity = l_LeftNodeInfo.m_Multiplicity + l_RightNodeInfo.m_Multiplicity;
 				}
 			}
 		}
@@ -1212,12 +1252,97 @@ public:
 		m_ParseNode_Info.m_DataType = l_LeftNodeInfo.m_DataType;
 		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo.m_ColorSet;
 
-		if(l_LeftNodeInfo.m_DataType == CPN_INTEGER && l_RightNodeInfo.m_DataType == CPN_INTEGER)
+		if (!m_ParseNode_Info.m_bSeparaterExpression)
 		{
-			m_ParseNode_Info.m_IntegerValue = l_LeftNodeInfo.m_IntegerValue - l_RightNodeInfo.m_IntegerValue;
-		}
+			if (l_LeftNodeInfo.m_DataType == CPN_INTEGER && l_RightNodeInfo.m_DataType == CPN_INTEGER)
+			{
+				m_ParseNode_Info.m_IntegerValue = l_LeftNodeInfo.m_IntegerValue - l_RightNodeInfo.m_IntegerValue;
+			}
 
-		CollectResult();
+			CollectResult();
+		}
+		else
+		{
+			//for marking-dependent arcs -- multiplicity
+			if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+			{
+				if (l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("-") + l_sRightMul;
+				}
+				else if (l_LeftNodeInfo.m_bPlaceFlag &&  !l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("-") + wxString::Format(wxT("%f"), l_RightNodeInfo.m_DoubleMultiplicity);
+				}
+				else if (!l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%f"), l_LeftNodeInfo.m_DoubleMultiplicity) + wxT("-") + l_sRightMul;
+				}
+				else
+				{
+					m_ParseNode_Info.m_DoubleMultiplicity = l_LeftNodeInfo.m_DoubleMultiplicity - l_RightNodeInfo.m_DoubleMultiplicity;
+				}
+			}
+			else
+			{
+				if (l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("-") + l_sRightMul;
+				}
+				else if (l_LeftNodeInfo.m_bPlaceFlag &&  !l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("-") + wxString::Format(wxT("%d"), l_RightNodeInfo.m_Multiplicity);
+				}
+				else if (!l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%d"), l_LeftNodeInfo.m_Multiplicity) + wxT("-") + l_sRightMul;
+				}
+				else
+				{
+					m_ParseNode_Info.m_Multiplicity = l_LeftNodeInfo.m_Multiplicity - l_RightNodeInfo.m_Multiplicity;
+				}
+			}
+		}
 
 		return m_ParseNode_Info;
 
@@ -1276,12 +1401,97 @@ public:
 		m_ParseNode_Info.m_DataType = l_LeftNodeInfo.m_DataType;
 		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo.m_ColorSet;
 
-		if(l_LeftNodeInfo.m_DataType == CPN_INTEGER && l_RightNodeInfo.m_DataType == CPN_INTEGER)
+		if (!m_ParseNode_Info.m_bSeparaterExpression)
 		{
-			m_ParseNode_Info.m_IntegerValue = l_LeftNodeInfo.m_IntegerValue * l_RightNodeInfo.m_IntegerValue;
-		}
+			if (l_LeftNodeInfo.m_DataType == CPN_INTEGER && l_RightNodeInfo.m_DataType == CPN_INTEGER)
+			{
+				m_ParseNode_Info.m_IntegerValue = l_LeftNodeInfo.m_IntegerValue * l_RightNodeInfo.m_IntegerValue;
+			}
 
-		CollectResult();
+			CollectResult();
+		}
+		else
+		{
+			//for marking-dependent arcs -- multiplicity
+			if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+			{
+				if (l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("*") + l_sRightMul;
+				}
+				else if (l_LeftNodeInfo.m_bPlaceFlag &&  !l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("*") + wxString::Format(wxT("%f"), l_RightNodeInfo.m_DoubleMultiplicity);
+				}
+				else if (!l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%f"), l_LeftNodeInfo.m_DoubleMultiplicity) + wxT("*") + l_sRightMul;
+				}
+				else
+				{
+					m_ParseNode_Info.m_DoubleMultiplicity = l_LeftNodeInfo.m_DoubleMultiplicity * l_RightNodeInfo.m_DoubleMultiplicity;
+				}
+			}
+			else
+			{
+				if (l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("*") + l_sRightMul;
+				}
+				else if (l_LeftNodeInfo.m_bPlaceFlag &&  !l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("*") + wxString::Format(wxT("%d"), l_RightNodeInfo.m_Multiplicity);
+				}
+				else if (!l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%d"), l_LeftNodeInfo.m_Multiplicity) + wxT("*") + l_sRightMul;
+				}
+				else
+				{
+					m_ParseNode_Info.m_Multiplicity = l_LeftNodeInfo.m_Multiplicity * l_RightNodeInfo.m_Multiplicity;
+				}
+			}
+		}
 
 		return m_ParseNode_Info;
 
@@ -1340,12 +1550,97 @@ public:
 		m_ParseNode_Info.m_DataType = l_LeftNodeInfo.m_DataType;
 		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo.m_ColorSet;
 
-		if(l_LeftNodeInfo.m_DataType == CPN_INTEGER && l_RightNodeInfo.m_DataType == CPN_INTEGER)
+		if (!m_ParseNode_Info.m_bSeparaterExpression)
 		{
-			m_ParseNode_Info.m_IntegerValue = l_LeftNodeInfo.m_IntegerValue / l_RightNodeInfo.m_IntegerValue;
-		}
+			if (l_LeftNodeInfo.m_DataType == CPN_INTEGER && l_RightNodeInfo.m_DataType == CPN_INTEGER)
+			{
+				m_ParseNode_Info.m_IntegerValue = l_LeftNodeInfo.m_IntegerValue / l_RightNodeInfo.m_IntegerValue;
+			}
 
-		CollectResult();
+			CollectResult();
+		}
+		else
+		{
+			//for marking-dependent arcs -- multiplicity
+			if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+			{
+				if (l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("/") + l_sRightMul;
+				}
+				else if (l_LeftNodeInfo.m_bPlaceFlag &&  !l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("/") + wxString::Format(wxT("%f"), l_RightNodeInfo.m_DoubleMultiplicity);
+				}
+				else if (!l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%f"), l_LeftNodeInfo.m_DoubleMultiplicity) + wxT("/") + l_sRightMul;
+				}
+				else
+				{
+					m_ParseNode_Info.m_DoubleMultiplicity = l_LeftNodeInfo.m_DoubleMultiplicity / l_RightNodeInfo.m_DoubleMultiplicity;
+				}
+			}
+			else
+			{
+				if (l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("/") + l_sRightMul;
+				}
+				else if (l_LeftNodeInfo.m_bPlaceFlag &&  !l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sLeftMul = l_LeftNodeInfo.m_stringMultiplicity;
+					if (l_LeftNodeInfo.m_NodeType == CPN_ADD_NODE || l_LeftNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sLeftMul = wxT("(") + l_sLeftMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = l_sLeftMul + wxT("/") + wxString::Format(wxT("%d"), l_RightNodeInfo.m_Multiplicity);
+				}
+				else if (!l_LeftNodeInfo.m_bPlaceFlag &&  l_RightNodeInfo.m_bPlaceFlag)
+				{
+					wxString l_sRightMul = l_RightNodeInfo.m_stringMultiplicity;
+					if (l_RightNodeInfo.m_NodeType == CPN_ADD_NODE || l_RightNodeInfo.m_NodeType == CPN_SUBSTRACT_NODE)
+					{
+						l_sRightMul = wxT("(") + l_sRightMul + wxT(")");
+					}
+					m_ParseNode_Info.m_stringMultiplicity = wxString::Format(wxT("%d"), l_LeftNodeInfo.m_Multiplicity) + wxT("/") + l_sRightMul;
+				}
+				else
+				{
+					m_ParseNode_Info.m_Multiplicity = l_LeftNodeInfo.m_Multiplicity / l_RightNodeInfo.m_Multiplicity;
+				}
+			}
+		}
 
 		return m_ParseNode_Info;
 

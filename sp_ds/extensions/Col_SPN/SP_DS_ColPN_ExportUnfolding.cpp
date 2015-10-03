@@ -736,11 +736,13 @@ bool SP_DS_ColPN_ExportUnfolding::CreateDuplicateEdge(SP_DS_Node* p_pcTransOldNo
 		wxString l_sMultiplicity;
 		if(p_UnfoldedArcInfo.m_sDiscContType == wxT("Place"))
 		{
-			l_sMultiplicity = wxString::Format(wxT("%ld"),p_UnfoldedArcInfo.m_nMultiplicity);
+			//l_sMultiplicity = wxString::Format(wxT("%ld"),p_UnfoldedArcInfo.m_nMultiplicity);
+			l_sMultiplicity = p_UnfoldedArcInfo.m_sMultiplicity;
 		}
 		else
 		{
-			l_sMultiplicity = wxString::Format(wxT("%f"),p_UnfoldedArcInfo.m_dMultiplicity);
+			//l_sMultiplicity = wxString::Format(wxT("%f"),p_UnfoldedArcInfo.m_dMultiplicity);
+			l_sMultiplicity = p_UnfoldedArcInfo.m_sMultiplicity;
 		}	
 
 		//if( m_sNetClass !=  SP_DS_COLHPN_CLASS )

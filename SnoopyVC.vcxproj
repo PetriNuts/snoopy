@@ -95,6 +95,7 @@
     <IntDir>$(Configuration)\$(Platform)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <EmbedManifest>false</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PreBuildEvent>
@@ -427,6 +428,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="export\SP_ExportColPN2ANDL_new.h" />
     <ClInclude Include="export\SP_ExportColPN2SBML.h" />
     <ClInclude Include="export\SP_ExportColPN2SSC.h" />
+    <ClInclude Include="export\SP_ExportReport.h" />
     <ClInclude Include="sp_core\MD5HasherDefs.h" />
     <ClInclude Include="sp_core\SP_Core.h" />
     <ClInclude Include="sp_core\SP_Deque.h" />
@@ -1006,6 +1008,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile Include="export\SP_ExportColPN2ANDL_new.cpp" />
     <ClCompile Include="export\SP_ExportColPN2SBML.cpp" />
     <ClCompile Include="export\SP_ExportColPN2SSC.cpp" />
+    <ClCompile Include="export\SP_ExportReport.cpp" />
     <ClCompile Include="sp_core\SP_Core.cpp" />
     <ClCompile Include="sp_core\SP_Deque.cpp" />
     <ClCompile Include="sp_core\SP_GPR_Animation.cpp" />

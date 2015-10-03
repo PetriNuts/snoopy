@@ -1328,6 +1328,12 @@ bool SP_CPN_Parse_Add_Node::check()
 
 bool SP_CPN_Parse_Substract_Node::check()
 {
+	if (m_ParseNode_Info.m_bSeparaterExpression)
+	{
+		m_pLeft->GetParseNodeInfo()->m_bSeparaterExpression = true;
+		m_pRight->GetParseNodeInfo()->m_bSeparaterExpression = true;
+	}
+
 	if(!m_pLeft->check())
 		return false;
 	if(!m_pRight->check())
@@ -1336,27 +1342,40 @@ bool SP_CPN_Parse_Substract_Node::check()
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if(!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER) )
+	if (l_LeftNodeInfo->m_bPlaceFlag == true || l_RightNodeInfo->m_bPlaceFlag == true)
 	{
-		wxString l_sError;					
-		l_sError = wxT("Operands of the Substract operator error. Position: ") +m_sErrorPosition;
-		SP_LOGERROR(l_sError);
-		return false;
+		m_ParseNode_Info.m_bPlaceFlag = true;
 	}
 
-	m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
-	if(l_LeftNodeInfo->m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
+	if (!m_ParseNode_Info.m_bSeparaterExpression)
+	{
+		if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER))
+		{
+			wxString l_sError;
+			l_sError = wxT("Operands of the Substract operator error. Position: ") + m_sErrorPosition;
+			SP_LOGERROR(l_sError);
+			return false;
+		}
 
-	if(l_RightNodeInfo->m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
+		m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
+		if (l_LeftNodeInfo->m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
 
-	if(m_ParseNode_Info.m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;	
+		if (l_RightNodeInfo->m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
+
+		if (m_ParseNode_Info.m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
+		else
+		{
+			m_ParseNode_Info.m_sColorSetList = wxT("");
+			m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+		}
+	}
 	else
 	{
-		m_ParseNode_Info.m_sColorSetList = wxT("");
-		m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+		//if the substract expression is a part of a separator expression
+		//will add the check codes
 	}
 
 	return true;
@@ -1364,6 +1383,12 @@ bool SP_CPN_Parse_Substract_Node::check()
 
 bool SP_CPN_Parse_Multiply_Node::check()
 {
+	if (m_ParseNode_Info.m_bSeparaterExpression)
+	{
+		m_pLeft->GetParseNodeInfo()->m_bSeparaterExpression = true;
+		m_pRight->GetParseNodeInfo()->m_bSeparaterExpression = true;
+	}
+
 	if(!m_pLeft->check())
 		return false;
 	if(!m_pRight->check())
@@ -1372,26 +1397,39 @@ bool SP_CPN_Parse_Multiply_Node::check()
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if(!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER) )
+	if (l_LeftNodeInfo->m_bPlaceFlag == true || l_RightNodeInfo->m_bPlaceFlag == true)
 	{
-		wxString l_sError;					
-		l_sError = wxT("Operands of the Multiply operator error. Position: ") +m_sErrorPosition;
-		SP_LOGERROR(l_sError);
-		return false;
+		m_ParseNode_Info.m_bPlaceFlag = true;
 	}
-	
-	m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
-	if(l_LeftNodeInfo->m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
-	if(l_RightNodeInfo->m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
 
-	if(m_ParseNode_Info.m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;	
+	if (!m_ParseNode_Info.m_bSeparaterExpression)
+	{
+		if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER))
+		{
+			wxString l_sError;
+			l_sError = wxT("Operands of the Multiply operator error. Position: ") + m_sErrorPosition;
+			SP_LOGERROR(l_sError);
+			return false;
+		}
+
+		m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
+		if (l_LeftNodeInfo->m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
+		if (l_RightNodeInfo->m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
+
+		if (m_ParseNode_Info.m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
+		else
+		{
+			m_ParseNode_Info.m_sColorSetList = wxT("");
+			m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+		}
+	}
 	else
 	{
-		m_ParseNode_Info.m_sColorSetList = wxT("");
-		m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+		//if the add expression is a part of a separator expression
+		//will add the check codes
 	}
 
 	return true;
@@ -1400,6 +1438,12 @@ bool SP_CPN_Parse_Multiply_Node::check()
 
 bool SP_CPN_Parse_Divide_Node::check()
 {
+	if (m_ParseNode_Info.m_bSeparaterExpression)
+	{
+		m_pLeft->GetParseNodeInfo()->m_bSeparaterExpression = true;
+		m_pRight->GetParseNodeInfo()->m_bSeparaterExpression = true;
+	}
+
 	if(!m_pLeft->check())
 		return false;
 	if(!m_pRight->check())
@@ -1408,28 +1452,41 @@ bool SP_CPN_Parse_Divide_Node::check()
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if(!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER) )
+	if (l_LeftNodeInfo->m_bPlaceFlag == true || l_RightNodeInfo->m_bPlaceFlag == true)
 	{
-		wxString l_sError;					
-		l_sError = wxT("Operands of the Divide operator error. Position: ") +m_sErrorPosition;
-		SP_LOGERROR(l_sError);
-		return false;
+		m_ParseNode_Info.m_bPlaceFlag = true;
 	}
 
-	m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
+	if (!m_ParseNode_Info.m_bSeparaterExpression)
+	{
+		if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER))
+		{
+			wxString l_sError;
+			l_sError = wxT("Operands of the Divide operator error. Position: ") + m_sErrorPosition;
+			SP_LOGERROR(l_sError);
+			return false;
+		}
 
-	if(l_LeftNodeInfo->m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
+		m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
 
-	if(l_RightNodeInfo->m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
+		if (l_LeftNodeInfo->m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
 
-	if(m_ParseNode_Info.m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;	
+		if (l_RightNodeInfo->m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
+
+		if (m_ParseNode_Info.m_ColorSet != wxT(""))
+			m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
+		else
+		{
+			m_ParseNode_Info.m_sColorSetList = wxT("");
+			m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+		}
+	}
 	else
 	{
-		m_ParseNode_Info.m_sColorSetList = wxT("");
-		m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+		//if the add expression is a part of a separator expression
+		//will add the check codes
 	}
 
 	return true;
@@ -1823,8 +1880,8 @@ SP_CPN_ParseNode_Info SP_CPN_Parse_Seperator_Node::evaluate()
 		}
 		else
 		{
-			wxString l_stringMultiplicity = l_LeftNodeInfo.m_stringMultiplicity;
-			l_stringMultiplicity = wxT("(") + l_stringMultiplicity + wxT(")");
+			//if there are places in the arc expressions: marking-dependent arcs
+			wxString l_stringMultiplicity = l_LeftNodeInfo.m_stringMultiplicity;			
 
 			//for the all() function
 			m_ParseNode_Info.m_EvalResults.clear();
@@ -1836,15 +1893,32 @@ SP_CPN_ParseNode_Info SP_CPN_Parse_Seperator_Node::evaluate()
 				l_stEvalRes.m_Predicate = l_RightNodeInfo.m_EvalResults[i].m_Predicate;
 				if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE)
 				{
-					wxString l_String = wxString::Format(wxT("%f"), l_RightNodeInfo.m_EvalResults[i].m_DoubleMultiplicity);
-					l_stEvalRes.m_stringMultiplicity = l_stringMultiplicity + wxT("*") + l_String;
+					double l_dMul = l_RightNodeInfo.m_EvalResults[i].m_DoubleMultiplicity;
+					if (l_dMul - 1 < 0.000000001)  //evaluate if two float numbers are equal or not
+					{
+						l_stEvalRes.m_stringMultiplicity = l_stringMultiplicity;
+					}
+					else
+					{
+						wxString l_String = wxString::Format(wxT("%f"), l_dMul);
+						l_stringMultiplicity = wxT("(") + l_stringMultiplicity + wxT(")");
+						l_stEvalRes.m_stringMultiplicity = l_stringMultiplicity + wxT("*") + l_String;
+					}					
 				}
 				else
 				{
-					wxString l_String = wxString::Format(wxT("%d"), l_RightNodeInfo.m_EvalResults[i].m_Multiplicity);
-					l_stEvalRes.m_stringMultiplicity = l_stringMultiplicity + wxT("*") + l_String;
+					int l_nMul = l_RightNodeInfo.m_EvalResults[i].m_Multiplicity;
+					if (l_nMul == 1)
+					{
+						l_stEvalRes.m_stringMultiplicity = l_stringMultiplicity;
+					}
+					else
+					{
+						wxString l_String = wxString::Format(wxT("%d"), l_nMul);
+						l_stringMultiplicity = wxT("(") + l_stringMultiplicity + wxT(")");
+						l_stEvalRes.m_stringMultiplicity = l_stringMultiplicity + wxT("*") + l_String;
+					}					
 				}
-
 				m_ParseNode_Info.m_EvalResults.push_back(l_stEvalRes);
 			}
 		}
@@ -1856,6 +1930,7 @@ SP_CPN_ParseNode_Info SP_CPN_Parse_Seperator_Node::evaluate()
 bool SP_CPN_Parse_Seperator_Node::check()
 {
 	m_pLeft->GetParseNodeInfo()->m_bSeparaterExpression = true;
+
 	if(!m_pLeft->check())
 		return false;
 	if(!m_pRight->check())
