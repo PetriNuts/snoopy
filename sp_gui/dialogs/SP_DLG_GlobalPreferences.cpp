@@ -20,6 +20,8 @@
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_gui/mdi/SP_MDI_View.h"
 
+#include <wx/fileconf.h>
+
 #include "sp_defines.h"
 
 IMPLEMENT_CLASS(SP_DLG_GlobalPreferences, wxDialog)
