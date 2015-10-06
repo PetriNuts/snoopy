@@ -7,9 +7,11 @@
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 #include <wx/valgen.h>
+#include <wx/busyinfo.h>
 
 #include "SP_DLG_LayoutProperties.h"
 #include "sp_core/SP_Core.h"
+#include "sp_core/tools/SP_StopWatch.h"
 
 #include "sp_gui/layout/SP_LayoutOGDF.h"
 
@@ -134,8 +136,13 @@ SP_DLG_LayoutProperties::GetAttributes()
 void
 SP_DLG_LayoutProperties::OnDlgOk(wxCommandEvent& p_cEvent)
 {
+	SP_StopWatch sw(wxT("Doing Layout"),
+					wxT("Finished layout in"));
 
-	SP_LayoutOGDF l_Layout;
+    wxWindowDisabler disableAll;
+    wxBusyInfo wait("Please wait, layout in progress...");
+
+    SP_LayoutOGDF l_Layout;
 
 	l_Layout.Visualization(this, m_pcDoc);
 /**

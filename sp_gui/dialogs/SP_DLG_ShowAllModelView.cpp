@@ -52,11 +52,11 @@ END_EVENT_TABLE()
  */
 
 SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_DS_Metadata* p_pcModelView, SP_DS_Graph* p_pcGraph) :
-		wxFrame(NULL, -1, wxT("Show all views"),
+		wxFrame(p_pcWnd, -1, wxT("Show all views"),
 				wxDefaultPosition,
 				wxSize(800, 750),
 				wxFRAME_FLOAT_ON_PARENT | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER | wxCAPTION | wxCLOSE_BOX),
-		m_pcModelView(p_pcModelView), m_pcParentWnd(p_pcWnd), m_pcGraph(p_pcGraph),
+		m_pcModelView(p_pcModelView), m_pcGraph(p_pcGraph), m_pcParentWnd(p_pcWnd),
 		m_bIsDisconnected(false), m_bIsShown(true)
 {
 	if (m_pcModelView == NULL)
