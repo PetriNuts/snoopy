@@ -415,10 +415,11 @@ void SP_DLG_ShowAllModelView::OnExportClick(wxCommandEvent& event)
 
 		if (l_sCurrentViewerType.IsSameAs(wxT("xyPlot")) || l_sCurrentViewerType.IsSameAs(wxT("Histogram")))
 		{
+			wxFileName l_FileName{m_pcParentWnd->GetDirectExportFilename()};
+			wxString l_sDefaultName = l_FileName.GetName() + wxT("_")
+									  + GetViewAttributeValue(m_pcModelView, wxT("Name"));
 
-			wxString l_sDefaultName = GetViewAttributeValue(m_pcModelView, wxT("Name"));
-
-			wxFileDialog* l_pcSaveDlg = new wxFileDialog(this, wxT("Export file name"), wxT(""), l_sDefaultName, wxT(""), wxFD_SAVE | wxFD_OVERWRITE_PROMPT | wxSTAY_ON_TOP);
+			wxFileDialog* l_pcSaveDlg = new wxFileDialog(this, wxT("Export file name"), l_FileName.GetPath(), l_sDefaultName, wxT(""), wxFD_SAVE | wxFD_OVERWRITE_PROMPT | wxSTAY_ON_TOP);
 
 			l_pcSaveDlg->SetWildcard(dynamic_cast<SP_DS_PlotViewer*>(m_pcResultViewer)->GetSupportedSaveExtensions());
 			l_pcSaveDlg->SetFilterIndex(2);
