@@ -66,6 +66,9 @@ public:
     virtual void OnEditProperties(wxCommandEvent& p_cEvent);
     virtual void OnTransformShapes(wxCommandEvent& p_cEvent);
 
+    virtual void OnUnifyNodes(wxCommandEvent& p_cEvent);
+    virtual void OnDivideNodes(wxCommandEvent& p_cEvent);
+
     virtual void OnConvertElement(wxCommandEvent& p_cEvent);
 
     virtual void OnActivateView(bool activate, wxView *activeView,
@@ -127,6 +130,9 @@ public:
 
     void DoHide(SP_ListGraphic& p_lSelectedGraphics, bool p_bAll = false);
     void DoUnHide(SP_ListGraphic& p_lSelectedGraphics, bool p_bAll = false);
+
+    void DoUnifyNodes(SP_ListGraphic& p_lSelectedGraphics);
+    void DoDivideNodes(SP_ListGraphic& p_lSelectedGraphics);
 
     // Do a general command
     void DoCmd(wxList& p_lShapes, wxList& p_lOldShapes, int p_nCmd, const wxString& p_sOp);

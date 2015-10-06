@@ -297,6 +297,26 @@ public:
     SP_ElementClass* GetClassObject();
 
     bool Update(bool p_bLocalOnly = FALSE);
+
+    /**	\brief	Divide the graphical node into several graphical nodes, one per edge.
+                Makes the node logical, if not already.
+
+         \param	p_pcGraphic	the node-graphic
+
+         \return # of divided logical nodes
+
+     */
+    int Divide(SP_GR_Node* p_pcGraphic, SP_GUI_Canvas* p_pcCanvas);
+
+    /**	\brief	Unify the graphical nodes into one graphical node on the given netnumber.
+                Makes the node non-logical, if it's the last one.
+
+         \param	p_pcGraphic	the node-graphic
+
+         \return # of unified logical nodes
+
+     */
+    int Unify(SP_GR_Node* p_pcGraphic, SP_GUI_Canvas* p_pcCanvas);
 };
 
 

@@ -760,7 +760,6 @@ bool SP_GR_Edge::SynchronizePrim()
 
 	wxLineShape* l_pcPrim = dynamic_cast<wxLineShape*>(GetPrimitive());
 	m_pcSource->GetPrimitive()->AddLine(l_pcPrim, m_pcTarget->GetPrimitive());
-
 	return TRUE;
 }
 

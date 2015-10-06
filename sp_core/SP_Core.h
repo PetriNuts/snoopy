@@ -27,6 +27,7 @@ typedef map<wxString, SP_DS_Netclass*> SP_MapString2Netclass;
 typedef map<wxShape*, SP_Graphic*> SP_MapExternObjects;
 typedef map<wxString, SP_WDG_DialogBase*> SP_MapString2DialogWidget;
 typedef map<SP_Data*, SP_ListGraphic> SP_MapData2ListGraphic;
+typedef map<SP_Data*, SP_Graphic*> SP_MapData2Graphic;
 typedef map<wxString, SP_DS_Animation*> SP_MapString2Animation;
 typedef map<SP_MDI_Doc*, bool> SP_MapAnimationRestart;
 

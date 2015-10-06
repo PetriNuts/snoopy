@@ -668,23 +668,43 @@ SP_DS_Graph::AddToExtrasMenu(wxMenu* p_pcMenu)
 {
     CHECK_POINTER(p_pcMenu, return FALSE);
 
-	wxString l_sName = GetNetclass()->GetName();
+    wxMenu *l_pcMenu = new wxMenu();
+    UpdateIASubMenu(l_pcMenu);
+    l_pcMenu->AppendSeparator();
+    l_pcMenu->Append(SP_MENU_ITEM_IA_TRIGGERGENERAL, wxT("Trigger General-Action\tCtrl+Shift+G"));
+    l_pcMenu->Append(SP_MENU_ITEM_IA_TRIGGERSINGLE, wxT("Trigger Single-Action(s)\tCtrl+Shift+S"));
+    l_pcMenu->Append(SP_MENU_ITEM_IA_TRIGGERMAKRO, wxT("Trigger Makro-Action\tCtrl+Shift+M"));
+    l_pcMenu->Append(SP_MENU_ITEM_IA_UNDOLASTACTION, wxT("Undo Last Action"));
+    l_pcMenu->AppendSeparator();
+    l_pcMenu->Append(SP_MENU_ITEM_IA_CONFIGURE, wxT("Configure..."));
+    l_pcMenu->Append(SP_MENU_ITEM_IA_REGCMDLIST, wxT("Registered Commands..."));
+    p_pcMenu->Append(SP_MENU_ITEM_IA_MENU, wxT("Interaction"), l_pcMenu);
+
+    p_pcMenu->AppendSeparator();
+    p_pcMenu->Append(SP_MENU_ITEM_DIVIDE,
+                     wxT("Divide Into Logical Nodes..."));
+    p_pcMenu->Append(SP_MENU_ITEM_UNIFY,
+                     wxT("Unify From Logical Nodes..."));
+
+    wxString l_sName = GetNetclass()->GetName();
 
 	if(l_sName == SP_DS_PN_CLASS ||
 	   l_sName == SP_DS_SPN_CLASS ||
 	   l_sName == SP_DS_EXTPN_CLASS ||
 	   l_sName == SP_DS_TIMEPN_CLASS ||
 	   l_sName == SP_DS_CONTINUOUSPED_CLASS ||
+       l_sName == SP_DS_HYBRIDPN_CLASS ||
 	   l_sName == SP_DS_MODULOPN_CLASS ||
 	   l_sName == SP_DS_MUSICPN_CLASS){
-      p_pcMenu->Append(SP_MENU_ITEM_LOAD_INVARIANT_FILE,
+        p_pcMenu->AppendSeparator();
+        p_pcMenu->Append(SP_MENU_ITEM_LOAD_INVARIANT_FILE,
 					wxT("Load node set file..."));
-	  p_pcMenu->AppendSeparator();
     }
 
 	if(l_sName == SP_DS_FAULTTREE_CLASS ||
-		l_sName == SP_DS_EXTFAULTTREE_CLASS){
-      p_pcMenu->Append(SP_MENU_ITEM_REDUCTION_RULES,
+       l_sName == SP_DS_EXTFAULTTREE_CLASS){
+        p_pcMenu->AppendSeparator();
+        p_pcMenu->Append(SP_MENU_ITEM_REDUCTION_RULES,
 					wxT("Reduction"));
     }
 	if(l_sName == SP_DS_FAULTTREE_CLASS){
@@ -699,7 +719,8 @@ SP_DS_Graph::AddToExtrasMenu(wxMenu* p_pcMenu)
 		||l_sName == SP_DS_COLHPN_CLASS
 		||l_sName == SP_DS_COLCPN_CLASS)
 	{
-		wxMenu *l_pcMenu = new wxMenu();
+        p_pcMenu->AppendSeparator();
+        wxMenu *l_pcMenu = new wxMenu();
 		l_pcMenu->Append(SP_MENU_ITEM_GENERATE_MASTER_NET,wxT("Generate master nets"));
 
 		if(l_sName == SP_DS_COLSPN_CLASS )
@@ -710,20 +731,6 @@ SP_DS_Graph::AddToExtrasMenu(wxMenu* p_pcMenu)
 		p_pcMenu->Append(SP_MENU_ITEM_FOLDING, wxT("Folding"), l_pcMenu);
     }
 
-
-	p_pcMenu->AppendSeparator();
-
-	wxMenu *l_pcMenu = new wxMenu();
-	UpdateIASubMenu(l_pcMenu);
-	l_pcMenu->AppendSeparator();
-	l_pcMenu->Append(SP_MENU_ITEM_IA_TRIGGERGENERAL, wxT("Trigger General-Action\tCtrl+Shift+G"));
-	l_pcMenu->Append(SP_MENU_ITEM_IA_TRIGGERSINGLE, wxT("Trigger Single-Action(s)\tCtrl+Shift+S"));
-	l_pcMenu->Append(SP_MENU_ITEM_IA_TRIGGERMAKRO, wxT("Trigger Makro-Action\tCtrl+Shift+M"));
-	l_pcMenu->Append(SP_MENU_ITEM_IA_UNDOLASTACTION, wxT("Undo Last Action"));
-	l_pcMenu->AppendSeparator();
-	l_pcMenu->Append(SP_MENU_ITEM_IA_CONFIGURE, wxT("Configure..."));
-	l_pcMenu->Append(SP_MENU_ITEM_IA_REGCMDLIST, wxT("Registered Commands..."));
-	p_pcMenu->Append(SP_MENU_ITEM_IA_MENU, wxT("Interaction"), l_pcMenu);
 
 	//metadata menu entries
 	p_pcMenu->AppendSeparator();

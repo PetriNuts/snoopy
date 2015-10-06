@@ -94,13 +94,12 @@ include_directories(${IRRKLANG_INCLUDE_DIRS})
 list(APPEND LIBS ${IRRKLANG_LIBRARIES})
 
 #gmplib
-find_package(GMP)
+#find_package(GMP)
 if(GMP_FOUND)
+    add_definitions( -DUSE_GMP )
     include_directories(GMP_INCLUDE_DIR)
     list(APPEND LIBS ${GMP_LIBRARIES})
     #SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-no_pie" )
-else(GMP_FOUND)
-    add_definitions( -DHAVE_NO_GMP )
 endif(GMP_FOUND)
 
 #dssz_util

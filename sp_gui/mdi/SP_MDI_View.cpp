@@ -36,6 +36,7 @@
 
 #include "sp_core/SP_Core.h"
 #include "sp_ds/extensions/SP_DS_Coarse.h"
+#include "sp_gr/SP_GR_Node.h"
 #include "sp_gr/SP_GR_Edge.h"
 
 #include <wx/filename.h>
@@ -117,6 +118,8 @@ EVT_MENU(SP_MENU_ITEM_IA_CONFIGURE, SP_MDI_View::OnIAConfigure)
 EVT_MENU(SP_MENU_ITEM_IA_REGCMDLIST, SP_MDI_View::OnIARegCmdList)
 EVT_MENU_RANGE(SP_MENU_ITEM_IA_SUBMENUITEM, SP_MENU_ITEM_IA_SUBMENUITEM_LAST, SP_MDI_View::OnIASubMenuSelection)
 
+EVT_MENU(SP_MENU_ITEM_UNIFY, SP_MDI_View::OnUnifyNodes)
+EVT_MENU(SP_MENU_ITEM_DIVIDE, SP_MDI_View::OnDivideNodes)
 
 EVT_MENU(SP_MENU_CONVERT_ELEMENT_MENU, SP_MDI_View::OnConvertElement)
 
@@ -2047,5 +2050,64 @@ SP_MDI_View::ColorEdges(SP_DS_Graph* l_pcGraph, list<wxString>& l_lPlaces, bool 
 }
 
 
+void SP_MDI_View::OnUnifyNodes(wxCommandEvent &p_cEvent) {
+	SP_ListGraphic l_lGraphic;
+	FindSelectedGraphics(l_lGraphic, false);
 
+	DoUnifyNodes(l_lGraphic);
+}
 
+void SP_MDI_View::DoUnifyNodes(SP_ListGraphic &p_lSelectedGraphics) {
+	if (p_lSelectedGraphics.empty())
+		return;
+
+	int l_nNumUnified = 0;
+	SP_MapData2Graphic l_mSelectedParents;
+	for (SP_Graphic* l_pcGraphic : p_lSelectedGraphics)
+	{
+		l_pcGraphic->Select(false);
+		if (l_pcGraphic->GetGraphicType() == SP_GRAPHIC_NODE)
+		{
+			l_mSelectedParents.insert(std::make_pair(l_pcGraphic->GetParent(),l_pcGraphic));
+		}
+	}
+
+	for (auto it : l_mSelectedParents)
+	{
+		SP_DS_Node* l_pcParent = static_cast<SP_DS_Node*>(it.first);
+		SP_GR_Node* l_pcGraphic = static_cast<SP_GR_Node*>(it.second);
+		l_nNumUnified += l_pcParent->Unify(l_pcGraphic, m_pcCanvas);
+	}
+
+	Refresh();
+	SP_LOGMESSAGE(wxString::Format(wxT("Unified %i logical nodes."), l_nNumUnified));
+	m_pcCanvas->Modify(TRUE);
+}
+
+void SP_MDI_View::OnDivideNodes(wxCommandEvent &p_cEvent) {
+	SP_ListGraphic l_lGraphic;
+	FindSelectedGraphics(l_lGraphic, false);
+
+	DoDivideNodes(l_lGraphic);
+}
+
+void SP_MDI_View::DoDivideNodes(SP_ListGraphic &p_lSelectedGraphics) {
+	if (p_lSelectedGraphics.empty())
+		return;
+
+	int l_nNumDivided = 0;
+	for (SP_Graphic* l_pcGraphic : p_lSelectedGraphics)
+	{
+		l_pcGraphic->Select(false);
+		if (l_pcGraphic->GetGraphicType() == SP_GRAPHIC_NODE)
+		{
+			l_nNumDivided +=
+					static_cast<SP_DS_Node*>(l_pcGraphic->GetParent())->
+							Divide(static_cast<SP_GR_Node*>(l_pcGraphic), m_pcCanvas);
+		}
+	}
+
+	Refresh();
+	SP_LOGMESSAGE(wxString::Format(wxT("Divided into %i logical nodes."), l_nNumDivided));
+	m_pcCanvas->Modify(TRUE);
+}
