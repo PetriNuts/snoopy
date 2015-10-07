@@ -51,7 +51,7 @@ EVT_BUTTON(wxID_CLOSE, SP_GUI_ConnectToServer::OnClose)
 END_EVENT_TABLE()
 
 SP_GUI_ConnectToServer::SP_GUI_ConnectToServer(wxWindow* p_pcParent, const wxString& p_sTitle, long p_nStyle) :
-		wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE), m_sPort(wxT("3000")), m_sIP(wxT("Localhost")), m_pcGUIClient(NULL)
+		wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP), m_sPort(wxT("3000")), m_sIP(wxT("Localhost")), m_pcGUIClient(NULL)
 {
 
 	//Main Sizer

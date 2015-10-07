@@ -33,7 +33,7 @@ enum
 };
 
 SP_DLG_ConvertElements::SP_DLG_ConvertElements(SP_MDI_View* p_pcView, wxWindow *p_parent, const wxString& p_title) :
-		wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER), m_nCopyBrush(false), m_nCanConvert(true)
+		wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER), m_nCopyBrush(false), m_nCanConvert(true)
 {
 	SP_VectorString l_vsPossibleConversions;
 

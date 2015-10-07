@@ -22,7 +22,7 @@ SP_DLG_GraphProperties::SP_DLG_GraphProperties(SP_GUI_Mainframe* p_pcParent,
                                                SP_DS_Graph* p_pcGraph,
                                                const wxString& p_sTitle,
                                                long p_nStyle)
-:wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, p_nStyle),
+:wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, p_nStyle | wxSTAY_ON_TOP),
 m_pcGraph(p_pcGraph),
 m_nCountAttr(0)
 {

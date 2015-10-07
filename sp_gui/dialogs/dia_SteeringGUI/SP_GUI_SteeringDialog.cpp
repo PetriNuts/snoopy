@@ -124,9 +124,11 @@ EVT_COMMAND_SCROLL_THUMBRELEASE(SP_ID_GUI_STEERING_DIALOG_SIM_SPEED_CHANGED,SP_G
 END_EVENT_TABLE()
 
 SP_GUI_SteeringDialog::SP_GUI_SteeringDialog(wxWindow* p_pcParent, spsa::SteeringClient* p_pcGUIClient, const wxString& p_sTitle) :
-		wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX), m_pcGUIClient(p_pcGUIClient), m_nCurrentViewerIndex(1), m_nViewMatrixType(
-				SP_VIEW_MARKING), m_bRefreshResult(false), m_bRefreshRuntime(false), m_nRefreshResultDuration(5000), m_nRefreshRuntimeDuration(5000), m_pcResultRefershTimer(NULL), m_pcRuntimeRefershTimer(
-				NULL), m_nOldSimulationState(0), m_nCurrentView(0), m_nExportSpacer(3), m_sExportFilename(wxT("")), m_bIsModified(false), m_bEnableRefreshCalculationTime(true)
+		wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
+		m_pcGUIClient(p_pcGUIClient), m_nCurrentViewerIndex(1), m_nViewMatrixType(SP_VIEW_MARKING),
+		m_bRefreshResult(false), m_bRefreshRuntime(false), m_nRefreshResultDuration(5000), m_nRefreshRuntimeDuration(5000),
+		m_pcResultRefershTimer(NULL), m_pcRuntimeRefershTimer(NULL), m_nOldSimulationState(0), m_nCurrentView(0),
+		m_nExportSpacer(3), m_sExportFilename(wxT("")), m_bIsModified(false), m_bEnableRefreshCalculationTime(true)
 
 {
 	m_pcResultMatrixInfo = new spsa::ResultMatrixInfo();

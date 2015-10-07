@@ -44,7 +44,7 @@ END_EVENT_TABLE()
 SP_GUI_SelectEditingList::SP_GUI_SelectEditingList(wxWindow* p_pcParent,const wxString& p_sTitle ,const SP_VectorString*
 		                                          p_sListToselectFrom,const spsa::VectorULong* p_pcInitalSelection,
 				                                 const SP_VectorDouble* p_pcCurrentValues)
-:wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER),
+:wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER),
 m_sListToselectFrom(p_sListToselectFrom),
 m_pcCurrentValues(p_pcCurrentValues)
 {

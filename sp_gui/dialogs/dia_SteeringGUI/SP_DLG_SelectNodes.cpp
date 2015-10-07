@@ -48,7 +48,7 @@ EVT_COMBOBOX(SP_GUI_STEERINGNODES_CURRENT_COLOR_NAME, SP_DLG_SelectNodes::OnColo
 END_EVENT_TABLE()
 
 SP_DLG_SelectNodes::SP_DLG_SelectNodes(wxWindow* p_pcParentWnd, spsa::Model * p_pcCurrentModel, const unsigned int& p_nCurrentView) :
-		wxDialog(p_pcParentWnd, -1, wxT("Select curves"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
+		wxDialog(p_pcParentWnd, -1, wxT("Select curves"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER),
 		m_bIsColoredModel(false),
 		m_nCurrentView(p_nCurrentView),
 		m_pcCurrentModel(p_pcCurrentModel)

@@ -27,7 +27,7 @@ SP_DLG_LayoutProperties::SP_DLG_LayoutProperties(SP_GUI_Mainframe* p_pcParent,
                                                const wxString& p_sTitle,
                                                long p_nStyle)
 :wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize,
-          p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
+          p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
 m_pcDoc(p_pcDoc)
 {
     /* top level sizer */

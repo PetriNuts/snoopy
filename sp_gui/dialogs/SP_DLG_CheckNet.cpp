@@ -48,7 +48,7 @@ BEGIN_EVENT_TABLE(SP_DLG_CheckNet, wxDialog)
 END_EVENT_TABLE()
 
 SP_DLG_CheckNet::SP_DLG_CheckNet( SP_MDI_View* p_pcView, wxWindow *p_parent, const wxString& p_title) :
-	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
+	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER),
 	m_nodeList(NULL)
 {
 	m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();

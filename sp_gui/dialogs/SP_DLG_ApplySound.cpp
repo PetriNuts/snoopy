@@ -70,7 +70,7 @@ SP_DLG_ApplySound::SP_DLG_ApplySound(const wxString& p_sAttrName, wxWindow* p_pc
 									 const wxString& p_sTitle, long p_nStyle) :
 
 wxDialog(p_pcParent, -1, p_sTitle, wxPoint( 120, 120), wxSize( 500, 300),
-		 p_nStyle)
+		 p_nStyle | wxSTAY_ON_TOP)
 {
 	m_pcParent = p_pcParent;
 	m_lAttrList.clear();

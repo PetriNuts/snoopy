@@ -80,7 +80,7 @@ END_EVENT_TABLE()
 
 SP_DLG_SMART::SP_DLG_SMART(wxWindow* p_pcParent)
 : wxDialog(p_pcParent, -1, wxT("SMART Export Configurator"), wxDefaultPosition, wxDefaultSize, 
-		   wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
+		   wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
 {
 	
 	

@@ -31,7 +31,7 @@ END_EVENT_TABLE()
 
 SP_DLG_IACommandConfigure::SP_DLG_IACommandConfigure(wxWindow *p_pcParent, SP_IA_Command *p_pcCmd)
 : wxDialog(p_pcParent, -1, wxT("Command Configuration"), wxDefaultPosition, wxDefaultSize, 
-		   wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
+		   wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
 m_pcCommand(p_pcCmd)
 {
 	

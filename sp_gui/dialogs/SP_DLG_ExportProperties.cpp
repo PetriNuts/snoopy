@@ -32,7 +32,7 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
                                                        const wxString& p_sTitle,
                                                        long p_nStyle)
   : wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize,
-	     p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
+	     p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
     m_pcExport(p_pcExport),
     m_pcDoc(p_pcDoc)
 {

@@ -54,7 +54,7 @@ SP_DLG_ChooseFTreeReduction::SP_DLG_ChooseFTreeReduction(SP_DS_Graph *p_pcGraph,
 				 wxWindow *p_parent, ReductionMap redNodes,
 				 const wxString& p_title)
   : wxDialog(p_parent, -1, p_title, wxDefaultPosition,
-	     wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
+	     wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER),
 	m_pcNodeColourizer(NULL),
 	m_colorize(FALSE),
 	m_bChanged(FALSE),

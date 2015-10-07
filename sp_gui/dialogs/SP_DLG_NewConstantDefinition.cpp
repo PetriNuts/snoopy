@@ -81,7 +81,7 @@ EVT_GRID_EDITOR_SHOWN( SP_DLG_NewConstantDefinition::OnEditorShown )
 END_EVENT_TABLE()
 
 SP_DLG_NewConstantDefinition::SP_DLG_NewConstantDefinition(wxWindow* p_pcParent, const wxString& p_sTitle, long p_nStyle) :
-		wxDialog(p_pcParent, -1, p_sTitle, wxPoint(120, 120), wxSize(1500, 400), p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
+		wxDialog(p_pcParent, -1, p_sTitle, wxPoint(120, 120), wxSize(1500, 400), p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
 		m_nMainSet(VALUES)
 
 {

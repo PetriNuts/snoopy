@@ -65,7 +65,7 @@ SP_WDG_DialogBool::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
 										  ,wxT("")
 										  ,wxDefaultPosition
 										  ,wxDefaultSize
-										  //,wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER
+										  ,wxCHK_2STATE | wxBU_NOTEXT
 										  );
 	        m_pcBoolCtrl.push_back(l_pcBoolCtrl);
 			wxBoxSizer* l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -106,7 +106,7 @@ SP_WDG_DialogBool::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
 										  ,wxT("")
 										  ,wxDefaultPosition
 										  ,wxDefaultSize
-										  //,wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER
+										  ,wxCHK_2STATE | wxBU_NOTEXT
 										  );
     		wxString l_pchValue = l_pcAttr->GetValueString();
     		l_pcBoolCtrl->SetValue(l_pchValue.Cmp(wxT("1")) == 0);

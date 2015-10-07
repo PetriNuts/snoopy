@@ -9,7 +9,7 @@
 
 
 
-#include "sp_gui/dialogs/dia_ColSPN//SP_DLG_ColStUnfolding.h"
+#include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStUnfolding.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
 
 IMPLEMENT_CLASS( SP_DLG_ColStUnfolding, wxDialog )
@@ -38,7 +38,7 @@ END_EVENT_TABLE()
 
 SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_Unfolding, wxWindow* p_pcParent,const wxString& p_sTitle, long p_nStyle) 
 		:wxDialog(p_pcParent, -1, p_sTitle, wxPoint( 120, 120),  wxSize( 1500, 400),
-			p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
+			p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
 {
 	m_pcColPN_Unfolding = p_pcColPN_Unfolding;
 	m_pcSizer = new wxBoxSizer( wxVERTICAL );

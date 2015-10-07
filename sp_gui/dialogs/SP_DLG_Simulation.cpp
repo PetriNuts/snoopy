@@ -1489,7 +1489,7 @@ void SP_DLG_Simulation::OnSimulationProperties(wxCommandEvent& p_cEvent)
 
     SP_DLG_SimulationProperties* l_pcDlg;
 
-    l_pcDlg = new SP_DLG_SimulationProperties(m_pcMainSimulator, NULL);
+    l_pcDlg = new SP_DLG_SimulationProperties(m_pcMainSimulator, this);
 
     l_pcDlg->ShowModal();
 

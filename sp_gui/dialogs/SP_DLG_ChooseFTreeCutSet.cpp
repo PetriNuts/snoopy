@@ -28,7 +28,7 @@ SP_DLG_ChooseFTreeCutSet::SP_DLG_ChooseFTreeCutSet(SP_DS_Graph *p_pcGraph,
 				 wxWindow *p_parent, list<SP_ListNode*>* cutSets,
 				 const wxString& p_title): 
 		wxDialog(p_parent, -1, p_title, wxDefaultPosition,
-	     wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
+	     wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER),
  	m_pcMapListNum2MarkValue(NULL),
 	m_pcMapListNum2CutSet(NULL),
     m_cutSets(cutSets),

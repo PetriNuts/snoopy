@@ -39,7 +39,7 @@ m_pcParent(p_pcParent)
 	{
 		m_bUpdateAllowed = true;
 	}
-	m_pcDialog = new wxDialog(m_pcParent, wxID_ANY, _("Check for Update"), wxDefaultPosition);
+	m_pcDialog = new wxDialog(m_pcParent, wxID_ANY, _("Check for Update"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP);
 	m_pcDialog->Show(false);
 }
 

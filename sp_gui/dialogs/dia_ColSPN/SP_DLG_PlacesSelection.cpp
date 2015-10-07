@@ -68,7 +68,7 @@ END_EVENT_TABLE()
 
 SP_DLG_PlacesSelection::SP_DLG_PlacesSelection(SP_DS_Metadata* p_pcEditMetadata, wxWindow* p_pcParent,
 		const wxString& p_sTitle, long p_nStyle) 
-		:wxDialog(p_pcParent, -1, p_sTitle, wxPoint( 120, 120), wxSize( 1500, 600), p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
+		:wxDialog(p_pcParent, -1, p_sTitle, wxPoint( 120, 120), wxSize( 1500, 600), p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
 		 m_sPlaceTransition(wxT("Place")),
 		 m_bComSingleRun(false),
          m_pcEditMetadata(p_pcEditMetadata),

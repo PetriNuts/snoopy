@@ -34,7 +34,7 @@ SP_DLG_SimulationParamterSelection::SP_DLG_SimulationParamterSelection(SP_DS_Ani
            p_sTitle, 
            wxDefaultPosition, 
            wxDefaultSize, 
-           p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
+           p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
   m_pcError(NULL),
   m_pcAnimation(NULL)
 {

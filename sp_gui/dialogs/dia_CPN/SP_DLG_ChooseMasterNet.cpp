@@ -24,7 +24,7 @@ BEGIN_EVENT_TABLE(SP_DLG_ChooseMasterNet, wxDialog)
 END_EVENT_TABLE()
 
 SP_DLG_ChooseMasterNet::SP_DLG_ChooseMasterNet(wxWindow *p_parent, const wxString& p_title) :
-	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)	
+	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER)
 {
 
 	wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);

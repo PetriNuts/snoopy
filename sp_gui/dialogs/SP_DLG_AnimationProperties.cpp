@@ -24,7 +24,7 @@ SP_DLG_AnimationProperties::SP_DLG_AnimationProperties(SP_DS_Animation* p_pcAnim
                                                        const wxString& p_sTitle,
                                                        long p_nStyle)
   : wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, 
-	     p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
+	     p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
     m_pcError(NULL),
     m_pcAnimation(p_pcAnim)
 {

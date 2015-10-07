@@ -55,7 +55,7 @@ SP_DLG_ExpressionAssistent::SP_DLG_ExpressionAssistent(SP_CPN_ExprAssistType p_E
 		const wxString& p_sTitle, long p_nStyle)
 
 :wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxSize(300, 500),
-			p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX )
+			p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX )
 
 {	
 	m_sColorsetName = p_psColorsetName;

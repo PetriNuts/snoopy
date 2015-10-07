@@ -55,7 +55,7 @@ SP_DLG_StParameterOverview::SP_DLG_StParameterOverview(wxWindow* p_pcParent,
 		const wxString& p_sTitle, long p_nStyle) :
 
 	wxDialog(p_pcParent, -1, p_sTitle, wxPoint( 120, 120), wxSize( 500, 300),
-			p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
+			p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
 
 {
 

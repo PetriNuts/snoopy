@@ -61,7 +61,7 @@ SP_DLG_StFunctionAssistent::SP_DLG_StFunctionAssistent(
 
 :
 	wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxSize(300, 500),
-			p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX )
+			p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX )
 
 {
 	m_nAssistentType = p_nAssistentType;

@@ -20,7 +20,7 @@ BEGIN_EVENT_TABLE(SP_DLG_ResultViewerProperties,wxDialog)
 END_EVENT_TABLE()
 
 SP_DLG_ResultViewerProperties::SP_DLG_ResultViewerProperties(SP_DS_ResultViewer* p_pcResultViewer,wxWindow* p_pcParent)
-:wxDialog(p_pcParent, wxID_ANY,wxT("Result Viewer Properties"),wxDefaultPosition,wxDefaultSize,wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE),
+:wxDialog(p_pcParent, wxID_ANY,wxT("Result Viewer Properties"),wxDefaultPosition,wxDefaultSize,wxRESIZE_BORDER | wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP),
 m_pcResultViewer(p_pcResultViewer)
 {
 	wxSizer* l_pcMainSizer = new wxBoxSizer( wxVERTICAL );

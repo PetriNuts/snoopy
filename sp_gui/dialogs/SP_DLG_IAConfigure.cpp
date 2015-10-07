@@ -54,7 +54,7 @@ END_EVENT_TABLE()
 
 SP_DLG_IAConfigure::SP_DLG_IAConfigure(wxWindow *p_pcParent, SP_IA_Manager *p_pcMgr)
   : wxDialog(p_pcParent, -1, wxT("Configure Interaction"), wxDefaultPosition, wxDefaultSize,
-	     wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
+	     wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
 {
 		m_pcManager = p_pcMgr;
 

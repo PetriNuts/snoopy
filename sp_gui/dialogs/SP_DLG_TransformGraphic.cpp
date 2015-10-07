@@ -28,7 +28,7 @@ SP_DLG_TransformGraphic::SP_DLG_TransformGraphic(SP_GUI_Mainframe* p_pcParent,
                                                  const wxString& p_sTitle,
                                                  long p_nStyle)
   :wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize,
-	    p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
+	    p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
    m_pcRadiusCtrl(NULL),
    m_nRadius(90),
    m_cPosition(p_cPosition),

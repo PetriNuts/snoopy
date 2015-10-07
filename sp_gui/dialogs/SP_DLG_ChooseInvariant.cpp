@@ -47,7 +47,7 @@ END_EVENT_TABLE()
 SP_DLG_ChooseInvariant::SP_DLG_ChooseInvariant(SP_DS_Graph *p_pcGraph,
 		wxWindow *p_parent, const wxString& p_title) :
 	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize,
-	wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER), m_pcNodeColourizer(NULL),
+	wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER), m_pcNodeColourizer(NULL),
 			m_colorize(FALSE), m_bChanged(false), m_pcListBox(NULL),
 			m_pcCheckBoxGradientColouring(NULL), m_pcKeepInvariant(NULL),
 			m_pcSelectNodes(NULL),

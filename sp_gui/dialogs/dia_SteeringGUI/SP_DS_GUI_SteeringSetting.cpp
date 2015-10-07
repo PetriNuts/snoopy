@@ -15,7 +15,7 @@ EVT_BUTTON(wxID_OK,SP_DS_GUI_SteeringSetting::OnOK)
 END_EVENT_TABLE();
 
 SP_DS_GUI_SteeringSetting::SP_DS_GUI_SteeringSetting(wxWindow* p_pcParent)
-:wxDialog(p_pcParent, -1, wxT("Setting"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
+:wxDialog(p_pcParent, -1, wxT("Setting"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER)
 {
 	      wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 

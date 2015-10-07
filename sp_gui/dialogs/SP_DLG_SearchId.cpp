@@ -33,7 +33,7 @@ BEGIN_EVENT_TABLE(SP_DLG_SearchId, wxDialog)
 END_EVENT_TABLE()
 
 SP_DLG_SearchId::SP_DLG_SearchId(SP_DS_Graph *p_graph, wxWindow *p_parent, const wxString& p_title) :
-	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
+	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER),
 	m_title(p_title), m_nSelect(0), m_sSelect(wxT("")), m_id(-1), m_sName(wxT("")), m_graph(p_graph), m_edgeList(nullptr), m_nodeList(nullptr)
 {
 	wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);

@@ -23,7 +23,7 @@ BEGIN_EVENT_TABLE(SP_DLG_RandomColor, wxDialog)
 END_EVENT_TABLE()
 
 SP_DLG_RandomColor::SP_DLG_RandomColor(vector<wxString>* p_pvColors, wxWindow *p_parent, const wxString& p_title) :
-	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)	
+	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER)
 {
 
 	m_pvColors = p_pvColors;

@@ -20,7 +20,7 @@ END_EVENT_TABLE()
 
 SP_DLG_IARegCmdList::SP_DLG_IARegCmdList(wxWindow *p_pcParent, SP_IA_Manager *p_pcMgr)
   : wxDialog(p_pcParent, -1, wxT("List of Registered Commands"), wxDefaultPosition, wxDefaultSize,
-	     wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
+	     wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
 {
 		m_pcManager = p_pcMgr;
 

@@ -15,7 +15,7 @@ enum
 
 SP_DLG_SelectXAxisVariable::SP_DLG_SelectXAxisVariable(wxWindow* p_pcParent, const SP_MapString2VectorString& p_mChoices, const wxString& p_sCurrentSelectedCategory,
 		const wxString& p_sCurrentSelectedSubCategory) :
-		wxDialog(p_pcParent, wxID_ANY, wxT("Select X axis variable"), wxDefaultPosition, wxDefaultSize),
+		wxDialog(p_pcParent, wxID_ANY, wxT("Select X axis variable"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP),
 		m_sSelectedCategory(p_sCurrentSelectedCategory),
 		m_sSelectedSubCategory(p_sCurrentSelectedSubCategory),
 		m_mChoices(p_mChoices)

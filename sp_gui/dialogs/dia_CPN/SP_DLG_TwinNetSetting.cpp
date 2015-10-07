@@ -35,7 +35,7 @@ BEGIN_EVENT_TABLE(SP_DLG_TwinNetSetting, wxDialog)
 END_EVENT_TABLE()
 
 SP_DLG_TwinNetSetting::SP_DLG_TwinNetSetting(wxWindow *p_parent, const wxString& p_title) :
-	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
+	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER),
 	m_pcColorSetTextCtrl(NULL),
 	m_pcVariableTextCtrl(NULL),
 	m_pcColorsTextCtrl(NULL),

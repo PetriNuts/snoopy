@@ -54,7 +54,7 @@ SP_DLG_ColListOverview::SP_DLG_ColListOverview(const wxString& p_sAttrName, wxWi
 		const wxString& p_sTitle, long p_nStyle) :
 
 	wxDialog(p_pcParent, -1, p_sTitle, wxPoint( 120, 120), wxSize( 500, 300),
-			p_nStyle | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
+			p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
 m_sAttrName(p_sAttrName), m_chSeperator(wxT(':'))
 {
 	m_pcParent = p_pcParent;

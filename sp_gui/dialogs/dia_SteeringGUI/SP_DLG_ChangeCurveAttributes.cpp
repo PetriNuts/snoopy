@@ -16,7 +16,7 @@ EVT_COLOURPICKER_CHANGED(wxID_ANY,SP_DLG_ChangeCurveAttributes::OnCurveColorChan
 END_EVENT_TABLE()
 
 SP_DLG_ChangeCurveAttributes::SP_DLG_ChangeCurveAttributes(wxWindow* p_pcParent,const wxString& p_sColor,const int& p_nLineWidth,const int p_nLineStyle)
-:wxDialog(p_pcParent, -1, wxT("Edit curve properties"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE),
+:wxDialog(p_pcParent, -1, wxT("Edit curve properties"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP),
 m_nLineWidth(p_nLineWidth),
 m_nLineStyle(p_nLineStyle)
 {

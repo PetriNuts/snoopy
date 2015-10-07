@@ -16,7 +16,7 @@ EVT_BUTTON(wxID_OK,SP_DLG_SimulatorSetting::OnOK)
 END_EVENT_TABLE()
 
 SP_DLG_SimulatorSetting::SP_DLG_SimulatorSetting(wxWindow* p_pcParentWnd,spsa::SteeringClient* p_pcGUIClient,const wxString& p_sSimName)
-:wxDialog(p_pcParentWnd,wxID_ANY, wxT("Simulator Setting"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER),
+:wxDialog(p_pcParentWnd,wxID_ANY, wxT("Simulator Setting"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER),
 m_pcGUIClient(p_pcGUIClient),
 m_bInitialised(false),
 m_sSimulatorName(p_sSimName)

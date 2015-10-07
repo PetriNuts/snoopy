@@ -53,7 +53,7 @@ END_EVENT_TABLE()
 
 SP_DLG_GlobalPreferences::SP_DLG_GlobalPreferences(wxWindow* p_pcParent)
 : wxDialog(p_pcParent, -1, wxT("Global Preferences"), wxDefaultPosition, wxDefaultSize,
-		   wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
+		   wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
 {
 
 	m_pcCanvasPrefs = wxGetApp().GetCanvasPrefs();
