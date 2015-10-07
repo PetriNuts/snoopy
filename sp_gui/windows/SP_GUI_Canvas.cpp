@@ -41,7 +41,7 @@ SP_GUI_Canvas::SP_GUI_Canvas(SP_MDI_View* p_pcView,
 	wxShapeCanvas(p_pcFrame, p_nId, p_cPos, p_cSize, p_nStyle),
 			m_pcView(p_pcView), m_pcParentframe(p_pcFrame),
 			m_pcEditElement(NULL), m_pcControlPoints(NULL),
-			m_nLastPosX(0),m_nLastPosY(0)
+			m_nSizeX(SP_DEFAULT_GRID_SIZE), m_nSizeY(SP_DEFAULT_GRID_SIZE)
 {
 	m_bStartup = TRUE;
 	SetView(p_pcView);
@@ -49,9 +49,16 @@ SP_GUI_Canvas::SP_GUI_Canvas(SP_MDI_View* p_pcView,
 	SetBackgroundColour(wxColour(wxT("WHITE")));
 	SetBackgroundStyle(wxBG_STYLE_PAINT);
 	SetCursor(wxCursor(wxCURSOR_HAND));
+	SP_MDI_Doc* l_pcDoc = SP_Core::Instance()->GetRootDocument();
+	if(l_pcDoc)
+	{
+		int l_nSize = wxGetApp().GetCanvasPrefs()->GetGridSize(l_pcDoc->GetNetclassName());
+		m_nSizeX = l_nSize;
+		m_nSizeY = l_nSize;
+	}
 
 	SetScrollRate(SP_DEFAULT_GRID_SPACING, SP_DEFAULT_GRID_SPACING);
-	SetVirtualSize(SP_DEFAULT_GRID_SIZE, SP_DEFAULT_GRID_SIZE);
+	SetVirtualSize(m_nSizeX, m_nSizeX);
 	EnableScrolling(true,true);
 }
 
@@ -119,20 +126,8 @@ void SP_GUI_Canvas::OnPaint(wxPaintEvent &p_cEvent)
 	if (!GetDiagram())
 		return;
 
-	SP_MDI_Doc* l_pcDoc = SP_Core::Instance()->GetRootDocument();
-	if(l_pcDoc)
-	{
-		int l_nSize = wxGetApp().GetCanvasPrefs()->GetGridSize(l_pcDoc->GetNetclassName());
-		SetVirtualSize(l_nSize*GetScaleX(), l_nSize*GetScaleY());
-/*
-		SetScrollbars(SP_DEFAULT_GRID_SPACING,
-					SP_DEFAULT_GRID_SPACING,
-					l_nSize/SP_DEFAULT_GRID_SPACING*GetScaleX(),
-					l_nSize/SP_DEFAULT_GRID_SPACING*GetScaleY(),
-					GetScrollPos(wxHORIZONTAL),
-					GetScrollPos(wxVERTICAL));
-*/
-	}
+	//adapt virtual size for zoom
+	SetVirtualSize(m_nSizeX*GetScaleX(), m_nSizeY*GetScaleY());
 
 	// new paint implementation
 	wxAutoBufferedPaintDC dc(this);
@@ -946,10 +941,18 @@ SP_GUI_Canvas::MoveShapes(double p_nOffsetX, double p_nOffsetY)
         if (l_pcShape->Selected() &&
             !l_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
         {
+        	double l_nX = l_pcShape->GetX() + p_nOffsetX;
+        	double l_nY = l_pcShape->GetY() + p_nOffsetY;
             // to get the line attachments right
-            l_pcShape->Move(l_cDC,
-            l_pcShape->GetX() + p_nOffsetX,
-            l_pcShape->GetY() + p_nOffsetY);
+            l_pcShape->Move(l_cDC, l_nX, l_nY);
+            if(m_nSizeX < WXROUND(l_nX))
+            {
+            	m_nSizeX = WXROUND(l_nX) + 20;
+            }
+            if(m_nSizeY < WXROUND(l_nY))
+            {
+            	m_nSizeY = WXROUND(l_nY) + 20;
+            }
         }
         l_pcNode = l_pcNode->GetNext();
     }

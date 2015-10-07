@@ -712,6 +712,15 @@ SP_Graphic::SetPosX(double p_nVal)
     if (!GetPrimitive())
         return FALSE;
 
+    if(GetPrimitive()->GetCanvas())
+    {
+    	wxSize l_VirtualSize = GetPrimitive()->GetCanvas()->GetVirtualSize();
+    	if(l_VirtualSize.GetX() < p_nVal)
+    	{
+        	static_cast<SP_GUI_Canvas*>(GetPrimitive()->GetCanvas())->SetVirtualSizeX(WXROUND(p_nVal+20));
+    	}
+    }
+
     GetPrimitive()->SetX(p_nVal);
     return TRUE;
 }
@@ -729,6 +738,15 @@ SP_Graphic::SetPosY(double p_nVal)
 {
     if (!GetPrimitive())
         return FALSE;
+
+	if(GetPrimitive()->GetCanvas())
+    {
+    	wxSize l_VirtualSize = GetPrimitive()->GetCanvas()->GetVirtualSize();
+    	if(l_VirtualSize.GetY() < p_nVal)
+    	{
+        	static_cast<SP_GUI_Canvas*>(GetPrimitive()->GetCanvas())->SetVirtualSizeY(WXROUND(p_nVal+20));
+    	}
+    }
 
     GetPrimitive()->SetY(p_nVal);
     return TRUE;

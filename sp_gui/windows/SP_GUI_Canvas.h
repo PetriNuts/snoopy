@@ -47,8 +47,11 @@ protected:
     //! while drawing a line
     wxList* m_pcControlPoints;
 
-    double m_nLastPosX;
-    double m_nLastPosY;
+    int m_nSizeX = 0;
+    int m_nSizeY = 0;
+
+    double m_nLastPosX = 0;
+    double m_nLastPosY = 0;
 
     bool UnSelectAll(int p_nKeys = 0);
 
@@ -122,6 +125,9 @@ public:
     bool MoveShapes(double p_nOffsetX, double p_nOffsetY);
 
     wxOverlay& GetOverlay() { return m_Overlay; }
+
+    void SetVirtualSizeX(int x) { m_nSizeX = x; }
+    void SetVirtualSizeY(int y) { m_nSizeY = y; }
 };
 
 #endif // __SP_GUI_CANVAS_H__
