@@ -57,10 +57,8 @@ SP_GR_DoubleMultiplicityAttribute::FormatText()
     if (m_pcPrimitive)
         m_pcPrimitive->Show(m_bShow && (l_pchVal.Len() != 0) && ((1 < l_nVal) || (1 > l_nVal)));
 
-    SP_FormatWithComma(l_pchVal);
-
     wxString l_sVal = m_sFormat;
-    l_sVal.Replace(wxT("%"), l_pchVal);
+    l_sVal.Replace(wxT("%"), SP_FormatWithComma(l_pchVal));
 
     return l_sVal;
 }

@@ -132,8 +132,7 @@ SP_GR_ContinuousMarkAttribute::DrawValue(wxString p_sValue)
 
 	if(m_bColorNet) // By Liu
 	{
-		wxString l_sValue = p_sValue;
-		SP_FormatWithComma(l_sValue);
+		wxString l_sValue = SP_FormatWithComma(p_sValue);
         if(m_pcPrimitive->CalculateDimensions(l_sValue))
         {
     		double l_nX = m_pcPrimitive->GetWidth();

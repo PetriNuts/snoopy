@@ -116,7 +116,7 @@ bool SP_GR_DoubleMarkAttribute::DrawValue(double p_nValue)
 	m_pcPrimitive->Show(m_bShow && (p_nValue > 0));
     wxString l_sValue;
     l_sValue << p_nValue;
-    SP_FormatWithComma(l_sValue);
+    l_sValue = SP_FormatWithComma(l_sValue);
     if(m_pcPrimitive->CalculateDimensions(l_sValue))
     {
 		double l_nX = m_pcPrimitive->GetWidth();

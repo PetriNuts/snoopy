@@ -96,8 +96,7 @@ SP_GR_MarkNumberAttribute::DrawValueString(const wxString& p_nValue)
 
 	m_pcPrimitive->Show(m_bShow && !p_nValue.IsEmpty() && p_nValue != wxT("0"));
 
-	wxString l_sValue = p_nValue;
-	SP_FormatWithComma(l_sValue);
+	wxString l_sValue = SP_FormatWithComma(p_nValue);
 
 	if(m_pcPrimitive->CalculateDimensions(l_sValue))
 	{

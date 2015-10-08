@@ -120,10 +120,8 @@ SP_GR_MultiplicityAttribute::FormatText()
 	if (m_pcPrimitive)
 		m_pcPrimitive->Show(l_bShow);
 
-    SP_FormatWithComma(l_pchVal);
-
 	wxString l_sVal = m_sFormat;
-	l_sVal.Replace(wxT("%"), l_pchVal);
+	l_sVal.Replace(wxT("%"), SP_FormatWithComma(l_pchVal));
 
     return l_sVal;
 }

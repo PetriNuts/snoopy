@@ -102,10 +102,8 @@ SP_GR_DoubleAttribute::FormatText()
     if (m_pcPrimitive)
         m_pcPrimitive->Show(m_bShow && (value > 0));
 
-    SP_FormatWithComma(l_pchVal);
-
     wxString l_sVal = m_sFormat;
-    l_sVal.Replace(wxT("%"), l_pchVal);
+    l_sVal.Replace(wxT("%"), SP_FormatWithComma(l_pchVal));
 
     return l_sVal;
 }

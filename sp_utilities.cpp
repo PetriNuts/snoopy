@@ -134,38 +134,41 @@ unsigned long SP_RandomLong(unsigned long p_nUpperbound)
 }
 
 /**
- * copy of wxNumberFormatter::AddThousandsSeparators
+ * Add Thousands Separators
  */
-bool
-SP_FormatWithComma(wxString& s)
+wxString
+SP_FormatWithComma(const wxString& s)
 {
+	if(s.length() < 4)
+		return s;
+
+	double v;
+	if(!s.ToDouble(&v))
+		return s;
+
     wxChar thousandsSep = wxT(',');
     wxChar decimalSep = wxT('.');
-    wxString doubleRegEx;
-    doubleRegEx << wxT("^[0-9]*\\") << decimalSep << wxT("?[0-9]+([eE][-+]?[0-9]+)?$");
-	wxRegEx regEx(doubleRegEx);
-	if(regEx.Matches(s))
+
+	size_t pos = s.find(decimalSep);
+	if ( pos == wxString::npos )
 	{
-	    size_t pos = s.find(decimalSep);
-	    if ( pos == wxString::npos )
-	    {
-	        // Start grouping at the end of an integer number.
-	        pos = s.length();
-	    }
-
-	    // We currently group digits by 3 independently of the locale.
-	    const size_t GROUP_LEN = 3;
-
-	    while ( pos > GROUP_LEN )
-	    {
-	        pos -= GROUP_LEN;
-	        s.insert(pos, thousandsSep);
-	    }
-
-		return true;
+		// Start grouping at the end of an integer number.
+		pos = s.length();
 	}
 
-	return false;
+	wxString res{s};
+	res.resize(s.length() + pos/3);
+
+	// We currently group digits by 3 independently of the locale.
+	const size_t GROUP_LEN = 3;
+
+	while ( pos > GROUP_LEN )
+	{
+		pos -= GROUP_LEN;
+		res.insert(pos, thousandsSep);
+	}
+
+	return res;
 }
 
 void SP_LOGDEBUG(const wxString& s)

@@ -170,8 +170,7 @@ SP_GR_MarkAttribute::DrawValueString(const wxString& p_nValue)
 	}
 	else
 	{
-		wxString l_sValue = p_nValue;
-		SP_FormatWithComma(l_sValue);
+		wxString l_sValue = SP_FormatWithComma(p_nValue);
 
 		if(m_pcPrimitive->CalculateDimensions(l_sValue))
 		{

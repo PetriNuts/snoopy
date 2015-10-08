@@ -101,9 +101,9 @@ wxString SP_ToWxString(T p_Param)
 }
 
 /**
- * copy of wxNumberFormatter::AddThousandsSeparators
+ * Add Thousands Separators
  */
-bool SP_FormatWithComma(wxString& s);
+wxString SP_FormatWithComma(const wxString& s);
 
 /**	\brief	replaces all non-alphanum chars with "_"
 	\param	string to normalize
