@@ -25,6 +25,8 @@
 #include "sp_gui/dialogs/SP_DLG_IARegCmdList.h"
 #include "sp_gui/dialogs/SP_DLG_ReduceFTree.h"
 #include "sp_gui/dialogs/SP_DLG_LayoutProperties.h"
+#include "sp_gui/dialogs/SP_DLG_DivideNodes.h"
+#include "sp_gui/dialogs/SP_DLG_UnifyNodes.h"
 #include "sp_ds/extensions/FTree/SP_DS_FTreeDeMorganTransformer.h"
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StSimulationResults.h"
 #include "sp_gui/dialogs/dia_ContinuousPN/SP_DLG_CPNSimulationResults.h"
@@ -2054,6 +2056,16 @@ void SP_MDI_View::OnUnifyNodes(wxCommandEvent &p_cEvent) {
 	SP_ListGraphic l_lGraphic;
 	FindSelectedGraphics(l_lGraphic, false);
 
+	if(l_lGraphic.empty())
+	{
+		SP_MDI_Doc* l_pcDoc = dynamic_cast<SP_MDI_Doc*>(GetDocument());
+		SP_DS_Graph* l_pcGraph = l_pcDoc->GetGraph();
+
+		SP_DLG_UnifyNodes l_Dlg(l_pcGraph, GetNetnumber(), &l_lGraphic, m_pcFrame);
+		l_Dlg.ShowModal();
+
+	}
+
 	DoUnifyNodes(l_lGraphic);
 }
 
@@ -2088,6 +2100,15 @@ void SP_MDI_View::OnDivideNodes(wxCommandEvent &p_cEvent) {
 	SP_ListGraphic l_lGraphic;
 	FindSelectedGraphics(l_lGraphic, false);
 
+	if(l_lGraphic.empty())
+	{
+		SP_MDI_Doc* l_pcDoc = dynamic_cast<SP_MDI_Doc*>(GetDocument());
+		SP_DS_Graph* l_pcGraph = l_pcDoc->GetGraph();
+
+		SP_DLG_DivideNodes l_Dlg(l_pcGraph, GetNetnumber(), &l_lGraphic, m_pcFrame);
+		l_Dlg.ShowModal();
+
+	}
 	DoDivideNodes(l_lGraphic);
 }
 

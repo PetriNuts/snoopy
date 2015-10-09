@@ -129,10 +129,10 @@ bool SP_LayoutOGDF::SP_FMMMLayout(Graph* p_Graph, GraphAttributes* p_GraphAttr)
 	FMMMLayout* l_Layout = new FMMMLayout();
 
 	l_Layout->useHighLevelOptions(true);
-	l_Layout->unitEdgeLength(80.0);
+	l_Layout->unitEdgeLength(40.0);
 	l_Layout->newInitialPlacement(true);
-	l_Layout->minDistCC(80.0);
-	l_Layout->tipOverCCs(FMMMLayout::toNone);
+	l_Layout->minDistCC(40.0);
+	l_Layout->tipOverCCs(FMMMLayout::toNoGrowingRow);
 	l_Layout->qualityVersusSpeed(FMMMLayout::qvsGorgeousAndEfficient);
 
 	l_Layout->call(*p_GraphAttr);

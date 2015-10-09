@@ -1017,6 +1017,8 @@ int SP_DS_Node::Unify(SP_GR_Node *p_pcGraphic, SP_GUI_Canvas* p_pcCanvas)
 		l_pcAttr->SetValueString(wxT("0"));
 	}
 
+	Update(false);
+
 	if (p_pcGraphic->GetPrimitive())
 	{
 		wxClientDC l_cDC(p_pcCanvas);
