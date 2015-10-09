@@ -7,8 +7,7 @@
 #include "export/SP_ExportEPS.h"
 #include "export/SP_EPSDC.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
-
-#include <wx/cmndata.h>
+#include "sp_gui/windows/SP_GUI_Canvas.h"
 
 SP_ExportEPS::~SP_ExportEPS()
 {
@@ -29,7 +28,10 @@ SP_ExportEPS::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 
   wxPrintData *pd = new wxPrintData();
   pd->SetFilename(p_fileName);
-  pd->SetPaperId(wxPAPER_A0);
+  pd->SetPaperId(wxPAPER_NONE);
+  int x = static_cast<SP_GUI_Canvas*>(p_doc->GetDiagram()->GetCanvas())->GetVirtualSizeX();
+  int y = static_cast<SP_GUI_Canvas*>(p_doc->GetDiagram()->GetCanvas())->GetVirtualSizeY();
+  pd->SetPaperSize(wxSize(x+100,y+100));
   pd->SetPrintMode(wxPRINT_MODE_FILE);
   SP_EPSDC epsDC (*pd);
 #if wxABI_VERSION < 30000

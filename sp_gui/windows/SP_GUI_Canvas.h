@@ -126,6 +126,8 @@ public:
 
     wxOverlay& GetOverlay() { return m_Overlay; }
 
+    int GetVirtualSizeX() { return m_nSizeX; }
+    int GetVirtualSizeY() { return m_nSizeY; }
     void SetVirtualSizeX(int x) { m_nSizeX = x; }
     void SetVirtualSizeY(int y) { m_nSizeY = y; }
 };
