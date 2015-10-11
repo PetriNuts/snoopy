@@ -118,7 +118,8 @@ public:
 
 
 	void OnModifyMarkingSets(wxCommandEvent& p_cEvent);
-	void OnMarkingSetChanged(wxCommandEvent& p_cEvent);
+	void OnModifyConstantSets(wxCommandEvent& p_cEvent);
+	void OnConstantSetsChanged(wxCommandEvent& p_cEvent);
 
 	//Export & Import options - Extra methods added
 	void OnExport(wxCommandEvent &p_pcEvent);

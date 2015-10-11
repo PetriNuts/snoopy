@@ -121,6 +121,7 @@ public:
 
     void Modify(bool p_bVal);
 
+    bool MoveShape(wxShape* p_pcShape, double p_nOffsetX, double p_nOffsetY);
     bool MoveLinePoints(double p_nOffsetX, double p_nOffsetY);
     bool MoveShapes(double p_nOffsetX, double p_nOffsetY);
 
@@ -130,6 +131,8 @@ public:
     int GetVirtualSizeY() { return m_nSizeY; }
     void SetVirtualSizeX(int x) { m_nSizeX = x; }
     void SetVirtualSizeY(int y) { m_nSizeY = y; }
+    bool UpdateVirtualSize(int x, int y);
+
 };
 
 #endif // __SP_GUI_CANVAS_H__

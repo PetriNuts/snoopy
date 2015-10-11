@@ -142,10 +142,8 @@ SP_GR_BaseEdge::InsertControlPoint(double p_nX, double p_nY)
         wxDELETE(l_pcNewPoint);
     }
 
-    wxClientDC l_cDC(GetCanvas());
-    GetCanvas()->DoPrepareDC(l_cDC);
-    GetFrom()->Move(l_cDC, GetFrom()->GetX(), GetFrom()->GetY());
-    GetTo()->Move(l_cDC, GetTo()->GetX(), GetTo()->GetY());
+    static_cast<SP_GUI_Canvas*>(GetCanvas())->MoveShape(GetFrom(), 0, 0);
+    static_cast<SP_GUI_Canvas*>(GetCanvas())->MoveShape(GetTo(), 0, 0);
 
     return TRUE;
 }

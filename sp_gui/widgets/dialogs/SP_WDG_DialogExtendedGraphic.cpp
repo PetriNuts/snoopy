@@ -335,8 +335,6 @@ SP_WDG_DialogExtendedGraphic::OnDlgOk()
 {
 	SP_GUI_Canvas *l_cCanvas = (*m_lGraphics.begin())->GetCanvas();
 	if (!l_cCanvas) return TRUE;
-	wxClientDC l_cDC(l_cCanvas);
-
 
     SP_ListGraphic::iterator l_Iter;
     for (l_Iter = m_lGraphics.begin(); l_Iter != m_lGraphics.end(); ++l_Iter)
@@ -415,13 +413,12 @@ SP_WDG_DialogExtendedGraphic::OnDlgOk()
 		}
 		if ((*l_Iter)->GetPrimitive() && (*l_Iter)->GetGraphicType() == SP_GRAPHIC_NODE)
 		{
-           	 (*l_Iter)->GetPrimitive()->Move(l_cDC, (*l_Iter)->GetPrimitive()->GetX(), (*l_Iter)->GetPrimitive()->GetY());
+			l_cCanvas->MoveShape((*l_Iter)->GetPrimitive(), 0, 0);
 		}
 
 		(*l_Iter)->Update(true);
 	}
 
-	l_cCanvas->DoPrepareDC(l_cDC);
 	l_cCanvas->Refresh();
 
 

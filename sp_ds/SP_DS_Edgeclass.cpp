@@ -356,10 +356,8 @@ SP_DS_Edgeclass::OnEndElement(SP_Graphic* p_pcShape, double p_nX, double p_nY, i
 				p_pcShape->GetParent()->Update(false);
 				m_pcStartShape->GetParent()->Update(false);
 				//move nodes to get edge looking nice
-				wxClientDC l_cDC(l_pcCanvas);
-				l_pcCanvas->DoPrepareDC(l_cDC);
-				m_pcStartShape->GetPrimitive()->Move(l_cDC, m_pcStartShape->GetPosX(), m_pcStartShape->GetPosY());
-				p_pcShape->GetPrimitive()->Move(l_cDC, p_pcShape->GetPosX(), p_pcShape->GetPosY());
+                l_pcCanvas->MoveShape(m_pcStartShape->GetPrimitive(), 0, 0);
+                l_pcCanvas->MoveShape(p_pcShape->GetPrimitive(), 0, 0);
             }
 			if(m_pcStartShape->GetParent()->GetCoarse())
 			{
@@ -370,10 +368,7 @@ SP_DS_Edgeclass::OnEndElement(SP_Graphic* p_pcShape, double p_nX, double p_nY, i
 	            l_pcEdge->ShowOnCanvas(l_pcCanvas, false, p_nX, p_nY, p_nKeys);
 				p_pcShape->GetParent()->Update(false);
 				m_pcStartShape->GetParent()->Update(false);
-
-				wxClientDC l_cDC(l_pcCanvas);
-				l_pcCanvas->DoPrepareDC(l_cDC);
-				l_pcGrTarget->GetPrimitive()->Move(l_cDC, l_pcGrTarget->GetPosX(), l_pcGrTarget->GetPosY());
+                l_pcCanvas->MoveShape(l_pcGrTarget->GetPrimitive(), 0, 0);
 			}
 			if(p_pcShape->GetParent()->GetCoarse())
 			{
@@ -384,10 +379,7 @@ SP_DS_Edgeclass::OnEndElement(SP_Graphic* p_pcShape, double p_nX, double p_nY, i
 	            l_pcEdge->ShowOnCanvas(l_pcCanvas, false, p_nX, p_nY, p_nKeys);
 				p_pcShape->GetParent()->Update(false);
 				m_pcStartShape->GetParent()->Update(false);
-
-				wxClientDC l_cDC(l_pcCanvas);
-				l_pcCanvas->DoPrepareDC(l_cDC);
-				l_pcGrSource->GetPrimitive()->Move(l_cDC, l_pcGrSource->GetPosX(), l_pcGrSource->GetPosY());
+                l_pcCanvas->MoveShape(l_pcGrSource->GetPrimitive(), 0, 0);
 			}
 
         }

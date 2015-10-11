@@ -20,7 +20,6 @@
 #include "sp_ds/attributes/SP_DS_MarkingAttribute.h"
 #include "sp_ds/attributes/SP_DS_MarkingDependentMultiplicity.h"
 #include "sp_gui/dialogs/SP_DLG_NewConstantDefinition.h"
-
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StSimulationResults.h"
 
 #include "sp_ds/animators/ani_SPN/SP_DS_StPlaceAnimator.h"
@@ -51,14 +50,17 @@ enum
 
 	SP_ID_BUTTON_OPEN_SIMULATION,
 
-	SP_ID_COMBOBOX_FUNCTION_SETS, SP_ID_COMBOBOX_MARKING_SETS, SP_ID_COMBOBOX_PARAMETER_SETS, SP_ID_COMBOBOX_WEIGHT_SETS,
+	SP_ID_COMBOBOX_FUNCTION_SETS,
+	SP_ID_COMBOBOX_MARKING_SETS,
+	SP_ID_COMBOBOX_CONSTANT_SETS,
+	SP_ID_COMBOBOX_WEIGHT_SETS,
 
 	SP_ID_COMBOBOX_DELAY_SETS, //By Liu on 6 Mar. 2009
 	SP_ID_COMBOBOX_SCHEDULE_SETS,//By Liu on 6 Mar. 2009
 
 	SP_ID_BUTTON_MODIFY_MARKING_SETS,
 	SP_ID_BUTTON_MODIFY_FUNCTION_SETS,
-	SP_ID_BUTTON_MODIFY_PARAMETER_SETS,
+	SP_ID_BUTTON_MODIFY_CONSTANT_SETS,
 
 	SP_ID_BUTTON_MODIFY_DELAY_SETS, //By Liu on 6 Mar. 2009
 	SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, //By Liu on 6 Mar. 2009
@@ -70,9 +72,8 @@ enum
 };
 BEGIN_EVENT_TABLE( SP_DS_StAnimation, SP_DS_PedAnimation)
 
-EVT_COMBOBOX( SP_ID_COMBOBOX_MARKING_SETS, SP_DS_StAnimation::OnMarkingSetChanged )
 EVT_COMBOBOX( SP_ID_COMBOBOX_FUNCTION_SETS, SP_DS_StAnimation::OnSetsChanged )
-//EVT_COMBOBOX( SP_ID_COMBOBOX_PARAMETER_SETS, SP_DS_StAnimation::OnSetsChanged )
+EVT_COMBOBOX( SP_ID_COMBOBOX_CONSTANT_SETS, SP_DS_StAnimation::OnConstantSetsChanged )
 
 EVT_COMBOBOX( SP_ID_COMBOBOX_WEIGHT_SETS, SP_DS_StAnimation::OnSetsChanged ) //By Liu on 6 Mar. 2009
 EVT_COMBOBOX( SP_ID_COMBOBOX_DELAY_SETS, SP_DS_StAnimation::OnSetsChanged ) //By Liu on 6 Mar. 2009
@@ -82,7 +83,7 @@ EVT_BUTTON( SP_ID_BUTTON_OPEN_SIMULATION, SP_DS_StAnimation :: OnOpenSimulation 
 
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_MARKING_SETS, SP_DS_StAnimation :: OnModifyMarkingSets )
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_FUNCTION_SETS, SP_DS_StAnimation :: OnModifyFunctionSets )
-//EVT_BUTTON( SP_ID_BUTTON_MODIFY_PARAMETER_SETS, SP_DS_StAnimation :: OnModifyParameterSets )
+EVT_BUTTON( SP_ID_BUTTON_MODIFY_CONSTANT_SETS, SP_DS_StAnimation :: OnModifyConstantSets )
 
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_WEIGHT_SETS, SP_DS_StAnimation :: OnModifyWeightSets ) //By Liu on 6 Mar. 2009
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_DELAY_SETS, SP_DS_StAnimation :: OnModifyDelaySets ) //By Liu on 6 Mar. 2009
@@ -90,14 +91,14 @@ EVT_BUTTON( SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, SP_DS_StAnimation :: OnModifySche
 
 EVT_UPDATE_UI(SP_ID_COMBOBOX_MARKING_SETS, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_COMBOBOX_FUNCTION_SETS, SP_DS_StAnimation::OnUpdateUI)
-//EVT_UPDATE_UI(SP_ID_COMBOBOX_PARAMETER_SETS, SP_DS_StAnimation::OnUpdateUI)
+EVT_UPDATE_UI(SP_ID_COMBOBOX_CONSTANT_SETS, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_COMBOBOX_WEIGHT_SETS, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_COMBOBOX_DELAY_SETS, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_COMBOBOX_SCHEDULE_SETS, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_BUTTON_OPEN_SIMULATION, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_MARKING_SETS, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_FUNCTION_SETS, SP_DS_StAnimation::OnUpdateUI)
-//EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_PARAMETER_SETS, SP_DS_StAnimation::OnUpdateUI)
+EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_CONSTANT_SETS, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_WEIGHT_SETS, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_DELAY_SETS, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, SP_DS_StAnimation::OnUpdateUI)
@@ -519,6 +520,12 @@ bool SP_DS_StAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSi
 	l_pcOutputLabelSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Marking overview:")), wxSizerFlags(1).Expand().Border(wxALL, 5));
+	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("")), wxSizerFlags(1).Expand().Border(wxALL, 5));
+	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), wxSizerFlags(0).Expand().Border(wxALL, 5));
+	l_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
+
+	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Function set:")), 1, wxALL | wxEXPAND, 5);
 	m_apcComboBoxes.push_back(new wxComboBox(p_pcCtrl, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
 	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5);
@@ -554,9 +561,9 @@ bool SP_DS_StAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSi
 		wxString l_sGroup = *l_itChoice;
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 		l_pcRowSizer->Add( new wxStaticText( p_pcCtrl, -1, l_sGroup + wxT(':') ), 1, wxALL | wxEXPAND, 5 );
-		m_apcComboBoxes.push_back(new wxComboBox( p_pcCtrl, SP_ID_COMBOBOX_MARKING_SETS , wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
+		m_apcComboBoxes.push_back(new wxComboBox( p_pcCtrl, SP_ID_COMBOBOX_CONSTANT_SETS , wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
 		l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5 );
-		l_pcRowSizer->Add( new wxButton( p_pcCtrl, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify") ), 0, wxALL, 5 );
+		l_pcRowSizer->Add( new wxButton( p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), 0, wxALL, 5 );
 		l_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND);
 	}
 
@@ -708,21 +715,9 @@ bool SP_DS_StAnimation::AddToDialog(SP_DLG_AnimationProperties* p_pcDlg, wxSizer
 	return TRUE;
 }
 
-void SP_DS_StAnimation::OnModifyMarkingSets(wxCommandEvent& p_cEvent)
-{
-	SP_DLG_NewConstantDefinition* l_pcDlg = new SP_DLG_NewConstantDefinition(NULL);
-
-	if (l_pcDlg->ShowModal() == wxID_OK)
-	{
-		LoadSets();
-	}
-
-	l_pcDlg->Destroy();
-}
-
 void SP_DS_StAnimation::OnModifyFunctionSets(wxCommandEvent& p_cEvent)
 {
-	SP_DLG_StFunctionOverview* l_pcDlg = new SP_DLG_StFunctionOverview(wxT("Transition"), NULL);
+	SP_DLG_StFunctionOverview* l_pcDlg = new SP_DLG_StFunctionOverview(wxT("Transition"), m_pcDialog);
 
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{
@@ -735,7 +730,7 @@ void SP_DS_StAnimation::OnModifyFunctionSets(wxCommandEvent& p_cEvent)
 void
 SP_DS_StAnimation::OnModifyWeightSets( wxCommandEvent& p_cEvent )
 {
-	SP_DLG_StFunctionOverview* l_pcDlg = new SP_DLG_StFunctionOverview(wxT("Immediate Transition"), NULL);
+	SP_DLG_StFunctionOverview* l_pcDlg = new SP_DLG_StFunctionOverview(wxT("Immediate Transition"), m_pcDialog);
 
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{
@@ -748,7 +743,7 @@ SP_DS_StAnimation::OnModifyWeightSets( wxCommandEvent& p_cEvent )
 void
 SP_DS_StAnimation::OnModifyDelaySets( wxCommandEvent& p_cEvent )
 {
-	SP_DLG_ColListOverview* l_pcDlg = new SP_DLG_ColListOverview(wxT("DelayList"), NULL);
+	SP_DLG_ColListOverview* l_pcDlg = new SP_DLG_ColListOverview(wxT("DelayList"), m_pcDialog);
 
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{
@@ -761,7 +756,7 @@ SP_DS_StAnimation::OnModifyDelaySets( wxCommandEvent& p_cEvent )
 void
 SP_DS_StAnimation::OnModifyScheduleSets( wxCommandEvent& p_cEvent )
 {
-	SP_DLG_ColListOverview* l_pcDlg = new SP_DLG_ColListOverview(wxT("PeriodicList"), NULL);
+	SP_DLG_ColListOverview* l_pcDlg = new SP_DLG_ColListOverview(wxT("PeriodicList"), m_pcDialog);
 
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{
@@ -809,25 +804,12 @@ void SP_DS_StAnimation::OnSetsChanged(wxCommandEvent& p_cEvent)
 
 }
 
-void SP_DS_StAnimation::OnMarkingSetChanged(wxCommandEvent& p_cEvent)
+void SP_DS_StAnimation::OnConstantSetsChanged(wxCommandEvent& p_cEvent)
 {
-
-	/*
-	 * bysl work around for active list
-	 */
-	for (size_t i = 0; i < m_apcColListAttr.size(); i++)
-	{
-		if (m_apcColListAttr[i])
-		{
-			m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i]->GetSelection());
-		}
-	}
+	SP_DS_PedAnimation::OnConstantSetsChanged(p_cEvent);
 
 	m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
 	m_bRestartAnimationFlag = true;
-
-	LoadCurrentMarking();
-
 }
 
 bool SP_DS_StAnimation::ReduceTransitions()

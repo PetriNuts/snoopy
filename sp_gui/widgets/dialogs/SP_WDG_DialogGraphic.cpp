@@ -185,7 +185,6 @@ SP_WDG_DialogGraphic::OnDlgOk()
 {
 	SP_GUI_Canvas *l_cCanvas = (*m_lGraphics.begin())->GetCanvas();
 	if (!l_cCanvas) return TRUE;
-	wxClientDC l_cDC(l_cCanvas);
 
 	SP_ListGraphic::iterator l_Iter;
     for (l_Iter = m_lGraphics.begin(); l_Iter != m_lGraphics.end(); ++l_Iter)
@@ -221,7 +220,7 @@ SP_WDG_DialogGraphic::OnDlgOk()
 				l_pcGr->SetHeight(m_scHeight->GetValue());
 			}
  			if (l_pcGr->GetPrimitive() && l_pcGr->GetGraphicType() == SP_GRAPHIC_NODE) {
-           		 l_pcGr->GetPrimitive()->Move(l_cDC, l_pcGr->GetPrimitive()->GetX(), l_pcGr->GetPrimitive()->GetY());
+				l_cCanvas->MoveShape(l_pcGr->GetPrimitive(), 0, 0);
 			}
 		}
 
@@ -237,7 +236,7 @@ SP_WDG_DialogGraphic::OnDlgOk()
 
        	l_pcGr->Update(true);
     }
-	l_cCanvas->DoPrepareDC(l_cDC);
+
     l_cCanvas->Refresh();
     return TRUE;
 }

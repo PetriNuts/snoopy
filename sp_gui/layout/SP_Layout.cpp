@@ -223,21 +223,11 @@ bool SP_Layout::RefreshNodes()
 {
 	SP_MDI_View* l_pcView =	dynamic_cast<SP_MDI_View*> (m_pcDoc->GetFirstView());
 	SP_GUI_Canvas* l_pcCanvas = l_pcView->GetCanvas();
-	wxClientDC l_cDC(l_pcCanvas);
-	l_pcCanvas->DoPrepareDC(l_cDC);
 
-	MapNodeData::iterator l_itN;
-	for(l_itN = m_mNodes.begin(); l_itN != m_mNodes.end(); ++l_itN)
-	{
-		SP_GR_Node* l_pcGrNode = l_itN->second->NodeGr;
-		// move it by 0,0
-		if (l_pcGrNode->GetPrimitive())
-		{
-			l_pcGrNode->GetPrimitive()->Move(l_cDC,
-					l_pcGrNode->GetPrimitive()->GetX(),
-					l_pcGrNode->GetPrimitive()->GetY());
-		}
-	}
+	l_pcView->SelectAll(true);
+	l_pcCanvas->MoveShapes(0,0);
+	l_pcView->SelectAll(false);
+
 	return TRUE;
 }
 

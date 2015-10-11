@@ -773,9 +773,7 @@ bool SP_CPN_GenTwinNet::DoCoarse(SP_ListGraphic* p_plShapes, double p_nX,
 
 	if (m_pcCanvas)
 	{
-		wxClientDC l_cDC(m_pcCanvas);
-		m_pcCanvas->DoPrepareDC(l_cDC);
-		l_pcCoarseGr->GetPrimitive()->Move(l_cDC, l_pcCoarseGr->GetPosX(), l_pcCoarseGr->GetPosY());
+		m_pcCanvas->MoveShape(l_pcCoarseGr->GetPrimitive(), 0, 0);
 	}
 
 	SP_Core::Instance()->RemoveQueuedElements();

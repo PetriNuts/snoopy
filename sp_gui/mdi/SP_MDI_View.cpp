@@ -25,8 +25,8 @@
 #include "sp_gui/dialogs/SP_DLG_IARegCmdList.h"
 #include "sp_gui/dialogs/SP_DLG_ReduceFTree.h"
 #include "sp_gui/dialogs/SP_DLG_LayoutProperties.h"
-#include "sp_gui/dialogs/SP_DLG_DivideNodes.h"
-#include "sp_gui/dialogs/SP_DLG_UnifyNodes.h"
+#include "sp_gui/dialogs/SP_DLG_DuplicateNodes.h"
+#include "sp_gui/dialogs/SP_DLG_MergeNodes.h"
 #include "sp_ds/extensions/FTree/SP_DS_FTreeDeMorganTransformer.h"
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StSimulationResults.h"
 #include "sp_gui/dialogs/dia_ContinuousPN/SP_DLG_CPNSimulationResults.h"
@@ -120,8 +120,8 @@ EVT_MENU(SP_MENU_ITEM_IA_CONFIGURE, SP_MDI_View::OnIAConfigure)
 EVT_MENU(SP_MENU_ITEM_IA_REGCMDLIST, SP_MDI_View::OnIARegCmdList)
 EVT_MENU_RANGE(SP_MENU_ITEM_IA_SUBMENUITEM, SP_MENU_ITEM_IA_SUBMENUITEM_LAST, SP_MDI_View::OnIASubMenuSelection)
 
-EVT_MENU(SP_MENU_ITEM_UNIFY, SP_MDI_View::OnUnifyNodes)
-EVT_MENU(SP_MENU_ITEM_DIVIDE, SP_MDI_View::OnDivideNodes)
+EVT_MENU(SP_MENU_ITEM_MERGE, SP_MDI_View::OnMergeNodes)
+EVT_MENU(SP_MENU_ITEM_DUPLICATE, SP_MDI_View::OnDuplicateNodes)
 
 EVT_MENU(SP_MENU_CONVERT_ELEMENT_MENU, SP_MDI_View::OnConvertElement)
 
@@ -420,23 +420,12 @@ void SP_MDI_View::OnZoom(wxCommandEvent& p_cEvent)
 
 void SP_MDI_View::OnRefresh(wxCommandEvent& p_cEvent)
 {
-	SelectAll(true);
-	wxList l_lShapes;
-	FindSelectedShapes(l_lShapes);
 	if (m_pcCanvas)
 	{
-		wxClientDC l_cDC(m_pcCanvas);
-		m_pcCanvas->DoPrepareDC(l_cDC);
-		wxNode* l_pcNode = l_lShapes.GetFirst();
-		while (l_pcNode)
-		{
-			wxShape* l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
-			l_pcShape->Move(l_cDC, l_pcShape->GetX(), l_pcShape->GetY());
-
-			l_pcNode = l_pcNode->GetNext();
-		}
+		SelectAll(true);
+		m_pcCanvas->MoveShapes(0,0);
+		SelectAll(false);
 	}
-	SelectAll(false);
 
 	SP_MDI_Doc* l_pcDocument = dynamic_cast<SP_MDI_Doc*>(GetDocument());
 	l_pcDocument->GetGraph()->Update();
@@ -544,9 +533,7 @@ bool SP_MDI_View::DoCoarse(SP_ListGraphic* p_plShapes, double p_nX,
 
 	if (m_pcCanvas)
 	{
-		wxClientDC l_cDC(m_pcCanvas);
-		m_pcCanvas->DoPrepareDC(l_cDC);
-		l_pcCoarseGr->GetPrimitive()->Move(l_cDC, l_pcCoarseGr->GetPosX(), l_pcCoarseGr->GetPosY());
+		m_pcCanvas->MoveShape(l_pcCoarseGr->GetPrimitive(), 0, 0);
 	}
 
 	SP_Core::Instance()->RemoveQueuedElements();
@@ -707,8 +694,6 @@ bool SP_MDI_View::DoFlatten(SP_ListGraphic* p_plShapes)
 
 	if (m_pcCanvas)
 	{
-		wxClientDC l_cDC(m_pcCanvas);
-		m_pcCanvas->DoPrepareDC(l_cDC);
 		for (l_Iter = l_lGraphics.begin(); l_Iter != l_lGraphics.end(); ++l_Iter)
 		{
 			// draw it
@@ -718,7 +703,7 @@ bool SP_MDI_View::DoFlatten(SP_ListGraphic* p_plShapes)
 				(*l_Iter)->Select(TRUE);
 			// move it by 0,0 if it is a node
 			if ((*l_Iter)->GetPrimitive() && ((*l_Iter)->GetGraphicType() == SP_GRAPHIC_NODE))
-				(*l_Iter)->GetPrimitive()->Move(l_cDC, (*l_Iter)->GetPrimitive()->GetX(), (*l_Iter)->GetPrimitive()->GetY());
+				m_pcCanvas->MoveShape((*l_Iter)->GetPrimitive(), 0, 0);
 		}
 	}
 
@@ -906,13 +891,11 @@ void SP_MDI_View::OnTransformShapes(wxCommandEvent& p_cEvent)
 
 	if (m_pcCanvas)
 	{
-		wxClientDC l_cDC(m_pcCanvas);
-		m_pcCanvas->DoPrepareDC(l_cDC);
 		SP_ListGraphic::iterator l_Iter;
 		for (l_Iter = l_lGraphic.begin(); l_Iter != l_lGraphic.end(); ++l_Iter)
 		{
 			if ((*l_Iter)->GetPrimitive())
-				(*l_Iter)->GetPrimitive()->Move(l_cDC, (*l_Iter)->GetPrimitive()->GetX(), (*l_Iter)->GetPrimitive()->GetY());
+				m_pcCanvas->MoveShape((*l_Iter)->GetPrimitive(), 0, 0);
 		}
 		Refresh();
 	}
@@ -1877,10 +1860,6 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 			(l_sName == SP_DS_COLHPN_CLASS) ||
 		   (l_sName == SP_DS_COLSPN_CLASS))
 		{
-			SP_CPN_SyntaxChecking l_cSyntaxChecking;
-			if( !l_cSyntaxChecking.SyntaxChecking())
-				return;
-
 			//create the unfolding object
 			l_pcUnfoldedNet = new SP_DS_ColPN_Unfolding();
 
@@ -2052,7 +2031,7 @@ SP_MDI_View::ColorEdges(SP_DS_Graph* l_pcGraph, list<wxString>& l_lPlaces, bool 
 }
 
 
-void SP_MDI_View::OnUnifyNodes(wxCommandEvent &p_cEvent) {
+void SP_MDI_View::OnMergeNodes(wxCommandEvent &p_cEvent) {
 	SP_ListGraphic l_lGraphic;
 	FindSelectedGraphics(l_lGraphic, false);
 
@@ -2061,15 +2040,15 @@ void SP_MDI_View::OnUnifyNodes(wxCommandEvent &p_cEvent) {
 		SP_MDI_Doc* l_pcDoc = dynamic_cast<SP_MDI_Doc*>(GetDocument());
 		SP_DS_Graph* l_pcGraph = l_pcDoc->GetGraph();
 
-		SP_DLG_UnifyNodes l_Dlg(l_pcGraph, GetNetnumber(), &l_lGraphic, m_pcFrame);
+		SP_DLG_MergeNodes l_Dlg(l_pcGraph, GetNetnumber(), &l_lGraphic, m_pcFrame);
 		l_Dlg.ShowModal();
 
 	}
 
-	DoUnifyNodes(l_lGraphic);
+	DoMergeNodes(l_lGraphic);
 }
 
-void SP_MDI_View::DoUnifyNodes(SP_ListGraphic &p_lSelectedGraphics) {
+void SP_MDI_View::DoMergeNodes(SP_ListGraphic &p_lSelectedGraphics) {
 	if (p_lSelectedGraphics.empty())
 		return;
 
@@ -2088,15 +2067,15 @@ void SP_MDI_View::DoUnifyNodes(SP_ListGraphic &p_lSelectedGraphics) {
 	{
 		SP_DS_Node* l_pcParent = static_cast<SP_DS_Node*>(it.first);
 		SP_GR_Node* l_pcGraphic = static_cast<SP_GR_Node*>(it.second);
-		l_nNumUnified += l_pcParent->Unify(l_pcGraphic, m_pcCanvas);
+		l_nNumUnified += l_pcParent->Merge(l_pcGraphic, m_pcCanvas);
 	}
 
 	Refresh();
-	SP_LOGMESSAGE(wxString::Format(wxT("Unified %i logical nodes."), l_nNumUnified));
+	SP_LOGMESSAGE(wxString::Format(wxT("Merged %i logical nodes."), l_nNumUnified));
 	m_pcCanvas->Modify(TRUE);
 }
 
-void SP_MDI_View::OnDivideNodes(wxCommandEvent &p_cEvent) {
+void SP_MDI_View::OnDuplicateNodes(wxCommandEvent &p_cEvent) {
 	SP_ListGraphic l_lGraphic;
 	FindSelectedGraphics(l_lGraphic, false);
 
@@ -2105,30 +2084,30 @@ void SP_MDI_View::OnDivideNodes(wxCommandEvent &p_cEvent) {
 		SP_MDI_Doc* l_pcDoc = dynamic_cast<SP_MDI_Doc*>(GetDocument());
 		SP_DS_Graph* l_pcGraph = l_pcDoc->GetGraph();
 
-		SP_DLG_DivideNodes l_Dlg(l_pcGraph, GetNetnumber(), &l_lGraphic, m_pcFrame);
+		SP_DLG_DuplicateNodes l_Dlg(l_pcGraph, GetNetnumber(), &l_lGraphic, m_pcFrame);
 		l_Dlg.ShowModal();
 
 	}
-	DoDivideNodes(l_lGraphic);
+	DoDuplicateNodes(l_lGraphic);
 }
 
-void SP_MDI_View::DoDivideNodes(SP_ListGraphic &p_lSelectedGraphics) {
+void SP_MDI_View::DoDuplicateNodes(SP_ListGraphic &p_lSelectedGraphics) {
 	if (p_lSelectedGraphics.empty())
 		return;
 
-	int l_nNumDivided = 0;
+	int l_nNumDuplicated = 0;
 	for (SP_Graphic* l_pcGraphic : p_lSelectedGraphics)
 	{
 		l_pcGraphic->Select(false);
 		if (l_pcGraphic->GetGraphicType() == SP_GRAPHIC_NODE)
 		{
-			l_nNumDivided +=
+			l_nNumDuplicated +=
 					static_cast<SP_DS_Node*>(l_pcGraphic->GetParent())->
-							Divide(static_cast<SP_GR_Node*>(l_pcGraphic), m_pcCanvas);
+							Duplicate(static_cast<SP_GR_Node*>(l_pcGraphic), m_pcCanvas);
 		}
 	}
 
 	Refresh();
-	SP_LOGMESSAGE(wxString::Format(wxT("Divided into %i logical nodes."), l_nNumDivided));
+	SP_LOGMESSAGE(wxString::Format(wxT("Duplicated into %i logical nodes."), l_nNumDuplicated));
 	m_pcCanvas->Modify(TRUE);
 }

@@ -39,9 +39,7 @@ class SP_DS_StAnimation: public SP_DS_PedAnimation
     void LoadSets();
     void UpdateChoices();
 
-    void OnModifyMarkingSets( wxCommandEvent& p_cEvent );
     void OnModifyFunctionSets( wxCommandEvent& p_cEvent );
-    void OnModifyParameterSets( wxCommandEvent& p_cEvent );
 	void OnModifyDelaySets( wxCommandEvent& p_cEvent );
 	void OnModifyScheduleSets( wxCommandEvent& p_cEvent );
 	void OnModifyWeightSets( wxCommandEvent& p_cEvent );
@@ -51,7 +49,7 @@ class SP_DS_StAnimation: public SP_DS_PedAnimation
     void LoadCurrentMarking();
 
     void OnSetsChanged( wxCommandEvent& p_cEvent );
-    void OnMarkingSetChanged( wxCommandEvent& p_cEvent );
+    void OnConstantSetsChanged(wxCommandEvent& p_cEvent);
 
 
     void SetCurrentMarking();

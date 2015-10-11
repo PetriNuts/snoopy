@@ -681,10 +681,10 @@ SP_DS_Graph::AddToExtrasMenu(wxMenu* p_pcMenu)
     p_pcMenu->Append(SP_MENU_ITEM_IA_MENU, wxT("Interaction"), l_pcMenu);
 
     p_pcMenu->AppendSeparator();
-    p_pcMenu->Append(SP_MENU_ITEM_DIVIDE,
-                     wxT("Divide Into Logical Nodes..."));
-    p_pcMenu->Append(SP_MENU_ITEM_UNIFY,
-                     wxT("Unify From Logical Nodes..."));
+    p_pcMenu->Append(SP_MENU_ITEM_DUPLICATE,
+                     wxT("Duplicate Into Logical Nodes..."));
+    p_pcMenu->Append(SP_MENU_ITEM_MERGE,
+                     wxT("Merge Logical Nodes..."));
 
     wxString l_sName = GetNetclass()->GetName();
 

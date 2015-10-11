@@ -22,7 +22,7 @@ private:
 protected:
     wxPen* m_pcSavedPen;
     wxPen* m_pcLastSetPen;
-    //! Dont react on hitt test nor draw the outlines
+    //! Dont react on hit test nor draw the outlines
     bool m_bHideDimensions;
 public:
     SP_GR_BaseDrawn();

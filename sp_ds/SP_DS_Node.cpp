@@ -903,25 +903,22 @@ bool SP_DS_Node::Update(bool p_bLocalOnly)
 	return l_bReturn && SP_Data::Update(p_bLocalOnly);
 }
 
-int SP_DS_Node::Divide(SP_GR_Node *p_pcGraphic, SP_GUI_Canvas* p_pcCanvas)
+int SP_DS_Node::Duplicate(SP_GR_Node *p_pcGraphic, SP_GUI_Canvas* p_pcCanvas)
 {
 	SP_DS_Attribute* l_pcAttr = GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_LOGIC);
 	if(!l_pcAttr)
 	{
-		SP_LOGDEBUG(wxT("SP_DS_Node::Divide not possible, because of missing SP_ATTRIBUTE_LOGIC!"));
+		SP_LOGDEBUG(wxT("SP_DS_Node::Duplicate not possible, because of missing SP_ATTRIBUTE_LOGIC!"));
 		return 0;
 	}
 
 	if((GetSourceEdges()->size() + GetTargetEdges()->size()) <= 1)
 	{
-		SP_LOGDEBUG(wxT("Node has not enough edges for divide (<=1)!"));
+		SP_LOGDEBUG(wxT("Node has not enough edges for duplicate (<=1)!"));
 		return 0;
 	}
 
 	l_pcAttr->SetValueString(wxT("1"));
-
-	wxClientDC l_cDC(p_pcCanvas);
-	p_pcCanvas->DoPrepareDC(l_cDC);
 
 	int l_nNumDivided = 0;
 
@@ -942,7 +939,7 @@ int SP_DS_Node::Divide(SP_GR_Node *p_pcGraphic, SP_GUI_Canvas* p_pcCanvas)
 					p_pcGraphic->RemoveSourceEdge(l_grEdge, false);
 					l_pcGrNew->AddSourceEdge(l_grEdge, this);
 					//move new shape by 0,0 to get edges updated
-					l_pcGrNew->GetPrimitive()->Move(l_cDC, l_pcGrNew->GetPosX(), l_pcGrNew->GetPosY());
+					p_pcCanvas->MoveShape(l_pcGrNew->GetPrimitive(), 0, 0);
 					++l_nNumDivided;
 				}
 				else
@@ -970,7 +967,7 @@ int SP_DS_Node::Divide(SP_GR_Node *p_pcGraphic, SP_GUI_Canvas* p_pcCanvas)
 					p_pcGraphic->RemoveTargetEdge(l_grEdge, false);
 					l_pcGrNew->AddTargetEdge(l_grEdge, this);
 					//move new shape by 0,0 to get edges updated
-					l_pcGrNew->GetPrimitive()->Move(l_cDC, l_pcGrNew->GetPosX(), l_pcGrNew->GetPosY());
+					p_pcCanvas->MoveShape(l_pcGrNew->GetPrimitive(), 0, 0);
 					++l_nNumDivided;
 				}
 				else
@@ -985,18 +982,18 @@ int SP_DS_Node::Divide(SP_GR_Node *p_pcGraphic, SP_GUI_Canvas* p_pcCanvas)
 	return l_nNumDivided;
 }
 
-int SP_DS_Node::Unify(SP_GR_Node *p_pcGraphic, SP_GUI_Canvas* p_pcCanvas)
+int SP_DS_Node::Merge(SP_GR_Node *p_pcGraphic, SP_GUI_Canvas* p_pcCanvas)
 {
 	SP_DS_Attribute* l_pcAttr = GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_LOGIC);
 	if(!l_pcAttr)
 	{
-		SP_LOGDEBUG(wxT("SP_DS_Node::Unify not possible, because of missing SP_ATTRIBUTE_LOGIC!"));
+		SP_LOGDEBUG(wxT("SP_DS_Node::Merge not possible, because of missing SP_ATTRIBUTE_LOGIC!"));
 		return 0;
 	}
 
 	if(GetGraphics()->size() == 1)
 	{
-		SP_LOGDEBUG(wxT("Node has not enough graphics for unify!"));
+		SP_LOGDEBUG(wxT("Node has not enough graphics for merge!"));
 		return 0;
 	}
 
@@ -1021,9 +1018,7 @@ int SP_DS_Node::Unify(SP_GR_Node *p_pcGraphic, SP_GUI_Canvas* p_pcCanvas)
 
 	if (p_pcGraphic->GetPrimitive())
 	{
-		wxClientDC l_cDC(p_pcCanvas);
-		p_pcCanvas->DoPrepareDC(l_cDC);
-		p_pcGraphic->GetPrimitive()->Move(l_cDC, p_pcGraphic->GetPosX(), p_pcGraphic->GetPosY());
+		p_pcCanvas->MoveShape(p_pcGraphic->GetPrimitive(), 0, 0);
 	}
 
 	return l_nNumUnified;

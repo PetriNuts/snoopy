@@ -182,11 +182,8 @@ SP_GRM_EdgeHandler::OnSizingEndDragLeft(wxControlPoint* p_pcCP,
         wxShape* l_pcSource = l_pcShape->GetFrom();
         wxShape* l_pcTarget = l_pcShape->GetTo();
 
-        wxClientDC l_cDC(l_pcCanvas);
-        l_pcCanvas->DoPrepareDC(l_cDC);
-
-        l_pcSource->Move(l_cDC, l_pcSource->GetX(), l_pcSource->GetY());
-        l_pcTarget->Move(l_cDC, l_pcTarget->GetX(), l_pcTarget->GetY());
+        l_pcCanvas->MoveShape(l_pcSource, 0, 0);
+        l_pcCanvas->MoveShape(l_pcTarget, 0, 0);
     }
     else
     {

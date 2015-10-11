@@ -18,6 +18,7 @@
 #include "sp_ds/extensions/Col_PN/Preprocessing/SP_ColPN_ProcessGuard.h"
 #include <wx/busyinfo.h> 
 #include <wx/regex.h>
+#include <sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStUnfolding.h>
 
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColUnfoldFile.h"
 
@@ -238,6 +239,10 @@ bool SP_DS_ColPN_Unfolding::Start()
 	}
 	else
 	{
+		SP_CPN_SyntaxChecking l_cSyntaxChecking;
+		if( !l_cSyntaxChecking.SyntaxChecking())
+			return false;
+
 		//initialize
 		if( ! Initialize() )
 			return false;

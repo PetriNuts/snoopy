@@ -306,7 +306,7 @@ public:
          \return # of divided logical nodes
 
      */
-    int Divide(SP_GR_Node* p_pcGraphic, SP_GUI_Canvas* p_pcCanvas);
+    int Duplicate(SP_GR_Node* p_pcGraphic, SP_GUI_Canvas* p_pcCanvas);
 
     /**	\brief	Unify the graphical nodes into one graphical node on the given netnumber.
                 Makes the node non-logical, if it's the last one.
@@ -316,7 +316,7 @@ public:
          \return # of unified logical nodes
 
      */
-    int Unify(SP_GR_Node* p_pcGraphic, SP_GUI_Canvas* p_pcCanvas);
+    int Merge(SP_GR_Node* p_pcGraphic, SP_GUI_Canvas* p_pcCanvas);
 };
 
 
