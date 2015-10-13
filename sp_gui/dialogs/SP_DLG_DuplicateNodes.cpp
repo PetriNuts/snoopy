@@ -98,7 +98,7 @@ SP_DLG_DuplicateNodes::SP_DLG_DuplicateNodes(SP_DS_Graph *p_graph, unsigned int 
 		m_text = new wxStaticText(this, wxID_ANY, wxT("min # of arcs "));
 		numberSizer->Add(m_text);
 
-		m_number = new wxSpinCtrl(this, SP_ID_SPIN, wxT("2"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, l_max);
+		m_number = new wxSpinCtrl(this, SP_ID_SPIN, wxT("2"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, l_max);
 		numberSizer->Add(m_number);
 		elemSizer->Add(numberSizer);
 
