@@ -31,7 +31,7 @@ SP_DLG_MergeNodes::~SP_DLG_MergeNodes()
 {
 }
 
-void SP_DLG_MergeNodes::LoadData(const wxString& p_sNodeClassName, int p_nNrArcs)
+void SP_DLG_MergeNodes::LoadData(const wxString& p_sNodeClassName, int p_nCount)
 {
 	//Load data
 	Clear();
@@ -50,7 +50,7 @@ void SP_DLG_MergeNodes::LoadData(const wxString& p_sNodeClassName, int p_nNrArcs
 			SP_ListGraphic l_lGraphics;
 			l_pcNode->GetGraphicsInNet(&l_lGraphics, m_netNumber, SP_ELEMENT_NODE);
 
-			if (l_lGraphics.size() >= p_nNrArcs)
+			if (l_lGraphics.size() >= p_nCount)
 			{
 				wxListItem l_cItem;
 				l_cItem.SetBackgroundColour(*wxWHITE);

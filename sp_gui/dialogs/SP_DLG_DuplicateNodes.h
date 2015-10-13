@@ -55,7 +55,7 @@ protected:
 	bool m_bListCtrlChanged;
 	int m_nSel;
 
-	virtual void LoadData(const wxString& p_sNodeClassName, int p_nNrArcs);
+	virtual void LoadData(const wxString& p_sNodeClassName, int p_nCount);
 	void Clear();
 	void DoApply();
 public:

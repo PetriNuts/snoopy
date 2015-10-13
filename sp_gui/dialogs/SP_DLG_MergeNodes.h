@@ -15,7 +15,7 @@ private:
 DECLARE_EVENT_TABLE()
 DECLARE_CLASS(SP_DLG_MergeNodes)
 protected:
-	virtual void LoadData(const wxString& p_sNodeClassName, int p_nNrArcs);
+	virtual void LoadData(const wxString& p_sNodeClassName, int p_nCount);
 public:
 	SP_DLG_MergeNodes(SP_DS_Graph *p_graph, unsigned int p_netNumber, SP_ListGraphic* p_graphics, wxWindow *p_parent,
 			const wxString& p_title = wxT("Merge Nodes"));

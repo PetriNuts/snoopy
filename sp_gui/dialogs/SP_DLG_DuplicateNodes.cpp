@@ -214,7 +214,7 @@ void SP_DLG_DuplicateNodes::OnDlgClose(wxCommandEvent& p_cEvent)
 	}
 }
 
-void SP_DLG_DuplicateNodes::LoadData(const wxString& p_sNodeClassName, int p_ncount)
+void SP_DLG_DuplicateNodes::LoadData(const wxString& p_sNodeClassName, int p_nCount)
 {
 	//Load data
 	Clear();
@@ -231,6 +231,13 @@ void SP_DLG_DuplicateNodes::LoadData(const wxString& p_sNodeClassName, int p_nco
 		{
 			wxString l_sElementName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 			std::map<SP_Graphic*, size_t> l_GrCount;
+			for(SP_Graphic* l_pcGrNode : *l_pcNode->GetGraphics())
+			{
+				if(l_pcGrNode->GetNetnumber() == m_netNumber)
+				{
+					l_GrCount[l_pcGrNode] = 0;
+				}
+			}
 			for (SP_DS_Edge* l_pcEdge : *l_pcNode->GetSourceEdges())
 			{
 				for (SP_Graphic *l_pcGr : *l_pcEdge->GetGraphics())
@@ -255,7 +262,7 @@ void SP_DLG_DuplicateNodes::LoadData(const wxString& p_sNodeClassName, int p_nco
 			}
 			for(auto it : l_GrCount)
 			{
-				if (it.second >= p_ncount)
+				if (it.second >= p_nCount)
 				{
 					wxListItem l_cItem;
 					l_cItem.SetBackgroundColour(*wxWHITE);
