@@ -195,7 +195,7 @@ void SP_LOGERROR(const wxString& s)
 	wxLogError("%s",s);
 }
 
-wxString SP_NormalizeString(const wxString& p_S)
+wxString SP_NormalizeString(const wxString& p_S, bool p_bCheckFirst)
 {
 	if (p_S.IsEmpty())
 		return p_S;
@@ -209,7 +209,7 @@ wxString SP_NormalizeString(const wxString& p_S)
 			tmp.SetChar(i, '_');
 		}
 	}
-	if(wxIsdigit(tmp.GetChar(0)))
+	if(p_bCheckFirst && wxIsdigit(tmp.GetChar(0)))
 	{
 		tmp.Prepend("_");
 	}

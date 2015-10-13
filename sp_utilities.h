@@ -109,7 +109,7 @@ wxString SP_FormatWithComma(const wxString& s);
 	\param	string to normalize
 	\return	wxString
 */
-wxString SP_NormalizeString (const wxString& p_sS);
+wxString SP_NormalizeString (const wxString& p_sS, bool p_bCheckFirst = true);
 
 /**
  * extract xml attribute from text

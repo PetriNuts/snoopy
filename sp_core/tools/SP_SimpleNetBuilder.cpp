@@ -85,7 +85,7 @@ bool SP_SimpleNetBuilder::operator ()(SP_DS_Graph* p_pcGraph)
 			netName = fn.GetName();
 		}
 
-		b.setName(SP_NormalizeString(netName).ToStdString());
+		b.setName(SP_NormalizeString(netName, false).ToStdString());
 
 		l_bFinish &= CreateFunctions(b);
 		l_bFinish &= CreateConstants(b);
@@ -412,7 +412,7 @@ bool SP_ColoredNetBuilder::operator ()(SP_DS_Graph* p_pcGraph)
 			netName = fn.GetName();
 		}
 
-		b.setName(SP_NormalizeString(netName).ToStdString());
+		b.setName(SP_NormalizeString(netName, false).ToStdString());
 
 		//l_bFinish &= CreateFunctions(b);
 		l_bFinish &= CreateConstants(b);
