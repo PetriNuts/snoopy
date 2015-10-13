@@ -67,6 +67,7 @@ public:
 	void OnDlgClose(wxCommandEvent& p_cEvent);
 	void OnDlgApply( wxCommandEvent& p_cEvent );
 	void OnRadio( wxCommandEvent& p_cEvent );
+	void OnText( wxCommandEvent& p_cEvent );
 	void OnSpin( wxSpinEvent& p_cEvent );
 	void OnColClick(wxListEvent& event);
 

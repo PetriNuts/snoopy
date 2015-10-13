@@ -59,6 +59,7 @@ BEGIN_EVENT_TABLE(SP_DLG_DuplicateNodes, wxDialog)
 	EVT_BUTTON(wxID_CLOSE, SP_DLG_DuplicateNodes::OnDlgClose)
 	EVT_BUTTON( wxID_APPLY, SP_DLG_DuplicateNodes::OnDlgApply )	
 	EVT_RADIOBOX(SP_ID_RADIO, SP_DLG_DuplicateNodes::OnRadio)
+	EVT_TEXT_ENTER(SP_ID_SPIN, SP_DLG_DuplicateNodes::OnText)
 	EVT_SPINCTRL(SP_ID_SPIN, SP_DLG_DuplicateNodes::OnSpin)
 	EVT_LIST_COL_CLICK(SP_ID_LISTCTRL_ELEMENT, SP_DLG_DuplicateNodes::OnColClick)
 END_EVENT_TABLE()
@@ -98,7 +99,7 @@ SP_DLG_DuplicateNodes::SP_DLG_DuplicateNodes(SP_DS_Graph *p_graph, unsigned int 
 		m_text = new wxStaticText(this, wxID_ANY, wxT("min # of arcs "));
 		numberSizer->Add(m_text);
 
-		m_number = new wxSpinCtrl(this, SP_ID_SPIN, wxT("2"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, l_max);
+		m_number = new wxSpinCtrl(this, SP_ID_SPIN, wxT("2"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, l_max);
 		numberSizer->Add(m_number);
 		elemSizer->Add(numberSizer);
 
@@ -291,6 +292,12 @@ void SP_DLG_DuplicateNodes::OnSpin(wxSpinEvent &p_cEvent)
 {
 	LoadData( m_choice->GetStringSelection(), m_number->GetValue() );
 
+}
+
+void SP_DLG_DuplicateNodes::OnText( wxCommandEvent& p_cEvent )
+{
+	m_choice->SetFocus();
+	m_number->SetFocus();
 }
 
 void SP_DLG_DuplicateNodes::OnColClick(wxListEvent &event)
