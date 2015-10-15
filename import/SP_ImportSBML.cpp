@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "SP_ImportSBML.h"
+#include "dssz/auxi/math.h"
 
 wxString
 SP_ImportSBML::formulaToString(const ASTNode* p_Math)
@@ -266,4 +267,26 @@ bool SP_ImportSBML::ValidateSBML(SBMLDocument* p_sbmlDoc)
 	}
 
 	return l_nSeriousErrors == 0;
+}
+
+bool SP_ImportSBML::NormalizeStoichiometries(const std::map<SP_DS_Edge*, double>& s)
+{
+	//check values for non-integer ones
+	double minimum = 1.0;
+	for (const auto & s_it : s)
+	{
+		minimum = std::min(minimum, s_it.second);
+	}
+	if(minimum < 1.0)
+	{
+		double faktor = 1.0 / minimum;
+		for (const auto & s_it : s)
+		{
+			long m = lround(s_it.second * faktor);
+			SP_DS_Edge* l_pcEdge = s_it.first;
+			l_pcEdge->GetAttribute(wxT("Multiplicity"))->SetValueString(
+					wxString::Format(wxT("%li"), m));
+		}
+	}
+	return true;
 }

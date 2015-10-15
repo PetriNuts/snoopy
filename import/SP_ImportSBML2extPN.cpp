@@ -394,19 +394,40 @@ void SP_ImportSBML2extPN::getReactions ()
 					wxString l_eductName = l_sbmlReactant->getSpecies();
 					if (sId == l_eductName)
 					{
+						double l_sbmlStoichiometry = l_sbmlReactant->getStoichiometry();
 						wxString l_stoichiometry =
-								wxString::Format(wxT("%.0f"),l_sbmlReactant->getStoichiometry());
-						drawEdge(l_pcNode, l_reactionNode,SP_DS_EDGE,l_stoichiometry);
+								wxString::Format(wxT("%li"), lround(l_sbmlStoichiometry));
+						SP_DS_Edge* l_pcEdge =
+								drawEdge(l_pcNode, l_reactionNode,SP_DS_EDGE,l_stoichiometry);
+						if(m_NormalizeStoichiometries)
+						{
+							l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
+						}
 						if(l_sbmlReactant->isSetConstant())
 						{
-							drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+							l_pcEdge =
+									drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+							if(m_NormalizeStoichiometries)
+							{
+								l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
+							}
 						}
 						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 						{
-							drawEdge(l_revReactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
+							l_pcEdge =
+									drawEdge(l_revReactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
+							if(m_NormalizeStoichiometries)
+							{
+								l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
+							}
 							if(l_sbmlReactant->isSetConstant())
 							{
-								drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+								l_pcEdge =
+										drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+								if(m_NormalizeStoichiometries)
+								{
+									l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
+								}
 							}
 						}
 					}
@@ -419,19 +440,40 @@ void SP_ImportSBML2extPN::getReactions ()
 					wxString l_productName = l_sbmlProduct->getSpecies();
 					if (sId == l_productName)
 					{
+						double l_sbmlStoichiometry = l_sbmlProduct->getStoichiometry();
 						wxString l_stoichiometry =
-								wxString::Format(wxT("%.0f"),l_sbmlProduct->getStoichiometry());
-						drawEdge(l_reactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
+								wxString::Format(wxT("%li"), lround(l_sbmlStoichiometry));
+						SP_DS_Edge* l_pcEdge =
+								drawEdge(l_reactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
+						if(m_NormalizeStoichiometries)
+						{
+							l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
+						}
 						if(l_sbmlProduct->isSetConstant())
 						{
-							drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+							l_pcEdge =
+									drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+							if(m_NormalizeStoichiometries)
+							{
+								l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
+							}
 						}
 						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 						{
-							drawEdge(l_pcNode, l_revReactionNode, SP_DS_EDGE,l_stoichiometry);
+							l_pcEdge =
+									drawEdge(l_pcNode, l_revReactionNode, SP_DS_EDGE,l_stoichiometry);
+							if(m_NormalizeStoichiometries)
+							{
+								l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
+							}
 							if(l_sbmlProduct->isSetConstant())
 							{
-								drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+								l_pcEdge =
+										drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+								if(m_NormalizeStoichiometries)
+								{
+									l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
+								}
 							}
 						}
 						if(l_sbmlReaction->isSetKineticLaw())
@@ -449,7 +491,10 @@ void SP_ImportSBML2extPN::getReactions ()
 						}
 					}
 				}
-
+				if(m_NormalizeStoichiometries)
+				{
+					NormalizeStoichiometries(l_Stoichiometries);
+				}
 				// get modifiers of actual reaction
 				for (unsigned int lom = 0; lom < modifiers->size() ; ++lom)
 				{

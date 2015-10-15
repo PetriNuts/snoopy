@@ -25,6 +25,7 @@ class SP_ImportSBML: public SP_ImportRoutine,
 private:
 
 protected:
+	bool NormalizeStoichiometries(const std::map<SP_DS_Edge*, double>& s);
 
 public:
 	wxString formulaToString(const ASTNode* p_Math);

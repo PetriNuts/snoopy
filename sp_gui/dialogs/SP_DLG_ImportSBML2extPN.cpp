@@ -33,6 +33,8 @@ SP_DLG_ImportSBML2extPN::SP_DLG_ImportSBML2extPN(SP_GUI_Mainframe*  p_pcParent,
 	m_cbCreateBoundaryConditions = new wxCheckBox(this, -1, wxT("Create boundary conditions"));
 	m_pcSizer->Add(m_cbCreateBoundaryConditions, 0, wxALL, 10);
 	m_cbNormalizeStoichiometries = new wxCheckBox(this, -1, wxT("Normalize stoichiometries"));
+	//TODO
+	m_cbNormalizeStoichiometries->Hide();
 	m_pcSizer->Add(m_cbNormalizeStoichiometries, 0, wxALL, 10);
 
 	/* Buttons in the lower right hand corner */
