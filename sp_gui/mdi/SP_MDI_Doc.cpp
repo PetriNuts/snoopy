@@ -421,7 +421,7 @@ bool SP_MDI_Doc::OnSaveDocument(const wxString& p_sFile)
 	if (m_pcGraph)
 	{
 		SP_StopWatch sw(wxT("Start saving file ") + p_sFile, wxT("Finished saving in"));
-        wxWindowDisabler disableAll;
+
         wxBusyInfo wait("Please wait, saving...");
 
     	if (GetDiagram() && GetDiagram()->GetShapeList())

@@ -30,14 +30,12 @@ class SP_ExportStochPed2ExtPT:  public SP_ExportRoutine, private SP_XmlWriter
   virtual bool WriteNetclass(SP_DS_Netclass* p_pcVal, wxXmlNode* p_pcRoot);
   virtual bool WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcRoot);
   virtual bool WriteEdgeclass(SP_DS_Edgeclass* p_pcVal, wxXmlNode* p_pcRoot);
-  //Added by Laarz 16.10.2012
-  virtual bool WriteMetadataclass(SP_DS_Metadataclass* p_pcVal, wxXmlNode* p_pcRoot);
- 
+
   //Changed by Laarz 16.10.2012
   //bool WritePlace( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
   bool WriteTransition( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
   //Added by Laarz 16.10.2012
-  bool WriteMetadata(SP_DS_Metadata* p_pcVal, wxXmlNode* p_pcRoot);
+  virtual bool WriteMetadata(SP_DS_Metadata* p_pcVal, wxXmlNode* p_pcRoot);
 
  public:
 

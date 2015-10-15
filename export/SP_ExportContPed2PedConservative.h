@@ -24,6 +24,8 @@ protected:
   virtual bool WriteEdgeclass(SP_DS_Edgeclass* p_pcVal, wxXmlNode* p_pcRoot);
   virtual bool WriteEdge(SP_DS_Edge* p_pcVal, wxXmlNode* p_pcRoot);
 
+  virtual bool WriteMetadata(SP_DS_Metadata* p_pcVal, wxXmlNode* p_pcRoot);
+
   virtual bool WriteAttribute(SP_DS_Attribute* p_pcVal, wxXmlNode* p_pcRoot);
 
   bool WritePlace( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);

@@ -34,7 +34,6 @@ bool SP_Layout::Visualization(SP_DLG_LayoutProperties* p_pcDlg, SP_MDI_Doc* p_pc
 	CHECK_POINTER(p_pcDlg, return FALSE);
 	CHECK_POINTER(p_pcDoc, return FALSE);
 
-    wxWindowDisabler disableAll;
     wxBusyInfo wait("Please wait, layouting...");
 
 	//set MemberVariable

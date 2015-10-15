@@ -86,60 +86,6 @@ bool SP_ExportStochPed2ExtPT::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 	return TRUE;
 }
 
-bool
-SP_ExportStochPed2ExtPT::WriteMetadataclass(SP_DS_Metadataclass* p_pcVal, wxXmlNode* p_pcRoot)
-{
-	CHECK_POINTER( p_pcVal, return FALSE );
-	CHECK_POINTER( p_pcRoot, return FALSE );
-
-	SP_ListMetadata::const_iterator l_Iter;
-	const SP_ListMetadata* l_plElements = p_pcVal->GetElements();
-	CHECK_POINTER( l_plElements, return FALSE );
-	wxString l_sMetadataclassName = p_pcVal->GetName();
-
-	if((l_sMetadataclassName == SP_DS_META_CONSTANT))
-	{
-		wxXmlNode*  l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("metadataclass"));
-		l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), l_plElements->size()));
-		l_pcElem->AddAttribute(wxT("name"), p_pcVal->GetName());
-		p_pcRoot->AddChild(l_pcElem);
-
-		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter) {
-
-			if (( *l_Iter )->GetAttribute(wxT("Type"))->GetValueString() == wxT("int") )
-				WriteMetadata((*l_Iter), l_pcElem);
-		}
-
-	}
-
-	return TRUE;
-
-}
-
-//Added by Laarz 16.10.2012
-bool
-SP_ExportStochPed2ExtPT::WriteMetadata(SP_DS_Metadata* p_pcVal, wxXmlNode* p_pcRoot)
-{
-	CHECK_POINTER( p_pcVal, return false );
-	CHECK_POINTER( p_pcRoot, return false );
-
-	SP_ListAttribute::const_iterator l_Iter;
-	const SP_ListAttribute* l_plAttributes = p_pcVal->GetAttributes();
-	CHECK_POINTER(l_plAttributes, return FALSE);
-
-	wxXmlNode*  l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("metadata"));
-	p_pcRoot->AddChild(l_pcElem);
-
-	for (l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter)
-		WriteAttribute((*l_Iter), l_pcElem);
-
-
-
-	return WriteData(p_pcVal, l_pcElem);
-
-}
-
-
 bool SP_ExportStochPed2ExtPT::Write(SP_MDI_Doc* p_doc,
 		const wxString& p_fileName)
 {
@@ -214,19 +160,14 @@ bool SP_ExportStochPed2ExtPT::WriteTransition(SP_DS_Node* p_pcVal, wxXmlNode* p_
 	wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE,  wxT("node"));	
 	p_pcRoot->AddChild(l_pcElem);	
 
-	/* old solution
-	 * Changed by Laarz 16.10.2012
-	for (l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter)	
+	for (l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter)
 	{
-		if (( *l_Iter )->GetName() == wxT("FunctionList"))
-		{
-
-		}
-		else if (( *l_Iter )->GetName() == wxT("DelayList"))
-		{
-
-		}
-		else if (( *l_Iter )->GetName() == wxT("PeriodicList"))
+		if ((( *l_Iter )->GetName() == wxT("FunctionList")) ||
+				(( *l_Iter )->GetName() == wxT("Delay")) ||
+				(( *l_Iter )->GetName() == wxT("Weight")) ||
+				(( *l_Iter )->GetName() == wxT("Start")) ||
+				(( *l_Iter )->GetName() == wxT("Repetition")) ||
+				(( *l_Iter )->GetName() == wxT("End")) )
 		{
 
 		}
@@ -235,23 +176,28 @@ bool SP_ExportStochPed2ExtPT::WriteTransition(SP_DS_Node* p_pcVal, wxXmlNode* p_
 			WriteAttribute( ( *l_Iter ), l_pcElem);
 		}
 	}
-	*/
-
-	for (l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter)
-		{
-			if ((( *l_Iter )->GetName() == wxT("FunctionList")) ||
-					(( *l_Iter )->GetName() == wxT("Delay")) ||
-					(( *l_Iter )->GetName() == wxT("Weight")) ||
-					(( *l_Iter )->GetName() == wxT("Start")) ||
-					(( *l_Iter )->GetName() == wxT("Repetition")) ||
-					(( *l_Iter )->GetName() == wxT("End")) )
-			{
-
-			}
-			else
-			{
-				WriteAttribute( ( *l_Iter ), l_pcElem);
-			}
-		}
 	return WriteData(p_pcVal, l_pcElem);
+}
+
+bool SP_ExportStochPed2ExtPT::WriteMetadata(SP_DS_Metadata *p_pcVal, wxXmlNode *p_pcRoot) {
+	if(p_pcVal->GetClassName() == SP_DS_META_CONSTANT)
+	{
+		SP_DS_Attribute* l_pcAttr = p_pcVal->GetAttribute(wxT("Type"));
+		if(l_pcAttr)
+		{
+			if(l_pcAttr->GetValueString() != wxT("int"))
+				return false;
+		}
+	}
+	else if(p_pcVal->GetClassName() == SP_DS_META_FUNCTION)
+	{
+		SP_DS_Attribute* l_pcAttr = p_pcVal->GetAttribute(wxT("Return"));
+		if(l_pcAttr)
+		{
+			if(l_pcAttr->GetValueString() != wxT("int"))
+				return false;
+		}
+	}
+
+	return SP_XmlWriter::WriteMetadata(p_pcVal, p_pcRoot);
 }

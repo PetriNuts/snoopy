@@ -139,7 +139,6 @@ SP_DLG_LayoutProperties::OnDlgOk(wxCommandEvent& p_cEvent)
 	SP_StopWatch sw(wxT("Doing Layout"),
 					wxT("Finished layout in"));
 
-    wxWindowDisabler disableAll;
     wxBusyInfo wait("Please wait, layout in progress...");
 
     SP_LayoutOGDF l_Layout;

@@ -242,3 +242,26 @@ SP_ExportContPed2PedConservative::WriteAttribute( SP_DS_Attribute* p_pcVal, wxXm
     return WriteData( p_pcVal, l_pcElem );
 
 }
+
+bool SP_ExportContPed2PedConservative::WriteMetadata(SP_DS_Metadata *p_pcVal, wxXmlNode *p_pcRoot) {
+	if(p_pcVal->GetClassName() == SP_DS_META_CONSTANT)
+	{
+		SP_DS_Attribute* l_pcAttr = p_pcVal->GetAttribute(wxT("Type"));
+		if(l_pcAttr)
+		{
+			if(l_pcAttr->GetValueString() != wxT("int"))
+				return false;
+		}
+	}
+	else if(p_pcVal->GetClassName() == SP_DS_META_FUNCTION)
+	{
+		SP_DS_Attribute* l_pcAttr = p_pcVal->GetAttribute(wxT("Return"));
+		if(l_pcAttr)
+		{
+			if(l_pcAttr->GetValueString() != wxT("int"))
+				return false;
+		}
+	}
+
+	return SP_XmlWriter::WriteMetadata(p_pcVal, p_pcRoot);
+}

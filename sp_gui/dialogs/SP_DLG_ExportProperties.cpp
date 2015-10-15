@@ -244,7 +244,6 @@ SP_DLG_ExportProperties::OnDlgOk(wxCommandEvent& p_cEvent)
 
         int l_nReturn = wxID_OK;
 
-        wxWindowDisabler disableAll;
         wxBusyInfo wait("Please wait, exporting...");
 
         if(!m_pcExport->Write(m_pcDoc, l_sOutName))

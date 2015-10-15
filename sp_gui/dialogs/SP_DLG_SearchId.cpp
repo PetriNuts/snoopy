@@ -252,7 +252,6 @@ void SP_DLG_SearchId::OnAll(wxCommandEvent& p_cEvent)
 	m_pcNext->Enable(false);
 	m_pcPrev->Enable(false);
 
-    wxWindowDisabler disableAll;
     wxBusyInfo wait("Please wait, searching...");
 
     for(SP_Graphic* l_pcGr : m_grList)

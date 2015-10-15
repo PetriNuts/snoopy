@@ -299,7 +299,6 @@ bool SP_DLG_CheckNet::Check()
 
 void SP_DLG_CheckNet::OnDlgOk(wxCommandEvent& p_cEvent)
 {
-    wxWindowDisabler disableAll;
     wxBusyInfo wait("Please wait, checking net...");
 
 	if (Validate() && TransferDataFromWindow())
