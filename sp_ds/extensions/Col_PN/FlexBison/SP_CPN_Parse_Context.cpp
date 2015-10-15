@@ -42,6 +42,7 @@ void SP_CPN_ParseNode::CollectResult()
 		l_stEvalRes.m_Multiplicity = m_ParseNode_Info.m_Multiplicity;
 	
 	l_stEvalRes.m_Predicate = m_ParseNode_Info.m_Predicate;
+	l_stEvalRes.m_bPlaceFlag = m_ParseNode_Info.m_bPlaceFlag;
 	m_ParseNode_Info.m_EvalResults.push_back(l_stEvalRes);
 
 }
@@ -553,6 +554,7 @@ bool SP_CPN_Parse_AllFunc_Node::GetValue()
 			l_stEvalRes.m_Multiplicity = m_ParseNode_Info.m_Multiplicity;
 		
 		l_stEvalRes.m_Predicate = m_ParseNode_Info.m_Predicate;
+		l_stEvalRes.m_bPlaceFlag = m_ParseNode_Info.m_bPlaceFlag;
 		m_ParseNode_Info.m_EvalResults.push_back(l_stEvalRes);		
 	}
    return true;

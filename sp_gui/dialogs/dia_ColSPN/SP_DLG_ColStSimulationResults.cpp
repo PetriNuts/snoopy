@@ -1271,6 +1271,7 @@ void SP_DLG_ColStSimulationResults::LoadConnections()
 		}
 
 		SP_LOGMESSAGE(l_itConnection->m_sMultiplicity);
+		SP_LOGMESSAGE(l_sArcWeight);
 
 		//m_pcMainSimulator->SetPreTransitionConnection(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID, GetConnectionType(l_itConnection->m_sArcClass), l_nWeight);
 	}
