@@ -18,11 +18,12 @@ class SP_DLG_ImportSBML2extPN: public wxDialog
 {
 private:
     DECLARE_EVENT_TABLE()
-		//! the top level sizer
-		wxBoxSizer* m_pcSizer;
-		wxCheckBox* m_cbCreateReactionReverseReaction;
-		wxCheckBox* m_cbHighlightReverseReaction;
-		wxCheckBox* m_cbCreateBoundaryConditions;
+	//! the top level sizer
+	wxBoxSizer* m_pcSizer;
+	wxCheckBox* m_cbCreateReactionReverseReaction;
+	wxCheckBox* m_cbHighlightReverseReaction;
+	wxCheckBox* m_cbCreateBoundaryConditions;
+	wxCheckBox* m_cbNormalizeStoichiometries;
 
     DECLARE_CLASS(SP_DLG_ImportSBML2extPN)
 protected:
@@ -37,6 +38,7 @@ public:
 	bool GetCreateReverseReactions();
 	bool GetHighlightReverseReactions();
 	bool GetCreateBoundaryConditions();
+	bool GetNormalizeStoichiometries();
 };
 
 #endif // __SP_DLG_IMPORTSBML2EXTPN_H__

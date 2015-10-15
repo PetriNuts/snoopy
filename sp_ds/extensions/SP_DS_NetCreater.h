@@ -47,10 +47,10 @@ protected:
 	\param	source		source node of the edge
 	\param	target		target node of the edge
 	*/
-	void drawEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& EdgeClass, const wxString& stoichiometry);
+	SP_DS_Edge* drawEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& EdgeClass, const wxString& stoichiometry);
 
 
-	void drawDpnEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& EdgeClass, const wxString& arcweight);
+	SP_DS_Edge* drawDpnEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& EdgeClass, const wxString& arcweight);
 
 	/**
 	\brief Update the frame

@@ -43,6 +43,7 @@ bool SP_ImportSBML2extPN::ReadFile(const wxString& p_sFile)
 		m_CreateReverseReactions = l_cDlg.GetCreateReverseReactions();
 		m_HighlightReversibleReactions = l_cDlg.GetHighlightReverseReactions();
 		m_CreateBoundaryConditions = l_cDlg.GetCreateBoundaryConditions();
+		m_NormalizeStoichiometries = l_cDlg.GetNormalizeStoichiometries();
 
 		l_sbmlDocument = readSBML(p_sFile.mb_str());
 		CHECK_POINTER(l_sbmlDocument, return FALSE);
@@ -377,6 +378,8 @@ void SP_ImportSBML2extPN::getReactions ()
 			const ListOfSpeciesReferences* rectants = l_sbmlReaction->getListOfReactants();
 			const ListOfSpeciesReferences* products = l_sbmlReaction->getListOfProducts();
 			const ListOfSpeciesReferences* modifiers = l_sbmlReaction->getListOfModifiers();
+
+			std::map<SP_DS_Edge*, double> l_Stoichiometries;
 
 			// search in compoundlist
 			SP_ListNode::const_iterator cIt;

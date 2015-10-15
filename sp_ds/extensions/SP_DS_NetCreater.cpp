@@ -56,12 +56,12 @@ SP_DS_NetCreater::CreateDocument(const wxString& netName)
 }
 
 
-void
+SP_DS_Edge*
 SP_DS_NetCreater::drawEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& EdgeClass, const wxString& stoichiometry)
 {
 	//connects two nodes with each other
 	SP_DS_Edgeclass* l_pcEdgeclass = m_pcMyDoc->GetGraph()->GetEdgeclass(EdgeClass);
-	if(!l_pcEdgeclass) return;
+	if(!l_pcEdgeclass) return nullptr;
 
 	edge_t id = make_pair(l_pcEdgeclass, make_pair(source, target));
 	SP_MapEdges::iterator eIt = m_Edges.find(id);
@@ -84,6 +84,7 @@ SP_DS_NetCreater::drawEdge(SP_DS_Node* source, SP_DS_Node* target, const wxStrin
 			}
 			l_pcEdge->ShowOnCanvas(m_pcCanvas, FALSE);
 		}
+		return eIt->second;
 	}
 	else
 	{
@@ -110,15 +111,16 @@ SP_DS_NetCreater::drawEdge(SP_DS_Node* source, SP_DS_Node* target, const wxStrin
 		l_pcEdge->ShowOnCanvas(m_pcCanvas, FALSE);
 
 		m_Edges[id] = l_pcEdge;
+		return l_pcEdge;
 	}
 }
 
-void
+SP_DS_Edge*
 SP_DS_NetCreater::drawDpnEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& EdgeClass, const wxString& arcweight)
 {
 	//connects two nodes with each other
 	SP_DS_Edgeclass* l_pcEdgeclass = m_pcMyDoc->GetGraph()->GetEdgeclass(EdgeClass);
-	if(!l_pcEdgeclass) return;
+	if(!l_pcEdgeclass) return nullptr;
 
 	edge_t id = make_pair(l_pcEdgeclass, make_pair(source, target));
 	SP_MapEdges::iterator eIt = m_Edges.find(id);
@@ -133,6 +135,7 @@ SP_DS_NetCreater::drawDpnEdge(SP_DS_Node* source, SP_DS_Node* target, const wxSt
 		l_pcEdge->GetAttribute(wxT("Multiplicity"))->SetValueString(wxString() << m);
 
 		l_pcEdge->ShowOnCanvas(m_pcCanvas, FALSE);
+		return l_pcEdge;
 	}
 	else
 	{
@@ -156,6 +159,7 @@ SP_DS_NetCreater::drawDpnEdge(SP_DS_Node* source, SP_DS_Node* target, const wxSt
 		l_pcEdge->ShowOnCanvas(m_pcCanvas, FALSE);
 
 		m_Edges[id] = l_pcEdge;
+		return l_pcEdge;
 	}
 }
 

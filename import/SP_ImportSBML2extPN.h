@@ -19,6 +19,7 @@ private:
 	bool m_HighlightReversibleReactions;
 	bool m_CreateReverseReactions;
 	bool m_CreateBoundaryConditions;
+	bool m_NormalizeStoichiometries;
 
 	/**
 	\brief  Add model description
