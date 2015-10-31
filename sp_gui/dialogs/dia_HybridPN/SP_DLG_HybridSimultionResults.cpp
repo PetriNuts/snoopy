@@ -1540,6 +1540,8 @@ bool SP_DLG_HybridSimulationResults::IsConstantArcWeight(const wxString& p_sWeig
 
 void SP_DLG_HybridSimulationResults::OnSimulatorThreadEvent(SP_DS_ThreadEvent& event)
 {
+	unsigned long l_nFiringCount;
+
 	switch (event.GetEventTask())
 	{
 	case SP_THREAD_EVENT_END_SIMULATION:
@@ -1559,6 +1561,12 @@ void SP_DLG_HybridSimulationResults::OnSimulatorThreadEvent(SP_DS_ThreadEvent& e
 		SetSimulationStopWatch(event.GetLongValue());
 
 		Update();
+
+		//log the total number of firing
+		l_nFiringCount=dynamic_cast<spsim::StochasticSimulator*>(m_pcMainSimulator)->GetFireCounter();
+
+		SP_LOGMESSAGE(wxString::Format("Total number of firing events: %ld",l_nFiringCount));
+
 		break;
 
 	case SP_THREAD_EVENT_END_ONE_RUN:
