@@ -46,7 +46,7 @@ SP_DLG_AnimationProperties::SP_DLG_AnimationProperties(SP_DS_Animation* p_pcAnim
 
     SetSizerAndFit(m_pcSizer);
     
-    Centre(wxBOTH);
+    Centre(wxCENTER_ON_SCREEN);
 }
 
 //------------------------------------------------------------------------

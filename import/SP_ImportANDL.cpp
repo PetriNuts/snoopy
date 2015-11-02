@@ -62,7 +62,7 @@ bool SP_ImportANDL::ReadFile(const wxString& p_sFile)
 	}
 	catch(const std::exception& e)
 	{
-		wxString l_sMsg = wxT("Error while parsing ") + p_sFile;
+		wxString l_sMsg = wxT("While parsing ") + p_sFile;
 		SP_LOGERROR(l_sMsg);
 		SP_LOGERROR(wxString(e.what()));
 	}
