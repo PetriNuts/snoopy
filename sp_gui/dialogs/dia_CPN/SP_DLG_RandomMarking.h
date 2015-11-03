@@ -21,7 +21,7 @@
 class SP_DLG_RandomMarking : public wxDialog
 {
 private:
-	wxComboBox* m_pcCSComboBox;
+	wxChoice* m_pcCSComboBox;
 	wxGrid* m_pcColorGrid;
 	wxGrid* m_pcPlaceGrid;
 

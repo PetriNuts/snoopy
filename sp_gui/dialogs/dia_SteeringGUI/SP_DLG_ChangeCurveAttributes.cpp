@@ -11,7 +11,7 @@
 
 BEGIN_EVENT_TABLE(SP_DLG_ChangeCurveAttributes,wxDialog)
 EVT_BUTTON(wxID_OK,SP_DLG_ChangeCurveAttributes::OnOk)
-EVT_COMBOBOX(wxID_ANY, SP_DLG_ChangeCurveAttributes::OnComboBoxChange)
+EVT_CHOICE(wxID_ANY, SP_DLG_ChangeCurveAttributes::OnComboBoxChange)
 EVT_COLOURPICKER_CHANGED(wxID_ANY,SP_DLG_ChangeCurveAttributes::OnCurveColorChanged)
 END_EVENT_TABLE()
 
@@ -38,7 +38,7 @@ wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 
 		  l_pcRowSizer= new wxBoxSizer(wxHORIZONTAL);
 		  //Curve width
-		  m_pcLineWidthBox=new wxComboBox( this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
+		  m_pcLineWidthBox=new wxChoice( this, wxID_ANY, wxDefaultPosition, wxSize(100,-1) );
 
 		  l_pcRowSizer->Add(new wxStaticText(this,wxID_ANY,wxT("Curve width")),1, wxALL, 5);
 		  l_pcRowSizer->Add(m_pcLineWidthBox,1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
@@ -56,7 +56,7 @@ wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 		  //Curve style
 		  l_pcRowSizer= new wxBoxSizer(wxHORIZONTAL);
 
-		  m_pcLineStyleBox=new wxComboBox( this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
+		  m_pcLineStyleBox=new wxChoice( this, wxID_ANY, wxDefaultPosition, wxSize(100,-1) );
 
 		  l_pcRowSizer->Add(new wxStaticText(this,wxID_ANY,wxT("Line style")),1, wxALL, 5);
 		  l_pcRowSizer->Add(m_pcLineStyleBox,1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);

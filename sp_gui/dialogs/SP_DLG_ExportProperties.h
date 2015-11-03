@@ -34,7 +34,7 @@ private:
     SP_WDG_Notebook* m_pcNotebook;
     SP_ExportRoutine* m_pcExport;
     wxFilePickerCtrl* m_pcFilePickerCtrl;
-    map<SP_DS_ColListAttribute*, wxComboBox*> m_mColListComboBoxes;
+    map<SP_DS_ColListAttribute*, wxChoice*> m_mColListComboBoxes;
     SP_MDI_Doc* m_pcDoc;
 
     DECLARE_CLASS(SP_DLG_ExportProperties)

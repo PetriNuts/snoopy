@@ -103,16 +103,16 @@ private:
 	wxStaticText* m_pcCurrentSimulatorTextBox;
 	wxStaticText* m_pcSimulationProgressPercentage;
 	wxGauge* m_pcSimulationProgressBar;
-	wxComboBox* m_pcModelViewBox;
+	wxChoice* m_pcModelViewBox;
 
-	wxComboBox* m_pcSimulatorsAlgorithmBox;
+	wxChoice* m_pcSimulatorsAlgorithmBox;
 
-	wxComboBox* m_pcSimulatorsCategoryBox;
+	wxChoice* m_pcSimulatorsCategoryBox;
 
 	SP_GUI_SteeringSubWindow* m_pcPlaceEditingWindow;
 	SP_GUI_SteeringSubWindow* m_pcParameterEditingWindow;
 
-	wxComboBox* m_pcModelsBox;
+	wxChoice* m_pcModelsBox;
 
 	wxTextCtrl* m_pcStartOutputPointTxtCtrl;
 	wxTextCtrl* m_pcEndOutputPointTxtCtrl;
@@ -127,7 +127,7 @@ private:
 	//Choice box
 	wxCheckListBox* m_pcItemsChoiceCheckListBox;
 
-	wxComboBox* m_pcOutputViewerType;
+	wxChoice* m_pcOutputViewerType;
 
 	//select all items check box
 	wxCheckBox* m_pcSelectClearAllChkBox;

@@ -43,7 +43,7 @@ EVT_LISTBOX_DCLICK(SP_GUI_SELECTNODES_LISTBOX_SELECYED_NODES, SP_DLG_SelectNodes
 
 EVT_CHECKBOX(SP_GUI_STEERINGNODES_COLORUNCOLOR_CHECK, SP_DLG_SelectNodes::OnSelectColorNodesCheckUncheck)
 
-EVT_COMBOBOX(SP_GUI_STEERINGNODES_CURRENT_COLOR_NAME, SP_DLG_SelectNodes::OnColorNameChanged)
+EVT_CHOICE(SP_GUI_STEERINGNODES_CURRENT_COLOR_NAME, SP_DLG_SelectNodes::OnColorNameChanged)
 
 END_EVENT_TABLE()
 
@@ -108,7 +108,7 @@ SP_DLG_SelectNodes::SP_DLG_SelectNodes(wxWindow* p_pcParentWnd, spsa::Model * p_
 		m_pcSelectColorNodes->SetValue(false);
 		l_pcRowSizer->Add(m_pcSelectColorNodes, 1, wxEXPAND | wxALIGN_CENTER);
 
-		m_pcColorName = new wxComboBox(this, SP_GUI_STEERINGNODES_CURRENT_COLOR_NAME, wxT(""), wxDefaultPosition, wxSize(150, -1), 0, NULL, wxCB_READONLY);
+		m_pcColorName = new wxChoice(this, SP_GUI_STEERINGNODES_CURRENT_COLOR_NAME, wxDefaultPosition, wxSize(150, -1));
 		//list box
 		l_pcRowSizer->Add(m_pcColorName, 1, wxEXPAND | wxALIGN_CENTER);
 		l_pcColorUncolorSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);

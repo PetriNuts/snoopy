@@ -13,6 +13,7 @@
 #include <wx/filepicker.h>
 #include <wx/filefn.h>
 #include <wx/tokenzr.h>
+#include <wx/gbsizer.h>
 
 #include "sp_ds/extensions/SP_DS_PedAnimation.h"
 #include "sp_ds/SP_DS_Graph.h"
@@ -50,7 +51,7 @@ enum
 	SP_ID_PEDIMPORT_CANCEL,
 	SP_ID_TIMER,
 	SP_ID_BUTTON_MODIFY_MARKING_SETS,
-	SP_ID_COMBOBOX_CONSTANTS_SETS,
+	SP_ID_CHOICE_CONSTANTS_SETS,
 	SP_ID_BUTTON_MODIFY_CONSTANTS_SETS,
 	SP_ID_STATIC_TEXT_OUTPUT_LABEL
 };
@@ -61,14 +62,14 @@ EVT_UPDATE_UI(SP_ID_PEDSET, SP_DS_PedAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_PEDKEEP, SP_DS_PedAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_PEDIMPORT, SP_DS_PedAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_PEDEXPORT, SP_DS_PedAnimation::OnUpdateUI)
-EVT_UPDATE_UI(SP_ID_COMBOBOX_CONSTANTS_SETS, SP_DS_PedAnimation::OnUpdateUI)
+EVT_UPDATE_UI(SP_ID_CHOICE_CONSTANTS_SETS, SP_DS_PedAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_CONSTANTS_SETS, SP_DS_PedAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_MARKING_SETS, SP_DS_PedAnimation::OnUpdateUI)
 EVT_BUTTON(SP_ID_PEDEXPORT,SP_DS_PedAnimation::OnExport)
 EVT_BUTTON(SP_ID_PEDIMPORT,SP_DS_PedAnimation::OnImport)
-EVT_BUTTON( SP_ID_BUTTON_MODIFY_MARKING_SETS, SP_DS_PedAnimation :: OnModifyMarkingSets )
-EVT_BUTTON( SP_ID_BUTTON_MODIFY_CONSTANTS_SETS, SP_DS_PedAnimation :: OnModifyConstantSets )
-EVT_COMBOBOX( SP_ID_COMBOBOX_CONSTANTS_SETS, SP_DS_PedAnimation::OnConstantSetsChanged )
+EVT_BUTTON(SP_ID_BUTTON_MODIFY_MARKING_SETS, SP_DS_PedAnimation :: OnModifyMarkingSets )
+EVT_BUTTON(SP_ID_BUTTON_MODIFY_CONSTANTS_SETS, SP_DS_PedAnimation :: OnModifyConstantSets )
+EVT_CHOICE(SP_ID_CHOICE_CONSTANTS_SETS, SP_DS_PedAnimation::OnConstantSetsChanged )
 END_EVENT_TABLE()
 
 SP_DS_PedAnimation::SP_DS_PedAnimation(unsigned int p_nRefresh, unsigned int p_nDuration, SP_ANIM_STEP_T p_eStepping):
@@ -767,13 +768,11 @@ bool SP_DS_PedAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcS
 	 * *******************************************************************************************************
 	 */
 
-	wxSizer* l_pcSetsSizer = new wxBoxSizer(wxVERTICAL);
-	wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+	auto l_pcSetsSizer = new wxGridBagSizer(5,5);
 
-	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Marking overview:")), wxSizerFlags(1).Expand().Border(wxALL, 5));
-	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("")), wxSizerFlags(1).Expand().Border(wxALL, 5));
-	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), wxSizerFlags(0).Expand().Border(wxALL, 5));
-	l_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	l_pcSetsSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Marking overview:")), wxGBPosition{0,0}, wxGBSpan{1,2});
+	//l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("")), wxSizerFlags(0).Expand().Border(wxALL, 5));
+	l_pcSetsSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), wxGBPosition{0,2}, wxDefaultSpan);
 
 	//all other sets
 	if (mc->GetElements()->size() > 0)
@@ -782,17 +781,17 @@ bool SP_DS_PedAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcS
 
 		for (unsigned int i = 0; i < m_choices.GetCount(); i++)
 		{
-			l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-			l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, m_choices[i]), 1, wxALL | wxEXPAND, 5);
-			m_apcComboBoxes.push_back(new wxComboBox(p_pcCtrl, SP_ID_COMBOBOX_CONSTANTS_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY, wxDefaultValidator, m_choices[i]));
-			l_pcRowSizer->Add(m_apcComboBoxes[i], 0, wxALL, 5);
-			l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANTS_SETS, wxT("Modify")), 0, wxALL, 5);
-			l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+			int row = i+1;
+			l_pcSetsSizer->Add(new wxStaticText(p_pcCtrl, -1, m_choices[i]), wxGBPosition(row,0));
+			m_apcChoices.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_CONSTANTS_SETS, wxDefaultPosition, wxSize(100, -1), 0, NULL, 0, wxDefaultValidator, m_choices[i]));
+			l_pcSetsSizer->Add(m_apcChoices[i], wxGBPosition(row,1), wxDefaultSpan, wxALIGN_CENTER | wxEXPAND);
+			l_pcSetsSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANTS_SETS, wxT("Modify")), wxGBPosition(row,2), wxDefaultSpan);
 		}
 	}
+	l_pcSetsSizer->AddGrowableCol(1);
 
 	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-	p_pcSizer->Add(l_pcSetsSizer, 0, wxALL, 5);
+	p_pcSizer->Add(l_pcSetsSizer, 1, wxALL | wxEXPAND, 5);
 
 	LoadSets();
 	LoadCurrentMarking();
@@ -865,7 +864,7 @@ void SP_DS_PedAnimation::LoadSets()
 	{
 		SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 
-		m_apcColListAttr.resize(m_apcComboBoxes.size());
+		m_apcColListAttr.resize(m_apcChoices.size());
 
 		unsigned int l_nIndex = 0;
 		SP_ListMetadata::const_iterator l_itElem;
@@ -904,8 +903,8 @@ void SP_DS_PedAnimation::LoadSets()
 	for (size_t j = 0; j < m_apcColListAttr.size(); j++)
 	{
 
-		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
-		wxComboBox* l_pcCombobox = m_apcComboBoxes[j];
+		auto l_pcAttr = m_apcColListAttr[j];
+		auto l_pcCombobox = m_apcChoices[j];
 		l_pcCombobox->Clear();
 		if (l_pcAttr)
 		{
@@ -1011,7 +1010,7 @@ void SP_DS_PedAnimation::OnConstantSetsChanged(wxCommandEvent& p_cEvent)
 
 		if (m_apcColListAttr[i])
 		{
-			m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i]->GetSelection());
+			m_apcColListAttr[i]->SetActiveList(m_apcChoices[i]->GetSelection());
 		}
 	}
 

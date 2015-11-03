@@ -41,17 +41,17 @@ protected:
 	unsigned long m_nContinuousPlaceCount;
 
 protected:
-	wxComboBox* m_pcMarkingSetComboBox;
-	wxComboBox* m_pcFunctionSetComboBox;
-	wxComboBox* m_pcStochasticRateSetComboBox;
-	wxComboBox* m_pcImmediateSetComboBox;
-	wxComboBox* m_pcDelaySetComboBox;
-	wxComboBox* m_pcScheduledSetComboBox;
+	wxChoice* m_pcMarkingSetComboBox;
+	wxChoice* m_pcFunctionSetComboBox;
+	wxChoice* m_pcStochasticRateSetComboBox;
+	wxChoice* m_pcImmediateSetComboBox;
+	wxChoice* m_pcDelaySetComboBox;
+	wxChoice* m_pcScheduledSetComboBox;
 
-	wxComboBox* m_pcParameterSetComboBox;
+	wxChoice* m_pcParameterSetComboBox;
 
-	wxComboBox* m_pcContinuousSolver;
-	wxComboBox* m_pcTimeSyncComboBox;
+	wxChoice* m_pcContinuousSolver;
+	wxChoice* m_pcTimeSyncComboBox;
 	wxButton * m_pcSimulationProperites;
 
 protected:

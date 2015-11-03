@@ -19,9 +19,9 @@ typedef std::map<wxString, SP_VectorString*> SP_MapString2VectorString;
 class SP_DLG_SelectXAxisVariable: public wxDialog
 {
 private:
-	wxComboBox* m_pcVariableTypeBox;
+	wxChoice* m_pcVariableTypeBox;
 
-	wxComboBox* m_pcVariableNameBox;
+	wxChoice* m_pcVariableNameBox;
 
 	wxString m_sSelectedCategory;
 	wxString m_sSelectedSubCategory;

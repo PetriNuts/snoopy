@@ -20,7 +20,7 @@ using namespace spsa;
 enum
 {
 	SP_ID_RADIOBOX_MODEL_OPTIONS,
-	SP_ID_COMBOBOX_MODEL_NAMES
+	SP_ID_CHOICE_MODEL_NAMES
 };
 
 BEGIN_EVENT_TABLE(SP_GUI_SteeringOptions,wxDialog)
@@ -29,7 +29,7 @@ BEGIN_EVENT_TABLE(SP_GUI_SteeringOptions,wxDialog)
 
  EVT_BUTTON(wxID_OK,SP_GUI_SteeringOptions::OnOkButtonClicked)
 
- EVT_COMBOBOX(SP_ID_COMBOBOX_MODEL_NAMES, SP_GUI_SteeringOptions::OnExistingModelBoxDropDown)
+ EVT_CHOICE(SP_ID_CHOICE_MODEL_NAMES, SP_GUI_SteeringOptions::OnExistingModelBoxDropDown)
 
 END_EVENT_TABLE()
 
@@ -60,7 +60,7 @@ SP_GUI_SteeringOptions::SP_GUI_SteeringOptions(wxWindow* p_pcParent,SteeringClie
 		m_pcModelOptions=new wxRadioBox(this,SP_ID_RADIOBOX_MODEL_OPTIONS, wxT(""),wxDefaultPosition, wxDefaultSize, 2, l_sChoices, 2, wxRA_SPECIFY_COLS);
 		l_pcTopSizer->Add(m_pcModelOptions, 1, wxEXPAND | wxALL, 5);
 
-		m_pcExistingModelBox=new wxComboBox( this, SP_ID_COMBOBOX_MODEL_NAMES, wxT(""), wxDefaultPosition, wxSize(200,-1), 0, NULL, wxCB_READONLY );
+		m_pcExistingModelBox=new wxChoice( this, SP_ID_CHOICE_MODEL_NAMES, wxDefaultPosition, wxSize(200,-1));
 
 		//Add the model names to the list box
 		UpdateModelnames();
@@ -90,7 +90,7 @@ SP_GUI_SteeringOptions::SP_GUI_SteeringOptions(wxWindow* p_pcParent,SteeringClie
 		wxBoxSizer* l_pcBottomSizer=new wxBoxSizer( wxHORIZONTAL );
 		l_pcSizer->Add(l_pcBottomSizer, 0, wxEXPAND | wxALIGN_CENTER);
 
-		m_pcExistingModelBox=new wxComboBox( this, SP_ID_COMBOBOX_MODEL_NAMES, wxT(""), wxDefaultPosition, wxSize(200,-1), 0, NULL, wxCB_READONLY );
+		m_pcExistingModelBox=new wxChoice( this, SP_ID_CHOICE_MODEL_NAMES, wxDefaultPosition, wxSize(200,-1));
 
 		//Add the model names to the list box
 		UpdateModelnames();
@@ -232,7 +232,7 @@ void SP_GUI_SteeringOptions::UpdateModelnames()
 
 void SP_GUI_SteeringOptions::OnExistingModelBoxDropDown(wxCommandEvent& event)
 {
-	//TODO: When wxWidget will be updated to version 2.9, use wxEVT_COMMAND_COMBOBOX_DROPDOWN event type
+	//TODO: When wxWidget will be updated to version 2.9, use wxEVT_COMMAND_CHOICE_DROPDOWN event type
 	if(event.GetEventType()==wxEVT_ENTER_WINDOW)
 	{
 		UpdateModelnames();

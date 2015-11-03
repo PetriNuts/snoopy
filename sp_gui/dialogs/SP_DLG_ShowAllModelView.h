@@ -44,8 +44,8 @@ private:
 
 	wxCheckListBox* m_pcPlaceChoiceCheckListBox;
 	wxCheckBox* m_pcSelectClearAllChkBox;
-	wxComboBox *m_pcOutputViewerType;
-	wxComboBox *m_pcOutputExportType;
+	wxChoice *m_pcOutputViewerType;
+	wxChoice *m_pcOutputExportType;
 	wxSizer *m_pcRightSizer;
 	wxButton *m_pcShowHideButton;
 	wxButton *m_pcXAxis;

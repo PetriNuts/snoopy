@@ -51,7 +51,7 @@ private:
 	spsim::Gillespie* m_pcSimulator;
 
 	vector<SP_DS_ColListAttribute*> m_apcColListAttr;
-	vector<wxComboBox*> m_apcComboBoxes;
+	vector<wxChoice*> m_apcComboBoxes;
 
     wxStaticText* m_pcOutputLabelStaticText;
 

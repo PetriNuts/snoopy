@@ -67,7 +67,7 @@ bool SP_DS_StSimGillespie::AddToSimulationProperties(SP_DLG_SimulationProperties
 
 	wxSizer* l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add(new wxStaticText( p_pcDlg, -1, wxT("Thread count:") ), 1, wxALL | wxEXPAND, 5);
-	m_pcThreadCountComboBox = new wxComboBox( p_pcDlg, -1 , wxT(""), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN | wxCB_READONLY );
+	m_pcThreadCountComboBox = new wxChoice( p_pcDlg, -1 );
 	for(int i = 1; i <= l_nCPUCount; ++i)
 	{
 		m_pcThreadCountComboBox->Append(wxString() << i);
@@ -85,7 +85,7 @@ bool SP_DS_StSimGillespie::OnSimulationPropertiesOk()
 
 	unsigned long l_nValue = 0;
 
-	if(m_pcThreadCountComboBox->GetValue().ToULong(&l_nValue) && l_nValue > 0)
+	if(m_pcThreadCountComboBox->GetStringSelection().ToULong(&l_nValue) && l_nValue > 0)
 	{
 		m_nThreadCount = l_nValue;
 	}

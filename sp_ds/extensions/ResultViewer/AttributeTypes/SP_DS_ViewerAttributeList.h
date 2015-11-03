@@ -17,7 +17,7 @@
 
 class SP_DS_ViewerAttributeList: public SP_DS_ViewerAttribute
 {
-	      wxComboBox*  m_pcPossibleValuesBox;
+	      wxChoice*  m_pcPossibleValuesBox;
 
 	      SP_VectorString m_asPossibleValues;
 

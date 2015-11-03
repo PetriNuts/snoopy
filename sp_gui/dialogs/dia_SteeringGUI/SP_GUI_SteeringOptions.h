@@ -17,7 +17,7 @@ class SP_GUI_SteeringOptions: public wxDialog
 {
 private:
 	      wxRadioBox * m_pcModelOptions;
-	      wxComboBox* m_pcExistingModelBox;
+	      wxChoice* m_pcExistingModelBox;
 
 	      wxTextCtrl* m_pcModelNameTextCtrl;
 

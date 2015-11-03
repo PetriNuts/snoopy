@@ -9,14 +9,14 @@
 #include "export/SP_ExportRoutine.h"
 
 #include <wx/filename.h>
+#include <wx/gbsizer.h>
+#include <wx/busyinfo.h>
 
 #include "sp_gui/dialogs/SP_DLG_ExportProperties.h"
 #include "sp_gui/windows/SP_GUI_Mainframe.h"
 #include "sp_ds/SP_DS_Graph.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_core/tools/SP_StopWatch.h"
-
-#include <wx/busyinfo.h>
 
 IMPLEMENT_CLASS(SP_DLG_ExportProperties, wxDialog)
 
@@ -41,7 +41,7 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
     m_pcSizer = new wxBoxSizer(wxVERTICAL);
 
     /* notebook to show multiple pages on */
-    m_pcNotebook = new SP_WDG_Notebook(this, wxT("Export"), wxDefaultPosition, wxSize(300,300));
+    m_pcNotebook = new SP_WDG_Notebook(this, wxT("Export"), wxDefaultPosition, wxSize(400,300));
     m_pcSizer->Add(m_pcNotebook, 1, wxEXPAND | wxALL, 5);
 
     SP_WDG_NotebookPage* l_pcNotebookPage = AddPage(wxT("General"));
@@ -63,6 +63,8 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 
 	wxString l_sNetClassName = m_pcDoc->GetGraph()->GetNetclass()->GetName();
 
+	auto l_pcSetsSizer = new wxGridBagSizer(5,5);
+	int row = 0;
 	//search for collist attributes
 	for (SP_ListNodeclass::const_iterator itNC = m_pcDoc->GetGraph()->GetNodeclasses()->begin(); itNC != m_pcDoc->GetGraph()->GetNodeclasses()->end(); itNC++)
 	{
@@ -106,30 +108,21 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 						}
 					}
 
-					// rows of SetsSizer
-
-					l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 					wxString l_sName;
 					l_sName << l_pcProtoColAttr->GetDisplayName() << wxT(":");
-					l_pcRowSizer->Add(new wxStaticText( l_pcNotebookPage, -1, l_sName ), 1, wxALL|wxEXPAND, 5);
+					l_pcSetsSizer->Add(new wxStaticText( l_pcNotebookPage, wxID_ANY, l_sName ), wxGBPosition{row,0});
 
-					wxComboBox* l_pcComboBox = new wxComboBox( l_pcNotebookPage, -1, wxT(""), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
-
-				
-					
+					auto l_pcComboBox = new wxChoice( l_pcNotebookPage, wxID_ANY );
 					for (unsigned int i = 0; i < l_vSetNames.size(); i++)
 					{
 						l_pcComboBox->Append( l_vSetNames[i]);
 					}					
-
-					
 					l_pcComboBox->SetSelection(l_pcColAttr->GetActiveList());
 
 					m_mColListComboBoxes[l_pcColAttr] = l_pcComboBox;
 
-					l_pcRowSizer->Add(l_pcComboBox, 1, wxALL|wxEXPAND | wxALIGN_RIGHT, 5);
-
-					l_pcNotebookPage->AddControl(l_pcRowSizer, 0, wxALL | wxEXPAND, 5);
+					l_pcSetsSizer->Add(l_pcComboBox, wxGBPosition{row,1}, wxDefaultSpan, wxALIGN_CENTER | wxEXPAND);
+					++row;
 				}
 			}
 		}
@@ -158,9 +151,8 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 			if (SP_Find(m_choices, l_sGroup) == m_choices.end())
 			{
 				m_choices.Add(l_sGroup);
-				l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
-				l_pcRowSizer->Add( new wxStaticText( l_pcNotebookPage, -1, m_choices.Last() ), 1, wxALL | wxEXPAND, 5 );
-				wxComboBox* l_pcComboBox = new wxComboBox( l_pcNotebookPage, -1, wxT(""), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				l_pcSetsSizer->Add( new wxStaticText( l_pcNotebookPage, wxID_ANY, m_choices.Last() ), wxGBPosition{row,0} );
+				auto l_pcComboBox = new wxChoice( l_pcNotebookPage, wxID_ANY);
 
 				for(unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++ )
 				{
@@ -170,12 +162,13 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 
 				l_pcComboBox->SetSelection(l_pcAttr->GetActiveList());
 				m_mColListComboBoxes[l_pcAttr] = l_pcComboBox;
-				l_pcRowSizer->Add(l_pcComboBox, 1, wxALL|wxEXPAND | wxALIGN_RIGHT, 5);
-				l_pcNotebookPage->AddControl(l_pcRowSizer, 0, wxALL | wxEXPAND, 5);
+				l_pcSetsSizer->Add(l_pcComboBox, wxGBPosition{row,1}, wxDefaultSpan, wxEXPAND | wxALIGN_CENTER);
+				++row;
 			}
 		}
-
 	}
+	l_pcSetsSizer->AddGrowableCol(1);
+	l_pcNotebookPage->AddControl(l_pcSetsSizer, 1, wxALL | wxEXPAND, 5);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////
@@ -278,11 +271,10 @@ SP_DLG_ExportProperties::OnDlgCancel(wxCommandEvent& p_cEvent)
 void
 SP_DLG_ExportProperties::SaveData()
 {
-	map<SP_DS_ColListAttribute*, wxComboBox*>::const_iterator l_it;
-	for(l_it = m_mColListComboBoxes.begin(); l_it != m_mColListComboBoxes.end(); l_it++)
+	for(auto l_it = m_mColListComboBoxes.begin(); l_it != m_mColListComboBoxes.end(); ++l_it)
 	{
-		SP_DS_ColListAttribute* l_pcCollist = (*l_it).first;
-		wxComboBox* l_pcComboBox = (*l_it).second;
+		auto l_pcCollist = (*l_it).first;
+		auto l_pcComboBox = (*l_it).second;
 		l_pcCollist->SetActiveList(l_pcComboBox->GetSelection());
 
 		l_pcCollist->SetActiveColumn(l_pcComboBox->GetSelection());

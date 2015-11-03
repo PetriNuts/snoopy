@@ -68,7 +68,7 @@ protected:
 	unsigned long m_nResultPointCount;
 	bool m_bSimThreadCreated;
 
-	vector<wxComboBox*> m_apcComboBoxes;
+	vector<wxChoice*> m_apcComboBoxes;
 	vector<SP_DS_ColListAttribute*> m_apcColListAttr;
 
 	SP_ExportType m_ExportType;
@@ -134,7 +134,7 @@ protected:
 	bool m_nlayoutAdaptaion;
 
 
-	wxComboBox* m_pcShowGraphViewBox;
+	wxChoice* m_pcShowGraphViewBox;
 
 	wxListBox *m_pcListboxShowAllGraphViewName;
 
@@ -154,7 +154,7 @@ protected:
 	wxButton* m_pcSimulationProperties;
 	wxButton* m_pcStartButton;
 
-	wxComboBox* m_pcViewBox;
+	wxChoice* m_pcViewBox;
 
 	wxCheckBox* m_pcSelectClearAllChkBox;
 

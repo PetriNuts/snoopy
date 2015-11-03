@@ -13,7 +13,7 @@ IMPLEMENT_CLASS(SP_DLG_RandomColor, wxDialog)
 enum
 {	
 	SP_ID_COLORSETTXTCTRL,
-	SP_ID_TYPECOMBOBOX	
+	SP_ID_TYPECHOICE	
 };
 
 BEGIN_EVENT_TABLE(SP_DLG_RandomColor, wxDialog)
@@ -42,7 +42,8 @@ SP_DLG_RandomColor::SP_DLG_RandomColor(vector<wxString>* p_pvColors, wxWindow *p
 		l_arDataTypes.Add( (*m_pvColors)[i]);
 	}
 
-	m_pcColorsComboBoxCtrl = new wxComboBox(this, SP_ID_TYPECOMBOBOX, (*m_pvColors)[0], wxDefaultPosition, wxDefaultSize, l_arDataTypes, wxCB_DROPDOWN);
+	m_pcColorsComboBoxCtrl = new wxChoice(this, SP_ID_TYPECHOICE, wxDefaultPosition, wxDefaultSize, l_arDataTypes);
+	m_pcColorsComboBoxCtrl->SetStringSelection((*m_pvColors)[0]);
 	l_pcRowSizer->Add(m_pcColorsComboBoxCtrl, 1, wxEXPAND | wxALL, 5);	
 
 	l_pcColorSetSizer->Add(l_pcRowSizer, 0, wxALL | wxEXPAND, 1);	
@@ -81,7 +82,7 @@ void SP_DLG_RandomColor::OnDlgOk(wxCommandEvent& p_cEvent)
 	
 		
 		// 1 -- color set type
-		m_sColors = m_pcColorsComboBoxCtrl->GetValue();		
+		m_sColors = m_pcColorsComboBoxCtrl->GetStringSelection();
 
 		// 2 -- color set colors
 		m_sNumber = m_pcNumberTextCtrl->GetValue();		

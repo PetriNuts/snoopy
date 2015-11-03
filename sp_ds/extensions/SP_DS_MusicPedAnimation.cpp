@@ -27,12 +27,12 @@ EVT_BUTTON(SP_ID_BUTTON_ANIM_PLAYFWD, SP_DS_MusicPedAnimation::OnAnimPlayFwd)
 EVT_BUTTON(SP_ID_BUTTON_ANIM_PLAYBWD, SP_DS_MusicPedAnimation::OnAnimPlayBwd)
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_SOUND_SETS, SP_DS_MusicPedAnimation :: OnModifySoundSets)
 
-EVT_COMBOBOX( SP_ID_COMBOBOX_SOUND_SETS, SP_DS_MusicPedAnimation::OnSoundSetChanged)
+EVT_CHOICE( SP_ID_CHOICE_SOUND_SETS, SP_DS_MusicPedAnimation::OnSoundSetChanged)
 
 EVT_COMMAND_SCROLL(SP_ID_SLIDER, SP_DS_MusicPedAnimation::OnVolumeChanged)
 
 EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_SOUND_SETS, SP_DS_MusicPedAnimation::OnUpdateUI)
-EVT_UPDATE_UI(SP_ID_COMBOBOX_SOUND_SETS, SP_DS_MusicPedAnimation::OnUpdateUI)
+EVT_UPDATE_UI(SP_ID_CHOICE_SOUND_SETS, SP_DS_MusicPedAnimation::OnUpdateUI)
 
 END_EVENT_TABLE()
 
@@ -140,7 +140,7 @@ SP_DS_MusicPedAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcS
 
 	l_pcRowSizer->Add( new wxStaticText( p_pcCtrl, -1, wxT("Sound Set:") ), 1, wxALL | wxEXPAND, 5 );
 
-	m_pcSoundSetComboBox = new wxComboBox( p_pcCtrl, SP_ID_COMBOBOX_SOUND_SETS, _T( "" ), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
+	m_pcSoundSetComboBox = new wxChoice( p_pcCtrl, SP_ID_CHOICE_SOUND_SETS, wxDefaultPosition, wxSize(100,-1) );
 
 	l_pcRowSizer->Add( m_pcSoundSetComboBox, 0, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( p_pcCtrl, SP_ID_BUTTON_MODIFY_SOUND_SETS, wxT( "Overview" ) ), 0, wxALL, 5 );

@@ -52,7 +52,7 @@ EVT_BUTTON( SP_ID_BUTTON_CHECK, SP_DLG_RandomMarking::OnCheckFunction )
     EVT_GRID_CELL_CHANGE( SP_DLG_RandomMarking::OnGridCellValueChanged ) 
 #endif
 
-EVT_COMBOBOX(SP_ID_COMBOX_CS, SP_DLG_RandomMarking::OnComBoxChange) 
+EVT_CHOICE(SP_ID_COMBOX_CS, SP_DLG_RandomMarking::OnComBoxChange) 
 
 //EVT_GRID_LABEL_LEFT_CLICK(SP_DLG_RandomMarking::onNumberGridClick)
 EVT_GRID_CMD_LABEL_LEFT_CLICK(SP_ID_GRID_NUMBER, SP_DLG_RandomMarking::onNumberGridClick)
@@ -77,7 +77,7 @@ SP_DLG_RandomMarking::SP_DLG_RandomMarking(int p_nSelColumn, wxWindow* p_pcParen
 
 	wxSizer* l_pcComboSizer = new wxBoxSizer( wxVERTICAL );
 	l_pcComboSizer->Add(new wxStaticText( this, -1, wxT("Choose a color set name:") ), 0, wxEXPAND | wxALL, 5);
-	m_pcCSComboBox = new wxComboBox( this, SP_ID_COMBOX_CS, wxT(""), wxDefaultPosition, wxSize( 200, 50 ), 0, NULL, wxCB_DROPDOWN | wxCB_READONLY );
+	m_pcCSComboBox = new wxChoice( this, SP_ID_COMBOX_CS, wxDefaultPosition, wxSize( 200, 50 ) );
 	l_pcComboSizer->Add(m_pcCSComboBox, 1, wxEXPAND | wxALL, 5);	
 	l_pcRowSizer->Add(l_pcComboSizer, 0, wxALL | wxEXPAND, 1);
 
@@ -239,7 +239,7 @@ bool SP_DLG_RandomMarking::Initialize()
 
 bool SP_DLG_RandomMarking::LoadData()
 {
-	wxString l_sSelectedCS = m_pcCSComboBox->GetValue();
+	wxString l_sSelectedCS = m_pcCSComboBox->GetStringSelection();
 
 	if (m_pcPlaceGrid->GetNumberRows() > 0)
 	{
@@ -375,7 +375,7 @@ bool SP_DLG_RandomMarking::SaveData()
 
 bool SP_DLG_RandomMarking::GetInitialMarking()
 {
-	wxString l_sColorSetName = m_pcCSComboBox->GetValue();
+	wxString l_sColorSetName = m_pcCSComboBox->GetStringSelection();
 
 	vector< vector<wxString> > l_vvOriginalMarkings;
 	for (int i = 0; i < m_pcColorGrid->GetNumberRows(); i++)

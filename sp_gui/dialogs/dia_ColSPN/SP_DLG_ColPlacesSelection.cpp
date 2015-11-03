@@ -460,7 +460,7 @@ void SP_DLG_ColPlacesSelection::AddtoCurLBInStrings(wxString p_sName)
 
 void SP_DLG_ColPlacesSelection::OnColPlaceSel( wxCommandEvent& p_cEvent )
 {
-	wxString l_sSelColPlace = m_pcChooseColoredPlace->GetValue();
+	wxString l_sSelColPlace = m_pcChooseColoredPlace->GetStringSelection();
 
 	if(l_sSelColPlace == wxT(""))
 		return;

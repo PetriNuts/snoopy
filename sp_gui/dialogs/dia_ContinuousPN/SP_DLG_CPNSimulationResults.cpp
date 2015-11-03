@@ -55,10 +55,10 @@ enum
 	SP_ID_BUTTON_MODIFY_FUNCTION_SETS,
 	SP_ID_BUTTON_MODIFY_PARAMETER_SETS,
 	SP_ID_BUTTON_MODIFY_CONSTANT_SETS,
-	SP_ID_COMBOBOX_MARKING_SETS,
-	SP_ID_COMBOBOX_FUNCTION_SETS,
-	SP_ID_COMBOBOX_PARAMETER_SETS,
-	SP_ID_COMBOBOX_SOLVER,
+	SP_ID_CHOICE_MARKING_SETS,
+	SP_ID_CHOICE_FUNCTION_SETS,
+	SP_ID_CHOICE_PARAMETER_SETS,
+	SP_ID_CHOICE_SOLVER,
 	SP_ID_RADIOBOX_SOLVER_TYPE,
 	SP_ID_BUTTON_SIMULATION_PROPERTIES,
 	SP_ID_BUTTON_SAVE_ODE
@@ -70,10 +70,10 @@ EVT_BUTTON( SP_ID_BUTTON_MODIFY_FUNCTION_SETS, SP_DLG_CPNSimulationResults :: On
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_PARAMETER_SETS, SP_DLG_CPNSimulationResults :: OnModifyParameterSets )
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_CONSTANT_SETS, SP_DLG_CPNSimulationResults :: OnModifyConstantSets )
 
-EVT_COMBOBOX( SP_ID_COMBOBOX_MARKING_SETS, SP_DLG_CPNSimulationResults::OnMarkingSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_FUNCTION_SETS, SP_DLG_CPNSimulationResults::OnFunctionSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_PARAMETER_SETS, SP_DLG_CPNSimulationResults::OnParameterSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_SOLVER, SP_DLG_CPNSimulationResults::OnSolverChanged )
+EVT_CHOICE( SP_ID_CHOICE_MARKING_SETS, SP_DLG_CPNSimulationResults::OnMarkingSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_FUNCTION_SETS, SP_DLG_CPNSimulationResults::OnFunctionSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_PARAMETER_SETS, SP_DLG_CPNSimulationResults::OnParameterSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_SOLVER, SP_DLG_CPNSimulationResults::OnSolverChanged )
 EVT_RADIOBOX(SP_ID_RADIOBOX_SOLVER_TYPE,SP_DLG_CPNSimulationResults::OnSolverTypeChanged)
 EVT_BUTTON( SP_ID_BUTTON_SIMULATION_PROPERTIES, SP_DLG_CPNSimulationResults :: OnSimulationProperties )
 EVT_BUTTON( SP_ID_BUTTON_SAVE_ODE, SP_DLG_CPNSimulationResults :: SaveODE )
@@ -100,7 +100,7 @@ int l_nSimulatorIndex =
 
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 		l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Function set:") ), 1, wxALL | wxEXPAND, 5 );
-		m_apcComboBoxes.push_back(new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_FUNCTION_SETS, wxDefaultPosition, wxSize(100, -1)));
 		l_pcRowSizer->Add( m_apcComboBoxes[0], 1, wxALL, 5 );
 		l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify") ), 0, wxALL, 5 );
 		m_pcSetsSizer->Add( l_pcRowSizer , 1, wxEXPAND);
@@ -112,7 +112,7 @@ int l_nSimulatorIndex =
 			wxString l_sGroup = *l_itChoice;
 			l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 			l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, l_sGroup + wxT(':') ), 1, wxALL | wxEXPAND, 5 );
-			m_apcComboBoxes.push_back(new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_MARKING_SETS , wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
+			m_apcComboBoxes.push_back(new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_MARKING_SETS , wxDefaultPosition, wxSize(100,-1), 0, NULL, 0, wxDefaultValidator, l_sGroup ));
 			l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], 1, wxALL, 5 );
 			l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), 0, wxALL, 5 );
 			m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND);
@@ -130,7 +130,7 @@ int l_nSimulatorIndex =
 	//
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Simulator")), 1, wxALL | wxEXPAND, 5);
-	m_pcSolver = new wxComboBox(m_pcPropertyWindowPropertySizer, SP_ID_COMBOBOX_SOLVER, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
+	m_pcSolver = new wxChoice(m_pcPropertyWindowPropertySizer, SP_ID_CHOICE_SOLVER, wxDefaultPosition, wxSize(100, -1));
 	m_pcSolver->Clear();
 
 	//decode the solver type index
@@ -348,7 +348,7 @@ void SP_DLG_CPNSimulationResults::OnMarkingSetChanged(wxCommandEvent& p_cEvent)
 	for(size_t j = 0; j < m_apcColListAttr.size(); j++)
 	{
 		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
-		wxComboBox* l_pcCombobox = m_apcComboBoxes[j];
+		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
 		unsigned int l_nCurrentMarkingSet = l_pcCombobox->GetSelection();
 		if(l_pcAttr)
 		{

@@ -38,7 +38,7 @@ private:
 	wxButton* m_pcStartButton;
 	wxButton* m_pcPauseButton;
 	wxGauge* m_pcUnfoldingProgressGauge;
-	wxComboBox* m_pcThreadCountComboBox;
+	wxChoice* m_pcThreadCountComboBox;
 
 	wxStopWatch m_cUnfoldingStopWatch;
 	wxStaticText* m_pcUnfoldingStopWatch;

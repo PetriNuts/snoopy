@@ -28,7 +28,7 @@ SP_DLG_SelectXAxisVariable::SP_DLG_SelectXAxisVariable(wxWindow* p_pcParent, con
 	l_pcMainSizer->Add(l_pcTopSizer, 0, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
 
 	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Variable type:")), 1, wxEXPAND | wxALL, 5);
-	m_pcVariableTypeBox = new wxComboBox(this, SP_DLG_SELECT_X_AXIS_CHANGE_TYPE, wxT(""), wxDefaultPosition, wxSize(150, -1), 0, NULL, wxCB_READONLY);
+	m_pcVariableTypeBox = new wxChoice(this, SP_DLG_SELECT_X_AXIS_CHANGE_TYPE, wxDefaultPosition, wxSize(150, -1));
 	l_pcRowSizer->Add(m_pcVariableTypeBox, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
 	l_pcTopSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
 	l_pcTopSizer->AddSpacer(10);
@@ -36,7 +36,7 @@ SP_DLG_SelectXAxisVariable::SP_DLG_SelectXAxisVariable(wxWindow* p_pcParent, con
 	//select variable name
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Name:")), 1, wxEXPAND | wxALL, 5);
-	m_pcVariableNameBox = new wxComboBox(this, SP_DLG_SELECT_X_AXIS_CHANGE_NAME, wxT(""), wxDefaultPosition, wxSize(150, -1), 0, NULL, wxCB_READONLY);
+	m_pcVariableNameBox = new wxChoice(this, SP_DLG_SELECT_X_AXIS_CHANGE_NAME, wxDefaultPosition, wxSize(150, -1));
 
 	l_pcRowSizer->Add(m_pcVariableNameBox, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
 	l_pcTopSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
@@ -57,9 +57,9 @@ SP_DLG_SelectXAxisVariable::SP_DLG_SelectXAxisVariable(wxWindow* p_pcParent, con
 	Center();
 
 	//connect event
-	Connect(SP_DLG_SELECT_X_AXIS_CHANGE_TYPE, wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(SP_DLG_SelectXAxisVariable::OnVariableTypeChanged));
+	Connect(SP_DLG_SELECT_X_AXIS_CHANGE_TYPE, wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(SP_DLG_SelectXAxisVariable::OnVariableTypeChanged));
 
-	Connect(SP_DLG_SELECT_X_AXIS_CHANGE_NAME, wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(SP_DLG_SelectXAxisVariable::OnVariableNameChanged));
+	Connect(SP_DLG_SELECT_X_AXIS_CHANGE_NAME, wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(SP_DLG_SelectXAxisVariable::OnVariableNameChanged));
 }
 
 SP_DLG_SelectXAxisVariable::~SP_DLG_SelectXAxisVariable()

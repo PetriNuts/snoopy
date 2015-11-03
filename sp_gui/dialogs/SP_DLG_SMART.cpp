@@ -342,7 +342,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_GarbageCollection = new wxCheckBox(m_pcNotebookPage, -1, wxT("#GarbageCollection"));
 		checkbox_GarbageCollection->SetValue(false);
 		Gridpanel->Add(checkbox_GarbageCollection,0, wxEXPAND);
-		combobox_GarbageCollection= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+		combobox_GarbageCollection= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_GarbageCollection->Insert(wxT("LAZY"), 0);
 		combobox_GarbageCollection->Insert(wxT("STRICT"), 1);
 		combobox_GarbageCollection->Insert(wxT("OPTIMISTIC"), 2);
@@ -356,7 +356,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_IgnoreWeightClasses= new wxCheckBox(m_pcNotebookPage, -1, wxT("#IgnoreWeightClasses"));
 		checkbox_IgnoreWeightClasses->SetValue(false);
 		Gridpanel->Add(checkbox_IgnoreWeightClasses,0, wxEXPAND);
-		combobox_IgnoreWeightClasses= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+		combobox_IgnoreWeightClasses= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_IgnoreWeightClasses->Insert(wxT("true"), 0);
 		combobox_IgnoreWeightClasses->Insert(wxT("false"), 1);
 		combobox_IgnoreWeightClasses->SetSelection(1);
@@ -368,7 +368,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_StateStorage = new wxCheckBox(m_pcNotebookPage, -1, wxT("#StateStorage"));
 		checkbox_StateStorage->SetValue(false);
 		Gridpanel->Add(checkbox_StateStorage,0, wxEXPAND);
-		combobox_StateStorage= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+		combobox_StateStorage= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_StateStorage->Insert(wxT("HASHING"), 0);
 		combobox_StateStorage->Insert(wxT("AVL"), 1);
 		combobox_StateStorage->Insert(wxT("SPLAY"), 2);
@@ -388,7 +388,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_MarkovStorage = new wxCheckBox(m_pcNotebookPage, -1, wxT("#MarkovStorage"));
 		checkbox_MarkovStorage->SetValue(false);
 		Gridpanel->Add(checkbox_MarkovStorage,0, wxEXPAND);
-		combobox_MarkovStorage= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+		combobox_MarkovStorage= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_MarkovStorage->Insert(wxT("SPARSE"), 0);
 		combobox_MarkovStorage->Insert(wxT("KRONECKER"), 1);
 		combobox_MarkovStorage->Insert(wxT("MATRIX DIAGRAM KRONECKER"), 2);
@@ -406,7 +406,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_RealFormat->SetValue(false);
 		Gridpanel->Add(checkbox_RealFormat,0, wxEXPAND);
 		combobox_RealFormat
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_RealFormat->Insert(wxT("FIXED"), 0);
 		combobox_RealFormat->Insert(wxT("SCIENTIFIC"), 1);
 		combobox_RealFormat->Insert(wxT("GENERAL"), 2);
@@ -421,7 +421,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_BFSTrace->SetValue(false);
 		Gridpanel->Add(checkbox_BFSTrace,0, wxEXPAND);
 		combobox_BFSTrace
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_BFSTrace->Insert(wxT("JOIN"), 0);
 		combobox_BFSTrace->Insert(wxT("FORWARD"), 1);
 		combobox_BFSTrace->Insert(wxT("BACKWARD"), 2);
@@ -436,7 +436,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_EmbedWithElim->SetValue(false);
 		Gridpanel->Add(checkbox_EmbedWithElim,0, wxEXPAND);
 		combobox_EmbedWithElim
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_EmbedWithElim->Insert(wxT("0"), 0);
 		combobox_EmbedWithElim->Insert(wxT("1"), 1);
 		combobox_EmbedWithElim->Insert(wxT("2"), 2);
@@ -451,7 +451,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_EUStrategy->SetValue(false);
 		Gridpanel->Add(checkbox_EUStrategy,0, wxEXPAND);
 		combobox_EUStrategy
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_EUStrategy->Insert(wxT("BFS"), 0);
 		combobox_EUStrategy->Insert(wxT("SATURATION"), 1);
 		combobox_EUStrategy->SetSelection(1);
@@ -464,7 +464,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_GarbageUnit->SetValue(false);
 		Gridpanel->Add(checkbox_GarbageUnit,0, wxEXPAND);
 		combobox_GarbageUnit
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_GarbageUnit->Insert(wxT("KBYTES"), 0);
 		combobox_GarbageUnit->Insert(wxT("NODES"), 1);
 		combobox_GarbageUnit->SetSelection(0);
@@ -488,7 +488,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_MatrixByRows->SetValue(false);
 		Gridpanel->Add(checkbox_MatrixByRows,0, wxEXPAND);
 		combobox_MatrixByRows
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_MatrixByRows->Insert(wxT("true"), 0);
 		combobox_MatrixByRows->Insert(wxT("false"), 1);
 		combobox_MatrixByRows->SetSelection(1);
@@ -551,7 +551,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		Gridpanel->Add(checkbox_init_option,0, wxEXPAND);
 
 		combobox_init_option
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_init_option->Insert(wxT("multiply"), 0);
 		combobox_init_option->Insert(wxT("set"), 1);
 		combobox_init_option->SetSelection(0);
@@ -564,7 +564,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_num_states->SetValue(false);
 		Gridpanel->Add(checkbox_num_states, 0, wxEXPAND);
 		combobox_num_states
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_num_states->Insert(wxT("TRUE"), 0);
 		combobox_num_states->Insert(wxT("FALSE"), 1);
 		combobox_num_states->SetSelection(1);
@@ -577,7 +577,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_num_arcs->SetValue(false);
 		Gridpanel->Add(checkbox_num_arcs, 0, wxEXPAND);
 		combobox_num_arcs
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_num_arcs->Insert(wxT("TRUE"), 0);
 		combobox_num_arcs->Insert(wxT("FALSE"), 1);
 		combobox_num_arcs->SetSelection(1);
@@ -590,7 +590,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_Report->SetValue(false);
 		Gridpanel->Add(checkbox_Report,0, wxEXPAND);
 		combobox_Report
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_Report->Insert(wxT("TRUE"), 0);
 		combobox_Report->Insert(wxT("FALSE"), 1);
 		combobox_Report->SetSelection(0);
@@ -603,7 +603,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_Verbose->SetValue(false);
 		Gridpanel->Add(checkbox_Verbose,0, wxEXPAND);
 		combobox_Verbose
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_Verbose->Insert(wxT("TRUE"), 0);
 		combobox_Verbose->Insert(wxT("FALSE"), 1);
 		combobox_Verbose->SetSelection(0);
@@ -623,7 +623,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_ParameterWarnings = new wxCheckBox(m_pcNotebookPage, -1, wxT("#ParamaterWarnings"));
 		checkbox_ParameterWarnings->SetValue(false);
 		Gridpanel->Add(checkbox_ParameterWarnings,0, wxEXPAND);
-		combobox_ParameterWarnings= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+		combobox_ParameterWarnings= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_ParameterWarnings->Insert(wxT("NEVER"), 0);
 		combobox_ParameterWarnings->Insert(wxT("ALWAYS"), 1);
 		combobox_ParameterWarnings->Insert(wxT("OVERLOADED"), 2);
@@ -637,7 +637,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_WriteDotOutput->SetValue(false);
 		Gridpanel->Add(checkbox_WriteDotOutput,0, wxEXPAND);
 		combobox_WriteDotOutput
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_WriteDotOutput->Insert(wxT("NONE"), 0);
 		combobox_WriteDotOutput->Insert(wxT("MTMDD"), 1);
 		combobox_WriteDotOutput->Insert(wxT("MXD_FULL"), 2);
@@ -660,7 +660,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_DotPrecision->SetValue(false);
 		Gridpanel->Add(checkbox_DotPrecision,0, wxEXPAND);
 		combobox_DotPrecision
-				= new wxComboBox( m_pcNotebookPage, -1, _T( "" ), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
+				= new wxChoice( m_pcNotebookPage, -1 );
 		combobox_DotPrecision->Insert(wxT("0"), 0);
 		combobox_DotPrecision->Insert(wxT("1"), 1);
 		combobox_DotPrecision->Insert(wxT("2"), 2);

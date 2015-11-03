@@ -16,8 +16,8 @@
 
 class SP_DLG_ChangeCurveAttributes: public wxDialog
 {
-	      wxComboBox* m_pcLineWidthBox;
-	      wxComboBox* m_pcLineStyleBox;
+	      wxChoice* m_pcLineWidthBox;
+	      wxChoice* m_pcLineStyleBox;
 	      wxColourPickerCtrl* m_pcColourPickerCtrl;
 
 	      //use default setting

@@ -83,7 +83,7 @@ enum
     SP_ID_BUTTON_PLOT_ZOOM_CENTRAL,
     SP_ID_PLOT_CTRL_DATA,
     SP_ID_PRINT,
-    SP_ID_COMBOBOX_RESULT_MATRIX_TYPE,
+    SP_ID_CHOICE_RESULT_MATRIX_TYPE,
     SP_ID_TIMER_UPDATE_DIALOG,
 	SP_ID_COLLAPSEPANEL_PROPERTY_SIZER,
 	SP_ID_COLLAPSEPANEL_DIRECT_EXPORT_SIZER,
@@ -916,7 +916,7 @@ void SP_DLG_Simulation::LoadSets()
     for (size_t j = 0; j < m_apcColListAttr.size(); j++)
     {
         SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
-        wxComboBox* l_pcCombobox = m_apcComboBoxes[j];
+        wxChoice* l_pcCombobox = m_apcComboBoxes[j];
         l_pcCombobox->Clear();
         if (l_pcAttr)
         {

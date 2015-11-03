@@ -30,7 +30,7 @@ enum
 	SP_ID_LISTBOX_OUT,
 	SP_ID_BUTTON_ADD,
 	
-	SP_ID_COMBOBOX_COLORPLACE_CHOICE,
+	SP_ID_CHOICE_COLORPLACE_CHOICE,
 	SP_ID_BUTTON_EDITAUXVAR,
 
 	SP_ID_PLACETRANSITIONRADIOBOX,
@@ -57,7 +57,7 @@ BEGIN_EVENT_TABLE( SP_DLG_PlacesSelection, wxDialog )
 
 	EVT_BUTTON(SP_ID_BUTTON_EDITAUXVAR, SP_DLG_PlacesSelection::OnEditAuxVariable)
 
-	EVT_COMBOBOX(SP_ID_COMBOBOX_COLORPLACE_CHOICE, SP_DLG_PlacesSelection::OnColPlaceSel)
+	EVT_CHOICE(SP_ID_CHOICE_COLORPLACE_CHOICE, SP_DLG_PlacesSelection::OnColPlaceSel)
 
 	EVT_RADIOBOX( SP_ID_PLACETRANSITIONRADIOBOX, SP_DLG_PlacesSelection::OnChangedPlaceTransition )
 	EVT_RADIOBOX( SP_ID_OUTPUTTYPERADIOBOX, SP_DLG_PlacesSelection::OnChangedOutType )
@@ -231,7 +231,7 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 		l_pcRowSizer = new wxBoxSizer( wxVERTICAL );
 		l_pcRowSizer->Add( new wxStaticText( this, -1, wxT("") ), 1, wxALL | wxEXPAND, 5 );
 		l_pcRowSizer->Add( new wxStaticText( this, -1, wxT("Advanced:") ), 1, wxALL | wxEXPAND, 5 );
-		m_pcChooseColoredPlace = new wxComboBox( this, SP_ID_COMBOBOX_COLORPLACE_CHOICE, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY);
+		m_pcChooseColoredPlace = new wxChoice( this, SP_ID_CHOICE_COLORPLACE_CHOICE, wxDefaultPosition, wxSize(100,-1));
 		l_pcRowSizer->Add(m_pcChooseColoredPlace, 0, wxALIGN_CENTER| wxALL, 5);
 		m_pcChooseColoredPlace->Append(wxT("")); //
 

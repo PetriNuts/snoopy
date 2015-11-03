@@ -24,7 +24,7 @@ private:
 
 	wxTextCtrl* m_pcNumberTextCtrl;
 
-	wxComboBox* m_pcColorsComboBoxCtrl;
+	wxChoice* m_pcColorsComboBoxCtrl;
 
 	wxString m_sNumber;
 	wxString m_sColors;

@@ -27,7 +27,7 @@ class SP_DLG_StSimulationResults: public SP_DLG_Simulation
 private:
 
 protected:
-	wxComboBox* m_pcSimulatorComboBox;
+	wxChoice* m_pcSimulatorComboBox;
 
 	SP_DS_SimulatorThreadStochastic* m_pcWorkerThread;
 

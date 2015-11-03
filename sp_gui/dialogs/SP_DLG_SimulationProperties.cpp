@@ -108,16 +108,16 @@ void SP_DLG_SimulationProperties::SetProperties()
 			   break;
 
 		case spsim::GUI_TYPE_COMBOBOX:
-			  m_apcPropertiesCtrl[l_nPropertyPos]=new wxComboBox( this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
-			  dynamic_cast<wxComboBox*>(m_apcPropertiesCtrl[l_nPropertyPos])->Clear();
+			  m_apcPropertiesCtrl[l_nPropertyPos]=new wxChoice( this, wxID_ANY, wxDefaultPosition, wxSize(100,-1) );
+			  dynamic_cast<wxChoice*>(m_apcPropertiesCtrl[l_nPropertyPos])->Clear();
 
 			  //Add the possible values to this combo box
 			  for(l_itStr=(*l_itProperty)->GetPossibleValues()->begin();l_itStr!=(*l_itProperty)->GetPossibleValues()->end();l_itStr++)
 			  {
-				   dynamic_cast<wxComboBox*>(m_apcPropertiesCtrl[l_nPropertyPos])->Append((*l_itStr));
+				   dynamic_cast<wxChoice*>(m_apcPropertiesCtrl[l_nPropertyPos])->Append((*l_itStr));
 			  }
 
-			  dynamic_cast<wxComboBox*>(m_apcPropertiesCtrl[l_nPropertyPos])->SetStringSelection((*l_itProperty)->GetValue());
+			  dynamic_cast<wxChoice*>(m_apcPropertiesCtrl[l_nPropertyPos])->SetStringSelection((*l_itProperty)->GetValue());
 			  break;
 
 		default:
@@ -178,7 +178,7 @@ void SP_DLG_SimulationProperties::GetProperties()
 		case spsim::GUI_TYPE_COMBOBOX:
 			  (*l_itProperty)->SetValue
 				  (
-					dynamic_cast<wxComboBox*>(m_apcPropertiesCtrl[l_nPropertyPos])->GetValue()
+					dynamic_cast<wxChoice*>(m_apcPropertiesCtrl[l_nPropertyPos])->GetStringSelection()
 				  );
 
 			  break;

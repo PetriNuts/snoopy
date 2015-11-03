@@ -305,10 +305,10 @@ class SP_ExportReport : public wxEvtHandler,
 
     //////////////
 
-    wxComboBox* m_pcComboBox_PaperSize;
-    wxComboBox* m_pcComboBox_FontStyle;
-    wxComboBox* m_pcComboBox_FontFamily;
-    wxComboBox* m_pcComboBox_FontSize;
+    wxChoice* m_pcComboBox_PaperSize;
+    wxChoice* m_pcComboBox_FontStyle;
+    wxChoice* m_pcComboBox_FontFamily;
+    wxChoice* m_pcComboBox_FontSize;
 
     wxString InputNetname;
     vector<wxCheckBox*> m_pcCheckBox_BasicsLayout;

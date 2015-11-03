@@ -69,7 +69,7 @@ protected :
 	SP_VectorBool m_aApFormulaHappend;
 	SP_VectorDouble m_aApResults;
 
-	wxComboBox* m_pcThreadCountComboBox;
+	wxChoice* m_pcThreadCountComboBox;
 	unsigned long m_nThreadCount;
 	unsigned long m_nThreadFinished;
 	// crit section

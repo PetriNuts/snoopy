@@ -29,7 +29,7 @@
 
 enum
 {
-	SP_ID_COMBOBOX_CONVERSION_TYPE
+	SP_ID_CHOICE_CONVERSION_TYPE
 };
 
 SP_DLG_ConvertElements::SP_DLG_ConvertElements(SP_MDI_View* p_pcView, wxWindow *p_parent, const wxString& p_title) :
@@ -49,7 +49,7 @@ SP_DLG_ConvertElements::SP_DLG_ConvertElements(SP_MDI_View* p_pcView, wxWindow *
 	wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Convert to:")), 1, wxALL | wxEXPAND, 5);
 
-	m_pcPossibleSelectionsComboBox = new wxComboBox(this, SP_ID_COMBOBOX_CONVERSION_TYPE, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
+	m_pcPossibleSelectionsComboBox = new wxChoice(this, SP_ID_CHOICE_CONVERSION_TYPE, wxDefaultPosition, wxSize(100, -1));
 	l_pcRowSizer->Add(m_pcPossibleSelectionsComboBox, 0, wxALL, 5);
 
 	l_pcSizer->Add(l_pcRowSizer);

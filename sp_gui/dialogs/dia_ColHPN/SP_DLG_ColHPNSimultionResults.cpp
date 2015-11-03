@@ -56,18 +56,18 @@ enum
    SP_ID_BUTTON_MODIFY_FUNCTION_SETS,
    SP_ID_BUTTON_MODIFY_PARAMETER_SETS,
    SP_ID_BUTTON_MODIFY_STOCHASTIC_RATE_SETS,
-   SP_ID_COMBOBOX_MARKING_SETS,
-   SP_ID_COMBOBOX_FUNCTION_SETS,
-   SP_ID_COMBOBOX_PARAMETER_SETS,
-   SP_ID_COMBOBOX_TIME_SYNC,
-   SP_ID_COMBOBOX_DELAY_SETS,
-   SP_ID_COMBOBOX_IMMEDIATE_SETS,
-   SP_ID_COMBOBOX_SCHEDULED_SETS,
-   SP_ID_COMBOBOX_STOCHASTIC_RATE_SETS,
-   SP_ID_COMBOBOX_SOLVER,
+   SP_ID_CHOICE_MARKING_SETS,
+   SP_ID_CHOICE_FUNCTION_SETS,
+   SP_ID_CHOICE_PARAMETER_SETS,
+   SP_ID_CHOICE_TIME_SYNC,
+   SP_ID_CHOICE_DELAY_SETS,
+   SP_ID_CHOICE_IMMEDIATE_SETS,
+   SP_ID_CHOICE_SCHEDULED_SETS,
+   SP_ID_CHOICE_STOCHASTIC_RATE_SETS,
+   SP_ID_CHOICE_SOLVER,
    SP_ID_BUTTON_SIMULATION_PROPERTIES,
    SP_ID_BUTTON_SAVE_ODE,
-   SP_ID_COMBOBOX_STOCHASTIC_SIMULATOR,
+   SP_ID_CHOICE_STOCHASTIC_SIMULATOR,
    SP_ID_BUTTON_CONTINUOUS_SOLVER_PROPERTIES,
    SP_ID_BUTTON_MODIFY_DELAY_SETS,
    SP_ID_BUTTON_MODIFY_IMMDIATE_SETS,
@@ -84,17 +84,17 @@ EVT_BUTTON( SP_ID_BUTTON_MODIFY_DELAY_SETS, SP_DLG_ColHPNSimultionResults :: OnM
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_IMMDIATE_SETS, SP_DLG_ColHPNSimultionResults :: OnModifyImmediateSets )
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_SCHEDULED_SETS, SP_DLG_ColHPNSimultionResults :: OnModifyScheduledSets )
 
-EVT_COMBOBOX( SP_ID_COMBOBOX_MARKING_SETS, SP_DLG_ColHPNSimultionResults::OnMarkingSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_FUNCTION_SETS, SP_DLG_ColHPNSimultionResults::OnFunctionSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_STOCHASTIC_RATE_SETS, SP_DLG_ColHPNSimultionResults::OnStochasticRateChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_IMMEDIATE_SETS, SP_DLG_ColHPNSimultionResults::OnImmediateSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_DELAY_SETS, SP_DLG_ColHPNSimultionResults::OnDelaySetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_SCHEDULED_SETS, SP_DLG_ColHPNSimultionResults::OnScheduledSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_MARKING_SETS, SP_DLG_ColHPNSimultionResults::OnMarkingSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_FUNCTION_SETS, SP_DLG_ColHPNSimultionResults::OnFunctionSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_STOCHASTIC_RATE_SETS, SP_DLG_ColHPNSimultionResults::OnStochasticRateChanged )
+EVT_CHOICE( SP_ID_CHOICE_IMMEDIATE_SETS, SP_DLG_ColHPNSimultionResults::OnImmediateSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_DELAY_SETS, SP_DLG_ColHPNSimultionResults::OnDelaySetChanged )
+EVT_CHOICE( SP_ID_CHOICE_SCHEDULED_SETS, SP_DLG_ColHPNSimultionResults::OnScheduledSetChanged )
 
-EVT_COMBOBOX( SP_ID_COMBOBOX_PARAMETER_SETS, SP_DLG_ColHPNSimultionResults::OnParameterSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_DELAY_SETS, SP_DLG_ColHPNSimultionResults::OnParameterSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_SOLVER, SP_DLG_ColHPNSimultionResults::OnSolverChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_TIME_SYNC, SP_DLG_ColHPNSimultionResults::OnTimeSyncTypeChanged )
+EVT_CHOICE( SP_ID_CHOICE_PARAMETER_SETS, SP_DLG_ColHPNSimultionResults::OnParameterSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_DELAY_SETS, SP_DLG_ColHPNSimultionResults::OnParameterSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_SOLVER, SP_DLG_ColHPNSimultionResults::OnSolverChanged )
+EVT_CHOICE( SP_ID_CHOICE_TIME_SYNC, SP_DLG_ColHPNSimultionResults::OnTimeSyncTypeChanged )
 EVT_BUTTON( SP_ID_BUTTON_SIMULATION_PROPERTIES, SP_DLG_ColHPNSimultionResults :: OnSimulationProperties )
 EVT_BUTTON( SP_ID_BUTTON_CONTINUOUS_SOLVER_PROPERTIES, SP_DLG_ColHPNSimultionResults :: OnODESolverProperties )
 EVT_BUTTON( SP_ID_BUTTON_SAVE_ODE, SP_DLG_ColHPNSimultionResults :: SaveODE )
@@ -120,7 +120,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	//Marking Set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Marking set:") ), 1, wxALL | wxEXPAND, 5 );
-	m_pcMarkingSetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_MARKING_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
+	m_pcMarkingSetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_MARKING_SETS, wxDefaultPosition, wxSize(100,-1));
 	l_pcRowSizer->Add( m_pcMarkingSetComboBox, 0, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
@@ -128,7 +128,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	//Function set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Continuous rate:") ), 1, wxALL | wxEXPAND, 5 );
-	m_pcFunctionSetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
+	m_pcFunctionSetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_FUNCTION_SETS, wxDefaultPosition, wxSize(100,-1));
 	l_pcRowSizer->Add( m_pcFunctionSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
@@ -136,7 +136,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	//Rate set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Stochastic  rate:") ), 1, wxALL | wxEXPAND, 5 );
-	m_pcStochasticRateSetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_STOCHASTIC_RATE_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
+	m_pcStochasticRateSetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_STOCHASTIC_RATE_SETS, wxDefaultPosition, wxSize(100,-1));
 	l_pcRowSizer->Add( m_pcStochasticRateSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_STOCHASTIC_RATE_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
@@ -144,7 +144,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	//immediate Set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Immediate set:") ), 1, wxALL | wxEXPAND, 5 );
-	m_pcImmediateSetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_IMMEDIATE_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
+	m_pcImmediateSetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_IMMEDIATE_SETS, wxDefaultPosition, wxSize(100,-1));
 	l_pcRowSizer->Add( m_pcImmediateSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_IMMDIATE_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
@@ -152,7 +152,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	//delay Set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Delay set:") ), 1, wxALL | wxEXPAND, 5 );
-	m_pcDelaySetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_DELAY_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
+	m_pcDelaySetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_DELAY_SETS, wxDefaultPosition, wxSize(100,-1));
 	l_pcRowSizer->Add( m_pcDelaySetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
@@ -161,7 +161,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	//scheduled Set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Scheduled set:") ), 1, wxALL | wxEXPAND, 5 );
-	m_pcScheduledSetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_SCHEDULED_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
+	m_pcScheduledSetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_SCHEDULED_SETS, wxDefaultPosition, wxSize(100,-1));
 	l_pcRowSizer->Add( m_pcScheduledSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULED_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
@@ -169,7 +169,7 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	//Parameter Set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Parameter set:") ), 1, wxALL | wxEXPAND, 5 );
-	m_pcParameterSetComboBox = new wxComboBox( m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_PARAMETER_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY );
+	m_pcParameterSetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_PARAMETER_SETS, wxDefaultPosition, wxSize(100,-1));
 	l_pcRowSizer->Add( m_pcParameterSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );

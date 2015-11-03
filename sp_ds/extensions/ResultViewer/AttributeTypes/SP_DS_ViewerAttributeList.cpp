@@ -29,7 +29,7 @@ void SP_DS_ViewerAttributeList::Create(wxWindow* p_pcParent,wxSizer* p_pcSizer)
 	wxBoxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	//create a text control to hold the attribute value
-	m_pcPossibleValuesBox=new wxComboBox( p_pcParent, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(150,-1), 0, NULL, wxCB_READONLY );
+	m_pcPossibleValuesBox=new wxChoice( p_pcParent, wxID_ANY, wxDefaultPosition, wxSize(150,-1) );
 
 	l_pcRowSizer->Add(new wxStaticText(p_pcParent,wxID_ANY,m_sDisplayName),0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 	l_pcRowSizer->Add(m_pcPossibleValuesBox,0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
@@ -48,7 +48,7 @@ void SP_DS_ViewerAttributeList::Update()
 {
             if(m_pcPossibleValuesBox!=NULL)
             {
-            	m_sValue=m_pcPossibleValuesBox->GetValue();
+            	m_sValue=m_pcPossibleValuesBox->GetStringSelection();
 
             	m_nSelection=m_pcPossibleValuesBox->GetSelection();
             }

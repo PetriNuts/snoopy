@@ -23,7 +23,7 @@ class SP_DLG_ConvertElements :public wxDialog, public SP_Error
           SP_MDI_View* m_pcView;
 		  wxString m_sNetClassName;
 
-	      wxComboBox *m_pcPossibleSelectionsComboBox;
+	      wxChoice *m_pcPossibleSelectionsComboBox;
 
 	      wxString m_sOriginalElementType;
 	      wxString m_sConvertToType;

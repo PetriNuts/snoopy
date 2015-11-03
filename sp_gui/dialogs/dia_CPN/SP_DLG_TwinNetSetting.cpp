@@ -16,7 +16,7 @@ enum
 	SP_ID_RADIO,
 	SP_ID_COLORSETTXTCTRL,
 	SP_ID_VARIABLETXTCTRL,
-	SP_ID_TYPECOMBOBOX,
+	SP_ID_TYPECHOICE,
 	SP_ID_COLORSTXTCTRL,
 	SP_ID_FUSIONNODETXTCTRL,
 	SP_ID_EXCHANGEPLACETXTCTRL,
@@ -31,7 +31,7 @@ enum
 BEGIN_EVENT_TABLE(SP_DLG_TwinNetSetting, wxDialog)
 	EVT_BUTTON(wxID_OK, SP_DLG_TwinNetSetting::OnDlgOk)
 	EVT_BUTTON(wxID_CLOSE, SP_DLG_TwinNetSetting::OnDlgClose)
-	EVT_COMBOBOX(SP_ID_TYPECOMBOBOX, SP_DLG_TwinNetSetting::OnComboBoxSelected)
+	EVT_CHOICE(SP_ID_TYPECHOICE, SP_DLG_TwinNetSetting::OnComboBoxSelected)
 END_EVENT_TABLE()
 
 SP_DLG_TwinNetSetting::SP_DLG_TwinNetSetting(wxWindow *p_parent, const wxString& p_title) :
@@ -67,7 +67,8 @@ SP_DLG_TwinNetSetting::SP_DLG_TwinNetSetting(wxWindow *p_parent, const wxString&
 	l_arDataTypes.Add(wxT("enum"));
 	l_arDataTypes.Add(wxT("string"));
 	l_arDataTypes.Add(wxT("bool"));
-	m_pcTypeComboBoxCtrl = new wxComboBox(this, SP_ID_TYPECOMBOBOX, wxT("enum"), wxDefaultPosition, wxDefaultSize, l_arDataTypes, wxCB_DROPDOWN);
+	m_pcTypeComboBoxCtrl = new wxChoice(this, SP_ID_TYPECHOICE, wxDefaultPosition, wxDefaultSize, l_arDataTypes);
+	m_pcTypeComboBoxCtrl->SetStringSelection(wxT("enum"));
 	l_pcRowSizer->Add(m_pcTypeComboBoxCtrl, 1, wxEXPAND | wxALL, 5);
 
 	l_pcRowSizer->Add(new wxStaticText( this, -1, wxT("Colors:") ), 0, wxEXPAND | wxALL, 5);
@@ -188,7 +189,7 @@ void SP_DLG_TwinNetSetting::OnDlgOk(wxCommandEvent& p_cEvent)
 		m_sColorSetName = m_pcColorSetTextCtrl->GetValue();	
 
 		// 1 -- color set type
-		m_sType = m_pcTypeComboBoxCtrl->GetValue();		
+		m_sType = m_pcTypeComboBoxCtrl->GetStringSelection();
 
 		// 2 -- color set colors
 		m_sColors = m_pcColorsTextCtrl->GetValue();
@@ -260,7 +261,7 @@ void SP_DLG_TwinNetSetting::OnDlgClose(wxCommandEvent& p_cEvent)
 
 void SP_DLG_TwinNetSetting::OnComboBoxSelected(wxCommandEvent& p_cEvent)
 {
-	wxString l_sSelectedType = m_pcTypeComboBoxCtrl->GetValue();
+	wxString l_sSelectedType = m_pcTypeComboBoxCtrl->GetStringSelection();
 
 	if( l_sSelectedType == wxT("int"))
 	{

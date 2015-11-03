@@ -66,7 +66,7 @@ private:
 	      wxCheckBox* m_pcSelectColorNodes;
 
 	      //colored name
-	      wxComboBox* m_pcColorName;
+	      wxChoice* m_pcColorName;
 protected:
 	      void OnNodeTypeChanged(wxCommandEvent& event);
 

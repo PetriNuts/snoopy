@@ -40,7 +40,7 @@ class SP_DLG_PlacesSelection : public wxDialog
 protected:	
 	
 	wxListBox * m_pListBoxOut;	
-	wxComboBox* m_pcComboBox;
+	wxChoice* m_pcComboBox;
 
 	wxBoxSizer* m_pcBoxSizer;
 
@@ -61,7 +61,7 @@ protected:
 
 	wxRadioBox* m_pcOutputTypeRadioBox;
 	
-	wxComboBox* m_pcChooseColoredPlace;
+	wxChoice* m_pcChooseColoredPlace;
 
 	wxString m_sPlaceType;
 

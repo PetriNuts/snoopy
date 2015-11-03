@@ -38,7 +38,7 @@ private:
 	wxTextCtrl* m_pcNewPlaceTextCtrl;
 	wxTextCtrl* m_pcNewTransitionTextCtrl;
 
-	wxComboBox* m_pcTypeComboBoxCtrl;
+	wxChoice* m_pcTypeComboBoxCtrl;
 
 	wxTextCtrl* m_pcParameterNameTextCtrl;
 	wxTextCtrl* m_pcParameterValueTextCtrl;

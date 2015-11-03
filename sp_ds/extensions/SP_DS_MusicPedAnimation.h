@@ -19,7 +19,7 @@ private:
 	DECLARE_EVENT_TABLE()
 	irrklang::ISoundEngine* m_pSoundEngine;
 	wxCheckBox* m_cbMuteBox;
-	wxComboBox* m_pcSoundSetComboBox;
+	wxChoice* m_pcSoundSetComboBox;
 	wxSlider* m_pcSlider;
 
 	wxStaticText* m_pcOutputLabelStaticText;

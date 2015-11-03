@@ -29,7 +29,7 @@ class SP_DS_StAnimation: public SP_DS_PedAnimation
     bool m_bRestartAnimationFlag;
 
 	vector<SP_DS_ColListAttribute*> m_apcColListAttr;
-	vector<wxComboBox*> m_apcComboBoxes;
+	vector<wxChoice*> m_apcComboBoxes;
 
     wxStaticText* m_pcOutputLabelStaticText;
 

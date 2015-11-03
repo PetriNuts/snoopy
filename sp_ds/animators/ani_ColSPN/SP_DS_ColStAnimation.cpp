@@ -46,13 +46,13 @@ enum
 
 	SP_ID_BUTTON_OPEN_SIMULATION,
 
-	SP_ID_COMBOBOX_FUNCTION_SETS,
-	SP_ID_COMBOBOX_MARKING_SETS,
-	SP_ID_COMBOBOX_PARAMETER_SETS,
+	SP_ID_CHOICE_FUNCTION_SETS,
+	SP_ID_CHOICE_MARKING_SETS,
+	SP_ID_CHOICE_PARAMETER_SETS,
 
-	SP_ID_COMBOBOX_WEIGHT_SETS,
-	SP_ID_COMBOBOX_DELAY_SETS, //By Liu on 6 Mar. 2009
-	SP_ID_COMBOBOX_SCHEDULE_SETS,//By Liu on 6 Mar. 2009
+	SP_ID_CHOICE_WEIGHT_SETS,
+	SP_ID_CHOICE_DELAY_SETS, //By Liu on 6 Mar. 2009
+	SP_ID_CHOICE_SCHEDULE_SETS,//By Liu on 6 Mar. 2009
 
 	SP_ID_BUTTON_MODIFY_MARKING_SETS,
 	SP_ID_BUTTON_MODIFY_FUNCTION_SETS,
@@ -71,13 +71,13 @@ EVT_UPDATE_UI(SP_ID_PEDSET, SP_DS_ColStAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_PEDKEEP, SP_DS_ColStAnimation::OnUpdateUI)
 EVT_BUTTON( SP_ID_BUTTON_OPEN_SIMULATION, SP_DS_ColStAnimation :: OnOpenSimulation )
 
-EVT_COMBOBOX( SP_ID_COMBOBOX_MARKING_SETS, SP_DS_ColStAnimation::OnMarkingSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_FUNCTION_SETS, SP_DS_ColStAnimation::OnFunctionSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_PARAMETER_SETS, SP_DS_ColStAnimation::OnSetsChanged )
+EVT_CHOICE( SP_ID_CHOICE_MARKING_SETS, SP_DS_ColStAnimation::OnMarkingSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_FUNCTION_SETS, SP_DS_ColStAnimation::OnFunctionSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_PARAMETER_SETS, SP_DS_ColStAnimation::OnSetsChanged )
 
-EVT_COMBOBOX( SP_ID_COMBOBOX_WEIGHT_SETS, SP_DS_ColStAnimation::OnWeightSetChanged ) //By Liu on 6 Mar. 2009
-EVT_COMBOBOX( SP_ID_COMBOBOX_DELAY_SETS, SP_DS_ColStAnimation::OnDelaySetChanged ) //By Liu on 6 Mar. 2009
-EVT_COMBOBOX( SP_ID_COMBOBOX_SCHEDULE_SETS, SP_DS_ColStAnimation::OnScheduleSetChanged ) //By Liu on 6 Mar. 2009
+EVT_CHOICE( SP_ID_CHOICE_WEIGHT_SETS, SP_DS_ColStAnimation::OnWeightSetChanged ) //By Liu on 6 Mar. 2009
+EVT_CHOICE( SP_ID_CHOICE_DELAY_SETS, SP_DS_ColStAnimation::OnDelaySetChanged ) //By Liu on 6 Mar. 2009
+EVT_CHOICE( SP_ID_CHOICE_SCHEDULE_SETS, SP_DS_ColStAnimation::OnScheduleSetChanged ) //By Liu on 6 Mar. 2009
 
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_MARKING_SETS, SP_DS_ColStAnimation :: OnModifyMarkingSets )
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_FUNCTION_SETS, SP_DS_ColStAnimation :: OnModifyFunctionSets )
@@ -563,7 +563,7 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 
 	l_pcRowSizer->Add( new wxStaticText( p_pcCtrl, -1, wxT("Marking set:") ), 1, wxALL | wxEXPAND, 5 );
 
-	m_apcComboBoxes.push_back(new wxComboBox( p_pcCtrl, SP_ID_COMBOBOX_MARKING_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY ));
+	m_apcComboBoxes.push_back(new wxChoice( p_pcCtrl, SP_ID_CHOICE_MARKING_SETS, wxDefaultPosition, wxSize(100,-1) ));
 
 	l_pcRowSizer->Add( m_apcComboBoxes[0], 0, wxALL, 5 );
 
@@ -576,7 +576,7 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 
 	l_pcRowSizer->Add( new wxStaticText( p_pcCtrl, -1, wxT("Function set:") ), 1, wxALL | wxEXPAND, 5 );
 
-	m_apcComboBoxes.push_back(new wxComboBox( p_pcCtrl, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY ));
+	m_apcComboBoxes.push_back(new wxChoice( p_pcCtrl, SP_ID_CHOICE_FUNCTION_SETS, wxDefaultPosition, wxSize(100,-1) ));
 
 	l_pcRowSizer->Add( m_apcComboBoxes[1], 0, wxALL, 5 );
 
@@ -590,7 +590,7 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 
 	l_pcRowSizer->Add( new wxStaticText( p_pcCtrl, -1, wxT("Weight set:") ), 1, wxALL | wxEXPAND, 5 );
 
-	m_apcComboBoxes.push_back(new wxComboBox( p_pcCtrl, SP_ID_COMBOBOX_WEIGHT_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY ));
+	m_apcComboBoxes.push_back(new wxChoice( p_pcCtrl, SP_ID_CHOICE_WEIGHT_SETS, wxDefaultPosition, wxSize(100,-1) ));
 
 	l_pcRowSizer->Add( m_apcComboBoxes[2], 0, wxALL, 5 );
 
@@ -604,7 +604,7 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 
 	l_pcRowSizer->Add( new wxStaticText( p_pcCtrl, -1, wxT("Delay set:") ), 1, wxALL | wxEXPAND, 5 );
 
-	m_apcComboBoxes.push_back(new wxComboBox( p_pcCtrl, SP_ID_COMBOBOX_DELAY_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY ));
+	m_apcComboBoxes.push_back(new wxChoice( p_pcCtrl, SP_ID_CHOICE_DELAY_SETS, wxDefaultPosition, wxSize(100,-1) ));
 
 	l_pcRowSizer->Add( m_apcComboBoxes[3], 0, wxALL, 5 );
 
@@ -617,7 +617,7 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 
 	l_pcRowSizer->Add( new wxStaticText( p_pcCtrl, -1, wxT("Schedule set:") ), 1, wxALL | wxEXPAND, 5 );
 
-	m_apcComboBoxes.push_back(new wxComboBox( p_pcCtrl, SP_ID_COMBOBOX_SCHEDULE_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY ));
+	m_apcComboBoxes.push_back(new wxChoice( p_pcCtrl, SP_ID_CHOICE_SCHEDULE_SETS, wxDefaultPosition, wxSize(100,-1) ));
 
 	l_pcRowSizer->Add( m_apcComboBoxes[4], 0, wxALL, 5 );
 
@@ -631,7 +631,7 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 
 	l_pcRowSizer->Add( new wxStaticText( p_pcCtrl, -1, wxT("Parameter set:") ), 1, wxALL | wxEXPAND, 5 );
 
-	m_apcComboBoxes.push_back(new wxComboBox( p_pcCtrl, SP_ID_COMBOBOX_PARAMETER_SETS, wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY ));
+	m_apcComboBoxes.push_back(new wxChoice( p_pcCtrl, SP_ID_CHOICE_PARAMETER_SETS, wxDefaultPosition, wxSize(100,-1) ));
 
 	l_pcRowSizer->Add( m_apcComboBoxes[5], 0, wxALL, 5 );
 
@@ -987,7 +987,7 @@ void SP_DS_ColStAnimation::LoadSets()
 	for(unsigned j = 0; j <= 4; j++)
 	{
 		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
-		wxComboBox* l_pcCombobox = m_apcComboBoxes[j];
+		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
 		l_pcCombobox->Clear();
 		if(l_pcAttr)
 		{
@@ -1041,7 +1041,7 @@ void SP_DS_ColStAnimation::LoadSets()
 	for(size_t j = 5; j < m_apcColListAttr.size(); j++)
 	{
 		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
-		wxComboBox* l_pcCombobox = m_apcComboBoxes[j];
+		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
 		l_pcCombobox->Clear();
 		if(l_pcAttr)
 		{

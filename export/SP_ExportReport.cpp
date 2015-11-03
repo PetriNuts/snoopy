@@ -1523,16 +1523,16 @@ SP_ExportReport::AddAttributes_BasicsTypography()
 	//Font Family
 	//l_pcSizerFontFamily->Add(10, 0);
 	l_pcSizerFontFamily->Add(new wxStaticText( m_pcNotebookPageBasics, -1, wxT("Font Family:") ), 0, wxALL, 5);
-	m_pcComboBox_FontFamily = new wxComboBox(m_pcNotebookPageBasics, -1);
+	m_pcComboBox_FontFamily = new wxChoice(m_pcNotebookPageBasics, -1);
 	m_pcComboBox_FontFamily->Set(m_Basics_FontFamily_Strings);
-	m_pcComboBox_FontFamily->SetValue("Roman (rm)");
+	m_pcComboBox_FontFamily->SetStringSelection("Roman (rm)");
 	l_pcSizerFontFamily->Add(m_pcComboBox_FontFamily, 0, wxALL, 5);
 
 	//Paper Size
 	l_pcSizerPaperSize->Add(new wxStaticText( m_pcNotebookPageBasics, -1, wxT("Paper Size:") ), 0, wxALL, 5);
-	m_pcComboBox_PaperSize = new wxComboBox( m_pcNotebookPageBasics, -1);
+	m_pcComboBox_PaperSize = new wxChoice( m_pcNotebookPageBasics, -1);
 	m_pcComboBox_PaperSize->Set(m_Basics_PaperSize_Strings);
-	m_pcComboBox_PaperSize->SetValue("a4paper");
+	m_pcComboBox_PaperSize->SetStringSelection("a4paper");
 	l_pcSizerPaperSize->Add(m_pcComboBox_PaperSize, 0, wxALL, 5);
 
 	/*
@@ -1547,7 +1547,7 @@ SP_ExportReport::AddAttributes_BasicsTypography()
 	//Font Size
 	l_pcSizerFontSize->Add(10, 0);
 	l_pcSizerFontSize->Add(new wxStaticText( m_pcNotebookPageBasics, -1, wxT("Font Size:") ), 0, wxALL, 5);
-	m_pcComboBox_FontSize = new wxComboBox( m_pcNotebookPageBasics, -1);
+	m_pcComboBox_FontSize = new wxChoice( m_pcNotebookPageBasics, -1);
 	m_pcComboBox_FontSize->Set(m_Basics_FontSize_Strings);
 	m_pcComboBox_FontSize->SetValue("normalsize");
 	l_pcSizerFontSize->Add(m_pcComboBox_FontSize, 0, wxALL, 5);
@@ -1555,7 +1555,7 @@ SP_ExportReport::AddAttributes_BasicsTypography()
 	//Font Style
 	l_pcSizerFontStyle->Add(10, 0);
 	l_pcSizerFontStyle->Add(new wxStaticText( m_pcNotebookPageBasics, -1, wxT("Font Style:") ), 0, wxALL, 5);
-	m_pcComboBox_FontStyle = new wxComboBox( m_pcNotebookPageBasics, -1);
+	m_pcComboBox_FontStyle = new wxChoice( m_pcNotebookPageBasics, -1);
 	m_pcComboBox_FontStyle->Set(m_Basics_FontStyle_Strings);
 	m_pcComboBox_FontStyle->SetValue("normal font");
 	l_pcSizerFontStyle->Add(m_pcComboBox_FontStyle, 0, wxALL, 5);
@@ -1897,7 +1897,7 @@ SP_ExportReport::StartDoc(const wxString& p_fileName)
 	wxString out = wxT("\\usepackage[top=1.0in, ");
 
 	//Set paper size
-	out += m_pcComboBox_PaperSize->GetValue();
+	out += m_pcComboBox_PaperSize->GetStringSelection();
 
 	//Set orientation
 	if( m_pcBasics_Landscape->GetValue() ) {

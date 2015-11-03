@@ -99,7 +99,7 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 	//fourth row
 	wxSizer* l_pcThreadSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcThreadSizer->Add( new wxStaticText( this, -1, wxT("Thread count") ), 0 , wxALL, 5 );
-	m_pcThreadCountComboBox = new wxComboBox( this, -1 , wxT(""), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN | wxCB_READONLY );
+	m_pcThreadCountComboBox = new wxChoice( this, -1 );
 	int l_nCPUCount = wxThread::GetCPUCount();
 	for(int i = 1; i <= l_nCPUCount; ++i)
 	{
@@ -201,7 +201,7 @@ void SP_DLG_ColStUnfolding::OnDlgOk(wxCommandEvent& p_cEvent)
 				m_pcColPN_Unfolding->SetSaveFilename( m_pcSaveFilePickerCtrl->GetPath() );
 
 			long l_nValue;
-			if(m_pcThreadCountComboBox->GetValue().ToLong(&l_nValue) && l_nValue > 0)			
+			if(m_pcThreadCountComboBox->GetStringSelection().ToLong(&l_nValue) && l_nValue > 0)
 				m_pcColPN_Unfolding->SetThreadCount( l_nValue );
 			else
 				return;

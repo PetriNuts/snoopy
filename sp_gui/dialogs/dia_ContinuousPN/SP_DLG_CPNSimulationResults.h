@@ -22,10 +22,10 @@ class SP_DLG_CPNSimulationResults : public SP_DLG_Simulation
  private:
 
  protected:
-		wxComboBox* m_pcMarkingSetComboBox;
-	    wxComboBox* m_pcFunctionSetComboBox;
-	    wxComboBox* m_pcParameterSetComboBox;
-	    wxComboBox* m_pcSolver;
+		wxChoice* m_pcMarkingSetComboBox;
+	    wxChoice* m_pcFunctionSetComboBox;
+	    wxChoice* m_pcParameterSetComboBox;
+	    wxChoice* m_pcSolver;
 	    wxRadioBox * m_pcSolverType;
 	    wxButton * m_pcSimulationProperites;
 

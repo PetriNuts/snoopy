@@ -50,13 +50,13 @@ enum
 
 	SP_ID_BUTTON_OPEN_SIMULATION,
 
-	SP_ID_COMBOBOX_FUNCTION_SETS,
-	SP_ID_COMBOBOX_MARKING_SETS,
-	SP_ID_COMBOBOX_CONSTANT_SETS,
-	SP_ID_COMBOBOX_WEIGHT_SETS,
+	SP_ID_CHOICE_FUNCTION_SETS,
+	SP_ID_CHOICE_MARKING_SETS,
+	SP_ID_CHOICE_CONSTANT_SETS,
+	SP_ID_CHOICE_WEIGHT_SETS,
 
-	SP_ID_COMBOBOX_DELAY_SETS, //By Liu on 6 Mar. 2009
-	SP_ID_COMBOBOX_SCHEDULE_SETS,//By Liu on 6 Mar. 2009
+	SP_ID_CHOICE_DELAY_SETS, //By Liu on 6 Mar. 2009
+	SP_ID_CHOICE_SCHEDULE_SETS,//By Liu on 6 Mar. 2009
 
 	SP_ID_BUTTON_MODIFY_MARKING_SETS,
 	SP_ID_BUTTON_MODIFY_FUNCTION_SETS,
@@ -72,12 +72,12 @@ enum
 };
 BEGIN_EVENT_TABLE( SP_DS_StAnimation, SP_DS_PedAnimation)
 
-EVT_COMBOBOX( SP_ID_COMBOBOX_FUNCTION_SETS, SP_DS_StAnimation::OnSetsChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_CONSTANT_SETS, SP_DS_StAnimation::OnConstantSetsChanged )
+EVT_CHOICE( SP_ID_CHOICE_FUNCTION_SETS, SP_DS_StAnimation::OnSetsChanged )
+EVT_CHOICE( SP_ID_CHOICE_CONSTANT_SETS, SP_DS_StAnimation::OnConstantSetsChanged )
 
-EVT_COMBOBOX( SP_ID_COMBOBOX_WEIGHT_SETS, SP_DS_StAnimation::OnSetsChanged ) //By Liu on 6 Mar. 2009
-EVT_COMBOBOX( SP_ID_COMBOBOX_DELAY_SETS, SP_DS_StAnimation::OnSetsChanged ) //By Liu on 6 Mar. 2009
-EVT_COMBOBOX( SP_ID_COMBOBOX_SCHEDULE_SETS, SP_DS_StAnimation::OnSetsChanged ) //By Liu on 6 Mar. 2009
+EVT_CHOICE( SP_ID_CHOICE_WEIGHT_SETS, SP_DS_StAnimation::OnSetsChanged ) //By Liu on 6 Mar. 2009
+EVT_CHOICE( SP_ID_CHOICE_DELAY_SETS, SP_DS_StAnimation::OnSetsChanged ) //By Liu on 6 Mar. 2009
+EVT_CHOICE( SP_ID_CHOICE_SCHEDULE_SETS, SP_DS_StAnimation::OnSetsChanged ) //By Liu on 6 Mar. 2009
 
 EVT_BUTTON( SP_ID_BUTTON_OPEN_SIMULATION, SP_DS_StAnimation :: OnOpenSimulation )
 
@@ -89,12 +89,12 @@ EVT_BUTTON( SP_ID_BUTTON_MODIFY_WEIGHT_SETS, SP_DS_StAnimation :: OnModifyWeight
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_DELAY_SETS, SP_DS_StAnimation :: OnModifyDelaySets ) //By Liu on 6 Mar. 2009
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, SP_DS_StAnimation :: OnModifyScheduleSets ) //By Liu on 6 Mar. 2009
 
-EVT_UPDATE_UI(SP_ID_COMBOBOX_MARKING_SETS, SP_DS_StAnimation::OnUpdateUI)
-EVT_UPDATE_UI(SP_ID_COMBOBOX_FUNCTION_SETS, SP_DS_StAnimation::OnUpdateUI)
-EVT_UPDATE_UI(SP_ID_COMBOBOX_CONSTANT_SETS, SP_DS_StAnimation::OnUpdateUI)
-EVT_UPDATE_UI(SP_ID_COMBOBOX_WEIGHT_SETS, SP_DS_StAnimation::OnUpdateUI)
-EVT_UPDATE_UI(SP_ID_COMBOBOX_DELAY_SETS, SP_DS_StAnimation::OnUpdateUI)
-EVT_UPDATE_UI(SP_ID_COMBOBOX_SCHEDULE_SETS, SP_DS_StAnimation::OnUpdateUI)
+EVT_UPDATE_UI(SP_ID_CHOICE_MARKING_SETS, SP_DS_StAnimation::OnUpdateUI)
+EVT_UPDATE_UI(SP_ID_CHOICE_FUNCTION_SETS, SP_DS_StAnimation::OnUpdateUI)
+EVT_UPDATE_UI(SP_ID_CHOICE_CONSTANT_SETS, SP_DS_StAnimation::OnUpdateUI)
+EVT_UPDATE_UI(SP_ID_CHOICE_WEIGHT_SETS, SP_DS_StAnimation::OnUpdateUI)
+EVT_UPDATE_UI(SP_ID_CHOICE_DELAY_SETS, SP_DS_StAnimation::OnUpdateUI)
+EVT_UPDATE_UI(SP_ID_CHOICE_SCHEDULE_SETS, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_BUTTON_OPEN_SIMULATION, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_MARKING_SETS, SP_DS_StAnimation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_BUTTON_MODIFY_FUNCTION_SETS, SP_DS_StAnimation::OnUpdateUI)
@@ -527,7 +527,7 @@ bool SP_DS_StAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSi
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Function set:")), 1, wxALL | wxEXPAND, 5);
-	m_apcComboBoxes.push_back(new wxComboBox(p_pcCtrl, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+	m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_FUNCTION_SETS, wxDefaultPosition, wxSize(100, -1)));
 	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5);
 	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify")), 0, wxALL, 5);
 	l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
@@ -535,21 +535,21 @@ bool SP_DS_StAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSi
 	//weitht
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Weight set:")), 1, wxALL | wxEXPAND, 5);
-	m_apcComboBoxes.push_back(new wxComboBox(p_pcCtrl, SP_ID_COMBOBOX_WEIGHT_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+	m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_WEIGHT_SETS, wxDefaultPosition, wxSize(100, -1)));
 	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5);
 	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_WEIGHT_SETS, wxT("Modify")), 0, wxALL, 5);
 	l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Delay set:")), 1, wxALL | wxEXPAND, 5);
-	m_apcComboBoxes.push_back(new wxComboBox(p_pcCtrl, SP_ID_COMBOBOX_DELAY_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+	m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_DELAY_SETS, wxDefaultPosition, wxSize(100, -1)));
 	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5);
 	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify")), 0, wxALL, 5);
 	l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Schedule set:")), 1, wxALL | wxEXPAND, 5);
-	m_apcComboBoxes.push_back(new wxComboBox(p_pcCtrl, SP_ID_COMBOBOX_SCHEDULE_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY));
+	m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_SCHEDULE_SETS, wxDefaultPosition, wxSize(100, -1)));
 	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5);
 	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("Modify")), 0, wxALL, 5);
 	l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
@@ -561,7 +561,7 @@ bool SP_DS_StAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSi
 		wxString l_sGroup = *l_itChoice;
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 		l_pcRowSizer->Add( new wxStaticText( p_pcCtrl, -1, l_sGroup + wxT(':') ), 1, wxALL | wxEXPAND, 5 );
-		m_apcComboBoxes.push_back(new wxComboBox( p_pcCtrl, SP_ID_COMBOBOX_CONSTANT_SETS , wxT(""), wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
+		m_apcComboBoxes.push_back(new wxChoice( p_pcCtrl, SP_ID_CHOICE_CONSTANT_SETS , wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
 		l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5 );
 		l_pcRowSizer->Add( new wxButton( p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), 0, wxALL, 5 );
 		l_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND);
@@ -652,7 +652,7 @@ void SP_DS_StAnimation::LoadSets()
 	for (size_t j = 0; j < m_apcColListAttr.size(); j++)
 	{
 		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
-		wxComboBox* l_pcCombobox = m_apcComboBoxes[j];
+		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
 		l_pcCombobox->Clear();
 		if (l_pcAttr)
 		{

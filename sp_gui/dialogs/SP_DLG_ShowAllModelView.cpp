@@ -36,7 +36,7 @@ enum
 	SP_ID_BUTTON_DISCONNECT,
 	SP_ID_CHECKLISTBOX_PLACE_CHOICE,
 	SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS,
-	SP_ID_COMBOBOX_RESULT_VIEWER_TYPE,
+	SP_ID_CHOICE_RESULT_VIEWER_TYPE,
 	SP_ID_BUTTON_EDIT_VIEWER_PROPERTIES,
 	SP_ID_BUTTON_EXPORT,
 	SP_ID_CHANGE_X_AXIS,
@@ -150,11 +150,11 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	wxSizer *l_pcViewSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	wxSizer *l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Viewer Type")), wxHORIZONTAL);
-	m_pcOutputViewerType = new wxComboBox(this, SP_ID_COMBOBOX_RESULT_VIEWER_TYPE, wxT(""), wxDefaultPosition, wxSize(129, -1), 0, NULL, wxCB_READONLY);
+	m_pcOutputViewerType = new wxChoice(this, SP_ID_CHOICE_RESULT_VIEWER_TYPE, wxDefaultPosition, wxSize(129, -1));
 	m_pcOutputViewerType->Append(wxT("Tabular"));
 	m_pcOutputViewerType->Append(wxT("xyPlot"));
 	m_pcOutputViewerType->Append(wxT("Histogram"));
-	m_pcOutputViewerType->SetValue(m_pcModelView->GetAttribute(wxT("ViewerType"))->GetValueString());
+	m_pcOutputViewerType->SetStringSelection(m_pcModelView->GetAttribute(wxT("ViewerType"))->GetValueString());
 
 	l_pcRowSizer->Add(m_pcOutputViewerType, 0, wxALL, 1);
 	m_pcViewerTypeButton = new wxButton(this, SP_ID_BUTTON_EDIT_VIEWER_PROPERTIES, wxT("Edit"));
@@ -162,7 +162,7 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	l_pcViewSizer->Add(l_pcRowSizer, 0, wxALL, 5);
 
 	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Export")), wxHORIZONTAL);
-	m_pcOutputExportType = new wxComboBox(this, -1, wxT(""), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY);
+	m_pcOutputExportType = new wxChoice(this, -1);
 	m_pcOutputExportType->Append(wxT("CSV Export"));
 	m_pcOutputExportType->Append(wxT("Image Export"));
 	m_pcOutputExportType->SetSelection(0);
@@ -231,7 +231,7 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	Bind(wxEVT_LISTBOX_DCLICK, &SP_DLG_ShowAllModelView::OnItemDoubleClick, this, SP_ID_CHECKLISTBOX_PLACE_CHOICE);
 	Bind(wxEVT_CHECKLISTBOX, &SP_DLG_ShowAllModelView::OnPlaceCheckUncheck, this, SP_ID_CHECKLISTBOX_PLACE_CHOICE);
 	Bind(wxEVT_CHECKBOX, &SP_DLG_ShowAllModelView::OnSelectClearAllItems, this, SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS);
-	Bind(wxEVT_COMBOBOX, &SP_DLG_ShowAllModelView::OnChangeResultViewer, this, SP_ID_COMBOBOX_RESULT_VIEWER_TYPE);
+	Bind(wxEVT_CHOICE, &SP_DLG_ShowAllModelView::OnChangeResultViewer, this, SP_ID_CHOICE_RESULT_VIEWER_TYPE);
 	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnEditViewerProperties, this, SP_ID_BUTTON_EDIT_VIEWER_PROPERTIES);
 	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnExportClick, this, SP_ID_BUTTON_EXPORT);
 	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnChangeXAxis, this, SP_ID_CHANGE_X_AXIS);

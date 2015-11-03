@@ -49,8 +49,8 @@ enum
 	SP_ID_GUI_STEERING_DIALOG_REFRESH_BUTTON,
 	SP_ID_GUI_STEERING_DIALOG_VIEWER_PROPERTIES_BUTTON,
 	SP_ID_GUI_STEERING_DIALOG_ITEMCHANGED_CHOICELISTBOX,
-	SP_ID_GUI_STEERING_DIALOG_CHANGEVIEW_COMBOBOX,
-	SP_ID_GUI_STEERING_DIALOG_CURRENTMODEL_CHANGED_COMBOBOX,
+	SP_ID_GUI_STEERING_DIALOG_CHANGEVIEW_CHOICE,
+	SP_ID_GUI_STEERING_DIALOG_CURRENTMODEL_CHANGED_CHOICE,
 	SP_ID_GUI_STEERING_DIALOG_RESULT_REFRESH_TIMER,
 	SP_ID_GUI_STEERING_DIALOG_RUNTIME_REFRESH_TIMER,
 	SP_ID_GUI_STEERING_DIALOG_SETTING,
@@ -93,16 +93,16 @@ EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_SELECT_PARAMETERS_TO_EDIT_BUTTON,SP_GUI_Ste
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_RESET_PARAMETER_VALUES,SP_GUI_SteeringDialog::OnResetParameterValues)
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_REFRESH_BUTTON,SP_GUI_SteeringDialog::OnRefreshButton)
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_VIEWER_PROPERTIES_BUTTON,SP_GUI_SteeringDialog::OnViewerPropertiesButton)
-EVT_COMBOBOX(SP_ID_GUI_STEERING_DIALOG_CHANGEVIEW_COMBOBOX,SP_GUI_SteeringDialog::OnChangeViewCombobox)
+EVT_CHOICE(SP_ID_GUI_STEERING_DIALOG_CHANGEVIEW_CHOICE,SP_GUI_SteeringDialog::OnChangeViewCombobox)
 EVT_CHECKLISTBOX(SP_ID_GUI_STEERING_DIALOG_ITEMCHANGED_CHOICELISTBOX, SP_GUI_SteeringDialog::OnItemStateChanged)
 EVT_LISTBOX_DCLICK(SP_ID_GUI_STEERING_DIALOG_ITEMCHANGED_CHOICELISTBOX,SP_GUI_SteeringDialog::OnItemDClick)
-EVT_COMBOBOX(SP_ID_GUI_STEERING_DIALOG_CURRENTMODEL_CHANGED_COMBOBOX, SP_GUI_SteeringDialog::OnModelNameChanged)
+EVT_CHOICE(SP_ID_GUI_STEERING_DIALOG_CURRENTMODEL_CHANGED_CHOICE, SP_GUI_SteeringDialog::OnModelNameChanged)
 EVT_TIMER(SP_ID_GUI_STEERING_DIALOG_RESULT_REFRESH_TIMER,SP_GUI_SteeringDialog::OnResultRefreshTimer)
 EVT_TIMER(SP_ID_GUI_STEERING_DIALOG_RUNTIME_REFRESH_TIMER,SP_GUI_SteeringDialog::OnRuntimeRefreshTimer)
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_SETTING,SP_GUI_SteeringDialog::OnSettingButton)
-EVT_COMBOBOX(SP_ID_GUI_STEERING_DIALOG_SIMULATOR_CATEGORY_CHANGED, SP_GUI_SteeringDialog::OnSimulatorCategoryChanged)
+EVT_CHOICE(SP_ID_GUI_STEERING_DIALOG_SIMULATOR_CATEGORY_CHANGED, SP_GUI_SteeringDialog::OnSimulatorCategoryChanged)
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_ADD_NEW_VIEW,SP_GUI_SteeringDialog::OnAddNewView)
-EVT_COMBOBOX(SP_ID_GUI_STEERING_DIALOG_CHANGE_MODEL_VIEW,SP_GUI_SteeringDialog::OnModelViewChanged)
+EVT_CHOICE(SP_ID_GUI_STEERING_DIALOG_CHANGE_MODEL_VIEW,SP_GUI_SteeringDialog::OnModelViewChanged)
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_OVERWRITE_MODEL_SETTING,SP_GUI_SteeringDialog::OnOverWriteModelSetting)
 EVT_BUTTON(wxID_CANCEL,SP_GUI_SteeringDialog::OnCloseDlg)
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_SIMULATOR_SETTING,SP_GUI_SteeringDialog::OnSimulatorSetting)
@@ -210,7 +210,7 @@ void SP_GUI_SteeringDialog::CreatModelViewsBar(wxSizer* p_pcParentSizer)
 	wxSizer* l_pcOuterSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Model Views")), wxVERTICAL);
 
 	wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	m_pcModelViewBox = new wxComboBox(this, SP_ID_GUI_STEERING_DIALOG_CHANGE_MODEL_VIEW, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
+	m_pcModelViewBox = new wxChoice(this, SP_ID_GUI_STEERING_DIALOG_CHANGE_MODEL_VIEW, wxDefaultPosition, wxSize(100, -1));
 	l_pcRowSizer->Add(m_pcModelViewBox, 1, wxALL);
 	l_pcRowSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_EDITVIEWS, wxT("Options...")), 1, wxALL);
 	l_pcOuterSizer->Add(l_pcRowSizer, 1, wxEXPAND);
@@ -219,7 +219,7 @@ void SP_GUI_SteeringDialog::CreatModelViewsBar(wxSizer* p_pcParentSizer)
 
 	//result viewer
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	m_pcOutputViewerType = new wxComboBox(this, SP_ID_GUI_STEERING_DIALOG_CHANGEVIEW_COMBOBOX, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
+	m_pcOutputViewerType = new wxChoice(this, SP_ID_GUI_STEERING_DIALOG_CHANGEVIEW_CHOICE,wxDefaultPosition, wxSize(100, -1));
 	l_pcRowSizer->Add(m_pcOutputViewerType, 1, wxALL);
 	l_pcRowSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_VIEWER_PROPERTIES_BUTTON, wxT("&Edit...")), 1, wxALL);
 	l_pcOuterSizer->Add(l_pcRowSizer, 1, wxEXPAND);
@@ -315,7 +315,7 @@ void SP_GUI_SteeringDialog::CreateSimulatorBar(wxSizer* p_pcParentSizer)
 	wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Type:")), 0, wxALL);
 	l_pcRowSizer->AddSpacer(2);
-	m_pcSimulatorsCategoryBox = new wxComboBox(this, SP_ID_GUI_STEERING_DIALOG_SIMULATOR_CATEGORY_CHANGED, wxT(""), wxDefaultPosition, wxSize(150, -1), 0, NULL, wxCB_READONLY);
+	m_pcSimulatorsCategoryBox = new wxChoice(this, SP_ID_GUI_STEERING_DIALOG_SIMULATOR_CATEGORY_CHANGED, wxDefaultPosition, wxSize(150, -1));
 	l_pcRowSizer->Add(m_pcSimulatorsCategoryBox, 0, wxALL);
 	l_pcSimulatorSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 	l_pcSimulatorSizer->AddSpacer(5);
@@ -323,7 +323,7 @@ void SP_GUI_SteeringDialog::CreateSimulatorBar(wxSizer* p_pcParentSizer)
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Algorithm:")), 0, wxALL);
 	l_pcRowSizer->AddSpacer(2);
-	m_pcSimulatorsAlgorithmBox = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(150, -1), 0, NULL, wxCB_READONLY);
+	m_pcSimulatorsAlgorithmBox = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxSize(150, -1));
 	l_pcRowSizer->Add(m_pcSimulatorsAlgorithmBox, 0, wxALL);
 	l_pcSimulatorSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
@@ -375,7 +375,7 @@ void SP_GUI_SteeringDialog::CreateSimulationIntervalBar(wxSizer* p_pcParentSizer
 
 	//Models
 	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Models")), wxHORIZONTAL);
-	m_pcModelsBox = new wxComboBox(this, SP_ID_GUI_STEERING_DIALOG_CURRENTMODEL_CHANGED_COMBOBOX, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
+	m_pcModelsBox = new wxChoice(this, SP_ID_GUI_STEERING_DIALOG_CURRENTMODEL_CHANGED_CHOICE, wxDefaultPosition, wxSize(100, -1));
 
 	l_pcRowSizer->Add(m_pcModelsBox, 1, wxALL);
 

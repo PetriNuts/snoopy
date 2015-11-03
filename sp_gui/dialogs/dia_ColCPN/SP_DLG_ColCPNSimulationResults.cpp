@@ -54,10 +54,10 @@ enum
 	SP_ID_BUTTON_MODIFY_MARKING_SETS = SP_ID_LAST_ID + 200,
 	SP_ID_BUTTON_MODIFY_FUNCTION_SETS,
 	SP_ID_BUTTON_MODIFY_PARAMETER_SETS,
-	SP_ID_COMBOBOX_MARKING_SETS,
-	SP_ID_COMBOBOX_FUNCTION_SETS,
-	SP_ID_COMBOBOX_PARAMETER_SETS,
-	SP_ID_COMBOBOX_SOLVER,
+	SP_ID_CHOICE_MARKING_SETS,
+	SP_ID_CHOICE_FUNCTION_SETS,
+	SP_ID_CHOICE_PARAMETER_SETS,
+	SP_ID_CHOICE_SOLVER,
 	SP_ID_RADIOBOX_SOLVER_TYPE,
 	SP_ID_BUTTON_SIMULATION_PROPERTIES,
 	SP_ID_BUTTON_SAVE_ODE
@@ -68,11 +68,11 @@ EVT_BUTTON( SP_ID_BUTTON_MODIFY_MARKING_SETS, SP_DLG_ColCPNSimulationResults :: 
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_FUNCTION_SETS, SP_DLG_ColCPNSimulationResults :: OnModifyFunctionSets )
 EVT_BUTTON( SP_ID_BUTTON_MODIFY_PARAMETER_SETS, SP_DLG_ColCPNSimulationResults :: OnModifyParameterSets )
 
-EVT_COMBOBOX( SP_ID_COMBOBOX_MARKING_SETS, SP_DLG_ColCPNSimulationResults::OnMarkingSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_FUNCTION_SETS, SP_DLG_ColCPNSimulationResults::OnFunctionSetChanged )
-EVT_COMBOBOX( SP_ID_COMBOBOX_PARAMETER_SETS, SP_DLG_ColCPNSimulationResults::OnParameterSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_MARKING_SETS, SP_DLG_ColCPNSimulationResults::OnMarkingSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_FUNCTION_SETS, SP_DLG_ColCPNSimulationResults::OnFunctionSetChanged )
+EVT_CHOICE( SP_ID_CHOICE_PARAMETER_SETS, SP_DLG_ColCPNSimulationResults::OnParameterSetChanged )
 
-EVT_COMBOBOX( SP_ID_COMBOBOX_SOLVER, SP_DLG_ColCPNSimulationResults::OnSolverChanged )
+EVT_CHOICE( SP_ID_CHOICE_SOLVER, SP_DLG_ColCPNSimulationResults::OnSolverChanged )
 EVT_BUTTON( SP_ID_BUTTON_SIMULATION_PROPERTIES, SP_DLG_ColCPNSimulationResults :: OnSimulationProperties )
 EVT_BUTTON( SP_ID_BUTTON_SAVE_ODE, SP_DLG_ColCPNSimulationResults :: SaveODE )
 END_EVENT_TABLE()
@@ -96,7 +96,7 @@ SP_DLG_ColCPNSimulationResults::SP_DLG_ColCPNSimulationResults(SP_DS_Graph* p_pc
 
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Marking set:")), 1, wxALL | wxEXPAND, 5);
 
-	m_pcMarkingSetComboBox = new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_MARKING_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
+	m_pcMarkingSetComboBox = new wxChoice(m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_MARKING_SETS, wxDefaultPosition, wxSize(100, -1));
 
 	l_pcRowSizer->Add(m_pcMarkingSetComboBox, 1, wxALL, 5);
 
@@ -108,7 +108,7 @@ SP_DLG_ColCPNSimulationResults::SP_DLG_ColCPNSimulationResults(SP_DS_Graph* p_pc
 
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Function set:")), 1, wxALL | wxEXPAND, 5);
 
-	m_pcFunctionSetComboBox = new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_FUNCTION_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
+	m_pcFunctionSetComboBox = new wxChoice(m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_FUNCTION_SETS, wxDefaultPosition, wxSize(100, -1));
 
 	l_pcRowSizer->Add(m_pcFunctionSetComboBox, 1, wxALL, 5);
 
@@ -120,7 +120,7 @@ SP_DLG_ColCPNSimulationResults::SP_DLG_ColCPNSimulationResults(SP_DS_Graph* p_pc
 
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Parameter set:")), 1, wxALL | wxEXPAND, 5);
 
-	m_pcParameterSetComboBox = new wxComboBox(m_pcPropertyWindowSetsSizer, SP_ID_COMBOBOX_PARAMETER_SETS, wxT(""), wxDefaultPosition, wxSize(100, -1), 0, NULL, wxCB_READONLY);
+	m_pcParameterSetComboBox = new wxChoice(m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_PARAMETER_SETS, wxDefaultPosition, wxSize(100, -1));
 
 	l_pcRowSizer->Add(m_pcParameterSetComboBox, 1, wxALL, 5);
 

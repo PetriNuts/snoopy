@@ -58,7 +58,7 @@ private:
 	SP_DLG_Animation *m_pcDialog;
 
 	//bysl
-	vector<wxComboBox*> m_apcComboBoxes;
+	vector<wxChoice*> m_apcChoices;
 	vector<SP_DS_ColListAttribute*> m_apcColListAttr;
 	wxArrayString  m_choices;
 
