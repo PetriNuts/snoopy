@@ -151,7 +151,7 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 			if (SP_Find(m_choices, l_sGroup) == m_choices.end())
 			{
 				m_choices.Add(l_sGroup);
-				l_pcSetsSizer->Add( new wxStaticText( l_pcNotebookPage, wxID_ANY, m_choices.Last() ), wxGBPosition{row,0} );
+				l_pcSetsSizer->Add( new wxStaticText( l_pcNotebookPage, wxID_ANY, m_choices.Last() + wxT(':') ), wxGBPosition{row,0} );
 				auto l_pcComboBox = new wxChoice( l_pcNotebookPage, wxID_ANY);
 
 				for(unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++ )
