@@ -94,7 +94,7 @@ include_directories(${IRRKLANG_INCLUDE_DIRS})
 list(APPEND LIBS ${IRRKLANG_LIBRARIES})
 
 #gmplib
-#find_package(GMP)
+find_package(GMP)
 if(GMP_FOUND)
     add_definitions( -DUSE_GMP )
     include_directories(GMP_INCLUDE_DIR)

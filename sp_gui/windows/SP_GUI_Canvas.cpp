@@ -902,19 +902,21 @@ void SP_GUI_Canvas::Modify(bool p_bVal)
 bool SP_GUI_Canvas::MoveShape(wxShape* p_pcShape, double p_nOffsetX, double p_nOffsetY)
 {
 	if (!GetDiagram())
-		return FALSE;
+		return false;
+
+	if (p_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
+		return false;
 
 	wxClientDC l_cDC(this);
 	DoPrepareDC(l_cDC);
 
-	if (!p_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
-	{
-		double l_nX = p_pcShape->GetX() + p_nOffsetX;
-		double l_nY = p_pcShape->GetY() + p_nOffsetY;
-		// to get the line attachments right
-		p_pcShape->Move(l_cDC, l_nX, l_nY);
-		UpdateVirtualSize(WXROUND(l_nX), WXROUND(l_nY));
-	}
+	double l_nX = p_pcShape->GetX() + p_nOffsetX;
+	double l_nY = p_pcShape->GetY() + p_nOffsetY;
+	// to get the line attachments right
+	p_pcShape->Move(l_cDC, l_nX, l_nY);
+	UpdateVirtualSize(WXROUND(l_nX), WXROUND(l_nY));
+
+	return true;
 }
 
 bool

@@ -1270,8 +1270,8 @@ void SP_DLG_ColStSimulationResults::LoadConnections()
 			m_pcMainSimulator->SetPreSelfModifyingWeights(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID,l_nArcType, l_sArcWeight);
 		}
 
-		SP_LOGMESSAGE(l_itConnection->m_sMultiplicity);
-		SP_LOGMESSAGE(l_sArcWeight);
+		SP_LOGDEBUG(l_itConnection->m_sMultiplicity);
+		SP_LOGDEBUG(l_sArcWeight);
 
 		//m_pcMainSimulator->SetPreTransitionConnection(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID, GetConnectionType(l_itConnection->m_sArcClass), l_nWeight);
 	}

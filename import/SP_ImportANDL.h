@@ -32,7 +32,7 @@ class SP_Graphic;
 class SP_ImportANDL: public SP_ImportRoutine,
 	public SP_Error
 {
-public:
+private:
 
 	struct Weights
 	{
@@ -56,8 +56,6 @@ public:
 			reset_(false), modifier_(false)
 		{}
 	};
-
-private:
 
 	map<std::string, SP_DS_Node*> lookupPlaces;
 	map<std::string, SP_DS_Node*> lookupParameters;

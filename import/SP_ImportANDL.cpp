@@ -43,6 +43,7 @@ SP_ImportANDL::~SP_ImportANDL()
 
 bool SP_ImportANDL::ReadFile(const wxString& p_sFile)
 {
+	ClearAll();
 
 	m_fileName = p_sFile;
 

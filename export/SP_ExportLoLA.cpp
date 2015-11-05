@@ -110,9 +110,9 @@ SP_ExportLoLA::WriteTransitions()
     aList = m_preTrMap[t->m_id];
     if (aList) {
       for (aIt = aList->begin(); aIt != aList->end(); aIt++) {
-	if(aIt != aList->begin()) m_file.Write(wxT(", "));
-	a = (*aIt);
-	m_file.Write(wxString::Format(wxT("%s:%u"),
+        if(aIt != aList->begin()) m_file.Write(wxT(", "));
+        a = (*aIt);
+        m_file.Write(wxString::Format(wxT("%s:%u"),
 					GetName(m_placeIdMap[a->m_id]).c_str(),
 				    a->m_mult));
       }
@@ -122,9 +122,9 @@ SP_ExportLoLA::WriteTransitions()
     aList = m_postTrMap[t->m_id];
     if (aList) {
       for (aIt = aList->begin(); aIt != aList->end(); aIt++) {
-	if(aIt != aList->begin()) m_file.Write(wxT(", "));
-	a = (*aIt);
-	m_file.Write(wxString::Format(wxT("%s:%u"),
+        if(aIt != aList->begin()) m_file.Write(wxT(", "));
+        a = (*aIt);
+        m_file.Write(wxString::Format(wxT("%s:%u"),
 				      GetName(m_placeIdMap[a->m_id]).c_str(),
 				      a->m_mult));
       }
