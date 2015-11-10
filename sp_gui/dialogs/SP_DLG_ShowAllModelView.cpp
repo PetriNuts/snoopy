@@ -95,50 +95,6 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	wxString l_sViewName = l_pcAttribute->GetValueString();
 
 	SetTitle(l_sViewName);
-	m_IsSelectedPlace.Clear();
-	m_IsSelectedTransition.Clear();
-	wxString l_sElementType = m_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
-	int l_nSize, l_nSize1 = 0;
-	if (l_sElementType == wxT("Place"))
-	{
-		l_nSize = m_pcParentWnd->m_ArrayUnPlaces.GetCount();
-		if (l_nSize > l_nSize1)
-			l_nSize1 = l_nSize;
-		l_nSize = m_pcParentWnd->m_ArrayColPlaces.GetCount();
-		if (l_nSize > l_nSize1)
-			l_nSize1 = l_nSize;
-		l_nSize = m_pcParentWnd->m_ArrayAuxPlaces.GetCount();
-		if (l_nSize > l_nSize1)
-			l_nSize1 = l_nSize;
-	}
-	else
-	{
-		l_nSize = m_pcParentWnd->m_ArrayUnTranstions.GetCount();
-		if (l_nSize > l_nSize1)
-			l_nSize1 = l_nSize;
-		l_nSize = m_pcParentWnd->m_ArrayColTranstions.GetCount();
-		if (l_nSize > l_nSize1)
-			l_nSize1 = l_nSize;
-		l_nSize = m_pcParentWnd->m_ArrayAuxtranstions.GetCount();
-		if (l_nSize > l_nSize1)
-			l_nSize1 = l_nSize;
-	}
-
-	for (int i = 0; i < l_nSize1; i++)
-	{
-		m_IsSelectedPlace.Add(1);
-		m_PlaceLineStyle.Add(0);
-		m_PlaceLineWidth.Add(2);
-		m_PlaceColor.Add(m_pcParentWnd->GetColourString(i));
-	}
-
-	for (int i = 0; i < l_nSize1; i++)
-	{
-		m_IsSelectedTransition.Add(1);
-		m_TransitionLineStyle.Add(0);
-		m_TransitionLineWidth.Add(2);
-		m_TransitionColor.Add(m_pcParentWnd->GetColourString(i));
-	}
 
 	m_pcViewerSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Viewer")), wxVERTICAL);
 
@@ -667,20 +623,6 @@ void SP_DLG_ShowAllModelView::RefreshCurrentWindow(int p_nCurveIndex, wxString p
 
 	wxDELETE(m_pcResultViewer);
 
-	wxString l_sElementType = m_pcModelView->GetAttribute(wxT("Nodeclass"))->GetValueString();
-	if (l_sElementType.IsSameAs(wxT("Transition")))
-	{
-		m_TransitionLineStyle[p_nCurveIndex] = p_nLineStyle;
-		m_TransitionLineWidth[p_nCurveIndex] = p_nLineWidth;
-		m_TransitionColor[p_nCurveIndex] = p_nColor;
-	}
-	else
-		if (l_sElementType.IsSameAs(wxT("Place")))
-		{
-			m_PlaceLineStyle[p_nCurveIndex] = p_nLineStyle;
-			m_PlaceLineWidth[p_nCurveIndex] = p_nLineWidth;
-			m_PlaceColor[p_nCurveIndex] = p_nColor;
-		}
 	CreateResultViewer();
 	LoadView(m_pcResultViewer, m_pcModelView);
 	m_pcResultViewer->SetCurveColor(p_nCurveIndex, p_nColor);

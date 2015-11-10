@@ -51,10 +51,6 @@ private:
 	wxButton *m_pcXAxis;
 	wxButton *m_pcViewerTypeButton;
 	wxButton *m_pcEditNodeListButton;
-	wxArrayInt m_IsSelectedPlace, m_IsSelectedTransition;
-	wxArrayInt m_PlaceLineStyle, m_TransitionLineStyle;
-	wxArrayInt m_PlaceLineWidth, m_TransitionLineWidth;
-	wxArrayString m_PlaceColor, m_TransitionColor;
 
 	bool m_bIsShown;
 	wxSizer *m_pcContentSizer;
