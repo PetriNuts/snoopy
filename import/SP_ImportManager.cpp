@@ -75,7 +75,7 @@ SP_ImportManager::DoImport()
   list<SP_ImportRoutine*>::const_iterator rIt;
   SP_ImportRoutine* impR;
 
-  size_t eCnt = 0;
+  int eCnt = 0;
   
   for (rIt = m_lRoutines.begin(); rIt != m_lRoutines.end(); rIt++) {
     impR = (*rIt);
@@ -92,7 +92,7 @@ SP_ImportManager::DoImport()
   }
 
   wxArrayInt sel;
-  size_t sCount = wxGetMultipleChoices(sel,
+  int sCount = wxGetSelectedChoices(sel,
 				       _T("Select import routine\n"
 					  wxT("(multi-choice is also accepted)")),
 				       _T("Import"),				       

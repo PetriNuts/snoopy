@@ -28,10 +28,10 @@
 IMPLEMENT_CLASS(SP_GUI_Canvas, wxShapeCanvas)
 
 BEGIN_EVENT_TABLE(SP_GUI_Canvas, wxShapeCanvas)
-EVT_MOUSE_EVENTS(SP_GUI_Canvas::OnMouseEvent)
-EVT_MOUSEWHEEL(SP_GUI_Canvas::OnMouseEvent)
-EVT_PAINT(SP_GUI_Canvas::OnPaint)
-EVT_KEY_DOWN(SP_GUI_Canvas::OnKeyEvent)
+  EVT_MOUSE_EVENTS(SP_GUI_Canvas::OnMouseEvent)
+  EVT_MOUSEWHEEL(SP_GUI_Canvas::OnMouseEvent)
+  EVT_PAINT(SP_GUI_Canvas::OnPaint)
+  EVT_KEY_DOWN(SP_GUI_Canvas::OnKeyEvent)
 END_EVENT_TABLE()
 
 // Define a constructor for my canvas
@@ -126,7 +126,8 @@ void SP_GUI_Canvas::OnPaint(wxPaintEvent &p_cEvent)
 		return;
 
 	//adapt virtual size for zoom
-	SetVirtualSize(m_nSizeX*GetScaleX(), m_nSizeY*GetScaleY());
+	SetVirtualSize(WXROUND(GetScaleX() * m_nSizeX),
+				   WXROUND(GetScaleY() * m_nSizeY));
 
 	// new paint implementation
 	wxAutoBufferedPaintDC pdc(this);

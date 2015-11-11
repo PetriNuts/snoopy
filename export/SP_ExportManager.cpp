@@ -65,7 +65,7 @@ bool SP_ExportManager::DoExport(SP_MDI_Doc* p_doc)
 {
 	CHECK_POINTER(p_doc, return false);
 
-	size_t eCnt = 0;
+	int eCnt = 0;
 
 	for (SP_ExportRoutine* expR : m_lRoutines)
 	{
@@ -73,7 +73,7 @@ bool SP_ExportManager::DoExport(SP_MDI_Doc* p_doc)
 			eCnt++;
 	}
 
-	if (!eCnt)
+	if (eCnt < 1)
 	{ // no export routinese for p_doc
 		SP_MESSAGEBOX(wxT("There are no export routines available for this ")
 				+ wxString(p_doc->GetNetclassName()), wxT("Export"), wxOK | wxICON_ERROR);
@@ -93,7 +93,7 @@ bool SP_ExportManager::DoExport(SP_MDI_Doc* p_doc)
 	}
 
 	wxArrayInt sel;
-	size_t sCount = wxGetMultipleChoices(sel,
+	int sCount = wxGetSelectedChoices(sel,
 			_T("Select export routine\n"
 			wxT("(multi-choice is also accepted)")),
 			_T("Export"), eCnt, choices);

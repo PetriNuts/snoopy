@@ -49,7 +49,7 @@ GetAttributeChar(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
     if(!p_pcNode)
         return wxT("");
 
-    wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetProperties();
+    wxXmlAttribute* l_pcAttributeNode = p_pcNode->GetAttributes();
     while(l_pcAttributeNode)
     {
     	if(l_pcAttributeNode->GetName() == p_pchAttr)
