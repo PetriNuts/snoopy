@@ -16,23 +16,18 @@
 #include <algorithm>
 
 SP_NodeColourizer::SP_NodeColourizer(SP_DS_Graph *p_pcGraph) :
-	m_pcMapNodeNum2wxColour(NULL),
 	m_pcGraph(p_pcGraph),
 	m_pclCoarseNodes(NULL),
 	m_nodeList(NULL),
 	m_grList(NULL),
 	m_bSelect(false)
 {
-	m_pcMapNodeNum2wxColour = new map<SP_Graphic*, SP_PairColour> ();
-	m_pcMapNodeNum2Style = new map<SP_Graphic*, SP_PairLong>();
 	m_pclCoarseNodes = new SP_ListData ();
 }
 
 SP_NodeColourizer::~SP_NodeColourizer()
 {
 	wxDELETE(m_pclCoarseNodes);
-	wxDELETE(m_pcMapNodeNum2wxColour);
-	wxDELETE(m_pcMapNodeNum2Style);
 }
 
 void SP_NodeColourizer::ColourNodeSet(SP_ListNode* p_nodesToColour, wxColour p_pcCol)
@@ -133,37 +128,35 @@ void SP_NodeColourizer::ColourCoarseNodes(wxColour p_pcCol)
 
 bool SP_NodeColourizer::SaveColour(SP_Graphic* p_pcNode)
 {
-	CHECK_POINTER(m_pcMapNodeNum2wxColour, return FALSE);
 	wxColour l_pcColBrush = p_pcNode->GetBrush()->GetColour();
 	wxColour l_pcColPen = p_pcNode->GetPen()->GetColour();
-	m_pcMapNodeNum2wxColour->insert(make_pair(p_pcNode, make_pair(l_pcColBrush, l_pcColPen)));
+	m_pcMapNodeNum2wxColour.insert(make_pair(p_pcNode, make_pair(l_pcColBrush, l_pcColPen)));
 
-	long l_StyleBrush = p_pcNode->GetBrush()->GetStyle();
-	long l_StylePen = p_pcNode->GetPen()->GetStyle();
-	m_pcMapNodeNum2Style->insert(make_pair(p_pcNode, make_pair(l_StyleBrush, l_StylePen)));
+	auto l_StyleBrush = p_pcNode->GetBrush()->GetStyle();
+	auto l_StylePen = p_pcNode->GetPen()->GetStyle();
+	m_pcMapNodeNum2Style.insert(make_pair(p_pcNode, make_pair(l_StyleBrush, l_StylePen)));
 	return true;
 }
 
 void SP_NodeColourizer::RestoreColours()
 {
-	CHECK_POINTER(m_pcMapNodeNum2wxColour, return);
-	if (m_pcMapNodeNum2wxColour->size() == 0)
+	if (m_pcMapNodeNum2wxColour.size() == 0)
 	{
 		return;
 	}
 
-	map<SP_Graphic*, SP_PairColour>::iterator l_pcIt = m_pcMapNodeNum2wxColour->begin();
-	map<SP_Graphic*, SP_PairLong>::iterator l_itStyle = m_pcMapNodeNum2Style->begin();
+	auto l_pcIt = m_pcMapNodeNum2wxColour.begin();
+	auto l_itStyle = m_pcMapNodeNum2Style.begin();
 
-	while (l_pcIt != m_pcMapNodeNum2wxColour->end())
+	while (l_pcIt != m_pcMapNodeNum2wxColour.end())
 	{
 		SP_Graphic* l_pcNode = (*l_pcIt).first;
 
 		wxColour l_pcColBrush = (*l_pcIt).second.first;
 		wxColour l_pcColPen = (*l_pcIt).second.second;
 
-		int l_styleBrush = (*l_itStyle).second.first;
-		int l_stylePen = (*l_itStyle).second.second;
+		auto l_styleBrush = (*l_itStyle).second.first;
+		auto l_stylePen = (*l_itStyle).second.second;
 
 		l_pcNode->SetBrush(wxTheBrushList->FindOrCreateBrush(l_pcColBrush, l_styleBrush));
 		l_pcNode->SetPen(wxThePenList->FindOrCreatePen(l_pcColPen, l_pcNode->GetPen()->GetWidth(), l_stylePen));
@@ -173,8 +166,8 @@ void SP_NodeColourizer::RestoreColours()
 		l_pcIt++;
 		l_itStyle++;
 	}
-	m_pcMapNodeNum2wxColour->clear();
-	m_pcMapNodeNum2Style->clear();
+	m_pcMapNodeNum2wxColour.clear();
+	m_pcMapNodeNum2Style.clear();
 
 	SP_MDI_Doc *doc = SP_Core::Instance()->GetRootDocument();
 
@@ -334,13 +327,12 @@ bool SP_NodeColourizer::ColourNeighbourNodesAndEdges(SP_DS_Node * p_pcNode, wxCo
 
 void SP_NodeColourizer::DiscardOldColours()
 {
-	CHECK_POINTER(m_pcMapNodeNum2wxColour, return);
-	if (m_pcMapNodeNum2wxColour->size() == 0)
+	if (m_pcMapNodeNum2wxColour.size() == 0)
 	{
 		return;
 	}
-	m_pcMapNodeNum2wxColour->clear();
-	m_pcMapNodeNum2Style->clear();
+	m_pcMapNodeNum2wxColour.clear();
+	m_pcMapNodeNum2Style.clear();
 }
 
 wxColour SP_NodeColourizer::GetGradientColour(int p_min, int p_max, int p_val, wxColour p_col)

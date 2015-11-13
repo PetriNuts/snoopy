@@ -115,8 +115,8 @@ SP_DS_SimpleGraph::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	l_pcGr = new SP_GR_MetaRectangle(l_pcMC->GetPrototype(), 2, 2);
     l_pcGr->SetFixedSize(FALSE);
-    l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255,255,255), 1, wxTRANSPARENT ));
-    l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(255,255,255), wxTRANSPARENT ));
+    l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255,255,255), 1, wxPENSTYLE_TRANSPARENT ));
+    l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(255,255,255), wxBRUSHSTYLE_TRANSPARENT ));
     l_pcMC->SetGraphic(l_pcGr);
 	l_pcMC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
@@ -132,7 +132,7 @@ SP_DS_SimpleGraph::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	l_pcGr = new SP_GR_MetaRectangle(l_pcMC->GetPrototype(), 2, 2);
     l_pcGr->SetFixedSize(FALSE);
-    l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255,255,255), 1, wxSOLID ));
+    l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255,255,255), 1 ));
     l_pcMC->SetGraphic(l_pcGr);
 	l_pcMC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
@@ -158,8 +158,8 @@ SP_DS_SimpleGraph::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	l_pcGr = new SP_GR_MetaRectangle(l_pcMC->GetPrototype(), 2, 2);
     l_pcGr->SetFixedSize(true);
-    l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255,255,255), 1, wxTRANSPARENT ));
-    l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(255,255,255), wxTRANSPARENT ));
+    l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255,255,255), 1, wxPENSTYLE_TRANSPARENT ));
+    l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(255,255,255), wxBRUSHSTYLE_TRANSPARENT ));
     l_pcMC->SetGraphic(l_pcGr);
 	l_pcMC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 //#endif

@@ -26,8 +26,8 @@ SP_GR_ExtendedEdge::SP_GR_ExtendedEdge(SP_DS_Edge* p_pcParent, SP_EXTENDED_TYPE_
 									   :SP_GR_Edge(p_pcParent)
 {
 	/* changed by ckruege2 17.06.2009 Initial */
-	m_pcCanvasModPen = wxThePenList->FindOrCreatePen(wxColour(0, 0, 0), 1, wxSOLID);
-	m_pcCanvasModCoarsePen = wxThePenList->FindOrCreatePen(wxColour(0, 0, 0), 1, wxSOLID);
+	m_pcCanvasModPen = wxThePenList->FindOrCreatePen(wxColour(0, 0, 0), 1);
+	m_pcCanvasModCoarsePen = wxThePenList->FindOrCreatePen(wxColour(0, 0, 0), 1);
 	/* changing end */
     // instance for displaying on the canvas
     m_pcPrimitive = new SP_GR_BaseEdge();
@@ -402,29 +402,29 @@ bool SP_GR_ExtendedEdge::SetCanvasModPenStyle(wxColour colour,int thick,int styl
 {
 	if(style == SP_EXTENDED_TYPE_DEFAULT_EDGE)
 	{
-		m_pcCanvasModPen = wxThePenList->FindOrCreatePen(colour, thick, wxSOLID);
-		m_pcCanvasModCoarsePen = wxThePenList->FindOrCreatePen(colour, thick, style);
+		m_pcCanvasModPen = wxThePenList->FindOrCreatePen(colour, thick);
+		m_pcCanvasModCoarsePen = wxThePenList->FindOrCreatePen(colour, thick);
 	}
 	else
 	{
 		if(style == SP_EXTENDED_TYPE_DOTTED_EDGE) 
 		{
-			m_pcCanvasModPen = wxThePenList->FindOrCreatePen(colour, thick, wxDOT);
-			m_pcCanvasModCoarsePen = wxThePenList->FindOrCreatePen(colour, thick, style);
+			m_pcCanvasModPen = wxThePenList->FindOrCreatePen(colour, thick, wxPENSTYLE_DOT);
+			m_pcCanvasModCoarsePen = wxThePenList->FindOrCreatePen(colour, thick, wxPENSTYLE_DOT);
 		}
 		else
 		{
 			if(style == SP_EXTENDED_TYPE_DOTTED_DASHED_EDGE)
 			{
-				m_pcCanvasModPen = wxThePenList->FindOrCreatePen(colour, thick, wxDOT_DASH);
-				m_pcCanvasModCoarsePen = wxThePenList->FindOrCreatePen(colour, thick, style);
+				m_pcCanvasModPen = wxThePenList->FindOrCreatePen(colour, thick, wxPENSTYLE_DOT_DASH);
+				m_pcCanvasModCoarsePen = wxThePenList->FindOrCreatePen(colour, thick, wxPENSTYLE_DOT_DASH);
 			}
 			else
 			{
 				if(style == SP_EXTENDED_TYPE_DASHED_EDGE) 
 				{
-					m_pcCanvasModPen = wxThePenList->FindOrCreatePen(colour, thick, wxSHORT_DASH);
-					m_pcCanvasModCoarsePen = wxThePenList->FindOrCreatePen(colour, thick, style);
+					m_pcCanvasModPen = wxThePenList->FindOrCreatePen(colour, thick, wxPENSTYLE_SHORT_DASH);
+					m_pcCanvasModCoarsePen = wxThePenList->FindOrCreatePen(colour, thick, wxPENSTYLE_SHORT_DASH);
 				}
 			}
 		}

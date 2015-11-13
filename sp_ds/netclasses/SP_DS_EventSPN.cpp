@@ -220,7 +220,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcGr = new SP_GR_Rectangle(l_pcNC->GetPrototype(), twidth, theight);
 	l_pcGr->SetHeight(20.0);
 	l_pcGr->SetWidth(10.0);
-	l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(0, 0, 0),wxSOLID));
+	l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(0, 0, 0)));
     l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
@@ -285,7 +285,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	theight = wxGetApp().GetElementPrefs()->GetNodeHeight(GetName(), wxT("Deterministic Transition"));
 
 	l_pcGr = new SP_GR_Rectangle(l_pcNC->GetPrototype(), twidth, theight);
-	l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(0, 0, 0),wxSOLID));
+	l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(0, 0, 0)));
     l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
@@ -352,7 +352,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	theight = wxGetApp().GetElementPrefs()->GetNodeHeight(GetName(), wxT("Scheduled Transition"));
 
 	l_pcGr = new SP_GR_Rectangle(l_pcNC->GetPrototype(), twidth, theight);
-	l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(125, 125, 125),wxSOLID));
+	l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(125, 125, 125)));
     l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));

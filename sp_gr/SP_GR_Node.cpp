@@ -63,7 +63,7 @@ SP_GR_Node::Update(bool p_bLocalOnly)
 	{
 		if (GetBrush()->GetColour() != *wxWHITE)
 		{
-			GetPrimitive()->SetBrush(wxTheBrushList->FindOrCreateBrush(GetBrush()->GetColour(), wxCROSSDIAG_HATCH));
+			GetPrimitive()->SetBrush(wxTheBrushList->FindOrCreateBrush(GetBrush()->GetColour(), wxBRUSHSTYLE_CROSSDIAG_HATCH));
 		}
 		else
 		{

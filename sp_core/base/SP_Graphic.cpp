@@ -19,8 +19,8 @@ SP_Graphic::SP_Graphic(SP_GRAPHIC_TYPE p_eType)
 :m_eGraphicType(p_eType),
 m_bShow(TRUE),
 m_eGraphicState(SP_STATE_NORMAL),
-m_pcDefaultBrush(p_eType == SP_GRAPHIC_EDGE ? wxTheBrushList->FindOrCreateBrush(wxColour(0,0,0), wxSOLID) : wxTheBrushList->FindOrCreateBrush(wxColour(255,255,255), wxSOLID)),
-m_pcDefaultPen(wxThePenList->FindOrCreatePen(wxColour(0,0,0), 1, wxSOLID)),
+m_pcDefaultBrush(p_eType == SP_GRAPHIC_EDGE ? wxTheBrushList->FindOrCreateBrush(wxColour(0,0,0)) : wxTheBrushList->FindOrCreateBrush(wxColour(255,255,255))),
+m_pcDefaultPen(wxThePenList->FindOrCreatePen(wxColour(0,0,0), 1)),
 m_pcBrush(NULL),
 m_pcPen(NULL),
 m_bBrushSet(FALSE),
@@ -886,17 +886,17 @@ void SP_Graphic::ToggleHide(bool p_bHide)
 		(p_bHide == false && l_chAlpha != 255))
 	{
 		l_chAlpha = p_bHide ? 50 : 255;
-		int l_nStyle = GetPrimitive()->GetBrush()->GetStyle();
+		auto l_nBrushStyle = GetPrimitive()->GetBrush()->GetStyle();
 		unsigned char l_chRed = GetPrimitive()->GetBrush()->GetColour().Red();
 		unsigned char l_chGreen = GetPrimitive()->GetBrush()->GetColour().Green();
 		unsigned char l_chBlue = GetPrimitive()->GetBrush()->GetColour().Blue();
-		GetPrimitive()->SetBrush(wxTheBrushList->FindOrCreateBrush(wxColour(l_chRed,l_chGreen,l_chBlue,l_chAlpha), l_nStyle));
+		GetPrimitive()->SetBrush(wxTheBrushList->FindOrCreateBrush(wxColour(l_chRed,l_chGreen,l_chBlue,l_chAlpha), l_nBrushStyle));
 
 		int l_nWidth = GetPrimitive()->GetPen()->GetWidth();
-		l_nStyle = GetPrimitive()->GetPen()->GetStyle();
+		auto l_nPenStyle = GetPrimitive()->GetPen()->GetStyle();
 		l_chRed = GetPrimitive()->GetPen()->GetColour().Red();
 		l_chGreen = GetPrimitive()->GetPen()->GetColour().Green();
 		l_chBlue = GetPrimitive()->GetPen()->GetColour().Blue();
-		GetPrimitive()->SetPen(wxThePenList->FindOrCreatePen(wxColour(l_chRed,l_chGreen,l_chBlue,l_chAlpha), l_nWidth, l_nStyle));
+		GetPrimitive()->SetPen(wxThePenList->FindOrCreatePen(wxColour(l_chRed,l_chGreen,l_chBlue,l_chAlpha), l_nWidth, l_nPenStyle));
 	}
 }

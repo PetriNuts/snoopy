@@ -159,8 +159,8 @@ SP_FTreeNodeColourizer::RestoreOneNodeColour(SP_DS_Node* restoreNode, SP_PairCol
 	SP_ListGraphic* sGraphic = m_pcNode->GetGraphics();
 	SP_ListGraphic::iterator sIt;
 	for (sIt = sGraphic->begin(); sIt != sGraphic->end(); ++sIt){
-		(*sIt)->SetBrush(wxTheBrushList->FindOrCreateBrush(l_pcColBrush, wxSOLID));
-		(*sIt)->SetPen(wxThePenList->FindOrCreatePen(l_pcColPen, 1, wxSOLID));
+		(*sIt)->SetBrush(wxTheBrushList->FindOrCreateBrush(l_pcColBrush));
+		(*sIt)->SetPen(wxThePenList->FindOrCreatePen(l_pcColPen, 1));
 		(*sIt)->Update(TRUE);
 	}
 
@@ -196,9 +196,9 @@ SP_FTreeNodeColourizer::ColourGraphic(
 	for (sIt = sGraphic->begin(); sIt != sGraphic->end(); ++sIt){
 
 		if(fullColouring == TRUE){
-			(*sIt)->SetBrush(wxTheBrushList->FindOrCreateBrush(col, wxSOLID));
+			(*sIt)->SetBrush(wxTheBrushList->FindOrCreateBrush(col));
 		}else{
-			(*sIt)->SetPen(wxThePenList->FindOrCreatePen(col, 1, wxSOLID));
+			(*sIt)->SetPen(wxThePenList->FindOrCreatePen(col, 1));
 		}
 
 		(*sIt)->Update(TRUE);

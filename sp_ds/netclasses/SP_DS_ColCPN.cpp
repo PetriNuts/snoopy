@@ -154,7 +154,7 @@ SP_DS_ColCPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcGrAttr->SetTextColor( wxGetApp().GetElementPrefs()->GetColorSetColor(GetName(), l_pcNC->GetDisplayName()));
 	l_pcGrAttr->SetOffsetY(-20);
 	l_pcGrAttr->SetShow(TRUE);
-	l_pcGrAttr->SetBrush(wxTheBrushList->FindOrCreateBrush(*wxBLUE,wxSOLID));
+	l_pcGrAttr->SetBrush(wxTheBrushList->FindOrCreateBrush(*wxBLUE));
 	l_pcAttr->SetGlobalShow();	
 
 
@@ -236,7 +236,7 @@ SP_DS_ColCPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 	int pawidth = wxGetApp().GetElementPrefs()->GetNodeWidth(GetName(), wxT("Parameter"));
 	if(pawidth == DEFAULT_WIDTH) { pawidth = 2*pawidth; }
    	l_pcGr = new SP_GR_ExtendedEllipse(l_pcNC->GetPrototype(),pawidth, paheight,TRUE,SP_EXTENDED_TYPE_DEFAULT,3,wxColour(128, 128, 128));
-	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3, wxSOLID ));
+	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
    	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 	l_pcNC->SetGraphic( l_pcGr );
 	l_pcNC->RegisterGraphicWidget( new SP_WDG_DialogExtendedGraphic( wxT("Graphic") ) );
@@ -265,7 +265,7 @@ SP_DS_ColCPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcNC->SetCoarse(l_pcCoarse);
 
    	l_pcGr = new SP_GR_ExtendedEllipse(l_pcNC->GetPrototype(),pawidth, paheight,TRUE,SP_EXTENDED_TYPE_TWO,3,wxColour(128, 128, 128));
-	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3, wxSOLID ));
+	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
    	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), wxT("Parameter")));
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogExtendedGraphic(wxT("Graphic")));

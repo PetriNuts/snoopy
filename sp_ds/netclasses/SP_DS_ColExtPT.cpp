@@ -150,7 +150,7 @@ SP_DS_ColExtPT::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcGrAttr->SetTextColor( wxGetApp().GetElementPrefs()->GetColorSetColor(GetName(), l_pcNC->GetName()));	
 	l_pcGrAttr->SetOffsetY(-20);
 	l_pcGrAttr->SetShow(TRUE);
-	l_pcGrAttr->SetBrush(wxTheBrushList->FindOrCreateBrush(*wxBLUE,wxSOLID));
+	l_pcGrAttr->SetBrush(wxTheBrushList->FindOrCreateBrush(*wxBLUE));
 	l_pcAttr->SetGlobalShow();	
 	
 	//////////////////////////////////////////////////////////////////////////////

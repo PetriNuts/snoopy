@@ -95,7 +95,7 @@ SP_DS_ModuloNets::CreateGraph(SP_DS_Graph* p_graph)
 /* change ckruege2 19.07.09 */
     l_pcGrNode = new SP_GR_ExtendedEllipse(l_pcNodeClass->GetPrototype(), 40,20,TRUE,SP_EXTENDED_TYPE_DEFAULT,1,wxColour(128, 128, 128));
 /* change end */ 
-    l_pcGrNode->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 1, wxSOLID ));
+    l_pcGrNode->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 1 ));
 	l_pcGrNode->SetFixedSize(FALSE);
 	l_pcNodeClass->SetGraphic(l_pcGrNode);
 

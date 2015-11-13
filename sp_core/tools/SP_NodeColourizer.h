@@ -21,8 +21,8 @@ class SP_NodeColourizer:
  private:
 
  // Map to save the colours of nodes
-  map<SP_Graphic*, SP_PairColour> *m_pcMapNodeNum2wxColour;
-  map<SP_Graphic*, SP_PairLong> *m_pcMapNodeNum2Style;
+  map<SP_Graphic*, SP_PairColour> m_pcMapNodeNum2wxColour;
+  map<SP_Graphic*, std::pair<wxBrushStyle, wxPenStyle> > m_pcMapNodeNum2Style;
   SP_DS_Graph* m_pcGraph;
   SP_ListData* m_pclCoarseNodes;
 

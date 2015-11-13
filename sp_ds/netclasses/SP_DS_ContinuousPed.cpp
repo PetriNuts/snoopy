@@ -147,7 +147,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	int pwidth = wxGetApp().GetElementPrefs()->GetNodeWidth(GetName(), SP_DS_CONTINUOUS_PLACE);
 
 	l_pcGr = new SP_GR_ExtendedCircle(l_pcNC->GetPrototype(), pwidth, SP_EXTENDED_TYPE_DEFAULT,3,wxColour(128,128,128));
-	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3, wxSOLID ));
+	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
 	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogExtendedGraphic(wxT("Graphic")));
@@ -203,7 +203,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	int theight = wxGetApp().GetElementPrefs()->GetNodeHeight(GetName(), SP_DS_CONTINUOUS_TRANS);
 
 	l_pcGr = new SP_GR_ExtendedRectangle(l_pcNC->GetPrototype(), twidth, theight,TRUE,SP_EXTENDED_TYPE_DEFAULT,3,wxColour(128,128,128));
-	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3, wxSOLID ));
+	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
 	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogExtendedGraphic(wxT("Graphic")));
@@ -234,7 +234,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcNC->SetCoarse(l_pcCoarse);
 
 	l_pcGr = new SP_GR_ExtendedCircle(l_pcNC->GetPrototype(), pwidth, SP_EXTENDED_TYPE_TWO, 3,wxColour(128,128,128));
-	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3, wxSOLID ));
+	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
 	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), SP_DS_CONTINUOUS_PLACE));
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogExtendedGraphic(wxT("Graphic")));
@@ -264,7 +264,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcNC->SetCoarse(l_pcCoarse);
 
 	l_pcGr = new SP_GR_ExtendedRectangle(l_pcNC->GetPrototype(), twidth, theight,TRUE,SP_EXTENDED_TYPE_TWO, 3,wxColour(128,128,128));
-	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3, wxSOLID ));
+	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
 	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), SP_DS_CONTINUOUS_TRANS));
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogExtendedGraphic(wxT("Graphic")));

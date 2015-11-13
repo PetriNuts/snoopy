@@ -1306,7 +1306,7 @@ SP_XmlReader::ReadPenColour(SP_Graphic* p_pcVal, wxXmlNode* p_pcNode)
     if (!GetColourAttribute(p_pcNode, wxT("pen"), &l_nR, &l_nG, &l_nB))
         return FALSE;
 
-    p_pcVal->SetPen(wxThePenList->FindOrCreatePen(wxColour(l_nR, l_nG, l_nB), 1, wxSOLID));
+    p_pcVal->SetPen(wxThePenList->FindOrCreatePen(wxColour(l_nR, l_nG, l_nB), 1));
 	p_pcVal->SetPenColour(wxColour(l_nR, l_nG, l_nB));
     return TRUE;
 }
@@ -1321,7 +1321,7 @@ SP_XmlReader::ReadBrushColour(SP_Graphic* p_pcVal, wxXmlNode* p_pcNode)
     if (!GetColourAttribute(p_pcNode, wxT("brush"), &l_nR, &l_nG, &l_nB))
         return FALSE;
 
-    p_pcVal->SetBrush(wxTheBrushList->FindOrCreateBrush(wxColour(l_nR, l_nG, l_nB), wxSOLID));
+    p_pcVal->SetBrush(wxTheBrushList->FindOrCreateBrush(wxColour(l_nR, l_nG, l_nB)));
 
     return TRUE;
 }

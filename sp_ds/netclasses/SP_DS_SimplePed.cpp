@@ -318,7 +318,7 @@ SP_DS_SimplePed::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	l_pcGrMeta = new SP_GR_MetaComposite(l_pcMC->GetPrototype());
     l_pcGrMeta->SetFixedSize(true);
-    l_pcGrMeta->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255,255,255), 1, wxSOLID ));
+    l_pcGrMeta->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255,255,255), 1 ));
     l_pcGrMeta->SetShow(false);
     l_pcMC->SetGraphic(l_pcGrMeta);
 	l_pcMC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
@@ -353,7 +353,7 @@ SP_DS_SimplePed::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	l_pcGrMeta = new SP_GR_MetaComposite(l_pcMC->GetPrototype());
     l_pcGrMeta->SetFixedSize(true);
-    l_pcGrMeta->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255,255,255), 1, wxSOLID ));
+    l_pcGrMeta->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255,255,255), 1 ));
     l_pcGrMeta->SetShow(false);
     l_pcMC->SetGraphic(l_pcGrMeta);
 	l_pcMC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));

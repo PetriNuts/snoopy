@@ -255,12 +255,12 @@ bool Snoopy::OnInit()
 	
 	wxFileSystem::AddHandler(new wxZipFSHandler);
 
-	m_pcCanvasNormalBrush = wxTheBrushList->FindOrCreateBrush(wxColour(255,	255, 255), wxSOLID);
-	m_pcCanvasEdgeBrush = wxTheBrushList->FindOrCreateBrush(wxColour(0, 0, 0), wxSOLID);
-	m_pcCanvasCoarseBrush = wxTheBrushList->FindOrCreateBrush(wxColour(64, 64, 255), wxSOLID);
+	m_pcCanvasNormalBrush = wxTheBrushList->FindOrCreateBrush(wxColour(255,	255, 255));
+	m_pcCanvasEdgeBrush = wxTheBrushList->FindOrCreateBrush(wxColour(0, 0, 0));
+	m_pcCanvasCoarseBrush = wxTheBrushList->FindOrCreateBrush(wxColour(64, 64, 255));
 
-	m_pcCanvasNormalPen = wxThePenList->FindOrCreatePen(wxColour(0, 0, 0), 1, wxSOLID);
-	m_pcCanvasCoarsePen = wxThePenList->FindOrCreatePen(wxColour(64, 64, 255), 1, wxSOLID);
+	m_pcCanvasNormalPen = wxThePenList->FindOrCreatePen(wxColour(0, 0, 0), 1);
+	m_pcCanvasCoarsePen = wxThePenList->FindOrCreatePen(wxColour(64, 64, 255), 1);
 
 	m_pcDocmanager = new SP_GM_Docmanager();
 
@@ -1098,10 +1098,10 @@ void Snoopy::SetCanvasLogicBrush(int style)
 {
 	if (style == wxCROSSDIAG_HATCH)
 	{
-		m_pcCanvasLogicBrush = wxTheBrushList->FindOrCreateBrush(wxColour(0, 0, 0), wxCROSSDIAG_HATCH);
+		m_pcCanvasLogicBrush = wxTheBrushList->FindOrCreateBrush(wxColour(0, 0, 0), wxBRUSHSTYLE_CROSSDIAG_HATCH);
 	}
 	else
 	{
-		m_pcCanvasLogicBrush = wxTheBrushList->FindOrCreateBrush(wxColour(192, 192, 192), wxSOLID);
+		m_pcCanvasLogicBrush = wxTheBrushList->FindOrCreateBrush(wxColour(192, 192, 192), wxBRUSHSTYLE_SOLID);
 	}
 }

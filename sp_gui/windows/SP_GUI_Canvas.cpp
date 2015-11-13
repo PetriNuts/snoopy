@@ -237,7 +237,7 @@ void SP_GUI_Canvas::DrawOutline(double p_nX1, double p_nY1,
     wxDCOverlay overlaydc( m_Overlay, &l_cDc);
     overlaydc.Clear();
 
-	wxPen* dottedPen = wxThePenList->FindOrCreatePen(*wxBLACK, 1, wxDOT);
+	wxPen* dottedPen = wxThePenList->FindOrCreatePen(*wxBLACK, 1, wxPENSTYLE_DOT);
 	l_cDc.SetPen(*dottedPen);
     l_cDc.SetBrush( *wxTRANSPARENT_BRUSH );
 	l_cDc.DrawRectangle(l_nX1, l_nY1, (l_nX2 - l_nX1), (l_nY2 - l_nY1));
@@ -252,7 +252,7 @@ SP_GUI_Canvas::DrawOutlineShapes(double p_nOffsetX, double p_nOffsetY)
     wxDCOverlay overlaydc( m_Overlay, &l_cDC);
     overlaydc.Clear();
 
-	wxPen* dottedPen = wxThePenList->FindOrCreatePen(*wxBLACK, 1, wxDOT);
+	wxPen* dottedPen = wxThePenList->FindOrCreatePen(*wxBLACK, 1, wxPENSTYLE_DOT);
     l_cDC.SetPen(*dottedPen);
     l_cDC.SetBrush(*wxTRANSPARENT_BRUSH);
 
@@ -581,7 +581,7 @@ bool SP_GUI_Canvas::OnDrawLine(wxShape* p_pcShape, double p_nX, double p_nY,
     wxDCOverlay overlaydc( m_Overlay, &l_cDC);
     overlaydc.Clear();
 
-	wxPen* dottedPen = wxThePenList->FindOrCreatePen(*wxBLACK, 1, wxDOT);
+	wxPen* dottedPen = wxThePenList->FindOrCreatePen(*wxBLACK, 1, wxPENSTYLE_DOT);
 	l_cDC.SetPen(*dottedPen);
 
 	l_cDC.DrawLine(l_nX1, l_nY1, l_nX2, l_nY2);
@@ -870,7 +870,7 @@ bool SP_GUI_Canvas::DrawTempEdge(double p_nX, double p_nY)
     wxDCOverlay overlaydc( m_Overlay, &l_cDC);
     overlaydc.Clear();
 
-	wxPen* l_cPen = wxThePenList->FindOrCreatePen(*wxBLACK, 1, wxDOT);
+	wxPen* l_cPen = wxThePenList->FindOrCreatePen(*wxBLACK, 1, wxPENSTYLE_DOT);
 	l_cDC.SetPen(*l_cPen);
 
 	int l_nX1,l_nY1,l_nX2,l_nY2;
