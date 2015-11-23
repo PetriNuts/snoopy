@@ -296,7 +296,7 @@ void SP_ImportSBML2cntPn::getReactions ()
 					{
 						wxString l_stoichiometry =
 								wxString::Format(wxT("%g"),l_sbmlReactant->getStoichiometry());
-						drawEdge(l_pcNode, l_reactionNode,SP_DS_EDGE,l_stoichiometry);
+						drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
 						if(l_sbmlReactant->isSetConstant())
 						{
 							drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
@@ -316,7 +316,7 @@ void SP_ImportSBML2cntPn::getReactions ()
 						drawEdge(l_reactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
 						if(l_sbmlProduct->isSetConstant())
 						{
-							drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+							drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
 						}
 						if(l_sbmlReaction->isSetKineticLaw())
 						{

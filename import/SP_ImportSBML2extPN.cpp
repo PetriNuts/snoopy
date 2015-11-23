@@ -398,7 +398,7 @@ void SP_ImportSBML2extPN::getReactions ()
 						wxString l_stoichiometry =
 								wxString::Format(wxT("%li"), lround(l_sbmlStoichiometry));
 						SP_DS_Edge* l_pcEdge =
-								drawEdge(l_pcNode, l_reactionNode,SP_DS_EDGE,l_stoichiometry);
+								drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
 						if(m_NormalizeStoichiometries)
 						{
 							l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
@@ -415,7 +415,7 @@ void SP_ImportSBML2extPN::getReactions ()
 						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 						{
 							l_pcEdge =
-									drawEdge(l_revReactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
+									drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
 							if(m_NormalizeStoichiometries)
 							{
 								l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
@@ -423,7 +423,7 @@ void SP_ImportSBML2extPN::getReactions ()
 							if(l_sbmlReactant->isSetConstant())
 							{
 								l_pcEdge =
-										drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+										drawEdge(l_pcNode,l_revReactionNode,SP_DS_EDGE,l_stoichiometry);
 								if(m_NormalizeStoichiometries)
 								{
 									l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
@@ -444,7 +444,7 @@ void SP_ImportSBML2extPN::getReactions ()
 						wxString l_stoichiometry =
 								wxString::Format(wxT("%li"), lround(l_sbmlStoichiometry));
 						SP_DS_Edge* l_pcEdge =
-								drawEdge(l_reactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
+								drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
 						if(m_NormalizeStoichiometries)
 						{
 							l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
@@ -452,7 +452,7 @@ void SP_ImportSBML2extPN::getReactions ()
 						if(l_sbmlProduct->isSetConstant())
 						{
 							l_pcEdge =
-									drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+									drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
 							if(m_NormalizeStoichiometries)
 							{
 								l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
