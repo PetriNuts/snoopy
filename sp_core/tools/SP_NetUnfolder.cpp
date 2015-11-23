@@ -25,7 +25,6 @@ SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph)
 	if(!p_pcGraph) return false;
 
 	m_pcGraph = p_pcGraph;
-	bool l_bFinish = false;
 
 	SP_ColoredNetBuilder builder;
 	if(builder(m_pcGraph))
@@ -47,7 +46,7 @@ SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph)
 			sout << "\nunfolding complete |P|=" << m_UnfoldedNet->nrPlaces() << "|T|=" << m_UnfoldedNet->nrTransitions() << "|A|=" << m_UnfoldedNet->nrArcs() << "\n";
 			wxString l_sMsg = sout.str();
 			SP_LOGMESSAGE(l_sMsg);
-			l_bFinish = true;
+			return true;
 		}
 		catch (const std::exception &exc)
 		{
@@ -63,7 +62,7 @@ SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph)
 	{
 		SP_LOGERROR(wxT(" while building colored net!"));
 	}
-	return l_bFinish;
+	return false;
 }
 
 namespace
@@ -232,6 +231,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 			l_UnfoldedArcInfo.m_sColPlaceName = l_sColoredPlaceName;
 			l_UnfoldedArcInfo.m_sColor = l_sColor;
 			wxString l_sInscription = c->value_;
+			l_UnfoldedArcInfo.m_sMultiplicity = l_sInscription;
 			if(coloredPlace->type_ == dsszmc::andl::PlType::CONTINUOUS_T)
 			{
 				l_UnfoldedArcInfo.m_sDiscContType = SP_DS_CONTINUOUS_PLACE;
@@ -275,6 +275,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 			l_UnfoldedArcInfo.m_sColPlaceName = l_sColoredPlaceName;
 			l_UnfoldedArcInfo.m_sColor = l_sColor;
 			wxString l_sInscription = u->value_;
+			l_UnfoldedArcInfo.m_sMultiplicity = l_sInscription;
 			if(coloredPlace->type_ == dsszmc::andl::PlType::CONTINUOUS_T)
 			{
 				l_UnfoldedArcInfo.m_sDiscContType = SP_DS_CONTINUOUS_PLACE;
