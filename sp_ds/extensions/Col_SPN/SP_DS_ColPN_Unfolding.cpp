@@ -85,7 +85,7 @@ bool SP_DS_ColPN_Unfolding::Unfolding()
 	{
 		m_pcUnfoldDlg->Destroy();
 		wxString l_Msg = wxT("Error while unfolding.\n");
-		l_Msg << wxT(__FILE__);
+		//l_Msg << wxT(__FILE__);
 		SP_LOGERROR(l_Msg);
 		return false;
 	}		

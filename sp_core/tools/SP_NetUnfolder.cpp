@@ -7,7 +7,6 @@
 
 #include "sp_core/tools/SP_NetUnfolder.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
-
 #include "sp_utilities.h"
 
 #include "dssz/auxi/auxi.h"
@@ -18,7 +17,6 @@
 #include "dssz/unfolding/net_unfolding.icc"
 #include "dssz/unfolding/gecode_representation.h"
 #include "dssz/unfolding/idd_representation.h"
-#include "dssz/functions/functionRegistry.h"
 
 template<typename Repr>
 bool
@@ -28,7 +26,6 @@ SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph)
 
 	m_pcGraph = p_pcGraph;
 	bool l_bFinish = false;
-
 
 	SP_ColoredNetBuilder builder;
 	if(builder(m_pcGraph))

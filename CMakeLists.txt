@@ -18,6 +18,8 @@ else()
 endif()
 
 #snoopy
+#Optimization flags
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -finline-functions -funroll-loops" )
 if(NOT WIN32)
     #Generate position-independent code (PIC)
     add_definitions( -fPIC )
@@ -64,6 +66,10 @@ if( WIN32 AND NOT BOOST_ROOT )
     MESSAGE( WARNING "Please set the BOOST_ROOT environment variable." )
 endif( WIN32 AND NOT BOOST_ROOT )
 
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME ON)
+
 find_package(Boost REQUIRED regex)
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
@@ -96,7 +102,6 @@ list(APPEND LIBS ${IRRKLANG_LIBRARIES})
 #gmplib
 find_package(GMP)
 if(GMP_FOUND)
-    add_definitions( -DUSE_GMP )
     include_directories(GMP_INCLUDE_DIR)
     list(APPEND LIBS ${GMP_LIBRARIES})
     #SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-no_pie" )
