@@ -110,19 +110,19 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 		if(!coloredPlace || ! dsszmc::aux::startsWith(p->name_, coloredPlace->name_))
 		{
 			coloredPlace = FindColoredNode<dsszmc::andl::Place>(p->name_, *m_ColoredNet->places_);
-			l_sColoredPlaceName = coloredPlace->name_;
-			//p_pcResults->m_mssColPlaceName2ColorSetforOrdering[l_sColoredPlaceName] = l_sColorSetName;
-			if(p->type_ == dsszmc::andl::PlType::CONTINUOUS_T)
-			{
-				l_mUnfoldedPlace = &(p_pcResults->GetUnfoldedContPlaces()[l_sColoredPlaceName]);
-			}
-			else
-			{
-				l_mUnfoldedPlace = &(p_pcResults->GetUnfoldedDiscPlaces()[l_sColoredPlaceName]);
-			}
 		}
-		// length()+1 because of '_' as delimiter between name and color
-		wxString l_sColor = p->name_.substr(coloredPlace->name_.length()+1);
+		l_sColoredPlaceName = p->name_.substr(0, p->prefix_);
+		//p_pcResults->m_mssColPlaceName2ColorSetforOrdering[l_sColoredPlaceName] = l_sColorSetName;
+		if(p->type_ == dsszmc::andl::PlType::CONTINUOUS_T)
+		{
+			l_mUnfoldedPlace = &(p_pcResults->GetUnfoldedContPlaces()[l_sColoredPlaceName]);
+		}
+		else
+		{
+			l_mUnfoldedPlace = &(p_pcResults->GetUnfoldedDiscPlaces()[l_sColoredPlaceName]);
+		}
+		// prefix+1 because of '_' as delimiter between name and color
+		wxString l_sColor = p->name_.substr(p->prefix_+1);
 		if(p->type_ == dsszmc::andl::PlType::CONTINUOUS_T)
 		{
 			SP_CPN_UnfoldedPlaceInfo& l_UnfoldedPlaceInfo = (*l_mUnfoldedPlace)[l_sColor];
@@ -159,37 +159,32 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 	}
 	//transitions
 
-	dsszmc::andl::Transition_ptr coloredTrans;
 	wxString l_sColoredTransName;
 	SP_CPN_UnfoldedTransition* l_UnfoldedTrans;
 	for(auto& t : *m_UnfoldedNet->transitions_)
 	{
 		if(!t) continue;
 
-		if(!coloredTrans || ! dsszmc::aux::startsWith(t->name_, coloredTrans->name_))
-		{
-			coloredTrans = FindColoredNode<dsszmc::andl::Transition>(t->name_, *m_ColoredNet->transitions_);
-			l_sColoredTransName = coloredTrans->name_;
-			switch (t->type_) {
-			case dsszmc::andl::TrType::CONTINUOUS_T:
-				l_UnfoldedTrans = &(p_pcResults->GetUnfoldedContTransions()[l_sColoredTransName]);
-				break;
-			case dsszmc::andl::TrType::IMMEDIATE_T:
-				l_UnfoldedTrans = &(p_pcResults->GetUnfoldedImmTransions()[l_sColoredTransName]);
-				break;
-			case dsszmc::andl::TrType::DETERMINISTIC_T:
-				l_UnfoldedTrans = &(p_pcResults->GetUnfoldedDetTransions()[l_sColoredTransName]);
-				break;
-			case dsszmc::andl::TrType::SCHEDULED_T:
-				l_UnfoldedTrans = &(p_pcResults->GetUnfoldedSchedTransions()[l_sColoredTransName]);
-				break;
-			default:
-				l_UnfoldedTrans = &(p_pcResults->GetUnfoldedStochTransions()[l_sColoredTransName]);
-				break;
-			}
+		l_sColoredTransName = t->name_.substr(0, t->prefix_);
+		switch (t->type_) {
+		case dsszmc::andl::TrType::CONTINUOUS_T:
+			l_UnfoldedTrans = &(p_pcResults->GetUnfoldedContTransions()[l_sColoredTransName]);
+			break;
+		case dsszmc::andl::TrType::IMMEDIATE_T:
+			l_UnfoldedTrans = &(p_pcResults->GetUnfoldedImmTransions()[l_sColoredTransName]);
+			break;
+		case dsszmc::andl::TrType::DETERMINISTIC_T:
+			l_UnfoldedTrans = &(p_pcResults->GetUnfoldedDetTransions()[l_sColoredTransName]);
+			break;
+		case dsszmc::andl::TrType::SCHEDULED_T:
+			l_UnfoldedTrans = &(p_pcResults->GetUnfoldedSchedTransions()[l_sColoredTransName]);
+			break;
+		default:
+			l_UnfoldedTrans = &(p_pcResults->GetUnfoldedStochTransions()[l_sColoredTransName]);
+			break;
 		}
-		// length()+1 because of '_' as delimiter between name and color
-		wxString l_sBinding = t->name_.substr(coloredTrans->name_.length()+1);
+		// prefix+1 because of '_' as delimiter between name and color
+		wxString l_sBinding = t->name_.substr(t->prefix_+1);
 		SP_CPN_UnfoldedTransInfo* l_UnfoldedTransInfo;
 		switch (t->type_) {
 		case dsszmc::andl::TrType::CONTINUOUS_T:
