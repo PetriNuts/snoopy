@@ -51,6 +51,7 @@ typedef SP_ListAnimator::const_iterator SP_AnimatorCIter;
 
 typedef map<SP_Data*, SP_Data*> SP_MapData2Data;
 typedef map<SP_Graphic*, SP_Graphic*> SP_MapGraphic2Graphic;
+typedef map<wxString, SP_DS_Node*> SP_MapString2Node;
 
 enum SP_DELETE_STATE
 {

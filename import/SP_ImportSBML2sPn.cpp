@@ -28,8 +28,8 @@ SP_ImportSBML2sPn::~SP_ImportSBML2sPn()
 
 bool SP_ImportSBML2sPn::ReadFile(const wxString& p_sFile)
 {
-	g_CompoundList.clear();
-	g_ReactionList.clear();
+	m_Species.clear();
+	m_Reactions.clear();
 
 	numReverseReactions = 0;
 	numBoundaryConditions = 0;
@@ -214,7 +214,7 @@ void SP_ImportSBML2sPn::getSpecies()
 
 			l_pcNode->ShowOnCanvas(m_pcCanvas, FALSE, 50, yComRea,0);
 
-			g_CompoundList.push_back(l_pcNode);
+			m_Species.insert(std::make_pair(l_speciesId,l_pcNode));
 		}
     }
 }
@@ -285,7 +285,7 @@ void SP_ImportSBML2sPn::getEvents()
 					l_comment << wxT("EventAssignment ") << (k+1)
 						<< wxT(": ") << variable << wxT(" = ") << formula << wxT("\n");
 
-					SP_DS_Node* l_pcPlace = existInCompoundList(variable);
+					SP_DS_Node* l_pcPlace = getSpeciesNode(variable);
 					if(l_pcPlace)
 					{
 						drawEdge(l_pcPlace, l_pcNode, SP_DS_RESET_EDGE, wxT("0"));
@@ -418,85 +418,78 @@ void SP_ImportSBML2sPn::getReactions ()
 			const ListOfSpeciesReferences* products = l_sbmlReaction->getListOfProducts();
 			const ListOfSpeciesReferences* modifiers = l_sbmlReaction->getListOfModifiers();
 
-			// search in compoundlist
-			SP_ListNode::const_iterator cIt;
-			for (cIt = g_CompoundList.begin(); cIt != g_CompoundList.end(); ++cIt)
+			// get rectants of actual reaction
+			for (unsigned int lor = 0; lor < rectants->size() ; ++lor)
 			{
-				SP_DS_Node* l_pcNode = (*cIt);
-				wxString sId = l_pcNode->GetAttribute(wxT("Name"))->GetValueString();
-				// get rectants of actual reaction
-				for (unsigned int lor = 0; lor < rectants->size() ; ++lor)
+				auto l_sbmlReactant = l_sbmlReaction->getReactant(lor);
+				wxString l_eductName = l_sbmlReactant->getSpecies();
+				auto l_sbmlSpecies = m_sbmlModel->getSpecies(l_eductName);
+				SP_DS_Node* l_pcNode = getSpeciesNode(l_eductName);
+
+				wxString l_stoichiometry =
+						wxString::Format(wxT("%.0f"),l_sbmlReactant->getStoichiometry());
+				drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
+				if(l_sbmlSpecies->getConstant())
 				{
-					auto l_sbmlReactant = l_sbmlReaction->getReactant(lor);
-					wxString l_eductName = l_sbmlReactant->getSpecies();
-					if (sId == l_eductName)
+					drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+				}
+				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
+				{
+					drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+					if(l_sbmlSpecies->getConstant())
 					{
-						wxString l_stoichiometry =
-								wxString::Format(wxT("%.0f"),l_sbmlReactant->getStoichiometry());
-						drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
-						if(l_sbmlReactant->isSetConstant())
-						{
-							drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
-						}
-						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
-						{
-							drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
-							if(l_sbmlReactant->isSetConstant())
-							{
-								drawEdge(l_pcNode,l_revReactionNode,SP_DS_EDGE,l_stoichiometry);
-							}
-						}
+						drawEdge(l_pcNode,l_revReactionNode,SP_DS_EDGE,l_stoichiometry);
 					}
 				}
+			}
 
-				// get products of actual reaction
-				for (unsigned int lop = 0; lop < products->size() ; ++lop)
+			// get products of actual reaction
+			for (unsigned int lop = 0; lop < products->size() ; ++lop)
+			{
+				auto l_sbmlProduct = l_sbmlReaction->getProduct(lop);
+				wxString l_productName = l_sbmlProduct->getSpecies();
+				auto l_sbmlSpecies = m_sbmlModel->getSpecies(l_productName);
+				SP_DS_Node* l_pcNode = getSpeciesNode(l_productName);
+
+				wxString l_stoichiometry =
+						wxString::Format(wxT("%.0f"),l_sbmlProduct->getStoichiometry());
+				drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+				if(l_sbmlSpecies->getConstant())
 				{
-					auto l_sbmlProduct = l_sbmlReaction->getProduct(lop);
-					wxString l_productName = l_sbmlProduct->getSpecies();
-					if (sId == l_productName)
+					drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
+				}
+				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
+				{
+					drawEdge(l_pcNode,l_revReactionNode, SP_DS_EDGE,l_stoichiometry);
+					if(l_sbmlSpecies->getConstant())
 					{
-						wxString l_stoichiometry =
-								wxString::Format(wxT("%.0f"),l_sbmlProduct->getStoichiometry());
-						drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
-						if(l_sbmlProduct->isSetConstant())
-						{
-							drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
-						}
-						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
-						{
-							drawEdge(l_pcNode,l_revReactionNode, SP_DS_EDGE,l_stoichiometry);
-							if(l_sbmlProduct->isSetConstant())
-							{
-								drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
-							}
-						}
-						if(l_sbmlReaction->isSetKineticLaw())
-						{
-							const ASTNode* l_sbmlMath = l_sbmlReaction->getKineticLaw()->getMath();
-							if(existInReactionFormula(l_productName, l_sbmlMath) &&
-								!l_reactionNode->IsTargetOf(l_pcNode))
-							{
-								drawEdge( l_pcNode, l_reactionNode, SP_DS_MODIFIER_EDGE, wxT("0"));
-							}
-						}
+						drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
 					}
 				}
-
-				// get modifiers of actual reaction
-				for (unsigned int lom = 0; lom < modifiers->size() ; ++lom)
+				if(l_sbmlReaction->isSetKineticLaw())
 				{
-					auto l_sbmlModifier = l_sbmlReaction->getModifier(lom);
-					wxString l_modifierName = l_sbmlModifier->getSpecies();
-					if (sId == l_modifierName)
+					const ASTNode* l_sbmlMath = l_sbmlReaction->getKineticLaw()->getMath();
+					if(existInReactionFormula(l_productName, l_sbmlMath) &&
+						!l_reactionNode->IsTargetOf(l_pcNode))
 					{
-						wxString l_stoichiometry = wxT("0"); // no info about in sbml
-						drawEdge( l_pcNode, l_reactionNode, SP_DS_MODIFIER_EDGE, l_stoichiometry);
-						if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
-						{
-							drawEdge(l_pcNode, l_revReactionNode,SP_DS_MODIFIER_EDGE,l_stoichiometry);
-						}
+						drawEdge( l_pcNode, l_reactionNode, SP_DS_MODIFIER_EDGE, wxT("0"));
 					}
+				}
+			}
+
+			// get modifiers of actual reaction
+			for (unsigned int lom = 0; lom < modifiers->size() ; ++lom)
+			{
+				auto l_sbmlModifier = l_sbmlReaction->getModifier(lom);
+				wxString l_modifierName = l_sbmlModifier->getSpecies();
+				auto l_sbmlSpecies = m_sbmlModel->getSpecies(l_modifierName);
+				SP_DS_Node* l_pcNode = getSpeciesNode(l_modifierName);
+
+				wxString l_stoichiometry = wxT("0"); // no info about in sbml
+				drawEdge( l_pcNode, l_reactionNode, SP_DS_MODIFIER_EDGE, l_stoichiometry);
+				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
+				{
+					drawEdge(l_pcNode, l_revReactionNode,SP_DS_MODIFIER_EDGE,l_stoichiometry);
 				}
 			}
 		}

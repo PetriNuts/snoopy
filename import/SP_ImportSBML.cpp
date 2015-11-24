@@ -119,34 +119,24 @@ SP_ImportSBML::getSBMLCompartmentName(Compartment* p_Compartment, wxString& p_Id
 	return ret;
 }
 
-
-// search in compoundlist
-SP_DS_Node* SP_ImportSBML::existInCompoundList(const wxString& searchName)
+SP_DS_Node* SP_ImportSBML::getSpeciesNode(const wxString& searchName)
 {
-	SP_ListNode::const_iterator speciesIt;
-	for (speciesIt = g_CompoundList.begin(); speciesIt != g_CompoundList.end(); ++speciesIt)
+	auto speciesIt = m_Species.find(searchName);
+	if (speciesIt != std::end(m_Species))
 	{
-		wxString speciesName = (*speciesIt)->GetAttribute(wxT("Name"))->GetValueString();
-		if (speciesName == searchName)
-		{
-			return (*speciesIt);
-		}
+		return speciesIt->second;
 	}
-	return NULL;
+	return nullptr;
 }
 
-bool SP_ImportSBML::existInReactionList(const wxString& searchName)
+SP_DS_Node* SP_ImportSBML::getReactionNode(const wxString& searchName)
 {
-	SP_ListNode::const_iterator reacIt;
-	for (reacIt = g_ReactionList.begin(); reacIt != g_ReactionList.end(); ++reacIt)
+	auto speciesIt = m_Reactions.find(searchName);
+	if (speciesIt != std::end(m_Reactions))
 	{
-		wxString reacName = (*reacIt)->GetAttribute(wxT("Name"))->GetValueString();
-		if (reacName == searchName)
-		{
-			return true;
-		}
+		return speciesIt->second;
 	}
-	return false;
+	return nullptr;
 }
 
 bool SP_ImportSBML::existInReactionFormula(const wxString& p_sName, const ASTNode* p_sbmlFormula)

@@ -42,11 +42,10 @@ public:
 
 	const ASTNode* getSBMLFormula(ASTNode* p_sbmlFormula);
 
-	SP_DS_Node* existInCompoundList(const wxString& searchName);
+	SP_DS_Node* getSpeciesNode(const wxString& searchName);
+	SP_DS_Node* getReactionNode(const wxString& searchName);
 
-	bool existInReactionList(const wxString& newName);
 	bool existInReactionFormula(const wxString& p_sName, const ASTNode* p_sbmlFormula);
-
 	bool changeInReactionFormula(const wxString& p_sOld, const wxString& p_sNew, ASTNode* p_sbmlFormula);
 
 	bool ValidateSBML(SBMLDocument* p_sbmlDoc);
@@ -54,8 +53,8 @@ public:
 	SP_DS_Graph* m_pcGraph = nullptr;
 	Model* m_sbmlModel = nullptr;
 
-	SP_ListNode g_CompoundList;
-	SP_ListNode g_ReactionList;
+	SP_MapString2Node m_Species;
+	SP_MapString2Node m_Reactions;
 
 	int yComRea;
 	int xPara;
