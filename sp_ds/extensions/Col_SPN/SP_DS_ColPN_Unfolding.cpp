@@ -24,8 +24,8 @@
 
 #include "sp_core/tools/SP_NetUnfolder.h"
 
-#include "sp_core/tools/alphanum.h"
-// alphanumeric comparision of strings
+#include "dssz/extern/alphanum.hpp"
+// alphanumeric comparison of strings
 bool alphanum_comparer::operator() (const wxString& left, const wxString& right) const
 {
   std::string l(left.mbc_str());
