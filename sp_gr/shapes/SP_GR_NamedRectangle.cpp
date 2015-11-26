@@ -93,7 +93,7 @@ SP_GR_NamedRectangle::Draw()
 	}
 
 	double l_iFontSize = size / ( 1.0 + (0.35* (m_shapeName.Len())));
-	m_pcPrimitive->SetFont(wxTheFontList->FindOrCreateFont(l_iFontSize, wxMODERN, wxNORMAL, wxNORMAL));
+	m_pcPrimitive->SetFont(wxTheFontList->FindOrCreateFont(l_iFontSize, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 
 	m_pcPrimitive->AddText(m_shapeName);

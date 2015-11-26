@@ -161,7 +161,7 @@ SP_GPR_Fonts::SetFont(const wxString& p_sNetClass, const wxString& p_sFontType, 
 			// if something went wrong, a default font is used if there isn't already one stored
 			if (!m_mFonts[l_sKey] || !m_mFonts[l_sKey]->IsOk())
 			{
-				m_mFonts[l_sKey] = wxTheFontList->FindOrCreateFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE);
+				m_mFonts[l_sKey] = wxTheFontList->FindOrCreateFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, FALSE);
 			}
 		}
 	}
@@ -179,7 +179,7 @@ SP_GPR_Fonts::GetNormalFont(const wxString& p_sNetClass, const wxString& p_sFont
 			return m_mFonts[l_sKey];
 		}
 	}
-	wxFont* l_pcFont = wxTheFontList->FindOrCreateFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE);
+	wxFont* l_pcFont = wxTheFontList->FindOrCreateFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, FALSE);
 	return l_pcFont;
 }
 
@@ -196,14 +196,14 @@ SP_GPR_Fonts::GetSelectFont(const wxString& p_sNetClass, const wxString& p_sFont
 				l_pcFont->GetPointSize(),
 				l_pcFont->GetFamily(),
 				l_pcFont->GetStyle(),
-				wxBOLD,
+				wxFONTWEIGHT_BOLD,
 				l_pcFont->GetUnderlined(),
 				l_pcFont->GetFaceName()
 				);
 			return  l_pcNewFont;
 		}
 	}
-	l_pcFont = wxTheFontList->FindOrCreateFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxBOLD, FALSE);
+	l_pcFont = wxTheFontList->FindOrCreateFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, FALSE);
 	return l_pcFont;
 }
 
@@ -219,7 +219,7 @@ SP_GPR_Fonts::GetItalicFont(const wxString& p_sNetClass, const wxString& p_sFont
 			wxFont* l_pcNewFont = wxTheFontList->FindOrCreateFont(
 				l_pcFont->GetPointSize(),
 				l_pcFont->GetFamily(),
-				wxITALIC,
+				wxFONTSTYLE_ITALIC,
 				l_pcFont->GetWeight(),
 				l_pcFont->GetUnderlined(),
 				l_pcFont->GetFaceName()
@@ -227,7 +227,7 @@ SP_GPR_Fonts::GetItalicFont(const wxString& p_sNetClass, const wxString& p_sFont
 			return  l_pcNewFont;
 		}
 	}
-	l_pcFont = wxTheFontList->FindOrCreateFont(8, wxFONTFAMILY_MODERN, wxITALIC, wxNORMAL, FALSE);
+	l_pcFont = wxTheFontList->FindOrCreateFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL, false);
 	return l_pcFont;
 }
 

@@ -83,7 +83,7 @@ SP_GR_ExtendedParameterCondition::Draw()
 	{
 		size = l_nX;
 	}
-	m_pcPrimitive->SetFont(wxTheFontList->FindOrCreateFont(l_nY, wxMODERN, wxNORMAL, wxNORMAL));
+	m_pcPrimitive->SetFont(wxTheFontList->FindOrCreateFont(l_nY, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	m_pcPrimitive->AddText(wxT(""));
 	m_pcPrimitive->CalculateSize();
