@@ -207,6 +207,8 @@ SP_GPR_Canvas::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage 
 				wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SP_GRID_SIZE_MIN, SP_GRID_SIZE_MAX, GetGridSize(p_sNetClass));
 		elemsizer->Add(m_scGridSize);
 		l_pcSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM, 10);
+		//TODO: grid size hidden, not needed anymore
+		elemsizer->Show(false);
 
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		elemsizer->Add(new wxStaticText(p_pcPage, -1, wxString::Format(wxT("Window size X (%d...%d): "), 100, 10000)), 0,
