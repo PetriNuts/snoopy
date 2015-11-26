@@ -644,6 +644,7 @@ bool SP_ColoredNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
 					l_sMarking = l_pcNode->GetAttribute(wxT("Marking"))->GetValueString();
 				}
 				dsszmc::aux::replaceAll(l_sMarking, "all()", "all");
+				dsszmc::aux::replaceAll(l_sMarking, "auto()", "auto");
 				dsszmc::aux::replaceAll(l_sMarking, "<>", "!=");
 				auto p = std::make_shared<dsszmc::andl::Place>(l_Type, l_sName, l_sMarking, l_sColorset);
 				b.addPlace(p);
@@ -711,6 +712,7 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcEdge->GetAttribute(SP_DS_CPN_INSCRIPTION));
 					std::string l_sInscr = l_pcColList->GetActiveCellValue(1);
 					dsszmc::aux::replaceAll(l_sInscr, "all()", "all");
+					dsszmc::aux::replaceAll(l_sInscr, "auto()", "auto");
 					dsszmc::aux::replaceAll(l_sInscr, "<>", "!=");
 
 					auto u = make_shared<dsszmc::andl::Update>(l_sTarget, '+', l_sInscr);
@@ -724,6 +726,7 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcEdge->GetAttribute(SP_DS_CPN_INSCRIPTION));
 					std::string l_sInscr = l_pcColList->GetActiveCellValue(1);
 					dsszmc::aux::replaceAll(l_sInscr, "all()", "all");
+					dsszmc::aux::replaceAll(l_sInscr, "auto()", "auto");
 					dsszmc::aux::replaceAll(l_sInscr, "<>", "!=");
 
 					if(l_pcEdge->GetClassName() == SP_DS_EDGE)
