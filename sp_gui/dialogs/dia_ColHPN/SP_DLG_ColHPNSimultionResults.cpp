@@ -1144,8 +1144,22 @@ void SP_DLG_ColHPNSimultionResults::LoadParameters()
 	SP_VectorString l_asParameterNames;
 	SP_VectorDouble l_anParameterValue;
 
-	   l_anParameterValue.clear();
-	   l_asParameterNames.clear();
+	auto l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
+	auto l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+	l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
+	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+	{
+		wxString l_sName = l_pcColList->GetCell(i,0);
+		wxString l_sType = l_pcColList->GetCell(i,1);
+		wxString l_sConstantvalue = l_pcColList->GetCell(i,2);
+		if(l_sType == wxT("int"))
+		{
+			l_asParameterNames.push_back(l_sName);
+			double l_nValue;
+			l_sConstantvalue.ToDouble(&l_nValue);
+			l_anParameterValue.push_back(l_nValue);
+		}
+	}
 
 	 //Go through all the transition nodes
 	 for(l_itElem=l_pcNodeclass->GetElements()->begin();l_itElem!=l_pcNodeclass->GetElements()->end();l_itElem++)

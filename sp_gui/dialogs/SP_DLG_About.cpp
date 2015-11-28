@@ -53,7 +53,7 @@ SP_DLG_About::SP_DLG_About (wxWindow *p_pcParent, int p_nMilliseconds)
     wxBoxSizer *l_pcTotalpane = new wxBoxSizer (wxVERTICAL);
     l_pcTotalpane->Add (0, 10);
     wxStaticText *l_pcAppname = new wxStaticText(this, wxID_ANY, SP_APP_LONG_NAME);
-    l_pcAppname->SetFont (wxFont (16, wxDEFAULT, wxNORMAL, wxBOLD));
+    l_pcAppname->SetFont (wxFont (16, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
     l_pcTotalpane->Add (l_pcAppname, 0, wxALIGN_CENTER | wxLEFT | wxRIGHT, 40);
     l_pcTotalpane->Add (0, 10);
 	l_pcTotalpane->Add (new wxStaticText(this, wxID_ANY, SP_APP_DESCRIPTION),
