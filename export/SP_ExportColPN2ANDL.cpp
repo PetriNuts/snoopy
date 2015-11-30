@@ -368,9 +368,9 @@ bool SP_ExportColPN2ANDL::WriteArcs(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unf
 					p_sConditions << l_sSep;
 				}
 				p_sConditions << wxT("[");
-				p_sConditions << l_sMult;
-				p_sConditions << wxT(" <= ");
 				p_sConditions << l_sName;
+				p_sConditions << wxT(" >= ");
+				p_sConditions << l_sMult;
 				p_sConditions << wxT("]");
 			}
 			else if(l_sArcType == SP_DS_INHIBITOR_EDGE )
