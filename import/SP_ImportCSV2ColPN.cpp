@@ -8,6 +8,7 @@
 #include "sp_ds/extensions/SP_DS_Coarse.h"
 #include "sp_ds/attributes/SP_DS_IdAttribute.h"
 #include "sp_ds/attributes/SP_DS_TextAttribute.h"
+#include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include "sp_gui/management/SP_GM_Docmanager.h"
 #include "sp_gui/management/SP_GM_DocTemplate.h"
 #include "sp_gui/windows/SP_GUI_Childframe.h"
@@ -106,6 +107,12 @@ bool SP_ImportCSV2ColPN::Parse(wxTextFile& p_cFile)
 		if( l_sDeclType == wxT("Function") )
 			g_bError = !ParseFunction(l_sLine);
 			
+		if( l_sDeclType == wxT("Place") )
+			g_bError = !ParsePlace(l_sLine);
+
+		if( l_sDeclType == wxT("Transition") )
+			g_bError = !ParseTransition(l_sLine);
+
 	}
 
 	if (g_bError)
@@ -291,6 +298,146 @@ bool SP_ImportCSV2ColPN::ParseFunction(wxString& p_sLine)
 	return true;
 }
 
+bool SP_ImportCSV2ColPN::ParsePlace(wxString& p_sLine)
+{
+	wxString l_sLine = p_sLine;
+	wxStringTokenizer l_cST(l_sLine,wxT(" \n\r\t"),wxTOKEN_STRTOK);
 
+	l_cST.GetNextToken(); //ignore the first token: place
+	wxString l_sName = l_cST.GetNextToken();
+	l_cST.GetNextToken(); //ignore the = operator
+	wxString l_sColourset = l_cST.GetNextToken();
+	l_cST.GetNextToken(); //ignore with
+	wxString l_sTokens = l_cST.GetNextToken();
+	l_sTokens = l_sTokens.BeforeLast(wxT(';'));
+
+	SP_VectorString l_Nodeclasses = {SP_DS_DISCRETE_PLACE, SP_DS_CONTINUOUS_PLACE};
+	for(auto l_sNC : l_Nodeclasses)
+	{
+		SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(l_sNC);
+		if(!l_pcNodeclass)
+			continue;
+		for(SP_DS_Node* l_pcNode : *(l_pcNodeclass->GetElements()))
+		{
+			SP_DS_NameAttribute* l_pcAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME));
+			if(l_pcAttr && l_sName == l_pcAttr->GetValue())
+			{
+				SP_DS_Attribute* l_pcCSAttr = l_pcNode->GetAttribute(SP_DS_CPN_COLORSETNAME);
+				if(l_pcCSAttr)
+				{
+					l_pcCSAttr->SetValueString(l_sColourset);
+				}
+
+				SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
+				if(l_pcColList)
+				{
+					l_pcColList->Clear();
+					size_t i = 0;
+					size_t p = l_sTokens.find(wxT("++"));
+					while( i != wxString::npos)
+					{
+						wxString l_sToken = l_sTokens.substr(i,p-i);
+						unsigned int l_nNewRow = l_pcColList->AppendEmptyRow();
+
+						l_pcColList->SetCell(l_nNewRow,0,l_sToken.After('`'));
+						l_pcColList->SetCell(l_nNewRow,1,l_sToken.Before('`'));
+
+						i = (p != wxString::npos ? p+2 : p);
+						p = l_sTokens.find(wxT("++"), i);
+					}
+				}
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool SP_ImportCSV2ColPN::ParseTransition(wxString& p_sLine)
+{
+	wxString l_sLine = p_sLine;
+	wxStringTokenizer l_cST(l_sLine,wxT(" \n\r\t"),wxTOKEN_STRTOK);
+
+	l_cST.GetNextToken(); //ignore the first token: place
+	wxString l_sName = l_cST.GetNextToken();
+	l_cST.GetNextToken(); //ignore the = operator
+	wxString l_sGuard = l_cST.GetNextToken();
+	l_cST.GetNextToken(); //ignore with
+	wxString l_sRatefunctions = l_cST.GetNextToken();
+	l_sRatefunctions = l_sRatefunctions.BeforeLast(wxT(';'));
+
+	SP_VectorString l_Nodeclasses = {SP_DS_STOCHASTIC_TRANS, SP_DS_CONTINUOUS_TRANS, SP_DS_IMMEDIATE_TRANS, SP_DS_DETERMINISTIC_TRANS, SP_DS_SCHEDULED_TRANS};
+	for(auto l_sNC : l_Nodeclasses)
+	{
+		SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(l_sNC);
+		if(!l_pcNodeclass)
+			continue;
+		for(SP_DS_Node* l_pcNode : *(l_pcNodeclass->GetElements()))
+		{
+			SP_DS_NameAttribute* l_pcAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME));
+			if(l_pcAttr && l_sName == l_pcAttr->GetValue())
+			{
+				SP_DS_ColListAttribute* l_pcColList;
+				l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNode->GetAttribute(SP_DS_CPN_GUARDLIST));
+				if(l_pcColList)
+				{
+					l_pcColList->Clear();
+					unsigned int l_nNewRow = l_pcColList->AppendEmptyRow();
+
+					l_pcColList->SetCell(l_nNewRow,0,wxT("Main"));
+					l_pcColList->SetCell(l_nNewRow,1,l_sGuard);
+				}
+
+				if(l_sNC == SP_DS_DETERMINISTIC_TRANS)
+				{
+					l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNode->GetAttribute(wxT("DelayList")));
+				}
+				else if(l_sNC == SP_DS_SCHEDULED_TRANS)
+				{
+					l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNode->GetAttribute(wxT("PeriodicList")));
+				}
+				else
+				{
+					l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNode->GetAttribute(SP_DS_CPN_RATEFUNCTIONLIST));
+				}
+
+				if(l_pcColList)
+				{
+					l_pcColList->Clear();
+					size_t i = 0;
+					size_t p = l_sRatefunctions.find(wxT("++"));
+					while( i != wxString::npos)
+					{
+						wxString l_sRF = l_sRatefunctions.substr(i,p-i);
+						unsigned int l_nNewRow = l_pcColList->AppendEmptyRow();
+
+						if(l_sRF.StartsWith(wxT("[")))
+						{
+							wxString l_sGuard = l_sRF.BeforeFirst(']');
+							l_pcColList->SetCell(l_nNewRow,0,l_sGuard.AfterFirst('['));
+							l_sRF = l_sRF.AfterFirst(']');
+						}
+						if(l_sNC == SP_DS_SCHEDULED_TRANS)
+						{
+							l_pcColList->SetCell(l_nNewRow,1,l_sRF.BeforeFirst(','));
+							l_pcColList->SetCell(l_nNewRow,2,l_sRF.AfterFirst(',').BeforeFirst(','));
+							l_pcColList->SetCell(l_nNewRow,3,l_sRF.AfterLast(','));
+						}
+						else
+						{
+							l_pcColList->SetCell(l_nNewRow,1,l_sRF);
+						}
+
+
+						i = (p != wxString::npos ? p+2 : p);
+						p = l_sRatefunctions.find(wxT("++"), i);
+					}
+				}
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 

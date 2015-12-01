@@ -37,8 +37,8 @@ class SP_ImportCSV2ColPN: public SP_ImportRoutine,
 	bool ParseConstant(wxString& p_sLine);
 	bool ParseVariable(wxString& p_sLine);
 	bool ParseFunction(wxString& p_sLine);
-
-
+	bool ParsePlace(wxString& p_sLine);
+	bool ParseTransition(wxString& p_sLine);
 
 
 	 long g_nIndex;

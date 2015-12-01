@@ -17,7 +17,6 @@ class SP_ImportCSV: public SP_ImportRoutine, public SP_Error
 private:
 	SP_DS_Graph* m_pcGraph;
 	wxString m_sClassname;
-	spsim::Simulator* m_pcSimulator;
 	wxString m_Separator;
 	wxArrayString m_ArrayString;
 	SP_MapString2ULong m_Place2Id;
