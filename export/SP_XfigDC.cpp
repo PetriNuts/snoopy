@@ -239,8 +239,8 @@ int SP_XfigDCImpl::GetXfigPColor()
 
 int SP_XfigDCImpl::GetXfigFColor()
 {
-  if (m_brush.GetStyle() != wxTRANSPARENT &&
-      m_brush.GetStyle() != wxSOLID) return XFIG_COLOR_WHITE;
+  if (m_brush.GetStyle() != wxBRUSHSTYLE_TRANSPARENT &&
+      m_brush.GetStyle() != wxBRUSHSTYLE_SOLID) return XFIG_COLOR_WHITE;
 
   if (m_brush.GetColour() == *wxWHITE) return XFIG_COLOR_WHITE;
   if (m_brush.GetColour() == *wxBLACK) return XFIG_COLOR_BLACK;
@@ -292,12 +292,12 @@ int SP_XfigDCImpl::GetXfigFont()
     break;
   }
 
-  if (m_font.GetStyle() == wxITALIC) {
+  if (m_font.GetStyle() == wxFONTSTYLE_ITALIC) {
     res = 3; // italic
     SP_LOGDEBUG(wxT("Font set to italic (3)"));
   }
 
-  if (m_font.GetWeight() == wxBOLD) {
+  if (m_font.GetWeight() == wxFONTWEIGHT_BOLD) {
     res = 2; // bold
     SP_LOGDEBUG(wxT("Font set to bold (2)"));
   }
@@ -435,8 +435,8 @@ void SP_XfigDCImpl::DoDrawEllipse (wxCoord x, wxCoord y, wxCoord width, wxCoord 
   //			 width, height));
   wxCHECK_RET( m_ok && m_pstream, wxT("invalid xfig dc") );
 
-  if (m_brush.GetStyle() != wxTRANSPARENT ||
-      m_pen.GetStyle() != wxTRANSPARENT) {
+  if (m_brush.GetStyle() != wxBRUSHSTYLE_TRANSPARENT ||
+      m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT) {
     wxFprintf (m_pstream, wxT("%d"), XFIG_ELLIPSE);
     if (width == height) {
       wxFprintf (m_pstream, wxT(" 2")); // circle defined by radius
@@ -480,8 +480,8 @@ void SP_XfigDCImpl::DoDrawArc (wxCoord x1, wxCoord y1, wxCoord x2,
 //				 y2, xc,  yc));
   wxCHECK_RET( m_ok && m_pstream, wxT("invalid xfig dc") );
 
-  if (m_brush.GetStyle () != wxTRANSPARENT ||
-      m_pen.GetStyle () != wxTRANSPARENT) {
+  if (m_brush.GetStyle () != wxBRUSHSTYLE_TRANSPARENT ||
+      m_pen.GetStyle () != wxPENSTYLE_TRANSPARENT) {
     wxFprintf (m_pstream, wxT("%d"), XFIG_ARC);
     wxFprintf (m_pstream, wxT(" 1")); // open ended arc
     wxFprintf (m_pstream, wxT(" %d"), GetXfigLStyle());
@@ -525,7 +525,7 @@ void SP_XfigDCImpl::DoDrawRotatedText( const wxString& text, wxCoord x,
 {
 //  SP_LOGDEBUG(wxString::Format(wxT("DoDrawRotatedText %s %d %d %f"),
 //				 text.c_str(), x, y, angle));
-  if (m_pen.GetStyle () != wxTRANSPARENT) {
+  if (m_pen.GetStyle () != wxPENSTYLE_TRANSPARENT) {
 
     wxCHECK_RET( m_ok && m_pstream, wxT("invalid xfig dc") );
 
@@ -557,7 +557,7 @@ void SP_XfigDCImpl::DoDrawLines (int n, const wxPoint points[],
 // 		n, xoffset, yoffset));
     wxCHECK_RET( m_ok && m_pstream, wxT("invalid xfig dc") );
 
-  if (m_pen.GetStyle () != wxTRANSPARENT) {
+  if (m_pen.GetStyle () != wxPENSTYLE_TRANSPARENT) {
     wxFprintf (m_pstream, wxT("%d"), XFIG_POLYLINE);
     wxFprintf (m_pstream, wxT(" 1")); // polyline
     wxFprintf (m_pstream, wxT(" %d"), GetXfigLStyle());
@@ -614,7 +614,7 @@ void SP_XfigDCImpl::DoDrawPolygon (int n, const wxPoint points[],
   wxCHECK_RET( m_ok && m_pstream, wxT("invalid xfig dc") );
 
 
-  if (m_pen.GetStyle() != wxTRANSPARENT &&
+  if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT &&
       m_pen.GetColour() != *wxWHITE) {
     wxFprintf (m_pstream, wxT("%d"), XFIG_POLYLINE);
     wxFprintf (m_pstream, wxT(" 3")); // polygon
@@ -702,7 +702,7 @@ void SP_XfigDCImpl::DoDrawRoundedRectangle (wxCoord x, wxCoord y,
   wxCHECK_RET( m_ok && m_pstream, wxT("invalid xfig dc") );
 
 
-  if (m_pen.GetStyle () != wxTRANSPARENT) {
+  if (m_pen.GetStyle () != wxPENSTYLE_TRANSPARENT) {
     wxFprintf (m_pstream, wxT("%d"), XFIG_POLYLINE);
     wxFprintf (m_pstream, wxT(" 4")); // polygon
     wxFprintf (m_pstream, wxT(" %d"), GetXfigLStyle());

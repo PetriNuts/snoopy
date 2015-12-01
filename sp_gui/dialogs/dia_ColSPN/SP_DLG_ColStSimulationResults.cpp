@@ -775,8 +775,6 @@ void SP_DLG_ColStSimulationResults::AddNewMarkingSet(const wxString& p_sMarkingS
 	SP_DS_ColListAttribute* l_pcColList;
 	SP_ListNode::const_iterator l_itElem;
 
-	SP_VectorDouble::const_iterator l_itCol = l_nCurrentTableRow.begin();
-
 	//Continuous places
 	SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
 

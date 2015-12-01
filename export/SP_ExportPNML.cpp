@@ -339,7 +339,8 @@ SP_ExportPNML::WriteText(const wxString& p_sText, wxXmlNode* p_pcRoot)
     CHECK_POINTER(p_pcRoot, return FALSE);
 
     wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("text"));
-    wxXmlNode* l_pcText = new wxXmlNode(l_pcElem, wxXML_TEXT_NODE, wxT(""), p_sText);
+    //wxXmlNode* l_pcText =
+    		new wxXmlNode(l_pcElem, wxXML_TEXT_NODE, wxT(""), p_sText);
     p_pcRoot->AddChild(l_pcElem);
 
 	return true;

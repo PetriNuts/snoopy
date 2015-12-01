@@ -16,9 +16,6 @@ class SP_ExportColStPN2ColExPN:  public SP_ExportRoutine, private SP_XmlWriter
  private:
 	 long m_nTransitionNumber;
 	 wxXmlNode* m_pcTransitionNodeclass;
-	 wxXmlNode* m_pcEdgeclass;
-
-	 bool m_changeColour;
      wxString m_edgeClass;
 
  protected:

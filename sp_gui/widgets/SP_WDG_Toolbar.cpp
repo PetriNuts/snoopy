@@ -16,8 +16,7 @@ SP_WDG_Toolbar::SP_WDG_Toolbar(SP_GUI_Mainframe* p_pcParent,
                                const wxSize& p_cSize, 
                                const long p_nStyle, 
                                const wxString& p_sName)
-:wxToolBar(p_pcParent, p_nId, p_cPos, p_cSize, p_nStyle, p_sName),
-m_pcMainframe(p_pcParent)
+:wxToolBar(p_pcParent, p_nId, p_cPos, p_cSize, p_nStyle, p_sName)
 {
 
 }

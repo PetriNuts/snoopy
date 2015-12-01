@@ -27,7 +27,6 @@ class SP_DLG_StTransformation : public wxDialog
     wxWindow* m_pcParent;
 
     wxBoxSizer* m_pcSizer;
-    wxStaticText* m_pcError;
 
     wxGrid* m_pcFunctionGrid;
 

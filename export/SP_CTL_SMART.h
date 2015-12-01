@@ -32,7 +32,6 @@ class SP_CTL_SMART
 	wxArrayString Get_CTL_grammar();
 
 	
-	long CTL_Tokenpos;
 	//CTL-Transform
 	bool Transform_Token_ADDandrule(TreeNode* root);
 	bool Transform_Token_CTL_formula1(TreeNode* root);

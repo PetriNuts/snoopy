@@ -26,7 +26,6 @@ class SP_DLG_StMarkingOverview : public wxDialog
     wxWindow* m_pcParent;
 
     wxBoxSizer* m_pcSizer;
-    wxStaticText* m_pcError;
 
     wxGrid* m_pcMarkingGrid;
 

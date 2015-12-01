@@ -34,6 +34,10 @@ SP_DS_PlotViewer::SP_DS_PlotViewer(wxWindow *p_pcParent, wxSizer *p_pcSizer)
           m_nLegendVerticalPosition(wxCENTER),
           m_sXAxisTitle(wxT("")),
           m_sYAxisTitle(wxT("")),
+          m_ChartWidth(wxT("600")),
+          m_ChartHeight(wxT("600")),
+          m_WindowWidth(wxT("600")),
+          m_WindowHeight(wxT("600")),
           m_bShowXAxis(true),
           m_bShowYAxis(true),
           m_nCurveOrder(0),
@@ -42,11 +46,8 @@ SP_DS_PlotViewer::SP_DS_PlotViewer(wxWindow *p_pcParent, wxSizer *p_pcSizer)
           m_nMinXValue(0),
           m_nMaxXValue(1),
           m_nMinYValue(0),
-          m_nMaxYValue(1),
-          m_ChartHeight(wxT("600")),
-          m_ChartWidth(wxT("600")),
-          m_WindowHeight(wxT("600")),
-          m_WindowWidth(wxT("600")) {
+          m_nMaxYValue(1)
+{
     SP_DS_ViewerAttribute *l_pcAttribute;
 
     SP_DS_ViewerAttributeText *l_pcTextAttribute = new SP_DS_ViewerAttributeText(wxT("WINDOW_WIDTH"), wxT("General"),

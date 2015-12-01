@@ -15,7 +15,6 @@ class SP_ExportColCPN2ColHPN:  public SP_ExportRoutine, private SP_XmlWriter
 
  private:
 	 wxString m_edgeClass;
-	 bool m_changeColour;
 
  protected:
 

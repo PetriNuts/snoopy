@@ -16,7 +16,7 @@
 class SP_WDG_Toolbar: public wxToolBar
 {
 private:
-	SP_GUI_Mainframe* m_pcMainframe;
+	//SP_GUI_Mainframe* m_pcMainframe;
 protected:
 public:
     SP_WDG_Toolbar(

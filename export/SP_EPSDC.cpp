@@ -154,8 +154,8 @@ SP_EPSDCImpl::SetBrush( const wxBrush& brush )
   // we will have to implement them, at the moment just
   // set color to light gray if fill style is not wxTRANSPARENT
   // or wxSOLID it prevents from drawin black filled shapes
-  if (brush.GetStyle() != wxTRANSPARENT &&
-      brush.GetStyle() != wxSOLID &&
+  if (brush.GetStyle() != wxBRUSHSTYLE_TRANSPARENT &&
+      brush.GetStyle() != wxBRUSHSTYLE_SOLID &&
       brush.GetColour() == *wxBLACK)
   {
     wxBrush t = brush;
@@ -182,7 +182,7 @@ SP_EPSDCImpl::CalcBoundingBox(wxCoord x, wxCoord y)
 void
 SP_EPSDCImpl::DoDrawBitmap(const wxBitmap& bitmap, wxCoord x, wxCoord y, bool useMask)
 {
-    if (m_pen.GetStyle() == wxTRANSPARENT) return;
+    if (m_pen.GetStyle() == wxPENSTYLE_TRANSPARENT) return;
 
     wxPostScriptDCImpl::DoDrawBitmap(bitmap, x, y, useMask);
     CalcBoundingBox(x, y);
@@ -192,7 +192,7 @@ SP_EPSDCImpl::DoDrawBitmap(const wxBitmap& bitmap, wxCoord x, wxCoord y, bool us
 void
 SP_EPSDCImpl::DoDrawText( const wxString& text, wxCoord x, wxCoord y )
 {
-    if (m_pen.GetStyle() == wxTRANSPARENT) return;
+    if (m_pen.GetStyle() == wxPENSTYLE_TRANSPARENT) return;
 
 	wxPostScriptDCImpl::DoDrawText(text, x, y);
 	int l_nSize = m_font.GetPointSize();
@@ -203,7 +203,7 @@ SP_EPSDCImpl::DoDrawText( const wxString& text, wxCoord x, wxCoord y )
 void
 SP_EPSDCImpl::DoDrawEllipse (wxCoord x, wxCoord y, wxCoord width, wxCoord height)
 {
-    if (m_pen.GetStyle() == wxTRANSPARENT) return;
+    if (m_pen.GetStyle() == wxPENSTYLE_TRANSPARENT) return;
 
   wxPostScriptDCImpl::DoDrawEllipse(x, y, width, height);
   CalcBoundingBox(x - width - m_pen.GetWidth(),
@@ -216,7 +216,7 @@ SP_EPSDCImpl::DoDrawEllipse (wxCoord x, wxCoord y, wxCoord width, wxCoord height
 void
 SP_EPSDCImpl::DoDrawRectangle (wxCoord x, wxCoord y, wxCoord width, wxCoord height)
 {
-    if (m_pen.GetStyle() == wxTRANSPARENT) return;
+    if (m_pen.GetStyle() == wxPENSTYLE_TRANSPARENT) return;
 
   wxPostScriptDCImpl::DoDrawRectangle(x, y, width, height);
   CalcBoundingBox(x - m_pen.GetWidth(),
@@ -228,7 +228,7 @@ SP_EPSDCImpl::DoDrawRectangle (wxCoord x, wxCoord y, wxCoord width, wxCoord heig
 void SP_EPSDCImpl::DoDrawRoundedRectangle (wxCoord x, wxCoord y, wxCoord width,
 				       wxCoord height, double radius)
 {
-    if (m_pen.GetStyle() == wxTRANSPARENT) return;
+    if (m_pen.GetStyle() == wxPENSTYLE_TRANSPARENT) return;
 
   wxPostScriptDCImpl::DoDrawRoundedRectangle(x, y, width, height, radius);
   CalcBoundingBox(x - m_pen.GetWidth(),
@@ -241,16 +241,16 @@ void SP_EPSDCImpl::DoDrawRoundedRectangle (wxCoord x, wxCoord y, wxCoord width,
 
 void SP_EPSDCImpl::DoDrawSpline(const wxPointList *points)
 {
-    if (m_pen.GetStyle() == wxTRANSPARENT) return;
+    if (m_pen.GetStyle() == wxPENSTYLE_TRANSPARENT) return;
 
     wxPostScriptDCImpl::DoDrawSpline(points);
 }
 
 void SP_EPSDCImpl::DoDrawPolygon (int n, wxPoint points[], wxCoord xoffset, wxCoord yoffset, wxPolygonFillMode fillStyle)
 {
-    if (m_pen.GetStyle() == wxTRANSPARENT) return;
+    if (m_pen.GetStyle() == wxPENSTYLE_TRANSPARENT) return;
 
-    int l_nStyle = m_pen.GetStyle();
+    auto l_nStyle = m_pen.GetStyle();
     //m_pen.SetStyle(wxTRANSPARENT);
 
 	wxPostScriptDCImpl::DoDrawPolygon (n, points, xoffset, yoffset, fillStyle);

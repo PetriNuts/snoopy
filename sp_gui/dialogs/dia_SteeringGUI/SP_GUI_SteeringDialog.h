@@ -118,8 +118,6 @@ private:
 	wxTextCtrl* m_pcEndOutputPointTxtCtrl;
 	wxTextCtrl* m_pcSamplingPointSizeTxtCtrl;
 
-	wxButton* m_pcChangeViewBtnCtrl;
-
 	wxSizer*  m_pcOutputSizer;
 
 	wxBoxSizer* m_pcMainSizer;

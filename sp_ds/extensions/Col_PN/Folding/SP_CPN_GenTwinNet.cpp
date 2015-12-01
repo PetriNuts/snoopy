@@ -573,7 +573,6 @@ bool SP_CPN_GenTwinNet::GenerateNewNet()
 			m_lShapes.push_back(l_pcNewGr);
 
 			//Add an edge
-			SP_ListGraphic::const_iterator l_itGrSource = l_pcNewFusionNode->GetGraphics()->begin();
 			SP_DS_Edgeclass* l_pcREC = m_pcGraph->GetEdgeclass(wxT("Read Edge"));
 			SP_DS_Edge* l_pcOldEdge = *(l_pcREC->GetElements()->begin());
 			SP_DS_Edge* l_pcNewEdge2 = l_pcOldEdge->Clone();					

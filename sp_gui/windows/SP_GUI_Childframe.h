@@ -51,8 +51,6 @@ private:
     wxMenu* m_pcElementsMenu;
 	wxMenu* m_pcExtrasMenu;
 
-	SP_MDI_Doc* m_pcDoc;
-
 protected:
     void Init();
 

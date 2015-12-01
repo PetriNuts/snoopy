@@ -22,9 +22,6 @@ class SP_ExportColPT2Structure: public SP_XmlWriter, public SP_ExportRoutine
 
 private:
 
-	SP_DS_ColListAttribute* m_pcColList;
-	SP_DS_TextAttribute* m_pcNameAttibute;
-
 	wxString m_sNetClassName;
  
   protected:

@@ -27,7 +27,6 @@ class SP_DLG_ColStFunctionOverview : public wxDialog
 	 SP_DS_Nodeclass* m_pcNodeclass;
 
     wxBoxSizer* m_pcSizer;
-    wxStaticText* m_pcError;
 
     wxGrid* m_pcFunctionGrid;
 

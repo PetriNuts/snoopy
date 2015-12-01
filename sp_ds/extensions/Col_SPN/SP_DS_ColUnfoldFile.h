@@ -20,7 +20,6 @@ class SP_DS_ColUnfoldFile
 private:
 	 wxFFile m_fFile;
 	 wxString m_fileName;
-	 SP_DS_Graph* m_pcGraph;
 	 SP_DS_ColPN_Unfolding* m_pcColPN_Unfolding;
 
 	 //read

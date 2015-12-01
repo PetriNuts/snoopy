@@ -16,9 +16,6 @@
 class SP_DS_MusTransAnimator: public SP_DS_TransAnimator
 {
 private:
-
-	irrklang::ISoundSource* m_pcSoundFile;
-
 	bool m_bFirstStep;
 
 protected:

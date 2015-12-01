@@ -53,7 +53,7 @@ SP_DS_FTreeCreater::CopyAttributes(SP_DS_Node* sourceNode, SP_DS_Node* copyNode)
 SP_DS_Graph*
 SP_DS_FTreeCreater::CreateDocument()
 {
-	SP_DS_Graph* l_pcGraph;
+	SP_DS_Graph* l_pcGraph = nullptr;
 	SP_GM_Docmanager* l_pcDM = wxGetApp().GetDocmanager();
 
 	wxString netName = SP_DS_FAULTTREE_CLASS;

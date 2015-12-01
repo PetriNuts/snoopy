@@ -131,14 +131,14 @@ bool SP_ExportCUDA::WriteTransitions()
 	l_sStructDelta << wxT("\tbool reset;\n");
 	l_sStructDelta << wxT("\tint val;\n");
 	l_sStructDelta << wxT("};\n");
-	unsigned l_nNumDelta = 0;
+	//unsigned l_nNumDelta = 0;
 	wxString l_sValDelta;
 
 	wxString l_sStructPre = wxT("struct pre = {\n");
 	l_sStructPre << wxT("\tint lower;\n");
 	l_sStructPre << wxT("\tint upper;\n");
 	l_sStructPre << wxT("};\n");
-	unsigned l_nNumPre = 0;
+	//unsigned l_nNumPre = 0;
 	wxString l_sValPre;
 
 	PlaceIdMap::iterator pIt;

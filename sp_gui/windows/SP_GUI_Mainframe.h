@@ -152,9 +152,9 @@ private:
 	SP_WDG_Toolbar* m_pcChildToolbar;
 
     //! Log Window
-    wxTextCtrl* m_pcLogWindow;
+    //wxTextCtrl* m_pcLogWindow;
     //! old log target to be reset on delete in DEBUG
-    wxLog* m_pcOldLogtarget;
+    //wxLog* m_pcOldLogtarget;
 
     // log window for export messages
     SP_GUI_LogWindow* m_pcExpLogWindow;

@@ -19,7 +19,6 @@ class SP_ExportColPN2SBML: public SP_ExportPT
 	wxString m_sNetClass;
 	wxRadioButton* m_pRadioButton1;
 	wxRadioButton* m_pRadioButton2;
-	wxBoxSizer* m_pcMainSizer;
 	int level;
 
 

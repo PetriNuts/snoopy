@@ -372,7 +372,7 @@ const wxString SP_DS_CPN_VARIABLECLASS = wxT("Variable Class");
 const wxString SP_DS_CPN_GUARDLIST = wxT("GuardList");
 const wxString SP_DS_CPN_INSCRIPTION = wxT("ExpressionList");
 const wxString SP_DS_CPN_FUNCTIONCLASS = wxT("Function Class");
-const wxString SP_DS_CPN_RATEFUNCTIONLIST = wxT("Function List");
+const wxString SP_DS_CPN_RATEFUNCTIONLIST = wxT("FunctionList");
 const wxString SP_DS_CPN_AUXILIARVARIABLESCLASS = wxT("Auxiliary Variables Class");
 
 //Continuous - Stochastic Petri Net

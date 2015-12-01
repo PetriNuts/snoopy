@@ -40,8 +40,7 @@ SP_GUI_Childframe::SP_GUI_Childframe(SP_MDI_Doc* p_pcDoc,
     m_pcEditMenu(NULL),
     m_pcViewMenu(NULL),
     m_pcElementsMenu(NULL),
-    m_pcExtrasMenu(NULL),
-	m_pcDoc(p_pcDoc)
+    m_pcExtrasMenu(NULL)
 {
     Bind(wxEVT_MENU, &SP_GUI_Childframe::OnHierarchyGoUp, this, SP_MENU_ITEM_GO_UP);
     Bind(wxEVT_MENU, &SP_GUI_Childframe::OnHierarchyGoToFirstChild, this, SP_MENU_ITEM_GO_FIRST_CHILD);

@@ -306,7 +306,6 @@ SP_Parser::Tokenlist_generate(wxString& data,wxArrayString Tokendef)
 				if(!find_rule)
 				{
 					//error can't find Tokenrule!
-					int abs=1;
 				}
 			}
 			}
@@ -381,9 +380,9 @@ SP_Parser::Tokenlist_RemoveTokentype(TreeNode *liste,wxString Tokentype)
 	bool find=false;
 	TreeNode *h=liste;
 	TreeNode *prev=NULL;
-	TreeNode *next=NULL;
-	TreeNode *parent=NULL;
-	TreeNode* child=NULL;
+	//TreeNode *next=NULL;
+	//TreeNode *parent=NULL;
+	//TreeNode* child=NULL;
 	while(h!=NULL)
 	{
 		if(h->type==Tokentype)
@@ -556,7 +555,6 @@ SP_Parser::Parse(TreeNode *root,TreeNode *parent,wxArrayString grammar,TreeNode*
 	wxString elementtype=parent->type;
 	
 	wxString helement=wxT("");
-	bool correct=false;
 	TreeNode* hroot=NULL;
 	TreeNode* rroot=hroot;
 	
@@ -566,18 +564,19 @@ SP_Parser::Parse(TreeNode *root,TreeNode *parent,wxArrayString grammar,TreeNode*
 	bool k=false;
 	if(parent->type==wxT("wert1"))
 						{
-							int i=1;
 						}
 	//check if wrong way
 	if(TreeToken_count>(Tokenlist_count))
 	{
 		if(Parser_error_TPos<TPos)
-					{
-						TreeNode* t1=Tokenlist_GetElementatPos(Tokenlist,TPos);
-						TreeNode* t2=Tokenlist_GetElementatPos(Tokenlist,TPos,Tokenlist_GetCountElementatPos(Tokenlist,TPos));
-						Parser_error=wxT("Parser error 5 \n more Token needed");// at:'") + t1->data + wxT("' \n at ")+t2->data;
-						Parser_error_TPos=TPos;
-					}
+		{
+			//TreeNode* t1=
+					Tokenlist_GetElementatPos(Tokenlist,TPos);
+			//TreeNode* t2=
+					Tokenlist_GetElementatPos(Tokenlist,TPos,Tokenlist_GetCountElementatPos(Tokenlist,TPos));
+			Parser_error=wxT("Parser error 5 \n more Token needed");// at:'") + t1->data + wxT("' \n at ")+t2->data;
+			Parser_error_TPos=TPos;
+		}
 		return k;
 	}
 	else
@@ -684,8 +683,10 @@ SP_Parser::Parse(TreeNode *root,TreeNode *parent,wxArrayString grammar,TreeNode*
 					//error: Tree has more Token as in Tokenlist
 					if(Parser_error_TPos<TPos)
 					{
-						TreeNode* t1=Tokenlist_GetElementatPos(Tokenlist,TPos);
-						TreeNode* t2=Tokenlist_GetElementatPos(Tokenlist,TPos,Tokenlist_GetCountElementatPos(Tokenlist,TPos));
+						//TreeNode* t1=
+							Tokenlist_GetElementatPos(Tokenlist,TPos);
+						//TreeNode* t2=
+							Tokenlist_GetElementatPos(Tokenlist,TPos,Tokenlist_GetCountElementatPos(Tokenlist,TPos));
 						Parser_error=wxT("Parser error 4 \n more Token needed");// at:'") + t1->data + wxT("' \n at ")+t2->data;
 						Parser_error_TPos=TPos;
 					}

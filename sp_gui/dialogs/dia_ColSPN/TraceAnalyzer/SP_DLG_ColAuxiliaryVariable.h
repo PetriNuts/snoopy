@@ -59,7 +59,6 @@ class SP_DLG_ColAuxiliaryVariable : public wxDialog
 
     wxWindow* m_pcParent;
     wxBoxSizer* m_pcSizer;
-    wxStaticText* m_pcError;
 
    
 	wxGrid* m_pcGrid;
@@ -75,16 +74,10 @@ class SP_DLG_ColAuxiliaryVariable : public wxDialog
 	SP_CPN_ColorSetClass m_ColorSetClass;
 	SP_CPN_ValueAssign m_ValueAssign;
 
-	SP_VectorString* m_pvsColoredPlaceNames;
 	wxArrayString m_ArrayColoredPlaceNames;
 	map<wxString,long> m_mColoredPlNames2Pos;
 
-	map<long, SP_CPN_CountInterval>* m_pnsPlaceCountById;
-	SP_VectorString* m_pvsUnPlaceNames;
-
 	SP_MapString2String m_msColPlName2ColSet;
-	SP_VectorString* m_pvsPlaceColor;
-
 
 	wxString m_sVarName;
 	wxString m_sCurFunction;

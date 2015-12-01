@@ -34,7 +34,6 @@ class SP_FTree_TermScanner: public SP_Error
 private:
 	wxString m_sText;
 
-	int m_nModus;
 	int m_nLastToken;
 	int m_nLastChar;
 	int m_nNoLastToken;

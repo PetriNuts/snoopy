@@ -831,7 +831,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			p_sNetClass.CmpNoCase(SP_DS_FREESTYLE_CLASS) == 0)
 		{
 			m_rbLogicBrush = new wxRadioBox(p_pcPage, -1, wxT("Logical Nodes (affecting all net classes)"), wxDefaultPosition, wxDefaultSize, 2, brushes, 1, wxRA_SPECIFY_ROWS);
-			if (wxGetApp().GetCanvasLogicBrush()->GetStyle() == wxCROSSDIAG_HATCH)
+			if (wxGetApp().GetCanvasLogicBrush()->GetStyle() == wxBRUSHSTYLE_CROSSDIAG_HATCH)
 			{
 				m_rbLogicBrush->SetSelection(1);
 			}

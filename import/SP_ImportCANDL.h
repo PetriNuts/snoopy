@@ -83,7 +83,6 @@ private:
 	////////////////////////Graph Creation////////////////
 	SP_MDI_View* m_pcView;
 	SP_DS_Graph* m_pcGraph;
-	SP_DS_Graph* m_pcNewGraph;
 	SP_GUI_Canvas* m_pcCanvas;
 	SP_MDI_Doc* m_pcMyDoc;
 

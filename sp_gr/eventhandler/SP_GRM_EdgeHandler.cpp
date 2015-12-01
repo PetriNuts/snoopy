@@ -100,7 +100,7 @@ SP_GRM_EdgeHandler::OnSizingBeginDragLeft(wxControlPoint* p_pcCP,
     wxPen *l_pcOldPen = l_pcShape->GetPen();
     wxBrush *l_pcOldBrush = l_pcShape->GetBrush();
 
-    wxPen l_cPen(wxColour(0, 0, 0), 1, wxDOT);
+    wxPen l_cPen(wxColour(0, 0, 0), 1, wxPENSTYLE_DOT);
     l_pcShape->SetPen(&l_cPen);
     l_pcShape->SetBrush(wxTRANSPARENT_BRUSH);
 
@@ -134,7 +134,7 @@ SP_GRM_EdgeHandler::OnSizingDragLeft(wxControlPoint* p_pcCP, bool p_bDraw,
     wxDCOverlay overlaydc(l_pcCanvas->GetOverlay(), &l_cDC);
     overlaydc.Clear();
 
-    wxPen l_cPen(wxColour(0, 0, 0), 1, wxDOT);
+    wxPen l_cPen(wxColour(0, 0, 0), 1, wxPENSTYLE_DOT);
     l_cDC.SetPen(l_cPen);
     l_cDC.SetBrush((* wxTRANSPARENT_BRUSH));
 

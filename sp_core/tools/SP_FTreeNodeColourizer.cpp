@@ -15,9 +15,6 @@
 SP_FTreeNodeColourizer::SP_FTreeNodeColourizer(SP_DS_Graph *p_pcGraph)
 :
 	m_pcMapNodeNum2wxColour(NULL),
-	m_pcGraph(p_pcGraph),
-	m_nodeList(NULL),
-	m_grList(NULL),
 	m_pcAllNodes(NULL)
 
 {

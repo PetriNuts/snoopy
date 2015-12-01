@@ -291,7 +291,7 @@ bool SP_ExportColPN2SBML::WritePlaceClass(std::shared_ptr<SP_DS_ColPN_Unfolding>
 			{
 				l_nMarking = itMap2->second.m_anNetMarkings[l_nCurrentColumn];
 			}
-			else if(l_sNodeType == SP_DS_CONTINUOUS_PLACE)
+			else //if(l_sNodeType == SP_DS_CONTINUOUS_PLACE)
 			{
 				l_nMarking = itMap2->second.m_adNetMarkings[l_nCurrentColumn];
 			}

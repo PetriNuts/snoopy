@@ -482,7 +482,6 @@ void SP_ImportSBML2sPn::getReactions ()
 			{
 				auto l_sbmlModifier = l_sbmlReaction->getModifier(lom);
 				wxString l_modifierName = l_sbmlModifier->getSpecies();
-				auto l_sbmlSpecies = m_sbmlModel->getSpecies(l_modifierName);
 				SP_DS_Node* l_pcNode = getSpeciesNode(l_modifierName);
 
 				wxString l_stoichiometry = wxT("0"); // no info about in sbml

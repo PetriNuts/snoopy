@@ -403,7 +403,6 @@ class SP_CPN_Parse_Variable_Node : public SP_CPN_ParseNode
 private:
 	wxString m_VariableName; 
 	wxString m_String;
-	bool m_bProVarErrorFlag;
     
 public:
    

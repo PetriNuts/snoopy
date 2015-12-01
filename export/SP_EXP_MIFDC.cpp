@@ -260,7 +260,7 @@ int SP_EXP_MIFDCImpl::GetObTint() {
 	float gray;
 	//get shade of object fill-color
 	//if there is none, get it from the pen color
-	if ((m_brush.GetColour() == *wxWHITE) || (m_brush.GetStyle() == wxTRANSPARENT)) {
+	if ((m_brush.GetColour() == *wxWHITE) || (m_brush.GetStyle() == wxBRUSHSTYLE_TRANSPARENT)) {
 		gray = (m_pen.GetColour().Green() + m_pen.GetColour().Red() + m_pen.GetColour().Blue()) / 3;
 	} else {
 		gray = (m_brush.GetColour().Green() + m_brush.GetColour().Red() + m_brush.GetColour().Blue()) / 3;
@@ -276,7 +276,7 @@ wxString SP_EXP_MIFDCImpl::GetObColor() {
 	int red, green, blue;
 	wxString rgb;
 
-	if ((m_brush.GetColour() == *wxWHITE) || (m_brush.GetStyle() == wxTRANSPARENT)) {
+	if ((m_brush.GetColour() == *wxWHITE) || (m_brush.GetStyle() == wxBRUSHSTYLE_TRANSPARENT)) {
 		red = Approx(m_pen.GetColour().Red());
 		green = Approx(m_pen.GetColour().Green());
 		blue = Approx(m_pen.GetColour().Blue());
@@ -419,7 +419,7 @@ void SP_EXP_MIFDCImpl::DoDrawEllipse (wxCoord x, wxCoord y, wxCoord width, wxCoo
 
   wxCHECK_RET( m_ok && m_pstream, wxT("DrawEllipse: invalid mif-dc") );
 
-  if (m_brush.GetStyle() != wxTRANSPARENT || m_pen.GetStyle() != wxTRANSPARENT) {
+  if (m_brush.GetStyle() != wxBRUSHSTYLE_TRANSPARENT || m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT) {
     wxFprintf(m_pstream, wxT(" <Ellipse\n"));
 		WriteObjectProperties(MIF_ELLIPSE, 0);
     int scaledX = (int)(x * m_scale);
@@ -447,7 +447,7 @@ void SP_EXP_MIFDCImpl::DoDrawEllipticArc(wxCoord x, wxCoord y, wxCoord w,
 
 	wxCHECK_RET(m_ok && m_pstream, wxT("DrawArc: invalid mif-dc"));
 
-	if (m_pen.GetStyle() != wxTRANSPARENT) {
+	if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT) {
 		wxFprintf(m_pstream, wxT(" <Arc\n"));
 		WriteObjectProperties(MIF_ARC, 0);
 		int scaledX = (int)(x * m_scale);
@@ -475,7 +475,7 @@ void SP_EXP_MIFDCImpl::DoDrawRotatedText( const wxString& text, wxCoord x, wxCoo
 
 	wxCHECK_RET( m_ok && m_pstream, wxT("DrawText: invalid mif-dc") );
 
-	if (m_pen.GetStyle () != wxTRANSPARENT) {
+	if (m_pen.GetStyle () != wxPENSTYLE_TRANSPARENT) {
     wxFprintf(m_pstream, wxT(" <TextLine\n"));
 		WriteObjectProperties(MIF_TEXT, angle);
     int scaledX = (int)(x * m_scale);
@@ -507,9 +507,9 @@ void SP_EXP_MIFDCImpl::DoDrawLines (int n, const wxPoint points[], wxCoord xoffs
 
 	wxCHECK_RET( m_ok && m_pstream, wxT("DrawLines: invalid mif-dc") );
 
-  if (m_pen.GetStyle () != wxTRANSPARENT) {
+  if (m_pen.GetStyle () != wxPENSTYLE_TRANSPARENT) {
     wxFprintf(m_pstream, wxT(" <PolyLine\n"));
-		m_brush.SetStyle(wxTRANSPARENT);
+		m_brush.SetStyle(wxBRUSHSTYLE_TRANSPARENT);
     WriteObjectProperties(MIF_POLYLINE, 0);
     int scaledX, scaledY;
     for (int i = 0; i < n; i++) {
@@ -528,7 +528,7 @@ void SP_EXP_MIFDCImpl::DoDrawPolygon (int n, const wxPoint points[],
 
   wxCHECK_RET( m_ok && m_pstream, wxT("DoDrawPolygon: invalid mif-dc") );
 
-  if (m_pen.GetStyle() != wxTRANSPARENT) {
+  if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT) {
     wxFprintf(m_pstream, wxT(" <Polygon\n"));
 		WriteObjectProperties(MIF_POLYGON, 0);
     int scaledX, scaledY;
@@ -556,7 +556,7 @@ void SP_EXP_MIFDCImpl::DoDrawRoundedRectangle (wxCoord x, wxCoord y, wxCoord wid
 
   wxCHECK_RET( m_ok && m_pstream, wxT("DoDrawRoundedRectangle: invalid mif-dc") );
 
-  if (m_pen.GetStyle() != wxTRANSPARENT) {
+  if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT) {
     wxFprintf(m_pstream, wxT(" <RoundRect\n"));
 		WriteObjectProperties(MIF_POLYGON, 0);
     int scaledX, scaledY, scaledW, scaledH, scaledR;
@@ -828,10 +828,10 @@ void SP_EXP_MIFDCImpl::DoDrawSpline(wxList* points)
 	SP_LOGDEBUG(wxT("DoDrawSpline"));
 	wxCHECK_RET( m_ok && m_pstream, wxT("DoDrawSpline: invalid mif-dc") );
 
-	if (m_pen.GetStyle() != wxTRANSPARENT)
+	if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT)
 	{
 		wxFprintf(m_pstream, wxT(" <PolyLine\n"));
-		m_brush.SetStyle(wxTRANSPARENT);
+		m_brush.SetStyle(wxBRUSHSTYLE_TRANSPARENT);
 		WriteObjectProperties(MIF_POLYLINE, 0);
 		wxFprintf(m_pstream, wxT("\t<Smoothed Yes>\n"));
 		int scaledX, scaledY;

@@ -12,7 +12,6 @@
 
 SP_FTree_TermScanner::SP_FTree_TermScanner():
 
-m_nModus(SP_SCANNER_NORMAL),
 m_nLastToken(-1),
 m_nLastChar(-1),
 m_nNoLastToken(true)

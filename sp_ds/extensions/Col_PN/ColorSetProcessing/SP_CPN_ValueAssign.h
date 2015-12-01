@@ -56,10 +56,6 @@ class SP_CPN_ValueAssign
 
 private:
 	// Visit the net elements
-	SP_DS_Graph* l_pcGraph;
-	SP_DS_Metadataclass* l_pcMetadataclass;
-	SP_DS_Metadata* l_pcNewMetadata;
-	SP_DS_ColListAttribute *m_pcColList;
 
 	SP_CPN_Parse_Context_ptr m_pParseContext;
 	SP_CPN_Driver_ptr  m_pDriver;

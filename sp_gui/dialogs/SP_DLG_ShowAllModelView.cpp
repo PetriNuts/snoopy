@@ -324,7 +324,6 @@ void SP_DLG_ShowAllModelView::OnChangeResultViewer(wxCommandEvent& event)
 	//Change the current view viewer
 	SP_DS_Attribute* l_pcAttribute = m_pcModelView->GetAttribute(wxT("ViewerType"));
 	CHECK_POINTER(l_pcAttribute, return);
-	unsigned int l_nLocation = m_pcOutputViewerType->GetSelection();
 	if (m_pcOutputViewerType->GetStringSelection() == wxT("Tabular"))
 	{
 		m_pcOutputExportType->Delete(1);

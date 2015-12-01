@@ -666,7 +666,6 @@ bool SP_CPN_ValueAssign::InitializeConstant()
 	{		
 		
 		SP_CPN_Variable_Constant l_ConstantStruct;
-		long l_nValue;
 		wxString l_ConstantName = (*l_pvDeclarations)[i].m_sName;
 
 		wxString l_sError;

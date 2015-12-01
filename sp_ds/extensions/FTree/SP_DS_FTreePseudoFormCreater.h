@@ -21,7 +21,6 @@ class SP_DS_FTreePseudoFormCreater: public SP_DS_FTreeAlgebraicEquationCreater
 {
 private:
  
-	SP_DS_Graph* m_pcGraph;
 	SP_ListString* pseudoForm;
 
 protected:

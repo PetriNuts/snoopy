@@ -147,7 +147,7 @@ void SP_GUI_Canvas::OnPaint(wxPaintEvent &p_cEvent)
 #endif
 	DoPrepareDC(dc);
 	dc.SetUserScale(GetScaleX(), GetScaleY()); //needed for Zoom
-	dc.SetBackground(wxBrush(GetBackgroundColour(), wxSOLID));
+	dc.SetBackground(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
 	dc.Clear();
 	GetDiagram()->Redraw(dc);
 	dc.SetUserScale(1.0, 1.0); //needed for Zoom

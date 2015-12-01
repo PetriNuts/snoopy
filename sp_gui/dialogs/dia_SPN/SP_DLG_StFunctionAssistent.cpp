@@ -188,7 +188,7 @@ void SP_DLG_StFunctionAssistent::LoadPrePlaces()
 		if((*l_itEdge)->GetClassName() == wxT("Modifier Edge"))
 		{
 			wxFont l_cFont = GetFont();
-			l_cFont.SetStyle(wxITALIC);
+			l_cFont.SetStyle(wxFONTSTYLE_ITALIC);
 			l_cItem.SetFont(l_cFont);
 		}
 		m_pcPlaceListCtrl->InsertItem(l_cItem);

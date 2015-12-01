@@ -31,8 +31,6 @@ private:
 	SP_MapString2Long* m_pmnPlaceArrayPos;
     SP_VectorString* m_pmsPlaceNames;
 
-	vector<SP_MapString2String>* m_pmsPlace2Color;
-
 	SP_VectorString* m_pmsColoredPlaceNames;
 
 	long m_nTransitionID;

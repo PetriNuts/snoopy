@@ -26,7 +26,6 @@ class SP_DLG_StFunctionOverview : public wxDialog
     wxWindow* m_pcParent;
     SP_DS_Nodeclass* m_pcNodeclass;
     wxBoxSizer* m_pcSizer;
-    wxStaticText* m_pcError;
 
     wxGrid* m_pcFunctionGrid;
 

@@ -22,11 +22,8 @@ class SP_FTreeNodeColourizer:
 
  // Map to save the colours of nodes
   map<SP_DS_Node*, SP_PairColour*> *m_pcMapNodeNum2wxColour;
-  SP_DS_Graph* m_pcGraph;
 
-  SP_ListNode* m_nodeList;
   SP_ListNode::const_iterator m_nodeIt;
-  SP_ListGraphic* m_grList;
   SP_ListGraphic::const_iterator m_grIt;
   SP_ListNode* m_pcAllNodes;
 

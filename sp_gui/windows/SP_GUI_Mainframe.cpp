@@ -53,8 +53,8 @@ SP_GUI_Mainframe::SP_GUI_Mainframe(SP_GM_Docmanager* p_pcDocmanager,
 			   m_pcHierarchyContainer(NULL),
 			   m_pcDeclarationContainer(NULL),
 			   m_pcToolbar(NULL),
-			   m_pcLogWindow(NULL),
-			   m_pcOldLogtarget(NULL),
+			   //m_pcLogWindow(NULL),
+			   //m_pcOldLogtarget(NULL),
 			   m_pcExpLogWindow(NULL)
 {
 	m_frameManager.SetManagedWindow(this);

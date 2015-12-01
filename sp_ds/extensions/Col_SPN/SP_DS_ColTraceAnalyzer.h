@@ -47,11 +47,7 @@ class SP_DS_ColTraceAnalyzer
 
   private:    
 
-    wxWindow* m_pcParent;
-    wxBoxSizer* m_pcSizer;
-    wxStaticText* m_pcError;
-
-	SP_DS_Graph* m_pcGraph ;
+	SP_DS_Graph* m_pcGraph;
 
 	//
 	SP_CPN_Parse_Context_ptr m_pcParseContext;

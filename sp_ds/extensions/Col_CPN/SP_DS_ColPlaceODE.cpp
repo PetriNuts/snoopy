@@ -76,8 +76,8 @@ bool SP_DS_ColPlaceODE::LoadTransitions()
 
 bool SP_DS_ColPlaceODE::LoadConnections()
 {
-	map<long, vector<SP_CPN_ContinuousArc> >* l_pmvPlaceID_PreTransitionID;  // = m_pUnfoldedNet->GetPlaceID_PreTransitionID();
-	map<long, vector<SP_CPN_ContinuousArc> >* l_pmvPlaceID_PostTransitionID; // = m_pUnfoldedNet->GetPlaceID_PostTransitionID();	
+	map<long, vector<SP_CPN_ContinuousArc> >* l_pmvPlaceID_PreTransitionID; // = m_pUnfoldedNet->GetPlaceID_PreTransitionID();
+	map<long, vector<SP_CPN_ContinuousArc> >* l_pmvPlaceID_PostTransitionID; // = m_pUnfoldedNet->GetPlaceID_PostTransitionID();
 	
 	m_a2DPlacePostTransitions.resize(m_nPlaceCount);
     m_a2DPlacePreTransitions.resize(m_nPlaceCount);

@@ -496,7 +496,7 @@ void SP_LatexDCImpl::DoDrawEllipse(wxCoord x, wxCoord y, wxCoord width, wxCoord 
 	//			 width, height));
 	wxCHECK_RET( m_ok && m_pstream, wxT("invalid latex dc"));
 
-	if (m_pen.GetStyle() != wxTRANSPARENT && m_pen.GetColour() != *wxWHITE)
+	if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT && m_pen.GetColour() != *wxWHITE)
 	{
 		double tX = (x * m_scale);
 		double tY = (y * m_scale);
@@ -526,7 +526,7 @@ void SP_LatexDCImpl::DoDrawArc(wxCoord x1, wxCoord y1, wxCoord x2, wxCoord y2, w
 //				 y2, xc,  yc));
 	wxCHECK_RET( m_ok && m_pstream, wxT("invalid latex dc"));
 
-	if (m_pen.GetStyle() != wxTRANSPARENT && m_pen.GetColour() != *wxWHITE)
+	if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT && m_pen.GetColour() != *wxWHITE)
 	{
 		double dx = x1 - xc;
 		double dy = y1 - yc;
@@ -589,7 +589,7 @@ void SP_LatexDCImpl::DoDrawRotatedText(const wxString& text, wxCoord x, wxCoord 
 {
 //  SP_LOGDEBUG(wxString::Format(wxT("DoDrawRotatedText %s %d %d %g"),
 //				 text.c_str(), x, y, angle));
-	if (m_pen.GetStyle() != wxTRANSPARENT && m_pen.GetColour() != *wxWHITE)
+	if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT && m_pen.GetColour() != *wxWHITE)
 	{
 
 		wxCHECK_RET( m_ok && m_pstream, wxT("invalid latex dc"));
@@ -638,7 +638,7 @@ void SP_LatexDCImpl::DoDrawLines(int n, const wxPoint points[], wxCoord xoffset,
 // 		n, xoffset, yoffset));
 	wxCHECK_RET( m_ok && m_pstream, wxT("invalid latex dc"));
 
-	if (m_pen.GetStyle() != wxTRANSPARENT && m_pen.GetColour() != *wxWHITE)
+	if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT && m_pen.GetColour() != *wxWHITE)
 	{
 		wxString out = wxT("\\draw[");
 		out << GetLatexPColor() << wxT(", ");
@@ -687,7 +687,7 @@ void SP_LatexDCImpl::DoDrawPolygon(int n, const wxPoint points[], wxCoord xoffse
 //  		n, m_pen.GetStyle(), m_pen.GetStyle() == wxTRANSPARENT ));
 	wxCHECK_RET( m_ok && m_pstream, wxT("invalid latex dc"));
 
-	if (m_pen.GetStyle() != wxTRANSPARENT && m_pen.GetColour() != *wxWHITE)
+	if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT && m_pen.GetColour() != *wxWHITE)
 	{
 		wxString out = wxT("\\draw[");
 		out << GetLatexPColor() << wxT(", ");
@@ -720,7 +720,7 @@ void SP_LatexDCImpl::DoDrawRectangle(wxCoord x, wxCoord y, wxCoord width, wxCoor
 //  				 width, height));
 
 	wxCHECK_RET( m_ok && m_pstream, wxT("invalid latex dc") );
-	if (m_pen.GetStyle() != wxTRANSPARENT && m_pen.GetColour() != *wxWHITE)
+	if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT && m_pen.GetColour() != *wxWHITE)
 	{
 		double tX = (x * m_scale);
 		double tY = (y * m_scale);
@@ -751,7 +751,7 @@ void SP_LatexDCImpl::DoDrawRoundedRectangle(wxCoord x, wxCoord y, wxCoord width,
 
 	wxCHECK_RET( m_ok && m_pstream, wxT("invalid latex dc"));
 
-	if (m_pen.GetStyle() != wxTRANSPARENT && m_pen.GetColour() != *wxWHITE)
+	if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT && m_pen.GetColour() != *wxWHITE)
 	{
 		double tX = (x * m_scale);
 		double tY = (y * m_scale);
@@ -778,7 +778,7 @@ void SP_LatexDCImpl::DoDrawSpline(const wxPointList *points)
 //	SP_LOGDEBUG(wxT("DoDrawSpline"));
 	wxCHECK_RET( m_ok && m_pstream, wxT("invalid latex dc"));
 
-	if (m_pen.GetStyle() != wxTRANSPARENT && m_pen.GetColour() != *wxWHITE)
+	if (m_pen.GetStyle() != wxPENSTYLE_TRANSPARENT && m_pen.GetColour() != *wxWHITE)
 	{
 	    double c, d, x1, y1, x2, y2, x3, y3;
 	    wxPoint *p, *q;

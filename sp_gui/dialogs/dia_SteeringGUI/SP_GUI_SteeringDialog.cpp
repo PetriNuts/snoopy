@@ -259,7 +259,6 @@ void SP_GUI_SteeringDialog::CreatStatisticBar(wxSizer* p_pcParentSizer)
 
 	m_pcSimulationProgressBar->SetRange(100);
 	m_pcSimulationProgressBar->SetToolTip(wxT("simulator progress"));
-	m_pcSimulationProgressBar->SetBezelFace(30);
 
 	p_pcParentSizer->Add(l_pcStatisticsSizer, 0, wxEXPAND | wxALIGN_CENTER);
 

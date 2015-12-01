@@ -34,8 +34,6 @@ private:
 	long r_id;
 	//list of all reductions results
 	ReductionMap r_map; 
-	//list of one reduction rule
-	SP_ListNode* reduce_Nodes; 
 
 protected:
 	

@@ -28,7 +28,7 @@ SP_DS_NetCreater::CreateDocument(const wxString& netName)
 {
 	m_Edges.clear();
 
-	SP_DS_Graph* l_pcGraph;
+	SP_DS_Graph* l_pcGraph = nullptr;
 	SP_GM_Docmanager* l_pcDM = wxGetApp().GetDocmanager();
 	SP_GM_DocTemplate* l_pcTemplate = l_pcDM->GetTemplate(netName);
 	SP_DS_Netclass* newClass = l_pcTemplate->GetNetclass();
