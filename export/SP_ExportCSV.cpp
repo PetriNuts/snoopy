@@ -99,6 +99,9 @@ bool SP_ExportCSV::WriteTransitions()
 							t->m_name.c_str(), nName.c_str()));
 		}
 		l_sLine = nName;
+		l_sLine << wxT(";");
+		l_sLine << t->m_function;
+/*
 		l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(t->m_node->GetAttribute(wxT("FunctionList")));
 		if(l_pcAttr)
 		{
@@ -109,6 +112,7 @@ bool SP_ExportCSV::WriteTransitions()
 				l_sLine << wxT(";") << l_sFunction;
 			}
 		}
+*/
 		l_sLine << wxT("\n");
 		m_file.Write(l_sLine);
 	}
@@ -153,7 +157,7 @@ bool SP_ExportCSV::WriteParameters()
 		}
 		m_file.Write(wxT("\n"));
 	}
-
+/*
 	if(!m_parameterIdMap.empty())
 	{
 		ParameterIdMap::iterator pIt = m_parameterIdMap.begin();
@@ -188,5 +192,6 @@ bool SP_ExportCSV::WriteParameters()
 		}
 		m_file.Write(wxT("\n"));
 	}
+*/
 	return TRUE;
 }

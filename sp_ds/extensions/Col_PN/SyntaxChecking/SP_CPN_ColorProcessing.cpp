@@ -533,14 +533,12 @@ bool SP_CPN_ColorProcessing::ProcessingString(wxString p_sColorsetName, wxString
 
 bool SP_CPN_ColorProcessing::ProcessingStringSub(wxString p_sColorsetName, vector<wxString> &p_vInputString, vector<wxString> &p_vString)
 {
-	
-	vector<wxString> StoredString = p_vInputString;
 	p_vString.clear();
 
-	if(StoredString[0] == wxT(",") || 
-		StoredString[0] == wxT("-")||
-		StoredString[StoredString.size()-1] == wxT(",") || 
-		StoredString[StoredString.size()-1] == wxT("-"))
+	if(p_vInputString[0] == wxT(",") ||
+		p_vInputString[0] == wxT("-")||
+		p_vInputString[p_vInputString.size()-1] == wxT(",") ||
+		p_vInputString[p_vInputString.size()-1] == wxT("-"))
 	{
 		wxString l_sError;
 		l_sError << wxT("Input format error");
@@ -550,9 +548,9 @@ bool SP_CPN_ColorProcessing::ProcessingStringSub(wxString p_sColorsetName, vecto
 		return false;
 	}
 
-	for(unsigned i = 0; i < StoredString.size(); i++)
+	for(unsigned i = 0; i < p_vInputString.size(); i++)
 	{
-		if(StoredString[i] == wxT(",") || StoredString[i] == wxT("-") )
+		if(p_vInputString[i] == wxT(",") || p_vInputString[i] == wxT("-") )
 		{
 			wxString l_sError;
 			l_sError << wxT("Input format error");
@@ -564,9 +562,9 @@ bool SP_CPN_ColorProcessing::ProcessingStringSub(wxString p_sColorsetName, vecto
 		i++;
 	}
 
-	for(unsigned i = 1; i < StoredString.size(); i++)
+	for(unsigned i = 1; i < p_vInputString.size(); i++)
 	{
-		if(StoredString[i] != wxT(",") && StoredString[i] != wxT("-") )
+		if(p_vInputString[i] != wxT(",") && p_vInputString[i] != wxT("-") )
 		{
 			wxString l_sError;
 			l_sError << wxT("Input format error");
@@ -578,22 +576,22 @@ bool SP_CPN_ColorProcessing::ProcessingStringSub(wxString p_sColorsetName, vecto
 		i++;
 	}
 
-	for(unsigned i = 0; i < StoredString.size(); i++)
+	for(unsigned i = 0; i < p_vInputString.size(); i++)
 	{
 
-		if(StoredString[i]!= wxT(",") && StoredString[i] != wxT("-") )
+		if(p_vInputString[i]!= wxT(",") && p_vInputString[i] != wxT("-") )
 		{
-			p_vString.push_back(StoredString[i]);
+			p_vString.push_back(p_vInputString[i]);
 		}
 
-		if(StoredString[i] == wxT("-"))
+		if(p_vInputString[i] == wxT("-"))
 		{
 			
 			wxString l_slow, l_sup;
 			unsigned index = p_vString.size()-1;
 			l_slow = p_vString[index];
 			p_vString.pop_back();
-			l_sup = StoredString[i+1];
+			l_sup = p_vInputString[i+1];
 
 			/////////////////////////////////////////////////////////////////////////////
 			//deal with the constant
