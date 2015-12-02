@@ -180,8 +180,6 @@ bool SP_DS_ColPN_Unfolding::Start()
 		SP_DS_ColUnfoldFile l_cColUnfoldFile(this);
 		if( ! l_cColUnfoldFile.DoRead(m_sLoadFilename))
 			return false;
-		//deal with unfolding results
-		ProcessResult();
 	}
 	else if(m_bIddDsszUtilSolve)
 	{
@@ -189,20 +187,6 @@ bool SP_DS_ColPN_Unfolding::Start()
 		if(unfolder(m_pcGraph))
 		{
 			unfolder.FillInResults(this);
-
-			//assign position to places
-			AssignPlacePositions(m_mmUnfoldedContPlaces);
-			AssignPlacePositions(m_mmUnfoldedDiscPlaces);   //order them in terms of hybrid nets
-
-			//assign position to transitions
-			AssignTransPositions(m_mmUnfoldedStochTransions); //order them in terms of hybrid nets
-			AssignTransPositions(m_mmUnfoldedContTransions);
-			AssignTransPositions(m_mmUnfoldedImmTransions);
-			AssignTransPositions(m_mmUnfoldedDetTransions);
-			AssignTransPositions(m_mmUnfoldedSchedTransions);
-
-			m_nPlaceCountStat = m_msPlaceNames.size();
-			m_nTransitionCountStat = m_msTransitionNames.size();
 		}
 		else
 		{
@@ -216,20 +200,6 @@ bool SP_DS_ColPN_Unfolding::Start()
 		if(unfolder(m_pcGraph))
 		{
 			unfolder.FillInResults(this);
-
-			//assign position to places
-			AssignPlacePositions(m_mmUnfoldedContPlaces);
-			AssignPlacePositions(m_mmUnfoldedDiscPlaces);   //order them in terms of hybrid nets
-
-			//assign position to transitions
-			AssignTransPositions(m_mmUnfoldedStochTransions); //order them in terms of hybrid nets
-			AssignTransPositions(m_mmUnfoldedContTransions);
-			AssignTransPositions(m_mmUnfoldedImmTransions);
-			AssignTransPositions(m_mmUnfoldedDetTransions);
-			AssignTransPositions(m_mmUnfoldedSchedTransions);
-
-			m_nPlaceCountStat = m_msPlaceNames.size();
-			m_nTransitionCountStat = m_msTransitionNames.size();
 		}
 		else
 		{
@@ -258,9 +228,11 @@ bool SP_DS_ColPN_Unfolding::Start()
 		if( ! StartThreadUnfolding() )
 			return false;
 
-		//deal with unfolding results
-		ProcessResult();
 	}
+
+	//deal with unfolding results
+	ProcessResult();
+
 	//SP_MESSAGEBOX(wxT("Paused"));
 
 
@@ -671,20 +643,29 @@ void SP_DS_ColPN_Unfolding::ComputeBindings(SP_DS_Node* p_pcTransNode)
 
 bool SP_DS_ColPN_Unfolding::ProcessResult()
 {
+
 	ClearPlaces();
 	ClearTranss();
-	
-	//find isolated places
-	FindIsolatedPlaces(m_mmUnfoldedStochTransions);
-	FindIsolatedPlaces(m_mmUnfoldedContTransions);
-	FindIsolatedPlaces(m_mmUnfoldedImmTransions);
-	FindIsolatedPlaces(m_mmUnfoldedDetTransions);
-	FindIsolatedPlaces(m_mmUnfoldedSchedTransions);
 
-	//assign position to places
-	AssignPlacePositionsNew(m_mmUnfoldedContPlaces);
-	AssignPlacePositionsNew(m_mmUnfoldedDiscPlaces);   //order them in terms of hybrid nets	
+	if(m_bIddDsszUtilSolve || m_bGecodeDsszUtilSolve)
+	{
+		//assign position to places
+		AssignPlacePositions(m_mmUnfoldedContPlaces);
+		AssignPlacePositions(m_mmUnfoldedDiscPlaces);   //order them in terms of hybrid nets
+	}
+	else
+	{
+		//find isolated places
+		FindIsolatedPlaces(m_mmUnfoldedStochTransions);
+		FindIsolatedPlaces(m_mmUnfoldedContTransions);
+		FindIsolatedPlaces(m_mmUnfoldedImmTransions);
+		FindIsolatedPlaces(m_mmUnfoldedDetTransions);
+		FindIsolatedPlaces(m_mmUnfoldedSchedTransions);
 
+		//assign position to places
+		AssignPlacePositionsNew(m_mmUnfoldedContPlaces);
+		AssignPlacePositionsNew(m_mmUnfoldedDiscPlaces);   //order them in terms of hybrid nets
+	}
 	//assign position to transitions	
 	AssignTransPositions(m_mmUnfoldedStochTransions); //order them in terms of hybrid nets	
 	AssignTransPositions(m_mmUnfoldedContTransions);
@@ -692,8 +673,10 @@ bool SP_DS_ColPN_Unfolding::ProcessResult()
 	AssignTransPositions(m_mmUnfoldedDetTransions);
 	AssignTransPositions(m_mmUnfoldedSchedTransions);
 
-	m_nPlaceCountStat = m_msPlaceNames.size();
-	m_nTransitionCountStat = m_msTransitionNames.size();
+	m_nPlaceCountStat = m_mmUnfoldedContPlaces.size() + m_mmUnfoldedDiscPlaces.size();
+	m_nTransitionCountStat = m_mmUnfoldedStochTransions.size() + m_mmUnfoldedContTransions.size()
+							+ m_mmUnfoldedImmTransions.size() + m_mmUnfoldedDetTransions.size()
+							+ m_mmUnfoldedSchedTransions.size();
 
 
 	return true;
@@ -786,8 +769,7 @@ void SP_DS_ColPN_Unfolding::AssignPlacePositionsNew(SP_CPN_UnfoldedPlaces& p_mmU
 	if( p_mmUnfoldedPlaces.size() == 0 )
 		return;
 
-	map< wxString,wxString >::iterator itMap;
-	for(itMap = m_mssColPlaceName2ColorSetforOrdering.begin(); itMap != m_mssColPlaceName2ColorSetforOrdering.end();itMap++)
+	for(auto itMap = m_mssColPlaceName2ColorSetforOrdering.begin(); itMap != m_mssColPlaceName2ColorSetforOrdering.end(); ++itMap)
 	{
 		wxString l_sColPlName = itMap->first;
 		wxString l_sColorSetName = itMap->second;
@@ -798,16 +780,13 @@ void SP_DS_ColPN_Unfolding::AssignPlacePositionsNew(SP_CPN_UnfoldedPlaces& p_mmU
 		unsigned long l_nLow = m_msPlaceNames.size();
 		unsigned long l_nUp;
 
-		SP_CPN_UnfoldedPlaces::iterator itMap1;
-		if( p_mmUnfoldedPlaces.find(l_sColPlName) != p_mmUnfoldedPlaces.end() )
+		auto itMap1 = p_mmUnfoldedPlaces.find(l_sColPlName);
+		if( itMap1 != p_mmUnfoldedPlaces.end() )
 		{
-			itMap1 = p_mmUnfoldedPlaces.find(l_sColPlName);
-
 			for(unsigned int l_nPos = 0; l_nPos < l_vColorVector.size(); l_nPos++ )
 			{
 				wxString l_sColor = l_vColorVector[l_nPos];
-				SP_CPN_UnfoldedPlace::iterator itMap2; 
-				itMap2 = itMap1->second.find(l_sColor);
+				auto itMap2 = itMap1->second.find(l_sColor);
 				if( ! itMap2->second.m_bIsolated )
 				{
 					wxString l_sNodeType = itMap2->second.m_sNodeType;					
@@ -850,15 +829,13 @@ void SP_DS_ColPN_Unfolding::AssignPlacePositionsNew(SP_CPN_UnfoldedPlaces& p_mmU
 
 void SP_DS_ColPN_Unfolding::AssignPlacePositions(SP_CPN_UnfoldedPlaces& p_mmUnfoldedPlaces )
 {		
-	SP_CPN_UnfoldedPlaces::iterator itMap1;
-	for(itMap1 = p_mmUnfoldedPlaces.begin(); itMap1 != p_mmUnfoldedPlaces.end(); itMap1++)
+	for(auto itMap1 = p_mmUnfoldedPlaces.begin(); itMap1 != p_mmUnfoldedPlaces.end(); ++itMap1)
 	{
 		wxString l_sColPlName = itMap1->first;
 		bool l_bIsoColPlace = true;
 		wxString l_sColorSetName;
 		unsigned long l_nLow = m_msPlaceNames.size();
-		SP_CPN_UnfoldedPlace::iterator itMap2; 
-		for(itMap2 = itMap1->second.begin(); itMap2 != itMap1->second.end(); itMap2++ )
+		for(auto itMap2 = itMap1->second.begin(); itMap2 != itMap1->second.end(); ++itMap2 )
 		{		
 			wxString l_sColor = itMap2->first;
 			if( ! itMap2->second.m_bIsolated )
@@ -920,16 +897,14 @@ void SP_DS_ColPN_Unfolding::ClearTranss()
 
 void SP_DS_ColPN_Unfolding::AssignTransPositions(SP_CPN_UnfoldedTransitions & p_mmUnfoldedTransions)
 {
-	SP_CPN_UnfoldedTransitions::iterator itMap1;
-	for(itMap1 = p_mmUnfoldedTransions.begin(); itMap1 != p_mmUnfoldedTransions.end(); itMap1++)
+	for(auto itMap1 = p_mmUnfoldedTransions.begin(); itMap1 != p_mmUnfoldedTransions.end(); ++itMap1)
 	{
 		wxString l_sColTRName = itMap1->first;
 		bool l_bIsoColTrans = true;		
 		unsigned long l_nLow = m_msTransitionNames.size();
 		unsigned long l_nUp;
 
-		SP_CPN_UnfoldedTransition::iterator itMap2; 
-		for(itMap2 = itMap1->second.begin(); itMap2 != itMap1->second.end(); itMap2++ )
+		for(auto itMap2 = itMap1->second.begin(); itMap2 != itMap1->second.end(); ++itMap2)
 		{			
 			if( itMap2->second.m_vInputArcs.size() + itMap2->second.m_vOutputArcs.size() != 0 ) //not isolated transition instance
 			{	
