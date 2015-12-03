@@ -673,10 +673,8 @@ bool SP_DS_ColPN_Unfolding::ProcessResult()
 	AssignTransPositions(m_mmUnfoldedDetTransions);
 	AssignTransPositions(m_mmUnfoldedSchedTransions);
 
-	m_nPlaceCountStat = m_mmUnfoldedContPlaces.size() + m_mmUnfoldedDiscPlaces.size();
-	m_nTransitionCountStat = m_mmUnfoldedStochTransions.size() + m_mmUnfoldedContTransions.size()
-							+ m_mmUnfoldedImmTransions.size() + m_mmUnfoldedDetTransions.size()
-							+ m_mmUnfoldedSchedTransions.size();
+	m_nPlaceCountStat = m_msPlaceNames.size();
+	m_nTransitionCountStat = m_msTransitionNames.size();
 
 
 	return true;
