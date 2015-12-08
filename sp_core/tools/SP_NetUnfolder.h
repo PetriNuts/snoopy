@@ -26,7 +26,7 @@ class SP_AbstractNetUnfolder
 {
 public:
 
-	bool operator()(SP_DS_Graph* p_pcGraph);
+	bool operator()(SP_DS_Graph* p_pcGraph, bool evalTokens = false, bool evalArcInscriptions = false);
 
 	SP_DS_Graph* GetGraph() { return m_pcGraph; }
 	dsszmc::andl::Net_ptr GetColoredNet() { return m_ColoredNet; }

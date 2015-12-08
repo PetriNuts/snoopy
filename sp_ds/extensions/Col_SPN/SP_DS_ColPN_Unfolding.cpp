@@ -184,7 +184,7 @@ bool SP_DS_ColPN_Unfolding::Start()
 	else if(m_bIddDsszUtilSolve)
 	{
 		SP_IddNetUnfolder unfolder;
-		if(unfolder(m_pcGraph))
+		if(unfolder(m_pcGraph, true, true))
 		{
 			unfolder.FillInResults(this);
 		}
@@ -197,7 +197,7 @@ bool SP_DS_ColPN_Unfolding::Start()
 	else if(m_bGecodeDsszUtilSolve)
 	{
 		SP_GecodeNetUnfolder unfolder;
-		if(unfolder(m_pcGraph))
+		if(unfolder(m_pcGraph, true, true))
 		{
 			unfolder.FillInResults(this);
 		}

@@ -20,7 +20,7 @@
 
 template<typename Repr>
 bool
-SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph)
+SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph, bool evalTokens, bool evalArcInscriptions)
 {
 	if(!p_pcGraph) return false;
 
@@ -39,7 +39,7 @@ SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph)
 			dsszmc::functions::FunctionRegistry fReg;
 			dsszmc::unfolding::net_unfolder<Repr> unfolder(m_ColoredNet,fReg);
 			dsszmc::aux::Timer unfoldTime;
-			unfolder();
+			unfolder(evalTokens, evalArcInscriptions);
 			m_UnfoldedNet = unfolder.result();
 			std::stringstream sout;
 			sout << "time for unfolding: " << unfoldTime << "\n";
