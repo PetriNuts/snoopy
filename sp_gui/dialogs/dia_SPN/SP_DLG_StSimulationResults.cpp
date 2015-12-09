@@ -172,6 +172,8 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 	m_pcDirectSingleExportRadioButton = new wxRadioButton(m_pcPropertyWindowDirectExportSizer, -1, wxT("Single trace export"), wxDefaultPosition, wxDefaultSize, 0);
 	l_pcRowSizer->Add(m_pcDirectSingleExportRadioButton, wxSizerFlags(0).Border(wxALL, 5));
 	m_pcDirectSingleExactExportRadioButton = new wxRadioButton(m_pcPropertyWindowDirectExportSizer, -1, wxT("Exact trace export"), wxDefaultPosition, wxDefaultSize, 0);
+	//TODO: hidden, because not supported in snoopy simulator library
+	m_pcDirectSingleExactExportRadioButton->Show(false);
 	l_pcRowSizer->Add(m_pcDirectSingleExactExportRadioButton, wxSizerFlags(0).Border(wxALL, 5));
 
 	//Check formula
