@@ -37,25 +37,20 @@ class SP_ImportCSV2ColPN: public SP_ImportRoutine,
 	bool ParseConstant(wxString& p_sLine);
 	bool ParseVariable(wxString& p_sLine);
 	bool ParseFunction(wxString& p_sLine);
-	bool ParsePlace(wxString& p_sLine);
-	bool ParseTransition(wxString& p_sLine);
 
+	bool ParseDeclarations(wxTextFile& p_cFile);
+	bool ParsePlacesTransitions(wxTextFile& p_cFile);
+	bool ParseParameters(wxTextFile& p_cFile);
 
-	 long g_nIndex;
 	 bool g_bError;
 	 wxString g_sMessage;
 	
 	 bool Parse(wxTextFile& p_cFile);
 	 
 	wxString errorString;
-	wxStringTokenizer* stz;
 	wxString m_fileName;
 	wxString netName;
 	wxString currentToken;
-
-	bool Open(const wxString& p_sFile);
-	bool Close();
-
 	
 	wxFFile m_fFile;
 
