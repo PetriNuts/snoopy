@@ -88,19 +88,20 @@ bool SP_ImportCSV2ColPN::Parse(wxTextFile& p_cFile)
 		{
 			continue;
 		}
-		if(l_cST.GetNextToken() == wxT("Declarations:"))
+		wxString token = l_cST.GetNextToken();
+		if(token == wxT("Declarations:"))
 		{
 			g_bError = !ParseDeclarations(p_cFile);
 		}
-		else if(l_cST.GetNextToken() == wxT("Place:"))
+		else if(token == wxT("Place:"))
 		{
 			g_bError = !ParsePlacesTransitions(p_cFile);
 		}
-		else if(l_cST.GetNextToken() == wxT("Transition:"))
+		else if(token == wxT("Transition:"))
 		{
 			g_bError = !ParsePlacesTransitions(p_cFile);
 		}
-		else if(l_cST.GetNextToken() == wxT("Parameter:"))
+		else if(token == wxT("Parameter:"))
 		{
 			g_bError = !ParseParameters(p_cFile);
 		}
