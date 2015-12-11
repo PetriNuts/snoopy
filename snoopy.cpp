@@ -973,8 +973,7 @@ bool Snoopy::OnInit()
 			NULL,
 			SP_APP_LONG_NAME,
 			wxPoint(m_nXPos, m_nYPos),
-			wxSize(m_nWidth, m_nHeight),
-			wxNO_FULL_REPAINT_ON_RESIZE | wxDEFAULT_FRAME_STYLE);
+			wxSize(m_nWidth, m_nHeight));
 
 	size_t fCount = parser.GetParamCount();
 	for (size_t i = 0; i < fCount; i++)
