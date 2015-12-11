@@ -177,7 +177,27 @@ bool SP_ExportColExtPT2ExtPT::WriteMetadataclass( SP_DS_Metadataclass* p_pcVal, 
 	wxString l_sName = p_pcVal->GetName();
 	if(l_sName == SP_DS_META_CONSTANT)
 	{
-		//TODO
+		SP_DS_Metadataclass* l_pcMC = m_pcExportGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+
+		SP_DS_ColListAttribute* l_pcColListAttr = dynamic_cast<SP_DS_ColListAttribute*>(p_pcVal->GetElements()->front()->GetAttribute(wxT("ConstantList")));
+	    for(unsigned int i = 0; i < l_pcColListAttr->GetRowCount(); i++)
+	    {
+			wxString l_sName = l_pcColListAttr->GetCell(i,0);
+			wxString l_sType = l_pcColListAttr->GetCell(i,1);
+			wxString l_sValue = l_pcColListAttr->GetCell(i,2);
+
+			if(l_sType == wxT("int"))
+			{
+				SP_DS_Metadata* l_pcConstant = l_pcMC->NewElement(1);
+				l_pcConstant->GetAttribute(wxT("Group"))->SetValueString(wxT("all"));
+				l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(wxT("int"));
+				l_pcConstant->GetAttribute(wxT("Name"))->SetValueString(l_sName);
+
+				SP_DS_ColListAttribute* l_pcValueColListAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+				l_pcValueColListAttr->SetCell(0, 1, l_sValue);
+			}
+		}
+	    SP_XmlWriter::WriteMetadataclass(l_pcMC, p_pcRoot);
 	}
 	else if(l_sName == SP_DS_META_FUNCTION)
 	{

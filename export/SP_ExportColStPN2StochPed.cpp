@@ -77,10 +77,12 @@ bool SP_ExportColStPN2StochPed::Write(SP_MDI_Doc* p_doc, const wxString& p_fileN
 		l_pcConstant = l_pcMC->NewElement(1);		
 		l_pcConstant->GetAttribute(wxT("Group"))->SetValueString(wxT("parameter"));
 		l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
-		SP_DS_ColListAttribute* l_pcValueColListAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
 
 		wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>((*l_itParam)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 		l_pcConstant->GetAttribute(wxT("Name"))->SetValueString(l_sName);
+
+		SP_DS_ColListAttribute* l_pcValueColListAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+		l_pcValueColListAttr->Clear();
 		SP_DS_ColListAttribute* l_pcColListAttr = dynamic_cast<SP_DS_ColListAttribute*>(( *l_itParam )->GetAttribute(wxT("ParameterList")));
 	    for(unsigned int i = 0; i < l_pcColListAttr->GetRowCount(); i++)
 	    {
@@ -268,12 +270,13 @@ bool SP_ExportColStPN2StochPed::WriteMetadataclass( SP_DS_Metadataclass* p_pcVal
 				l_pcValueColListAttr->SetCell(0, 1, l_sValue);
 			}
 		}
+	    SP_XmlWriter::WriteMetadataclass(l_pcMC, p_pcRoot);
 	}
 	else if(l_sName == SP_DS_META_FUNCTION)
 	{
 		//TODO
 	}
-	if(m_pcExportGraph->GetMetadataclass(l_sName))
+	else if(m_pcExportGraph->GetMetadataclass(l_sName))
 	{
 		SP_XmlWriter::WriteMetadataclass(p_pcVal, p_pcRoot);
 	}
