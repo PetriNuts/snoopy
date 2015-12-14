@@ -146,6 +146,11 @@ bool SP_ImportCSV2ColPN::ParseDeclarations(wxTextFile& p_cFile)
 		{
 			g_bError = !ParseFunction(l_sLine);
 		}
+		else
+		{
+			p_cFile.GetPrevLine();
+			return true;
+		}
 	}
 	return !g_bError;
 }
@@ -162,6 +167,11 @@ bool SP_ImportCSV2ColPN::ParsePlacesTransitions(wxTextFile& p_cFile)
 		if(l_sLine.IsEmpty()){ continue; }
 
 		wxStringTokenizer l_cST(l_sLine, wxT(";"), wxTOKEN_RET_EMPTY_ALL);
+		if(l_cST.CountTokens() == 1)
+		{
+			p_cFile.GetPrevLine();
+			return true;
+		}
 		while ( l_cST.HasMoreTokens() )
 		{
 		    wxString token = l_cST.GetNextToken();
@@ -329,6 +339,11 @@ bool SP_ImportCSV2ColPN::ParseParameters(wxTextFile& p_cFile)
 		if(l_sLine.IsEmpty()){ continue; }
 
 		wxStringTokenizer l_cST(l_sLine, wxT(";"), wxTOKEN_RET_EMPTY_ALL);
+		if(l_cST.CountTokens() == 1)
+		{
+			p_cFile.GetPrevLine();
+			return true;
+		}
 		while ( l_cST.HasMoreTokens() )
 		{
 		    wxString token = l_cST.GetNextToken();
@@ -389,11 +404,6 @@ bool SP_ImportCSV2ColPN::ParseParameters(wxTextFile& p_cFile)
 						if(l_pcAttr && token == l_pcAttr->GetValue())
 						{
 							l_pcPlace = l_pcNode;
-						    SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcPlace->GetAttribute(wxT("ParameterList")));
-						    if(l_pcAttr)
-						    {
-						    	l_pcAttr->Clear();
-						    }
 							break;
 						}
 					}
@@ -401,12 +411,13 @@ bool SP_ImportCSV2ColPN::ParseParameters(wxTextFile& p_cFile)
 				SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcPlace->GetAttribute(wxT("ParameterList")));
 			    if(l_pcAttr)
 			    {
-			    	size_t r = l_pcAttr->AppendEmptyRow();
+			    	size_t r = 0;
 					while ( l_cST.HasMoreTokens() )
 					{
 					    token = l_cST.GetNextToken();
 					    token.Trim();
 					    l_pcAttr->SetCell(r, 1, token);
+					    ++r;
 					}
 			    }
 		    }
