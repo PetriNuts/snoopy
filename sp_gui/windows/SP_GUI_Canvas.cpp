@@ -131,8 +131,8 @@ void SP_GUI_Canvas::OnPaint(wxPaintEvent &p_cEvent)
 
 	if(m_bBitmapCacheInvalid)
 	{
-		m_BitmapCache = wxBitmap(WXROUND(GetScaleX() * m_nSizeX) + SP_DEFAULT_GRID_SPACING,
-								 WXROUND(GetScaleY() * m_nSizeY) + SP_DEFAULT_GRID_SPACING);
+		m_BitmapCache = wxBitmap(WXROUND(GetScaleX() * m_nSizeX),
+								 WXROUND(GetScaleY() * m_nSizeY));
 		wxMemoryDC memDC(m_BitmapCache);
 		memDC.SetUserScale(GetScaleX(), GetScaleY()); //needed for Zoom
 		memDC.SetBackground(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
@@ -145,7 +145,7 @@ void SP_GUI_Canvas::OnPaint(wxPaintEvent &p_cEvent)
 
 	// new paint implementation
 	wxAutoBufferedPaintDC pdc(this);
-#if wxUSE_GRAPHICS_CONTEXT
+#if wxUSE_GRAPHICS_CONTEXT && 0
 	wxGCDC dc;
 	wxGraphicsRenderer* const renderer = wxGraphicsRenderer::
 #if TEST_CAIRO_EVERYWHERE
@@ -164,6 +164,7 @@ void SP_GUI_Canvas::OnPaint(wxPaintEvent &p_cEvent)
 	dc.Clear();
 	dc.DrawBitmap(m_BitmapCache, 0, 0, true);
 	dc.SetUserScale(1.0, 1.0); //needed for Zoom
+
 }
 
 bool SP_GUI_Canvas::UnSelectAll(int p_nKeys)
@@ -288,11 +289,11 @@ SP_GUI_Canvas::DrawOutlineShapes(double p_nOffsetX, double p_nOffsetY)
 			l_pcShape->OnDrawOutline(l_cDC, l_nX, l_nY, l_nWidth, l_nHeight);
 			if(m_nSizeX < WXROUND(l_nX))
 			{
-				m_nSizeX = WXROUND(l_nX) + 20;
+				m_nSizeX = WXROUND(l_nX) + SP_DEFAULT_GRID_SPACING;
 			}
 			if(m_nSizeY < WXROUND(l_nY))
 			{
-				m_nSizeY = WXROUND(l_nY) + 20;
+				m_nSizeY = WXROUND(l_nY) + SP_DEFAULT_GRID_SPACING;
 			}
         }
         l_pcNode = l_pcNode->GetNext();
