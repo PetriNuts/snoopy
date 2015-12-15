@@ -131,7 +131,8 @@ void SP_GUI_Canvas::OnPaint(wxPaintEvent &p_cEvent)
 
 	if(m_bBitmapCacheInvalid)
 	{
-		m_BitmapCache = wxBitmap(WXROUND(GetScaleX() * m_nSizeX), WXROUND(GetScaleY() * m_nSizeY));
+		m_BitmapCache = wxBitmap(WXROUND(GetScaleX() * m_nSizeX) + SP_DEFAULT_GRID_SPACING,
+								 WXROUND(GetScaleY() * m_nSizeY) + SP_DEFAULT_GRID_SPACING);
 		wxMemoryDC memDC(m_BitmapCache);
 		memDC.SetUserScale(GetScaleX(), GetScaleY()); //needed for Zoom
 		memDC.SetBackground(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
