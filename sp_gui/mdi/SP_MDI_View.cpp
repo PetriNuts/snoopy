@@ -1626,7 +1626,7 @@ bool SP_MDI_View::DoCopyInNewNet(SP_ListGraphic* p_plShapes)
 void SP_MDI_View::Refresh(bool p_bRealRefresh)
 {
 	if (m_pcCanvas)
-		m_pcCanvas->RefreshRects(p_bRealRefresh);
+		m_pcCanvas->Refresh(p_bRealRefresh);
 }
 
 void SP_MDI_View::RefreshAllViews()

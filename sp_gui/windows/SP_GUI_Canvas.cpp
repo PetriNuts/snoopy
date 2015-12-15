@@ -39,9 +39,10 @@ SP_GUI_Canvas::SP_GUI_Canvas(SP_MDI_View* p_pcView,
 		SP_GUI_Childframe *p_pcFrame, wxWindowID p_nId, const wxPoint& p_cPos,
 		const wxSize& p_cSize, const long p_nStyle) :
 	wxShapeCanvas(p_pcFrame, p_nId, p_cPos, p_cSize, p_nStyle),
-			m_pcView(p_pcView), m_pcParentframe(p_pcFrame),
-			m_pcEditElement(NULL), m_pcControlPoints(NULL),
-			m_nSizeX(SP_DEFAULT_GRID_SIZE), m_nSizeY(SP_DEFAULT_GRID_SIZE)
+	m_bBitmapCacheInvalid(true),
+	m_pcView(p_pcView), m_pcParentframe(p_pcFrame),
+	m_pcEditElement(NULL), m_pcControlPoints(NULL),
+	m_nSizeX(SP_DEFAULT_GRID_SIZE), m_nSizeY(SP_DEFAULT_GRID_SIZE)
 {
 	m_bStartup = TRUE;
 	SetView(p_pcView);
@@ -117,7 +118,10 @@ void SP_GUI_Canvas::InsertShape(wxShape* p_pcShape)
 void SP_GUI_Canvas::RemoveShape(wxShape *p_pcShape)
 {
 	if (GetDiagram())
+	{
 		GetDiagram()->RemoveShape(p_pcShape);
+		m_bBitmapCacheInvalid = true;
+	}
 }
 
 void SP_GUI_Canvas::OnPaint(wxPaintEvent &p_cEvent)
@@ -125,9 +129,20 @@ void SP_GUI_Canvas::OnPaint(wxPaintEvent &p_cEvent)
 	if (!GetDiagram())
 		return;
 
+	if(m_bBitmapCacheInvalid)
+	{
+		m_BitmapCache = wxBitmap(WXROUND(GetScaleX() * m_nSizeX), WXROUND(GetScaleY() * m_nSizeY));
+		wxMemoryDC memDC(m_BitmapCache);
+		memDC.SetUserScale(GetScaleX(), GetScaleY()); //needed for Zoom
+		memDC.SetBackground(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
+		memDC.Clear();
+		GetDiagram()->Redraw(memDC);
+		m_bBitmapCacheInvalid = false;
+	}
 	//adapt virtual size for zoom
-	SetVirtualSize(WXROUND(GetScaleX() * m_nSizeX),
-				   WXROUND(GetScaleY() * m_nSizeY));
+	wxSize l_nVS = m_BitmapCache.GetSize();
+	l_nVS.DecBy(SP_DEFAULT_GRID_SPACING);
+	SetVirtualSize(l_nVS);
 
 	// new paint implementation
 	wxAutoBufferedPaintDC pdc(this);
@@ -146,10 +161,9 @@ void SP_GUI_Canvas::OnPaint(wxPaintEvent &p_cEvent)
     wxDC &dc = pdc;
 #endif
 	DoPrepareDC(dc);
-	dc.SetUserScale(GetScaleX(), GetScaleY()); //needed for Zoom
-	dc.SetBackground(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
+	dc.SetUserScale(1.0, 1.0); //needed for Zoom
 	dc.Clear();
-	GetDiagram()->Redraw(dc);
+	dc.DrawBitmap(m_BitmapCache, 0, 0, true);
 	dc.SetUserScale(1.0, 1.0); //needed for Zoom
 }
 
@@ -161,16 +175,17 @@ bool SP_GUI_Canvas::UnSelectAll(int p_nKeys)
 	if (GetView())
 	{
 		GetView()->SelectAll(FALSE);
-		RefreshRects();
+		Refresh();
 	}
 
 	return TRUE;
 }
 
-void SP_GUI_Canvas::RefreshRects(bool p_bErase)
+void SP_GUI_Canvas::Refresh( bool eraseBackground, const wxRect *rect )
 {
-	Refresh(p_bErase);
+	wxShapeCanvas::Refresh(eraseBackground, rect);
 	m_Overlay.Reset();
+	m_bBitmapCacheInvalid = true;
 }
 
 SP_Type* SP_GUI_Canvas::SetEditElement(SP_Type* p_pcElement)
@@ -220,6 +235,7 @@ unsigned int SP_GUI_Canvas::GetNetnumber()
 void SP_GUI_Canvas::DrawOutline(double p_nX1, double p_nY1,
 		double p_nX2, double p_nY2)
 {
+	m_bBitmapCacheInvalid = true;
 	wxClientDC l_cDc(this);
 	int l_nX1,l_nY1,l_nX2,l_nY2;
 //TODO: check if neccessary in wx3.0
@@ -246,6 +262,7 @@ void SP_GUI_Canvas::DrawOutline(double p_nX1, double p_nY1,
 bool
 SP_GUI_Canvas::DrawOutlineShapes(double p_nOffsetX, double p_nOffsetY)
 {
+	m_bBitmapCacheInvalid = true;
     wxClientDC l_cDC(this);
     DoPrepareDC(l_cDC);
 
@@ -315,7 +332,7 @@ void SP_GUI_Canvas::OnLeftClick(double p_nX, double p_nY, int p_nKeys)
 		}
 	}
 
-	RefreshRects();
+	Refresh();
 }
 
 bool SP_GUI_Canvas::DrawAllElements(SP_DS_Graph* p_pcGraph, bool p_bLocalOnly)
@@ -389,7 +406,6 @@ bool SP_GUI_Canvas::OnEndDragLeftShape(wxShape* p_pcShape, double p_nX,
 			}
 
 			SP_LOGDEBUG(wxT("SP_GUI_Canvas::OnEndDragLeftShape -- ReleaseMouse();"));
-			RefreshRects();
 			Refresh();
 
 			return l_bReturn;
@@ -502,7 +518,7 @@ bool SP_GUI_Canvas::MergeAll(SP_ListGraphic* p_plShapes,
 		MoveShape(p_pcTarget->GetPrimitive(), 0,0);
 	}
 
-	RefreshRects();
+	Refresh();
 
 	return TRUE;
 }
@@ -537,7 +553,6 @@ bool SP_GUI_Canvas::OnClickOnShape(wxShape* p_pcShape, double p_nX,
 			wxDELETE(m_pcControlPoints);
 			m_pcControlPoints = NULL;
 		}
-		RefreshRects();
 		Refresh();
 	}
 
@@ -558,6 +573,7 @@ bool SP_GUI_Canvas::OnStartLine(wxShape* p_pcShape, double p_nX, double p_nY,
 bool SP_GUI_Canvas::OnDrawLine(wxShape* p_pcShape, double p_nX, double p_nY,
 		int p_nKeys, int p_nAttach)
 {
+	m_bBitmapCacheInvalid = true;
 	wxClientDC l_cDC(this);
 
 	double l_nX = g_nStartX, l_nY = g_nStartY;
@@ -644,6 +660,7 @@ void SP_GUI_Canvas::OnEndDragLeft(double p_nX, double p_nY, int p_nKeys)
 
 	ReleaseMouse();
 
+	m_bBitmapCacheInvalid = true;
 	wxClientDC l_cDc(this);
 	DoPrepareDC(l_cDc);
 
@@ -698,7 +715,7 @@ void SP_GUI_Canvas::OnEndDragLeft(double p_nX, double p_nY, int p_nKeys)
 		}
 		l_pcNode = l_pcNode->GetNext();
 	}
-	RefreshRects();
+	Refresh();
 
 	Modify(TRUE);
 }
@@ -842,7 +859,7 @@ void SP_GUI_Canvas::OnKeyEvent(wxKeyEvent& p_cEvent)
 			  Thaw();
 
 			  Modify(TRUE);
-			  RefreshRects();
+			  Refresh();
 
           }
 		}
@@ -864,6 +881,7 @@ void SP_GUI_Canvas::AddControlPoint(double p_nX, double p_nY)
 
 bool SP_GUI_Canvas::DrawTempEdge(double p_nX, double p_nY)
 {
+	m_bBitmapCacheInvalid = true;
 	wxClientDC l_cDC(this);
 	DoPrepareDC(l_cDC);
 
@@ -908,6 +926,7 @@ bool SP_GUI_Canvas::MoveShape(wxShape* p_pcShape, double p_nOffsetX, double p_nO
 	if (p_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
 		return false;
 
+	m_bBitmapCacheInvalid = true;
 	wxClientDC l_cDC(this);
 	DoPrepareDC(l_cDC);
 
@@ -961,6 +980,7 @@ SP_GUI_Canvas::MoveShapes(double p_nOffsetX, double p_nOffsetY)
     if (!GetDiagram())
         return FALSE;
 
+	m_bBitmapCacheInvalid = true;
     wxClientDC l_cDC(this);
     DoPrepareDC(l_cDC);
 
@@ -994,5 +1014,6 @@ bool SP_GUI_Canvas::UpdateVirtualSize(int x, int y)
 	{
 		m_nSizeY = y + 20;
 	}
+	m_bBitmapCacheInvalid = true;
 	return false;
 }

@@ -42,7 +42,7 @@ SP_GRM_EventHandler::UnSelectAll(int p_nKeys)
     {
         SP_MDI_View* l_pcView = l_pcCanvas->GetView();
         l_pcView->SelectAll(FALSE);
-        l_pcCanvas->RefreshRects();
+        l_pcCanvas->Refresh();
     }
 
     return l_pcCanvas;
@@ -60,7 +60,7 @@ SP_GRM_EventHandler::OnLeftClick(double p_nX, double p_nY, int p_nKeys, int p_nA
         if (l_pcGraphic)
             SP_Core::Instance()->GetAnim()->OnLeftClick(l_pcGraphic->GetParent());
         if (GetShape()->GetCanvas())
-            dynamic_cast<SP_GUI_Canvas*>(GetShape()->GetCanvas())->RefreshRects();
+            dynamic_cast<SP_GUI_Canvas*>(GetShape()->GetCanvas())->Refresh();
         return;
     }
 
@@ -80,7 +80,7 @@ SP_GRM_EventHandler::OnLeftClick(double p_nX, double p_nY, int p_nKeys, int p_nA
 
     GetShape()->Select(l_bSelected, &l_cDC);
 
-    l_pcCanvas->RefreshRects(); // Redraw because bits of objects will be missing
+    l_pcCanvas->Refresh(); // Redraw because bits of objects will be missing
 
 		if (GetShape()->IsKindOf(CLASSINFO(wxLineShape))) return;
 
@@ -111,7 +111,7 @@ SP_GRM_EventHandler::OnLeftDoubleClick(double p_nX, double p_nY, int p_nKeys, in
 
     l_pcGraphic->OnDoubleClick(p_nKeys);
 
-    l_pcCanvas->RefreshRects();
+    l_pcCanvas->Refresh();
 }
 
 void
@@ -126,7 +126,7 @@ SP_GRM_EventHandler::OnRightClick(double p_nX, double p_nY, int p_nKeys, int p_n
         if (l_pcGraphic)
             SP_Core::Instance()->GetAnim()->OnRightClick(l_pcGraphic->GetParent());
         if (GetShape()->GetCanvas())
-            dynamic_cast<SP_GUI_Canvas*>(GetShape()->GetCanvas())->RefreshRects();
+            dynamic_cast<SP_GUI_Canvas*>(GetShape()->GetCanvas())->Refresh();
         return;
     }
 
@@ -216,7 +216,7 @@ SP_GRM_EventHandler::OnEndDragLeft(double p_nX, double p_nY, int p_nKeys, int p_
     l_pcCanvas->Thaw();
 
     l_pcCanvas->Modify(TRUE);
-    l_pcCanvas->RefreshRects();
+    l_pcCanvas->Refresh();
 }
 
 void

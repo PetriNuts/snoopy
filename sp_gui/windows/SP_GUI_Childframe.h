@@ -29,10 +29,10 @@
   Part of the DocView/MDI and used to displays views on documents
 */
 
-#ifdef __WXGTK__
-	typedef wxDocChildFrame SP_GUI_ChildframeBase;
-#else
+#ifdef __WXMSW__
 	typedef wxDocMDIChildFrame SP_GUI_ChildframeBase;
+#else
+	typedef wxDocChildFrame SP_GUI_ChildframeBase;
 #endif
 
 class SP_GUI_Childframe: public SP_GUI_ChildframeBase, public SP_Error

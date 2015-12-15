@@ -33,6 +33,8 @@ private:
     DECLARE_EVENT_TABLE()
 
     wxOverlay m_Overlay;
+    wxBitmap m_BitmapCache;
+    bool m_bBitmapCacheInvalid;
     double g_nStartX = -10.0;
     double g_nStartY = -10.0;
 
@@ -56,6 +58,7 @@ protected:
     bool UnSelectAll(int p_nKeys = 0);
 
     bool OnEndDragLeftMerge(SP_Graphic* p_pcShape);
+
 public:
     SP_GUI_Canvas(
         SP_MDI_View* p_pcView,
@@ -104,7 +107,8 @@ public:
     void OnScroll(wxScrollWinEvent& p_cEvent);
     void OnKeyEvent(wxKeyEvent& p_cEvent);
 
-    void RefreshRects(bool p_bErase = TRUE);
+    void Refresh( bool eraseBackground = true,
+                              const wxRect *rect = NULL );
     void ReleaseMouse() { if (GetCapture() == this) wxShapeCanvas::ReleaseMouse(); }
 
     void DrawOutline(double x1, double y1, double x2, double y2);

@@ -321,7 +321,7 @@ SP_GUI_Mainframe::CreateToolbar()
                   Name(wxT("m_pcChildToolbar")).Caption(wxT("ChildToolbar")).
                   ToolbarPane().Top().
                   LeftDockable(false).RightDockable(false));
-#ifndef __WXGTK__
+#ifdef __WXMSW__
     m_frameManager.AddPane(this->GetClientWindow(), wxCENTER, _(""));
 #endif
 
@@ -338,7 +338,7 @@ SP_GUI_Mainframe::Refresh(bool p_bEraseBackground, const wxRect* p_pcRect)
 void
 SP_GUI_Mainframe::ActivateNextFrame(bool p_bMaximized)
 {
-#ifndef __WXGTK__
+#ifdef __WXMSW__
 	SP_GUI_MainframeBase::ActivateNext();
 #endif
     SP_GUI_Childframe* l_pcChild = GetActiveChildframe();

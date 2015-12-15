@@ -117,7 +117,7 @@ SP_DS_Animation::Refresh()
 {
     set<SP_GUI_Canvas*>::iterator l_Iter;
     for (l_Iter = m_tsCanvas.begin(); l_Iter != m_tsCanvas.end(); ++l_Iter)
-        (*l_Iter)->RefreshRects(FALSE);
+        (*l_Iter)->Refresh(FALSE);
 }
 
 bool

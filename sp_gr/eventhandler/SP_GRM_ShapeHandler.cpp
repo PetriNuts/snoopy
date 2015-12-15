@@ -62,7 +62,7 @@ SP_GRM_ShapeHandler::OnEndDragLeft(double p_nX, double p_nY, int p_nKeys, int p_
         {
             // unfortunately, OnEndDragLeft doesn't return anything, so we
             // can't pass the result of the canvas handler directly
-            l_pcCanvas->RefreshRects();
+            l_pcCanvas->Refresh();
             return;
         }
     }

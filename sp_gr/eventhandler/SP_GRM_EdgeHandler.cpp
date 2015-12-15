@@ -49,7 +49,7 @@ SP_GRM_EdgeHandler::OnLeftClick(double p_nX, double p_nY, int p_nKeys, int p_nAt
 				dynamic_cast<SP_GR_BaseEdge*>(GetShape())->InsertControlPoint(p_nX, p_nY);
 				GetShape()->Select(FALSE);
 				SP_Core::Instance()->ResolveExtern(GetShape())->Update();
-				l_pcCanvas->RefreshRects();
+				l_pcCanvas->Refresh();
 				GetShape()->Select();
 				return;
 			}
@@ -192,7 +192,7 @@ SP_GRM_EdgeHandler::OnSizingEndDragLeft(wxControlPoint* p_pcCP,
         wxShapeEvtHandler::OnSizingEndDragLeft(p_pcCP, p_nX, p_nY, p_nKeys, p_nAttach);
     }
 
-    l_pcCanvas->RefreshRects();
+    l_pcCanvas->Refresh();
 }
 
 bool

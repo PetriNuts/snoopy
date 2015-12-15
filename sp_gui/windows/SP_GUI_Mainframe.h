@@ -39,10 +39,10 @@ class SP_GUI_LogWindow;
 
   The layout is realised using the wxAUI -Library
 */
-#ifdef __WXGTK__
-	typedef wxDocParentFrame SP_GUI_MainframeBase;
-#else
+#ifdef __WXMSW__
 	typedef wxDocMDIParentFrame SP_GUI_MainframeBase;
+#else
+	typedef wxDocParentFrame SP_GUI_MainframeBase;
 #endif
 
 class SP_GUI_Mainframe: public SP_GUI_MainframeBase
