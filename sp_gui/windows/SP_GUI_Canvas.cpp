@@ -140,9 +140,7 @@ void SP_GUI_Canvas::OnPaint(wxPaintEvent &p_cEvent)
 		m_bBitmapCacheInvalid = false;
 	}
 	//adapt virtual size for zoom
-	wxSize l_nVS = m_BitmapCache.GetSize();
-	l_nVS.DecBy(SP_DEFAULT_GRID_SPACING);
-	SetVirtualSize(l_nVS);
+	SetVirtualSize(m_BitmapCache.GetSize());
 
 	// new paint implementation
 	wxAutoBufferedPaintDC pdc(this);
