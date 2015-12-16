@@ -1168,20 +1168,26 @@ void SP_DLG_CPNSimulationResults::LoadPlaces()
 	(dynamic_cast<spsim::ContinuousSimulator*>(m_pcMainSimulator))->SetInitialMarking(l_anCurrentMarking);
 }
 
-void SP_DLG_CPNSimulationResults::UpdateViewer()
+void SP_DLG_CPNSimulationResults::UpdateViewer(SP_DS_Metadata* p_pcView)
 {
 	CHECK_POINTER(m_pcMainSimulator, return);
 
 	//select the suited matrix to view (rate/marking)
-	UpdateSimulationMatrix();
+	UpdateSimulationMatrix(p_pcView);
 
 }
 
-void SP_DLG_CPNSimulationResults::UpdateSimulationMatrix()
+void SP_DLG_CPNSimulationResults::UpdateSimulationMatrix(SP_DS_Metadata* p_pcView)
 {
-	CHECK_POINTER(m_pcCurrentTablePlot, return);
-	//get the current nodeclass type
-	SP_DS_Attribute* l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("Nodeclass"));
+	SP_DS_Attribute* l_pcAttribute = nullptr;
+	if(p_pcView)
+	{
+		l_pcAttribute = p_pcView->GetAttribute(wxT("Nodeclass"));
+	}
+	else if(m_pcCurrentTablePlot)
+	{
+		l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("Nodeclass"));
+	}
 	CHECK_POINTER(l_pcAttribute, return);
 
 	wxString l_sElementType = l_pcAttribute->GetValueString();

@@ -78,10 +78,10 @@ protected:
 
 	    virtual void LoadColAuxResults(){}
 
-	    virtual void UpdateViewer();
+	    virtual void UpdateViewer(SP_DS_Metadata* p_pcView = nullptr);
 
 	    //select the rate or marking matrix
-	    virtual void UpdateSimulationMatrix();
+	    virtual void UpdateSimulationMatrix(SP_DS_Metadata* p_pcView = nullptr);
 
 	    virtual void InitializeEmptyView(SP_DS_Metadata* p_pcView);
 

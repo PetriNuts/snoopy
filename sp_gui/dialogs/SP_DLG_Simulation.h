@@ -181,7 +181,7 @@ public:
 	virtual void LoadData(bool p_bCreateNewTree = true);
 
 	//TODO: implement it in your derived class
-	virtual void UpdateViewer()=0;
+	virtual void UpdateViewer(SP_DS_Metadata* p_pcView = nullptr)=0;
 
 	virtual void SetViewAttributeValue(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName, const wxString& p_sValue);
 
@@ -339,7 +339,7 @@ protected:
 	virtual bool IsMarkingSetNameExist(const wxString& p_sName);
 
 	//specify how we get a reference to the result matrices
-	virtual void UpdateSimulationMatrix()=0;
+	virtual void UpdateSimulationMatrix(SP_DS_Metadata* p_pcView = nullptr)=0;
 
 	//load the net information first time the dialog is opened
 	virtual void LoadNetInformation()=0;

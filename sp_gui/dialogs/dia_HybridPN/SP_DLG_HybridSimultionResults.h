@@ -92,9 +92,9 @@ protected:
 
 	virtual void ChangeODESolver();
 
-	virtual void UpdateViewer();
+	virtual void UpdateViewer(SP_DS_Metadata* p_pcView = nullptr);
 
-	virtual void UpdateSimulationMatrix();
+	virtual void UpdateSimulationMatrix(SP_DS_Metadata* p_pcView = nullptr);
 
 	virtual void InitializeEmptyView(SP_DS_Metadata* p_pcView);
 

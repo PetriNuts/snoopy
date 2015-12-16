@@ -227,8 +227,6 @@ void SP_DLG_ShowAllModelView::OnItemDoubleClick(wxCommandEvent& p_cEvent) {
 		l_pcCurveInfoList->SetCell(l_nCurveIndex, 4, wxString::Format(wxT("%i"), l_nLineWidth));
 		l_pcCurveInfoList->SetCell(l_nCurveIndex, 5, wxString::Format(wxT("%i"), l_nLineStyle));
 
-		//Update the current viewer
-		m_pcParentWnd->UpdateViewer();
 		RefreshCurrentWindow(l_nCurveIndex, l_nColor.GetAsString(wxC2S_HTML_SYNTAX), l_dial.GetLineWidth(), l_dial.GetLineStyle());
 	}
 }
@@ -247,9 +245,6 @@ void SP_DLG_ShowAllModelView::OnPlaceCheckUncheck(wxCommandEvent& p_cEvent) {
 	SP_DS_ColListAttribute* l_pcPlaceIdList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttribute);
 
 	l_pcPlaceIdList->SetCell(l_nSelection, 2, wxString::Format(wxT("%d"), l_bCheckState));
-
-	//update the viewer
-	m_pcParentWnd->UpdateViewer();
 
 	RefreshWindow();
 }
@@ -277,8 +272,6 @@ void SP_DLG_ShowAllModelView::OnSelectClearAllItems(wxCommandEvent& p_cEvent)
 		}
 	}
 
-	//Update the current viewer
-	m_pcParentWnd->UpdateViewer();
 	RefreshWindow();
 }
 
@@ -288,7 +281,6 @@ void SP_DLG_ShowAllModelView::OnEditViewerProperties(wxCommandEvent& p_cEvent)
 
 	if (l_pcViewerProperties->ShowModal() == wxID_OK)
 	{
-		m_pcParentWnd->UpdateViewer();
 		m_pcResultViewer->SaveViewToSnoopyFormat(m_pcModelView);
 		RefreshWindow();
 		SP_Core::Instance()->GetRootDocument()->Modify(true);
@@ -353,8 +345,6 @@ void SP_DLG_ShowAllModelView::OnChangeResultViewer(wxCommandEvent& event)
 	}
 
 	m_pcParentWnd->LoadData(false);
-	//update viewer matrix
-	m_pcParentWnd->UpdateViewer();
 	RefreshWindow();
 }
 
@@ -469,8 +459,10 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 	CHECK_POINTER(m_pcParentWnd, return false);
 
 	m_pcParentWnd->LoadData(p_pcResultViewer, p_pcModelView);
+	//Update the current viewer
+	m_pcParentWnd->UpdateViewer(p_pcModelView);
 
-	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(p_pcModelView->GetAttribute(wxT("CurveInfo")));
+		SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(p_pcModelView->GetAttribute(wxT("CurveInfo")));
 	if (l_pcCurveInfoList == NULL)
 		return false;
 	m_pcPlaceChoiceCheckListBox->Clear();

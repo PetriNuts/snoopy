@@ -49,9 +49,9 @@ protected:
 	virtual void AddNewMarkingSet(const wxString& p_sMarkingSetName, const int& p_nRow);
 	virtual bool IsMarkingSetNameExist(const wxString& p_sName);
 
-	virtual void UpdateViewer();
+	virtual void UpdateViewer(SP_DS_Metadata* p_pcView = nullptr);
 
-	void UpdateSimulationMatrix();
+	void UpdateSimulationMatrix(SP_DS_Metadata* p_pcView = nullptr);
 
 	virtual void InitializeEmptyView(SP_DS_Metadata* p_pcView);
 
