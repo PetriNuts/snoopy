@@ -29,7 +29,7 @@
   Part of the DocView/MDI and used to displays views on documents
 */
 
-#ifdef __WXMSW__
+#ifdef USE_MDI
 	typedef wxDocMDIChildFrame SP_GUI_ChildframeBase;
 #else
 	typedef wxDocChildFrame SP_GUI_ChildframeBase;
