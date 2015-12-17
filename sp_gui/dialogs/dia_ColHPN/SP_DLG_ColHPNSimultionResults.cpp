@@ -960,6 +960,80 @@ void SP_DLG_ColHPNSimultionResults::DirectExportToCSV()
 
 void SP_DLG_ColHPNSimultionResults::SaveODE(wxCommandEvent& p_cEvent)
 {
+
+	wxFFile l_File;
+		wxFileName fn = wxFileName(wxT("parsed-ode.txt"));
+		wxString l_sOutName;
+		wxString l_sSelName;
+		wxString l_sSelDir;
+		wxString l_sFileExt;
+		wxString l_sFileExtFilter;
+		bool l_bSelAgain;
+		l_sSelName = fn.GetName() + wxT(".txt");
+		l_sFileExt = wxT("txt");
+		l_sFileExtFilter = wxT("Text file (*.txt)|*.txt");
+		l_sSelDir = wxT("");
+
+		if (m_pcMainSimulator->GetSimulatorClass() == wxT("Stochastic"))
+		{
+			SP_LOGERROR(wxT("ODEs cannot be saved for stochastic simulation"));
+
+			return;
+		}
+		do
+		{
+			l_bSelAgain = false;
+			l_sOutName = wxFileSelector(wxT("Simulation result file"), l_sSelDir, l_sSelName, l_sFileExt, l_sFileExtFilter, wxFD_SAVE);
+			if (l_sOutName.empty())
+			{
+				break;
+			}
+			if (wxFileName::FileExists(l_sOutName))
+			{
+				int l_nAnswer = SP_MESSAGEBOX(wxT("File ") + l_sOutName + wxT(" exists.")
+				wxT(" Overwrite?"), wxT("Overwrite?"), wxYES_NO | wxICON_QUESTION);
+				if (l_nAnswer == wxNO)
+				{
+					l_bSelAgain = true;
+					wxFileName l_tmpFN = wxFileName(l_sOutName);
+					l_sSelDir = l_tmpFN.GetPath();
+					l_sSelName = l_tmpFN.GetFullName();
+				}
+			}
+		}
+		while (l_bSelAgain);
+
+		if (!InitializeSimulator())
+		{
+			SP_MESSAGEBOX(wxT("Error: Can not Initialize Place ODE"));
+			return;
+		}
+
+		wxString l_sResult;
+		//Iterate for all the places
+		for (unsigned long l_nPlacePos = 0; l_nPlacePos < m_msPlaceNames.size(); l_nPlacePos++)
+		{
+			wxString l_sName = m_msPlaceNames[l_nPlacePos];
+			l_sResult << wxT("d")<<l_sName << wxT("/dt = ");
+			l_sResult << (dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))->GetPlaceODEString(l_nPlacePos) << wxT("\n\n");
+		}
+
+		//Cumulative propensity
+		l_sResult << wxT("\n\n=========== Total propensitiy ODE ==========\n\n");
+
+		l_sResult << wxT("da0")<<wxT("/dt = ");
+		l_sResult << (dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))->GetPlaceODEString(m_nContinuousPlaceCount) << wxT("\n\n");
+
+		//after the simulator is initialized, it will automatically set running. Therefore we need to stop it here
+		m_pcMainSimulator->AbortSimulation();
+
+		if (l_sOutName.empty())
+			return;
+		if (!l_File.Open(l_sOutName.c_str(), wxT("wt")))
+			return;
+		l_File.Write(l_sResult);
+		if (l_File.Close())
+			return;
 }
 
 
