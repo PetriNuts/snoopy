@@ -383,8 +383,8 @@ bool SP_DLG_SearchId::FindNextNode()
 			if(l_bFound)
 			{
 				SP_LOGDEBUG(wxT("found node"));
-				m_grIt = m_grList.insert(m_grList.end(), (*m_nodeIt)->GetGraphics()->begin(), (*m_nodeIt)->GetGraphics()->end());
-
+				m_grIt = m_grList.insert(m_grList.end(), (*m_nodeIt)->GetGraphics()->front());
+				m_grList.insert(m_grList.end(), ++((*m_nodeIt)->GetGraphics()->begin()), (*m_nodeIt)->GetGraphics()->end());
 				// ok, we can start next search from the next node
 				m_nodeIt++;
 				return true;
@@ -395,8 +395,8 @@ bool SP_DLG_SearchId::FindNextNode()
 			if (m_id == dynamic_cast<SP_DS_IdAttribute*> (attr)->GetValue())
 			{
 				SP_LOGDEBUG(wxT("found node"));
-				m_grIt = m_grList.insert(m_grList.end(), (*m_nodeIt)->GetGraphics()->begin(), (*m_nodeIt)->GetGraphics()->end());
-
+				m_grIt = m_grList.insert(m_grList.end(), (*m_nodeIt)->GetGraphics()->front());
+				m_grList.insert(m_grList.end(), ++((*m_nodeIt)->GetGraphics()->begin()), (*m_nodeIt)->GetGraphics()->end());
 				// ok, we can start next search from the next node
 				m_nodeIt++;
 				return true;
@@ -419,8 +419,8 @@ SP_DLG_SearchId::FindNextElement() {
 			SP_LOGDEBUG((*m_nodeIt)->GetAttribute(wxT("Name"))->GetValueString());
 
 			SP_LOGDEBUG(wxT("found node"));
-			m_grIt = m_grList.insert(m_grList.end(), (*m_nodeIt)->GetGraphics()->begin(), (*m_nodeIt)->GetGraphics()->end());
-
+			m_grIt = m_grList.insert(m_grList.end(), (*m_nodeIt)->GetGraphics()->front());
+			m_grList.insert(m_grList.end(), ++((*m_nodeIt)->GetGraphics()->begin()), (*m_nodeIt)->GetGraphics()->end());
 			// ok, we can start next search from the next node
 			++m_nodeIt;
 			return true;
@@ -442,8 +442,8 @@ bool SP_DLG_SearchId::FindNextEdge() {
 		{
 			SP_LOGDEBUG(wxT("found edge"));
 
-			m_grIt = m_grList.insert(m_grList.end(), (*m_edgeIt)->GetGraphics()->begin(), (*m_edgeIt)->GetGraphics()->end());
-
+			m_grIt = m_grList.insert(m_grList.end(), (*m_edgeIt)->GetGraphics()->front());
+			m_grList.insert(m_grList.end(), ++((*m_edgeIt)->GetGraphics()->begin()), (*m_edgeIt)->GetGraphics()->end());
 			// ok, we can start next search from the next edge
 			++m_edgeIt;
 			return true;
