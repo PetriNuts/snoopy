@@ -168,7 +168,7 @@ SP_DLG_CheckForUpdate::CheckForUpdate(bool p_bAskUser)
 			}
 		}
 		//test for new beta version
-		l_sTestRegEx.Replace(wxT("stable"), SP_APP_RELEASE);
+		l_sTestRegEx.Replace(wxT("stable"), wxT("beta"));
 		SP_LOGDEBUG(l_sTestRegEx);
 		l_cExp.Compile(l_sTestRegEx);
 		if(l_cExp.Matches(l_sSnoopyWebpage))
