@@ -208,12 +208,8 @@ SP_GRM_EventHandler::OnEndDragLeft(double p_nX, double p_nY, int p_nKeys, int p_
     double offsetY = yy - g_nDragStartY;
 
     l_pcCanvas->MoveLinePoints(offsetX, offsetY);
-    // maybe enough to hide the moving of every line point from the viewer?
-    l_pcCanvas->Freeze();
     // do the real moving
     l_pcCanvas->MoveShapes(offsetX, offsetY);
-    // if we freeze, we need to thaw, too
-    l_pcCanvas->Thaw();
 
     l_pcCanvas->Modify(TRUE);
     l_pcCanvas->Refresh();

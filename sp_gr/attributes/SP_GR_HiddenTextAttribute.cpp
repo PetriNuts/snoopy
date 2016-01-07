@@ -67,36 +67,3 @@ SP_GR_HiddenTextAttribute::FormatText()
     return l_sVal;
 }
 
-/*
-//---------------------------------------------------------------
-//
-// Accessors
-//
-//---------------------------------------------------------------
-bool
-SP_GR_HiddenTextAttribute::Update(bool p_bLocalOnly)
-{
-    if (!GetCanvas() || !m_pcPrimitive)
-        return TRUE;
-
-    wxString l_sVal = FormatText();
-
-    if (m_pcPrimitive->CalculateDimensions(l_sVal))
-    {
-        wxClientDC l_cDC(GetCanvas());
-        GetCanvas()->DoPrepareDC(l_cDC);
-        m_pcPrimitive->Erase(l_cDC);
-        m_pcPrimitive->FormatText(l_cDC, l_sVal);
-        m_pcPrimitive->Move(l_cDC, m_pcPrimitive->GetX(), m_pcPrimitive->GetY(), TRUE);
-        m_pcPrimitive->Draw(l_cDC);
-    }
-    return TRUE;
-}
-
-wxShape*
-SP_GR_HiddenTextAttribute::GetPrimitive()
-{
-    return m_pcPrimitive;
-}
-
-*/

@@ -13,6 +13,7 @@
 #include <wx/dcgraph.h>
 #include <wx/dcmemory.h>
 #include <wx/dcbuffer.h>
+#include <wx/wupdlock.h>
 
 #include "sp_core/base/SP_Type.h"
 #include "sp_core/SP_Core.h"
@@ -851,12 +852,8 @@ void SP_GUI_Canvas::OnKeyEvent(wxKeyEvent& p_cEvent)
           {
 
 			  MoveLinePoints(offsetX, offsetY);
-			  // maybe enough to hide the moving of every line point from the viewer?
-			  Freeze();
 			  // do the real moving
 			  MoveShapes(offsetX, offsetY);
-			  // if we freeze, we need to thaw, too
-			  Thaw();
 
 			  Modify(TRUE);
 			  Refresh();
@@ -930,10 +927,19 @@ bool SP_GUI_Canvas::MoveShape(wxShape* p_pcShape, double p_nOffsetX, double p_nO
 	wxClientDC l_cDC(this);
 	DoPrepareDC(l_cDC);
 
+	bool l_bSelected = p_pcShape->Selected();
+	if(l_bSelected)
+	{
+		p_pcShape->Select(false, &l_cDC);
+	}
 	double l_nX = p_pcShape->GetX() + p_nOffsetX;
 	double l_nY = p_pcShape->GetY() + p_nOffsetY;
 	// to get the line attachments right
 	p_pcShape->Move(l_cDC, l_nX, l_nY);
+	if(l_bSelected)
+	{
+		p_pcShape->Select(true, &l_cDC);
+	}
 	UpdateVirtualSize(WXROUND(l_nX), WXROUND(l_nY));
 
 	return true;
@@ -980,25 +986,36 @@ SP_GUI_Canvas::MoveShapes(double p_nOffsetX, double p_nOffsetY)
     if (!GetDiagram())
         return FALSE;
 
-	m_bBitmapCacheInvalid = true;
+    wxWindowUpdateLocker noUpdates(this);
+    m_bBitmapCacheInvalid = true;
     wxClientDC l_cDC(this);
     DoPrepareDC(l_cDC);
 
     // Add selected node shapes, if any
     wxNode* l_pcNode = GetDiagram()->GetShapeList()->GetFirst();
+    std::list<wxShape*> l_lSelectedShapes;
     while (l_pcNode)
     {
         wxShape* l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
         if (l_pcShape->Selected() &&
             !l_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
         {
-        	double l_nX = l_pcShape->GetX() + p_nOffsetX;
-        	double l_nY = l_pcShape->GetY() + p_nOffsetY;
-            // to get the line attachments right
-            l_pcShape->Move(l_cDC, l_nX, l_nY);
-			UpdateVirtualSize(WXROUND(l_nX), WXROUND(l_nY));
+        	l_pcShape->Select(false, &l_cDC);
+        	l_lSelectedShapes.push_back(l_pcShape);
         }
         l_pcNode = l_pcNode->GetNext();
+    }
+    for(auto l_pcShape : l_lSelectedShapes)
+    {
+    	double l_nX = l_pcShape->GetX() + p_nOffsetX;
+    	double l_nY = l_pcShape->GetY() + p_nOffsetY;
+        // to get the line attachments right
+    	l_pcShape->Move(l_cDC, l_nX, l_nY);
+		UpdateVirtualSize(WXROUND(l_nX), WXROUND(l_nY));
+    }
+    for(auto l_pcShape : l_lSelectedShapes)
+    {
+    	l_pcShape->Select(true, &l_cDC);
     }
     return TRUE;
 }
