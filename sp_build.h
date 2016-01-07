@@ -2,6 +2,6 @@
 #define __SP_BUILD_H__
 #include <wx/wx.h>
 
-const wxString SP_APP_BUILD = __TDATE__;
+extern const wxString SP_APP_BUILD;
 
 #endif // __SP_BUILD_H__

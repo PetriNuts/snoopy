@@ -43,9 +43,9 @@ typedef pair<wxColour, wxColour> SP_PairColour;
 typedef SP_Matrix<SP_PairLong> SP_MatrixPairLong;
 typedef SP_Matrix<SP_PairDouble> SP_MatrixPairDouble;
 
-const unsigned SP_INFINITY = std::numeric_limits<unsigned>::max();
+extern const unsigned SP_INFINITY;
 
-const wxString SP_WILDCARD = wxT("<*>");
+extern const wxString SP_WILDCARD;
 
 //------------------------------------------------------------------------
 
@@ -331,134 +331,134 @@ enum SP_ORDERING_MODE
  * names of elements of each netclass
  */
 // SP_DS_SimpleGraph
-const wxString SP_DS_SIMPLEGRAPH_CLASS = wxT("Simple Graph");
+extern const wxString SP_DS_SIMPLEGRAPH_CLASS;
 
 // SP_DS_BipartGraph
-const wxString SP_DS_BIPARTGRAPH_CLASS = wxT("Bipart Graph");
+extern const wxString SP_DS_BIPARTGRAPH_CLASS;
 
 // SP_DS_SimplePed
-const wxString SP_DS_PN_CLASS = wxT("Petri Net");
+extern const wxString SP_DS_PN_CLASS;
 
 // SP_DS_ExtPT
-const wxString SP_DS_EXTPN_CLASS = wxT("Extended Petri Net");
+extern const wxString SP_DS_EXTPN_CLASS;
 
 // SP_DS_ContinuousPed
-const wxString SP_DS_CONTINUOUSPED_CLASS = wxT("Continuous Petri Net");
+extern const wxString SP_DS_CONTINUOUSPED_CLASS;
 
-const wxString SP_DS_COARSE_PLACE = wxT("Coarse Place");
-const wxString SP_DS_COARSE_TRANSITION = wxT("Coarse Transition");
-const wxString SP_DS_COARSE_PARAMETER = wxT("Coarse Parameter");
+extern const wxString SP_DS_COARSE_PLACE;
+extern const wxString SP_DS_COARSE_TRANSITION;
+extern const wxString SP_DS_COARSE_PARAMETER;
 
 
 // SP_DS_EventSPN
-const wxString SP_DS_SPN_CLASS = wxT("Stochastic Petri Net");
+extern const wxString SP_DS_SPN_CLASS;
 
 // SP_DS_TimePT
-const wxString SP_DS_TIMEPN_CLASS = wxT("Time Petri Net");
+extern const wxString SP_DS_TIMEPN_CLASS;
 
 // SP_DS_Metadataclass constants
-const wxString SP_DS_META_CONSTANT = wxT("Constant Class");
-const wxString SP_DS_META_FUNCTION = wxT("Function Class");
+extern const wxString SP_DS_META_CONSTANT;
+extern const wxString SP_DS_META_FUNCTION;
 
 // SP_DS_Colored Petri Nets
-const wxString SP_DS_COLEPN_CLASS = wxT("Colored Extended Petri Net");
-const wxString SP_DS_CPN_MARKINGLIST = wxT("MarkingList");
-const wxString SP_DS_CPN_COLORSETNAME = wxT("Colorset");
-const wxString SP_DS_CPN_BASICCOLORSETCLASS = wxT("Basic Colorset Class");
-const wxString SP_DS_CPN_STRUCTUREDCOLORSETCLASS = wxT("Structured Colorset Class");
-const wxString SP_DS_CPN_ALIASCOLORSETCLASS = wxT("Alias Colorset Class");
-const wxString SP_DS_CPN_CONSTANTCLASS = wxT("Constant Class");
-const wxString SP_DS_CPN_VARIABLECLASS = wxT("Variable Class");
-const wxString SP_DS_CPN_GUARDLIST = wxT("GuardList");
-const wxString SP_DS_CPN_INSCRIPTION = wxT("ExpressionList");
-const wxString SP_DS_CPN_FUNCTIONCLASS = wxT("Function Class");
-const wxString SP_DS_CPN_RATEFUNCTIONLIST = wxT("FunctionList");
-const wxString SP_DS_CPN_AUXILIARVARIABLESCLASS = wxT("Auxiliary Variables Class");
+extern const wxString SP_DS_COLEPN_CLASS;
+extern const wxString SP_DS_CPN_MARKINGLIST;
+extern const wxString SP_DS_CPN_COLORSETNAME;
+extern const wxString SP_DS_CPN_BASICCOLORSETCLASS;
+extern const wxString SP_DS_CPN_STRUCTUREDCOLORSETCLASS;
+extern const wxString SP_DS_CPN_ALIASCOLORSETCLASS;
+extern const wxString SP_DS_CPN_CONSTANTCLASS;
+extern const wxString SP_DS_CPN_VARIABLECLASS;
+extern const wxString SP_DS_CPN_GUARDLIST;
+extern const wxString SP_DS_CPN_INSCRIPTION;
+extern const wxString SP_DS_CPN_FUNCTIONCLASS;
+extern const wxString SP_DS_CPN_RATEFUNCTIONLIST;
+extern const wxString SP_DS_CPN_AUXILIARVARIABLESCLASS;
 
 //Continuous - Stochastic Petri Net
-const wxString SP_DS_HYBRIDPN_CLASS = wxT("Hybrid Petri Net");
+extern const wxString SP_DS_HYBRIDPN_CLASS;
 //Extension
-const wxString SP_DS_HYBRIDPN_EXT = wxT("hpn");
+extern const wxString SP_DS_HYBRIDPN_EXT;
 
 //SP_DS_ColPN
-const wxString SP_DS_COLPN_CLASS = wxT("Colored Petri Net");
+extern const wxString SP_DS_COLPN_CLASS;
 
 //SP_DS_ColSPN
-const wxString SP_DS_COLSPN_CLASS = wxT("Colored Stochastic Petri Net");
+extern const wxString SP_DS_COLSPN_CLASS;
 
 //SP_DS_ColCPN
-const wxString SP_DS_COLCPN_CLASS = wxT("Colored Continuous Petri Net");
+extern const wxString SP_DS_COLCPN_CLASS;
 
 //SP_DS_ColHPN
-const wxString SP_DS_COLHPN_CLASS = wxT("Colored Hybrid Petri Net");
+extern const wxString SP_DS_COLHPN_CLASS;
 
 //SP_DS_ModuloNets
-const wxString SP_DS_MODULOPN_CLASS = wxT("Modulo Petri Net");
+extern const wxString SP_DS_MODULOPN_CLASS;
 
 // SP_DS_MusicPed
-const wxString SP_DS_MUSICPN_CLASS = wxT("Music Petri Net");
+extern const wxString SP_DS_MUSICPN_CLASS;
 
 // SP_DS_ReachabilityGraph
-const wxString SP_DS_REACHABILITY_CLASS = wxT("Reachability Graph");
+extern const wxString SP_DS_REACHABILITY_CLASS;
 
 // SP_DS_FaultTree
-const wxString SP_DS_FAULTTREE_CLASS = wxT("Fault Tree");
+extern const wxString SP_DS_FAULTTREE_CLASS;
 
 // SP_DS_ExtendedFaultTree
-const wxString SP_DS_EXTFAULTTREE_CLASS = wxT("Extended Fault Tree");
+extern const wxString SP_DS_EXTFAULTTREE_CLASS;
 
 // SP_DS_Freestyle
-const wxString SP_DS_FREESTYLE_CLASS = wxT("Freestyle Net");
+extern const wxString SP_DS_FREESTYLE_CLASS;
 
 // SP_DS_MTBDD
-const wxString SP_DS_MTBDD_CLASS = wxT("MTBDD");
+extern const wxString SP_DS_MTBDD_CLASS;
 
 // SP_DS_MTIDD
-const wxString SP_DS_MTIDD_CLASS = wxT("MTIDD");
+extern const wxString SP_DS_MTIDD_CLASS;
 
 //Continuous place
-const wxString SP_DS_CONTINUOUS_PLACE = wxT("Place, Continuous");
+extern const wxString SP_DS_CONTINUOUS_PLACE;
 
 //Continuous Transition
-const wxString SP_DS_CONTINUOUS_TRANS = wxT("Transition, Continuous");
+extern const wxString SP_DS_CONTINUOUS_TRANS;
 
 //Discrete Place
-const wxString SP_DS_DISCRETE_PLACE = wxT("Place");
+extern const wxString SP_DS_DISCRETE_PLACE;
 
 //Discrete Transition
-const wxString SP_DS_DISCRETE_TRANS = wxT("Transition");
+extern const wxString SP_DS_DISCRETE_TRANS;
 
 //discrete param
-const wxString SP_DS_PARAM = wxT("Parameter");
+extern const wxString SP_DS_PARAM;
 
 //Immediate Transition
-const wxString SP_DS_IMMEDIATE_TRANS = wxT("Immediate Transition");
+extern const wxString SP_DS_IMMEDIATE_TRANS;
 
 //deterministic Transition
-const wxString SP_DS_DETERMINISTIC_TRANS = wxT("Deterministic Transition");
+extern const wxString SP_DS_DETERMINISTIC_TRANS;
 
 //scheduled transition
-const wxString SP_DS_SCHEDULED_TRANS = wxT("Scheduled Transition");
+extern const wxString SP_DS_SCHEDULED_TRANS;
 
 //Stochastic Transition
-const wxString SP_DS_STOCHASTIC_TRANS = wxT("Transition");
+extern const wxString SP_DS_STOCHASTIC_TRANS;
 
 // Normal Edge
-const wxString SP_DS_EDGE = wxT("Edge");
+extern const wxString SP_DS_EDGE;
 
 //Inhibitor Edge
-const wxString SP_DS_INHIBITOR_EDGE = wxT("Inhibitor Edge");
+extern const wxString SP_DS_INHIBITOR_EDGE;
 
 //Read Edge
-const wxString SP_DS_READ_EDGE = wxT("Read Edge");
+extern const wxString SP_DS_READ_EDGE;
 
 //Equal
-const wxString SP_DS_EQUAL_EDGE = wxT("Equal Edge");
+extern const wxString SP_DS_EQUAL_EDGE;
 
 //Reset Edge
-const wxString SP_DS_RESET_EDGE = wxT("Reset Edge");
+extern const wxString SP_DS_RESET_EDGE;
 
 //Modifier Edge
-const wxString SP_DS_MODIFIER_EDGE = wxT("Modifier Edge");
+extern const wxString SP_DS_MODIFIER_EDGE;
 
 #endif // __SP_DEFINES_H__
