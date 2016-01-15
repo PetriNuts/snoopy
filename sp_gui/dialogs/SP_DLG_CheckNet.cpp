@@ -248,7 +248,7 @@ bool SP_DLG_CheckNet::Check()
 		double saveDelta = wxGetApp().getDelta();
 		if(m_cbPosition->IsEnabled() && m_cbPosition->IsChecked())
 		{
-			wxGetApp().setDelta(20);
+			wxGetApp().setDelta(wxGetApp().getStdOffset());
 		}
 		l_bCheck = m_graph->CheckIntegrity();
 		if(m_cbPosition->IsEnabled() && m_cbPosition->IsChecked())

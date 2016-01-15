@@ -35,7 +35,7 @@ private:
     int  m_nHeight;
 	wxString localeSave;
 	// used in CheckIntegrity to verify position/offset
-	double DELTA = 200;
+	double DELTA = 500;
 	// standard offset
 	double STD_OFFSET = 20;
 
