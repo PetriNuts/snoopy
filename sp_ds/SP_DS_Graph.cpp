@@ -27,6 +27,8 @@
 #include "sp_gui/interaction/SP_IA_Manager.h"
 #include "sp_gui/commands/SP_CMD_Edit.h"
 
+#include <wx/wupdlock.h>
+
 
 SP_DS_Graph::SP_DS_Graph(SP_DS_Netclass* p_pcNetclass)
 :SP_Type(SP_ELEMENT_GRAPH),
@@ -308,6 +310,7 @@ SP_DS_Graph::ShowOnCanvas(SP_GUI_Canvas* p_pcCanvas, bool p_bLocalOnly)
 {
     CHECK_POINTER(p_pcCanvas, return FALSE);
 
+    wxWindowUpdateLocker noUpdates(p_pcCanvas);
     bool l_bReturn = TRUE;
 
     for (auto l_pcNC : m_lNodeclass)

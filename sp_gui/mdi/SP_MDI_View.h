@@ -134,6 +134,8 @@ public:
     void DoMergeNodes(SP_ListGraphic& p_lSelectedGraphics);
     void DoDuplicateNodes(SP_ListGraphic& p_lSelectedGraphics);
 
+    void DoRefresh();
+
     // Do a general command
     void DoCmd(wxList& p_lShapes, wxList& p_lOldShapes, int p_nCmd, const wxString& p_sOp);
 

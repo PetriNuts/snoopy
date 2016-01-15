@@ -42,6 +42,7 @@
 #include "sp_gr/SP_GR_Edge.h"
 
 #include <wx/filename.h>
+#include <wx/wupdlock.h>
 
 #include "snoopy.h"
 
@@ -419,6 +420,11 @@ void SP_MDI_View::OnZoom(wxCommandEvent& p_cEvent)
 }
 
 void SP_MDI_View::OnRefresh(wxCommandEvent& p_cEvent)
+{
+	DoRefresh();
+}
+
+void SP_MDI_View::DoRefresh()
 {
 	if (m_pcCanvas)
 	{
@@ -1168,6 +1174,7 @@ void SP_MDI_View::SelectAll(bool p_bSelect)
 	if (!m_pcCanvas || !GetDocument())
 		return;
 
+	wxWindowUpdateLocker noUpdates(m_pcCanvas);
 	wxClientDC l_cDC(m_pcCanvas);
 	m_pcCanvas->DoPrepareDC(l_cDC);
 
@@ -1207,6 +1214,7 @@ void SP_MDI_View::SelectAllClass(const wxString& p_sClass)
 	if (!m_pcCanvas || p_sClass.IsEmpty() || !GetDocument())
 		return;
 
+	wxWindowUpdateLocker noUpdates(m_pcCanvas);
 	wxShape *l_pcShape;
 	SP_Graphic* l_pcGraphic;
 	wxClientDC l_cDC(m_pcCanvas);
@@ -1236,6 +1244,7 @@ void SP_MDI_View::SelectAllGraphics(const SP_ListGraphic& p_lGraphics, bool p_bS
 	if (!m_pcCanvas || !GetDocument() || p_lGraphics.empty())
 		return;
 
+	wxWindowUpdateLocker noUpdates(m_pcCanvas);
 	wxClientDC l_cDC(m_pcCanvas);
 	m_pcCanvas->DoPrepareDC(l_cDC);
 

@@ -12,6 +12,7 @@
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
+#include "sp_gui/mdi/SP_MDI_View.h"
 
 SP_ImportCSV2SPN::SP_ImportCSV2SPN()
 {
@@ -49,6 +50,7 @@ SP_ImportCSV2SPN::ReadFile(const wxString& fileName)
 
 				CheckImportValues();
 			    SetImportValues();
+			    dynamic_cast<SP_MDI_View*>(l_pcDoc->GetFirstView())->DoRefresh();
 			}
 			else
 			{
@@ -87,12 +89,20 @@ SP_ImportCSV2SPN::ParseLine(const wxString& p_sValue)
 
 	wxStringTokenizer l_cTokenizer(l_sValue, wxT(";"), wxTOKEN_RET_EMPTY_ALL);
 
-	m_sClassname = l_cTokenizer.GetNextToken();
-
 	SP_VectorString l_vLine;
+
 	while(l_cTokenizer.HasMoreTokens())
 	{
-		l_vLine.push_back(l_cTokenizer.GetNextToken());
+		wxString l_sToken = l_cTokenizer.GetNextToken();
+
+		if(l_sToken == SP_DS_DISCRETE_PLACE
+			|| l_sToken == SP_DS_DISCRETE_TRANS
+			|| l_sToken == SP_DS_PARAM
+			|| SP_DS_META_CONSTANT.StartsWith(l_sToken))
+		{
+			m_sClassname = l_sToken;
+		}
+		l_vLine.push_back(l_sToken);
 	}
 
 	if(!m_sClassname.IsEmpty())

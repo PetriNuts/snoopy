@@ -63,7 +63,9 @@ bool SP_ImportCSV2ColPN::ReadFile(const wxString& p_sFile)
 
 		l_cFile.Close();
 
-		if(!l_bFlag)
+	    dynamic_cast<SP_MDI_View*>(l_pcDoc->GetFirstView())->DoRefresh();
+
+	    if(!l_bFlag)
 			return false;
 	}
 
