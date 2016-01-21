@@ -33,11 +33,11 @@ SP_DLG_About::SP_DLG_About (wxWindow *p_pcParent, int p_nMilliseconds)
     l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_BUILD),0, wxALIGN_LEFT);
     l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Contributors: \n(in alphabetic order)  ")),0, wxALIGN_LEFT);
     l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY,
-	wxT("Denny Bayer, Matthias Dube, Markus Fieber, Monika Heiner, \n")
-	wxT("Mostafa Herajy, Erik Jongsma, Christian Krueger, Anja Kurth, \n")
-	wxT("Steffen Laarz, Sebastian Lehrack, Fei Liu, Thomas Meier, \n")
-	wxT("Ronny Richter, Christian Rohr, Daniel Scheibler, Martin Schwarick, \n")
-	wxT("Alexey Tovchigrechko, Katja Winder")
+	wxT("Shubham Agarwal, Denny Bayer, Matthias Dube, Markus Fieber, \n")
+	wxT("Monika Heiner, Mostafa Herajy, Erik Jongsma, Christian Krueger, \n")
+	wxT("Anja Kurth, Steffen Laarz, Sebastian Lehrack, Fei Liu, \n")
+	wxT("Thomas Meier, Ronny Richter, Christian Rohr, Daniel Scheibler, \n")
+	wxT("Martin Schwarick, Anjali Sharma, Alexey Tovchigrechko, Katja Winder")
     )
 	,0, wxALIGN_LEFT);
 
