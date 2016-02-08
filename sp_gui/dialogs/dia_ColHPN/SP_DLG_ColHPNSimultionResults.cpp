@@ -1178,10 +1178,12 @@ vector<SP_CPN_ContinuousArc>::const_iterator l_itConnection;
 			}
 			else
 			{
+				//SP_LOGMESSAGE(l_sArcWeight);
+
 				m_pcMainSimulator->SetPreSelfModifyingWeights(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID,l_nArcType, l_sArcWeight);
 			}
 
-			SP_LOGMESSAGE(l_itConnection->m_sMultiplicity);
+
 
 			//m_pcMainSimulator->SetPreTransitionConnection(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID, GetConnectionType(l_itConnection->m_sArcClass), l_nWeight);
 		}
@@ -1202,8 +1204,11 @@ vector<SP_CPN_ContinuousArc>::const_iterator l_itConnection;
 			}
 			else
 			{
+				//SP_LOGMESSAGE(l_sArcWeight);
+
 				m_pcMainSimulator->SetPostSelfModifyingWeights(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID,l_sArcWeight);
 			}
+
 
 			//m_pcMainSimulator->SetPostTransitionConnection(l_itConnection->m_nTranPos, l_itConnection->m_nPlaceID, l_nWeight);
 		}

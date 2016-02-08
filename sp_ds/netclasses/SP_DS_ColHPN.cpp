@@ -420,7 +420,7 @@ SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->AddNodeclass( new SP_DS_Nodeclass( p_pcGraph, wxT("Parameter") ) );
-	l_pcNC->SetShortcut( wxT("A") );
+	l_pcNC->SetShortcut( wxT("K") );
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute( wxT("Name") ) );
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText( wxT("General") ) );
 	l_pcGrAttr = l_pcAttr->AddGraphic( new SP_GR_TextAttribute( l_pcAttr ) );
@@ -465,7 +465,7 @@ SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->AddNodeclass(new SP_DS_Nodeclass(p_pcGraph, wxT("Coarse Parameter") ));
-	l_pcNC->SetShortcut(wxT("Shift+A"));
+	l_pcNC->SetShortcut(wxT("Shift+K"));
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));

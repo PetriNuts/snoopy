@@ -450,6 +450,8 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	///simulator properties
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_NumberAttribute( wxT("simulator"), 0 ));
+	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_NumberAttribute( wxT("simulator Semantics"), 0 ));
+
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("simulator properties"), SP_COLLIST_STRING, 2 ) );
 
 	//////////////////////////////////////////////////////////////////////////////

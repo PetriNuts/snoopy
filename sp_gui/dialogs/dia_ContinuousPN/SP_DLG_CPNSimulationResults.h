@@ -25,9 +25,19 @@ class SP_DLG_CPNSimulationResults : public SP_DLG_Simulation
 		wxChoice* m_pcMarkingSetComboBox;
 	    wxChoice* m_pcFunctionSetComboBox;
 	    wxChoice* m_pcParameterSetComboBox;
-	    wxChoice* m_pcSolver;
-	    wxRadioBox * m_pcSolverType;
+
+	    //simulator type: bio or server semantics
+	    wxChoice* m_pcsemanticsComboBox;
+
+	    //ODE solver: Euler, RK, ... etc
+	    wxChoice* m_pcSolverComboBox;
+
+
+	   // wxRadioBox * m_pcSolverType;
 	    wxButton * m_pcSimulationProperites;
+
+	    //ODE properties button
+	    wxButton * m_pcODESolverProperites;
 
 	    wxStaticText* m_pcCurrentSimulationTimeTxtCtrl;
 
@@ -36,6 +46,9 @@ class SP_DLG_CPNSimulationResults : public SP_DLG_Simulation
 	    bool m_bIsSimulatorInitialized;
 
 	    bool m_nRedraw;
+
+	    //continuous simulation semantics (bio or server)
+	    unsigned long m_nSimulationSemantics;
 
  protected:
 	    DECLARE_EVENT_TABLE();
@@ -51,12 +64,13 @@ class SP_DLG_CPNSimulationResults : public SP_DLG_Simulation
 
 	    virtual void OnFunctionSetChanged( wxCommandEvent& p_cEvent );
 
-	    //Solver type Change stiff/ unstiff
-	    virtual void OnSolverTypeChanged(wxCommandEvent& p_cEven);
-
 protected:
 
+	    //on ODE solver changed
 	    virtual void OnSolverChanged(wxCommandEvent& p_cEven);
+
+	    //on semantics changed
+	    virtual void OnSemanticsChanged(wxCommandEvent& p_cEven);
 
 	    virtual void  LoadSets();
 
@@ -96,6 +110,16 @@ protected:
 
 	    //create a simulator based on the child class type
 	    virtual  spsim::Simulator* CreateSimulator(const int& p_nSimulatorType);
+
+	    virtual int LoadSimulatorProperties();
+
+	     virtual void SaveSimulatorProperties();
+
+	     //add solver names
+	     void AddODESoverNameToComboBox();
+
+	     //destroy the Old ODE and create a new one
+	     void ChangeODESolver();
  public:
 
 	    DECLARE_CLASS( SP_DLG_CPNSimulationResults )

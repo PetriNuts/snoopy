@@ -59,8 +59,9 @@ enum
 	SP_ID_CHOICE_FUNCTION_SETS,
 	SP_ID_CHOICE_PARAMETER_SETS,
 	SP_ID_CHOICE_SOLVER,
-	SP_ID_RADIOBOX_SOLVER_TYPE,
+	SP_ID_CHOICE_SIMULATOR_SEMANTICS,
 	SP_ID_BUTTON_SIMULATION_PROPERTIES,
+	SP_ID_BUTTON_ODE_SOLVER_PROPERTIES,
 	SP_ID_BUTTON_SAVE_ODE
 };
 BEGIN_EVENT_TABLE( SP_DLG_CPNSimulationResults, SP_DLG_Simulation )
@@ -74,14 +75,14 @@ EVT_CHOICE( SP_ID_CHOICE_MARKING_SETS, SP_DLG_CPNSimulationResults::OnMarkingSet
 EVT_CHOICE( SP_ID_CHOICE_FUNCTION_SETS, SP_DLG_CPNSimulationResults::OnFunctionSetChanged )
 EVT_CHOICE( SP_ID_CHOICE_PARAMETER_SETS, SP_DLG_CPNSimulationResults::OnParameterSetChanged )
 EVT_CHOICE( SP_ID_CHOICE_SOLVER, SP_DLG_CPNSimulationResults::OnSolverChanged )
-EVT_RADIOBOX(SP_ID_RADIOBOX_SOLVER_TYPE,SP_DLG_CPNSimulationResults::OnSolverTypeChanged)
+EVT_CHOICE( SP_ID_CHOICE_SIMULATOR_SEMANTICS, SP_DLG_CPNSimulationResults::OnSemanticsChanged )
 EVT_BUTTON( SP_ID_BUTTON_SIMULATION_PROPERTIES, SP_DLG_CPNSimulationResults :: OnSimulationProperties )
 EVT_BUTTON( SP_ID_BUTTON_SAVE_ODE, SP_DLG_CPNSimulationResults :: SaveODE )
 END_EVENT_TABLE()
 //
 
 SP_DLG_CPNSimulationResults::SP_DLG_CPNSimulationResults(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText, wxString p_sTitle, long p_nStyle) :
-		SP_DLG_Simulation(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle), m_bIsSimulatorInitialized(false), m_nRedraw(true)
+		SP_DLG_Simulation(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle), m_bIsSimulatorInitialized(false), m_nRedraw(true),m_nSimulationSemantics(0)
 {
 
 int l_nSimulatorIndex =
@@ -119,54 +120,48 @@ int l_nSimulatorIndex =
 		}
 	}
 
+	//simulation algorithm
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxString l_sChoices[] =
-	{ wxT("Stiff"), wxT("Unstiff") };
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Simulator Semantics")), 1, wxALL | wxEXPAND, 5);
+	m_pcsemanticsComboBox = new wxChoice(m_pcPropertyWindowPropertySizer, SP_ID_CHOICE_SIMULATOR_SEMANTICS, wxDefaultPosition, wxSize(100, -1));
 
-	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Solver Type")), 1, wxALL | wxEXPAND, 5);
-	m_pcSolverType = new wxRadioBox(m_pcPropertyWindowPropertySizer, SP_ID_RADIOBOX_SOLVER_TYPE, wxT(""), wxDefaultPosition, wxDefaultSize, 2, l_sChoices, 2, wxRA_SPECIFY_COLS);
-	l_pcRowSizer->Add(m_pcSolverType);
+	l_pcRowSizer->Add(m_pcsemanticsComboBox);
+
+	//currently we support bio and server semantics
+	m_pcsemanticsComboBox->Clear();
+	m_pcsemanticsComboBox->Append(wxT("Bio Semantics"));
+	m_pcsemanticsComboBox->Append(wxT("Server Semantics"));
+
+	///set default solving algorithm
+	m_pcsemanticsComboBox->SetSelection(m_nSimulationSemantics);
+
+	m_pcSimulationProperites = new wxButton(m_pcPropertyWindowPropertySizer, SP_ID_BUTTON_ODE_SOLVER_PROPERTIES, wxT("Properties"));
+	l_pcRowSizer->Add(m_pcSimulationProperites, 0, wxALL
+	#if wxCHECK_VERSION(2,8,8)
+				| wxRESERVE_SPACE_EVEN_IF_HIDDEN
+	#endif
+				, 5);
+
 	m_pcPropertySizer->Add(l_pcRowSizer, 1, wxEXPAND);
-	//
+
+
+
+	//ODE solver
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Simulator")), 1, wxALL | wxEXPAND, 5);
-	m_pcSolver = new wxChoice(m_pcPropertyWindowPropertySizer, SP_ID_CHOICE_SOLVER, wxDefaultPosition, wxSize(100, -1));
-	m_pcSolver->Clear();
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("ODE Solver")), 1, wxALL | wxEXPAND, 5);
+	m_pcSolverComboBox = new wxChoice(m_pcPropertyWindowPropertySizer, SP_ID_CHOICE_SOLVER, wxDefaultPosition, wxSize(100, -1));
+	m_pcSolverComboBox->Clear();
 
-	//decode the solver type index
-	int l_nSolverType=l_nSimulatorIndex/7;
-
-	int L_nSolverAlgorithm=l_nSimulatorIndex-l_nSolverType*7;
-
-
-	 wxString l_asStiffSolverChoices[] =
-			{ wxT("BDF"), wxT("Shampine, Rosenbrock-Method"), wxT("[GRK4T] Kaps-Rentrop, Rosenbrock-Method"), wxT("[GRK4A] Kaps-Rentrop, Rosenbrock-Method"),
-					wxT("[gamma = 1/2] Van Veldhuizen, Rosenbrock-Method"), wxT("[D-stable] Van Veldhuizen, Rosenbrock-Method"), wxT("[L-stable], Rosenbrock-Method") };
-
-	 wxString l_asUnStiffSolverChoices[] =
-			{ wxT("ADAMS"), wxT("Euler (fixed step size)"), wxT("Modificated Euler (fixed step size)"), wxT("Classic Runge-Kutta (fixed step size)"), wxT("Kuntzmann 4th order (fixed step size)"),
-					wxT("Runge-Kutta-Fehlberg-4(5) (dynamic step size)"), wxT("Dormand-Prince-5(4) (dynamic step size)") };
-
-	//for stiff solver
-	if (l_nSolverType==0){
-	   for (int i = 0; i < 7; i++)
-		  m_pcSolver->Append(l_asStiffSolverChoices[i]);
-	}//for unstiff solver
-	else
-	{
-		for (int i = 0; i < 7; i++)
-			m_pcSolver->Append(l_asUnStiffSolverChoices[i]);
-	}
+	//add solve name to the m_pcSolverComboBox combobox
+	AddODESoverNameToComboBox();
 
 	//set default solving algorithm
-	m_pcSolver->SetSelection(L_nSolverAlgorithm);
+	 m_pcSolverComboBox->SetSelection(l_nSimulatorIndex);
 
-	//Set default solver type
-	m_pcSolverType->SetSelection(l_nSolverType);
-	l_pcRowSizer->Add(m_pcSolver, 1, wxALL, 5);
+	l_pcRowSizer->Add(m_pcSolverComboBox, 1, wxALL, 5);
 
-	m_pcSimulationProperites = new wxButton(m_pcPropertyWindowPropertySizer, SP_ID_BUTTON_SIMULATION_PROPERTIES, wxT("Properties"));
-	l_pcRowSizer->Add(m_pcSimulationProperites, 0, wxALL
+	m_pcODESolverProperites = new wxButton(m_pcPropertyWindowPropertySizer, SP_ID_BUTTON_SIMULATION_PROPERTIES, wxT("Properties"));
+	l_pcRowSizer->Add(m_pcODESolverProperites, 0, wxALL
 #if wxCHECK_VERSION(2,8,8)
 			| wxRESERVE_SPACE_EVEN_IF_HIDDEN
 #endif
@@ -403,49 +398,7 @@ void SP_DLG_CPNSimulationResults::OnFunctionSetChanged(wxCommandEvent& p_cEvent)
 	m_bIsSimulatorInitialized = false;
 
 }
-//
-void SP_DLG_CPNSimulationResults::OnSolverTypeChanged(wxCommandEvent& p_cEven)
-{
-	wxString l_asUnstiffSolverChoices[] =
-	{ wxT("ADAMS"), wxT("Euler (fixed step size)"), wxT("Modificated Euler (fixed step size)"), wxT("Classic Runge-Kutta (fixed step size)"), wxT("Kuntzmann 4th order (fixed step size)"),
-			wxT("Runge-Kutta-Fehlberg-4(5) (dynamic step size)"), wxT("Dormand-Prince-5(4) (dynamic step size)") };
-	wxString l_asStiffSolverChoices[] =
-	{ wxT("BDF"), wxT("Shampine, Rosenbrock-Method"), wxT("[GRK4T] Kaps-Rentrop, Rosenbrock-Method"), wxT("[GRK4A] Kaps-Rentrop, Rosenbrock-Method"),
-			wxT("[gamma = 1/2] Van Veldhuizen, Rosenbrock-Method"), wxT("[D-stable] Van Veldhuizen, Rosenbrock-Method"), wxT("[L-stable], Rosenbrock-Method") };
-	if (p_cEven.GetEventType() == wxEVT_COMMAND_RADIOBOX_SELECTED)
-	{
-		m_pcSolver->Clear();
-		if (m_pcSolverType->GetSelection() == 0)
-		{
-			for (int i = 0; i < 7; i++)
-				m_pcSolver->Append(l_asStiffSolverChoices[i]);
 
-			//Set default solver algorithm
-			m_pcMainSimulator = new spsim::CVODEContinuous(CV_BDF, CV_NEWTON);
-		}
-		else
-		{
-			for (int i = 0; i < 7; i++)
-			{
-				m_pcSolver->Append(l_asUnstiffSolverChoices[i]);
-			}
-
-			//Set default solver algorithm
-			m_pcMainSimulator = new spsim::CVODEContinuous();
-		}
-
-		//Select the first algorithm of the selected group
-		m_pcSolver->SetSelection(0);
-
-		m_bIsSimulatorInitialized = false;
-
-		//add gui properties
-		AddGuiOption2Simulator();
-
-	}
-
-}
-//
 void SP_DLG_CPNSimulationResults::OnModifyMarkingSets(wxCommandEvent& p_cEvent)
 {
 	SP_DLG_MarkingOverview* l_pcDlg = new SP_DLG_MarkingOverview(this);
@@ -477,6 +430,36 @@ void SP_DLG_CPNSimulationResults::OnModifyFunctionSets(wxCommandEvent& p_cEvent)
 		m_bIsSimulatorInitialized = false;
 	}
 	l_pcDlg->Destroy();
+}
+
+void SP_DLG_CPNSimulationResults::AddODESoverNameToComboBox()
+{
+	            wxString l_asODESolverNames[]={wxT("BDF (stiff)"),wxT("ADAMS (unstiff)"),
+					                       wxT("Rosenbrock-Method (stiff)"), wxT("Euler (unstiff)"),
+			                               wxT("Modificated Euler (unstiff)"),wxT("Classic Runge-Kutta (unstiff)"),
+										   wxT("Kuntzmann 4th order (unstiff)")};
+
+		         m_pcSolverComboBox->Clear();
+
+		         m_nSimulationSemantics=m_pcsemanticsComboBox->GetSelection();
+
+		         int l_nSimulatorCount=m_nSimulationSemantics==0? 6:2;
+
+		         for(int i=0;i<l_nSimulatorCount;i++)
+		         {
+		        	 m_pcSolverComboBox->Append(l_asODESolverNames[i]);
+		         }
+
+		         //select the first ODE solver
+		         m_pcSolverComboBox->SetSelection(0);
+
+		         //change the current ODE solver
+		         ChangeODESolver();
+}
+
+void SP_DLG_CPNSimulationResults::OnSemanticsChanged(wxCommandEvent& p_cEvent)
+{
+	        AddODESoverNameToComboBox();
 }
 
 void SP_DLG_CPNSimulationResults::OnModifyParameterSets(wxCommandEvent& p_cEvent)
@@ -518,6 +501,10 @@ void SP_DLG_CPNSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cEven
 	if (m_pcMainSimulator->IsSimulationRunning())
 	{
 		m_pcMainSimulator->AbortSimulation();
+		SetSimulationProgressGauge(100);
+		m_pcStartButton->SetLabel(wxT("Start Simulation"));
+		m_pcStartButton->SetBackgroundColour(*wxGREEN);
+		Update();
 		return;
 	}
 
@@ -721,103 +708,126 @@ void SP_DLG_CPNSimulationResults::UpdateSimulationDialog(const unsigned long& p_
 
 void SP_DLG_CPNSimulationResults::OnSolverChanged(wxCommandEvent& p_cEven)
 {
-	//Solver Algorithm
-	int l_nSolverIndex = m_pcSolver->GetSelection();
+	  ChangeODESolver();
+}
 
-	//Stiff/unstiff
-	int l_nSolverType = m_pcSolverType->GetSelection();
-	int l_nSolver = l_nSolverType * 7 + l_nSolverIndex;
+void SP_DLG_CPNSimulationResults::ChangeODESolver()
+{
+	     //Solver Algorithm
+		int l_nSolverIndex = m_pcSolverComboBox->GetSelection();
 
-	//get a pointer to the old simulator
-	spsim::Simulator* l_pcOldSimulator = m_pcMainSimulator;
+		m_nSimulationSemantics=m_pcsemanticsComboBox->GetSelection();
 
-	//create a solver
-	m_pcMainSimulator = CreateSimulator(l_nSolver);
+		//get a pointer to the old simulator
+		spsim::Simulator* l_pcOldSimulator = m_pcMainSimulator;
 
-	AddGuiOption2Simulator();
+		//create a solver
+		m_pcMainSimulator = CreateSimulator(l_nSolverIndex);
 
-	//copy old setting
-	m_pcMainSimulator->CopySettingFrom(l_pcOldSimulator);
+		AddGuiOption2Simulator();
 
-	wxDELETE(l_pcOldSimulator);
+		//copy old setting
+		m_pcMainSimulator->CopySettingFrom(l_pcOldSimulator);
 
-	m_bIsSimulatorInitialized = false;
+		wxDELETE(l_pcOldSimulator);
 
-	//tell the viewer the new data source
-	UpdateViewer();
+		m_bIsSimulatorInitialized = false;
+
+		//tell the viewer the new data source
+		UpdateViewer();
 }
 
 int SP_DLG_CPNSimulationResults::GetCureentSelectedSimulator()
 {
-	//Solver Algorithm
-	int l_nSolverAlgorithm=m_pcSolver->GetSelection();
-
-	 //Stiff/unstiff
-	 int l_nSolverType=m_pcSolverType->GetSelection();
-	 int l_nSolver=l_nSolverType*7+l_nSolverAlgorithm;
-
-	return l_nSolver;
+	return m_pcSolverComboBox->GetSelection();
 }
 
-spsim::Simulator* SP_DLG_CPNSimulationResults::CreateSimulator(const int& p_nSimulatorType)
+spsim::Simulator* SP_DLG_CPNSimulationResults::
+CreateSimulator(const int& p_nSimulatorType)
 {
+    if(m_nSimulationSemantics==1)  //server semantics
+    {
+    	if(p_nSimulatorType==0)
+    	{
+    		return new spsim::continuousSimulatorWithServerSemantics(CV_BDF, CV_NEWTON);
+    	}
+    	else if(p_nSimulatorType==1)
+    	{
+    		return new spsim::continuousSimulatorWithServerSemantics();
+    	}
+    	else
+    	{
+    		SP_LOGMESSAGE(wxT("Invalid value for the simulator index, we use BDF with server semantics."));
+    		return new spsim::continuousSimulatorWithServerSemantics(CV_BDF, CV_NEWTON);;
+    	}
+    }
 
 	//select the user selected solver
 	switch (p_nSimulatorType)
 	{
 	case 0:
 		return new spsim::CVODEContinuous(CV_BDF, CV_NEWTON);
-		break;
 	case 1:
-		return new spsim::RosenBrock(1);
-		break;
+		return new spsim::CVODEContinuous();
 	case 2:
-		return new spsim::RosenBrock(2);
-		break;
+		return new spsim::RosenBrock(1);
 	case 3:
-		return new spsim::RosenBrock(3);
-		break;
+		 return new spsim::Euler();
 	case 4:
-		return new spsim::RosenBrock(4);
-		break;
-	case 5:
-		return new spsim::RosenBrock(5);
-		break;
-	case 6:
-		return new spsim::RosenBrock(6);
-		break;
-	case 7:
-		return new spsim::CVODEContinuous();
-		break;
-	case 8:
-		return new spsim::Euler();
-		break;
-	case 9:
 		return new spsim::ModifiedEuler();
-		break;
-	case 10:
+	case 5:
+		return new spsim::RosenBrock(4);
+	case 6:
 		return new spsim::ClassicRungeKutta();
-		break;
-	case 11:
+	case 7:
 		return new spsim::SolverKuntzmann4();
-		break;
-	case 12:
-		return new spsim::CVODEContinuous();
-		//TODO: RungeKuttaFehlberg4_5 needs to be adjusted to the new code
-		//return new spsim::RungeKuttaFehlberg4_5();
-		break;
-	case 13:
-		return new spsim::CVODEContinuous();
-		//TODO: DormandPrince5_4 needs to be adjusted to the new code
-		//return new spsim::DormandPrince5_4();
-		break;
 	default:
-		return new spsim::Euler();
-		break;
+		SP_LOGMESSAGE(wxT("Invalid value for the simulator index, we use BDF with bio semantics."));
+		return new spsim::CVODEContinuous(CV_BDF, CV_NEWTON);
 	}
-
-	return new spsim::Euler();
 }
+
+int SP_DLG_CPNSimulationResults::LoadSimulatorProperties()
+{
+	    //Retrieve simulator name
+	    SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("Simulation Properties"))->GetElements()->begin());
+
+	    SP_DS_Attribute* l_pcAttr=NULL;
+
+	    if (l_pcSimProp!=NULL) {
+	    	 l_pcAttr = l_pcSimProp->GetAttribute(wxT("simulator Semantics"));
+	    }
+
+	    if(l_pcAttr!=NULL){
+	    	 m_nSimulationSemantics = (dynamic_cast<SP_DS_NumberAttribute*>(l_pcAttr))->GetValue();
+	    }
+	    else {
+	    	//by default we use the bio semantics
+	    	m_nSimulationSemantics=0;
+	    }
+
+	     //call the parent class to load the rest of properites
+         return SP_DLG_Simulation::LoadSimulatorProperties();
+}
+void SP_DLG_CPNSimulationResults::SaveSimulatorProperties()
+{
+	        SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("Simulation Properties"))->GetElements()->begin());
+
+		    SP_DS_Attribute* l_pcAttr=NULL;
+
+		    if (l_pcSimProp!=NULL) {
+		    	 l_pcAttr = l_pcSimProp->GetAttribute(wxT("simulator Semantics"));
+		    }
+
+		    if(l_pcAttr!=NULL){
+
+		    	(dynamic_cast<SP_DS_NumberAttribute*>(l_pcAttr))->SetValue(m_nSimulationSemantics);
+               }
+
+	    //call the parent class to save the rest of simulation properties
+	    SP_DLG_Simulation::SaveSimulatorProperties();
+}
+
 
 void SP_DLG_CPNSimulationResults::DirectExportToCSV()
 {
