@@ -993,6 +993,8 @@ SP_GUI_Canvas::MoveShapes(double p_nOffsetX, double p_nOffsetY)
 
     // Add selected node shapes, if any
     wxNode* l_pcNode = GetDiagram()->GetShapeList()->GetFirst();
+#if 1
+    // slow but no bug
     while (l_pcNode)
     {
         wxShape* l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
@@ -1007,6 +1009,33 @@ SP_GUI_Canvas::MoveShapes(double p_nOffsetX, double p_nOffsetY)
         }
         l_pcNode = l_pcNode->GetNext();
     }
+#else
+    // fast but bug while moving shapes
+    std::list<wxShape*> l_lSelectedShapes;
+    while (l_pcNode)
+    {
+        wxShape* l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
+        if (l_pcShape->Selected() &&
+            !l_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
+        {
+        	l_pcShape->Select(false, &l_cDC);
+        	l_lSelectedShapes.push_back(l_pcShape);
+        }
+        l_pcNode = l_pcNode->GetNext();
+    }
+    for(auto l_pcShape : l_lSelectedShapes)
+    {
+    	double l_nX = l_pcShape->GetX() + p_nOffsetX;
+    	double l_nY = l_pcShape->GetY() + p_nOffsetY;
+        // to get the line attachments right
+    	l_pcShape->Move(l_cDC, l_nX, l_nY);
+		UpdateVirtualSize(WXROUND(l_nX), WXROUND(l_nY));
+    }
+    for(auto l_pcShape : l_lSelectedShapes)
+    {
+    	l_pcShape->Select(true, &l_cDC);
+    }
+#endif
     return TRUE;
 }
 
