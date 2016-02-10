@@ -1010,8 +1010,12 @@ void SP_DLG_ColHPNSimultionResults::SaveODE(wxCommandEvent& p_cEvent)
 		}
 
 		wxString l_sResult;
+
+	    unsigned long l_nODECount=(dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))->
+	    		                      GetCurrentMarking()->GetContinuousPlaceCount();;
+
 		//Iterate for all the places
-		for (unsigned long l_nPlacePos = 0; l_nPlacePos < m_msPlaceNames.size(); l_nPlacePos++)
+		for (unsigned long l_nPlacePos = 0; l_nPlacePos <l_nODECount; l_nPlacePos++)
 		{
 			wxString l_sName = m_msPlaceNames[l_nPlacePos];
 			l_sResult << wxT("d")<<l_sName << wxT("/dt = ");

@@ -352,23 +352,7 @@ void SP_DLG_CPNSimulationResults::OnMarkingSetChanged(wxCommandEvent& p_cEvent)
 		}
 	}
 
-
-	/*
-	//Get the Places Nodes
-	unsigned int l_nCurrentMarkingSet = m_pcMarkingSetComboBox->GetSelection();
-	const SP_ListNode* l_pcPlaces = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE)->GetElements();
-
-	//Set the current Active List
-	for (SP_ListNode::const_iterator l_itPlace = l_pcPlaces->begin(); l_itPlace != l_pcPlaces->end(); l_itPlace++)
-		(dynamic_cast<SP_DS_ColListAttribute*>((*l_itPlace)->GetAttribute(wxT("MarkingList"))))->SetActiveList(l_nCurrentMarkingSet);
-	*/
 	m_bIsSimulatorInitialized = false;
-
-	//TODO: load only the current active Marking
-	//LoadPlaces();
-
-	//by sl
-	//LoadConnections();
 }
 //
 void SP_DLG_CPNSimulationResults::OnParameterSetChanged(wxCommandEvent& p_cEvent)
@@ -500,11 +484,17 @@ void SP_DLG_CPNSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cEven
 
 	if (m_pcMainSimulator->IsSimulationRunning())
 	{
+		//TDOD: rewrite this part
 		m_pcMainSimulator->AbortSimulation();
 		SetSimulationProgressGauge(100);
 		m_pcStartButton->SetLabel(wxT("Start Simulation"));
 		m_pcStartButton->SetBackgroundColour(*wxGREEN);
+
+		//Stop the stopwatch
+		 m_cSimulationStopWatch.Pause();
+
 		Update();
+
 		return;
 	}
 
@@ -654,6 +644,8 @@ void SP_DLG_CPNSimulationResults::DoStartSimulation()
 
 	while (l_nCurrentTime <= m_pcMainSimulator->GetOutputEndPoint() && m_pcMainSimulator->IsSimulationRunning())
 	{
+		//SP_LOGERROR( wxT("Simulating"));
+
 		l_nCurrentTime = m_pcMainSimulator->RunSimulationToNextOutputPoint();
 
 		UpdateSimulationDialog(m_pcMainSimulator->GetGeneratedResultPointsCount());
@@ -687,6 +679,14 @@ void SP_DLG_CPNSimulationResults::UpdateSimulationDialog(const unsigned long& p_
 		l_bUpdate = true;
 
 	}
+
+	CHECK_POINTER(m_pcMainSimulator, return);
+
+	if(!m_pcMainSimulator->IsSimulationRunning())
+	{
+		return;
+	}
+
 	if (l_bUpdate)
 	{
 		SetSimulationProgressGauge(p_nGeneratedResultPointCount);
@@ -700,7 +700,7 @@ void SP_DLG_CPNSimulationResults::UpdateSimulationDialog(const unsigned long& p_
 		}
 		m_nLastUpdateTime = l_nUpdateTime;
 
-		CHECK_EVENTS(m_pcMainSimulator->IsSimulationRunning(), return);
+		//CHECK_EVENTS(m_pcMainSimulator->IsSimulationRunning(), return);
 
 		RefreshExternalWindows();
 	}
