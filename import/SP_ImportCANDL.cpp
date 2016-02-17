@@ -303,6 +303,14 @@ bool SP_ImportCANDL::CreateColorsets(const dsszmc::andl::Colorsets& p_Colorsets)
 		wxString name = cs->name_;
 		//TODO: add more
 		wxString type = wxT("int");
+		if(cs->type_ == dsszmc::andl::ColorsetType::ENUM_T)
+		{
+			type = wxT("enum");
+		}
+		else if(cs->type_ == dsszmc::andl::ColorsetType::STRING_T)
+		{
+			type = wxT("string");
+		}
 		wxString colors = cs->definition_;
 		bool l_bSimple = true;
 		if(colors.StartsWith(wxT("PROD")))
