@@ -307,6 +307,7 @@ DECLARE_EVENT_TABLE()
 	virtual void OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent);
 	virtual void OnAddingNewModalView(wxCommandEvent& p_cEvent);
 	virtual void OnRemovingModalViews(wxCommandEvent& p_cEvent);
+	virtual void OnRenameModalView(wxCommandEvent& p_cEvent);
 	//overwrite this function in child class to give periodic update
 	virtual void OnTimer(wxTimerEvent& event)
 	{

@@ -92,7 +92,8 @@ enum
 	SP_ID_BUTTON_SHOW_SELECTED_VIEWS,
 	SP_ID_BUTTON_SHOW_ALL_VIEWS,
 	SP_ID_BUTTON_ADD_NEW_VIEW,
-	SP_ID_BUTTON_REMOVE_VIEWS
+	SP_ID_BUTTON_REMOVE_VIEWS,
+	SP_ID_BUTTON_RENAME_VIEW
 };
 
 BEGIN_EVENT_TABLE( SP_DLG_Simulation, SP_DLG_BaseSimulation )
@@ -134,6 +135,7 @@ EVT_BUTTON( SP_ID_BUTTON_SHOW_SELECTED_VIEWS, SP_DLG_Simulation :: OnOpenSelecte
 EVT_BUTTON( SP_ID_BUTTON_SHOW_ALL_VIEWS, SP_DLG_Simulation :: OnOpenAllViewsSeparately)
 EVT_BUTTON( SP_ID_BUTTON_ADD_NEW_VIEW, SP_DLG_Simulation :: OnAddingNewModalView)
 EVT_BUTTON( SP_ID_BUTTON_REMOVE_VIEWS, SP_DLG_Simulation :: OnRemovingModalViews)
+EVT_BUTTON( SP_ID_BUTTON_RENAME_VIEW, SP_DLG_Simulation :: OnRenameModalView)
 
 END_EVENT_TABLE()
 
@@ -310,6 +312,8 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	l_pctemp->Add(new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_ADD_NEW_VIEW, wxT("Add a New View")),
 					wxSizerFlags(0).Border(wxALL, 2));
 	l_pctemp->Add(new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_REMOVE_VIEWS, wxT("Remove Views")),
+					wxSizerFlags(0).Border(wxALL, 2));
+	l_pctemp->Add(new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_RENAME_VIEW, wxT("Rename View")),
 					wxSizerFlags(0).Border(wxALL, 2));
 	l_pcRowSizer->Add(l_pctemp, wxSizerFlags(0).Border(wxALL, 2));
 
@@ -515,6 +519,77 @@ void SP_DLG_Simulation::OnRemovingModalViews(wxCommandEvent& p_cEvent) {
 
 
 
+}
+
+void SP_DLG_Simulation::OnRenameModalView(wxCommandEvent& p_cEvent) {
+
+	wxArrayInt currentSelections;
+	wxArrayString currentSelections1;
+	currentSelections.Clear();
+	m_pcListboxShowAllGraphViewName->GetSelections(currentSelections);
+
+	if(currentSelections.IsEmpty() || currentSelections.GetCount() > 1)
+	{
+		SP_MESSAGEBOX(wxT("Please select one view to rename."), wxT("Error"), wxOK | wxICON_ERROR);
+		return;
+	}
+
+	// get a pointer to the view
+	wxString l_sView = m_pcListboxShowAllGraphViewName->GetStringSelection();
+	SP_DS_Metadata* l_pcView = FindView(l_sView);
+	//ChangeCurrentView(l_pcView);
+
+	//the user can not delete the main table
+	if (m_pcListboxShowAllGraphViewName->GetCount() == 1)
+	{
+		SP_MESSAGEBOX(wxT("Can not rename default view."), wxT("Error"), wxOK | wxICON_ERROR);
+		return;
+	}
+
+	wxTextEntryDialog* l_pcModelViewDlg;
+	wxString l_sViewName;
+
+	int l_nReturnCode = 0;
+
+	l_pcModelViewDlg = new wxTextEntryDialog(this, wxT("Enter view name:"), wxGetTextFromUserPromptStr, l_sView);
+
+	//ask the user to enter view name until he gives a valid
+	//name or give up
+	while ((l_nReturnCode = l_pcModelViewDlg->ShowModal()) != wxID_CANCEL)
+	{
+		l_sViewName = l_pcModelViewDlg->GetValue();
+
+		//check if the user supplied name is valid
+		if (l_sViewName == wxT(""))
+		{
+			SP_MESSAGEBOX(wxT("Invalid view name. View name can not be empty"), wxT("Error"));
+			continue;
+		}
+
+		if (IsViewNameExist(l_sViewName))
+		{
+			SP_MESSAGEBOX(wxT("Invalid view name. A view with this name already exists"), wxT("Error"));
+			continue;
+		}
+
+		//if there is no problem, break
+		break;
+	}
+
+	//check if the user canceled the dialog
+	if (l_nReturnCode == wxID_CANCEL)
+	{
+		return;
+	}
+
+	l_pcView->GetAttribute(wxT("Name"))->SetValueString(l_sViewName);
+    l_pcView->GetAttribute(wxT("ViewTitle"))->SetValueString(l_sViewName);
+
+	//m_pcCurrentTablePlot = NULL;
+	InitializeViews();
+
+	//reload the curves
+	LoadData(true);
 }
 
 void SP_DLG_Simulation::OnEditXAxis(wxWindow *p_pcExternalWindowDialog) {
