@@ -152,7 +152,12 @@ bool SP_DS_ColListAttribute::SetCell(unsigned int p_nRowNumber, unsigned int p_n
 {
 	if ( CheckRowIndex(p_nRowNumber) && CheckColIndex(p_nColNumber))
 	{
-		m_mmValues[p_nRowNumber][p_nColNumber] = p_nVal;
+		wxString l_sTemp = p_nVal;
+		if(p_nVal.Contains(SP_WILDCARD))
+		{
+			l_sTemp.Replace(SP_WILDCARD, m_mmValues[p_nRowNumber][p_nColNumber]);
+		}
+		m_mmValues[p_nRowNumber][p_nColNumber] = l_sTemp;
 		return true;
 	}
 
