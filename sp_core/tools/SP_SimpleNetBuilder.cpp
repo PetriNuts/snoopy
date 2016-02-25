@@ -703,6 +703,9 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 					l_sGuard.Trim(true).Trim(false);
 					if(!l_sGuard.IsEmpty() && l_sGuard.CmpNoCase(wxT("true")) != 0)
 						t->guard_ = "[" + l_sGuard + "]";
+					dsszmc::aux::replaceAll(t->guard_, "all()", "all");
+					dsszmc::aux::replaceAll(t->guard_, "auto()", "auto");
+					dsszmc::aux::replaceAll(t->guard_, "<>", "!=");
 				}
 
 				for(SP_DS_Edge* l_pcEdge : *(l_pcNode->GetSourceEdges()))
@@ -820,6 +823,9 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 					}
 				}
 				t->function_ = l_sFunction;
+				dsszmc::aux::replaceAll(t->function_, "all()", "all");
+				dsszmc::aux::replaceAll(t->function_, "auto()", "auto");
+				dsszmc::aux::replaceAll(t->function_, "<>", "!=");
 
 				b.addTransition(t);
 			}

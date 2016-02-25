@@ -171,6 +171,7 @@ SP_ImportCANDL::CreatePlaces(const dsszmc::andl::Places& p_Places)
 		}
 		wxString name = p->name_;
 		wxString marking = p->marking_;
+		AdaptColorExpression(marking);
 		wxString colorset = p->colorset_;
 		l_node = nodeClass->NewElement(l_pcCanvas->GetNetnumber());
 		l_node->GetAttribute(wxT("Name"))->SetValueString(name);
@@ -179,6 +180,25 @@ SP_ImportCANDL::CreatePlaces(const dsszmc::andl::Places& p_Places)
 		l_pcAttr->SetValueString(colorset);
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_node->GetAttribute(wxT("MarkingList")));
 		l_pcColAttr->Clear();
+
+		wxArrayString l_Functions = wxStringTokenize(marking, wxT("++"));
+		for(size_t i = 0; i < l_Functions.Count(); ++i)
+		{
+			wxString color,token;
+			if(l_Functions[i].Contains(wxT("`")))
+			{
+				token = l_Functions[i].BeforeFirst('`');
+				color = l_Functions[i].AfterFirst('`');
+			}
+			else
+			{
+				token = wxT("1");
+				color = l_Functions[i];
+			}
+			unsigned int l_nNewRow = l_pcColAttr->AppendEmptyRow();
+			l_pcColAttr->SetCell(l_nNewRow,0, color);
+			l_pcColAttr->SetCell(l_nNewRow,1, token);
+		}
 
 		l_node->ShowOnCanvas(l_pcCanvas, FALSE, x, y, 0);
 		lookupPlaces[p->name_] = l_node;
@@ -325,6 +345,7 @@ bool SP_ImportCANDL::CreateColorsets(const dsszmc::andl::Colorsets& p_Colorsets)
 			colors.Replace(wxT("{"), wxT("("));
 			colors.Replace(wxT("}"), wxT(")"));
 		}
+		AdaptColorExpression(colors);
 		if(l_bSimple)
 		{
 			unsigned int l_nNewRow = l_pcColListSimple->AppendEmptyRow();
@@ -405,7 +426,7 @@ bool SP_ImportCANDL::CreateFunctions(const dsszmc::andl::ColorFunctions& p_Funct
 			param << p.first << wxT(" ") << p.second;
 		}
 		wxString body = f->body_;
-
+		AdaptColorExpression(body);
 		SP_DS_Metadataclass* l_pcMetadataclass;
 		l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_FUNCTIONCLASS);
 		if(!l_pcMetadataclass)
@@ -486,6 +507,7 @@ SP_ImportCANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions
 		l_node->GetAttribute(wxT("Name"))->SetShow(TRUE);
 
 		wxString guard = t->guard_;
+		AdaptColorExpression(guard);
 		SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_node->GetAttribute(SP_DS_CPN_GUARDLIST));
 		l_pcAttr->SetCell(0,1,guard);
 
@@ -499,6 +521,7 @@ SP_ImportCANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions
 			if (!t->function_.empty())
 			{
 				function = t->function_;
+				AdaptColorExpression(function);
 			}
 
 			SP_DS_ColListAttribute* l_pcAttr;
@@ -519,24 +542,30 @@ SP_ImportCANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions
 
 			for(size_t i = 0; i < l_Functions.Count(); ++i)
 			{
-				wxString predicate = l_Functions[i].AfterFirst('[').BeforeFirst(']');
-				wxString function = l_Functions[i].AfterFirst('[');
-				unsigned int l_nNewRow = l_pcAttr->AppendEmptyRow();
-				l_pcAttr->SetCell(l_nNewRow,0, predicate);
-				if(nodeClass->GetName() == SP_DS_DETERMINISTIC_TRANS)
+				wxString pred;
+				wxString func;
+				if(l_Functions[i].Contains(wxT("]")))
 				{
-					l_pcAttr->SetCell(l_nNewRow,1, function);
+					pred = l_Functions[i].AfterFirst('[').BeforeFirst(']');
+					func =  l_Functions[i].AfterFirst(']');
 				}
-				else if(nodeClass->GetName() == SP_DS_SCHEDULED_TRANS)
+				else
 				{
-					wxArrayString vals = wxStringTokenize(function,  wxT(","));
+					pred = wxT("true");
+					func = l_Functions[i];
+				}
+				unsigned int l_nNewRow = l_pcAttr->AppendEmptyRow();
+				l_pcAttr->SetCell(l_nNewRow,0, pred);
+				if(nodeClass->GetName() == SP_DS_SCHEDULED_TRANS)
+				{
+					wxArrayString vals = wxStringTokenize(func,  wxT(","));
 					l_pcAttr->SetCell(l_nNewRow,1, vals[0]);
 					l_pcAttr->SetCell(l_nNewRow,2, vals[1]);
 					l_pcAttr->SetCell(l_nNewRow,3, vals[2]);
 				}
 				else
 				{
-					l_pcAttr->SetCell(l_nNewRow,1, function);
+					l_pcAttr->SetCell(l_nNewRow,1, func);
 				}
 			}
 		}
@@ -703,19 +732,29 @@ SP_ImportCANDL::CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxStrin
 	CHECK_POINTER(source, SP_LOGDEBUG(wxString(wxT("source is NULL"))));
 	CHECK_POINTER(target, SP_LOGDEBUG(wxString(wxT("target is NULL"))));
 
-		SP_DS_Edgeclass* l_pcEC = m_pcGraph->GetEdgeclass(type);
-		SP_GUI_Canvas* l_pcCanvas = m_pcView->GetCanvas();
-		SP_DS_Edge *l_edge =  l_pcEC->GetPrototype()->Clone();
-		l_edge->SetNetnumber(l_pcCanvas->GetNetnumber());
-		l_edge->SetNodes(source,target);
-		l_edge->SetNodes(*(source->GetGraphics()->begin()),*(target->GetGraphics()->begin()));
-		SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_edge->GetAttribute(SP_DS_CPN_INSCRIPTION));
-		if(l_pcAttr)
-			l_pcAttr->SetCell(0,1,weight);
-		l_pcEC->AddElement(l_edge);
-		l_edge->ShowOnCanvas(l_pcCanvas, FALSE);
-		CHECK_POINTER(l_edge->GetGraphics(),SP_LOGDEBUG(wxT("no graphics")));
+	wxString w = weight;
+	AdaptColorExpression(w);
+	SP_DS_Edgeclass* l_pcEC = m_pcGraph->GetEdgeclass(type);
+	SP_GUI_Canvas* l_pcCanvas = m_pcView->GetCanvas();
+	SP_DS_Edge *l_edge =  l_pcEC->GetPrototype()->Clone();
+	l_edge->SetNetnumber(l_pcCanvas->GetNetnumber());
+	l_edge->SetNodes(source,target);
+	l_edge->SetNodes(*(source->GetGraphics()->begin()),*(target->GetGraphics()->begin()));
+	SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_edge->GetAttribute(SP_DS_CPN_INSCRIPTION));
+	if(l_pcAttr)
+		l_pcAttr->SetCell(0,1,w);
+	l_pcEC->AddElement(l_edge);
+	l_edge->ShowOnCanvas(l_pcCanvas, FALSE);
+	CHECK_POINTER(l_edge->GetGraphics(),SP_LOGDEBUG(wxT("no graphics")));
 
+}
+
+void
+SP_ImportCANDL::AdaptColorExpression(wxString& p_ColorExpression)
+{
+	p_ColorExpression.Replace("all", "all()");
+	p_ColorExpression.Replace("auto", "auto()");
+	p_ColorExpression.Replace("!=", "<>");
 }
 
 

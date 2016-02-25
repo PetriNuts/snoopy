@@ -104,7 +104,7 @@ private:
 	bool CreateTransitions(const dsszmc::andl::Transitions& p_Transitions);
 	void CreateArcs();
 	void doLayout();
-
+	void AdaptColorExpression(wxString& p_ColorExpression);
 
  protected:
 
