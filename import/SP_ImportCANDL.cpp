@@ -181,19 +181,29 @@ SP_ImportCANDL::CreatePlaces(const dsszmc::andl::Places& p_Places)
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_node->GetAttribute(wxT("MarkingList")));
 		l_pcColAttr->Clear();
 
-		wxArrayString l_Functions = wxStringTokenize(marking, wxT("++"));
-		for(size_t i = 0; i < l_Functions.Count(); ++i)
+		wxArrayString l_Markings;
+		size_t prev = 0;
+		for(size_t i = marking.find(wxT("++")); i != wxNOT_FOUND; i = marking.find(wxT("++"), i+2))
+		{
+			l_Markings.Add(marking.Mid(prev,i-prev));
+			prev = i;
+		}
+		if(l_Markings.IsEmpty())
+		{
+			l_Markings.Add(marking);
+		}
+		for(size_t i = 0; i < l_Markings.Count(); ++i)
 		{
 			wxString color,token;
-			if(l_Functions[i].Contains(wxT("`")))
+			if(l_Markings[i].Contains(wxT("`")))
 			{
-				token = l_Functions[i].BeforeFirst('`');
-				color = l_Functions[i].AfterFirst('`');
+				token = l_Markings[i].BeforeFirst('`');
+				color = l_Markings[i].AfterFirst('`');
 			}
 			else
 			{
 				token = wxT("1");
-				color = l_Functions[i];
+				color = l_Markings[i];
 			}
 			unsigned int l_nNewRow = l_pcColAttr->AppendEmptyRow();
 			l_pcColAttr->SetCell(l_nNewRow,0, color);
@@ -342,8 +352,8 @@ bool SP_ImportCANDL::CreateColorsets(const dsszmc::andl::Colorsets& p_Colorsets)
 		else
 		{
 			colors.Replace(wxT(".."), wxT("-"));
-			colors.Replace(wxT("{"), wxT("("));
-			colors.Replace(wxT("}"), wxT(")"));
+			colors.Replace(wxT("{"), wxT(""));
+			colors.Replace(wxT("}"), wxT(""));
 		}
 		AdaptColorExpression(colors);
 		if(l_bSimple)
@@ -538,8 +548,17 @@ SP_ImportCANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions
 				l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_node->GetAttribute(wxT("FunctionList")));
 			}
 			l_pcAttr->Clear();
-			wxArrayString l_Functions = wxStringTokenize(function, wxT("++"));
-
+			wxArrayString l_Functions;
+			size_t prev = 0;
+			for(size_t i = function.find(wxT("++")); i != wxNOT_FOUND; i = function.find(wxT("++"), i+2))
+			{
+				l_Functions.Add(function.Mid(prev,i-prev));
+				prev = i;
+			}
+			if(l_Functions.IsEmpty())
+			{
+				l_Functions.Add(function);
+			}
 			for(size_t i = 0; i < l_Functions.Count(); ++i)
 			{
 				wxString pred;
