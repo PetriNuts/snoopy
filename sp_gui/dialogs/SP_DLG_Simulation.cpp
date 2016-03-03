@@ -319,24 +319,27 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
 	m_pcSimulationButtonSizer->Add(l_pcRowSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	m_pcStartButton = new wxButton(m_pcPropertyWindowSimulationButtonSizer, SP_ID_BUTTON_START_SIMULATION, wxT("Start Simulation"));
-	m_pcStartButton->SetBackgroundColour(*wxGREEN);
-	l_pcRowSizer->Add(m_pcStartButton, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	m_pcSimulationProgressGauge = new wxGauge(m_pcPropertyWindowSimulationButtonSizer, -1, 100, wxDefaultPosition, wxDefaultSize, 0);
-	l_pcRowSizer->Add(m_pcSimulationProgressGauge, wxSizerFlags(1).Expand().Border(wxALL, 5));
-	m_pcSimulationButtonSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
-
-	// simulation stop watch
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("Simulation runtime:")), 0, wxALL, 5);
-	m_pcSimulationStopWatch = new wxStaticText(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("0.000 s"));
-	l_pcRowSizer->Add(m_pcSimulationStopWatch, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	m_pcSimulationButtonSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
-
 	m_pcPropertyWindowSimulationButtonSizer->SetSizerAndFit(m_pcSimulationButtonSizer);
 	m_pcSimulationButtonSizer->SetSizeHints(m_pcPropertyWindowSimulationButtonSizer);
 	m_pcSimulationControlSizer->Add(m_pcPropertyWindowSimulationButtonSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
+
+	// start simulation
+	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+	m_pcStartButton = new wxButton(this, SP_ID_BUTTON_START_SIMULATION, wxT("Start Simulation"));
+	m_pcStartButton->SetBackgroundColour(*wxGREEN);
+	l_pcRowSizer->Add(m_pcStartButton, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_pcSimulationProgressGauge = new wxGauge(this, -1, 100, wxDefaultPosition, wxDefaultSize, 0);
+	l_pcRowSizer->Add(m_pcSimulationProgressGauge, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	m_pcSimulationProgressText = new wxStaticText(this, -1, wxT("    0 %"), wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE | wxALIGN_RIGHT);
+	l_pcRowSizer->Add(m_pcSimulationProgressText, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_pcMainSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
+
+	// simulation stop watch
+	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Simulation runtime:")), 0, wxALL, 5);
+	m_pcSimulationStopWatch = new wxStaticText(this, -1, wxT("0.000 s"));
+	l_pcRowSizer->Add(m_pcSimulationStopWatch, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_pcMainSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 	m_pcMainSizer->Add(new wxButton(this, wxID_CANCEL, wxT("Close")), wxSizerFlags(0).Border(wxALL, 5));
 

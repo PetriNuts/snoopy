@@ -90,6 +90,8 @@ protected:
 	SP_MapLong2Colour m_msPlacePos2Colour;
 
 	wxGauge* m_pcSimulationProgressGauge;
+	wxStaticText* m_pcSimulationProgressText;
+
 	bool m_bCompressExact;
 	wxString m_sNodeclass;
 	bool m_bSumOfNodes;
@@ -407,11 +409,14 @@ public:
 	virtual void SetSimulationProgressGauge(long p_nValue)
 	{
 		m_pcSimulationProgressGauge->SetValue(p_nValue);
+		m_pcSimulationProgressText->SetLabel(
+				wxString::Format(wxT("%i %%"),(p_nValue*100)/m_pcSimulationProgressGauge->GetRange()));
 		Update();
 	}
 	virtual void SetSimulationProgressGaugeRange(long p_nRangeValue)
 	{
 		m_pcSimulationProgressGauge->SetRange(p_nRangeValue);
+		m_pcSimulationProgressText->SetLabel(wxT("0 %"));
 	}
 
 	virtual void SetDirectExportFilename(const wxString& p_sFilename)
