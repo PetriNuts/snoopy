@@ -66,7 +66,7 @@ bool SP_ExportColHPN2HybridPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileNa
 	CHECK_POINTER(l_pcParams,return false);
 
 	SP_GM_Docmanager* l_pcDM = wxGetApp().GetDocmanager();
-	SP_GM_DocTemplate* l_pcTemplate = l_pcDM->GetTemplate(SP_DS_SPN_CLASS);
+	SP_GM_DocTemplate* l_pcTemplate = l_pcDM->GetTemplate(SP_DS_HYBRIDPN_CLASS);
 	SP_DS_Netclass* newClass = l_pcTemplate->GetNetclass();
 	m_pcExportGraph = new SP_DS_Graph(newClass);
 
@@ -142,6 +142,7 @@ bool SP_ExportColHPN2HybridPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNod
 	l_pcElem->AddAttribute(wxT("name"), l_sNodeclassName);
 	p_pcRoot->AddChild( l_pcElem );		
 
+
 	if( wxT("Place") == l_sNodeclassName )
 	{	
 		map<wxString, SP_DS_Node*>::iterator itMap;
@@ -167,7 +168,8 @@ bool SP_ExportColHPN2HybridPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNod
 		}
 	}
 	else if( SP_DS_CONTINUOUS_TRANS == l_sNodeclassName )
-	{		
+	{
+
 		map<wxString, SP_DS_Node*>::iterator itMap;
 		for ( itMap = m_mNewContinuousTransitionNodes.begin(); itMap != m_mNewContinuousTransitionNodes.end(); ++itMap )
 		{				
