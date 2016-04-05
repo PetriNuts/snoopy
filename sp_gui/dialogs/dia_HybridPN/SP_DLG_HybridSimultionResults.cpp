@@ -191,8 +191,6 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 	m_pcContinuousSolver->Clear();
 
 	//Add the ODE Solver Types
-	m_pcContinuousSolver->Append(wxT("Explicit RK"));
-	m_pcContinuousSolver->Append(wxT("Implicit RK"));
 	m_pcContinuousSolver->Append(wxT("ARK"));
 	m_pcContinuousSolver->Append(wxT("BDF"));
 	m_pcContinuousSolver->Append(wxT("ADAMS"));
@@ -419,24 +417,6 @@ void SP_DLG_HybridSimulationResults::OnMarkingSetChanged(wxCommandEvent& p_cEven
 }
 //
 
-/*
- void SP_DLG_HybridSimulationResults::OnParameterSetChanged( wxCommandEvent& p_cEvent )
- {
- if(m_pcMainSimulator->IsSimulationRunning())
- {
- return;
- }
-
- unsigned int l_nCurrentParameterSet = m_pcParameterSetComboBox->GetSelection();
- const SP_ListNode* l_pcParams=m_pcGraph->GetNodeclass(SP_DS_PARAM)->GetElements();
-
- //Set the current Active List
- for(SP_ListNode::const_iterator l_itParam=l_pcParams->begin();l_itParam!=l_pcParams->end();l_itParam++)
- (dynamic_cast<SP_DS_ColListAttribute*>((*l_itParam)->GetAttribute(wxT("ParameterList"))))->SetActiveList(l_nCurrentParameterSet);
-
- m_bIsSimulatorInitialized=false;
- }
- */
 
 void SP_DLG_HybridSimulationResults::OnFunctionSetChanged(wxCommandEvent& p_cEvent)
 {
