@@ -134,7 +134,7 @@ bool SP_VectorReader::Read(SP_DS_NodeVectorSystem *p_pcNvms,
 				}
 			}
 			l_pcNodeVector->SetVector(a_vector);
-			l_pcNodeVector->AddAttribute(new SP_DS_NameAttribute(wxT("Name"), wxT("")));
+			l_pcNodeVector->AddAttribute(new SP_DS_TextAttribute(wxT("Name"), wxT("")));
 			l_pcNodeVector->AddAttribute(new SP_DS_TextAttribute(wxT("Comment"), wxT("")));
 
 			p_pcNvms->AddElement(l_pcNodeVector);
@@ -159,7 +159,7 @@ bool SP_VectorReader::Read(SP_DS_NodeVectorSystem *p_pcNvms,
 			if (nodeVector->GetAttribute(wxT("Name"))
 					&& nodeVector->GetAttribute(wxT("Comment")))
 			{
-				dynamic_cast<SP_DS_NameAttribute*>(nodeVector->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->SetValueString(l_name);
+				dynamic_cast<SP_DS_TextAttribute*>(nodeVector->GetAttribute(wxT("Name")))->SetValueString(l_name);
 				dynamic_cast<SP_DS_TextAttribute*>(nodeVector->GetAttribute(wxT("Comment")))->SetValueString(l_description);
 			}
 		}
