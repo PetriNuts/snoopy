@@ -68,5 +68,7 @@
 			<string>Default</string>
 		</dict>
 	</array>
+	<key>NSPrincipalClass</key>
+	<string>wxNSApplication</string>
 </dict>
 </plist>

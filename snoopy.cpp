@@ -82,7 +82,6 @@
 #include "export/SP_ExportStochPed2ContPed.h"
 #include "export/SP_ExportPed2StochPed.h"
 #include "export/SP_ExportExtPT2StochPed.h"
-//TODO: uncomment when new SPN class is added
 #include "export/SP_ExportStochPed2TimePT.h"
 #include "export/SP_ExportPNML.h"
 #include "export/SP_ExportSBML.h"

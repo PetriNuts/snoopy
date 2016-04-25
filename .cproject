@@ -1,425 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?fileVersion 4.0.0?><cproject>
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
-		<cconfiguration id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863" moduleId="org.eclipse.cdt.core.settings" name="Debug-MacOSX">
-				<externalSettings/>
-				<extensions>
-					<extension id="org.eclipse.cdt.core.MachO" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-				</extensions>
-			</storageModule>
-			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="snoopy" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.MakeErrorParser" id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863" name="Debug-MacOSX" parent="cdt.managedbuild.config.gnu.macosx.exe.debug" postannouncebuildStep="" postbuildStep="mkdir -p ${BuildArtifactFileName}.app/Contents/MacOS ; mv ${BuildArtifactFileName} ${BuildArtifactFileName}.app/Contents/MacOS/" preannouncebuildStep="" prebuildStep="">
-					<folderInfo id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863." name="/" resourcePath="">
-						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.macosx.exe.debug.1471375859" name="MacOSX GCC" resourceTypeBasedDiscovery="true" superClass="cdt.managedbuild.toolchain.gnu.macosx.exe.debug">
-							<targetPlatform binaryParser="org.eclipse.cdt.core.MachO64;org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.MachO" id="cdt.managedbuild.target.gnu.platform.macosx.exe.debug.1558561428" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.macosx.exe.debug"/>
-							<builder autoBuildTarget="all" buildPath="${workspace_loc:/snoopy/Debug-MacOSX}" cleanBuildTarget="clean" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" errorParsers="" id="cdt.managedbuild.target.gnu.builder.macosx.exe.debug.2059672840" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.debug">
-								<outputEntries>
-									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug-MacOSX"/>
-									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release-MacOSX"/>
-									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug-Linux"/>
-									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release-Linux"/>
-								</outputEntries>
-							</builder>
-							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug.2041455969" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug"/>
-							<tool command="g++ `/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html --static=yes --unicode=yes --debug=yes`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.debug.1161291233" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.debug">
-								<option id="macosx.cpp.link.option.paths.358687021" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Debug_MacOSX}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_MacOSX}&quot;"/>
-								</option>
-								<option id="macosx.cpp.link.option.libs.1398695993" name="Libraries (-l)" superClass="macosx.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="wxcode_macud_freechart-2.8"/>
-									<listOptionValue builtIn="false" value="wxcode_macud_ogl-2.8"/>
-									<listOptionValue builtIn="false" value="sundials_nvecserial"/>
-									<listOptionValue builtIn="false" value="sundials_cvode"/>
-									<listOptionValue builtIn="false" value="sbml"/>
-									<listOptionValue builtIn="false" value="irrklang"/>
-									<listOptionValue builtIn="false" value="OGDF"/>
-									<listOptionValue builtIn="false" value="SPSA_SteeringAPI"/>
-									<listOptionValue builtIn="false" value="spsim_sd"/>
-									<listOptionValue builtIn="false" value="gecodeflatzinc"/>
-									<listOptionValue builtIn="false" value="gecodedriver"/>
-									<listOptionValue builtIn="false" value="gecodesearch"/>
-									<listOptionValue builtIn="false" value="gecodeminimodel"/>
-									<listOptionValue builtIn="false" value="gecodeset"/>
-									<listOptionValue builtIn="false" value="gecodeint"/>
-									<listOptionValue builtIn="false" value="gecodekernel"/>
-									<listOptionValue builtIn="false" value="gecodesupport"/>
-								</option>
-								<option id="macosx.cpp.link.option.flags.7353077" name="Linker flags" superClass="macosx.cpp.link.option.flags" value="-arch i386 -mmacosx-version-min=10.5" valueType="string"/>
-								<option id="macosx.cpp.link.option.other.1285920091" name="Other options (-Xlinker [option])" superClass="macosx.cpp.link.option.other"/>
-								<option id="macosx.cpp.link.option.nostart.833048945" name="Do not use standard start files (-nostartfiles)" superClass="macosx.cpp.link.option.nostart"/>
-								<option id="macosx.cpp.link.option.nodeflibs.1711434376" name="Do not use default libraries (-nodefaultlibs)" superClass="macosx.cpp.link.option.nodeflibs"/>
-								<option id="macosx.cpp.link.option.nostdlibs.566840101" name="No startup or default libs (-nostdlib)" superClass="macosx.cpp.link.option.nostdlibs"/>
-								<option id="macosx.cpp.link.option.strip.1283428413" name="Omit all symbol information (-s)" superClass="macosx.cpp.link.option.strip"/>
-								<option id="macosx.cpp.link.option.userobjs.2119094428" name="Other objects" superClass="macosx.cpp.link.option.userobjs"/>
-								<option id="macosx.cpp.link.option.shared.2086033922" name="Shared (-dynamiclib)" superClass="macosx.cpp.link.option.shared"/>
-								<inputType id="cdt.managedbuild.tool.macosx.cpp.linker.input.2051996527" superClass="cdt.managedbuild.tool.macosx.cpp.linker.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
-							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.assembler.macosx.exe.debug.882457878" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.macosx.exe.debug">
-								<option id="gnu.both.asm.option.include.paths.1983407307" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths"/>
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.546657616" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.archiver.macosx.base.1081794464" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.macosx.base"/>
-							<tool command="g++ `/usr/local/bin/wx-config --cxxflags --static=yes --unicode=yes --debug=yes`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.debug.2003384820" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.debug">
-								<option id="gnu.cpp.compilermacosx.exe.debug.option.optimization.level.1251652414" name="Optimization Level" superClass="gnu.cpp.compilermacosx.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.macosx.exe.debug.option.debugging.level.169263370" name="Debug Level" superClass="gnu.cpp.compiler.macosx.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.1140774545" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="__WXMAC__"/>
-									<listOptionValue builtIn="false" value="__WXDEBUG__"/>
-									<listOptionValue builtIn="false" value="UNICODE"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.other.other.201664478" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -mfpmath=sse -arch i386 -mmacosx-version-min=10.5" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.include.paths.2089678311" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/wx-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/mac-unicode-debug-static-2.8"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.1025677018" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.preprocess.944939954" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.undef.1206716809" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef"/>
-								<option id="gnu.cpp.compiler.option.optimization.flags.1084319085" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.debugging.other.649485092" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other" value="-g2" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.debugging.prof.1565572468" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof"/>
-								<option id="gnu.cpp.compiler.option.debugging.gprof.1580840332" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof" value="false" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.warnings.syntax.2119271893" name="Check syntax only (-fsyntax-only)" superClass="gnu.cpp.compiler.option.warnings.syntax"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.2065762991" name="Pedantic (-pedantic)" superClass="gnu.cpp.compiler.option.warnings.pedantic"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.error.740169818" name="Pedantic warnings as errors (-pedantic-errors)" superClass="gnu.cpp.compiler.option.warnings.pedantic.error"/>
-								<option id="gnu.cpp.compiler.option.warnings.nowarn.392752155" name="Inhibit all warnings (-w)" superClass="gnu.cpp.compiler.option.warnings.nowarn" value="false" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.warnings.allwarn.1660871684" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.warnings.toerrors.287004215" name="Warnings as errors (-Werror)" superClass="gnu.cpp.compiler.option.warnings.toerrors" value="false" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.other.verbose.694009046" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose"/>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1288665147" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
-							</tool>
-							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug.925342154" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug">
-								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.macosx.exe.debug.option.optimization.level.530052558" name="Optimization Level" superClass="gnu.c.compiler.macosx.exe.debug.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.macosx.exe.debug.option.debugging.level.425432438" name="Debug Level" superClass="gnu.c.compiler.macosx.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.include.paths.2138365248" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths"/>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.2133102425" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols"/>
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1265960067" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
-							</tool>
-						</toolChain>
-					</folderInfo>
-					<sourceEntries>
-						<entry excluding="Release-MacOSX|functions/exceptions.cc|Release-MacOSX-Univ|Debug-MacOSX-Univ|Debug-MacOSX|Snoopy.rc|Release|makefile.unx|wxwin.m4|SnoopyVC.sln|SnoopyVC.dsw|sp_ds/extensions/ext_SPN/SP_DS_StFormula.cpp|mk.sh|snoopy.dmg|snoopy.icns|snoopy.ico|Makefile.in|bitmaps|SnoopyVC.dsp|SnoopyVC.vcproj|createSnoopyPackage|src.lst|mk_src_lst.sh|Setup|scripts|SP_DS_HybridMarking.cpp|snoopy.m4|snoopy.xpm|Debug|aclocal.m4|build|configure|configure.in|sp_ds/extensions/ext_SPN/SP_DS_StFormula.h|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.cpp|distr|Info.plist|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.h|SnoopyVC.mak|INSTALL|mkAppBundleOSX.sh|snoopy.xcodeproj|mk_distr.sh|Makefile.am|install-sh|config.h.in|snoopy2.spec|missing|depcomp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-					</sourceEntries>
-				</configuration>
-			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
-			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
-			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
-		</cconfiguration>
-		<cconfiguration id="cdt.managedbuild.config.macosx.exe.release.239936695">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.macosx.exe.release.239936695" moduleId="org.eclipse.cdt.core.settings" name="Release-MacOSX">
-				<externalSettings/>
-				<extensions>
-					<extension id="org.eclipse.cdt.core.MachO" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-				</extensions>
-			</storageModule>
-			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="snoopy" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" errorParsers="" id="cdt.managedbuild.config.macosx.exe.release.239936695" name="Release-MacOSX" parent="cdt.managedbuild.config.macosx.exe.release" postannouncebuildStep="" postbuildStep="../mkAppBundleOSX.sh ${BuildArtifactFileName} ; rm  sp_gui/dialogs/SP_DLG_About.* ; rm sp_gui/dialogs/SP_DLG_CheckForUpdate.*" preannouncebuildStep="" prebuildStep="">
-					<folderInfo id="cdt.managedbuild.config.macosx.exe.release.239936695." name="/" resourcePath="">
-						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.macosx.exe.release.351912029" name="MacOSX GCC" superClass="cdt.managedbuild.toolchain.gnu.macosx.exe.release">
-							<targetPlatform binaryParser="org.eclipse.cdt.core.MachO64;org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.MachO" id="cdt.managedbuild.target.gnu.platform.macosx.exe.release.833650102" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.macosx.exe.release"/>
-							<builder autoBuildTarget="all" buildPath="${workspace_loc:/snoopy/Release-MacOSX}" cleanBuildTarget="clean" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" errorParsers="org.eclipse.cdt.core.MakeErrorParser" id="cdt.managedbuild.target.gnu.builder.macosx.exe.release.1566741220" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="8" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.release"/>
-							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release.739024547" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release"/>
-							<tool command="g++ `/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html --static=yes --unicode=yes --debug=no --version=2.8`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release.1501743496" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release">
-								<option id="macosx.cpp.link.option.paths.1479419569" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Release_MacOSX}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Release_MacOSX}&quot;"/>
-								</option>
-								<option id="macosx.cpp.link.option.libs.166249148" name="Libraries (-l)" superClass="macosx.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="wxcode_macu_freechart-2.8"/>
-									<listOptionValue builtIn="false" value="wxcode_macu_ogl-2.8"/>
-									<listOptionValue builtIn="false" value="sundials_nvecserial"/>
-									<listOptionValue builtIn="false" value="sundials_cvode"/>
-									<listOptionValue builtIn="false" value="sbml"/>
-									<listOptionValue builtIn="false" value="irrklang"/>
-									<listOptionValue builtIn="false" value="OGDF"/>
-									<listOptionValue builtIn="false" value="spsim_sr"/>
-									<listOptionValue builtIn="false" value="SPSA_SteeringAPI"/>
-									<listOptionValue builtIn="false" value="gecodeflatzinc"/>
-									<listOptionValue builtIn="false" value="gecodedriver"/>
-									<listOptionValue builtIn="false" value="gecodesearch"/>
-									<listOptionValue builtIn="false" value="gecodeminimodel"/>
-									<listOptionValue builtIn="false" value="gecodeset"/>
-									<listOptionValue builtIn="false" value="gecodeint"/>
-									<listOptionValue builtIn="false" value="gecodekernel"/>
-									<listOptionValue builtIn="false" value="gecodesupport"/>
-									<listOptionValue builtIn="false" value="functions"/>
-									<listOptionValue builtIn="false" value="boost_regex"/>
-								</option>
-								<option id="macosx.cpp.link.option.other.976058916" name="Other options (-Xlinker [option])" superClass="macosx.cpp.link.option.other"/>
-								<option id="macosx.cpp.link.option.nostart.1131803690" name="Do not use standard start files (-nostartfiles)" superClass="macosx.cpp.link.option.nostart"/>
-								<option id="macosx.cpp.link.option.nodeflibs.853872587" name="Do not use default libraries (-nodefaultlibs)" superClass="macosx.cpp.link.option.nodeflibs"/>
-								<option id="macosx.cpp.link.option.nostdlibs.496380714" name="No startup or default libs (-nostdlib)" superClass="macosx.cpp.link.option.nostdlibs"/>
-								<option id="macosx.cpp.link.option.strip.168664947" name="Omit all symbol information (-s)" superClass="macosx.cpp.link.option.strip"/>
-								<option id="macosx.cpp.link.option.flags.721356221" name="Linker flags" superClass="macosx.cpp.link.option.flags" value="-arch i386 -mmacosx-version-min=10.5" valueType="string"/>
-								<option id="macosx.cpp.link.option.userobjs.1765789255" name="Other objects" superClass="macosx.cpp.link.option.userobjs"/>
-								<option id="macosx.cpp.link.option.shared.1150147071" name="Shared (-dynamiclib)" superClass="macosx.cpp.link.option.shared"/>
-								<inputType id="cdt.managedbuild.tool.macosx.cpp.linker.input.992676575" superClass="cdt.managedbuild.tool.macosx.cpp.linker.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
-							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.assembler.macosx.exe.release.821461845" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.macosx.exe.release">
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.305750628" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.archiver.macosx.base.1197657214" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.macosx.base"/>
-							<tool command="g++ `/usr/local/bin/wx-config --cxxflags --static=yes --unicode=yes --debug=no --version=2.8`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release.1654213482" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release">
-								<option id="gnu.cpp.compiler.macosx.exe.release.option.optimization.level.287277451" name="Optimization Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.more" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.macosx.exe.release.option.debugging.level.1047800433" name="Debug Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.2062525018" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="__WXMAC__"/>
-									<listOptionValue builtIn="false" value="UNICODE"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.include.paths.522580868" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/wx-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/mac-unicode-release-static-2.8"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.other.other.1149973763" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -mfpmath=sse -Wno-overloaded-virtual " valueType="string"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.760209630" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.preprocess.703923774" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.undef.129372711" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef"/>
-								<option id="gnu.cpp.compiler.option.optimization.flags.127508465" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.debugging.other.2013867273" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other"/>
-								<option id="gnu.cpp.compiler.option.debugging.prof.508733607" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof"/>
-								<option id="gnu.cpp.compiler.option.debugging.gprof.444410395" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof"/>
-								<option id="gnu.cpp.compiler.option.warnings.syntax.572303911" name="Check syntax only (-fsyntax-only)" superClass="gnu.cpp.compiler.option.warnings.syntax"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.1050923947" name="Pedantic (-pedantic)" superClass="gnu.cpp.compiler.option.warnings.pedantic"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.error.339542009" name="Pedantic warnings as errors (-pedantic-errors)" superClass="gnu.cpp.compiler.option.warnings.pedantic.error"/>
-								<option id="gnu.cpp.compiler.option.warnings.nowarn.807929563" name="Inhibit all warnings (-w)" superClass="gnu.cpp.compiler.option.warnings.nowarn"/>
-								<option id="gnu.cpp.compiler.option.warnings.allwarn.1993538321" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn"/>
-								<option id="gnu.cpp.compiler.option.warnings.toerrors.1316481954" name="Warnings as errors (-Werror)" superClass="gnu.cpp.compiler.option.warnings.toerrors"/>
-								<option id="gnu.cpp.compiler.option.other.verbose.1499203369" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose"/>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1176058254" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
-							</tool>
-							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.release.1270211853" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.release">
-								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.macosx.exe.release.option.optimization.level.385373790" name="Optimization Level" superClass="gnu.c.compiler.macosx.exe.release.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.macosx.exe.release.option.debugging.level.749747574" name="Debug Level" superClass="gnu.c.compiler.macosx.exe.release.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.317838331" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
-							</tool>
-						</toolChain>
-					</folderInfo>
-					<sourceEntries>
-						<entry excluding="Release-MacOSX|functions/exceptions.cc|Release-MacOSX-Univ|Debug-MacOSX-Univ|Debug-MacOSX|SP_DS_HybridMarking.cpp|sp_ds/extensions/ext_SPN/SP_DS_StFormula.h|sp_ds/extensions/ext_SPN/SP_DS_StFormula.cpp|wxwin.m4|src.lst|SnoopyVC.vcproj|SnoopyVC.sln|SnoopyVC.mak|SnoopyVC.dsw|SnoopyVC.dsp|snoopy2.spec|snoopy.xpm|Snoopy.rc|snoopy.m4|snoopy.ico|snoopy.icns|snoopy.dmg|mkAppBundleOSX.sh|mk.sh|mk_src_lst.sh|mk_distr.sh|missing|makefile.unx|Makefile.in|Makefile.am|install-sh|INSTALL|Info.plist|depcomp|createSnoopyPackage|configure.in|configure|config.h.in|aclocal.m4|scripts|Setup|bitmaps|distr|snoopy.xcodeproj|Release|Debug|build|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.h|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-					</sourceEntries>
-				</configuration>
-			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
-			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
-			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
-		</cconfiguration>
-		<cconfiguration id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863.1046048353">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863.1046048353" moduleId="org.eclipse.cdt.core.settings" name="Debug-Linux">
-				<externalSettings/>
-				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.MachO" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-				</extensions>
-			</storageModule>
-			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="snoopy" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.MakeErrorParser" id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863.1046048353" name="Debug-Linux" parent="cdt.managedbuild.config.gnu.macosx.exe.debug" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
-					<folderInfo id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863.1046048353." name="/" resourcePath="">
-						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.base.1819517205" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.MachO64;org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.MachO" id="cdt.managedbuild.target.gnu.platform.base.421649838" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
-							<builder buildPath="${workspace_loc:/snoopy-test/Debug-Linux}" errorParsers="" id="cdt.managedbuild.target.gnu.builder.base.671460681" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.base"/>
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.378598578" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
-							<tool command="g++ `wx-config --cxxflags --static=no --unicode=yes --debug=yes`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.2022284116" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
-								<option id="gnu.cpp.compiler.option.include.paths.583597" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/wx-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/include/wx-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/gtk2-unicode-debug-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/lib/wx/include/gtk2-unicode-debug-2.8"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.383066751" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="__WXGTK__"/>
-									<listOptionValue builtIn="false" value="__WXDEBUG__"/>
-									<listOptionValue builtIn="false" value="UNICODE"/>
-									<listOptionValue builtIn="false" value="__TR1__"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.optimization.level.620867819" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.debugging.level.1731998894" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.other.other.1209743726" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -mfpmath=sse" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.debugging.gprof.1195336786" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.debugging.prof.747737866" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof" value="false" valueType="boolean"/>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.98481652" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
-							</tool>
-							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.base.899782967" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
-								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.2008997483" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.debugging.level.1989493176" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1212461109" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1095319448" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
-							<tool command="g++" commandLinePattern="${COMMAND} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} ${FLAGS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.base.1821397363" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
-								<option id="gnu.cpp.link.option.libs.1928881392" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="wxcode_gtk2ud_freechart-2.8"/>
-									<listOptionValue builtIn="false" value="wxcode_gtk2ud_ogl-2.8"/>
-									<listOptionValue builtIn="false" value="sbml"/>
-									<listOptionValue builtIn="false" value="IrrKlang"/>
-									<listOptionValue builtIn="false" value="OGDF"/>
-									<listOptionValue builtIn="false" value="SPSA_SteeringAPI"/>
-									<listOptionValue builtIn="false" value="spsim_sd"/>
-									<listOptionValue builtIn="false" value="sundials_nvecserial"/>
-									<listOptionValue builtIn="false" value="sundials_cvode"/>
-									<listOptionValue builtIn="false" value="sundials_arkode"/>
-									<listOptionValue builtIn="false" value="gecodeflatzinc"/>
-									<listOptionValue builtIn="false" value="gecodedriver"/>
-									<listOptionValue builtIn="false" value="gecodesearch"/>
-									<listOptionValue builtIn="false" value="gecodeminimodel"/>
-									<listOptionValue builtIn="false" value="gecodeset"/>
-									<listOptionValue builtIn="false" value="gecodeint"/>
-									<listOptionValue builtIn="false" value="gecodekernel"/>
-									<listOptionValue builtIn="false" value="gecodesupport"/>
-								</option>
-								<option id="gnu.cpp.link.option.debugging.gprof.494484845" name="Generate gprof information (-pg)" superClass="gnu.cpp.link.option.debugging.gprof" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.link.option.debugging.prof.179422014" name="Generate prof information (-p)" superClass="gnu.cpp.link.option.debugging.prof" value="false" valueType="boolean"/>
-								<option id="gnu.cpp.link.option.paths.1733414385" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_Linux}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Debug_Linux}&quot;"/>
-								</option>
-								<option id="gnu.cpp.link.option.flags.371878953" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`wx-config --libs base,core,adv,aui,net,xml,html --static=no --unicode=yes --debug=yes`" valueType="string"/>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1339266402" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
-							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.assembler.base.95534641" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1132856859" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
-							</tool>
-						</toolChain>
-					</folderInfo>
-					<sourceEntries>
-						<entry excluding="Release-MacOSX|functions/exceptions.cc|Release-MacOSX-Univ|Debug-MacOSX-Univ|Debug-MacOSX|SP_DS_HybridMarking.cpp|sp_ds/extensions/ext_SPN/SP_DS_StFormula.h|sp_ds/extensions/ext_SPN/SP_DS_StFormula.cpp|wxwin.m4|src.lst|SnoopyVC.vcproj|SnoopyVC.sln|SnoopyVC.mak|SnoopyVC.dsw|SnoopyVC.dsp|snoopy2.spec|snoopy.xpm|Snoopy.rc|snoopy.m4|snoopy.ico|snoopy.icns|snoopy.dmg|mkAppBundleOSX.sh|mk.sh|mk_src_lst.sh|mk_distr.sh|missing|makefile.unx|Makefile.in|Makefile.am|install-sh|INSTALL|Info.plist|depcomp|createSnoopyPackage|configure.in|configure|config.h.in|aclocal.m4|scripts|Setup|bitmaps|distr|snoopy.xcodeproj|Release|Debug|build|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.h|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-					</sourceEntries>
-				</configuration>
-			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
-			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
-			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
-		</cconfiguration>
-		<cconfiguration id="cdt.managedbuild.config.macosx.exe.release.239936695.2064496289">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.macosx.exe.release.239936695.2064496289" moduleId="org.eclipse.cdt.core.settings" name="Release-Linux">
-				<externalSettings/>
-				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.MachO" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-				</extensions>
-			</storageModule>
-			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="snoopy" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.MakeErrorParser" id="cdt.managedbuild.config.macosx.exe.release.239936695.2064496289" name="Release-Linux" parent="cdt.managedbuild.config.macosx.exe.release" postannouncebuildStep="" postbuildStep="rm  sp_gui/dialogs/SP_DLG_About.* ; rm sp_gui/dialogs/SP_DLG_CheckForUpdate.*" preannouncebuildStep="" prebuildStep="">
-					<folderInfo id="cdt.managedbuild.config.macosx.exe.release.239936695.2064496289." name="/" resourcePath="">
-						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.base.892559081" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.MachO64;org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.MachO" id="cdt.managedbuild.target.gnu.platform.base.1200269108" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
-							<builder buildPath="${workspace_loc:/snoopy-test/Release-Linux}" errorParsers="" id="cdt.managedbuild.target.gnu.builder.base.691088355" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.base"/>
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1699535922" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
-							<tool command="g++ `wx-config --cxxflags --static=no --unicode=yes --debug=no`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.316463340" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
-								<option id="gnu.cpp.compiler.option.include.paths.433166574" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/wx-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/include/wx-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/gtk2-unicode-release-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/lib/wx/include/gtk2-unicode-release-2.8"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.918706220" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="__WXGTK__"/>
-									<listOptionValue builtIn="false" value="UNICODE"/>
-									<listOptionValue builtIn="false" value="__TR1__"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.optimization.level.587082335" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.debugging.level.512090879" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.other.other.263280266" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -mfpmath=sse -Wno-overloaded-virtual" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.optimization.flags.42360220" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="-fno-strict-aliasing" valueType="string"/>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1040891565" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
-							</tool>
-							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.base.191550509" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
-								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.1209523718" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.debugging.level.1679667726" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1791047774" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.192941753" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
-							<tool command="g++" commandLinePattern="${COMMAND} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} ${FLAGS} " errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.base.2095298587" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
-								<option id="gnu.cpp.link.option.libs.1392008442" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="wxcode_gtk2u_freechart-2.8"/>
-									<listOptionValue builtIn="false" value="wxcode_gtk2u_ogl-2.8"/>
-									<listOptionValue builtIn="false" value="sbml"/>
-									<listOptionValue builtIn="false" value="IrrKlang"/>
-									<listOptionValue builtIn="false" value="OGDF"/>
-									<listOptionValue builtIn="false" value="SPSA_SteeringAPI"/>
-									<listOptionValue builtIn="false" value="spsim_sr"/>
-									<listOptionValue builtIn="false" value="sundials_nvecserial"/>
-									<listOptionValue builtIn="false" value="sundials_cvode"/>
-									<listOptionValue builtIn="false" value="sundials_arkode"/>
-									<listOptionValue builtIn="false" value="gecodeflatzinc"/>
-									<listOptionValue builtIn="false" value="gecodedriver"/>
-									<listOptionValue builtIn="false" value="gecodesearch"/>
-									<listOptionValue builtIn="false" value="gecodeminimodel"/>
-									<listOptionValue builtIn="false" value="gecodeset"/>
-									<listOptionValue builtIn="false" value="gecodeint"/>
-									<listOptionValue builtIn="false" value="gecodekernel"/>
-									<listOptionValue builtIn="false" value="gecodesupport"/>
-								</option>
-								<option id="gnu.cpp.link.option.paths.26651766" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Release_Linux}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Release_Linux}&quot;"/>
-								</option>
-								<option id="gnu.cpp.link.option.flags.1026535297" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`wx-config --libs base,core,adv,aui,net,xml,html --static=no --unicode=yes --debug=no`" valueType="string"/>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1219386883" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
-							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.assembler.base.937186477" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.2028958712" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
-							</tool>
-						</toolChain>
-					</folderInfo>
-					<sourceEntries>
-						<entry excluding="Release-MacOSX|functions/exceptions.cc|Release-MacOSX-Univ|Debug-MacOSX-Univ|Debug-MacOSX|SP_DS_HybridMarking.cpp|sp_ds/extensions/ext_SPN/SP_DS_StFormula.h|sp_ds/extensions/ext_SPN/SP_DS_StFormula.cpp|wxwin.m4|src.lst|SnoopyVC.vcproj|SnoopyVC.sln|SnoopyVC.mak|SnoopyVC.dsw|SnoopyVC.dsp|snoopy2.spec|snoopy.xpm|Snoopy.rc|snoopy.m4|snoopy.ico|snoopy.icns|snoopy.dmg|mkAppBundleOSX.sh|mk.sh|mk_src_lst.sh|mk_distr.sh|missing|makefile.unx|Makefile.in|Makefile.am|install-sh|INSTALL|Info.plist|depcomp|createSnoopyPackage|configure.in|configure|config.h.in|aclocal.m4|scripts|Setup|bitmaps|distr|snoopy.xcodeproj|Release|Debug|build|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.h|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-					</sourceEntries>
-				</configuration>
-			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
-			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
-			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
-		</cconfiguration>
 		<cconfiguration id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863.1046048353.1567199265">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863.1046048353.1567199265" moduleId="org.eclipse.cdt.core.settings" name="Debug-Linux-64">
 				<externalSettings/>
@@ -440,15 +21,13 @@
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.MachO64;org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.MachO" id="cdt.managedbuild.target.gnu.platform.base.1895491080" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
 							<builder buildPath="${workspace_loc:/snoopy-test/Debug-Linux}" errorParsers="" id="cdt.managedbuild.target.gnu.builder.base.101356122" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.2069660490" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
-							<tool command="`/usr/local/bin/wx-config --cxx --cxxflags --version=3.0`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.465333939" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+							<tool command="`/usr/local/bin/wx-config --cxx --cxxflags`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.465333939" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
 								<option id="gnu.cpp.compiler.option.include.paths.460376008" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.0"/>
-									<listOptionValue builtIn="false" value="/usr/include/wx-3.0"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/gtk2-unicode-3.0"/>
-									<listOptionValue builtIn="false" value="/usr/lib/wx/include/gtk2-unicode-3.0"/>
+									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.1"/>
+									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/gtk2-unicode-3.1"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1815971354" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__WXGTK__"/>
@@ -460,7 +39,7 @@
 									<listOptionValue builtIn="false" value="WXUSINGDLL"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.optimization.level.608175399" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.debugging.level.71720563" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.71720563" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.default" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.other.other.913741906" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -mfpmath=sse -Wno-overloaded-virtual" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.debugging.gprof.1527865906" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.debugging.prof.1206722653" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof" value="false" valueType="boolean"/>
@@ -472,13 +51,14 @@
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.base.830836445" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1568683179" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.1628556945" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.dialect.std.1005135947" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1229524469" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1566566143" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
-							<tool command="`/usr/local/bin/wx-config --cxx --version=3.0`" commandLinePattern="${COMMAND} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} ${FLAGS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.base.270241786" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+							<tool command="`/usr/local/bin/wx-config --cxx`" commandLinePattern="${COMMAND} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} ${FLAGS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.base.270241786" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
 								<option id="gnu.cpp.link.option.libs.751672870" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="wxcode_gtk2u_freechart-3.0"/>
-									<listOptionValue builtIn="false" value="wxcode_gtk2u_ogl-3.0"/>
+									<listOptionValue builtIn="false" value="wxcode_gtk2u_freechart-3.1"/>
+									<listOptionValue builtIn="false" value="wxcode_gtk2u_ogl-3.1"/>
 									<listOptionValue builtIn="false" value="sbml"/>
 									<listOptionValue builtIn="false" value="OGDF"/>
 									<listOptionValue builtIn="false" value="SPSA_SteeringAPI"/>
@@ -505,7 +85,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_Linux}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Debug_Linux}&quot;"/>
 								</option>
-								<option id="gnu.cpp.link.option.flags.988044372" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html --version=3.0` -Wl,-rpath='$ORIGIN/../lib' -Wl,-rpath=&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_Linux}&quot; -Wl,-rpath=&quot;${workspace_loc:/Snoopy Simulator/Debug_Linux}&quot;" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.988044372" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html` -Wl,-rpath='$ORIGIN/../lib' -Wl,-rpath=&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_Linux}&quot; -Wl,-rpath=&quot;${workspace_loc:/Snoopy Simulator/Debug_Linux}&quot;" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1433657995" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -545,15 +125,13 @@
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.MachO64;org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.MachO" id="cdt.managedbuild.target.gnu.platform.base.420787452" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
 							<builder buildPath="${workspace_loc:/snoopy-test/Release-Linux}" errorParsers="" id="cdt.managedbuild.target.gnu.builder.base.1526688018" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1168252656" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
-							<tool command="`/usr/local/bin/wx-config --cxx --cxxflags --version=3.0`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.262657007" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+							<tool command="`/usr/local/bin/wx-config --cxx --cxxflags`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.262657007" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
 								<option id="gnu.cpp.compiler.option.include.paths.1111466910" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.0"/>
-									<listOptionValue builtIn="false" value="/usr/include/wx-3.0"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/gtk2-unicode-3.0"/>
-									<listOptionValue builtIn="false" value="/usr/lib/wx/include/gtk2-unicode-3.0"/>
+									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.1"/>
+									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/gtk2-unicode-3.1"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.486053023" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__WXGTK__"/>
@@ -575,13 +153,14 @@
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.base.596789648" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
 								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.91028698" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.650156506" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.dialect.std.510458525" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1791148123" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.530545099" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
 							<tool command="`/usr/local/bin/wx-config --cxx`" commandLinePattern="${COMMAND} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} ${FLAGS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.base.557637824" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
 								<option id="gnu.cpp.link.option.libs.425272042" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="wxcode_gtk2u_freechart-3.0"/>
-									<listOptionValue builtIn="false" value="wxcode_gtk2u_ogl-3.0"/>
+									<listOptionValue builtIn="false" value="wxcode_gtk2u_freechart-3.1"/>
+									<listOptionValue builtIn="false" value="wxcode_gtk2u_ogl-3.1"/>
 									<listOptionValue builtIn="false" value="sbml"/>
 									<listOptionValue builtIn="false" value="OGDF"/>
 									<listOptionValue builtIn="false" value="SPSA_SteeringAPI"/>
@@ -607,7 +186,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Release_Linux}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Release_Linux}&quot;"/>
 								</option>
-								<option id="gnu.cpp.link.option.flags.318845265" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html --version=3.0` -Wl,-rpath='$ORIGIN/../lib' -Wl,-rpath=&quot;${workspace_loc:/SPSA_SteeringAPI/Release_Linux}&quot; -Wl,-rpath=&quot;${workspace_loc:/Snoopy Simulator/Release_Linux}&quot;" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.318845265" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html` -Wl,-rpath='$ORIGIN/../lib' -Wl,-rpath=&quot;${workspace_loc:/SPSA_SteeringAPI/Release_Linux}&quot; -Wl,-rpath=&quot;${workspace_loc:/Snoopy Simulator/Release_Linux}&quot;" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1230062185" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -615,247 +194,6 @@
 							</tool>
 							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.assembler.base.1774793054" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.401968550" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
-							</tool>
-						</toolChain>
-					</folderInfo>
-					<sourceEntries>
-						<entry excluding="Release-MacOSX|functions/exceptions.cc|Release-MacOSX-Univ|Debug-MacOSX-Univ|Debug-MacOSX|SP_DS_HybridMarking.cpp|sp_ds/extensions/ext_SPN/SP_DS_StFormula.h|sp_ds/extensions/ext_SPN/SP_DS_StFormula.cpp|wxwin.m4|src.lst|SnoopyVC.vcproj|SnoopyVC.sln|SnoopyVC.mak|SnoopyVC.dsw|SnoopyVC.dsp|snoopy2.spec|snoopy.xpm|Snoopy.rc|snoopy.m4|snoopy.ico|snoopy.icns|snoopy.dmg|mkAppBundleOSX.sh|mk.sh|mk_src_lst.sh|mk_distr.sh|missing|makefile.unx|Makefile.in|Makefile.am|install-sh|INSTALL|Info.plist|depcomp|createSnoopyPackage|configure.in|configure|config.h.in|aclocal.m4|scripts|Setup|bitmaps|distr|snoopy.xcodeproj|Release|Debug|build|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.h|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-					</sourceEntries>
-				</configuration>
-			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
-			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
-			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
-		</cconfiguration>
-		<cconfiguration id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863.1009999732">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863.1009999732" moduleId="org.eclipse.cdt.core.settings" name="Debug_MacOSX_Shared">
-				<externalSettings/>
-				<extensions>
-					<extension id="org.eclipse.cdt.core.MachO" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-				</extensions>
-			</storageModule>
-			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="snoopy" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.MakeErrorParser" id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863.1009999732" name="Debug_MacOSX_Shared" parent="cdt.managedbuild.config.gnu.macosx.exe.debug" postannouncebuildStep="" postbuildStep="mkdir -p ${BuildArtifactFileName}.app/Contents/MacOS ; mv ${BuildArtifactFileName} ${BuildArtifactFileName}.app/Contents/MacOS/" preannouncebuildStep="" prebuildStep="">
-					<folderInfo id="cdt.managedbuild.config.gnu.macosx.exe.debug.1473882863.1009999732." name="/" resourcePath="">
-						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.macosx.exe.debug.290422952" name="MacOSX GCC" resourceTypeBasedDiscovery="true" superClass="cdt.managedbuild.toolchain.gnu.macosx.exe.debug">
-							<targetPlatform binaryParser="org.eclipse.cdt.core.MachO64;org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.MachO" id="cdt.managedbuild.target.gnu.platform.macosx.exe.debug.527210122" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.macosx.exe.debug"/>
-							<builder autoBuildTarget="all" buildPath="${workspace_loc:/snoopy/Debug-MacOSX}" cleanBuildTarget="clean" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" errorParsers="" id="cdt.managedbuild.target.gnu.builder.macosx.exe.debug.281298624" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="2" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.debug">
-								<outputEntries>
-									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug-MacOSX"/>
-									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release-MacOSX"/>
-									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug-Linux"/>
-									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release-Linux"/>
-								</outputEntries>
-							</builder>
-							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug.1685381595" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug"/>
-							<tool command="g++ `/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html --static=no --unicode=yes --debug=yes --version=2.8`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.debug.385329471" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.debug">
-								<option id="macosx.cpp.link.option.paths.296868993" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_MacOSX}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Debug_MacOSX_SharedLib}&quot;"/>
-								</option>
-								<option id="macosx.cpp.link.option.libs.1414236932" name="Libraries (-l)" superClass="macosx.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="wxcode_macud_freechart-2.8"/>
-									<listOptionValue builtIn="false" value="wxcode_macud_ogl-2.8"/>
-									<listOptionValue builtIn="false" value="sbml"/>
-									<listOptionValue builtIn="false" value="irrklang"/>
-									<listOptionValue builtIn="false" value="OGDF"/>
-									<listOptionValue builtIn="false" value="SPSA_SteeringAPI"/>
-									<listOptionValue builtIn="false" value="spsim_dd"/>
-									<listOptionValue builtIn="false" value="gecodeflatzinc"/>
-									<listOptionValue builtIn="false" value="gecodedriver"/>
-									<listOptionValue builtIn="false" value="gecodesearch"/>
-									<listOptionValue builtIn="false" value="gecodeminimodel"/>
-									<listOptionValue builtIn="false" value="gecodeset"/>
-									<listOptionValue builtIn="false" value="gecodeint"/>
-									<listOptionValue builtIn="false" value="gecodekernel"/>
-									<listOptionValue builtIn="false" value="gecodesupport"/>
-								</option>
-								<option id="macosx.cpp.link.option.flags.774567993" name="Linker flags" superClass="macosx.cpp.link.option.flags" value="-arch i386 -mmacosx-version-min=10.5" valueType="string"/>
-								<option id="macosx.cpp.link.option.other.794073250" name="Other options (-Xlinker [option])" superClass="macosx.cpp.link.option.other"/>
-								<option id="macosx.cpp.link.option.nostart.173388244" name="Do not use standard start files (-nostartfiles)" superClass="macosx.cpp.link.option.nostart"/>
-								<option id="macosx.cpp.link.option.nodeflibs.1750506565" name="Do not use default libraries (-nodefaultlibs)" superClass="macosx.cpp.link.option.nodeflibs"/>
-								<option id="macosx.cpp.link.option.nostdlibs.614083130" name="No startup or default libs (-nostdlib)" superClass="macosx.cpp.link.option.nostdlibs"/>
-								<option id="macosx.cpp.link.option.strip.1591396225" name="Omit all symbol information (-s)" superClass="macosx.cpp.link.option.strip"/>
-								<option id="macosx.cpp.link.option.userobjs.454458281" name="Other objects" superClass="macosx.cpp.link.option.userobjs"/>
-								<option id="macosx.cpp.link.option.shared.2052722456" name="Shared (-dynamiclib)" superClass="macosx.cpp.link.option.shared"/>
-								<inputType id="cdt.managedbuild.tool.macosx.cpp.linker.input.1456281918" superClass="cdt.managedbuild.tool.macosx.cpp.linker.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
-							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.assembler.macosx.exe.debug.1235198832" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.macosx.exe.debug">
-								<option id="gnu.both.asm.option.include.paths.242235240" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI}&quot;"/>
-									<listOptionValue builtIn="false" value="/Users/herajmos/workspace/snoopy"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/wx-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/mac-unicode-debug-static-2.8"/>
-								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1760073848" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.archiver.macosx.base.2099254868" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.macosx.base"/>
-							<tool command="g++ `/usr/local/bin/wx-config --cxxflags --static=yes --unicode=yes --debug=yes --version=2.8`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.debug.1205255119" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.debug">
-								<option id="gnu.cpp.compilermacosx.exe.debug.option.optimization.level.1956738614" name="Optimization Level" superClass="gnu.cpp.compilermacosx.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.macosx.exe.debug.option.debugging.level.445151118" name="Debug Level" superClass="gnu.cpp.compiler.macosx.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.385791509" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="__WXMAC__"/>
-									<listOptionValue builtIn="false" value="__WXDEBUG__"/>
-									<listOptionValue builtIn="false" value="UNICODE"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.other.other.91182661" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -mfpmath=sse -arch i386 -mmacosx-version-min=10.5" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.include.paths.1491038960" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/wx-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/mac-unicode-debug-2.8"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.556037308" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.preprocess.973923914" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.undef.1893617422" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef"/>
-								<option id="gnu.cpp.compiler.option.optimization.flags.1003636163" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.debugging.other.1311263759" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other" value="-g2" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.debugging.prof.1745230699" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof"/>
-								<option id="gnu.cpp.compiler.option.debugging.gprof.45718966" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof" value="false" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.warnings.syntax.43858085" name="Check syntax only (-fsyntax-only)" superClass="gnu.cpp.compiler.option.warnings.syntax"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.286009281" name="Pedantic (-pedantic)" superClass="gnu.cpp.compiler.option.warnings.pedantic"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.error.1545474577" name="Pedantic warnings as errors (-pedantic-errors)" superClass="gnu.cpp.compiler.option.warnings.pedantic.error"/>
-								<option id="gnu.cpp.compiler.option.warnings.nowarn.503352864" name="Inhibit all warnings (-w)" superClass="gnu.cpp.compiler.option.warnings.nowarn" value="false" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.warnings.allwarn.1420341806" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.warnings.toerrors.51203242" name="Warnings as errors (-Werror)" superClass="gnu.cpp.compiler.option.warnings.toerrors" value="false" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.other.verbose.154453092" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose"/>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.999980897" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
-							</tool>
-							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug.756117430" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug">
-								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.macosx.exe.debug.option.optimization.level.1941780927" name="Optimization Level" superClass="gnu.c.compiler.macosx.exe.debug.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.macosx.exe.debug.option.debugging.level.2096452753" name="Debug Level" superClass="gnu.c.compiler.macosx.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.include.paths.393864387" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI}&quot;"/>
-									<listOptionValue builtIn="false" value="/Users/herajmos/workspace/snoopy"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/wx-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/mac-unicode-debug-static-2.8"/>
-								</option>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.534828560" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="__WXMAC__"/>
-									<listOptionValue builtIn="false" value="__WXDEBUG__"/>
-									<listOptionValue builtIn="false" value="UNICODE"/>
-								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.323857549" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
-							</tool>
-						</toolChain>
-					</folderInfo>
-					<sourceEntries>
-						<entry excluding="Release-MacOSX|functions/exceptions.cc|Release-MacOSX-Univ|Debug-MacOSX-Univ|Debug-MacOSX|Snoopy.rc|Release|makefile.unx|wxwin.m4|SnoopyVC.sln|SnoopyVC.dsw|sp_ds/extensions/ext_SPN/SP_DS_StFormula.cpp|mk.sh|snoopy.dmg|snoopy.icns|snoopy.ico|Makefile.in|bitmaps|SnoopyVC.dsp|SnoopyVC.vcproj|createSnoopyPackage|src.lst|mk_src_lst.sh|Setup|scripts|SP_DS_HybridMarking.cpp|snoopy.m4|snoopy.xpm|Debug|aclocal.m4|build|configure|configure.in|sp_ds/extensions/ext_SPN/SP_DS_StFormula.h|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.cpp|distr|Info.plist|sp_gui/dialogs/dia_SPN/SP_DLG_StEditTimeEvent.h|SnoopyVC.mak|INSTALL|mkAppBundleOSX.sh|snoopy.xcodeproj|mk_distr.sh|Makefile.am|install-sh|config.h.in|snoopy2.spec|missing|depcomp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-					</sourceEntries>
-				</configuration>
-			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
-			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
-			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
-		</cconfiguration>
-		<cconfiguration id="cdt.managedbuild.config.macosx.exe.release.239936695.119485900">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.macosx.exe.release.239936695.119485900" moduleId="org.eclipse.cdt.core.settings" name="Release_MacOSX_Shared">
-				<externalSettings/>
-				<extensions>
-					<extension id="org.eclipse.cdt.core.MachO" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-				</extensions>
-			</storageModule>
-			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="snoopy" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" errorParsers="" id="cdt.managedbuild.config.macosx.exe.release.239936695.119485900" name="Release_MacOSX_Shared" parent="cdt.managedbuild.config.macosx.exe.release" postannouncebuildStep="" postbuildStep="../mkAppBundleOSX.sh ${BuildArtifactFileName} ; rm  sp_gui/dialogs/SP_DLG_About.* ; rm sp_gui/dialogs/SP_DLG_CheckForUpdate.*" preannouncebuildStep="" prebuildStep="">
-					<folderInfo id="cdt.managedbuild.config.macosx.exe.release.239936695.119485900." name="/" resourcePath="">
-						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.macosx.exe.release.676866699" name="MacOSX GCC" superClass="cdt.managedbuild.toolchain.gnu.macosx.exe.release">
-							<targetPlatform binaryParser="org.eclipse.cdt.core.MachO64;org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.MachO" id="cdt.managedbuild.target.gnu.platform.macosx.exe.release.1291007879" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.macosx.exe.release"/>
-							<builder autoBuildTarget="all" buildPath="${workspace_loc:/snoopy/Release-MacOSX}" cleanBuildTarget="clean" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" errorParsers="org.eclipse.cdt.core.MakeErrorParser" id="cdt.managedbuild.target.gnu.builder.macosx.exe.release.1461001231" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="2" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.release"/>
-							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release.1097756187" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release"/>
-							<tool command="g++ `/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html --static=no --unicode=yes --debug=no --version=2.8`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release.662740683" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release">
-								<option id="macosx.cpp.link.option.paths.864122710" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Release_MacOSX}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Release_MacOSX_Shared}&quot;"/>
-								</option>
-								<option id="macosx.cpp.link.option.libs.1868517976" name="Libraries (-l)" superClass="macosx.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="wxcode_macu_freechart-2.8"/>
-									<listOptionValue builtIn="false" value="wxcode_macu_ogl-2.8"/>
-									<listOptionValue builtIn="false" value="sundials_nvecserial"/>
-									<listOptionValue builtIn="false" value="sundials_cvode"/>
-									<listOptionValue builtIn="false" value="sbml"/>
-									<listOptionValue builtIn="false" value="irrklang"/>
-									<listOptionValue builtIn="false" value="OGDF"/>
-									<listOptionValue builtIn="false" value="spsim_dr"/>
-									<listOptionValue builtIn="false" value="SPSA_SteeringAPI"/>
-									<listOptionValue builtIn="false" value="gecodeflatzinc"/>
-									<listOptionValue builtIn="false" value="gecodedriver"/>
-									<listOptionValue builtIn="false" value="gecodesearch"/>
-									<listOptionValue builtIn="false" value="gecodeminimodel"/>
-									<listOptionValue builtIn="false" value="gecodeset"/>
-									<listOptionValue builtIn="false" value="gecodeint"/>
-									<listOptionValue builtIn="false" value="gecodekernel"/>
-									<listOptionValue builtIn="false" value="gecodesupport"/>
-								</option>
-								<option id="macosx.cpp.link.option.other.1488445664" name="Other options (-Xlinker [option])" superClass="macosx.cpp.link.option.other"/>
-								<option id="macosx.cpp.link.option.nostart.1195551770" name="Do not use standard start files (-nostartfiles)" superClass="macosx.cpp.link.option.nostart"/>
-								<option id="macosx.cpp.link.option.nodeflibs.243127509" name="Do not use default libraries (-nodefaultlibs)" superClass="macosx.cpp.link.option.nodeflibs"/>
-								<option id="macosx.cpp.link.option.nostdlibs.1870632678" name="No startup or default libs (-nostdlib)" superClass="macosx.cpp.link.option.nostdlibs"/>
-								<option id="macosx.cpp.link.option.strip.1921619557" name="Omit all symbol information (-s)" superClass="macosx.cpp.link.option.strip"/>
-								<option id="macosx.cpp.link.option.flags.1844136539" name="Linker flags" superClass="macosx.cpp.link.option.flags" value="-arch i386 -mmacosx-version-min=10.5" valueType="string"/>
-								<option id="macosx.cpp.link.option.userobjs.368156129" name="Other objects" superClass="macosx.cpp.link.option.userobjs"/>
-								<option id="macosx.cpp.link.option.shared.1359361101" name="Shared (-dynamiclib)" superClass="macosx.cpp.link.option.shared"/>
-								<inputType id="cdt.managedbuild.tool.macosx.cpp.linker.input.1869934376" superClass="cdt.managedbuild.tool.macosx.cpp.linker.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
-							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.assembler.macosx.exe.release.780029390" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.macosx.exe.release">
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.448394639" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.archiver.macosx.base.975067820" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.macosx.base"/>
-							<tool command="g++ `/usr/local/bin/wx-config --cxxflags --static=yes --unicode=yes --debug=no --version=2.8`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release.1591315872" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release">
-								<option id="gnu.cpp.compiler.macosx.exe.release.option.optimization.level.1285088511" name="Optimization Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.more" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.macosx.exe.release.option.debugging.level.539729299" name="Debug Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.2146905708" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="__WXMAC__"/>
-									<listOptionValue builtIn="false" value="UNICODE"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.include.paths.1876271910" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/wx-2.8"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/mac-unicode-release-2.8"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.other.other.1452117856" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -mfpmath=sse -arch i386 -mmacosx-version-min=10.5" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.384172341" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.preprocess.1749856236" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.undef.1136430676" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef"/>
-								<option id="gnu.cpp.compiler.option.optimization.flags.2125417979" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.debugging.other.1099946044" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other"/>
-								<option id="gnu.cpp.compiler.option.debugging.prof.1066517911" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof"/>
-								<option id="gnu.cpp.compiler.option.debugging.gprof.321046694" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof"/>
-								<option id="gnu.cpp.compiler.option.warnings.syntax.720229118" name="Check syntax only (-fsyntax-only)" superClass="gnu.cpp.compiler.option.warnings.syntax"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.1538104880" name="Pedantic (-pedantic)" superClass="gnu.cpp.compiler.option.warnings.pedantic"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.error.699880348" name="Pedantic warnings as errors (-pedantic-errors)" superClass="gnu.cpp.compiler.option.warnings.pedantic.error"/>
-								<option id="gnu.cpp.compiler.option.warnings.nowarn.1786112036" name="Inhibit all warnings (-w)" superClass="gnu.cpp.compiler.option.warnings.nowarn"/>
-								<option id="gnu.cpp.compiler.option.warnings.allwarn.2039090535" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn"/>
-								<option id="gnu.cpp.compiler.option.warnings.toerrors.1053449937" name="Warnings as errors (-Werror)" superClass="gnu.cpp.compiler.option.warnings.toerrors"/>
-								<option id="gnu.cpp.compiler.option.other.verbose.30572500" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose"/>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.622978900" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
-							</tool>
-							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.release.1665718963" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.release">
-								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.macosx.exe.release.option.optimization.level.2102764507" name="Optimization Level" superClass="gnu.c.compiler.macosx.exe.release.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.macosx.exe.release.option.debugging.level.1681359473" name="Debug Level" superClass="gnu.c.compiler.macosx.exe.release.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1576601425" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
@@ -878,25 +216,26 @@
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="snoopy" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" errorParsers="" id="cdt.managedbuild.config.macosx.exe.release.239936695.1640673565" name="Release-MacOSX-Univ" parent="cdt.managedbuild.config.macosx.exe.release" postannouncebuildStep="" postbuildStep="../mkAppBundleOSX.sh ${BuildArtifactFileName} ; rm  sp_gui/dialogs/SP_DLG_About.* ; rm sp_gui/dialogs/SP_DLG_CheckForUpdate.*" preannouncebuildStep="" prebuildStep="">
+				<configuration artifactName="snoopy" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" errorParsers="" id="cdt.managedbuild.config.macosx.exe.release.239936695.1640673565" name="Release-MacOSX-Univ" parent="cdt.managedbuild.config.macosx.exe.release" postannouncebuildStep="" postbuildStep="../mkAppBundleOSX.sh ${BuildArtifactFileName} ; rm  sp_build.*" preannouncebuildStep="" prebuildStep="">
 					<folderInfo id="cdt.managedbuild.config.macosx.exe.release.239936695.1640673565." name="/" resourcePath="">
-						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.macosx.exe.release.612753450" name="MacOSX GCC" superClass="cdt.managedbuild.toolchain.gnu.macosx.exe.release">
+						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.macosx.exe.release.612753450" name="MacOSX GCC" nonInternalBuilderId="cdt.managedbuild.target.gnu.builder.macosx.exe.release" superClass="cdt.managedbuild.toolchain.gnu.macosx.exe.release">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.MachO64;org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.MachO" id="cdt.managedbuild.target.gnu.platform.macosx.exe.release.1331086575" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.macosx.exe.release"/>
-							<builder autoBuildTarget="all" buildPath="${workspace_loc:/snoopy/Release-MacOSX}" cleanBuildTarget="clean" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" errorParsers="org.eclipse.cdt.core.MakeErrorParser" id="cdt.managedbuild.target.gnu.builder.macosx.exe.release.983510152" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="2" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.release"/>
+							<builder buildPath="${workspace_loc:/snoopy}/Release-MacOSX-Univ" id="cdt.managedbuild.target.gnu.builder.macosx.exe.release.390475067" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="2" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.release"/>
 							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release.934194051" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release"/>
-							<tool command="`/usr/local/bin/wx-config --cxx --libs base,core,adv,aui,net,xml,html --version=3.0`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release.134466457" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release">
+							<tool command="`/usr/local/bin/wx-config --cxx --libs base,core,adv,aui,net,xml,html`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release.134466457" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release">
 								<option id="macosx.cpp.link.option.paths.1628673185" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Release_MacOSX_Univ}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Release_MacOSX_Univ}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib"/>
 								</option>
 								<option id="macosx.cpp.link.option.libs.850805987" name="Libraries (-l)" superClass="macosx.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="wxcode_osx_cocoau_freechart-3.0"/>
-									<listOptionValue builtIn="false" value="wxcode_osx_cocoau_ogl-3.0"/>
+									<listOptionValue builtIn="false" value="wxcode_osx_cocoau_freechart-3.1"/>
+									<listOptionValue builtIn="false" value="wxcode_osx_cocoau_ogl-3.1"/>
 									<listOptionValue builtIn="false" value="sundials_nvecserial"/>
 									<listOptionValue builtIn="false" value="sundials_cvode"/>
 									<listOptionValue builtIn="false" value="sbml"/>
@@ -933,8 +272,8 @@
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.267466201" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.macosx.base.1007758636" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.macosx.base"/>
-							<tool command="`/usr/local/bin/wx-config --cxx --cxxflags --version=3.0`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release.1975309588" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release">
-								<option id="gnu.cpp.compiler.macosx.exe.release.option.optimization.level.1369472936" name="Optimization Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.more" valueType="enumerated"/>
+							<tool command="`/usr/local/bin/wx-config --cxx --cxxflags`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release.1975309588" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release">
+								<option id="gnu.cpp.compiler.macosx.exe.release.option.optimization.level.1369472936" name="Optimization Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.macosx.exe.release.option.debugging.level.742248935" name="Debug Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.203399292" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__SNOOPY__"/>
@@ -948,19 +287,18 @@
 									<listOptionValue builtIn="false" value="_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.1266662112" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/include"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.0"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/osx_cocoa-unicode-3.0"/>
+									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.1"/>
+									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/osx_cocoa-unicode-3.1"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.1462480041" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -Wno-overloaded-virtual" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.910583807" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.preprocess.968599418" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.undef.1727538037" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef"/>
-								<option id="gnu.cpp.compiler.option.optimization.flags.1982094786" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.optimization.flags.1982094786" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="-finline-functions -funroll-loops&#10;" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.debugging.other.914935592" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other"/>
 								<option id="gnu.cpp.compiler.option.debugging.prof.523055952" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof"/>
 								<option id="gnu.cpp.compiler.option.debugging.gprof.1861115813" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof"/>
@@ -1001,14 +339,16 @@
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactName="snoopy" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.MakeErrorParser" id="cdt.managedbuild.config.macosx.exe.release.239936695.1640673565.954916925" name="Debug-MacOSX-Univ" parent="cdt.managedbuild.config.macosx.exe.release" postannouncebuildStep="" postbuildStep="mkdir -p ${BuildArtifactFileName}.app/Contents/MacOS ; mv ${BuildArtifactFileName} ${BuildArtifactFileName}.app/Contents/MacOS/" preannouncebuildStep="" prebuildStep="">
 					<folderInfo id="cdt.managedbuild.config.macosx.exe.release.239936695.1640673565.954916925." name="/" resourcePath="">
-						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.macosx.exe.release.424059679" name="MacOSX GCC" superClass="cdt.managedbuild.toolchain.gnu.macosx.exe.release">
+						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.macosx.exe.release.424059679" name="MacOSX GCC" nonInternalBuilderId="cdt.managedbuild.target.gnu.builder.macosx.exe.release" superClass="cdt.managedbuild.toolchain.gnu.macosx.exe.release">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.MachO64;org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.MachO" id="cdt.managedbuild.target.gnu.platform.macosx.exe.release.1609620774" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.macosx.exe.release"/>
-							<builder autoBuildTarget="all" buildPath="${workspace_loc:/snoopy/Release-MacOSX}" cleanBuildTarget="clean" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" errorParsers="" id="cdt.managedbuild.target.gnu.builder.macosx.exe.release.56166469" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.release"/>
+							<builder buildPath="${workspace_loc:/snoopy}/Debug-MacOSX-Univ" id="cdt.managedbuild.target.gnu.builder.macosx.exe.release.1393604838" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.release"/>
 							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release.1020970111" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release"/>
 							<tool command="`/usr/local/bin/wx-config --cxx --libs base,core,adv,aui,net,xml,html --version=3.0`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release.1170145505" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release">
 								<option id="macosx.cpp.link.option.paths.1651646245" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" valueType="libPaths">
@@ -1120,7 +460,7 @@
 			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
 		</configuration>
 		<configuration configurationName="Release-MacOSX-Univ">
-			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
+			<resource resourceType="PROJECT" workspacePath="/snoopy"/>
 		</configuration>
 		<configuration configurationName="Debug-MacOSX">
 			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
@@ -1128,22 +468,22 @@
 		<configuration configurationName="Release-Linux">
 			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
 		</configuration>
+		<configuration configurationName="Debug-MacOSX-Univ">
+			<resource resourceType="PROJECT" workspacePath="/snoopy"/>
+		</configuration>
 		<configuration configurationName="Release-MacOSX">
 			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
 		</configuration>
 		<configuration configurationName="Debug_MacOSX_Shared">
 			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
 		</configuration>
-		<configuration configurationName="Debug-MacOSX-Univ">
-			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
-		</configuration>
 		<configuration configurationName="Release_MacOSX_Shared">
 			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
 		</configuration>
-		<configuration configurationName="Debug-Linux">
+		<configuration configurationName="Debug-Linux-64">
 			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
 		</configuration>
-		<configuration configurationName="Debug-Linux-64">
+		<configuration configurationName="Debug-Linux">
 			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
 		</configuration>
 	</storageModule>
