@@ -15,7 +15,19 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_006726B6500D420AA6114A5BC9A1FBAF"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_013AD27F84E5464C8EBB273F18DA8C7C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0F87BC10C5564B4F961D0B21AFDE22AA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -27,19 +39,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_352CAC8D946D4415A3E3A55C2A3BFC1B"
+        "MsmKey" = "8:_2E48E3359BAD4164A3618C790651BB68"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_3D9FC0C78AF740F2A72A36D6B7B23370"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_3F615F1CF27849DCBFB519AEDC73B99F"
+        "MsmKey" = "8:_3CB8C58FAE794432B0A4EB6F9C165513"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -51,7 +57,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_47F0130A291947E6B70B6B5F553626D9"
+        "MsmKey" = "8:_4B5E0E7475544AD6BD1DCECC04E82A02"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -69,19 +75,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_5219E2FB5BF54B4EBB35AE9572B0AEDB"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_64E5624E21D74CF280760A7077641095"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_6A5D926F42DF4F039B4162AF375355ED"
+        "MsmKey" = "8:_6DB48BE0F2C94B328A488FD80DC8779E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -99,25 +93,25 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A07157F4CD59421294E90C1DEF245888"
+        "MsmKey" = "8:_B56723F8F53B467E99EAEBC0827C2CBE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_BFF23DE130114DAEAC8826A63CDCC303"
+        "MsmKey" = "8:_CAEA3789642E4BA08A99DDC85F3655CD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_DF34157F512049B087424698348C0968"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_F79E9DE9679E40CBB58803AA405C5E07"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F7D3CC2BD6CA413782C9AE19C5E4A2BE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -285,10 +279,50 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_006726B6500D420AA6114A5BC9A1FBAF"
+            {
+            "SourcePath" = "8:..\\Release\\x64\\wxbase31u_vc_x64_custom.dll"
+            "TargetName" = "8:wxbase31u_vc_x64_custom.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_013AD27F84E5464C8EBB273F18DA8C7C"
             {
             "SourcePath" = "8:..\\Release\\x64\\libsbml.dll"
             "TargetName" = "8:libsbml.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0F87BC10C5564B4F961D0B21AFDE22AA"
+            {
+            "SourcePath" = "8:..\\Release\\x64\\wxcode_msw31u_freechart_vc_x64.dll"
+            "TargetName" = "8:wxcode_msw31u_freechart_vc_x64.dll"
             "Tag" = "8:"
             "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
             "Condition" = "8:"
@@ -325,10 +359,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_352CAC8D946D4415A3E3A55C2A3BFC1B"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2E48E3359BAD4164A3618C790651BB68"
             {
-            "SourcePath" = "8:..\\Release\\x64\\wxcode_msw30u_vc_x64_ogl.dll"
-            "TargetName" = "8:wxcode_msw30u_vc_x64_ogl.dll"
+            "SourcePath" = "8:..\\Release\\x64\\wxmsw31u_adv_vc_x64_custom.dll"
+            "TargetName" = "8:wxmsw31u_adv_vc_x64_custom.dll"
             "Tag" = "8:"
             "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
             "Condition" = "8:"
@@ -345,30 +379,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3D9FC0C78AF740F2A72A36D6B7B23370"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3CB8C58FAE794432B0A4EB6F9C165513"
             {
-            "SourcePath" = "8:..\\Release\\x64\\wxmsw30u_media_vc_x64_custom.dll"
-            "TargetName" = "8:wxmsw30u_media_vc_x64_custom.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3F615F1CF27849DCBFB519AEDC73B99F"
-            {
-            "SourcePath" = "8:..\\Release\\x64\\wxmsw30u_aui_vc_x64_custom.dll"
-            "TargetName" = "8:wxmsw30u_aui_vc_x64_custom.dll"
+            "SourcePath" = "8:..\\Release\\x64\\wxbase31u_net_vc_x64_custom.dll"
+            "TargetName" = "8:wxbase31u_net_vc_x64_custom.dll"
             "Tag" = "8:"
             "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
             "Condition" = "8:"
@@ -405,10 +419,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_47F0130A291947E6B70B6B5F553626D9"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B5E0E7475544AD6BD1DCECC04E82A02"
             {
-            "SourcePath" = "8:..\\Release\\x64\\wxmsw30u_adv_vc_x64_custom.dll"
-            "TargetName" = "8:wxmsw30u_adv_vc_x64_custom.dll"
+            "SourcePath" = "8:..\\Release\\x64\\wxmsw31u_aui_vc_x64_custom.dll"
+            "TargetName" = "8:wxmsw31u_aui_vc_x64_custom.dll"
             "Tag" = "8:"
             "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
             "Condition" = "8:"
@@ -445,50 +459,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5219E2FB5BF54B4EBB35AE9572B0AEDB"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6DB48BE0F2C94B328A488FD80DC8779E"
             {
-            "SourcePath" = "8:..\\Release\\x64\\wxcode_msw30u_freechart.dll"
-            "TargetName" = "8:wxcode_msw30u_freechart.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_64E5624E21D74CF280760A7077641095"
-            {
-            "SourcePath" = "8:..\\Release\\x64\\wxmsw30u_core_vc_x64_custom.dll"
-            "TargetName" = "8:wxmsw30u_core_vc_x64_custom.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6A5D926F42DF4F039B4162AF375355ED"
-            {
-            "SourcePath" = "8:..\\Release\\x64\\wxbase30u_vc_x64_custom.dll"
-            "TargetName" = "8:wxbase30u_vc_x64_custom.dll"
+            "SourcePath" = "8:..\\Release\\x64\\wxmsw31u_core_vc_x64_custom.dll"
+            "TargetName" = "8:wxmsw31u_core_vc_x64_custom.dll"
             "Tag" = "8:"
             "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
             "Condition" = "8:"
@@ -545,10 +519,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A07157F4CD59421294E90C1DEF245888"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B56723F8F53B467E99EAEBC0827C2CBE"
             {
-            "SourcePath" = "8:..\\Release\\x64\\wxbase30u_net_vc_x64_custom.dll"
-            "TargetName" = "8:wxbase30u_net_vc_x64_custom.dll"
+            "SourcePath" = "8:..\\Release\\x64\\wxmsw31u_html_vc_x64_custom.dll"
+            "TargetName" = "8:wxmsw31u_html_vc_x64_custom.dll"
             "Tag" = "8:"
             "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
             "Condition" = "8:"
@@ -565,10 +539,30 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BFF23DE130114DAEAC8826A63CDCC303"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CAEA3789642E4BA08A99DDC85F3655CD"
             {
-            "SourcePath" = "8:..\\Release\\x64\\wxbase30u_xml_vc_x64_custom.dll"
-            "TargetName" = "8:wxbase30u_xml_vc_x64_custom.dll"
+            "SourcePath" = "8:..\\Release\\x64\\wxcode_msw31u_ogl_vc_x64.dll"
+            "TargetName" = "8:wxcode_msw31u_ogl_vc_x64.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DF34157F512049B087424698348C0968"
+            {
+            "SourcePath" = "8:..\\Release\\x64\\wxbase31u_xml_vc_x64_custom.dll"
+            "TargetName" = "8:wxbase31u_xml_vc_x64_custom.dll"
             "Tag" = "8:"
             "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
             "Condition" = "8:"
@@ -589,26 +583,6 @@
             {
             "SourcePath" = "8:..\\Release\\x64\\irrKlang.dll"
             "TargetName" = "8:irrKlang.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F7D3CC2BD6CA413782C9AE19C5E4A2BE"
-            {
-            "SourcePath" = "8:..\\Release\\x64\\wxmsw30u_html_vc_x64_custom.dll"
-            "TargetName" = "8:wxmsw30u_html_vc_x64_custom.dll"
             "Tag" = "8:"
             "Folder" = "8:_70F225A065574109AB66C04A3B43C06D"
             "Condition" = "8:"
