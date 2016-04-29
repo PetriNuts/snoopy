@@ -130,7 +130,7 @@ int l_nSimulatorIndex =
 	//currently we support bio and server semantics
 	m_pcsemanticsComboBox->Clear();
 	m_pcsemanticsComboBox->Append(wxT("Bio Semantics"));
-	m_pcsemanticsComboBox->Append(wxT("Server Semantics"));
+	m_pcsemanticsComboBox->Append(wxT("Adaptive Semantics"));
 
 	///set default solving algorithm
 	m_pcsemanticsComboBox->SetSelection(m_nSimulationSemantics);
@@ -749,16 +749,16 @@ CreateSimulator(const int& p_nSimulatorType)
     {
     	if(p_nSimulatorType==0)
     	{
-    		return new spsim::continuousSimulatorWithServerSemantics(CV_BDF, CV_NEWTON);
+    		return new spsim::ContinuousSimulatorAdaptive(CV_BDF, CV_NEWTON);
     	}
     	else if(p_nSimulatorType==1)
     	{
-    		return new spsim::continuousSimulatorWithServerSemantics();
+    		return new spsim::ContinuousSimulatorAdaptive();
     	}
     	else
     	{
     		SP_LOGMESSAGE(wxT("Invalid value for the simulator index, we use BDF with server semantics."));
-    		return new spsim::continuousSimulatorWithServerSemantics(CV_BDF, CV_NEWTON);;
+    		return new spsim::ContinuousSimulatorAdaptive(CV_BDF, CV_NEWTON);;
     	}
     }
 
