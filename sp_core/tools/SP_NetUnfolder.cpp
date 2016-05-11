@@ -316,4 +316,3 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 template class SP_AbstractNetUnfolder<dsszmc::unfolding::idd_guard_representation>;
 template class SP_AbstractNetUnfolder<dsszmc::unfolding::gecode_guard_representation>;
 
-

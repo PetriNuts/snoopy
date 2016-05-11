@@ -60,7 +60,7 @@ bool SP_ExportColCPN2ContPed::Write(SP_MDI_Doc* p_doc, const wxString& p_fileNam
 	CHECK_POINTER(l_pcParams,return false);
 
 	SP_GM_Docmanager* l_pcDM = wxGetApp().GetDocmanager();
-	SP_GM_DocTemplate* l_pcTemplate = l_pcDM->GetTemplate(SP_DS_SPN_CLASS);
+	SP_GM_DocTemplate* l_pcTemplate = l_pcDM->GetTemplate(SP_DS_CONTINUOUSPED_CLASS);
 	SP_DS_Netclass* newClass = l_pcTemplate->GetNetclass();
 	m_pcExportGraph = new SP_DS_Graph(newClass);
 
