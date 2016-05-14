@@ -19,8 +19,11 @@
 
 class SP_DLG_CPNSimulationResults : public SP_DLG_Simulation
 {
- private:
+ protected:
+	      // replace values less than  l_nReplacedVaue
+          bool  m_bReplaceValue;
 
+          double m_nReplacedVaue;
  protected:
 		wxChoice* m_pcMarkingSetComboBox;
 	    wxChoice* m_pcFunctionSetComboBox;
@@ -63,6 +66,9 @@ class SP_DLG_CPNSimulationResults : public SP_DLG_Simulation
 	    virtual void OnParameterSetChanged( wxCommandEvent& p_cEvent );
 
 	    virtual void OnFunctionSetChanged( wxCommandEvent& p_cEvent );
+
+	    //call the special csv export dialog
+	    virtual void OnExportToCSV();
 
 protected:
 

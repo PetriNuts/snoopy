@@ -39,6 +39,10 @@
 #include "sp_ds/attributes/SP_DS_DoubleMarkingAttribute.h"
 #include "sp_ds/attributes/SP_DS_DoubleMarkingDependentMultiplicity.h"
 
+#include "sp_gui/dialogs/dia_SPN/SP_DLG_StDirectExportProperties.h"
+#include "sp_gui/dialogs/dia_continuouspn/sp_dlg_csvexport.h"
+
+
 //New simulator header file
 #include "spsim/spsim.h"
 #if !defined(__WXMSW__) && !defined(__WXPM__)
@@ -889,6 +893,11 @@ void SP_DLG_CPNSimulationResults::DirectExportToCSV()
 				l_dResult = 0;
 			}
 
+			if(m_bReplaceValue==true && l_dResult<=m_nReplacedVaue)
+			{
+				l_dResult=0;
+			}
+
 			//write 
 			l_sCurrentRow << l_sSpacer;
 			l_sCurrentRow << wxString::Format(wxT("%.16g"), l_dResult);
@@ -1216,3 +1225,32 @@ void SP_DLG_CPNSimulationResults::UpdateSimulationMatrix(SP_DS_Metadata* p_pcVie
 	UpdateXAxisValues();
 }
 
+
+void SP_DLG_CPNSimulationResults::
+OnExportToCSV()
+{
+	    wxString l_sFilename = m_sExportFilename;
+	    bool l_bCompressExact = false;
+	    SP_DLG_CSVExport* l_pcDlg = new SP_DLG_CSVExport(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this,
+	    		                                          &l_sFilename, &m_nExportSpacer,
+														  &l_bCompressExact,m_bReplaceValue,
+														  m_nReplacedVaue);
+
+	    if (l_pcDlg->ShowModal() == wxID_OK)
+	    {
+	        wxString l_sBackupFilename = m_sExportFilename;
+	        m_sExportFilename = l_sFilename;
+
+	        OpenExportFile();
+	        DirectExportToCSV();
+	        CloseExportFile();
+
+	        m_sExportFilename = l_sBackupFilename;
+
+	        m_bReplaceValue=l_pcDlg->GetReplaceValue();
+
+	        m_nReplacedVaue=l_pcDlg->GetReplacedValues();
+	    }
+
+	    l_pcDlg->Destroy();
+}

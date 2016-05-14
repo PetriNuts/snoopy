@@ -26,12 +26,15 @@ typedef enum {
 class SP_DLG_StDirectExportProperties : public wxDialog
 {
 
-  private:
+  protected:
   
     SP_DS_StExportCSVEditDlgType m_eDlgType;
 
     wxChoice* m_pcSpacerChoice;
     wxBoxSizer* m_pcMainSizer;
+
+    wxSizer* m_pcPropertiesSizer;
+
     wxFilePickerCtrl* m_pcFilePickerCtrl;
     wxCheckBox* m_pcCompressCheckBox;
 
@@ -39,8 +42,9 @@ class SP_DLG_StDirectExportProperties : public wxDialog
     int* m_pnSpacer;
     bool* m_pbCompressExact;
 
-    void LoadData();
-    bool SaveData();
+    virtual void LoadData();
+
+    virtual bool SaveData();
 
   protected:
   
@@ -59,7 +63,6 @@ class SP_DLG_StDirectExportProperties : public wxDialog
 
     DECLARE_CLASS( SP_DLG_StDirectExportProperties )
     DECLARE_EVENT_TABLE()
-
 };
 
 #endif // __SP_DLG_StDirectExportProperties__

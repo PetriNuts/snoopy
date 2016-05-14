@@ -53,10 +53,10 @@ SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 
 	m_pcMainSizer = new wxBoxSizer(wxVERTICAL);
 
-	wxSizer* l_pcMainTablePropertiesSizer =	new wxStaticBoxSizer( new wxStaticBox( this, -1,
+	 m_pcPropertiesSizer =	new wxStaticBoxSizer( new wxStaticBox( this, -1,
 											wxT("Export properties for main table") ), wxVERTICAL );
 
-	m_pcMainSizer->Add(l_pcMainTablePropertiesSizer, 0, wxALL | wxEXPAND, 5);
+	m_pcMainSizer->Add(m_pcPropertiesSizer, 0, wxALL | wxEXPAND, 5);
 
 	// rows of SetsSizer
 
@@ -69,7 +69,7 @@ SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 
 	l_pcRowSizer->Add(m_pcFilePickerCtrl, 1, wxALL | wxEXPAND, 5);
 
-	l_pcMainTablePropertiesSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND);
+	m_pcPropertiesSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND);
 
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 
@@ -80,7 +80,7 @@ SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 
 	l_pcRowSizer->Add(m_pcSpacerChoice, 1, wxALL | wxEXPAND, 5);
 
-	l_pcMainTablePropertiesSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND);
+	m_pcPropertiesSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND);
 
 	if (m_eDlgType == SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT)
 	{
@@ -90,7 +90,7 @@ SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 
 		l_pcRowSizer->Add( m_pcCompressCheckBox, 1, wxALL | wxEXPAND, 5 );
 
-		l_pcMainTablePropertiesSizer->Add( l_pcRowSizer, 1, wxALL | wxEXPAND );
+		m_pcPropertiesSizer->Add( l_pcRowSizer, 1, wxALL | wxEXPAND );
 
 	}
 
