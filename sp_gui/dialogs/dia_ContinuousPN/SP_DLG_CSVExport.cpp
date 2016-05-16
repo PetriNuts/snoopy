@@ -42,7 +42,6 @@ m_nReplacedValues(p_nReplacedValues)
 
 		SetSizerAndFit( m_pcMainSizer );
 }
-
 void SP_DLG_CSVExport::LoadData()
 {
 	SP_DLG_StDirectExportProperties::LoadData();
@@ -53,7 +52,7 @@ void SP_DLG_CSVExport::LoadData()
 }
 bool SP_DLG_CSVExport::SaveData()
 {
-	SP_DLG_StDirectExportProperties::LoadData();
+	SP_DLG_StDirectExportProperties::SaveData();
 
 	m_bReplaceValues=m_pcChkReplaceValues->IsChecked();
 

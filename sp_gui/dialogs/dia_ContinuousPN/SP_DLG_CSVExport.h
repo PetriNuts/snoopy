@@ -32,6 +32,7 @@ protected:
 protected:
 
 	     virtual void LoadData();
+
 	     virtual bool SaveData();
 
 public:
