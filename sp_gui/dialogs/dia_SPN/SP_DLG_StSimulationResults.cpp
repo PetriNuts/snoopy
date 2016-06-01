@@ -159,8 +159,8 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Simulator:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
 	m_pcSimulatorComboBox = new wxChoice(m_pcPropertyWindowPropertySizer, SP_ID_CHOICE_SIMULATOR_CHOICE, wxDefaultPosition, wxSize(100, -1));
 	m_pcSimulatorComboBox->Append(wxT("Gillespie"));
-	m_pcSimulatorComboBox->Append(wxT("Tau Leaping"));
-	m_pcSimulatorComboBox->Append(wxT("Parameter Free"));
+	m_pcSimulatorComboBox->Append(wxT("Tau-Leaping"));
+	m_pcSimulatorComboBox->Append(wxT("Delta-Leaping"));
 	m_pcSimulatorComboBox->Append(wxT("FAU"));
 	m_pcSimulatorComboBox->SetSelection(l_nSimulatorType);
 	l_pcRowSizer->Add(m_pcSimulatorComboBox, wxSizerFlags(1).Expand().Border(wxALL, 2));

@@ -217,10 +217,12 @@ void SP_DLG_DuplicateNodes::OnDlgClose(wxCommandEvent& p_cEvent)
 
 void SP_DLG_DuplicateNodes::LoadData(const wxString& p_sNodeClassName, int p_nCount)
 {
+	wxString l_sData = wxT("Number of arcs connected with ") + p_sNodeClassName + wxT(":\n");
 	//Load data
 	Clear();
 	m_pcListCtrl->InsertColumn( 0, p_sNodeClassName );
 	m_pcListCtrl->InsertColumn( 1, wxT("# of arcs") );
+	l_sData << p_sNodeClassName << wxT(",arcs\n");
 
 	int l_nPos = 0;
 	long l_nIndex = 0;
@@ -279,6 +281,11 @@ void SP_DLG_DuplicateNodes::LoadData(const wxString& p_sNodeClassName, int p_nCo
 			}
 		}
 		m_pcListCtrl->SortItems(SP_CompareFunction, 1);
+		for(unsigned i = 0; i < m_pcListCtrl->GetItemCount(); ++i)
+		{
+			l_sData << m_pcListCtrl->GetItemText(i,0) << wxT(",") << m_pcListCtrl->GetItemText(i,1) << wxT("\n");
+		}
+		SP_LOGDEBUG(l_sData);
 	}
 }
 
