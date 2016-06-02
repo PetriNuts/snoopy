@@ -40,7 +40,7 @@
 #include "sp_ds/attributes/SP_DS_DoubleMarkingDependentMultiplicity.h"
 
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StDirectExportProperties.h"
-#include "sp_gui/dialogs/dia_continuouspn/sp_dlg_csvexport.h"
+#include "sp_gui/dialogs/dia_ContinuousPN/SP_DLG_CSVExport.h"
 
 
 //New simulator header file

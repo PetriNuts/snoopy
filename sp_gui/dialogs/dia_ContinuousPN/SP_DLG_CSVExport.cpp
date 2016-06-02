@@ -9,7 +9,7 @@
  //======================================================================================
 
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StDirectExportProperties.h"
-#include "sp_gui/dialogs/dia_continuouspn/sp_dlg_csvexport.h"
+#include "sp_gui/dialogs/dia_ContinuousPN/SP_DLG_CSVExport.h"
 
 SP_DLG_CSVExport::SP_DLG_CSVExport( SP_DS_StExportCSVEditDlgType p_eType,
 						  wxDialog* p_pcParent,
