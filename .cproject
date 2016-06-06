@@ -120,7 +120,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="snoopy" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.MakeErrorParser" id="cdt.managedbuild.config.macosx.exe.release.239936695.2064496289.186521783" name="Release-Linux-64" parent="cdt.managedbuild.config.macosx.exe.release" postannouncebuildStep="" postbuildStep="rm  sp_gui/dialogs/SP_DLG_About.* ; rm sp_gui/dialogs/SP_DLG_CheckForUpdate.*" preannouncebuildStep="" prebuildStep="">
+				<configuration artifactName="snoopy" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.MakeErrorParser" id="cdt.managedbuild.config.macosx.exe.release.239936695.2064496289.186521783" name="Release-Linux-64" parent="cdt.managedbuild.config.macosx.exe.release" postannouncebuildStep="" postbuildStep="rm  sp_build.*" preannouncebuildStep="" prebuildStep="">
 					<folderInfo id="cdt.managedbuild.config.macosx.exe.release.239936695.2064496289.186521783." name="/" resourcePath="">
 						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.base.198623798" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.MachO64;org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.MachO" id="cdt.managedbuild.target.gnu.platform.base.420787452" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
@@ -458,35 +458,35 @@
 		<project id="snoopy.cdt.managedbuild.target.macosx.exe.619994303" name="Executable" projectType="cdt.managedbuild.target.macosx.exe"/>
 	</storageModule>
 	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="Release-Linux-64">
-			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
-		</configuration>
-		<configuration configurationName="Release-MacOSX-Univ">
-			<resource resourceType="PROJECT" workspacePath="/snoopy"/>
-		</configuration>
-		<configuration configurationName="Debug-MacOSX">
-			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
-		</configuration>
-		<configuration configurationName="Release-Linux">
-			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
-		</configuration>
-		<configuration configurationName="Debug-MacOSX-Univ">
-			<resource resourceType="PROJECT" workspacePath="/snoopy"/>
-		</configuration>
-		<configuration configurationName="Release-MacOSX">
-			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
-		</configuration>
-		<configuration configurationName="Debug_MacOSX_Shared">
-			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
-		</configuration>
-		<configuration configurationName="Release_MacOSX_Shared">
-			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
-		</configuration>
 		<configuration configurationName="Debug-Linux-64">
 			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
 		</configuration>
 		<configuration configurationName="Debug-Linux">
 			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
+		</configuration>
+		<configuration configurationName="Release-MacOSX">
+			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
+		</configuration>
+		<configuration configurationName="Release-Linux">
+			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
+		</configuration>
+		<configuration configurationName="Debug-MacOSX">
+			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
+		</configuration>
+		<configuration configurationName="Release_MacOSX_Shared">
+			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
+		</configuration>
+		<configuration configurationName="Debug-MacOSX-Univ">
+			<resource resourceType="PROJECT" workspacePath="/snoopy"/>
+		</configuration>
+		<configuration configurationName="Release-Linux-64">
+			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
+		</configuration>
+		<configuration configurationName="Debug_MacOSX_Shared">
+			<resource resourceType="PROJECT" workspacePath="/snoopy-trunk"/>
+		</configuration>
+		<configuration configurationName="Release-MacOSX-Univ">
+			<resource resourceType="PROJECT" workspacePath="/snoopy"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
