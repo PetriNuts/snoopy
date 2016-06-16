@@ -360,6 +360,13 @@ bool SP_GR_Edge::OnCoarse(unsigned int p_nNewNet, SP_Graphic* p_pcCoarseGr,
 			}
 		}
 
+		//for hybrid Petri nets. TODO: find a better solution!
+		if(l_pcharCoarseClassName == SP_DS_DISCRETE_PLACE&&
+				l_pcharTargetName==SP_DS_CONTINUOUS_PLACE)
+		{
+			l_pcharTargetName=SP_DS_DISCRETE_PLACE;
+		}
+
 		if (l_pcharTargetName.Cmp(l_pcharCoarseClassName) != 0 /*||
 		 (GetGraphicState() != SP_STATE_NORMAL)*/)
 		{
@@ -422,6 +429,13 @@ bool SP_GR_Edge::OnCoarse(unsigned int p_nNewNet, SP_Graphic* p_pcCoarseGr,
 			{
 				l_pcharSourceName = SP_DS_STOCHASTIC_TRANS;
 			}
+		}
+
+		//for hybrid Petri nets. TODO: find a better solution!
+		if(l_pcharCoarseClassName == SP_DS_DISCRETE_PLACE&&
+			l_pcharSourceName==SP_DS_CONTINUOUS_PLACE)
+		{
+			l_pcharSourceName=SP_DS_DISCRETE_PLACE;
 		}
 
 		if (l_pcharSourceName.Cmp(l_pcharCoarseClassName) != 0 /*||
