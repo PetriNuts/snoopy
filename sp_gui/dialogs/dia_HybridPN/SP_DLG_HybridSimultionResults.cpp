@@ -113,7 +113,7 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 		m_bIsSimulatorInitialized(false),
 		m_nRedraw(false),
 		m_pcWorkerThread(NULL),
-		m_sSimulatorType(wxT("Static")),
+		m_sSimulatorType(wxT("Static (exact)")),
 		m_nCurrentODESimulator(2)
 {
 
@@ -208,7 +208,8 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Time Synch.:")), 1, wxALL | wxEXPAND, 5);
 	m_pcTimeSyncComboBox = new wxChoice(m_pcPropertyWindowPropertySizer, SP_ID_CHOICE_TIME_SYNC, wxDefaultPosition, wxSize(100, -1));
-	m_pcTimeSyncComboBox->Append(wxT("Static"));
+	m_pcTimeSyncComboBox->Append(wxT("Static (exact)"));
+	m_pcTimeSyncComboBox->Append(wxT("Static (accelerated)"));
 	m_pcTimeSyncComboBox->Append(wxT("Dynamic"));
 	m_pcTimeSyncComboBox->Append(wxT("Approximate"));
 	m_pcTimeSyncComboBox->Append(wxT("Continuous"));
@@ -395,25 +396,7 @@ void SP_DLG_HybridSimulationResults::OnMarkingSetChanged(wxCommandEvent& p_cEven
 		}
 	}
 
-	/*
-	 //Get the Places Nodes
-	 unsigned int l_nCurrentMarkingSet = m_pcMarkingSetComboBox->GetSelection();
-	 const SP_ListNode* l_pcPlaces=m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE)->GetElements();
-
-	 //Set the current Active List
-	 for(SP_ListNode::const_iterator l_itPlace=l_pcPlaces->begin();l_itPlace!=l_pcPlaces->end();l_itPlace++)
-	 (dynamic_cast<SP_DS_ColListAttribute*>((*l_itPlace)->GetAttribute(wxT("MarkingList"))))->SetActiveList(l_nCurrentMarkingSet);
-
-
-	 //fixed a bug liu 2011.12.06
-	 l_pcPlaces=m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE)->GetElements();
-
-	 //Set the current Active List
-	 for(SP_ListNode::const_iterator l_itPlace=l_pcPlaces->begin();l_itPlace!=l_pcPlaces->end();l_itPlace++)
-	 (dynamic_cast<SP_DS_ColListAttribute*>((*l_itPlace)->GetAttribute(wxT("MarkingList"))))->SetActiveList(l_nCurrentMarkingSet);
-
-	 */
-	m_bIsSimulatorInitialized = false;
+   m_bIsSimulatorInitialized = false;
 }
 //
 
@@ -789,19 +772,22 @@ spsim::Simulator* SP_DLG_HybridSimulationResults::CreateSimulator(const int& p_n
 {
 	switch (p_nSimulatorType)
 	{
-	case 0: //static
-		m_sSimulatorType = wxT("Static");
+	case 0: //static (exact)
+		m_sSimulatorType = wxT("Static (exact)");
 		return new spsim::HybridStatic();
-	case 1: //dynamic
+	case 1: //static (exact)
+		m_sSimulatorType = wxT("Static (accelerated)");
+		return new spsim::HybridAccelerated();
+	case 2: //dynamic
 		m_sSimulatorType = wxT("Dynamic");
 		return new spsim::HybridDynamic();
-	case 2: //approximate
+	case 3: //approximate
 		m_sSimulatorType = wxT("Approximate");
 		return new spsim::HybridApproximate();
-	case 3: //continuous
+	case 4: //continuous
 		m_sSimulatorType = wxT("Continuous");
 		return new spsim::HybridStatic();
-	case 4: //stochastic
+	case 5: //stochastic
 		m_sSimulatorType = wxT("Stochastic");
 		return new spsim::Gillespie();
 	}
