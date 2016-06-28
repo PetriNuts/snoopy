@@ -209,15 +209,22 @@ bool SP_ImportANDL::CreateConst(const dsszmc::andl::Constants& p_Constants, cons
 			l_constant->GetAttribute(wxT("Type"))->SetValueString(type);
 
 			SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
-			for(size_t i = 0; i < constant->values_.size(); ++i)
+			if(p_Valuesets.size() <= 1)
 			{
-				wxString value = constant->values_[i];
-				if(p_Valuesets.size() > i)
+				if(!constant->values_.empty())
+					l_pcAttr->SetCell(0, 1, constant->values_[0]);
+			}
+			else
+			{
+				l_pcAttr->Clear();
+				for(size_t i = 0; i < constant->values_.size(); ++i)
 				{
+					l_pcAttr->AppendEmptyRow();
 					wxString vset = p_Valuesets[i];
 					l_pcAttr->SetCell(i, 0, vset);
+					wxString value = constant->values_[i];
+					l_pcAttr->SetCell(i, 1, value);
 				}
-				l_pcAttr->SetCell(i, 1, value);
 			}
 		}
 	}

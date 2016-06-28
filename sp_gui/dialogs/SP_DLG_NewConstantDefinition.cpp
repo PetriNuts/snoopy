@@ -620,34 +620,32 @@ bool SP_DLG_NewConstantDefinition::DoCheckFunction(const wxString& p_sName, cons
 	if(p_sType == wxT("int"))
 	{
 		long l_Val = SP_DS_FunctionEvaluatorLong{l_pcFR, l_pcFunction, std::numeric_limits<long>::min()}();
-		if(l_Val > std::numeric_limits<long>::min())
+		if(l_Val >= 0)
 		{
 			l_sValue << l_Val;
 			//SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" with value ") + l_sValue + wxT(" is correct"), wxT("Check Constant"), wxOK | wxICON_INFORMATION);
 			new wxTipWindow(this, wxT("the constant ") + p_sName + wxT(" with value ") + l_sValue + wxT(" is correct"), 1000);
-			return true;
 		}
 		else
 		{
-			SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" with value ") + p_sValue + wxT(" is not correct"), wxT("Check Constant"), wxOK | wxICON_ERROR);
-			return false;
+			SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" with value ") + p_sValue + wxT(" is possibly not correct"), wxT("Check Constant"), wxOK | wxICON_WARNING);
 		}
+		return true;
 	}
 	else if(p_sType == wxT("double"))
 	{
 		double l_Val = SP_DS_FunctionEvaluatorDouble{l_pcFR, l_pcFunction, std::numeric_limits<double>::min()}();
-		if(l_Val > std::numeric_limits<double>::min())
+		if(l_Val >= 0.0)
 		{
 			l_sValue << l_Val;
 			//SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" with value ") + l_sValue + wxT(" is correct"), wxT("Check Constant"), wxOK | wxICON_INFORMATION);
 			new wxTipWindow(this, wxT("the constant ") + p_sName + wxT(" with value ") + l_sValue + wxT(" is correct"), 1000);
-			return true;
 		}
 		else
 		{
-			SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" with value ") + p_sValue + wxT(" is not correct"), wxT("Check Constant"), wxOK | wxICON_ERROR);
-			return false;
+			SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" with value ") + p_sValue + wxT(" is possibly not correct"), wxT("Check Constant"), wxOK | wxICON_WARNING);
 		}
+		return true;
 	}
 	return false;
 }
