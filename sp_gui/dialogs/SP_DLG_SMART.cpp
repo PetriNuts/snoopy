@@ -113,7 +113,7 @@ SP_DLG_SMART::SP_DLG_SMART(wxWindow* p_pcParent)
 	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK), 0, wxALL, 5);
 	l_pcButtonSizer->Add(this->CreateButtonSizer(wxCANCEL), 0, wxALL, 5);
 	m_pcMainSizer->Add(m_pcTopSizer, 1, wxEXPAND);
-    m_pcMainSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT);
+    m_pcMainSizer->Add(l_pcButtonSizer, 0);
 	
     SetAutoLayout(true);
 	//seems to be a reasonable dimension
@@ -267,12 +267,12 @@ SP_DLG_SMART::CreateNotebookPages() {
 		elemsizer->Add(CheckBox_Part_3, 0, wxRIGHT | wxLEFT , 5);
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
-		elemsizer->Add(new wxStaticText(m_pcNotebookPage,-1,wxT("   Coarse depth:")), 0, wxALIGN_CENTER , 5);
+		elemsizer->Add(new wxStaticText(m_pcNotebookPage,-1,wxT("   Coarse depth:")), 0, 5);
 		partition_depth = new wxTextCtrl(m_pcNotebookPage,-1 ,wxT(""));
 		partition_depth->SetValidator( wxTextValidator(wxFILTER_NUMERIC ));
 		partition_depth->SetValue(ExportConfig->GetConfigurationElement(wxT("partition_depth_default"))->value );
 		elemsizer->Add(partition_depth, 0, wxTOP | wxBOTTOM , 5);
-		elemsizer->Add(new wxStaticText(m_pcNotebookPage,-1,wxT("  min number of places:")), 0, wxALIGN_CENTER , 5);
+		elemsizer->Add(new wxStaticText(m_pcNotebookPage,-1,wxT("  min number of places:")), 0, 5);
 		partition_min_number= new wxTextCtrl(m_pcNotebookPage,-1 ,wxT(""));
 		partition_min_number->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 		partition_min_number->SetValue(ExportConfig->GetConfigurationElement(wxT("partition_min_number_default"))->value);

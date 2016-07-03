@@ -43,7 +43,7 @@ m_pcCommand(p_pcCmd)
 	wxBoxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 10);
 	
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcButtonSizer, 0);
 	
 	SetSizerAndFit(m_pcSizer);
 	

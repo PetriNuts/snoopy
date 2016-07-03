@@ -23,15 +23,15 @@ SP_DLG_About::SP_DLG_About (wxWindow *p_pcParent, int p_nMilliseconds)
 
     // about info
     wxFlexGridSizer *l_pcAboutInfo = new wxFlexGridSizer (2, 0, 2);
-    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Vendor: ")),0, wxALIGN_LEFT);
-    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_VENDOR),0, wxALIGN_LEFT);
-    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Version: ")),0, wxALIGN_LEFT);
-    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_REVISION),0, wxALIGN_LEFT);
-    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Release: ")),0, wxALIGN_LEFT);
-    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_RELEASE),0, wxALIGN_LEFT);
-    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Build: ")),0, wxALIGN_LEFT);
-    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_BUILD),0, wxALIGN_LEFT);
-    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Contributors: \n(in alphabetic order)  ")),0, wxALIGN_LEFT);
+    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Vendor: ")),0);
+    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_VENDOR),0);
+    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Version: ")),0);
+    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_REVISION),0);
+    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Release: ")),0);
+    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_RELEASE),0);
+    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Build: ")),0);
+    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_BUILD),0);
+    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Contributors: \n(in alphabetic order)  ")),0);
     l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY,
 	wxT("Shubham Agarwal, Denny Bayer, Matthias Dube, Markus Fieber, \n")
 	wxT("Monika Heiner, Mostafa Herajy, Erik Jongsma, Christian Krueger, \n")
@@ -39,14 +39,14 @@ SP_DLG_About::SP_DLG_About (wxWindow *p_pcParent, int p_nMilliseconds)
 	wxT("Thomas Meier, Ronny Richter, Christian Rohr, Daniel Scheibler, \n")
 	wxT("Martin Schwarick, Anjali Sharma, Alexey Tovchigrechko, Katja Winder")
     )
-	,0, wxALIGN_LEFT);
+	,0);
 
     // about icontitle//info
     wxBoxSizer *l_pcAboutpane = new wxBoxSizer (wxHORIZONTAL);
     wxBitmap bitmap = wxBitmap(wxICON (snoopy));
     l_pcAboutpane->Add (new wxStaticBitmap (this, wxID_ANY, bitmap),
                     1,  wxLEFT | wxRIGHT, 20);
-    l_pcAboutpane->Add (l_pcAboutInfo, 0, wxALIGN_LEFT );
+    l_pcAboutpane->Add (l_pcAboutInfo, 0);
     l_pcAboutpane->Add (20, 0);
 
     // about complete

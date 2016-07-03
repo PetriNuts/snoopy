@@ -178,7 +178,7 @@ wxDialog(p_pcParent, -1, p_sTitle, wxPoint( 120, 120), wxSize( 500, 300),
 	wxBoxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 5);
 
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcButtonSizer, 0);
 
 	SetSizerAndFit(m_pcSizer);
 

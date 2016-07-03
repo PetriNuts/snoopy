@@ -60,7 +60,7 @@ SP_DLG_ShapeProperties::Init()
     /* Buttons in the lower right hand corner */
     wxStdDialogButtonSizer* l_pcButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 
-    m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT);
+    m_pcSizer->Add(l_pcButtonSizer, 0);
 
     SetSizerAndFit(m_pcSizer);
     Layout();

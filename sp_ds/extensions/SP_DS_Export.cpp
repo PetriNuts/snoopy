@@ -61,7 +61,7 @@ Export::Export(const wxString &title,SP_DS_PedAnimation *temp) :
 
 	//Step Details
 	m_pc_StepDetails = new wxStaticText(m_pc_Panel,wxID_ANY,wxT("Step Details"));
-	m_pc_VBox->Add(m_pc_StepDetails,0,wxALIGN_CENTER,5);
+	m_pc_VBox->Add(m_pc_StepDetails,0,5);
 
 	//Horizontal Line
 	m_pc_StLine2 = new wxStaticLine(m_pc_Panel,wxID_ANY);

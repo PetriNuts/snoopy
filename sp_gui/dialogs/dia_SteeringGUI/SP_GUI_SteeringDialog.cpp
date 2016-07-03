@@ -203,7 +203,7 @@ void SP_GUI_SteeringDialog::CreateControlButtonBar(wxSizer* p_pcParentSizer)
 	l_pcBottomSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_SETTING, wxT("&Setting")), 0, wxEXPAND | wxALL , 5);
 	l_pcBottomSizer->Add(new wxButton(this, wxID_CANCEL, wxT("&Close")), 0, wxEXPAND | wxALL , 5);
 
-	p_pcParentSizer->Add(l_pcBottomSizer, 0, wxALIGN_CENTER);
+	p_pcParentSizer->Add(l_pcBottomSizer, 0);
 }
 void SP_GUI_SteeringDialog::CreatModelViewsBar(wxSizer* p_pcParentSizer)
 {
@@ -338,7 +338,7 @@ void SP_GUI_SteeringDialog::CreateSimulatorBar(wxSizer* p_pcParentSizer)
 	l_pcRowSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_SIMULATOR_SETTING, wxT("&Setting ...")), 0, wxALL);
 	l_pcSimulatorSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
-	p_pcParentSizer->Add(l_pcSimulatorSizer, 0, wxALIGN_CENTER);
+	p_pcParentSizer->Add(l_pcSimulatorSizer, 0);
 }
 void SP_GUI_SteeringDialog::CreateSimulationIntervalBar(wxSizer* p_pcParentSizer)
 {

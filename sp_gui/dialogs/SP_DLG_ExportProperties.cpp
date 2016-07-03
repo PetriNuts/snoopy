@@ -177,7 +177,7 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
     wxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 5);
 
-    m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT);
+    m_pcSizer->Add(l_pcButtonSizer, 0);
 
     // export properties come from the export, of course
     m_pcExport->AddToDialog(this, m_pcDoc);

@@ -99,7 +99,7 @@ SP_DLG_CheckNet::SP_DLG_CheckNet( SP_MDI_View* p_pcView, wxWindow *p_parent, con
     wxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 5);
 
-    l_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT);
+    l_pcSizer->Add(l_pcButtonSizer, 0);
 
 	SetSizerAndFit(l_pcSizer);
 

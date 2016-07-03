@@ -130,7 +130,7 @@ SP_DLG_SearchId::SP_DLG_SearchId(SP_DS_Graph *p_graph, wxWindow *p_parent, const
 
 	buttonSizer->Add(new wxButton(this, wxID_OK, wxT("&Close")), 0, wxLEFT | wxRIGHT | wxTOP, 5);
 
-	topSizer->Add(buttonSizer, 0, wxALIGN_RIGHT);
+	topSizer->Add(buttonSizer, 0);
 
 	SetSizerAndFit(topSizer);
 

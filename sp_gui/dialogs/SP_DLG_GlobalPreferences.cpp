@@ -98,7 +98,7 @@ SP_DLG_GlobalPreferences::SP_DLG_GlobalPreferences(wxWindow* p_pcParent)
 	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 5);
 
 	m_pcMainSizer->Add(m_pcTopSizer, 1, wxEXPAND);
-    m_pcMainSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT);
+    m_pcMainSizer->Add(l_pcButtonSizer, 0);
 
     SetSizerAndFit(m_pcMainSizer);
 

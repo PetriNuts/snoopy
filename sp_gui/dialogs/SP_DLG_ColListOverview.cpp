@@ -99,7 +99,7 @@ m_sAttrName(p_sAttrName), m_chSeperator(wxT(':'))
 	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND );
 
 	m_pcSizer->Add(l_pcGridSizer, 1,  wxEXPAND);
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcButtonSizer, 0);
 
 	SetSizerAndFit(m_pcSizer);
 }

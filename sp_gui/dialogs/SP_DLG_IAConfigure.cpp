@@ -74,7 +74,7 @@ SP_DLG_IAConfigure::SP_DLG_IAConfigure(wxWindow *p_pcParent, SP_IA_Manager *p_pc
 		l_pcHelpSizer2 = new wxBoxSizer(wxVERTICAL);
 		l_pcHelpSizer2->Add(new wxButton(this, SP_ID_BUTTON_CONNECT, wxT("Connect")), 0, wxLEFT | wxRIGHT | wxTOP, 10);
 		l_pcHelpSizer2->Add(new wxButton(this, SP_ID_BUTTON_DISCONNECT, wxT("Disconnect")), 0, wxALL, 10);
-		l_pcHelpSizer->Add(l_pcHelpSizer2, 0, wxALIGN_BOTTOM);
+		l_pcHelpSizer->Add(l_pcHelpSizer2, 0);
 
 		m_lbConnectedNets = new wxListBox(this, SP_ID_LISTBOX_CONNECTEDNETS, wxDefaultPosition, wxSize(-1, 100),
 																	0, 0, wxLB_HSCROLL | wxLB_NEEDED_SB);
@@ -113,7 +113,7 @@ SP_DLG_IAConfigure::SP_DLG_IAConfigure(wxWindow *p_pcParent, SP_IA_Manager *p_pc
 		l_pcHelpSizer2->Add(m_buCmdConfig, 0, wxALL , 10);
 		l_pcHelpSizer2->Add(new wxButton(this, SP_ID_BUTTON_ACTIVATE, wxT("Activate")), 0, wxLEFT | wxRIGHT, 10);
 		l_pcHelpSizer2->Add(new wxButton(this, SP_ID_BUTTON_DEACTIVATE, wxT("Deactivate")), 0, wxALL , 10);
-		l_pcHelpSizer->Add(l_pcHelpSizer2, 0, wxALIGN_BOTTOM);
+		l_pcHelpSizer->Add(l_pcHelpSizer2, 0);
 
 		m_lbActCommands = new wxListBox(this, SP_ID_LISTBOX_ACTCMDS, wxDefaultPosition, wxSize(-1, 100),
 																	0, 0, wxLB_HSCROLL | wxLB_NEEDED_SB);

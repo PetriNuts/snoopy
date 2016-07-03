@@ -125,7 +125,7 @@ SP_DLG_ChooseFTreeReduction::InitGUI(){
 		   0, wxLEFT | wxRIGHT | wxTOP , 5);
 
  	l_pcSizerNorth->Add(l_pcSizerList, 1, wxEXPAND, 1);
-	l_pcSizerNorth->Add(l_pcSizerButtons, 0, wxALIGN_RIGHT,0);
+	l_pcSizerNorth->Add(l_pcSizerButtons, 0,0);
 
 
 	l_pcSizerTop->Add(l_pcSizerNorth, 1, wxLEFT | wxRIGHT | wxTOP | wxEXPAND, 1);

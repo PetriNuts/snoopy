@@ -137,7 +137,7 @@ void SP_DLG_ChooseInvariant::InitGUI()
 	l_pcSizerButtons->Add(new wxButton(this, wxID_CANCEL, wxT("&Close")), 0, wxALL, 5);
 
 	l_pcSizerNorth->Add(l_pcSizerList, 1, wxEXPAND, 1);
-	l_pcSizerNorth->Add(l_pcSizerButtons, 0, wxALIGN_RIGHT, 0);
+	l_pcSizerNorth->Add(l_pcSizerButtons, 0, 0);
 
 	// @todo insert color choosing
 	l_pcSizerTop->Add(l_pcSizerNorth, 1, wxALL | wxEXPAND, 1);

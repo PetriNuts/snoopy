@@ -186,7 +186,7 @@ SP_DLG_ColorSetSetting::SP_DLG_ColorSetSetting( wxWindow* p_pcParent,SP_CPN_Grid
 
     l_pcNotebookPage->AddControl(l_pcButtonSizer, 0, wxALL | wxEXPAND, 5);
 
-	//l_pcRowSizer->Add(l_pcButtonSizer, 0, wxALIGN_LEFT);
+	//l_pcRowSizer->Add(l_pcButtonSizer, 0);
 
 	//l_pcRowSizer->Layout();
 
@@ -307,7 +307,7 @@ SP_DLG_ColorSetSetting::SP_DLG_ColorSetSetting( wxWindow* p_pcParent,SP_CPN_Grid
 	wxStdDialogButtonSizer* l_pcBottomButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 	
 	
-	m_pcSizer->Add(l_pcBottomButtonSizer, 0, wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcBottomButtonSizer, 0);
 
 	m_pcNotebook->ChangeSelection(p_GridNumber);
   

@@ -106,7 +106,7 @@ SP_DLG_ReduceFTree::SP_DLG_ReduceFTree( SP_DS_Graph *p_graph,
 
 	elemSizer->Add(m_multipleInputs, 0, wxEXPAND | wxALL, 5);
 
-	levelSizer->Add(elemSizer, 0, wxALIGN_LEFT);
+	levelSizer->Add(elemSizer, 0);
 
 	wxBoxSizer* detailsSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -126,7 +126,7 @@ SP_DLG_ReduceFTree::SP_DLG_ReduceFTree( SP_DS_Graph *p_graph,
 	detailsSizer-> Add(new wxButton(this, SP_DETAILS_M_OF_N_GATE, wxT("&Details")),
 		     0, wxLEFT | wxRIGHT | wxTOP, 5);
 
-	levelSizer->Add(detailsSizer, 0, wxALIGN_RIGHT);
+	levelSizer->Add(detailsSizer, 0);
 
 
 	/* Buttons in the lower right hand corner */
@@ -145,8 +145,8 @@ SP_DLG_ReduceFTree::SP_DLG_ReduceFTree( SP_DS_Graph *p_graph,
 	buttonSizer->Add(new wxButton(this, wxID_CANCEL, wxT("&Cancel")),
 		     0, wxLEFT | wxRIGHT | wxTOP, 5);
 
-	itemStaticBoxSizer3->Add(levelSizer, 20, wxALIGN_CENTER);
-	itemStaticBoxSizer3->Add(buttonSizer, 5, wxALIGN_CENTER);
+	itemStaticBoxSizer3->Add(levelSizer, 20);
+	itemStaticBoxSizer3->Add(buttonSizer, 5);
 
 	topSizer->Add(new wxStaticText(this, -1, wxT("   Details:")), 0, wxRIGHT , 5);
 
