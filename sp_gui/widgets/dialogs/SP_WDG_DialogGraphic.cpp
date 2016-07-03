@@ -80,22 +80,22 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
     wxBoxSizer* l_pcSizer;
 
 	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Pen Colour:")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Pen Colour:")), 0, wxALL | wxALIGN_CENTER, 5);
     m_pcButtonPen = new wxColourPickerCtrl(l_pcPage, m_nDialogID+ SP_COLOURPEN + wxID_HIGHEST , (*m_lGraphics.begin())->GetPen()->GetColour(),
                                             wxDefaultPosition, wxDefaultSize,
                                             wxCLRP_DEFAULT_STYLE);
 	l_pcSizer->Add(m_pcButtonPen, 0, wxALL, 5);
-    l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTPEN + m_nDialogID+ wxID_HIGHEST, _T("Default")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+    l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTPEN + m_nDialogID+ wxID_HIGHEST, _T("Default")), 0, wxALL | wxALIGN_CENTER, 5);
     l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
     l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Brush Colour:")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+    l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Brush Colour:")), 0, wxALL | wxALIGN_CENTER, 5);
 
 	m_pcButtonBrush = new wxColourPickerCtrl(l_pcPage, SP_COLOURBRUSH + m_nDialogID+ wxID_HIGHEST, (*m_lGraphics.begin())->GetBrush()->GetColour(),
 											wxDefaultPosition, wxDefaultSize);
 
 	l_pcSizer->Add(m_pcButtonBrush, 0, wxALL, 5);
-    l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTBRUSH + m_nDialogID+ wxID_HIGHEST, _T("Default")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+    l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTBRUSH + m_nDialogID+ wxID_HIGHEST, _T("Default")), 0, wxALL | wxALIGN_CENTER, 5);
     l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
 	/* change ckruge2 19.06.2009 */
@@ -114,7 +114,7 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
 			h = (*m_lGraphics.begin())->GetHeight();
 		}
 		l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Width:")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Width:")), 0, wxALL | wxALIGN_CENTER, 5);
 		m_scWidth = new wxSpinCtrl(l_pcPage, SP_SPINCTRL_WIDTH + 1000+ SP_ID_LAST_ID);
 		// -1 means unmodified
 		if (m_bMultiple) {
@@ -127,7 +127,7 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
 		l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Height:")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Height:")), 0, wxALL | wxALIGN_CENTER, 5);
 		m_scHeight = new wxSpinCtrl(l_pcPage, SP_SPINCTRL_HEIGHT + 1000+ SP_ID_LAST_ID);
 		// -1 means unmodified
 	    if (m_bMultiple)
@@ -149,7 +149,7 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
 		if(l_pcGr->GetThickness()!=0) {
 			int l_intT =(dynamic_cast<SP_GR_ExtendedEdge*>(l_pcGr))->GetThickness();
 			l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-			l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Line Thickness:")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+			l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Line Thickness:")), 0, wxALL | wxALIGN_CENTER, 5);
 			m_scThickness = new wxSpinCtrl(l_pcPage, SP_SPINCTRL_HEIGHT + 1000+ SP_ID_LAST_ID, wxString::Format(wxT("%d"), l_intT),
 					wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, INT_MAX, l_intT);
 			l_pcSizer->Add(m_scThickness, 0, wxALL, 5);
@@ -157,7 +157,7 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
 
 			SP_Graphic* l_pcGr = *m_lGraphics.begin();
 			l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-			l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Arrow Thickness:")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+			l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Arrow Thickness:")), 0, wxALL | wxALIGN_CENTER, 5);
 			size_t l_intALT = (dynamic_cast<SP_GR_ExtendedEdge*>(l_pcGr))->GetArrowLeftThickness();		
 			m_scArrowLThickness = new wxSpinCtrl(l_pcPage, SP_SPINCTRL_WIDTH + 1000+ SP_ID_LAST_ID, wxString::Format(wxT("%d"), l_intALT),
 						wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, INT_MAX, l_intALT);

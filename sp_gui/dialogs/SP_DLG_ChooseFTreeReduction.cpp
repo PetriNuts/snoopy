@@ -108,7 +108,7 @@ SP_DLG_ChooseFTreeReduction::InitGUI(){
 	l_pcSizerButtons->Add(new wxButton(this, SP_DELETE_SELECTION, wxT("&Delete")),
 			 0, wxLEFT | wxRIGHT | wxTOP, 5);
 
-	l_pcSizerColour->Add(new wxStaticText(this, -1, _T("Colour:")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+	l_pcSizerColour->Add(new wxStaticText(this, -1, _T("Colour:")), 0, wxALL | wxALIGN_CENTER, 5);
 
 	m_pcButtonColour = new wxColourPickerCtrl(this, SP_ID_BUTTON_COLOUR, *wxRED,
             wxDefaultPosition, wxDefaultSize,

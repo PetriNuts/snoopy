@@ -73,7 +73,7 @@ SP_DLG_ChooseFTreeCutSet::InitGUI(){
 
 	
 	l_pcSizerList->Add(m_pcListBox, 1, wxEXPAND, 1);
-	l_pcSizerColour->Add(new wxStaticText(this, -1, _T("Colour:")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+	l_pcSizerColour->Add(new wxStaticText(this, -1, _T("Colour:")), 0, wxALL | wxALIGN_CENTER, 5);
 	m_pcButtonColour = new wxColourPickerCtrl(this, SP_ID_BUTTON_COLOUR, *wxRED,
             wxDefaultPosition, wxDefaultSize,
             wxCLRP_DEFAULT_STYLE);

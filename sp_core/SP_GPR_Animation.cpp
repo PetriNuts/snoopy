@@ -370,8 +370,7 @@ SP_GPR_Animation::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPa
 
 
 	} else /*DEFAULT*/ {
-		l_pcSizer->Add(new wxStaticText(p_pcPage, -1, wxT("No editable animation preferences for this class.")), 0,
-									wxALL | wxALIGN_CENTER_VERTICAL, 5);
+		l_pcSizer->Add(new wxStaticText(p_pcPage, -1, wxT("No editable animation preferences for this class.")), 0, wxALL, 5);
 	}
 
 	if (p_sNetClass.CmpNoCase(SP_DS_FAULTTREE_CLASS) == 0

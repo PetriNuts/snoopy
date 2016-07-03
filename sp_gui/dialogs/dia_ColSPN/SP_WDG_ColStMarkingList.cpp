@@ -93,7 +93,7 @@ bool SP_WDG_ColStMarkingList::AddToDialog(
     SP_WDG_NotebookPage* l_pcPage = p_pcDlg->AddPage(l_sPage, GetDialogOrdering());
 	CHECK_POINTER( l_pcPage, return FALSE );
 
-	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 1, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 1, wxALL | wxALIGN_CENTER, 5);
 	AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);
 
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);

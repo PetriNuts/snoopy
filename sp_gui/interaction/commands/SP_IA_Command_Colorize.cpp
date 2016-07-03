@@ -144,7 +144,7 @@ void SP_IA_Command_Colorize::AddToConfigDialog(wxWindow *p_pcParent,
 {
 
 	wxBoxSizer *l_pcColorSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcColorSizer->Add(new wxStaticText(p_pcParent, -1, wxT("Color:")), 0, wxALIGN_CENTER_VERTICAL);
+	l_pcColorSizer->Add(new wxStaticText(p_pcParent, -1, wxT("Color:")), 0, wxALIGN_CENTER);
 
 	m_buChooseColor = new wxColourPickerCtrl(p_pcParent, SP_ID_BUTTON_COLOUR, GetColor(),
 	            wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE);

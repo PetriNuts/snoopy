@@ -62,7 +62,7 @@ SP_WDG_StLookupTableName::AddToDialog( const SP_ListAttribute* p_ptlAttributes,
   m_bMultiple = ( p_ptlAttributes->size() > 1 );
 
   l_pcSizer->Add( new wxStaticText( l_pcPage, -1, wxT("") ), 1,
-    wxALL | wxALIGN_CENTER_VERTICAL, 5 );
+    wxALL | wxALIGN_CENTER, 5 );
 
   l_pcPage->AddControl( l_pcSizer, 0, wxEXPAND );
 

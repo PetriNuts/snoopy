@@ -77,7 +77,7 @@ bool SP_WDG_DialogChoice::AddToDialog(const SP_ListAttribute* p_ptlAttributes, S
 
 			wxString l_pchValue = l_pcAttr->GetValueString();
 			wxString l_sName = l_pcAttr->GetParentName();
-			l_pcFlexGridSizer->Add(new wxStaticText(l_pcPage, -1, l_sName), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+			l_pcFlexGridSizer->Add(new wxStaticText(l_pcPage, -1, l_sName), 0, wxALL | wxALIGN_CENTER, 5);
 			wxChoice* l_pcChoice = new wxChoice(l_pcPage, -1, wxDefaultPosition, wxDefaultSize, m_pcChoiceValues);
 			int l_nSelected = l_pcChoice->FindString(l_pchValue);
 			if (l_nSelected != wxNOT_FOUND)
@@ -86,7 +86,7 @@ bool SP_WDG_DialogChoice::AddToDialog(const SP_ListAttribute* p_ptlAttributes, S
 			}
 			m_pcChoice.push_back(l_pcChoice);
 			wxBoxSizer* l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-			l_pcSizer->Add(l_pcChoice, 1, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+			l_pcSizer->Add(l_pcChoice, 1, wxALL | wxALIGN_CENTER, 5);
 
 			AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);
 			l_pcFlexGridSizer->Add(l_pcSizer, 1, wxEXPAND);
@@ -101,7 +101,7 @@ bool SP_WDG_DialogChoice::AddToDialog(const SP_ListAttribute* p_ptlAttributes, S
         SP_WDG_NotebookPage* l_pcPage = p_pcDlg->AddPage(l_sPage, GetDialogOrdering());
         CHECK_POINTER(l_pcPage, return FALSE);
 
-    	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+    	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 0, wxALL | wxALIGN_CENTER, 5);
 		wxChoice* l_pcChoice = new wxChoice(l_pcPage, -1, wxDefaultPosition, wxDefaultSize, m_pcChoiceValues);
 		if(m_bMultiple)
 		{
@@ -119,7 +119,7 @@ bool SP_WDG_DialogChoice::AddToDialog(const SP_ListAttribute* p_ptlAttributes, S
 			}
 		}
 		m_pcChoice.push_back(l_pcChoice);
-        l_pcSizer->Add(l_pcChoice, 1, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+        l_pcSizer->Add(l_pcChoice, 1, wxALL | wxALIGN_CENTER, 5);
 
         AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);
         l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);

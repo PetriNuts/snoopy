@@ -235,9 +235,9 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 		l_pcRowSizer->Add(m_pcChooseColoredPlace, 0, wxALIGN_CENTER| wxALL, 5);
 		m_pcChooseColoredPlace->Append(wxT("")); //
 
-		l_pcSizerColumn3->Add(l_pcRowSizer, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL);
+		l_pcSizerColumn3->Add(l_pcRowSizer, 0, wxEXPAND|wxALIGN_CENTER);
 	}	
-	l_pcThirdColumSizer->Add(l_pcSizerColumn3, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL);
+	l_pcThirdColumSizer->Add(l_pcSizerColumn3, 1, wxEXPAND|wxALIGN_CENTER);
 
 
 	/***************************the fourth column**************************/

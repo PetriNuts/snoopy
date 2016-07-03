@@ -57,7 +57,7 @@ SP_DLG_TransformGraphic::SP_DLG_TransformGraphic(SP_GUI_Mainframe* p_pcParent,
         wxRA_SPECIFY_COLS);
 
     m_pcSizer->Add(m_pcChoice, 0, wxEXPAND | wxALL, 5);
-    l_pcSizer->Add(new wxStaticText(this, -1, wxT("Angle:")), 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+    l_pcSizer->Add(new wxStaticText(this, -1, wxT("Angle:")), 0, wxRIGHT | wxALIGN_CENTER, 5);
     l_pcSizer->Add(m_pcRadiusCtrl, 1);
     m_pcSizer->Add(l_pcSizer, 0, wxEXPAND | wxALL, 5);
 

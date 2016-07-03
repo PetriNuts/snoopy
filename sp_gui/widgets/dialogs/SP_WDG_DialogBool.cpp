@@ -59,7 +59,7 @@ SP_WDG_DialogBool::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
 
 			wxString l_pchValue = l_pcAttr->GetValueString();
 			wxString l_sName = l_pcAttr->GetParentName();
-			l_pcFlexGridSizer->Add(new wxStaticText(l_pcPage, -1, l_sName), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+			l_pcFlexGridSizer->Add(new wxStaticText(l_pcPage, -1, l_sName), 0, wxALL | wxALIGN_CENTER, 5);
 	        wxCheckBox* l_pcBoolCtrl = new wxCheckBox(l_pcPage
 										  ,-1
 										  ,wxT("")
@@ -73,7 +73,7 @@ SP_WDG_DialogBool::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
 
 			l_pcSizer->Add(l_pcBoolCtrl, 0, wxALL, 5);
 
-			l_pcFlexGridSizer->Add(l_pcSizer, 1, wxEXPAND | wxALL | wxALIGN_CENTER_VERTICAL);
+			l_pcFlexGridSizer->Add(l_pcSizer, 1, wxEXPAND | wxALL | wxALIGN_CENTER);
     	}
 		l_pcPage->AddControl(l_pcFlexGridSizer, 0, wxEXPAND);
 	}
@@ -85,7 +85,7 @@ SP_WDG_DialogBool::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
         SP_WDG_NotebookPage* l_pcPage = p_pcDlg->AddPage(l_sPage, GetDialogOrdering());
         CHECK_POINTER(l_pcPage, return FALSE);
 
-        l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+        l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 0, wxALL | wxALIGN_CENTER, 5);
         wxCheckBox* l_pcBoolCtrl = NULL;
     	// set the value
     	if (m_bMultiple)
@@ -113,7 +113,7 @@ SP_WDG_DialogBool::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
         }
         m_pcBoolCtrl.push_back(l_pcBoolCtrl);
 
-		l_pcSizer->Add(l_pcBoolCtrl, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+		l_pcSizer->Add(l_pcBoolCtrl, 0, wxALL | wxALIGN_CENTER, 5);
 
 	    l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
     }

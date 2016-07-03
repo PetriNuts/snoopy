@@ -410,13 +410,13 @@ SP_DS_Animation::AddToDialog(SP_DLG_AnimationProperties* p_pcDlg, wxSizer* p_pcS
     m_sDlgDuration = wxString::Format(wxT("%d"), m_nStepDuration);
 
     wxBoxSizer* l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcSizer->Add(new wxStaticText(p_pcDlg, -1, wxT("Refresh (ms)")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
+    l_pcSizer->Add(new wxStaticText(p_pcDlg, -1, wxT("Refresh (ms)")), 0, wxALL | wxALIGN_CENTER, 2);
     l_pcSizer->Add(new wxTextCtrl(p_pcDlg, -1, m_sDlgFrequency, wxDefaultPosition, wxDefaultSize, 0,
         wxTextValidator(wxFILTER_NUMERIC, &m_sDlgFrequency)), 1, wxALL, 2);
     p_pcSizer->Add(l_pcSizer, 0, wxALL | wxEXPAND, 5);
 
     l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcSizer->Add(new wxStaticText(p_pcDlg, -1, wxT("Duration (ms)")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
+    l_pcSizer->Add(new wxStaticText(p_pcDlg, -1, wxT("Duration (ms)")), 0, wxALL | wxALIGN_CENTER, 2);
     l_pcSizer->Add(new wxTextCtrl(p_pcDlg, -1, m_sDlgDuration, wxDefaultPosition, wxDefaultSize, 0,
         wxTextValidator(wxFILTER_NUMERIC, &m_sDlgDuration)), 1, wxALL, 2);
     p_pcSizer->Add(l_pcSizer, 0, wxALL | wxEXPAND, 5);

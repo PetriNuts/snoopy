@@ -45,8 +45,8 @@ SP_DLG_About::SP_DLG_About (wxWindow *p_pcParent, int p_nMilliseconds)
     wxBoxSizer *l_pcAboutpane = new wxBoxSizer (wxHORIZONTAL);
     wxBitmap bitmap = wxBitmap(wxICON (snoopy));
     l_pcAboutpane->Add (new wxStaticBitmap (this, wxID_ANY, bitmap),
-                    1, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT, 20);
-    l_pcAboutpane->Add (l_pcAboutInfo, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                    1, wxALIGN_CENTER | wxALIGN_CENTER | wxLEFT | wxRIGHT, 20);
+    l_pcAboutpane->Add (l_pcAboutInfo, 0, wxALIGN_LEFT | wxALIGN_CENTER);
     l_pcAboutpane->Add (20, 0);
 
     // about complete

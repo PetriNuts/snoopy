@@ -54,7 +54,7 @@ m_pcCurrentValues(p_pcCurrentValues)
 
 		     //add sub sizer
 		     l_pcMainSizer->Add(l_pcSelectorSizer, 1, wxEXPAND | wxALL);
-		     l_pcMainSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+		     l_pcMainSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_CENTER);
 
 		     //available nodes
 	         wxSizer* l_pcRowSizer=new wxBoxSizer(wxVERTICAL);
@@ -80,7 +80,7 @@ m_pcCurrentValues(p_pcCurrentValues)
 	         l_pcMiddleSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL);
 			 l_pcRowSizer=new wxBoxSizer(wxHORIZONTAL);
 			 l_pcMiddleSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL);
-			 l_pcSelectorSizer->Add(l_pcMiddleSizer, 0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+			 l_pcSelectorSizer->Add(l_pcMiddleSizer, 0, wxEXPAND | wxALIGN_CENTER);
 
 
 	         //selected nodes

@@ -117,7 +117,7 @@ void SP_DLG_ChooseInvariant::InitGUI()
 	l_pcSizerButtons->Add(new wxButton(this, SP_ID_BUTTON_LAST_VEC, wxT("&Last")), 0, wxALL, 5);
 	l_pcSizerButtons->Add(m_pcChoice, 0, wxALL, 5);
 
-	l_pcSizerColour->Add(new wxStaticText(this, -1, _T("Colour:")), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+	l_pcSizerColour->Add(new wxStaticText(this, -1, _T("Colour:")), 0, wxALL | wxALIGN_CENTER, 5);
 
 	m_pcCheckBoxGradientColouring = new wxCheckBox(this, SP_ID_CHECKBOX_GRADIENT_VEC, wxT("gradient colouring"));
 	l_pcSizerButtons->Add(m_pcCheckBoxGradientColouring, 0, wxALL, 5);

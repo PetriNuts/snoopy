@@ -71,7 +71,7 @@ bool SP_WDG_StLookupTable::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
     SP_WDG_NotebookPage* l_pcPage = p_pcDlg->AddPage(l_sPage, GetDialogOrdering());
 	CHECK_POINTER( l_pcPage, return FALSE );
 
-	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("") ), 1, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("") ), 1, wxALL | wxALIGN_CENTER, 5);
 
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 

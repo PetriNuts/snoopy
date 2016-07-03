@@ -88,13 +88,13 @@ SP_DLG_IAConfigure::SP_DLG_IAConfigure(wxWindow *p_pcParent, SP_IA_Manager *p_pc
 		m_pcMainSizer->Add(new wxStaticLine(this, -1), 0, wxEXPAND | wxALL, 10);
 
 		l_pcHelpSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcHelpSizer->Add(new wxStaticText(this, -1, wxT("Source Net: ")), 0, wxLEFT | wxALIGN_CENTER_VERTICAL, 10);
+		l_pcHelpSizer->Add(new wxStaticText(this, -1, wxT("Source Net: ")), 0, wxLEFT | wxALIGN_CENTER, 10);
 		m_tcSourceName = new wxTextCtrl(this, -1, GetSourceName(), wxDefaultPosition, wxDefaultSize,	wxTE_READONLY);
 		l_pcHelpSizer->Add(m_tcSourceName, 1, wxLEFT | wxRIGHT | wxEXPAND, 10);
 		m_pcMainSizer->Add(l_pcHelpSizer, 0, wxTOP | wxEXPAND, 10);
 
 		l_pcHelpSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcHelpSizer->Add(new wxStaticText(this, -1, wxT("Selected Target Net: ")), 0, wxLEFT | wxALIGN_CENTER_VERTICAL, 10);
+		l_pcHelpSizer->Add(new wxStaticText(this, -1, wxT("Selected Target Net: ")), 0, wxLEFT | wxALIGN_CENTER, 10);
 		m_tcTargetName = new wxTextCtrl(this, -1, wxT(""), wxDefaultPosition, wxDefaultSize,	wxTE_READONLY);
 		l_pcHelpSizer->Add(m_tcTargetName, 1, wxLEFT | wxRIGHT | wxEXPAND, 10);
 		m_pcMainSizer->Add(l_pcHelpSizer, 0, wxTOP | wxEXPAND, 10);

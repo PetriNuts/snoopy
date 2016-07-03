@@ -282,7 +282,7 @@ SP_GPR_Fonts::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage *
 			wxString l_sKey = wxString::Format(wxT("%s|%s"), p_sNetClass.c_str(), l_rString.c_str());
 			l_pcSectionSizer = new wxStaticBoxSizer(new wxStaticBox(p_pcPage, -1, wxString::Format(wxT("%s"), l_rString.c_str())), wxVERTICAL);
 			helpSizer = new wxBoxSizer(wxHORIZONTAL);
-			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Font:")), 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Font:")), 0, wxLEFT | wxRIGHT | wxALIGN_CENTER, 5);
 			wxFont* l_pcFont = m_mFonts[l_sKey];
 			m_mtcFaceName[*it] = new wxTextCtrl(p_pcPage, -1, l_pcFont->GetFaceName(),
 																		wxDefaultPosition, wxDefaultSize,	wxTE_READONLY);
@@ -291,11 +291,11 @@ SP_GPR_Fonts::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage *
 			l_pcSectionSizer->Add(helpSizer, 0, wxTOP | wxBOTTOM, 5);
 
 			helpSizer = new wxBoxSizer(wxHORIZONTAL);
-			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Style:")), 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Style:")), 0, wxLEFT | wxRIGHT | wxALIGN_CENTER, 5);
 			m_mtcStyle[*it] = new wxTextCtrl(p_pcPage, -1, DetermineStyle(l_pcFont),
 																							wxDefaultPosition, wxDefaultSize,	wxTE_READONLY);
 			helpSizer->Add(m_mtcStyle[*it]);
-			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Size:")), 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Size:")), 0, wxLEFT | wxRIGHT | wxALIGN_CENTER, 5);
 			m_mtcSize[*it] = new wxTextCtrl(p_pcPage, -1, wxString::Format(wxT("%d"), l_pcFont->GetPointSize()),
 																						wxDefaultPosition, wxSize(30, -1),	wxTE_READONLY);
 			helpSizer->Add(m_mtcSize[*it]);
@@ -305,7 +305,7 @@ SP_GPR_Fonts::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage *
 		}
 	}	else /*DEFAULT*/ {
 		l_pcSizer->Add(new wxStaticText(p_pcPage, -1, wxT("No editable font preferences.")), 0,
-									wxALL | wxALIGN_CENTER_VERTICAL, 5);
+									wxALL | wxALIGN_CENTER, 5);
 	}
 
 	p_pcPage->AddControl(l_pcSizer,0,wxEXPAND);

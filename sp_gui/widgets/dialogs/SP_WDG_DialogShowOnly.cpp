@@ -56,7 +56,7 @@ SP_WDG_DialogShowOnly::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
 
 			wxString l_pchValue = l_pcAttr->GetValueString();
 			wxString l_sName = l_pcAttr->GetParentName();
-			l_pcFlexGridSizer->Add(new wxStaticText(l_pcPage, -1, l_sName), 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+			l_pcFlexGridSizer->Add(new wxStaticText(l_pcPage, -1, l_sName), 0, wxALL | wxALIGN_CENTER, 5);
 
 			wxBoxSizer* l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
 			l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetValueString()), 1, wxALL, 5);
@@ -77,7 +77,7 @@ SP_WDG_DialogShowOnly::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
 
 		wxString l_sLabel = l_pcAttr->GetName() + (m_bMultiple ? wxT(": multiple") : wxT(": ") + l_pcAttr->GetValueString());
 
-		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_sLabel), 1, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_sLabel), 1, wxALL | wxALIGN_CENTER, 5);
 		AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);
 
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);

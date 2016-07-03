@@ -71,7 +71,7 @@ SP_DLG_SelectNodes::SP_DLG_SelectNodes(wxWindow* p_pcParentWnd, spsa::Model * p_
 	l_pcMainSizer->Add(l_pcSelectorSizer, 1, wxEXPAND | wxALL);
 	l_pcMainSizer->Add(l_pcColorUncolorSizer, 0, wxEXPAND | wxALL);
 	l_pcMainSizer->Add(l_pcNodeTypeSizer, 0, wxEXPAND | wxALL);
-	l_pcMainSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+	l_pcMainSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_CENTER);
 
 	//available nodes
 	wxSizer* l_pcRowSizer = new wxBoxSizer(wxVERTICAL);
@@ -97,7 +97,7 @@ SP_DLG_SelectNodes::SP_DLG_SelectNodes(wxWindow* p_pcParentWnd, spsa::Model * p_
 	l_pcMiddleSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL);
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcMiddleSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL);
-	l_pcSelectorSizer->Add(l_pcMiddleSizer, 0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+	l_pcSelectorSizer->Add(l_pcMiddleSizer, 0, wxEXPAND | wxALIGN_CENTER);
 
 	if (m_bIsColoredModel)
 	{
@@ -111,7 +111,7 @@ SP_DLG_SelectNodes::SP_DLG_SelectNodes(wxWindow* p_pcParentWnd, spsa::Model * p_
 		m_pcColorName = new wxChoice(this, SP_GUI_STEERINGNODES_CURRENT_COLOR_NAME, wxDefaultPosition, wxSize(150, -1));
 		//list box
 		l_pcRowSizer->Add(m_pcColorName, 1, wxEXPAND | wxALIGN_CENTER);
-		l_pcColorUncolorSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+		l_pcColorUncolorSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALIGN_CENTER);
 	}
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -119,7 +119,7 @@ SP_DLG_SelectNodes::SP_DLG_SelectNodes(wxWindow* p_pcParentWnd, spsa::Model * p_
 	{ wxT("Place"), wxT("Transitions") };
 	m_pcNodeTypes = new wxRadioBox(this, SP_GUI_SELECTNODES_OPTIONBOX_NODETYPE, wxT(""), wxDefaultPosition, wxDefaultSize, 2, l_sNodes);
 	l_pcRowSizer->Add(m_pcNodeTypes, 0, wxEXPAND | wxALIGN_CENTER);
-	l_pcNodeTypeSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+	l_pcNodeTypeSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALIGN_CENTER);
 
 	//selected nodes
 	l_pcRowSizer = new wxBoxSizer(wxVERTICAL);
