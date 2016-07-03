@@ -40,10 +40,8 @@ m_pcCommand(p_pcCmd)
 	if (m_pcCommand) m_pcCommand->AddToConfigDialog(this, m_pcSizer);
 	
 	m_pcSizer->Add(new wxStaticLine(this, -1), 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, 10);
-	wxBoxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
-	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 10);
-	
-	m_pcSizer->Add(l_pcButtonSizer, 0);
+
+	m_pcSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 10);
 	
 	SetSizerAndFit(m_pcSizer);
 	

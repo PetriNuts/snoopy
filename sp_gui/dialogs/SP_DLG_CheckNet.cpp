@@ -96,10 +96,7 @@ SP_DLG_CheckNet::SP_DLG_CheckNet( SP_MDI_View* p_pcView, wxWindow *p_parent, con
 	l_pcSizer->Add(elemsizer);
 
     /* Buttons in the lower right hand corner */
-    wxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
-	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 5);
-
-    l_pcSizer->Add(l_pcButtonSizer, 0);
+	l_pcSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 
 	SetSizerAndFit(l_pcSizer);
 

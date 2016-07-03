@@ -90,10 +90,7 @@ m_pcDoc(p_pcDoc)
     m_pcSizer->Add(l_pcCustomSizer, 0, wxEXPAND | wxALL, 5);
 #endif
 	/* Buttons in the lower right hand corner */
-    wxBoxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
-	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 5);
-
-    m_pcSizer->Add(l_pcButtonSizer, 0);
+    m_pcSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 
     SetSizerAndFit(m_pcSizer);
 

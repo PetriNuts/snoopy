@@ -66,7 +66,7 @@ SP_DLG_CheckForUpdate::CheckForUpdate(bool p_bAskUser)
 		m_pcUpdateCheckBox = new wxCheckBox(m_pcDialog, wxID_ANY, wxT("Automatically check for update every week."));
 		m_pcUpdateCheckBox->SetValue(m_bUpdateAllowed);
 		m_pcUpdateSizer->Add(m_pcUpdateCheckBox, 0, wxALL, 10);
-		m_pcUpdateSizer->Add(m_pcDialog->CreateButtonSizer(wxOK | wxCANCEL), 0,  wxALL, 10);
+		m_pcUpdateSizer->Add(m_pcDialog->CreateButtonSizer(wxOK | wxCANCEL), 0, wxEXPAND | wxALL, 10);
 		m_pcUpdateSizer->Show(true);
 		m_pcDialog->SetSizerAndFit(m_pcUpdateSizer);
 		m_pcDialog->CentreOnParent();
@@ -235,7 +235,7 @@ SP_DLG_CheckForUpdate::ShowResult(const wxString& p_sNewVersion, const wxString&
 	m_pcUpdateCheckBox = new wxCheckBox(m_pcDialog, wxID_ANY, wxT("Automatically check for update every week."));
 	m_pcUpdateCheckBox->SetValue(m_bUpdateAllowed);
 	m_pcResultSizer->Add(m_pcUpdateCheckBox, 0, wxALL, 10);
-	m_pcResultSizer->Add(m_pcDialog->CreateButtonSizer(wxOK), 0,  wxALL, 10);
+	m_pcResultSizer->Add(m_pcDialog->CreateButtonSizer(wxOK), 0, wxEXPAND | wxALL, 10);
 	m_pcResultSizer->Show(true);
 	m_pcDialog->SetSizerAndFit(m_pcResultSizer);
 	m_pcDialog->CentreOnParent();

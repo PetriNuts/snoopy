@@ -62,10 +62,7 @@ SP_DLG_TransformGraphic::SP_DLG_TransformGraphic(SP_GUI_Mainframe* p_pcParent,
     m_pcSizer->Add(l_pcSizer, 0, wxEXPAND | wxALL, 5);
 
     /* Buttons in the lower right hand corner */
-    wxBoxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
-	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 5);
-
-    m_pcSizer->Add(l_pcButtonSizer, 0);
+	m_pcSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 
     SetSizerAndFit(m_pcSizer);
 

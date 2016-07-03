@@ -57,7 +57,7 @@ int SP_MESSAGEBOX(const wxString& message,
 	wxBoxSizer* l_cTextpane = new wxBoxSizer(wxVERTICAL);
 	wxStaticText* l_cMsg = new wxStaticText(l_pcDlg, -1, message);
 	l_cTextpane->Add (l_cMsg, 0,  wxALL, 10);
-	l_cTextpane->Add(l_pcDlg->CreateButtonSizer(style), 0, wxALL, 10);
+	l_cTextpane->Add(l_pcDlg->CreateButtonSizer(style), 0, wxEXPAND | wxALL, 10);
 
 	if( style & wxNO )
 		l_pcDlg->SetEscapeId(wxID_NO);

@@ -127,7 +127,7 @@ SP_DLG_ColAuxiliaryVariable::SP_DLG_ColAuxiliaryVariable( wxWindow* p_pcParent,c
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check") ), 1, wxALL, 5);
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ASSISTENT, wxT("Assistant") ), 1, wxALL, 5);
 	
-	wxStdDialogButtonSizer* l_pcBottomButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
+	wxSizer* l_pcBottomButtonSizer = CreateButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 	
 	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND);
 	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND );

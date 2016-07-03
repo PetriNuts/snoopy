@@ -100,13 +100,10 @@ SP_DLG_InscriptionOverview::SP_DLG_InscriptionOverview(wxWindow* p_pcParent,
 
 	wxSizer *l_pcBottomButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 
-	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,
-			wxEXPAND | wxALL, 5);
+	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 
-	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND 
-			);
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND 
-			);
+	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND);
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND);
 
 	m_pcSizer->Add(l_pcGridSizer, 1,  wxEXPAND);
 	m_pcSizer->Add(l_pcButtonSizer, 0,  wxEXPAND);

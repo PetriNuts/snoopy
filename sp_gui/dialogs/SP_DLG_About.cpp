@@ -69,7 +69,7 @@ SP_DLG_About::SP_DLG_About (wxWindow *p_pcParent, int p_nMilliseconds)
 	wxHyperlinkCtrl *l_pcEmail = new wxHyperlinkCtrl (this, wxID_ANY, l_sEmailadress, SP_APP_EMAIL);
 	l_pcTotalpane->Add (l_pcEmail, 0, wxALIGN_CENTER | wxLEFT | wxRIGHT | wxBOTTOM, 10);
 
-	l_pcTotalpane->Add (this->CreateButtonSizer(wxOK), 0,  wxALL, 10);
+	l_pcTotalpane->Add (this->CreateButtonSizer(wxOK), 0, wxEXPAND);
 
     SetSizerAndFit (l_pcTotalpane);
     CentreOnParent();

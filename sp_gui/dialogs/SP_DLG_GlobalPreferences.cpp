@@ -95,10 +95,10 @@ SP_DLG_GlobalPreferences::SP_DLG_GlobalPreferences(wxWindow* p_pcParent)
 
     /* Buttons in the lower right hand corner */
     wxBoxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
-	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 5);
+	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 
 	m_pcMainSizer->Add(m_pcTopSizer, 1, wxEXPAND);
-    m_pcMainSizer->Add(l_pcButtonSizer, 0);
+    m_pcMainSizer->Add(l_pcButtonSizer, 0, wxEXPAND);
 
     SetSizerAndFit(m_pcMainSizer);
 

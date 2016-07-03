@@ -52,7 +52,7 @@ SP_DLG_SimulationParamterSelection::SP_DLG_SimulationParamterSelection(SP_DS_Ani
   m_pcError->SetForegroundColour(*wxRED);
   l_pcButtonSizer->Add(m_pcError, 0, wxLEFT | wxRIGHT | wxTOP, 5);
   l_pcButtonSizer->Add(new wxButton(this, SP_ID_PARAMSELECTIONADDCOL, wxT("Add Column")), 0, wxALL, 5);
-  l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL, 5);
+  l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
   m_pcSizer->Add(l_pcButtonSizer, 0);
 
   SetSizerAndFit(m_pcSizer);

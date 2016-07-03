@@ -58,9 +58,9 @@ SP_DLG_ShapeProperties::Init()
     m_pcSizer->Add(m_pcNotebook, 1, wxEXPAND | wxALL, 5);
 
     /* Buttons in the lower right hand corner */
-    wxStdDialogButtonSizer* l_pcButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
+    wxSizer* l_pcButtonSizer = CreateButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 
-    m_pcSizer->Add(l_pcButtonSizer, 0);
+    m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND);
 
     SetSizerAndFit(m_pcSizer);
     Layout();

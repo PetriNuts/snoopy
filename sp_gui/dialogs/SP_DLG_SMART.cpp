@@ -110,10 +110,9 @@ SP_DLG_SMART::SP_DLG_SMART(wxWindow* p_pcParent)
 	
     /* Buttons in the lower right hand corner */
     wxBoxSizer *l_pcButtonSizer = new wxBoxSizer( wxHORIZONTAL );
-	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK), 0, wxALL, 5);
-	l_pcButtonSizer->Add(this->CreateButtonSizer(wxCANCEL), 0, wxALL, 5);
+	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 	m_pcMainSizer->Add(m_pcTopSizer, 1, wxEXPAND);
-    m_pcMainSizer->Add(l_pcButtonSizer, 0);
+    m_pcMainSizer->Add(l_pcButtonSizer, 0, wxEXPAND);
 	
     SetAutoLayout(true);
 	//seems to be a reasonable dimension

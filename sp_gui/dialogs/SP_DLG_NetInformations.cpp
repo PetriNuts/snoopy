@@ -68,9 +68,9 @@ SP_DLG_NetInformations::SP_DLG_NetInformations(SP_DS_Graph *p_graph, wxWindow *p
 		elemSizer->Add(new wxStaticText(this, -1, wxString::Format(wxT("%u"), l_nSize)), wxGBPosition(l_nRow, ++l_nCol), wxGBSpan(), wxLEFT | wxRIGHT | wxTOP, l_nBorder);
 	}
 
-	topSizer->Prepend(elemSizer, 1, wxALIGN_CENTER | wxALL, 5);
+	topSizer->Prepend(elemSizer, 1, wxEXPAND | wxALL, 5);
 
-	topSizer->Add(this->CreateButtonSizer(wxOK), 0, wxALL, 5);
+	topSizer->Add(this->CreateButtonSizer(wxOK), 0, wxEXPAND | wxALL, 5);
 
 	SetMinSize(wxSize(200,100));
 	SetSizerAndFit(topSizer);

@@ -38,8 +38,8 @@ SP_DLG_ImportSBML2extPN::SP_DLG_ImportSBML2extPN(SP_GUI_Mainframe*  p_pcParent,
 	m_pcSizer->Add(m_cbNormalizeStoichiometries, 0, wxALL, 10);
 
 	/* Buttons in the lower right hand corner */
-	wxStdDialogButtonSizer* l_pcButtons = CreateStdDialogButtonSizer(wxOK | wxCANCEL);
-    m_pcSizer->Add(l_pcButtons, 0, wxALL, 10);
+	wxSizer* l_pcButtons = CreateButtonSizer(wxOK | wxCANCEL);
+    m_pcSizer->Add(l_pcButtons, 0, wxEXPAND | wxALL, 10);
 
    SetSizerAndFit(m_pcSizer);
 

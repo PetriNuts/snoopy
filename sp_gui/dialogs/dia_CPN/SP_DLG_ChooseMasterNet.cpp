@@ -52,7 +52,7 @@ SP_DLG_ChooseMasterNet::SP_DLG_ChooseMasterNet(wxWindow *p_parent, const wxStrin
 
 	topSizer->Add(l_pcRowSizer, 0, wxALL | wxEXPAND, 1);	
 
-	topSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxALL, 5);
+	topSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 	SetSizerAndFit(topSizer);
 
 	Centre(wxBOTH);

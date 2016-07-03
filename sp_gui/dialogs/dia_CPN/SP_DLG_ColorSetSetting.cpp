@@ -304,10 +304,10 @@ SP_DLG_ColorSetSetting::SP_DLG_ColorSetSetting( wxWindow* p_pcParent,SP_CPN_Grid
 	//The end of Page 4
 
 	// OK and Cancel command for the whole dialogue
-	wxStdDialogButtonSizer* l_pcBottomButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
+	wxSizer* l_pcBottomButtonSizer = CreateButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 	
 	
-	m_pcSizer->Add(l_pcBottomButtonSizer, 0);
+	m_pcSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND);
 
 	m_pcNotebook->ChangeSelection(p_GridNumber);
   

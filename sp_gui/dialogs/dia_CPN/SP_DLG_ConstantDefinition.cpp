@@ -124,7 +124,7 @@ SP_DLG_ConstantDefinition::SP_DLG_ConstantDefinition( wxWindow* p_pcParent,
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_DELETE, wxT("Delete constant") ), 1, wxALL, 5);
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check constants") ), 1, wxALL, 5);
 
-	wxStdDialogButtonSizer* l_pcBottomButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
+	wxSizer* l_pcBottomButtonSizer = CreateButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 
 	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND );
 	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND );

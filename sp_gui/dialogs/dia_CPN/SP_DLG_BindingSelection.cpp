@@ -59,9 +59,7 @@ SP_DLG_BindingSelection::SP_DLG_BindingSelection( vector<wxString>& p_BindingArr
 
 	m_pcSizer->Add(l_pcParameterListBoxSizer, 1, wxALL | wxEXPAND, 1);
 	//buttons
-	wxBoxSizer* l_pcButtonSizer =	new wxBoxSizer( wxHORIZONTAL);
-	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK | wxCANCEL), 0, wxALL, 5);
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxALL , 1);
+	m_pcSizer->Add(this->CreateButtonSizer(wxOK | wxCANCEL), 0, wxEXPAND | wxALL, 5);
 
 	LoadData();
 

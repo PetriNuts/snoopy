@@ -83,7 +83,7 @@ SP_DLG_ChooseFTreeCutSet::InitGUI(){
   
 
 	l_pcSizerButtons->Add(this->CreateButtonSizer(wxOK|wxCANCEL),
-		   0, wxLEFT | wxRIGHT | wxTOP , 5);
+		   0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP , 5);
 
  	l_pcSizerNorth->Add(l_pcSizerList, 1, wxEXPAND, 1);
 	l_pcSizerNorth->Add(l_pcSizerButtons, 0,0);

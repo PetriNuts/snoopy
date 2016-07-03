@@ -120,7 +120,7 @@ SP_DLG_DuplicateNodes::SP_DLG_DuplicateNodes(SP_DS_Graph *p_graph, unsigned int 
 
 	topSizer->Prepend(UserdefiningSizer, 1, wxALL | wxEXPAND, 5);
 
-	wxStdDialogButtonSizer* l_pcButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL);
+	wxSizer* l_pcButtonSizer = CreateButtonSizer(wxOK|wxCANCEL);
 
 	topSizer->Add(l_pcButtonSizer, 0, wxALL | wxEXPAND, 1);
 
