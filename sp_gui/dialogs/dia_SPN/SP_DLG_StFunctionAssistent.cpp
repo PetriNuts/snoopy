@@ -79,7 +79,7 @@ SP_DLG_StFunctionAssistent::SP_DLG_StFunctionAssistent(
 
 	//formula
 	wxBoxSizer* l_pcFormulaSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcFormulaSizer->Add(new wxStaticText(this, -1, l_sTypeLabel), 0, wxALL | wxALIGN_CENTER | wxEXPAND, 5);
+	l_pcFormulaSizer->Add(new wxStaticText(this, -1, l_sTypeLabel), 0, wxALL |  wxEXPAND, 5);
 	m_pcFormulaTextCtrl = new wxTextCtrl(this, SP_ID_TEXTCTRL_FORMULA, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 	l_pcFormulaSizer->Add(m_pcFormulaTextCtrl, 1, wxALL | wxEXPAND, 5);
 	l_pcFormulaSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check")), 0, wxALL | wxEXPAND, 5);

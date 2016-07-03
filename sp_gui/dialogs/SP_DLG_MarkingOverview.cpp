@@ -86,7 +86,7 @@ SP_DLG_MarkingOverview::SP_DLG_MarkingOverview(wxWindow* p_pcParent, const wxStr
 
 	SP_AutoSizeRowLabelSize(m_pcMarkingGrid);
 
-	m_pcSizer->Add(l_pcGridSizer, 1, wxALIGN_CENTER | wxEXPAND);
+	m_pcSizer->Add(l_pcGridSizer, 1,  wxEXPAND);
 	m_pcSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALIGN_RIGHT | wxEXPAND);
 
 	SetSizerAndFit(m_pcSizer);

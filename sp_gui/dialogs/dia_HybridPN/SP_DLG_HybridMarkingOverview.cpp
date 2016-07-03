@@ -132,7 +132,7 @@ SP_DLG_HybridMarkingOverview::SP_DLG_HybridMarkingOverview(wxWindow* p_pcParent,
 	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM
 			);
 
-	m_pcSizer->Add(l_pcGridSizer, 0, wxALIGN_CENTER | wxEXPAND);
+	m_pcSizer->Add(l_pcGridSizer, 0,  wxEXPAND);
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT | wxEXPAND);
 
 	SetSizerAndFit(m_pcSizer);

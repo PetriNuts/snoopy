@@ -784,7 +784,7 @@ bool SP_DS_PedAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcS
 			int row = i+1;
 			l_pcSetsSizer->Add(new wxStaticText(p_pcCtrl, -1, m_choices[i] + wxT(':')), wxGBPosition(row,0));
 			m_apcChoices.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_CONSTANTS_SETS, wxDefaultPosition, wxSize(100, -1), 0, NULL, 0, wxDefaultValidator, m_choices[i]));
-			l_pcSetsSizer->Add(m_apcChoices[i], wxGBPosition(row,1), wxDefaultSpan, wxALIGN_CENTER | wxEXPAND);
+			l_pcSetsSizer->Add(m_apcChoices[i], wxGBPosition(row,1), wxDefaultSpan,  wxEXPAND);
 			l_pcSetsSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANTS_SETS, wxT("Modify")), wxGBPosition(row,2), wxDefaultSpan);
 		}
 	}

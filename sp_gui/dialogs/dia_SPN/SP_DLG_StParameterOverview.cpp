@@ -112,7 +112,7 @@ SP_DLG_StParameterOverview::SP_DLG_StParameterOverview(wxWindow* p_pcParent,
 	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM
 			);
 
-	m_pcSizer->Add(l_pcGridSizer, 1, wxALIGN_CENTER | wxEXPAND);
+	m_pcSizer->Add(l_pcGridSizer, 1,  wxEXPAND);
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT | wxEXPAND);
 
 	SetSizerAndFit(m_pcSizer);
