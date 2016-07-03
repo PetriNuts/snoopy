@@ -44,8 +44,7 @@ SP_DLG_About::SP_DLG_About (wxWindow *p_pcParent, int p_nMilliseconds)
     // about icontitle//info
     wxBoxSizer *l_pcAboutpane = new wxBoxSizer (wxHORIZONTAL);
     wxBitmap bitmap = wxBitmap(wxICON (snoopy));
-    l_pcAboutpane->Add (new wxStaticBitmap (this, wxID_ANY, bitmap),
-                    1,  wxLEFT | wxRIGHT, 20);
+    l_pcAboutpane->Add (new wxStaticBitmap (this, wxID_ANY, bitmap), 1,  wxLEFT | wxRIGHT, 20);
     l_pcAboutpane->Add (l_pcAboutInfo, 0);
     l_pcAboutpane->Add (20, 0);
 
@@ -54,23 +53,21 @@ SP_DLG_About::SP_DLG_About (wxWindow *p_pcParent, int p_nMilliseconds)
     l_pcTotalpane->Add (0, 10);
     wxStaticText *l_pcAppname = new wxStaticText(this, wxID_ANY, SP_APP_LONG_NAME);
     l_pcAppname->SetFont (wxFont (16, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-    l_pcTotalpane->Add (l_pcAppname, 0,  wxLEFT | wxRIGHT, 40);
+    l_pcTotalpane->Add (l_pcAppname, 0, wxALIGN_CENTER | wxLEFT | wxRIGHT, 40);
     l_pcTotalpane->Add (0, 10);
-	l_pcTotalpane->Add (new wxStaticText(this, wxID_ANY, SP_APP_DESCRIPTION),
-                    0,  wxLEFT | wxRIGHT, 10);
+	l_pcTotalpane->Add (new wxStaticText(this, wxID_ANY, SP_APP_DESCRIPTION), 0, wxALIGN_CENTER | wxLEFT | wxRIGHT, 10);
     l_pcTotalpane->Add (0, 15);
 	l_pcTotalpane->Add (l_pcAboutpane, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
 
     wxHyperlinkCtrl *l_pcWebsite = new wxHyperlinkCtrl(this, wxID_ANY, SP_APP_WEBPAGE, SP_APP_WEBPAGE);
 
-    l_pcTotalpane->Add (l_pcWebsite, 0,  wxLEFT | wxRIGHT | wxBOTTOM, 10);
+    l_pcTotalpane->Add (l_pcWebsite, 0, wxALIGN_CENTER | wxLEFT | wxRIGHT | wxBOTTOM, 10);
 	l_pcTotalpane->Add (0, 6);
-    l_pcTotalpane->Add (new wxStaticText(this, wxID_ANY, wxT("Any comments to:")),
-                    0,  wxLEFT | wxRIGHT, 10);
+    l_pcTotalpane->Add (new wxStaticText(this, wxID_ANY, wxT("Any comments to:")), 0, wxALIGN_CENTER | wxLEFT | wxRIGHT, 10);
 	l_pcTotalpane->Add (0, 6);
 	wxString l_sEmailadress = wxString(SP_APP_EMAIL).Mid(7);
 	wxHyperlinkCtrl *l_pcEmail = new wxHyperlinkCtrl (this, wxID_ANY, l_sEmailadress, SP_APP_EMAIL);
-	l_pcTotalpane->Add (l_pcEmail, 0,  wxLEFT | wxRIGHT | wxBOTTOM, 10);
+	l_pcTotalpane->Add (l_pcEmail, 0, wxALIGN_CENTER | wxLEFT | wxRIGHT | wxBOTTOM, 10);
 
 	l_pcTotalpane->Add (this->CreateButtonSizer(wxOK), 0,  wxALL, 10);
 
