@@ -50,7 +50,7 @@ m_pcDoc(p_pcDoc)
     l_pcLayoutSizer->Add(m_pcLayoutChoice, 1);
     m_pcSizer->Add(l_pcLayoutSizer, 0, wxEXPAND | wxALL, 5);
 
-	/* all Views or only theactual one*/
+	/* all Views or only the current one*/
 	wxArrayString l_asOneOrAllViewsChoice;
 	l_asOneOrAllViewsChoice.Add(wxT("layout only current view"));
 	l_asOneOrAllViewsChoice.Add(wxT("layout all views"));

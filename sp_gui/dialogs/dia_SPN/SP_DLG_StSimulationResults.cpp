@@ -146,7 +146,7 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 			wxString l_sGroup = *l_itChoice;
 			l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 			l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, l_sGroup + wxT(':') ), wxSizerFlags(1).Expand().Border(wxALL, 2));
-			m_apcComboBoxes.push_back(new wxChoice( m_pcPropertyWindowSetsSizer, -1 , wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
+			m_apcComboBoxes.push_back(new wxChoice( m_pcPropertyWindowSetsSizer, -1 , wxDefaultPosition, wxSize(100,-1), 0, NULL, 0, wxDefaultValidator, l_sGroup ));
 			l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], wxSizerFlags(1).Expand().Border(wxALL, 2));
 			l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), wxSizerFlags(0).Expand().Border(wxALL, 2));
 			m_pcSetsSizer->Add( l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));

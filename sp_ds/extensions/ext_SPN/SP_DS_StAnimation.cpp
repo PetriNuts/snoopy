@@ -561,7 +561,7 @@ bool SP_DS_StAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSi
 		wxString l_sGroup = *l_itChoice;
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 		l_pcRowSizer->Add( new wxStaticText( p_pcCtrl, -1, l_sGroup + wxT(':') ), 1, wxALL | wxEXPAND, 5 );
-		m_apcComboBoxes.push_back(new wxChoice( p_pcCtrl, SP_ID_CHOICE_CONSTANT_SETS , wxDefaultPosition, wxSize(100,-1), 0, NULL, wxCB_READONLY, wxDefaultValidator, l_sGroup ));
+		m_apcComboBoxes.push_back(new wxChoice( p_pcCtrl, SP_ID_CHOICE_CONSTANT_SETS , wxDefaultPosition, wxSize(100,-1), 0, NULL, 0, wxDefaultValidator, l_sGroup ));
 		l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], 0, wxALL, 5 );
 		l_pcRowSizer->Add( new wxButton( p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), 0, wxALL, 5 );
 		l_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND);
