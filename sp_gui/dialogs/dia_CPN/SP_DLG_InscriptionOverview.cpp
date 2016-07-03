@@ -104,9 +104,9 @@ SP_DLG_InscriptionOverview::SP_DLG_InscriptionOverview(wxWindow* p_pcParent,
 			wxEXPAND | wxALL, 5);
 
 	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND | wxALIGN_TOP
-			| wxALIGN_CENTER);
+			);
 	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM
-			| wxALIGN_CENTER);
+			);
 
 	m_pcSizer->Add(l_pcGridSizer, 1, wxALIGN_CENTER | wxEXPAND);
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT | wxEXPAND);
@@ -194,7 +194,7 @@ void SP_DLG_InscriptionOverview::LoadData()
 			wxString l_sExprssion = l_pcColList->GetCell(0, 1);			
 			m_pcInscriptionGrid->SetCellValue(l_nGridRowNumber, 0, l_sExprssion);
 			m_pcInscriptionGrid->SetCellBackgroundColour(l_nGridRowNumber, 0,(l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
-			m_pcInscriptionGrid->SetCellAlignment(l_nGridRowNumber, 0 ,wxALIGN_RIGHT, wxALIGN_CENTRE);
+			m_pcInscriptionGrid->SetCellAlignment(l_nGridRowNumber, 0 ,wxALIGN_RIGHT, wxALIGN_CENTER);
 		}
 
 		(l_bWhite ? l_bWhite = false : l_bWhite = true );
@@ -303,7 +303,7 @@ void SP_DLG_InscriptionOverview::LoadDataForColoredCPN()
 			wxString l_sExprssion = l_pcColList->GetCell(0, 1);			
 			m_pcInscriptionGrid->SetCellValue(l_nGridRowNumber, 0, l_sExprssion);
 			m_pcInscriptionGrid->SetCellBackgroundColour(l_nGridRowNumber, 0,(l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
-			m_pcInscriptionGrid->SetCellAlignment(l_nGridRowNumber, 0 ,wxALIGN_RIGHT, wxALIGN_CENTRE);
+			m_pcInscriptionGrid->SetCellAlignment(l_nGridRowNumber, 0 ,wxALIGN_RIGHT, wxALIGN_CENTER);
 		}
 
 		(l_bWhite ? l_bWhite = false : l_bWhite = true );
@@ -336,7 +336,7 @@ void SP_DLG_InscriptionOverview::LoadDataForColoredCPN()
 			wxString l_sExprssion = l_pcColList->GetCell(0, 1);			
 			m_pcInscriptionGrid->SetCellValue(l_nGridRowNumber, 0, l_sExprssion);
 			m_pcInscriptionGrid->SetCellBackgroundColour(l_nGridRowNumber, 0,(l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
-			m_pcInscriptionGrid->SetCellAlignment(l_nGridRowNumber, 0 ,wxALIGN_RIGHT, wxALIGN_CENTRE);
+			m_pcInscriptionGrid->SetCellAlignment(l_nGridRowNumber, 0 ,wxALIGN_RIGHT, wxALIGN_CENTER);
 		}
 
 		(l_bWhite ? l_bWhite = false : l_bWhite = true );
@@ -368,7 +368,7 @@ void SP_DLG_InscriptionOverview::LoadDataForColoredCPN()
 			wxString l_sExprssion = l_pcColList->GetCell(0, 1);			
 			m_pcInscriptionGrid->SetCellValue(l_nGridRowNumber, 0, l_sExprssion);
 			m_pcInscriptionGrid->SetCellBackgroundColour(l_nGridRowNumber, 0,(l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
-			m_pcInscriptionGrid->SetCellAlignment(l_nGridRowNumber, 0 ,wxALIGN_RIGHT, wxALIGN_CENTRE);
+			m_pcInscriptionGrid->SetCellAlignment(l_nGridRowNumber, 0 ,wxALIGN_RIGHT, wxALIGN_CENTER);
 		}
 
 		(l_bWhite ? l_bWhite = false : l_bWhite = true );

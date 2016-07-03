@@ -65,9 +65,9 @@ void SP_GUI_SteeringSubWindow::AddVariable(const wxString& p_sName,const double&
 
 	        l_pcSpinCtrl->SetValue(p_nCurrentValue);
 	       
-	        l_pcRowSizer->Add(l_pcSpinCtrl, 1, wxEXPAND | wxALIGN_CENTER,5);
+	        l_pcRowSizer->Add(l_pcSpinCtrl, 1, wxEXPAND ,5);
 
-	        l_pcMainSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALIGN_CENTER,5);
+	        l_pcMainSizer->Add(l_pcRowSizer, 0, wxEXPAND ,5);
 
 	        m_apcSteeringVariables.push_back(l_pcSpinCtrl);
 }

@@ -95,8 +95,8 @@ m_sAttrName(p_sAttrName), m_chSeperator(wxT(':'))
 
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 
-	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND | wxALIGN_CENTER);
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_CENTER);
+	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND );
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND );
 
 	m_pcSizer->Add(l_pcGridSizer, 1, wxALIGN_CENTER | wxEXPAND);
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT);
@@ -227,7 +227,7 @@ void SP_DLG_ColListOverview::OnAddSet(wxCommandEvent& p_cEvent)
 						m_pcValueGrid->GetCellValue(l_nGridRow, l_nGridCol-l_nNumberAttr) );
 
 				m_pcValueGrid->SetCellAlignment(l_nGridRow, l_nGridCol,
-						wxALIGN_RIGHT, wxALIGN_CENTRE);
+						wxALIGN_RIGHT, wxALIGN_CENTER);
 
 				m_pcValueGrid->SetCellBackgroundColour(l_nGridRow, l_nGridCol,
 						(l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
@@ -480,7 +480,7 @@ void SP_DLG_ColListOverview::LoadData()
 					m_pcValueGrid->SetCellValue(i, l_nGridColNumber, l_pcAttr->GetCell(l_nRow,l_nCol));
 
 					m_pcValueGrid->SetCellBackgroundColour(i, l_nGridColNumber,	(l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
-					m_pcValueGrid->SetCellAlignment(i, l_nGridColNumber, wxALIGN_RIGHT,	wxALIGN_CENTRE);
+					m_pcValueGrid->SetCellAlignment(i, l_nGridColNumber, wxALIGN_RIGHT,	wxALIGN_CENTER);
 					l_nGridColNumber++;
 				}
 			}

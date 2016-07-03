@@ -54,10 +54,10 @@ m_pcResultViewer(p_pcResultViewer)
 
 	wxBoxSizer* l_pcBottonsSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	l_pcMainSizer->Add(l_pcBottonsSizer, 0, wxEXPAND | wxALIGN_CENTER | wxALL, 5);
+	l_pcMainSizer->Add(l_pcBottonsSizer, 0, wxEXPAND  | wxALL, 5);
 
 	l_pcBottonsSizer->Add(new wxButton( this, wxID_OK, wxT("&Ok") ), 0, wxALL|wxALIGN_CENTER, 5);
-	l_pcBottonsSizer->Add(new wxButton( this, wxID_CANCEL, wxT("&Cancel") ), 0, wxEXPAND | wxALL|wxALIGN_CENTER, 5);
+	l_pcBottonsSizer->Add(new wxButton( this, wxID_CANCEL, wxT("&Cancel") ), 0, wxEXPAND | wxALL, 5);
 
 	SetSizerAndFit(l_pcMainSizer);
 	Centre();

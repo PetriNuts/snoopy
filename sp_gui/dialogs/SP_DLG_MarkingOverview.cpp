@@ -163,7 +163,7 @@ void SP_DLG_MarkingOverview::LoadData()
 					(l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
 
 			m_pcMarkingGrid->SetCellAlignment(l_nGridRowNumber, 0,
-					wxALIGN_RIGHT, wxALIGN_CENTRE);
+					wxALIGN_RIGHT, wxALIGN_CENTER);
 
 			(l_bWhite ? l_bWhite = false : l_bWhite = true );
 			l_nGridRowNumber++;
@@ -193,7 +193,7 @@ void SP_DLG_MarkingOverview::LoadData()
 					(l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
 
 			m_pcMarkingGrid->SetCellAlignment(l_nGridRowNumber, 0,
-					wxALIGN_RIGHT, wxALIGN_CENTRE);
+					wxALIGN_RIGHT, wxALIGN_CENTER);
 
 			(l_bWhite ? l_bWhite = false : l_bWhite = true );
 			l_nGridRowNumber++;

@@ -120,9 +120,9 @@ SP_DLG_ColStMarkingOverview::SP_DLG_ColStMarkingOverview(wxWindow* p_pcParent,
 			wxEXPAND | wxALL, 5);
 
 	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND | wxALIGN_TOP
-			| wxALIGN_CENTER);
+			);
 	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM
-			| wxALIGN_CENTER);
+			);
 
 	m_pcSizer->Add(l_pcGridSizer, 1, wxALIGN_CENTER | wxEXPAND);
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT | wxEXPAND);
@@ -219,11 +219,11 @@ void SP_DLG_ColStMarkingOverview::OnAddSet(wxCommandEvent& p_cEvent)
 		for (l_nGridRow = 0; l_nGridRow < m_pcMarkingGrid->GetNumberRows(); l_nGridRow++)
 		{
 			m_pcMarkingGrid->SetCellValue(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-2, m_pcMarkingGrid->GetCellValue(l_nGridRow, l_nColorCol) );
-			m_pcMarkingGrid->SetCellAlignment(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-2,wxALIGN_RIGHT, wxALIGN_CENTRE);
+			m_pcMarkingGrid->SetCellAlignment(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-2,wxALIGN_RIGHT, wxALIGN_CENTER);
 			m_pcMarkingGrid->SetCellBackgroundColour(l_nGridRow,m_pcMarkingGrid->GetNumberCols()-2, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
 
 			m_pcMarkingGrid->SetCellValue(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-1, m_pcMarkingGrid->GetCellValue(l_nGridRow, l_nValueColumn) );
-			m_pcMarkingGrid->SetCellAlignment(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-1, wxALIGN_RIGHT, wxALIGN_CENTRE);
+			m_pcMarkingGrid->SetCellAlignment(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-1, wxALIGN_RIGHT, wxALIGN_CENTER);
 			m_pcMarkingGrid->SetCellBackgroundColour(l_nGridRow,m_pcMarkingGrid->GetNumberCols()-1, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
 
 			(l_bWhite ? l_bWhite = false : l_bWhite = true );
@@ -431,7 +431,7 @@ void SP_DLG_ColStMarkingOverview::LoadData()
 			for (unsigned int j = 0; j < l_pcColList->GetColCount(); j++)
 			{				
 				m_pcMarkingGrid->SetCellValue(l_nGridRowNumber, j, l_pcColList->GetCell(i, j));	
-				m_pcMarkingGrid->SetCellAlignment(l_nGridRowNumber, j, wxALIGN_RIGHT, wxALIGN_CENTRE);
+				m_pcMarkingGrid->SetCellAlignment(l_nGridRowNumber, j, wxALIGN_RIGHT, wxALIGN_CENTER);
 				m_pcMarkingGrid->SetCellBackgroundColour(l_nGridRowNumber,j, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
 
 				if(j%2==1)

@@ -54,7 +54,7 @@ m_pcCurrentValues(p_pcCurrentValues)
 
 		     //add sub sizer
 		     l_pcMainSizer->Add(l_pcSelectorSizer, 1, wxEXPAND | wxALL);
-		     l_pcMainSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_CENTER);
+		     l_pcMainSizer->Add(l_pcButtonSizer, 0, wxEXPAND );
 
 		     //available nodes
 	         wxSizer* l_pcRowSizer=new wxBoxSizer(wxVERTICAL);
@@ -69,18 +69,18 @@ m_pcCurrentValues(p_pcCurrentValues)
 
 	         //button sizer
 	         l_pcRowSizer=new wxBoxSizer(wxVERTICAL);
-	         l_pcRowSizer->Add(new wxButton(this,SP_GUI_SELECTNODES_BUTTON_MOVE_LEFT_TO_RIGHT,wxT(">")),0,wxEXPAND | wxALIGN_CENTER);
+	         l_pcRowSizer->Add(new wxButton(this,SP_GUI_SELECTNODES_BUTTON_MOVE_LEFT_TO_RIGHT,wxT(">")),0,wxEXPAND );
 	         l_pcRowSizer->AddSpacer(8);
-	         l_pcRowSizer->Add(new wxButton(this,SP_GUI_SELECTNODES_BUTTON_MOVE_RIGHT_TO_LEFT,wxT("<")),0,wxEXPAND | wxALIGN_CENTER);
+	         l_pcRowSizer->Add(new wxButton(this,SP_GUI_SELECTNODES_BUTTON_MOVE_RIGHT_TO_LEFT,wxT("<")),0,wxEXPAND );
 	         l_pcRowSizer->AddSpacer(8);
-	         l_pcRowSizer->Add(new wxButton(this,SP_GUI_SELECTNODES_BUTTON_MOVE_ALL_LEFT_TO_RIGHT,wxT(">>")),0,wxEXPAND | wxALIGN_CENTER);
+	         l_pcRowSizer->Add(new wxButton(this,SP_GUI_SELECTNODES_BUTTON_MOVE_ALL_LEFT_TO_RIGHT,wxT(">>")),0,wxEXPAND );
 	         l_pcRowSizer->AddSpacer(8);
-	         l_pcRowSizer->Add(new wxButton(this,SP_GUI_SELECTNODES_BUTTON_MOVE_ALL_RIGHT_TO_LEFT,wxT("<<")),0,wxEXPAND | wxALIGN_CENTER);
+	         l_pcRowSizer->Add(new wxButton(this,SP_GUI_SELECTNODES_BUTTON_MOVE_ALL_RIGHT_TO_LEFT,wxT("<<")),0,wxEXPAND );
 
 	         l_pcMiddleSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL);
 			 l_pcRowSizer=new wxBoxSizer(wxHORIZONTAL);
 			 l_pcMiddleSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL);
-			 l_pcSelectorSizer->Add(l_pcMiddleSizer, 0, wxEXPAND | wxALIGN_CENTER);
+			 l_pcSelectorSizer->Add(l_pcMiddleSizer, 0, wxEXPAND );
 
 
 	         //selected nodes
@@ -92,7 +92,7 @@ m_pcCurrentValues(p_pcCurrentValues)
 			 l_pcSelectorSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL);
 
 
-		     l_pcButtonSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALIGN_CENTER);
+		     l_pcButtonSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND );
 
 
 			 //alignment the sizer

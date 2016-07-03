@@ -73,7 +73,7 @@ SP_WDG_DialogBool::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
 
 			l_pcSizer->Add(l_pcBoolCtrl, 0, wxALL, 5);
 
-			l_pcFlexGridSizer->Add(l_pcSizer, 1, wxEXPAND | wxALL | wxALIGN_CENTER);
+			l_pcFlexGridSizer->Add(l_pcSizer, 1, wxEXPAND | wxALL );
     	}
 		l_pcPage->AddControl(l_pcFlexGridSizer, 0, wxEXPAND);
 	}

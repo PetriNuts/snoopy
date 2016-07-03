@@ -756,8 +756,8 @@ bool SP_DS_PedAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcS
 	m_pcStepCounterText = new wxStaticText(p_pcCtrl,wxID_ANY,wxT("Step Counter"));
 	m_pcStepCounterValue = new wxStaticText(p_pcCtrl,wxID_ANY,l_tmp);
 
-	m_pcStepCounter->Add(m_pcStepCounterText,1,wxEXPAND | wxALL | wxALIGN_CENTER,5);
-	m_pcStepCounter->Add(m_pcStepCounterValue,1,wxEXPAND | wxALL | wxALIGN_CENTER,5);
+	m_pcStepCounter->Add(m_pcStepCounterText,1,wxEXPAND | wxALL ,5);
+	m_pcStepCounter->Add(m_pcStepCounterValue,1,wxEXPAND | wxALL ,5);
 
 	p_pcSizer->Add(m_pcStepCounter,0,wxEXPAND);
 

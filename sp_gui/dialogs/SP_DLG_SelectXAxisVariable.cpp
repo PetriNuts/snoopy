@@ -25,12 +25,12 @@ SP_DLG_SelectXAxisVariable::SP_DLG_SelectXAxisVariable(wxWindow* p_pcParent, con
 	//add variable type combobox
 	wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	wxSizer* l_pcTopSizer = new wxBoxSizer(wxVERTICAL);
-	l_pcMainSizer->Add(l_pcTopSizer, 0, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
+	l_pcMainSizer->Add(l_pcTopSizer, 0, wxALL | wxEXPAND , 5);
 
 	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Variable type:")), 1, wxEXPAND | wxALL, 5);
 	m_pcVariableTypeBox = new wxChoice(this, SP_DLG_SELECT_X_AXIS_CHANGE_TYPE, wxDefaultPosition, wxSize(150, -1));
-	l_pcRowSizer->Add(m_pcVariableTypeBox, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
-	l_pcTopSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
+	l_pcRowSizer->Add(m_pcVariableTypeBox, 1, wxALL | wxEXPAND , 5);
+	l_pcTopSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND , 5);
 	l_pcTopSizer->AddSpacer(10);
 
 	//select variable name
@@ -38,8 +38,8 @@ SP_DLG_SelectXAxisVariable::SP_DLG_SelectXAxisVariable(wxWindow* p_pcParent, con
 	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Name:")), 1, wxEXPAND | wxALL, 5);
 	m_pcVariableNameBox = new wxChoice(this, SP_DLG_SELECT_X_AXIS_CHANGE_NAME, wxDefaultPosition, wxSize(150, -1));
 
-	l_pcRowSizer->Add(m_pcVariableNameBox, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
-	l_pcTopSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
+	l_pcRowSizer->Add(m_pcVariableNameBox, 1, wxALL | wxEXPAND , 5);
+	l_pcTopSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND , 5);
 
 	SP_MapString2VectorString::const_iterator l_itChoice;
 	for (l_itChoice = m_mChoices.begin(); l_itChoice != m_mChoices.end(); l_itChoice++)
@@ -51,7 +51,7 @@ SP_DLG_SelectXAxisVariable::SP_DLG_SelectXAxisVariable(wxWindow* p_pcParent, con
 	AddItemNames();
 	m_pcVariableNameBox->SetStringSelection(m_sSelectedSubCategory);
 
-	l_pcMainSizer->Add(CreateSeparatedButtonSizer(wxOK | wxCANCEL), 0, wxALL | wxEXPAND | wxALIGN_CENTER, 5);
+	l_pcMainSizer->Add(CreateSeparatedButtonSizer(wxOK | wxCANCEL), 0, wxALL | wxEXPAND , 5);
 
 	SetSizerAndFit(l_pcMainSizer);
 	Center();

@@ -115,9 +115,9 @@ SP_DLG_StMarkingOverview::SP_DLG_StMarkingOverview(wxWindow* p_pcParent,const wx
 			wxEXPAND | wxALL, 5);
 
 	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND | wxALIGN_TOP
-			| wxALIGN_CENTER);
+			);
 	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM
-			| wxALIGN_CENTER);
+			);
 
 	m_pcSizer->Add(l_pcGridSizer, 1, wxALIGN_CENTER | wxEXPAND);
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT | wxEXPAND);
@@ -213,7 +213,7 @@ void SP_DLG_StMarkingOverview::OnAddSet(wxCommandEvent& p_cEvent)
 								- 1) );
 
 				m_pcMarkingGrid->SetCellAlignment(l_nGridRow, l_nGridCol,
-						wxALIGN_RIGHT, wxALIGN_CENTRE);
+						wxALIGN_RIGHT, wxALIGN_CENTER);
 
 				m_pcMarkingGrid->SetCellBackgroundColour(l_nGridRow,
 						l_nGridCol, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
@@ -366,7 +366,7 @@ void SP_DLG_StMarkingOverview::LoadData()
 					(l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
 
 			m_pcMarkingGrid->SetCellAlignment(l_nGridRowNumber, i,
-					wxALIGN_RIGHT, wxALIGN_CENTRE);
+					wxALIGN_RIGHT, wxALIGN_CENTER);
 
 		}
 

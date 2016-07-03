@@ -127,11 +127,11 @@ SP_DLG_StFunctionOverview::SP_DLG_StFunctionOverview(wxString p_sNodeclass, wxWi
 			wxEXPAND | wxALL, 5);
 
 	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND | wxALIGN_TOP
-			| wxALIGN_CENTER);
+			);
 	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM
-			| wxALIGN_CENTER);
+			);
 
-	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND | wxALIGN_CENTER);
+	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND );
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
 
 	SetSizerAndFit(m_pcSizer);
@@ -220,7 +220,7 @@ void SP_DLG_StFunctionOverview::OnAddSet(wxCommandEvent& p_cEvent)
 								- 1) );
 
 				m_pcFunctionGrid->SetCellAlignment(l_nGridRow, l_nGridCol,
-						wxALIGN_RIGHT, wxALIGN_CENTRE);
+						wxALIGN_RIGHT, wxALIGN_CENTER);
 
 				m_pcFunctionGrid->SetCellBackgroundColour(l_nGridRow,
 						l_nGridCol, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
@@ -350,7 +350,7 @@ void SP_DLG_StFunctionOverview::LoadData()
 			m_pcFunctionGrid->SetCellValue(l_nGridRowNumber, i, l_pcColList->GetCell(i, 1));
 			m_pcFunctionGrid->SetCellBackgroundColour(l_nGridRowNumber, i, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
 
-			m_pcFunctionGrid->SetCellAlignment(l_nGridRowNumber, i,	wxALIGN_RIGHT, wxALIGN_CENTRE);
+			m_pcFunctionGrid->SetCellAlignment(l_nGridRowNumber, i,	wxALIGN_RIGHT, wxALIGN_CENTER);
 		}
 
 		(l_bWhite ? l_bWhite = false : l_bWhite = true );

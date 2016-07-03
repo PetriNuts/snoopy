@@ -39,9 +39,9 @@ m_sSimulatorName(p_sSimName)
 
 	m_bInitialised=true;
 
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_CENTER);
+	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND );
 
-	l_pcButtonSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALIGN_CENTER);
+	l_pcButtonSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND );
 
 
 	//alignment the sizer

@@ -98,7 +98,7 @@ wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 		  l_pcRowSizer->Add(m_pcUseDefaultSetting,1, wxALL|wxALIGN_CENTER, 5);
 		  l_pcTopSizer->Add(l_pcRowSizer, 1);
 
-		  l_pcBottomSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALIGN_CENTER);
+		  l_pcBottomSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND );
 
 		  SetSizerAndFit(l_pcMainSizer);
 		  Center();

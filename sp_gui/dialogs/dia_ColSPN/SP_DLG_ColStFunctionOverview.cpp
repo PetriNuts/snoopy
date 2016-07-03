@@ -145,11 +145,11 @@ SP_DLG_ColStFunctionOverview::SP_DLG_ColStFunctionOverview(wxString p_sNodeclass
 			wxEXPAND | wxALL, 5);
 
 	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND | wxALIGN_TOP
-			| wxALIGN_CENTER);
+			);
 	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM
-			| wxALIGN_CENTER);
+			);
 
-	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND | wxALIGN_CENTER);
+	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND );
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
 
 	SetSizerAndFit(m_pcSizer);
@@ -268,7 +268,7 @@ void SP_DLG_ColStFunctionOverview::OnAddSet(wxCommandEvent& p_cEvent)
 								- 1) );
 
 					m_pcFunctionGrid->SetCellAlignment(l_nGridRow, l_nGridCol,
-						wxALIGN_RIGHT, wxALIGN_CENTRE);
+						wxALIGN_RIGHT, wxALIGN_CENTER);
 
 					m_pcFunctionGrid->SetCellBackgroundColour(l_nGridRow,
 						l_nGridCol, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));

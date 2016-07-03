@@ -378,7 +378,7 @@ void SP_DLG_NewConstantDefinition::OnAddValueSet(wxCommandEvent& p_cEvent)
 		for (l_nGridRow = 0; l_nGridRow < m_pcConstantSetGrid->GetNumberRows(); l_nGridRow++)
 		{
 			m_pcConstantSetGrid->SetCellValue(l_nGridRow, l_nGridCol, wxT(""));
-			m_pcConstantSetGrid->SetCellAlignment(l_nGridRow, l_nGridCol, wxALIGN_CENTRE, wxALIGN_CENTRE);
+			m_pcConstantSetGrid->SetCellAlignment(l_nGridRow, l_nGridCol, wxALIGN_CENTER, wxALIGN_CENTER);
 			m_pcConstantSetGrid->SetCellBackgroundColour(l_nGridRow, l_nGridCol, (l_bWhite ? *wxWHITE: *wxLIGHT_GREY));
 			(l_bWhite ? l_bWhite = false : l_bWhite = true);
 		}

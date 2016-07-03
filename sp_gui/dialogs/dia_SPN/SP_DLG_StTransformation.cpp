@@ -107,7 +107,7 @@ SP_DLG_StTransformation::SP_DLG_StTransformation( SP_ListNode* TransformingNodes
 
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL, 5);
 	
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM | wxALIGN_CENTER);
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM );
 
 	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND | wxALIGN_RIGHT);
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
@@ -195,7 +195,7 @@ void SP_DLG_StTransformation::LoadTransformData()
 			m_pcFunctionGrid->SetCellValue(l_nGridRowNumber, i, l_pcColList->GetCell(i, 1));
 			m_pcFunctionGrid->SetCellBackgroundColour(l_nGridRowNumber, i, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY ));
 
-			m_pcFunctionGrid->SetCellAlignment(l_nGridRowNumber, i,	wxALIGN_RIGHT, wxALIGN_CENTRE);
+			m_pcFunctionGrid->SetCellAlignment(l_nGridRowNumber, i,	wxALIGN_RIGHT, wxALIGN_CENTER);
 		}
 
 		(l_bWhite ? l_bWhite = false : l_bWhite = true );

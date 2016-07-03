@@ -162,7 +162,7 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 
 				l_pcComboBox->SetSelection(l_pcAttr->GetActiveList());
 				m_mColListComboBoxes[l_pcAttr] = l_pcComboBox;
-				l_pcSetsSizer->Add(l_pcComboBox, wxGBPosition{row,1}, wxDefaultSpan, wxEXPAND | wxALIGN_CENTER);
+				l_pcSetsSizer->Add(l_pcComboBox, wxGBPosition{row,1}, wxDefaultSpan, wxEXPAND );
 				++row;
 			}
 		}

@@ -64,7 +64,7 @@ SP_GUI_ConnectToServer::SP_GUI_ConnectToServer(wxWindow* p_pcParent, const wxStr
 	l_pcRowSizer->Add(m_pcStatusTxtCtrl, 0, wxALL | wxEXPAND, 5);
 	m_pcIndicatorGaugeCtrl = new wxGauge(this, 100, -1);
 	l_pcRowSizer->Add(m_pcIndicatorGaugeCtrl, 1, wxALL | wxEXPAND || wxRESERVE_SPACE_EVEN_IF_HIDDEN, 5);
-	l_pcSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALIGN_CENTER);
+	l_pcSizer->Add(l_pcRowSizer, 0, wxEXPAND );
 
 	//Buttons
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -75,11 +75,11 @@ SP_GUI_ConnectToServer::SP_GUI_ConnectToServer(wxWindow* p_pcParent, const wxStr
 	l_pcRowSizer->Add(m_pcPropertiesButtonCtrl, 1, wxEXPAND | wxALL, 5);
 	m_pcCloseButtonCtrl = new wxButton(this, SP_ID_BUTTON_CLOSE, wxT("Close"));
 	l_pcRowSizer->Add(m_pcCloseButtonCtrl, 1, wxEXPAND | wxALL, 5);
-	l_pcSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALIGN_CENTER);
+	l_pcSizer->Add(l_pcRowSizer, 0, wxEXPAND );
 
 	//Details
 	m_pcPropertiesSize = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Connection Properties")), wxVERTICAL);
-	l_pcSizer->Add(m_pcPropertiesSize, 1, wxEXPAND | wxALIGN_CENTER);
+	l_pcSizer->Add(m_pcPropertiesSize, 1, wxEXPAND );
 
 	//port
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);

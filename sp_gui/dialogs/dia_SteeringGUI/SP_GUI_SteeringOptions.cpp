@@ -47,13 +47,13 @@ SP_GUI_SteeringOptions::SP_GUI_SteeringOptions(wxWindow* p_pcParent,SteeringClie
 
 		wxBoxSizer* l_pcTopSizer = new wxBoxSizer( wxHORIZONTAL);
 		wxBoxSizer* l_pcBottomSizer=new wxBoxSizer( wxHORIZONTAL);
-		l_pcSizer->Add(l_pcTopSizer, 0, wxEXPAND | wxALIGN_CENTER);
-		l_pcSizer->Add(l_pcBottomSizer, 0, wxEXPAND | wxALIGN_CENTER);
+		l_pcSizer->Add(l_pcTopSizer, 0, wxEXPAND );
+		l_pcSizer->Add(l_pcBottomSizer, 0, wxEXPAND );
 		wxBoxSizer* l_pcLeftSizer=new wxBoxSizer( wxVERTICAL );
 		wxBoxSizer* l_pcRightSizer=new wxBoxSizer( wxVERTICAL );
 
-		l_pcBottomSizer->Add(l_pcLeftSizer, 0, wxEXPAND | wxALIGN_CENTER);
-		l_pcBottomSizer->Add(l_pcRightSizer, 0, wxEXPAND | wxALIGN_CENTER);
+		l_pcBottomSizer->Add(l_pcLeftSizer, 0, wxEXPAND );
+		l_pcBottomSizer->Add(l_pcRightSizer, 0, wxEXPAND );
 
 
 		wxString l_sChoices[]={wxT("Send a New Model"),wxT("Use an Existing Model")};
@@ -88,7 +88,7 @@ SP_GUI_SteeringOptions::SP_GUI_SteeringOptions(wxWindow* p_pcParent,SteeringClie
 	else
 	{
 		wxBoxSizer* l_pcBottomSizer=new wxBoxSizer( wxHORIZONTAL );
-		l_pcSizer->Add(l_pcBottomSizer, 0, wxEXPAND | wxALIGN_CENTER);
+		l_pcSizer->Add(l_pcBottomSizer, 0, wxEXPAND );
 
 		m_pcExistingModelBox=new wxChoice( this, SP_ID_CHOICE_MODEL_NAMES, wxDefaultPosition, wxSize(200,-1));
 
@@ -105,7 +105,7 @@ SP_GUI_SteeringOptions::SP_GUI_SteeringOptions(wxWindow* p_pcParent,SteeringClie
 	}
 
 	//add a button sizer with ok and cancel
-	l_pcSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALIGN_CENTER);
+	l_pcSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND );
 
 	//Set the final alignment
 	SetSizerAndFit(l_pcSizer);

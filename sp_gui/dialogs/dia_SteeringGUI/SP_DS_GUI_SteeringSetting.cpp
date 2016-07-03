@@ -30,18 +30,18 @@ SP_DS_GUI_SteeringSetting::SP_DS_GUI_SteeringSetting(wxWindow* p_pcParent)
 
 		  m_pcRefreshRuntimeChkBox=new wxCheckBox(this,wxID_ANY,wxT("Refresh periodically"));
 		  m_pcRefreshRuntimeChkBox->SetValue(m_bRefreshRuntime);
-		  l_pcTempSizer->Add(m_pcRefreshRuntimeChkBox, 0, wxEXPAND | wxALIGN_CENTER);
-		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND | wxALIGN_CENTER);
+		  l_pcTempSizer->Add(m_pcRefreshRuntimeChkBox, 0, wxEXPAND );
+		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND );
 
 		  l_pcTempSizer= new wxBoxSizer(wxHORIZONTAL);
 
 		  l_pcTempSizer->Add(new wxStaticText( this,wxID_ANY, wxT("Refresh:") ),1, wxEXPAND | wxALL);
 		  m_pcRefreshRuntimeSlider=new wxSlider( this,wxID_ANY,m_nRefreshRuntimeDuration,1,500,
 	        		                            wxDefaultPosition,wxDefaultSize,wxSL_HORIZONTAL|wxSL_LABELS);
-		  l_pcTempSizer->Add(m_pcRefreshRuntimeSlider, 0, wxEXPAND | wxALIGN_CENTER);
+		  l_pcTempSizer->Add(m_pcRefreshRuntimeSlider, 0, wxEXPAND );
 
-		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND | wxALIGN_CENTER);
-		  l_pcTopSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALIGN_CENTER);
+		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND );
+		  l_pcTopSizer->Add(l_pcRowSizer, 0, wxEXPAND );
 
 		  //results
 		  l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( this,wxID_ANY,wxT("Results") ), wxVERTICAL);
@@ -50,8 +50,8 @@ SP_DS_GUI_SteeringSetting::SP_DS_GUI_SteeringSetting(wxWindow* p_pcParent)
 		  m_pcRefreshResultChkBox=new wxCheckBox(this,wxID_ANY,wxT("Refresh periodically"));
 		  m_pcRefreshResultChkBox->SetValue(m_bRefreshResult);
 
-		  l_pcTempSizer->Add(m_pcRefreshResultChkBox, 0, wxEXPAND | wxALIGN_CENTER);
-		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND | wxALIGN_CENTER);
+		  l_pcTempSizer->Add(m_pcRefreshResultChkBox, 0, wxEXPAND );
+		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND );
 
 		  l_pcTempSizer= new wxBoxSizer(wxHORIZONTAL);
 
@@ -60,8 +60,8 @@ SP_DS_GUI_SteeringSetting::SP_DS_GUI_SteeringSetting(wxWindow* p_pcParent)
 												wxDefaultPosition,wxDefaultSize,wxSL_HORIZONTAL|wxSL_LABELS);
 		  l_pcTempSizer->Add(m_pcRefreshResultSlider, 0, wxALL);
 
-		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND | wxALIGN_CENTER);
-		  l_pcTopSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALIGN_CENTER);
+		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND );
+		  l_pcTopSizer->Add(l_pcRowSizer, 0, wxEXPAND );
 
 
 		  //time out
@@ -70,7 +70,7 @@ SP_DS_GUI_SteeringSetting::SP_DS_GUI_SteeringSetting(wxWindow* p_pcParent)
 		  m_pcTimeoutSlider=new wxSlider( this,wxID_ANY,m_nTimeout,5,500,
 	        		                            wxDefaultPosition,wxDefaultSize,wxSL_HORIZONTAL|wxSL_LABELS);
 		  l_pcRowSizer->Add(m_pcTimeoutSlider, 0, wxALL);
-		  l_pcTopSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALIGN_CENTER);
+		  l_pcTopSizer->Add(l_pcRowSizer, 0, wxEXPAND );
 
 		  //enable refresh calculation time
 		  l_pcRowSizer= new wxStaticBoxSizer( new wxStaticBox( this,wxID_ANY,wxT("General") ), wxVERTICAL);
@@ -80,22 +80,22 @@ SP_DS_GUI_SteeringSetting::SP_DS_GUI_SteeringSetting(wxWindow* p_pcParent)
 		  m_pcEnableRefreshCalculationTimeChkBox=new wxCheckBox(this,wxID_ANY,wxT("Auto adjust the result's refresh time"));
 		  m_pcEnableRefreshCalculationTimeChkBox->SetValue(m_bEnableRefreshCalculationTime);
 		  l_pcTempSizer->Add(m_pcEnableRefreshCalculationTimeChkBox, 0, wxALL);
-		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND | wxALIGN_CENTER);
+		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND );
 
 		  l_pcRowSizer->AddSpacer(10);
 
 		  l_pcTempSizer= new wxBoxSizer(wxHORIZONTAL);
 		  l_pcTempSizer->Add(new wxStaticText( this,wxID_ANY, wxT("Spin tick value:") ),1, wxEXPAND | wxALL);
 		  m_pcSteeringConstant=new wxTextCtrl(this,wxID_ANY,wxString::Format(wxT("%g"),m_nSteeringConstant));
-		  l_pcTempSizer->Add(m_pcSteeringConstant, 0, wxEXPAND | wxALIGN_CENTER);
+		  l_pcTempSizer->Add(m_pcSteeringConstant, 0, wxEXPAND );
 
-		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND | wxALIGN_CENTER);
-
-
-		  l_pcTopSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALIGN_CENTER);
+		  l_pcRowSizer->Add(l_pcTempSizer,1, wxEXPAND );
 
 
-		  l_pcBottomSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALIGN_CENTER);
+		  l_pcTopSizer->Add(l_pcRowSizer, 0, wxEXPAND );
+
+
+		  l_pcBottomSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND );
 
 		  //alignment the sizer
 		  SetSizerAndFit(l_pcMainSizer);
