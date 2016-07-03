@@ -75,7 +75,7 @@ SP_DLG_SelectNodes::SP_DLG_SelectNodes(wxWindow* p_pcParentWnd, spsa::Model * p_
 
 	//available nodes
 	wxSizer* l_pcRowSizer = new wxBoxSizer(wxVERTICAL);
-	m_pcAvailableNodes = new wxListBox(this, SP_GUI_SELECTNODES_LISTBOX_AVAILABLE_NODES, wxDefaultPosition, wxSize(-1, 300), 0, NULL, wxLB_MULTIPLE);
+	m_pcAvailableNodes = new wxListBox(this, SP_GUI_SELECTNODES_LISTBOX_AVAILABLE_NODES, wxDefaultPosition, wxSize(-1, 300), 0, NULL, wxLB_EXTENDED);
 	l_pcRowSizer->Add(m_pcAvailableNodes, 1, wxEXPAND | wxALL);
 	l_pcSelectorSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL);
 
@@ -123,7 +123,7 @@ SP_DLG_SelectNodes::SP_DLG_SelectNodes(wxWindow* p_pcParentWnd, spsa::Model * p_
 
 	//selected nodes
 	l_pcRowSizer = new wxBoxSizer(wxVERTICAL);
-	m_pcSelectedNodes = new wxListBox(this, SP_GUI_SELECTNODES_LISTBOX_SELECYED_NODES, wxDefaultPosition, wxSize(-1, 300), 0, NULL, wxLB_MULTIPLE);
+	m_pcSelectedNodes = new wxListBox(this, SP_GUI_SELECTNODES_LISTBOX_SELECYED_NODES, wxDefaultPosition, wxSize(-1, 300), 0, NULL, wxLB_EXTENDED);
 	l_pcRowSizer->Add(m_pcSelectedNodes, 1, wxEXPAND | wxALL);
 
 	l_pcSelectorSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL);

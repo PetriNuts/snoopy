@@ -298,7 +298,7 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
 	// rows of control button#
 	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(m_pcPropertyWindowSimulationButtonSizer, -1, wxT("Views")), wxVERTICAL);
-	m_pcListboxShowAllGraphViewName = new wxListBox(m_pcPropertyWindowSimulationButtonSizer, -1, wxDefaultPosition, wxSize(-1, 125), 0, NULL, wxLB_MULTIPLE | wxLB_EXTENDED | wxLB_HSCROLL);
+	m_pcListboxShowAllGraphViewName = new wxListBox(m_pcPropertyWindowSimulationButtonSizer, -1, wxDefaultPosition, wxSize(-1, 125), 0, NULL, wxLB_EXTENDED | wxLB_HSCROLL);
 	l_pcRowSizer->Add(m_pcListboxShowAllGraphViewName, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
 	wxSizer *l_pctemp = new wxBoxSizer(wxHORIZONTAL);
