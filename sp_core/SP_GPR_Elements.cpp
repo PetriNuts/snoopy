@@ -704,7 +704,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 		if (p_sNetClass.CmpNoCase(SP_DS_FAULTTREE_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_EXTFAULTTREE_CLASS) == 0)
 		{
-			l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Edge Design:")), 0, wxALL | wxALIGN_CENTER, 5);
+			l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Edge Design:")), 0, wxALL , 5);
 
 			SP_EXTENDED_ARC_TYPE l_nType = GetEdgeDesignType();
 			m_lbListBox = new wxListBox(p_pcPage, -1);
@@ -726,7 +726,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 
 		if (p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0)
 		{
-			l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Node Design:")), 0, wxALL | wxALIGN_CENTER, 5);
+			l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Node Design:")), 0, wxALL , 5);
 
 			SP_EXTENDED_TYPE l_nType = GetNodeDesignType(p_sNetClass);
 
@@ -756,7 +756,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0
 			)
 		{
-			l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Line Design for Edges:")), 0, wxALL | wxALIGN_CENTER, 5);
+			l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Line Design for Edges:")), 0, wxALL , 5);
 			SP_EXTENDED_TYPE_EDGE l_nType = GetLineEdgeDesignType(p_sNetClass);
 			m_LineListBox = new wxListBox(p_pcPage, -1);
 			m_LineListBox->InsertItems(m_LineListBoxValue, 0);
@@ -775,7 +775,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 		}
 		if (p_sNetClass.CmpNoCase(SP_DS_FREESTYLE_CLASS) == 0)
 		{
-			l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Arrows:\n From - To:")), 0, wxALL | wxALIGN_CENTER, 5);
+			l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Arrows:\n From - To:")), 0, wxALL , 5);
 			SP_EXTENDED_ARROW_TYPE_EDGE l_nType1 = GetArrowEdgeTypeR(p_sNetClass);
 			m_ARListBox = new wxListBox(p_pcPage, -1);
 			m_ARListBox->InsertItems(m_ARListBoxValue, 0);
@@ -846,7 +846,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			m_rbLogicBrush = NULL;
 		}
 		//Choose Edgestyle wxT("Line" oder "Spline")
-		l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Edge")), 0, wxALL | wxALIGN_CENTER, 5);
+		l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Edge")), 0, wxALL , 5);
 		m_rbEdgeSpline = new wxRadioBox(p_pcPage, -1, wxT("Choose Edge Style"), wxDefaultPosition, wxDefaultSize, 2, edgestyles, 1, wxRA_SPECIFY_ROWS);
 		m_rbEdgeSpline->SetSelection(GetEdgeSpline(p_sNetClass));
 		l_pcSizer->Add(m_rbEdgeSpline, 0, wxEXPAND | wxALL, 5);
@@ -859,7 +859,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 				p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0 ) ) 
 		{
 			wxColour l_ColorSetColor = wxColour( GetExpressionColor(p_sNetClass) );	
-			l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Expression:")), 0, wxALL | wxALIGN_CENTER, 5);
+			l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Expression:")), 0, wxALL , 5);
 			wxColourPickerCtrl* l_pcExpressionColourPickerCtrl = new wxColourPickerCtrl(p_pcPage,  -1, l_ColorSetColor,
 																wxDefaultPosition, wxDefaultSize,wxCLRP_DEFAULT_STYLE);
 
@@ -879,7 +879,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 	}
 	else /*DEFAULT*/
 	{
-		l_pcSizer->Add(new wxStaticText(p_pcPage, -1, wxT("No editable nodes for this class.")), 0, wxALL | wxALIGN_CENTER, 5);
+		l_pcSizer->Add(new wxStaticText(p_pcPage, -1, wxT("No editable nodes for this class.")), 0, wxALL , 5);
 	}
 
 	p_pcPage->AddControl(l_pcSizer,0,wxEXPAND);

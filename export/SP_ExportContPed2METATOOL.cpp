@@ -215,9 +215,9 @@ SP_ExportContPed2METATOOL::AddToDialog(SP_DLG_ExportProperties* p_pcDlg, SP_MDI_
 	wxStaticText* m_pStatic1=new wxStaticText(l_pcNotebookPage,-1,wxT(""),wxDefaultPosition,wxDefaultSize,wxALIGN_LEFT);
 	wxButton* l_pButton1=new wxButton( l_pcNotebookPage, SP_ID_BUTTON_TOPLR, wxT( ">>" ) );
 	wxButton* l_pButton2=new wxButton( l_pcNotebookPage, SP_ID_BUTTON_TOPRL, wxT( "<<" ) );
-    l_pcRowSizerleft->Add( m_pStatic1, 0, wxALIGN_CENTER| wxALL, 10);
-	l_pcRowSizerleft->Add(l_pButton1, 0,  wxALIGN_CENTER| wxALL, 5);
-	l_pcRowSizerleft->Add(l_pButton2, 0, wxALIGN_CENTER| wxALL, 5);	
+    l_pcRowSizerleft->Add( m_pStatic1, 0,  wxALL, 10);
+	l_pcRowSizerleft->Add(l_pButton1, 0,   wxALL, 5);
+	l_pcRowSizerleft->Add(l_pButton2, 0,  wxALL, 5);	
 
 
 	wxBoxSizer* l_pcRowSizerforrever = new wxBoxSizer( wxVERTICAL );

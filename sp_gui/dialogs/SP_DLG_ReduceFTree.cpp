@@ -148,13 +148,13 @@ SP_DLG_ReduceFTree::SP_DLG_ReduceFTree( SP_DS_Graph *p_graph,
 	itemStaticBoxSizer3->Add(levelSizer, 20, wxALIGN_CENTER);
 	itemStaticBoxSizer3->Add(buttonSizer, 5, wxALIGN_CENTER);
 
-	topSizer->Add(new wxStaticText(this, -1, wxT("   Details:")), 0, wxRIGHT | wxALIGN_CENTER, 5);
+	topSizer->Add(new wxStaticText(this, -1, wxT("   Details:")), 0, wxRIGHT , 5);
 
 	m_pcDetailsCtrl = new wxTextCtrl(this, -1, m_msg, wxDefaultPosition, wxSize(510,100),
         wxTE_MULTILINE | wxTE_READONLY);
 
 
-	topSizer->Add(m_pcDetailsCtrl,0, wxALL | wxALIGN_CENTER, 5);
+	topSizer->Add(m_pcDetailsCtrl,0, wxALL , 5);
 
 	SetSizerAndFit(topSizer);
 

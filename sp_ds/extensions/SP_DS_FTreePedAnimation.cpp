@@ -544,7 +544,7 @@ bool SP_DS_FTreePedAnimation::AddToDialog(SP_DLG_AnimationProperties* p_pcDlg,
 	itemStaticBoxSizer3->Add(l_pcSizerAnalysis, 0, wxEXPAND | wxALL, 5);
 
 	wxBoxSizer* l_pcSizerColourSim = new wxBoxSizer(wxHORIZONTAL);
-	l_pcSizerColourSim->Add(new wxStaticText(p_pcDlg, -1, wxT("Colour: ")), 0, wxRIGHT | wxALIGN_CENTER, 5);
+	l_pcSizerColourSim->Add(new wxStaticText(p_pcDlg, -1, wxT("Colour: ")), 0, wxRIGHT , 5);
 
 	m_pcButtonColourSim = new wxColourPickerCtrl(p_pcDlg, SP_ID_BUTTON_COLOUR, *wxBLUE,
 			wxDefaultPosition, wxDefaultSize,

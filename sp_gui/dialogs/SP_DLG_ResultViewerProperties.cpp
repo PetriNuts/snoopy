@@ -56,7 +56,7 @@ m_pcResultViewer(p_pcResultViewer)
 
 	l_pcMainSizer->Add(l_pcBottonsSizer, 0, wxEXPAND  | wxALL, 5);
 
-	l_pcBottonsSizer->Add(new wxButton( this, wxID_OK, wxT("&Ok") ), 0, wxALL|wxALIGN_CENTER, 5);
+	l_pcBottonsSizer->Add(new wxButton( this, wxID_OK, wxT("&Ok") ), 0, wxALL, 5);
 	l_pcBottonsSizer->Add(new wxButton( this, wxID_CANCEL, wxT("&Cancel") ), 0, wxEXPAND | wxALL, 5);
 
 	SetSizerAndFit(l_pcMainSizer);

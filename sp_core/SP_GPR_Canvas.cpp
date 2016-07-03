@@ -186,7 +186,7 @@ SP_GPR_Canvas::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage 
 			|| p_sNetClass.CmpNoCase(SP_DS_FREESTYLE_CLASS) == 0)
 	{
 		elemsizer->Add(new wxStaticText(p_pcPage, -1, wxString::Format(wxT("Grid spacing (%d...%dpt): "),SP_GRID_MIN, SP_GRID_MAX)), 0,
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+										wxRIGHT | wxLEFT , 10);
 		m_scGridSpacing = new wxSpinCtrl(p_pcPage, SP_ID_SPINCTRL_GRID_SPACING, wxString::Format(wxT("%d"), GetGridSpacing(p_sNetClass)),
 				wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SP_GRID_MIN, SP_GRID_MAX, GetGridSpacing(p_sNetClass));
 		elemsizer->Add(m_scGridSpacing);
@@ -202,7 +202,7 @@ SP_GPR_Canvas::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage 
 
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		elemsizer->Add(new wxStaticText(p_pcPage, -1, wxString::Format(wxT("Grid size (%d...%dpt): "), SP_GRID_SIZE_MIN, SP_GRID_SIZE_MAX)), 0,
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+										wxRIGHT | wxLEFT , 10);
 		m_scGridSize = new wxSpinCtrl(p_pcPage, SP_ID_SPINCTRL_GRID_SIZE, wxString::Format(wxT("%d"), GetGridSize(p_sNetClass)),
 				wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SP_GRID_SIZE_MIN, SP_GRID_SIZE_MAX, GetGridSize(p_sNetClass));
 		elemsizer->Add(m_scGridSize);
@@ -212,7 +212,7 @@ SP_GPR_Canvas::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage 
 
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		elemsizer->Add(new wxStaticText(p_pcPage, -1, wxString::Format(wxT("Window size X (%d...%d): "), 100, 10000)), 0,
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+										wxRIGHT | wxLEFT , 10);
 		m_scWindowSizeX = new wxSpinCtrl(p_pcPage, SP_ID_SPINCTRL_WINDOW_SIZE_X, wxString::Format(wxT("%d"), GetWindowSizeX(p_sNetClass)),
 				wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 100, 10000, GetWindowSizeX(p_sNetClass));
 		elemsizer->Add(m_scWindowSizeX);
@@ -220,7 +220,7 @@ SP_GPR_Canvas::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage 
 
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		elemsizer->Add(new wxStaticText(p_pcPage, -1, wxString::Format(wxT("Window size Y (%d...%d): "), 100, 10000)), 0,
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+										wxRIGHT | wxLEFT , 10);
 		m_scWindowSizeY = new wxSpinCtrl(p_pcPage, SP_ID_SPINCTRL_WINDOW_SIZE_Y, wxString::Format(wxT("%d"), GetWindowSizeY(p_sNetClass)),
 				wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 100, 10000, GetWindowSizeY(p_sNetClass));
 		elemsizer->Add(m_scWindowSizeY);

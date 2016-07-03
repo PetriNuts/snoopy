@@ -62,11 +62,11 @@ SP_DLG_CheckForUpdate::CheckForUpdate(bool p_bAskUser)
 	{
 		m_pcUpdateSizer = new wxBoxSizer(wxVERTICAL);
 		m_pcUpdateSizer->Add(new wxStaticText(m_pcDialog, wxID_ANY, wxT("Do you want to check for a new version?")),
-							0, wxALIGN_CENTER | wxALL,10);
+							0,  wxALL,10);
 		m_pcUpdateCheckBox = new wxCheckBox(m_pcDialog, wxID_ANY, wxT("Automatically check for update every week."));
 		m_pcUpdateCheckBox->SetValue(m_bUpdateAllowed);
 		m_pcUpdateSizer->Add(m_pcUpdateCheckBox, 0, wxALL, 10);
-		m_pcUpdateSizer->Add(m_pcDialog->CreateButtonSizer(wxOK | wxCANCEL), 0, wxALIGN_RIGHT | wxALL, 10);
+		m_pcUpdateSizer->Add(m_pcDialog->CreateButtonSizer(wxOK | wxCANCEL), 0,  wxALL, 10);
 		m_pcUpdateSizer->Show(true);
 		m_pcDialog->SetSizerAndFit(m_pcUpdateSizer);
 		m_pcDialog->CentreOnParent();
@@ -220,22 +220,22 @@ SP_DLG_CheckForUpdate::ShowResult(const wxString& p_sNewVersion, const wxString&
 			l_sText = wxT("Can't connect to server. Please try again later.");
 		}
 	}
-	m_pcResultSizer->Add(new wxStaticText(m_pcDialog, wxID_ANY, l_sText),	0, wxALIGN_CENTER | wxALL,10);
+	m_pcResultSizer->Add(new wxStaticText(m_pcDialog, wxID_ANY, l_sText),	0,  wxALL,10);
 /*	if(!l_sUrl.IsEmpty())
 	{
-		m_pcResultSizer->Add(new wxStaticText(m_pcDialog, wxID_ANY, wxT("Click on the link to download the new version:")),	0, wxALIGN_CENTER | wxALL,10);
+		m_pcResultSizer->Add(new wxStaticText(m_pcDialog, wxID_ANY, wxT("Click on the link to download the new version:")),	0,  wxALL,10);
 		wxHyperlinkCtrl *l_pcWebsite = new wxHyperlinkCtrl(m_pcDialog, wxID_ANY, p_sNewVersion, l_sUrl);
-		m_pcResultSizer->Add(l_pcWebsite, 0, wxALIGN_CENTER | wxALL, 10);
+		m_pcResultSizer->Add(l_pcWebsite, 0,  wxALL, 10);
 
 	}
 */
-	m_pcResultSizer->Add(new wxStaticText(m_pcDialog, wxID_ANY, wxT("Click on the link to open the")),	0, wxALIGN_CENTER | wxALL,10);
+	m_pcResultSizer->Add(new wxStaticText(m_pcDialog, wxID_ANY, wxT("Click on the link to open the")),	0,  wxALL,10);
 	wxHyperlinkCtrl *l_pcWebsite = new wxHyperlinkCtrl(m_pcDialog, wxID_ANY, wxT("Snoopy webpage."), SP_APP_WEBPAGE);
-	m_pcResultSizer->Add(l_pcWebsite, 0, wxALIGN_CENTER | wxALL, 10);
+	m_pcResultSizer->Add(l_pcWebsite, 0,  wxALL, 10);
 	m_pcUpdateCheckBox = new wxCheckBox(m_pcDialog, wxID_ANY, wxT("Automatically check for update every week."));
 	m_pcUpdateCheckBox->SetValue(m_bUpdateAllowed);
 	m_pcResultSizer->Add(m_pcUpdateCheckBox, 0, wxALL, 10);
-	m_pcResultSizer->Add(m_pcDialog->CreateButtonSizer(wxOK), 0, wxALIGN_RIGHT | wxALL, 10);
+	m_pcResultSizer->Add(m_pcDialog->CreateButtonSizer(wxOK), 0,  wxALL, 10);
 	m_pcResultSizer->Show(true);
 	m_pcDialog->SetSizerAndFit(m_pcResultSizer);
 	m_pcDialog->CentreOnParent();

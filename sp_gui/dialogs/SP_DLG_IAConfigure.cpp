@@ -88,13 +88,13 @@ SP_DLG_IAConfigure::SP_DLG_IAConfigure(wxWindow *p_pcParent, SP_IA_Manager *p_pc
 		m_pcMainSizer->Add(new wxStaticLine(this, -1), 0, wxEXPAND | wxALL, 10);
 
 		l_pcHelpSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcHelpSizer->Add(new wxStaticText(this, -1, wxT("Source Net: ")), 0, wxLEFT | wxALIGN_CENTER, 10);
+		l_pcHelpSizer->Add(new wxStaticText(this, -1, wxT("Source Net: ")), 0, wxLEFT , 10);
 		m_tcSourceName = new wxTextCtrl(this, -1, GetSourceName(), wxDefaultPosition, wxDefaultSize,	wxTE_READONLY);
 		l_pcHelpSizer->Add(m_tcSourceName, 1, wxLEFT | wxRIGHT | wxEXPAND, 10);
 		m_pcMainSizer->Add(l_pcHelpSizer, 0, wxTOP | wxEXPAND, 10);
 
 		l_pcHelpSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcHelpSizer->Add(new wxStaticText(this, -1, wxT("Selected Target Net: ")), 0, wxLEFT | wxALIGN_CENTER, 10);
+		l_pcHelpSizer->Add(new wxStaticText(this, -1, wxT("Selected Target Net: ")), 0, wxLEFT , 10);
 		m_tcTargetName = new wxTextCtrl(this, -1, wxT(""), wxDefaultPosition, wxDefaultSize,	wxTE_READONLY);
 		l_pcHelpSizer->Add(m_tcTargetName, 1, wxLEFT | wxRIGHT | wxEXPAND, 10);
 		m_pcMainSizer->Add(l_pcHelpSizer, 0, wxTOP | wxEXPAND, 10);
@@ -110,9 +110,9 @@ SP_DLG_IAConfigure::SP_DLG_IAConfigure(wxWindow *p_pcParent, SP_IA_Manager *p_pc
 		l_pcHelpSizer2 = new wxBoxSizer(wxVERTICAL);
 		m_buCmdConfig = new wxButton(this, SP_ID_BUTTON_CMDCONFIG, wxT("Configure..."));
 		m_buCmdConfig->Enable(false);
-		l_pcHelpSizer2->Add(m_buCmdConfig, 0, wxALL | wxALIGN_TOP, 10);
+		l_pcHelpSizer2->Add(m_buCmdConfig, 0, wxALL , 10);
 		l_pcHelpSizer2->Add(new wxButton(this, SP_ID_BUTTON_ACTIVATE, wxT("Activate")), 0, wxLEFT | wxRIGHT, 10);
-		l_pcHelpSizer2->Add(new wxButton(this, SP_ID_BUTTON_DEACTIVATE, wxT("Deactivate")), 0, wxALL | wxALIGN_BOTTOM, 10);
+		l_pcHelpSizer2->Add(new wxButton(this, SP_ID_BUTTON_DEACTIVATE, wxT("Deactivate")), 0, wxALL , 10);
 		l_pcHelpSizer->Add(l_pcHelpSizer2, 0, wxALIGN_BOTTOM);
 
 		m_lbActCommands = new wxListBox(this, SP_ID_LISTBOX_ACTCMDS, wxDefaultPosition, wxSize(-1, 100),
@@ -131,8 +131,8 @@ SP_DLG_IAConfigure::SP_DLG_IAConfigure(wxWindow *p_pcParent, SP_IA_Manager *p_pc
 		l_pcHelpSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcHelpSizer->Add(new wxButton(this, SP_ID_BUTTON_LOAD, wxT("Load...")), 0, wxALL, 10);
 		l_pcHelpSizer->Add(new wxButton(this, SP_ID_BUTTON_SAVE, wxT("Save...")), 0, wxALL, 10);
-		l_pcHelpSizer->Add(new wxButton(this, wxID_OK, wxT("Close")), 0, wxALL | wxALIGN_RIGHT, 10);
-		m_pcMainSizer->Add(l_pcHelpSizer, 0, wxBOTTOM | wxALIGN_RIGHT, 15);
+		l_pcHelpSizer->Add(new wxButton(this, wxID_OK, wxT("Close")), 0, wxALL , 10);
+		m_pcMainSizer->Add(l_pcHelpSizer, 0, wxBOTTOM , 15);
 
 	//seems to be a reasonable dimension
 	SetSizeHints(700, 650);

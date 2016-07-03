@@ -105,7 +105,7 @@ SP_DLG_ExpressionAssistent::SP_DLG_ExpressionAssistent(SP_CPN_ExprAssistType p_E
 	//buttons
 	wxBoxSizer* l_pcButtonSizer =	new wxBoxSizer(wxHORIZONTAL);
 	l_pcButtonSizer->Add(this->CreateButtonSizer(wxOK | wxCANCEL), 0, wxALL, 5);
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxALL | wxALIGN_RIGHT, 1);
+	m_pcSizer->Add(l_pcButtonSizer, 0, wxALL , 1);
 
 	LoadData();
 

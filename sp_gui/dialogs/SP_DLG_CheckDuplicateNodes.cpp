@@ -69,7 +69,7 @@ SP_DLG_CheckDuplicateNodes::SP_DLG_CheckDuplicateNodes(SP_DS_Graph *p_graph, wxW
 
 	topSizer->Prepend(elemSizer, 1, wxALL, 5);
 
-	topSizer->Add(this->CreateButtonSizer(wxOK), 0, wxALIGN_RIGHT | wxLEFT | wxRIGHT | wxTOP, 5);
+	topSizer->Add(this->CreateButtonSizer(wxOK), 0,  wxLEFT | wxRIGHT | wxTOP, 5);
 
 	SetSizerAndFit(topSizer);
 

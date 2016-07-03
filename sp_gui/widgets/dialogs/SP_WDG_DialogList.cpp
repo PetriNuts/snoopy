@@ -74,7 +74,7 @@ SP_WDG_DialogList::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
                                   -1,
                                   l_pcListAttr->GetName()),
                  1,
-                 wxALL | wxALIGN_CENTER,
+                 wxALL ,
                  5);
   AddShowFlag(l_pcPage, l_pcSizer, l_pcListAttr);
   l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);

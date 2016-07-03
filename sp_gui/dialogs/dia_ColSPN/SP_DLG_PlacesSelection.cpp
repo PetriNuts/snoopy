@@ -221,10 +221,10 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 	wxButton* l_pButton3=new wxButton( this, SP_ID_BUTTON_LF2RTALL, wxT( ">>" ) );
 	wxButton* l_pButton4=new wxButton( this, SP_ID_BUTTON_RT2LFALL, wxT( "<<" ) );
 
-	l_pcSizerColumn3->Add(l_pButton1, 0,  wxALIGN_CENTER| wxTOP, 25);
-	l_pcSizerColumn3->Add(l_pButton2, 0, wxALIGN_CENTER| wxALL, 5);
-	l_pcSizerColumn3->Add(l_pButton3, 0,  wxALIGN_CENTER| wxALL, 5);
-	l_pcSizerColumn3->Add(l_pButton4, 0, wxALIGN_CENTER| wxALL, 5);
+	l_pcSizerColumn3->Add(l_pButton1, 0,   wxTOP, 25);
+	l_pcSizerColumn3->Add(l_pButton2, 0,  wxALL, 5);
+	l_pcSizerColumn3->Add(l_pButton3, 0,   wxALL, 5);
+	l_pcSizerColumn3->Add(l_pButton4, 0,  wxALL, 5);
 	//advanced selection
 	if(l_sNetClass.Contains(wxT("Colored")))
 	{
@@ -232,12 +232,12 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 		l_pcRowSizer->Add( new wxStaticText( this, -1, wxT("") ), 1, wxALL | wxEXPAND, 5 );
 		l_pcRowSizer->Add( new wxStaticText( this, -1, wxT("Advanced:") ), 1, wxALL | wxEXPAND, 5 );
 		m_pcChooseColoredPlace = new wxChoice( this, SP_ID_CHOICE_COLORPLACE_CHOICE, wxDefaultPosition, wxSize(100,-1));
-		l_pcRowSizer->Add(m_pcChooseColoredPlace, 0, wxALIGN_CENTER| wxALL, 5);
+		l_pcRowSizer->Add(m_pcChooseColoredPlace, 0,  wxALL, 5);
 		m_pcChooseColoredPlace->Append(wxT("")); //
 
-		l_pcSizerColumn3->Add(l_pcRowSizer, 0, wxEXPAND|wxALIGN_CENTER);
+		l_pcSizerColumn3->Add(l_pcRowSizer, 0, wxEXPAND);
 	}	
-	l_pcThirdColumSizer->Add(l_pcSizerColumn3, 1, wxEXPAND|wxALIGN_CENTER);
+	l_pcThirdColumSizer->Add(l_pcSizerColumn3, 1, wxEXPAND);
 
 
 	/***************************the fourth column**************************/

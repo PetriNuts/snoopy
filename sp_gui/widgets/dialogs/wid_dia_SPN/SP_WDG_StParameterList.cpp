@@ -74,7 +74,7 @@ bool SP_WDG_StParameterList::AddToDialog(
 	wxBoxSizer* l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
 	m_bMultiple = (p_ptlAttributes->size() > 1);
 
-	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("") ), 1, wxALL | wxALIGN_CENTER, 5);
+	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("") ), 1, wxALL , 5);
 
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 

@@ -52,7 +52,7 @@ SP_WDG_DialogBase::AddShowFlag(SP_WDG_NotebookPage* p_pcPage, wxBoxSizer* p_pcSi
     else
         l_pcShow->Enable(FALSE);
 
-    p_pcSizer->Add(l_pcShow, 0, wxALL | wxALIGN_CENTER, 5);
+    p_pcSizer->Add(l_pcShow, 0, wxALL , 5);
 
     return TRUE;
 }

@@ -28,8 +28,8 @@ void SP_DS_ViewerAttributeText::Create(wxWindow* p_pcParent,wxSizer* p_pcSizer)
 	//create a text control to hold the attribute value
 	m_pcValueTxtCtrl=new wxTextCtrl(p_pcParent,wxID_ANY,m_sValue);
 
-	l_pcRowSizer->Add(new wxStaticText(p_pcParent,wxID_ANY,m_sDisplayName),0, wxALL|wxALIGN_CENTER, 5);
-	l_pcRowSizer->Add(m_pcValueTxtCtrl,0, wxALL|wxALIGN_CENTER, 5);
+	l_pcRowSizer->Add(new wxStaticText(p_pcParent,wxID_ANY,m_sDisplayName),0, wxALL, 5);
+	l_pcRowSizer->Add(m_pcValueTxtCtrl,0, wxALL, 5);
 
 	p_pcSizer->Add(l_pcRowSizer,0, wxALL, 5);
 }

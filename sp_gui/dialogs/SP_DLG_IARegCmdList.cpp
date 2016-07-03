@@ -41,7 +41,7 @@ SP_DLG_IARegCmdList::SP_DLG_IARegCmdList(wxWindow *p_pcParent, SP_IA_Manager *p_
 */		m_pcMainSizer->Add(new wxStaticLine(this, -1), 0, wxEXPAND | wxALL, 10);
 
 		/* Buttons in the lower right hand corner */
-    m_pcMainSizer->Add(new wxButton(this, wxID_OK, wxT("Close")), 0, wxALL | wxALIGN_RIGHT, 10);
+    m_pcMainSizer->Add(new wxButton(this, wxID_OK, wxT("Close")), 0, wxALL , 10);
 
 	//seems to be a reasonable dimension
 	SetSizeHints(350, 500);

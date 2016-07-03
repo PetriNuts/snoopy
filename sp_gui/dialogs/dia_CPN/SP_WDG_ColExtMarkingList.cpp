@@ -96,10 +96,10 @@ bool SP_WDG_ColExtMarkingList::AddToDialog(
 
 	//wxStaticText* l_StaticText=new wxStaticText(l_pcPage, -1, wxT("ColorSet:"));
 	//m_pcColorSetTextCtrl= new wxTextCtrl(l_pcPage, -1, wxT("0"), wxDefaultPosition, wxDefaultSize, 0);
-	//l_pcSizer->Add(l_StaticText, 1, wxALL | wxALIGN_CENTER, 5);
-	//l_pcSizer->Add(m_pcColorSetTextCtrl, 1, wxALL | wxALIGN_CENTER, 5);
-	//l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("") ), 1, wxALL | wxALIGN_CENTER, 5);
-	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 1, wxALL | wxALIGN_CENTER, 5);
+	//l_pcSizer->Add(l_StaticText, 1, wxALL , 5);
+	//l_pcSizer->Add(m_pcColorSetTextCtrl, 1, wxALL , 5);
+	//l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("") ), 1, wxALL , 5);
+	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 1, wxALL , 5);
 	AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);
 
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);

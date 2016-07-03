@@ -46,7 +46,7 @@ m_pcDoc(p_pcDoc)
 									);
 	m_pcLayoutChoice->SetSelection(0);
 	wxBoxSizer* l_pcLayoutSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcLayoutSizer->Add(new wxStaticText(this, -1, wxT("Layout:")), 0, wxRIGHT | wxALIGN_CENTER, 5);
+	l_pcLayoutSizer->Add(new wxStaticText(this, -1, wxT("Layout:")), 0, wxRIGHT , 5);
     l_pcLayoutSizer->Add(m_pcLayoutChoice, 1);
     m_pcSizer->Add(l_pcLayoutSizer, 0, wxEXPAND | wxALL, 5);
 
@@ -72,7 +72,7 @@ m_pcDoc(p_pcDoc)
     m_pcNodeSepCtrl = new wxTextCtrl(this, -1, wxT("0.5"),
         wxDefaultPosition, wxDefaultSize, 0);
 
-	l_pcNodeSizer->Add(new wxStaticText(this, -1, wxT("Nodeseperation:")), 0, wxRIGHT | wxALIGN_CENTER, 5);
+	l_pcNodeSizer->Add(new wxStaticText(this, -1, wxT("Nodeseperation:")), 0, wxRIGHT , 5);
     l_pcNodeSizer->Add(m_pcNodeSepCtrl, 1);
     m_pcSizer->Add(l_pcNodeSizer, 0, wxEXPAND | wxALL, 5);
 

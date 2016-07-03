@@ -207,27 +207,27 @@ SP_DLG_SMART::CreateNotebookPages() {
 		//netname
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		elemsizer->Add(new wxStaticText(m_pcNotebookPage, -1, wxT("net - name: ") + ExportConfig->GetConfigurationElement(wxT("netname"))->value), 0, 
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
+										wxRIGHT | wxLEFT , 0);
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM, 5);
 		//nettype
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		elemsizer->Add(new wxStaticText(m_pcNotebookPage, -1, wxT("net - type: ") + ExportConfig->GetConfigurationElement(wxT("nettype"))->value), 0, 
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
+										wxRIGHT | wxLEFT , 0);
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM, 5);
 		//Count of places
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		elemsizer->Add(new wxStaticText(m_pcNotebookPage, -1, wxT("number of places: ") + ExportConfig->GetConfigurationElement(wxT("place_count"))->value), 0, 
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
+										wxRIGHT | wxLEFT , 0);
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM, 5);
 		//count of transitions
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		elemsizer->Add(new wxStaticText(m_pcNotebookPage, -1, wxT("number of transitions: ") + ExportConfig->GetConfigurationElement(wxT("transitions_count"))->value), 0, 
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
+										wxRIGHT | wxLEFT , 0);
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM, 5);
 		//count of Arcs
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		elemsizer->Add(new wxStaticText(m_pcNotebookPage, -1, wxT("number of arcs: ") + ExportConfig->GetConfigurationElement(wxT("arcs_count"))->value), 0, 
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
+										wxRIGHT | wxLEFT , 0);
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM, 5);
 		
 		m_pcNotebookPage->SetAutoLayout(true);
@@ -251,20 +251,20 @@ SP_DLG_SMART::CreateNotebookPages() {
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		CheckBox_Part_1 = new wxCheckBox(m_pcNotebookPage, SP_ID_CHECKBOX_Part_1, wxT("none"));
 		CheckBox_Part_1->SetValue(true);
-		elemsizer->Add(CheckBox_Part_1, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+		elemsizer->Add(CheckBox_Part_1, 0, wxRIGHT | wxLEFT , 5);
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 		ExportConfig->SetConfigurationElement(wxT("partition"),true,wxT("none"));
 		//everyplace as partition
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		CheckBox_Part_2 = new wxCheckBox(m_pcNotebookPage, SP_ID_CHECKBOX_Part_2, wxT("every place as Partition"));
 		CheckBox_Part_2->SetValue(false);
-		elemsizer->Add(CheckBox_Part_2, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+		elemsizer->Add(CheckBox_Part_2, 0, wxRIGHT | wxLEFT , 5);
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 		//auto partition
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		CheckBox_Part_3 = new wxCheckBox(m_pcNotebookPage, SP_ID_CHECKBOX_Part_3, wxT("create auto Partition"));
 		CheckBox_Part_3->SetValue(false);
-		elemsizer->Add(CheckBox_Part_3, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+		elemsizer->Add(CheckBox_Part_3, 0, wxRIGHT | wxLEFT , 5);
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		elemsizer->Add(new wxStaticText(m_pcNotebookPage,-1,wxT("   Coarse depth:")), 0, wxALIGN_CENTER , 5);
@@ -282,7 +282,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
 		CheckBox_Part_4 = new wxCheckBox(m_pcNotebookPage, SP_ID_CHECKBOX_Part_4, wxT("userdefined Partition"));
 		CheckBox_Part_4->SetValue(false);
-		elemsizer->Add(CheckBox_Part_4, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+		elemsizer->Add(CheckBox_Part_4, 0, wxRIGHT | wxLEFT , 5);
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 		//listboxes
 		//wxSize* s= new wxSize();
@@ -293,29 +293,29 @@ SP_DLG_SMART::CreateNotebookPages() {
 			ListBoxallpart1 = new wxListBox(m_pcNotebookPage, SP_ID_LISTBOX_PARTITIONLIST,wxDefaultPosition,s);
 			
 			//ListBoxallpart1->SetMinSize
-			elemsizer->Add(ListBoxallpart1, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
+			elemsizer->Add(ListBoxallpart1, 0, wxRIGHT | wxLEFT , 0);
 		//Buttons	
 			helemsizer = new wxBoxSizer(wxVERTICAL);
-			helemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_DELETE_PARTITION, wxT( "delete Partition" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
-			helemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_NEW_PARTITION, wxT( "new Partition" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
-			elemsizer->Add(helemsizer, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+			helemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_DELETE_PARTITION, wxT( "delete Partition" ) ), 0, wxRIGHT | wxLEFT , 0);
+			helemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_NEW_PARTITION, wxT( "new Partition" ) ), 0, wxRIGHT | wxLEFT , 0);
+			elemsizer->Add(helemsizer, 0, wxRIGHT | wxLEFT , 5);
 		//second box
 			ListBoxallpart2 = new wxListBox(m_pcNotebookPage, -1,wxDefaultPosition,s);
-			elemsizer->Add(ListBoxallpart2, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
+			elemsizer->Add(ListBoxallpart2, 0, wxRIGHT | wxLEFT , 0);
 		//buttons
 			helemsizer = new wxBoxSizer(wxVERTICAL);
-			helemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_ELEMENTTO_PARTITION, wxT( "<<" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
-			helemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_ELEMENTFROM_PARTITION, wxT( ">>" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
-			elemsizer->Add(helemsizer, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+			helemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_ELEMENTTO_PARTITION, wxT( "<<" ) ), 0, wxRIGHT | wxLEFT , 0);
+			helemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_ELEMENTFROM_PARTITION, wxT( ">>" ) ), 0, wxRIGHT | wxLEFT , 0);
+			elemsizer->Add(helemsizer, 0, wxRIGHT | wxLEFT , 5);
 		//third box
 			ListBoxallpart3 = new wxListBox(m_pcNotebookPage, -1,wxDefaultPosition,s);
-			elemsizer->Add(ListBoxallpart3, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 0);
+			elemsizer->Add(ListBoxallpart3, 0, wxRIGHT | wxLEFT , 0);
 			UpdateListboxes();
 		//load /save buttons partition
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
-		elemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_PARTITION_LOAD, wxT( "Load Partition" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-		elemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_PARTITION_SAVE, wxT( "Save Partition" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+		elemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_PARTITION_LOAD, wxT( "Load Partition" ) ), 0, wxRIGHT | wxLEFT , 5);
+		elemsizer->Add( new wxButton( m_pcNotebookPage, SP_ID_BUTTON_PARTITION_SAVE, wxT( "Save Partition" ) ), 0, wxRIGHT | wxLEFT , 5);
 		m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 
 	m_pcNotebookPage->SetAutoLayout(true);
@@ -348,7 +348,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_GarbageCollection->Insert(wxT("OPTIMISTIC"), 2);
 		combobox_GarbageCollection->SetSelection(0);
 		ExportConfig->SetConfigurationElement(wxT("GarbageCollection"),checkbox_GarbageCollection->GetValue(),combobox_GarbageCollection->GetStringSelection());
-		elemsizer->Add(combobox_GarbageCollection, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_GarbageCollection, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 			
 		//IgnoreWeightClasses
@@ -360,7 +360,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_IgnoreWeightClasses->Insert(wxT("true"), 0);
 		combobox_IgnoreWeightClasses->Insert(wxT("false"), 1);
 		combobox_IgnoreWeightClasses->SetSelection(1);
-		elemsizer->Add(combobox_IgnoreWeightClasses, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_IgnoreWeightClasses, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		
 		//statestorage
@@ -381,7 +381,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_StateStorage->Insert(wxT("MDD_SATURATION_PREGEN"), 9);
 		combobox_StateStorage->SetSelection(0);
 		ExportConfig->SetConfigurationElement(wxT("StateStorage"),checkbox_StateStorage->GetValue(),combobox_StateStorage->GetStringSelection());
-		elemsizer->Add(combobox_StateStorage, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_StateStorage, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//MarkovStorage
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -398,7 +398,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_MarkovStorage->Insert(wxT("POT POT MTMDD"), 6);
 		combobox_MarkovStorage->SetSelection(0);
 		ExportConfig->SetConfigurationElement(wxT("MarkovStorage"),checkbox_MarkovStorage->GetValue(),combobox_MarkovStorage->GetStringSelection());
-		elemsizer->Add(combobox_MarkovStorage, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_MarkovStorage, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//RealFormat
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -412,7 +412,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_RealFormat->Insert(wxT("GENERAL"), 2);
 		combobox_RealFormat->SetSelection(0);
 		ExportConfig->SetConfigurationElement(wxT("RealFormat"),checkbox_RealFormat->GetValue(),combobox_RealFormat->GetStringSelection());	
-		elemsizer->Add(combobox_RealFormat, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_RealFormat, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		
 		// BFSTrace
@@ -427,7 +427,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_BFSTrace->Insert(wxT("BACKWARD"), 2);
 		combobox_BFSTrace->SetSelection(0);
 		ExportConfig->SetConfigurationElement(wxT("BFSTrace"),checkbox_BFSTrace->GetValue(),combobox_BFSTrace->GetStringSelection());
-		elemsizer->Add(combobox_BFSTrace, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_BFSTrace, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		
 		//EmbedWithElim
@@ -443,7 +443,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_EmbedWithElim->Insert(wxT("3"), 3);
 		combobox_EmbedWithElim->SetSelection(3);
 		ExportConfig->SetConfigurationElement(wxT("EmbedWithElim"),checkbox_EmbedWithElim->GetValue(),combobox_EmbedWithElim->GetStringSelection());
-		elemsizer->Add(combobox_EmbedWithElim, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_EmbedWithElim, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//EUStrategy
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -456,7 +456,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_EUStrategy->Insert(wxT("SATURATION"), 1);
 		combobox_EUStrategy->SetSelection(1);
 		ExportConfig->SetConfigurationElement(wxT("EUStrategy"),checkbox_EUStrategy->GetValue(),combobox_EUStrategy->GetStringSelection());
-		elemsizer->Add(combobox_EUStrategy, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_EUStrategy, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//GarbageUnit
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -469,7 +469,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_GarbageUnit->Insert(wxT("NODES"), 1);
 		combobox_GarbageUnit->SetSelection(0);
 		ExportConfig->SetConfigurationElement(wxT("GarbageUnit"),checkbox_GarbageUnit->GetValue(),combobox_GarbageUnit->GetStringSelection());
-		elemsizer->Add(combobox_GarbageUnit, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_GarbageUnit, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//GarbageSize
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -479,7 +479,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		Textbox_GarbageSize = new wxTextCtrl(m_pcNotebookPage,-1 ,wxT("100"));
 		Textbox_GarbageSize->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 			//Textbox_GarbageSize->SetValue(ExportConfig->GetConfigurationElement(wxT("GarbageSize"))->value );
-		elemsizer->Add(Textbox_GarbageSize, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(Textbox_GarbageSize, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//IgnoreWeightClasses
 		//MatrixByRows
@@ -493,7 +493,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_MatrixByRows->Insert(wxT("false"), 1);
 		combobox_MatrixByRows->SetSelection(1);
 		ExportConfig->SetConfigurationElement(wxT("MatrixByRows"),checkbox_MatrixByRows->GetValue(),combobox_MatrixByRows->GetStringSelection());
-		elemsizer->Add(combobox_MatrixByRows, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_MatrixByRows, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//MaxConvergeIters
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -503,7 +503,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		Textbox_MaxConvergeIters = new wxTextCtrl(m_pcNotebookPage,-1 ,wxT("10000"));
 		Textbox_MaxConvergeIters->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 			//Textbox_MaxConvergeIters->SetValue(ExportConfig->GetConfigurationElement(wxT("MaxConvergeIters"))->value );
-		elemsizer->Add(Textbox_MaxConvergeIters, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(Textbox_MaxConvergeIters, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//MaxNumericalIters
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -513,7 +513,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		Textbox_MaxNumericalIters = new wxTextCtrl(m_pcNotebookPage,-1 ,wxT("10000"));
 		Textbox_MaxNumericalIters->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 			//Textbox_MaxNumericalIters->SetValue(ExportConfig->GetConfigurationElement(wxT("MaxNumericalIters"))->value );
-		elemsizer->Add(Textbox_MaxNumericalIters, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(Textbox_MaxNumericalIters, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//MaxPrintedItems
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -523,7 +523,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		Textbox_MaxPrintedItems = new wxTextCtrl(m_pcNotebookPage,-1 ,wxT("1000"));
 		Textbox_MaxPrintedItems->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 			//Textbox_MaxPrintedItems->SetValue(ExportConfig->GetConfigurationElement(wxT("MaxPrintedItems"))->value );
-		elemsizer->Add(Textbox_MaxPrintedItems, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(Textbox_MaxPrintedItems, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 
 
@@ -556,7 +556,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_init_option->Insert(wxT("set"), 1);
 		combobox_init_option->SetSelection(0);
 		ExportConfig->SetConfigurationElement(wxT("init_option"),checkbox_init_option->GetValue(),combobox_init_option->GetStringSelection());
-		elemsizer->Add(combobox_init_option, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_init_option, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//numstates
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -569,7 +569,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_num_states->Insert(wxT("FALSE"), 1);
 		combobox_num_states->SetSelection(1);
 		ExportConfig->SetConfigurationElement(wxT("num_states"),checkbox_num_states->GetValue(),combobox_num_states->GetStringSelection());
-		elemsizer->Add(combobox_num_states, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_num_states, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer, 0, wxEXPAND);
 		//num_arcs
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -582,7 +582,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_num_arcs->Insert(wxT("FALSE"), 1);
 		combobox_num_arcs->SetSelection(1);
 		ExportConfig->SetConfigurationElement(wxT("num_arcs"),checkbox_num_arcs->GetValue(),combobox_num_arcs->GetStringSelection());
-		elemsizer->Add(combobox_num_arcs, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_num_arcs, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer, 0, wxEXPAND);
 		//Report
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -595,7 +595,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_Report->Insert(wxT("FALSE"), 1);
 		combobox_Report->SetSelection(0);
 		ExportConfig->SetConfigurationElement(wxT("Report"),checkbox_Report->GetValue(),combobox_Report->GetStringSelection());
-		elemsizer->Add(combobox_Report, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_Report, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//Verbose
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -608,7 +608,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_Verbose->Insert(wxT("FALSE"), 1);
 		combobox_Verbose->SetSelection(0);
 		ExportConfig->SetConfigurationElement(wxT("Verbose"),checkbox_Verbose->GetValue(),combobox_Verbose->GetStringSelection());
-		elemsizer->Add(combobox_Verbose, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_Verbose, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//InfinityString
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -616,7 +616,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_InfinityString->SetValue(false);
 		Gridpanel->Add(checkbox_InfinityString,0, wxEXPAND);
 		Textbox_InfinityString = new wxTextCtrl(m_pcNotebookPage,-1 ,wxT("infinity"));
-		elemsizer->Add(Textbox_InfinityString, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(Textbox_InfinityString, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//ParameterWarnings
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -629,7 +629,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_ParameterWarnings->Insert(wxT("OVERLOADED"), 2);
 		combobox_ParameterWarnings->SetSelection(0);
 		ExportConfig->SetConfigurationElement(wxT("ParameterWarnings"),checkbox_ParameterWarnings->GetValue(),combobox_ParameterWarnings->GetStringSelection());
-		elemsizer->Add(combobox_ParameterWarnings, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_ParameterWarnings, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//WriteDotOutput
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -644,7 +644,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_WriteDotOutput->Insert(wxT("MXD SPARSE"), 3);
 		combobox_WriteDotOutput->SetSelection(0);
 		ExportConfig->SetConfigurationElement(wxT("WriteDotOutput"),checkbox_WriteDotOutput->GetValue(),combobox_WriteDotOutput->GetStringSelection());
-		elemsizer->Add(combobox_WriteDotOutput, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_WriteDotOutput, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//DotOutputFile
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -652,7 +652,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_DotOutputFile->SetValue(false);
 		Gridpanel->Add(checkbox_DotOutputFile,0, wxEXPAND);
 		Textbox_DotOutputFile = new wxTextCtrl(m_pcNotebookPage,-1 ,wxT("out.dot"));
-		elemsizer->Add(Textbox_DotOutputFile, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(Textbox_DotOutputFile, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//DotPrecision
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -674,7 +674,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		combobox_DotPrecision->Insert(wxT("10"), 10);
 		combobox_DotPrecision->SetSelection(3);
 		ExportConfig->SetConfigurationElement(wxT("DotPrecision"),checkbox_DotPrecision->GetValue(),combobox_DotPrecision->GetStringSelection());
-		elemsizer->Add(combobox_DotPrecision, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(combobox_DotPrecision, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		//DotTitle
 		elemsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -682,7 +682,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 		checkbox_DotTitle->SetValue(false);
 		Gridpanel->Add(checkbox_DotTitle,0, wxEXPAND);
 		Textbox_DotTitle = new wxTextCtrl(m_pcNotebookPage,-1 ,wxT(""));
-		elemsizer->Add(Textbox_DotTitle, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 10);
+		elemsizer->Add(Textbox_DotTitle, 0, wxRIGHT | wxLEFT , 10);
 		Gridpanel->Add(elemsizer,0, wxEXPAND);
 		
 		m_pcPageSizer->Add(Gridpanel, 0, wxTOP | wxBOTTOM , 5);
@@ -706,10 +706,10 @@ SP_DLG_SMART::CreateNotebookPages() {
 	m_pcNotebook->AddPage(m_pcNotebookPage, wxT("CTL"));
 	elemsizer = new wxBoxSizer(wxHORIZONTAL);
 	//buttons
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_CTL_LOAD, wxT( "Load CTL File" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_CTL_SAVE, wxT( "SAVE CTL File" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_CTL_CLEAR, wxT( "CLEAR TextBox" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_CTL_CHECK, wxT( "Check CTL " ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_CTL_LOAD, wxT( "Load CTL File" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_CTL_SAVE, wxT( "SAVE CTL File" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_CTL_CLEAR, wxT( "CLEAR TextBox" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_CTL_CHECK, wxT( "Check CTL " ) ), 0, wxRIGHT | wxLEFT , 5);
 	m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 	elemsizer = new wxBoxSizer(wxHORIZONTAL);
 	//textbox
@@ -743,7 +743,7 @@ SP_DLG_SMART::CreateNotebookPages() {
 	
 	elemsizer = new wxBoxSizer(wxVERTICAL);
 	elemsizer->Add(new wxStaticText(m_pcNotebookPage, -1, wxT("Intervall Logische Ausdruecke:") ), 0, 
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+										wxRIGHT | wxLEFT , 5);
 	s.SetHeight(250);
 	s.SetWidth(400);
 	ListBox_steadystate = new wxListBox(m_pcNotebookPage, SP_ID_LISTBOX_STEADYSTATE,wxDefaultPosition,s);
@@ -756,18 +756,18 @@ SP_DLG_SMART::CreateNotebookPages() {
 	m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 	elemsizer = new wxBoxSizer(wxVERTICAL);
 	elemsizer->Add(new wxStaticText(m_pcNotebookPage, -1, wxT("Intervall Logische Ausdruck:") ), 0, 
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+										wxRIGHT | wxLEFT , 5);
 	Textbox_steadystate= new wxTextCtrl(m_pcNotebookPage,-1 ,wxT(""));
 
 	Textbox_steadystate->SetSize(300,25);
-	elemsizer->Add(Textbox_steadystate, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+	elemsizer->Add(Textbox_steadystate, 0, wxRIGHT | wxLEFT , 5);
 	
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_ADD, wxT( "Add" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_REMOVE, wxT( "Remove" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_CLEAR, wxT( "Clear" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_CHECK, wxT( "Check" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_LOAD, wxT( "Load" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_SAVE, wxT( "Save" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_ADD, wxT( "Add" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_REMOVE, wxT( "Remove" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_CLEAR, wxT( "Clear" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_CHECK, wxT( "Check" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_LOAD, wxT( "Load" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_STEADYSTATE_SAVE, wxT( "Save" ) ), 0, wxRIGHT | wxLEFT , 5);
 	m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 	//elemsizer = new wxBoxSizer(wxVERTICAL);
 	//m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
@@ -793,34 +793,34 @@ SP_DLG_SMART::CreateNotebookPages() {
 	
 	elemsizer = new wxBoxSizer(wxVERTICAL);
 	elemsizer->Add(new wxStaticText(m_pcNotebookPage, -1, wxT("Intervall Logische Ausdruecke:") ), 0, 
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+										wxRIGHT | wxLEFT , 5);
 	s.SetHeight(250);
 	s.SetWidth(400);
 	ListBox_transiente = new wxListBox(m_pcNotebookPage, SP_ID_LISTBOX_TRANSIENTE,wxDefaultPosition,s);
 			
 	ListBox_transiente->SetSize(300,350);	
-	elemsizer->Add(ListBox_transiente, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+	elemsizer->Add(ListBox_transiente, 0, wxRIGHT | wxLEFT , 5);
 	m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 	
 	elemsizer = new wxBoxSizer(wxVERTICAL);
 	elemsizer->Add(new wxStaticText(m_pcNotebookPage, -1, wxT("Intervall Logische Ausdruck:") ), 0, 
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+										wxRIGHT | wxLEFT , 5);
 	Textbox_transiente= new wxTextCtrl(m_pcNotebookPage,-1 ,wxT(""));
 	
 	Textbox_transiente->SetSize(300,25);
-	elemsizer->Add(Textbox_transiente, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+	elemsizer->Add(Textbox_transiente, 0, wxRIGHT | wxLEFT , 5);
 	elemsizer->Add(new wxStaticText(m_pcNotebookPage, -1, wxT("at time:") ), 0, 
-										wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+										wxRIGHT | wxLEFT , 5);
 	Textbox_transiente_time= new wxTextCtrl(m_pcNotebookPage,-1 ,wxT(""));
 	Textbox_transiente_time->SetValidator( wxTextValidator(wxFILTER_NUMERIC ));
-	elemsizer->Add(Textbox_transiente_time, 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+	elemsizer->Add(Textbox_transiente_time, 0, wxRIGHT | wxLEFT , 5);
 	
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_ADD, wxT( "Add" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_REMOVE, wxT( "Remove" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_CLEAR, wxT( "Clear" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_CHECK, wxT( "Check" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_LOAD, wxT( "Load" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
-	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_SAVE, wxT( "Save" ) ), 0, wxRIGHT | wxLEFT | wxALIGN_CENTER, 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_ADD, wxT( "Add" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_REMOVE, wxT( "Remove" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_CLEAR, wxT( "Clear" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_CHECK, wxT( "Check" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_LOAD, wxT( "Load" ) ), 0, wxRIGHT | wxLEFT , 5);
+	elemsizer->Add(new wxButton( m_pcNotebookPage, SP_ID_BUTTON_TRANSIENTE_SAVE, wxT( "Save" ) ), 0, wxRIGHT | wxLEFT , 5);
 	m_pcPageSizer->Add(elemsizer, 0, wxTOP | wxBOTTOM , 5);
 	
 	

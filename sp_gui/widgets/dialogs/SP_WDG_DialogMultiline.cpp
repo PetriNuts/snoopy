@@ -57,13 +57,13 @@ SP_WDG_DialogMultiline::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
 
 			wxString l_pchValue = l_pcAttr->GetValueString();
 			wxString l_sName = l_pcAttr->GetParentName();
-			l_pcFlexGridSizer->Add(new wxStaticText(l_pcPage, -1, l_sName), 0, wxALL | wxALIGN_CENTER, 5);
+			l_pcFlexGridSizer->Add(new wxStaticText(l_pcPage, -1, l_sName), 0, wxALL , 5);
 			wxTextCtrl* l_pcTextCtrl = new wxTextCtrl(l_pcPage, -1, l_pchValue, wxDefaultPosition,
 					wxSize(12,50),//wxDefaultSize,
 					wxTE_MULTILINE);
 			m_pcTextCtrl.push_back(l_pcTextCtrl);
 			wxBoxSizer* l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-			l_pcSizer->Add(l_pcTextCtrl, 1, wxALL | wxALIGN_CENTER, 5);
+			l_pcSizer->Add(l_pcTextCtrl, 1, wxALL , 5);
 
 			AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);
 			l_pcFlexGridSizer->Add(l_pcSizer, 1, wxEXPAND | wxALL);
@@ -80,7 +80,7 @@ SP_WDG_DialogMultiline::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
 
     	wxString l_pchValue = (m_bMultiple ? SP_WILDCARD : l_pcAttr->GetValueString());
 
-        l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 1, wxALL | wxALIGN_CENTER, 5);
+        l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 1, wxALL , 5);
         AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);
         l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 

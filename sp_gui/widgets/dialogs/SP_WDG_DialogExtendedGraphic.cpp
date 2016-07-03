@@ -124,22 +124,22 @@ bool SP_WDG_DialogExtendedGraphic::AddToDialog(SP_ListGraphic* p_plGraphics, SP_
     wxBoxSizer* l_pcSizer;
 
 	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Pen Colour:")), 0, wxALL | wxALIGN_CENTER, 5);
+	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Pen Colour:")), 0, wxALL , 5);
     m_pcButtonPen = new wxColourPickerCtrl(l_pcPage, m_nDialogID+ SP_COLOURPEN + wxID_HIGHEST , (*m_lGraphics.begin())->GetPen()->GetColour(),
                                             wxDefaultPosition, wxDefaultSize,
                                             wxCLRP_DEFAULT_STYLE);
 	l_pcSizer->Add(m_pcButtonPen, 0, wxALL, 5);
-    l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTPEN + m_nDialogID+ wxID_HIGHEST, _T("Default")), 0, wxALL | wxALIGN_CENTER, 5);
+    l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTPEN + m_nDialogID+ wxID_HIGHEST, _T("Default")), 0, wxALL , 5);
     l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
     l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Brush Colour:")), 0, wxALL | wxALIGN_CENTER, 5);
+    l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Brush Colour:")), 0, wxALL , 5);
 
 	m_pcButtonBrush = new wxColourPickerCtrl(l_pcPage, SP_COLOURBRUSH + m_nDialogID+ wxID_HIGHEST, (*m_lGraphics.begin())->GetBrush()->GetColour(),
 											wxDefaultPosition, wxDefaultSize);
 
 	l_pcSizer->Add(m_pcButtonBrush, 0, wxALL, 5);
-    l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTBRUSH + m_nDialogID+ wxID_HIGHEST, _T("Default")), 0, wxALL | wxALIGN_CENTER, 5);
+    l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTBRUSH + m_nDialogID+ wxID_HIGHEST, _T("Default")), 0, wxALL , 5);
     l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
 	//only Nodes have high and width
@@ -149,14 +149,14 @@ bool SP_WDG_DialogExtendedGraphic::AddToDialog(SP_ListGraphic* p_plGraphics, SP_
 		int l_intH = (*m_lGraphics.begin())->GetHeight();
 
 		l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Width:")), 0, wxALL | wxALIGN_CENTER, 5);
+		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Width:")), 0, wxALL , 5);
 		m_scWidth = new wxSpinCtrl(l_pcPage, SP_SPINCTRL_WIDTH + 1000+ SP_ID_LAST_ID, wxString::Format(wxT("%d"), l_intW),
 						wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, INT_MAX, l_intW);
 		l_pcSizer->Add(m_scWidth, 0, wxALL, 5);
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
 		l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Height:")), 0, wxALL | wxALIGN_CENTER, 5);
+		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Height:")), 0, wxALL , 5);
 		m_scHeight = new wxSpinCtrl(l_pcPage, SP_SPINCTRL_HEIGHT + 1000+ SP_ID_LAST_ID, wxString::Format(wxT("%d"), l_intH),
 						wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, INT_MAX, l_intH);
 		l_pcSizer->Add(m_scHeight, 0, wxALL, 5);
@@ -177,7 +177,7 @@ bool SP_WDG_DialogExtendedGraphic::AddToDialog(SP_ListGraphic* p_plGraphics, SP_
 		l_intT = (dynamic_cast<SP_GR_ExtendedEdge*>(l_pcGr))->GetThickness();
 	}
 	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Line Thickness:")), 0, wxALL | wxALIGN_CENTER, 5);
+	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Line Thickness:")), 0, wxALL , 5);
 	m_scThickness = new wxSpinCtrl(l_pcPage, SP_SPINCTRL_HEIGHT + 1000+ SP_ID_LAST_ID, wxString::Format(wxT("%lu"), l_intT),
 					wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, INT_MAX, l_intT);
 	l_pcSizer->Add(m_scThickness, 0, wxALL, 5);
@@ -187,7 +187,7 @@ bool SP_WDG_DialogExtendedGraphic::AddToDialog(SP_ListGraphic* p_plGraphics, SP_
 	if (l_pctmp->GetElementType() == SP_ELEMENT_NODE) //node
 	{
 		l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Pen Design:")), 0, wxALL | wxALIGN_CENTER, 5);
+		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Pen Design:")), 0, wxALL , 5);
 		l_pcGr = *m_lGraphics.begin();
 		SP_EXTENDED_TYPE l_nType = (dynamic_cast<SP_GR_ExtendedDrawnShape*>(l_pcGr))->GetType();
 		wxString l_pcType;
@@ -212,7 +212,7 @@ bool SP_WDG_DialogExtendedGraphic::AddToDialog(SP_ListGraphic* p_plGraphics, SP_
 #endif
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 		l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL | wxALIGN_CENTER , 5);
+		l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL , 5);
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 	}
 
@@ -220,7 +220,7 @@ bool SP_WDG_DialogExtendedGraphic::AddToDialog(SP_ListGraphic* p_plGraphics, SP_
 	if (l_pctmp->GetElementType() == SP_ELEMENT_EDGE)
 	{
 		l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Pen Design:")), 0, wxALL | wxALIGN_CENTER, 5);
+		l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Pen Design:")), 0, wxALL , 5);
 		l_pcGr = *m_lGraphics.begin();
 		SP_EXTENDED_TYPE_EDGE l_nType = (dynamic_cast<SP_GR_ExtendedEdge*>(l_pcGr))->GetType();
 		wxString l_pcType;
@@ -245,7 +245,7 @@ bool SP_WDG_DialogExtendedGraphic::AddToDialog(SP_ListGraphic* p_plGraphics, SP_
 #endif
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 		l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL | wxALIGN_CENTER , 5);
+		l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL , 5);
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 	}
 

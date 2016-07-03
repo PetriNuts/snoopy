@@ -27,7 +27,7 @@ void SP_DS_TableViewer::Create()
 {
 	        m_pcStaticTextBox=new wxStaticText(m_pcParent,wxID_ANY,m_sTitle);
 
-			m_pcSizer->Add(m_pcStaticTextBox , 0, wxALL|wxALIGN_CENTER, 5);
+			m_pcSizer->Add(m_pcStaticTextBox , 0, wxALL, 5);
 
 	        //Create the table Ctrl
 			m_pcTableViewGrid = new wxGrid( m_pcParent, wxID_ANY,	wxDefaultPosition, wxSize( 600, 600 ), wxSUNKEN_BORDER );

@@ -98,7 +98,7 @@ bool SP_WDG_DialogColList::AddToDialog(
 	//
 
 	wxBoxSizer* l_pcSizer = new wxBoxSizer( wxHORIZONTAL );
-	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, m_pcColList->GetName()), 1, wxALL | wxALIGN_CENTER, 5);
+	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, m_pcColList->GetName()), 1, wxALL , 5);
 	AddShowFlag(l_pcPage, l_pcSizer, m_pcColList);
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
