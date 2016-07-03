@@ -173,7 +173,7 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
 	}
 
 	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL | wxALIGN_CENTER_HORIZONTAL , 5);
+	l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL | wxALIGN_CENTER , 5);
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
     ConnectEvents();
     p_pcDlg->PushEventHandler(this);

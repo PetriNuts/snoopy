@@ -245,7 +245,7 @@ void SP_GUI_SteeringDialog::CreatStatisticBar(wxSizer* p_pcParentSizer)
 
 	m_pcCurrentSimulatorTextBox = new wxStaticText(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(200, -1), wxCENTER);
 	m_pcCurrentSimulatorTextBox->SetToolTip(wxT("Current Simulator"));
-	l_pcStatisticsSizer->Add(m_pcCurrentSimulatorTextBox, 0, wxEXPAND | wxALL | wxALIGN_CENTER_HORIZONTAL, 5);
+	l_pcStatisticsSizer->Add(m_pcCurrentSimulatorTextBox, 0, wxEXPAND | wxALL | wxALIGN_CENTER, 5);
 	l_pcStatisticsSizer->AddSpacer(5);
 
 	m_pcSimulationProgressPercentage = new wxStaticText(this, wxID_ANY, wxT("0 %"));

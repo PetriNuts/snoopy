@@ -212,7 +212,7 @@ bool SP_WDG_DialogExtendedGraphic::AddToDialog(SP_ListGraphic* p_plGraphics, SP_
 #endif
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 		l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL | wxALIGN_CENTER_HORIZONTAL , 5);
+		l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL | wxALIGN_CENTER , 5);
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 	}
 
@@ -245,7 +245,7 @@ bool SP_WDG_DialogExtendedGraphic::AddToDialog(SP_ListGraphic* p_plGraphics, SP_
 #endif
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 		l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL | wxALIGN_CENTER_HORIZONTAL , 5);
+		l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL | wxALIGN_CENTER , 5);
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 	}
 

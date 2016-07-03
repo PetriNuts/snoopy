@@ -41,7 +41,7 @@ wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 		  m_pcLineWidthBox=new wxChoice( this, wxID_ANY, wxDefaultPosition, wxSize(100,-1) );
 
 		  l_pcRowSizer->Add(new wxStaticText(this,wxID_ANY,wxT("Curve width")),1, wxALL, 5);
-		  l_pcRowSizer->Add(m_pcLineWidthBox,1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+		  l_pcRowSizer->Add(m_pcLineWidthBox,1, wxALL|wxALIGN_CENTER, 5);
 
 		  for(int i=1; i<=20;i++)
 		  {
@@ -59,7 +59,7 @@ wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 		  m_pcLineStyleBox=new wxChoice( this, wxID_ANY, wxDefaultPosition, wxSize(100,-1) );
 
 		  l_pcRowSizer->Add(new wxStaticText(this,wxID_ANY,wxT("Line style")),1, wxALL, 5);
-		  l_pcRowSizer->Add(m_pcLineStyleBox,1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+		  l_pcRowSizer->Add(m_pcLineStyleBox,1, wxALL|wxALIGN_CENTER, 5);
 		  l_pcTopSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 		  m_pcLineStyleBox->Append(wxT("Solid"));
@@ -95,7 +95,7 @@ wxSizer* l_pcMainSizer=new wxBoxSizer(wxVERTICAL);
 		  m_pcUseDefaultSetting=new wxCheckBox(this, wxID_ANY,wxT("use default setting"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE);
 		  m_pcUseDefaultSetting->SetValue(true);
 		  l_pcRowSizer= new wxBoxSizer( wxHORIZONTAL);
-		  l_pcRowSizer->Add(m_pcUseDefaultSetting,1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+		  l_pcRowSizer->Add(m_pcUseDefaultSetting,1, wxALL|wxALIGN_CENTER, 5);
 		  l_pcTopSizer->Add(l_pcRowSizer, 1);
 
 		  l_pcBottomSizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALIGN_CENTER);
