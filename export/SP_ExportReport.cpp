@@ -890,7 +890,7 @@ SP_ExportReport::AddGeneral()
 
 	m_pcMainSizerGeneral->Add(m_pcSizerGeneratePDF, 1, wxALL | wxEXPAND, 5);
 
-	m_pcNotebookPageGeneral->AddControl(m_pcMainSizerGeneral, 0, wxEXPAND | wxALIGN_LEFT | wxALL, 5);
+	m_pcNotebookPageGeneral->AddControl(m_pcMainSizerGeneral, 0, wxEXPAND  | wxALL, 5);
 
 }
 

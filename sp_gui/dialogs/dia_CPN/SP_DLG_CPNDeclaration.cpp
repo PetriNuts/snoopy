@@ -82,13 +82,13 @@ SP_DLG_CPNDeclaration::SP_DLG_CPNDeclaration( wxWindow* p_pcParent,
 
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL, 5);
 	
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM );
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND  );
 
-	m_pcSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcRowSizer, 1, wxEXPAND );
 
-	m_pcSizer->Add(l_pcStaticSizer, 1, wxEXPAND | wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcStaticSizer, 1, wxEXPAND );
 
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND );
 
 	SetSizerAndFit(m_pcSizer);
 

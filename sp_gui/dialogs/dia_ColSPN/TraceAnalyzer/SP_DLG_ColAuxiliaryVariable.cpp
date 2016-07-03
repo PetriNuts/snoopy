@@ -130,7 +130,7 @@ SP_DLG_ColAuxiliaryVariable::SP_DLG_ColAuxiliaryVariable( wxWindow* p_pcParent,c
 	wxStdDialogButtonSizer* l_pcBottomButtonSizer = CreateStdDialogButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 	
 	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND);
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND );
 
 	
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND);

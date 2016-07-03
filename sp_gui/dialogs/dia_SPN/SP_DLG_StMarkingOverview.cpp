@@ -114,13 +114,13 @@ SP_DLG_StMarkingOverview::SP_DLG_StMarkingOverview(wxWindow* p_pcParent,const wx
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,
 			wxEXPAND | wxALL, 5);
 
-	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND | wxALIGN_TOP
+	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND 
 			);
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND 
 			);
 
 	m_pcSizer->Add(l_pcGridSizer, 1,  wxEXPAND);
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT | wxEXPAND);
+	m_pcSizer->Add(l_pcButtonSizer, 0,  wxEXPAND);
 
 	SetSizerAndFit(m_pcSizer);
 

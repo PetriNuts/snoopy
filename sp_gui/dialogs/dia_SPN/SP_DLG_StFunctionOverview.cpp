@@ -126,13 +126,13 @@ SP_DLG_StFunctionOverview::SP_DLG_StFunctionOverview(wxString p_sNodeclass, wxWi
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,
 			wxEXPAND | wxALL, 5);
 
-	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND | wxALIGN_TOP
+	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND 
 			);
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND 
 			);
 
 	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND );
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND );
 
 	SetSizerAndFit(m_pcSizer);
 

@@ -84,8 +84,8 @@ SP_DLG_ColColoredPlaceSelection::SP_DLG_ColColoredPlaceSelection(wxArrayString& 
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL, 5);
 
 	
-	m_pcBoxSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALIGN_RIGHT);
-	m_pcBoxSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
+	m_pcBoxSizer->Add(l_pcRowSizer, 1, wxEXPAND );
+	m_pcBoxSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND );
 
 	SetAutoLayout( TRUE);
 	SetSizer(m_pcBoxSizer);

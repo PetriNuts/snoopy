@@ -36,7 +36,7 @@ m_nCountAttr(0)
 	//ShowDotExpression();
     
     /* Buttons in the lower right hand corner */
-    l_pcBoxSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL | wxEXPAND | wxALIGN_RIGHT, 5);
+    l_pcBoxSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxALL | wxEXPAND , 5);
  
 	SetSizerAndFit(l_pcBoxSizer);
 

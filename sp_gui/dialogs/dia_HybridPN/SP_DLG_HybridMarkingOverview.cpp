@@ -115,8 +115,8 @@ SP_DLG_HybridMarkingOverview::SP_DLG_HybridMarkingOverview(wxWindow* p_pcParent,
 	l_pcRowSizer->Add(l_pcContinuousPlaceCheckBox, 0, wxALL, 5);
 
 	wxSizer *l_pcCheckBoxSizer = new wxBoxSizer( wxVERTICAL );
-	l_pcCheckBoxSizer->Add(l_pcDiscretePlaceCheckBox, 0, wxEXPAND | wxALIGN_TOP);
-	l_pcCheckBoxSizer->Add(l_pcContinuousPlaceCheckBox, 0, wxEXPAND | wxALIGN_TOP);
+	l_pcCheckBoxSizer->Add(l_pcDiscretePlaceCheckBox, 0, wxEXPAND );
+	l_pcCheckBoxSizer->Add(l_pcContinuousPlaceCheckBox, 0, wxEXPAND );
 
 	wxSizer *l_pcBottomButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 
@@ -124,16 +124,16 @@ SP_DLG_HybridMarkingOverview::SP_DLG_HybridMarkingOverview(wxWindow* p_pcParent,
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,
 			wxEXPAND | wxALL, 5);
 
-	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND | wxALIGN_TOP
+	l_pcButtonSizer->Add(l_pcTopButtonSizer, 0, wxEXPAND 
 			);
-	l_pcButtonSizer->Add(l_pcCheckBoxSizer, 0, wxEXPAND | wxALIGN_TOP
+	l_pcButtonSizer->Add(l_pcCheckBoxSizer, 0, wxEXPAND 
 				);
 
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND 
 			);
 
 	m_pcSizer->Add(l_pcGridSizer, 0,  wxEXPAND);
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxALIGN_RIGHT | wxEXPAND);
+	m_pcSizer->Add(l_pcButtonSizer, 0,  wxEXPAND);
 
 	SetSizerAndFit(m_pcSizer);
 	 m_pcMarkingGrid->SetRowMinimalAcceptableHeight(0);

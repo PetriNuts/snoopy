@@ -50,7 +50,7 @@ m_pcResultViewer(p_pcResultViewer)
 		  m_pcNoteBook->AddPage(l_pcPage,l_Category);
 	}
 
-	l_pcMainSizer->Add(m_pcNoteBook, 1, wxEXPAND | wxALIGN_LEFT | wxALL, 5);
+	l_pcMainSizer->Add(m_pcNoteBook, 1, wxEXPAND  | wxALL, 5);
 
 	wxBoxSizer* l_pcBottonsSizer = new wxBoxSizer(wxHORIZONTAL);
 

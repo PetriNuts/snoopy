@@ -125,11 +125,11 @@ SP_DLG_FuncParaDecl::SP_DLG_FuncParaDecl( wxString p_sFunctionName, wxString p_s
 
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL, 5);
 	
-	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND | wxALIGN_BOTTOM );
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM );
+	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND  );
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND  );
 
-	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND | wxALIGN_RIGHT);
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND );
+	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND );
 
 	SetAutoLayout( TRUE);
 	SetSizer(m_pcSizer);

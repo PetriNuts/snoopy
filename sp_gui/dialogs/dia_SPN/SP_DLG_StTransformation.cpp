@@ -107,10 +107,10 @@ SP_DLG_StTransformation::SP_DLG_StTransformation( SP_ListNode* TransformingNodes
 
 	l_pcBottomButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL, 5);
 	
-	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND | wxALIGN_BOTTOM );
+	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND  );
 
-	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND | wxALIGN_RIGHT);
-	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND | wxALIGN_RIGHT);
+	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND );
+	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND );
 
 	SetSizerAndFit(m_pcSizer);
 

@@ -81,7 +81,7 @@ SP_DLG_GlobalPreferences::SP_DLG_GlobalPreferences(wxWindow* p_pcParent)
 	m_rbNetClasses = new wxRadioBox(this, SP_ID_RADIOBOX_NETCLASSES, wxT("Net class"), wxDefaultPosition,
 									wxDefaultSize, m_sNetClasses, 1, wxRA_SPECIFY_COLS);
 	m_rbNetClasses->SetStringSelection(m_sCurrentNetClass);
-	m_pcTopSizer->Add(m_rbNetClasses, 0, wxALL | wxALIGN_LEFT | wxEXPAND, 5);
+	m_pcTopSizer->Add(m_rbNetClasses, 0, wxALL |  wxEXPAND, 5);
 
 	//add some space between netclass selector and preference pages
 	m_pcTopSizer->Add(10, 0, 0);

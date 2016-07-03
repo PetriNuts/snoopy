@@ -136,8 +136,8 @@ SP_DLG_RandomMarking::SP_DLG_RandomMarking(int p_nSelColumn, wxWindow* p_pcParen
 	topSizer->Add(l_pcSecondSizer, 0, wxALL | wxEXPAND, 1);
 
 	wxBoxSizer* l_pcOKButtonSizer = new wxBoxSizer(wxHORIZONTAL );	
-	l_pcOKButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL | wxALIGN_RIGHT, 5);
-	topSizer->Add(l_pcOKButtonSizer, 0, wxALL | wxEXPAND | wxALIGN_RIGHT, 1);	
+	l_pcOKButtonSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0,wxEXPAND | wxALL , 5);
+	topSizer->Add(l_pcOKButtonSizer, 0, wxALL | wxEXPAND , 1);	
 
 	SetAutoLayout( TRUE);
 	SetSizer(topSizer);
