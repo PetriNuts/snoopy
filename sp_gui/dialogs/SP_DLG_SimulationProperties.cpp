@@ -35,7 +35,7 @@ SP_DLG_SimulationProperties::SP_DLG_SimulationProperties(spsim::Simulator* p_pcM
     }
 
     /* Buttons in the lower right hand corner */
-	m_pcSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
+	m_pcSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 
     SetSizerAndFit(m_pcSizer);
     

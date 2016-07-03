@@ -70,7 +70,7 @@ SP_DLG_NetInformations::SP_DLG_NetInformations(SP_DS_Graph *p_graph, wxWindow *p
 
 	topSizer->Prepend(elemSizer, 1, wxEXPAND | wxALL, 5);
 
-	topSizer->Add(this->CreateButtonSizer(wxOK), 0, wxEXPAND | wxALL, 5);
+	topSizer->Add(this->CreateButtonSizer(wxOK), 0, wxEXPAND | wxALL, 5);
 
 	SetMinSize(wxSize(200,100));
 	SetSizerAndFit(topSizer);

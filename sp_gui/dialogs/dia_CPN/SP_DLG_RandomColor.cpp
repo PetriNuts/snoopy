@@ -57,7 +57,7 @@ SP_DLG_RandomColor::SP_DLG_RandomColor(vector<wxString>* p_pvColors, wxWindow *p
 
 	topSizer->Add(l_pcColorSetSizer, 0, wxALL | wxEXPAND, 1);	
 
-	topSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
+	topSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 
 	SetSizerAndFit(topSizer);
 
