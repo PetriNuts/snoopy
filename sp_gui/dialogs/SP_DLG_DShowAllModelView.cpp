@@ -15,7 +15,7 @@
 
 #include "sp_gui/dialogs/SP_DLG_DirSimulation.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_PlacesSelection.h"
-#include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColDPlacesSelection.h"
+//#include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColDPlacesSelection.h"
 #include "sp_gui/dialogs/dia_SteeringGUI/SP_DLG_ChangeCurveAttributes.h"
 #include "sp_gui/dialogs/SP_DLG_DShowAllModelView.h"
 #include "sp_gui/dialogs/SP_DLG_ResultViewerProperties.h"
@@ -408,7 +408,7 @@ void SP_DLG_DShowAllModelView::OnEditNodeList(wxCommandEvent& event)
 	{
 		//m_pcParentWnd->SaveCurrentView();
 
-		SP_DLG_ColDPlacesSelection* l_pcDlg = new SP_DLG_ColDPlacesSelection(m_pcParentWnd, m_pcModelView, this);
+		/*SP_DLG_ColDPlacesSelection* l_pcDlg = new SP_DLG_ColDPlacesSelection(m_pcParentWnd, m_pcModelView, this);
 
 		if (l_pcDlg->ShowModal() == wxID_OK)
 		{
@@ -418,7 +418,7 @@ void SP_DLG_DShowAllModelView::OnEditNodeList(wxCommandEvent& event)
 			SP_Core::Instance()->GetRootDocument()->Modify(true);
 		}
 
-		l_pcDlg->Destroy();
+		l_pcDlg->Destroy();*/
 	}
 	else
 	{

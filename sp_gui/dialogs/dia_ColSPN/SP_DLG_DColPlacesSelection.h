@@ -9,7 +9,7 @@
 #include <wx/event.h>
 
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_DPlacesSelection.h"
-#include "sp_gui/dialogs/dia_HybridPN//SP_DLG_DirtColoredHybridSimultionResults.h"
+//#include "sp_gui/dialogs/dia_HybridPN//SP_DLG_DirtColoredHybridSimultionResults.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Coloring.h"
 
 
