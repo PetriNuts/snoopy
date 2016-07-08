@@ -32,6 +32,7 @@ private:
     bool m_bDestruction;
 
 protected:
+	
     SP_DS_Netclass* m_pcNetclass;
 
     SP_ListMetadataclass m_lMetadataclass;
@@ -77,6 +78,7 @@ public:
 
     SP_DS_Netclass* GetNetclass();
     SP_DS_Netclass* SetNetclass(SP_DS_Netclass* p_pcVal) { m_pcNetclass = p_pcVal; return m_pcNetclass; }
+	
 
     bool SetGlobalShow(bool p_bVal = TRUE);
 

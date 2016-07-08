@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////
 // $Source: $
 // $Author: mf $
 // $Version: 0.0 $
@@ -8,7 +8,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "sp_gui/mdi/SP_MDI_View.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
-
+////////#include "wx/choicdlg.h"
+#include "wx/msgdlg.h"
 #include "sp_defines.h"
 
 #include "sp_gui/management/SP_GM_Docmanager.h"
@@ -33,6 +34,15 @@
 #include "sp_gui/dialogs/dia_ColCPN/SP_DLG_ColCPNSimulationResults.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStSimulationResults.h"
 #include "sp_gui/dialogs/dia_ColHPN/SP_DLG_ColHPNSimultionResults.h"
+
+
+//AMR
+#include "sp_gui/dialogs/dia_ColCPN/SP_DLG_ColCPNDirSimulationResults.h"
+//#include "sp_gui/dialogs/dia_ColHPN/SP_DLG_ColHPNDirSimulationResults.h"
+//#include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStDirSimResults.h"
+
+
+
 #include "sp_gui/dialogs/dia_HybridPN/SP_DLG_HybridSimultionResults.h"
 #include "sp_gui/dialogs/SP_DLG_ConvertElements.h"
 
@@ -63,6 +73,10 @@
 #include "sp_gui/dialogs/SP_DLG_CheckNet.h"
 
 #include "sp_ds/extensions/HybridPN/SP_DS_CheckTransitions.h"
+
+//Amr
+#include "sp_gui/dialogs/SP_DLG_DirColorSimulation.h"
+
 
 #include <wx/busyinfo.h> 
 
@@ -110,6 +124,8 @@ EVT_MENU(SP_MENU_ITEM_HIGHMARKING, SP_MDI_View::OnToggleMarking)
 
 // view animation
 EVT_MENU(SP_MENU_ITEM_TOGGLESIMULATION, SP_MDI_View::OnStartSimulation)
+//by Amr
+EVT_MENU(SP_MENU_ITEM_TOGGLEDIRSIMULATION, SP_MDI_View::OnStartDirSimulation)
 // search id
 EVT_MENU(SP_MENU_ITEM_SEARCHID, SP_MDI_View::OnSearchId)
 EVT_MENU(SP_MENU_ITEM_LOAD_INVARIANT_FILE, SP_MDI_View::OnLoadInvariantFile)
@@ -1884,6 +1900,7 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 			}
 			else if(l_sName == SP_DS_COLCPN_CLASS)
 			{
+				
 				l_pcDlg = new SP_DLG_ColCPNSimulationResults( l_pcGraph,l_pcUnfoldedNet, m_pcFrame );
 			}
 			else if(l_sName == SP_DS_COLHPN_CLASS)
@@ -1936,6 +1953,66 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 		SP_LOGERROR(e.what());
 	}
 	catch(...)
+	{
+		SP_LOGERROR(wxT("unkown exception!"));
+	}
+}
+
+// Amr
+void SP_MDI_View::OnStartDirSimulation(wxCommandEvent& p_cEvent)
+{
+	try
+	{
+		SP_MDI_Doc* l_pcDoc = dynamic_cast<SP_MDI_Doc*>(GetDocument());
+		SP_DS_Graph* l_pcGraph = l_pcDoc->GetGraph();
+
+		SP_DLG_DirColorSimulation* l_pccolDiDlg = NULL;
+
+
+		SP_DS_ColPN_Coloring* l_pcoloredNet = NULL;
+		
+		wxString l_sName = l_pcGraph->GetNetclass()->GetName();
+		if ((l_sName == SP_DS_COLCPN_CLASS) ||
+			(l_sName == SP_DS_COLHPN_CLASS) ||
+			(l_sName == SP_DS_COLSPN_CLASS))
+		{
+			l_pcoloredNet = new SP_DS_ColPN_Coloring();
+			if (!l_pcoloredNet->Coloring())
+			{
+				wxDELETE(l_pcoloredNet);
+
+				return;
+			}
+
+			if (l_sName == SP_DS_COLHPN_CLASS)
+			{
+				
+					SP_LOGERROR(wxT("Sorry, The Method for this class  under preparing"));
+				
+
+			}
+			else if (l_sName == SP_DS_COLSPN_CLASS)
+			{
+
+				SP_LOGERROR(wxT("Sorry, The Method for this class  under preparing"));
+				//l_pccolDiDlg = new SP_DLG_ColStDirSimResults(l_pcGraph, l_pcoloredNet, m_pcFrame);
+			}
+			else if (l_sName == SP_DS_COLCPN_CLASS)
+			{
+				l_pccolDiDlg = new SP_DLG_ColCPNDirSimulationResults(l_pcGraph, l_pcoloredNet, m_pcFrame);
+			}
+			 if (l_pccolDiDlg != NULL)
+			{
+				l_pccolDiDlg->Show();
+			}
+			
+		}
+	}
+	catch (std::exception& e)
+	{
+		SP_LOGERROR(e.what());
+	}
+	catch (...)
 	{
 		SP_LOGERROR(wxT("unkown exception!"));
 	}

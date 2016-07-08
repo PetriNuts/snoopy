@@ -191,6 +191,8 @@ public:
 	void OnColorizeAnyNets(wxCommandEvent& p_cEvent);
 
 	void OnStartSimulation(wxCommandEvent& p_cEvent);
+	//Amr
+	void OnStartDirSimulation(wxCommandEvent& p_cEvent);
 };
 
 #endif // __SP_MDI_VIEW_H__

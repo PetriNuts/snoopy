@@ -150,6 +150,8 @@ enum
 
     //simulation
     SP_MENU_ITEM_TOGGLESIMULATION,
+	// Amr Direct Method
+	SP_MENU_ITEM_TOGGLEDIRSIMULATION,
 
     //Steering
     SP_MENU_ITEM_TOGGLESTEERING,

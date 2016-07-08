@@ -116,6 +116,12 @@ SP_DS_Graph::GetNetclass()
     return m_pcNetclass;
 }
 
+/*SP_DLG_ColCPNDirSimulationResults*
+SP_DS_Graph::GetSimClass()
+{
+	return m_pcSimClass;
+}*/
+
 SP_DS_Nodeclass*
 SP_DS_Graph::AddNodeclass(SP_DS_Nodeclass* p_pcClass)
 {
@@ -627,9 +633,26 @@ SP_DS_Graph::AddToViewMenu(wxMenu* p_pcMenu)
 					  wxT("Start Simulation-Mode\tF6"),
 					  wxT("Start Simulation mode"));
 		p_pcMenu->Append(l_pcMenuItem);
+
+		
+		
+	
     }
-
-
+//Amr
+	//wxString l_sName = this->GetNetclass()->GetName();
+	if ((l_sName == SP_DS_COLSPN_CLASS) ||
+		(l_sName == SP_DS_COLCPN_CLASS) ||
+		(l_sName == SP_DS_COLHPN_CLASS) )
+	{
+		//Direct Simulation mode
+		p_pcMenu->AppendSeparator();
+		wxMenuItem* l_pcMenuItem = new wxMenuItem(p_pcMenu,
+			SP_MENU_ITEM_TOGGLEDIRSIMULATION,
+			wxT("&Start Direct Simulation-Mode\tCtrl+F6"),
+			wxT("Direct Simulation mode"));
+		p_pcMenu->Append(l_pcMenuItem);
+		
+	}
     //by sl
     if((l_sName == SP_DS_EXTPN_CLASS) ||
        (l_sName == SP_DS_SPN_CLASS) ||
