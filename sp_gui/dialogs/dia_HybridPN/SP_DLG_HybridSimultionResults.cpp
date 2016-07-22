@@ -871,7 +871,10 @@ void SP_DLG_HybridSimulationResults::DirectExportToCSV()
 
 	{
 		l_sOutput = wxT("");
-		l_sOutput << wxString::Format(wxT("%g"), m_pcMainSimulator->GetOutputSampleSize() * i);
+
+		double l_nTime=m_pcMainSimulator->GetOutputStartPoint()+m_pcMainSimulator->GetOutputSampleSize() * i;
+
+		l_sOutput << wxString::Format(wxT("%g"),l_nTime );
 		l_sCurrentRow = wxT("");
 
 		for (unsigned int l_n = 0; l_n < l_pcCurveInfoList->GetRowCount(); l_n++)
