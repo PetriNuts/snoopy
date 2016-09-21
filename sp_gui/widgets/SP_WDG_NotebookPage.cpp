@@ -1,4 +1,5 @@
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_gui/widgets/SP_WDG_NotebookPage.h"
 #include "sp_gui/widgets/SP_WDG_Notebook.h"
 

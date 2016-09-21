@@ -17,7 +17,8 @@
 
 #include "sp_core/base/SP_Type.h"
 #include "sp_core/SP_Core.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_ds/SP_DS_Nodeclass.h"
 #include "sp_ds/SP_DS_Edgeclass.h"
 #include "sp_ds/SP_DS_Edge.h"

@@ -11,7 +11,8 @@
 
 #include "sp_core/SP_Core.h"
 #include "sp_core/base/SP_Graphic.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include "snoopy.h"
 

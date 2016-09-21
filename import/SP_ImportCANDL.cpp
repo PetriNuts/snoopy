@@ -26,7 +26,8 @@
 
 #include "snoopy.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include "dssz/andl/andl_reader.h"
 

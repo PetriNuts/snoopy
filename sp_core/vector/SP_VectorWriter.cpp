@@ -12,7 +12,8 @@
 #include "sp_ds/attributes/SP_DS_IdAttribute.h"
 #include "sp_ds/attributes/SP_DS_TextAttribute.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 SP_VectorWriter::SP_VectorWriter() :
 			m_bOccurrencesWritten(FALSE)

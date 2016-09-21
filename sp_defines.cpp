@@ -1,4 +1,5 @@
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 const unsigned SP_INFINITY = std::numeric_limits<unsigned>::max();
 

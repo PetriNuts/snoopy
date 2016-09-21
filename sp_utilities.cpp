@@ -171,25 +171,25 @@ SP_FormatWithComma(const wxString& s)
 	return res;
 }
 
-void SP_LOGDEBUG(const wxString& s)
+void SP_LOGDEBUG_(const wxString& s)
 {
 	//use of ("%s",s) is important, otherwise '%' is not printed
 	wxLogVerbose("%s",s);
 }
 
-void SP_LOGMESSAGE(const wxString& s)
+void SP_LOGMESSAGE_(const wxString& s)
 {
 	//use of ("%s",s) is important, otherwise '%' is not printed
 	wxLogMessage("%s",s);
 }
 
-void SP_LOGWARNING(const wxString& s)
+void SP_LOGWARNING_(const wxString& s)
 {
 	//use of ("%s",s) is important, otherwise '%' is not printed
 	wxLogWarning("%s",s);
 }
 
-void SP_LOGERROR(const wxString& s)
+void SP_LOGERROR_(const wxString& s)
 {
 	//use of ("%s",s) is important, otherwise '%' is not printed
 	wxLogError("%s",s);

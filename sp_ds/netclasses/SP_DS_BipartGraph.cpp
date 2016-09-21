@@ -18,7 +18,8 @@
 
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogText.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 SP_DS_BipartGraph::SP_DS_BipartGraph()
 :SP_DS_SimpleGraph(SP_DS_BIPARTGRAPH_CLASS)

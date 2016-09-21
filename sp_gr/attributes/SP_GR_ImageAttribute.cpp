@@ -9,7 +9,8 @@
 #include "sp_gr/attributes/SP_GR_ImageAttribute.h"
 #include "sp_gr/base/SP_GR_BaseBitmap.h"
 #include "sp_gr/eventhandler/SP_GRM_UpwardHandler.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Core.h"
 #include "sp_core/SP_GPR_Fonts.h"
 

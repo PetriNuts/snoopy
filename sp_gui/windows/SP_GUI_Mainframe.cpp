@@ -8,7 +8,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "sp_gui/windows/SP_GUI_Mainframe.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include "sp_gui/windows/SP_GUI_DevbarContainer.h"
 #include "sp_gui/widgets/SP_WDG_Toolbar.h"

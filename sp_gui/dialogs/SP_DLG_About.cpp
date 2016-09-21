@@ -7,7 +7,8 @@
 #include "sp_gui/dialogs/SP_DLG_About.h"
 #include "sp_revision.h"
 #include "sp_build.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 // under Windows the icons are in the .rc file
 // else, we have to include them manually

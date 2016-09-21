@@ -8,7 +8,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "sp_gui/windows/SP_GUI_DevbarContainer.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 BEGIN_EVENT_TABLE(SP_GUI_DevbarContainer, wxPanel)
 EVT_SIZE(SP_GUI_DevbarContainer::OnSize)

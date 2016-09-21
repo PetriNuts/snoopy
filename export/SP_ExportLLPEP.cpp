@@ -6,7 +6,8 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "export/SP_ExportLLPEP.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_revision.h"
 
 #include "sp_ds/SP_DS_Edge.h"

@@ -23,7 +23,8 @@
 #define DEFAULT_REFRESHFREQU 1
 #define HISTORY_MAX 10
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_GPR_Base.h"
 
 class SP_DLG_GlobalPreferences;

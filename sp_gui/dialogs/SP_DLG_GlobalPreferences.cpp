@@ -22,7 +22,8 @@
 
 #include <wx/fileconf.h>
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 IMPLEMENT_CLASS(SP_DLG_GlobalPreferences, wxDialog)
 

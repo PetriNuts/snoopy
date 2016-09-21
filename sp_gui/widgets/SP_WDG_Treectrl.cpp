@@ -19,7 +19,8 @@
 #include "sp_ds/SP_DS_Nodeclass.h"
 #include "sp_ds/SP_DS_Edgeclass.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #ifdef __WIN32__
 // this is not supported by native control

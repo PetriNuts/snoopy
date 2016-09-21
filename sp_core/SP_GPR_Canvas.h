@@ -25,7 +25,8 @@ const bool SP_DEFAULT_COMPRESS_FILE = false;
 
 #include <wx/tokenzr.h>
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_GPR_Base.h"
 
 struct SP_WindowOptions

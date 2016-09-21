@@ -36,7 +36,8 @@
 #include "sp_gr/edges/SP_GR_ArrowEdge.h"
 #include "sp_gr/edges/SP_GR_ExtendedEdge.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "snoopy.h"
 
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogText.h"

@@ -14,7 +14,7 @@
 
 #include "sp_revision.h"
 #include "sp_build.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
 
 SP_DLG_CheckForUpdate::SP_DLG_CheckForUpdate (wxWindow *p_pcParent):
 m_bUpdateAllowed(false),

@@ -6,7 +6,8 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "export/SP_ExportMETATOOL.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 

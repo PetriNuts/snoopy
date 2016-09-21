@@ -11,7 +11,8 @@
 
 #include "sp_revision.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Core.h"
 
 #include "sp_gui/dialogs/SP_DLG_GlobalPreferences.h"

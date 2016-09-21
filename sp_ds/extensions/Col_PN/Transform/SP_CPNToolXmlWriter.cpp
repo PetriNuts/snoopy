@@ -9,7 +9,8 @@
 #include <wx/file.h>
 #include <wx/textfile.h>
 #include "sp_ds/extensions/Col_PN/Transform/SP_CPNToolXmlWriter.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_revision.h"
 #include "sp_gr/SP_GR_Node.h"
 #include "sp_gr/SP_GR_Metadata.h"

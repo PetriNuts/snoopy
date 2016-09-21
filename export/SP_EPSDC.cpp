@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "export/SP_EPSDC.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
 
 #include <string.h>
 #include <wx/filename.h>

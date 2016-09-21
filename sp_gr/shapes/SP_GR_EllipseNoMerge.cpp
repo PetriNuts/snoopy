@@ -8,7 +8,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "sp_gr/shapes/SP_GR_EllipseNoMerge.h"
 #include "sp_gr/shapes/SP_GR_Ellipse.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Core.h"
 
 //---------------------------------------------------------------

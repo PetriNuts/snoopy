@@ -10,7 +10,8 @@
 #if !defined(__SP_IA_EVENT_H__)
 #define __SP_IA_EVENT_H__
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/base/SP_Data.h"
 #include "sp_core/SP_List.h"
 

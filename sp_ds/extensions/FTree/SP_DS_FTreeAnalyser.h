@@ -11,7 +11,8 @@
 
 #include "sp_ds/extensions/FTree/SP_DS_FTreeLogicalExpressionReader.h"
 #include "sp_ds/extensions/FTree/SP_DS_FTreeCutSetsCreater.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 
  /**

@@ -33,7 +33,8 @@
 
 #include "sp_ds/extensions/SP_DS_Coarse.h"
 #include "sp_core/SP_Core.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_ds/attributes/SP_DS_TextAttribute.h"
 
 

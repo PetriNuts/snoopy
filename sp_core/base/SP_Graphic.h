@@ -12,7 +12,8 @@
 #include "sp_core/base/SP_NetElement.h"
 //! for SP_Data and SP_MapString2ListAttribute
 #include "sp_core/base/SP_Data.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include "sp_gui/windows/SP_GUI_Canvas.h"
 

@@ -13,7 +13,8 @@
 #include "sp_gui/windows/SP_GUI_Mainframe.h"
 #include "sp_gui/dialogs/SP_DLG_AnimationProperties.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Core.h"
 #include "snoopy.h"
 

@@ -7,7 +7,8 @@
 // Short Description: XML Writer, writes graph structures actually
 //////////////////////////////////////////////////////////////////////
 #include "sp_core/SP_Writer.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 SP_Writer::SP_Writer()
 :m_pcGraph(NULL)

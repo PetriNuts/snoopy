@@ -10,7 +10,8 @@
 
 #include <wx/dc.h>
 #include <wx/cmndata.h>
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #if wxABI_VERSION > 30000
 

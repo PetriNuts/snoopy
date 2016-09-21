@@ -9,7 +9,8 @@
 #include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 #include "sp_gr/shapes/SP_GR_ExtendedRhombus.h"
 #include "sp_gr/eventhandler/SP_GRM_ShapeHandler.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "snoopy.h"
 #include "sp_core/SP_Core.h"
 

@@ -12,7 +12,8 @@
 
 #include "sp_core/SP_Core.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include "sp_gui/mdi/SP_MDI_CoarseDoc.h"
 IMPLEMENT_DYNAMIC_CLASS(SP_MDI_CoarseDoc, SP_MDI_Doc)

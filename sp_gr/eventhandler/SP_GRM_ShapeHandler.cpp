@@ -8,7 +8,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "sp_gr/eventhandler/SP_GRM_ShapeHandler.h"
 #include "sp_gui/windows/SP_GUI_Canvas.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 SP_GRM_ShapeHandler::SP_GRM_ShapeHandler(wxShapeEvtHandler* p_pcPrev, wxShape* p_pcShape)
 :SP_GRM_EventHandler(p_pcPrev, p_pcShape)

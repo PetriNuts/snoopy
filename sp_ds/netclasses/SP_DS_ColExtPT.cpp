@@ -52,7 +52,8 @@
 
 #include "sp_gr/attributes/SP_GR_ColListAttribute.h" 
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "snoopy.h"
 #include "sp_core/SP_GPR_Elements.h"
 #include "sp_core/SP_GPR_Animation.h"

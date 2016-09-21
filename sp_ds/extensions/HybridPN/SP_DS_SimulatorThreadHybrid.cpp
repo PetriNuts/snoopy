@@ -8,7 +8,8 @@
  */
  //==============================================================================
 #include "sp_ds/extensions/HybridPN/SP_DS_SimulatorThreadHybrid.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 SP_DS_SimulatorThreadHybrid::SP_DS_SimulatorThreadHybrid(wxWindow* p_pcParent,spsim::Simulator* p_pcSimulator)
 :SP_DS_SimulatorThread(p_pcParent,p_pcSimulator)

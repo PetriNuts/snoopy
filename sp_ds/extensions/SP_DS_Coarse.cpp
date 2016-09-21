@@ -17,7 +17,8 @@
 
 #include "snoopy.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 SP_DS_Coarse::SP_DS_Coarse(const wxString& p_pchName,
                            const wxString& p_pchInnerClass,

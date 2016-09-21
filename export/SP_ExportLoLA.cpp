@@ -7,7 +7,8 @@
 
 #include "export/SP_ExportLoLA.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 
 

@@ -9,7 +9,8 @@
 #include "sp_core/SP_Core.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_core/SP_Set.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_ds/SP_DS_Netclass.h"
 #include "sp_ds/SP_DS_Graph.h"
 #include "sp_ds/SP_DS_Nodeclass.h"

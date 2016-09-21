@@ -58,7 +58,8 @@
 
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogExtendedGraphic.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "snoopy.h"
 #include "sp_core/SP_GPR_Elements.h"
 #include "sp_core/SP_GPR_Animation.h"

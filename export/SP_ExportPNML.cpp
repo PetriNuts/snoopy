@@ -9,7 +9,8 @@
 #include <wx/file.h>
 #include <wx/textfile.h>
 #include "export/SP_ExportPNML.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_revision.h"
 #include "sp_gr/SP_GR_Node.h"
 #include "sp_gr/SP_GR_Metadata.h"

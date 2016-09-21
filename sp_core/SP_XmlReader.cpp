@@ -13,7 +13,8 @@
 #include <wx/zipstrm.h>
 
 #include "sp_core/SP_XmlReader.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_revision.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 

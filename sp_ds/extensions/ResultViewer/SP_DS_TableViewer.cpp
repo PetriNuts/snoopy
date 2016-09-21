@@ -6,7 +6,8 @@
  * $Date: 06.06.2011
  * Short Description:
  *///=================================================
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/base/SP_Error.h"
 #include "sp_core/SP_Vector.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_ResultViewer.h"

@@ -9,7 +9,8 @@
 #include "export/SP_ExportExtPT2ContPed.h"
 #include "sp_ds/netclasses/SP_DS_ContinuousPed.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_revision.h"
 
 bool SP_ExportExtPT2ContPed::Write(SP_MDI_Doc* p_doc,

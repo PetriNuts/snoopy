@@ -69,7 +69,8 @@
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogMultiline.h"
 #include "sp_gui/widgets/dialogs/wid_dia_SPN/SP_WDG_StFunctionList.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "snoopy.h"
 #include "sp_core/SP_GPR_Elements.h"
 #include "sp_core/SP_GPR_Animation.h"

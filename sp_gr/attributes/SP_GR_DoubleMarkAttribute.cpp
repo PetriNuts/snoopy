@@ -11,7 +11,8 @@
 #include "sp_ds/attributes/SP_DS_DoubleAttribute.h"
 #include "sp_ds/attributes/SP_DS_DoubleListAttribute.h"
 #include "sp_gr/eventhandler/SP_GRM_UpwardHandler.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Core.h"
 
 #include "snoopy.h"

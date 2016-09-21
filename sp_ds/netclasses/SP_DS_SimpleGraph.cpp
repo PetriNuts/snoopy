@@ -31,7 +31,8 @@
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogShowOnly.h"
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogFilename.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 SP_DS_SimpleGraph::SP_DS_SimpleGraph()
 :SP_DS_Netclass(SP_DS_SIMPLEGRAPH_CLASS)

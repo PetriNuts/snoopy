@@ -10,7 +10,8 @@
 #define __SNOOPY_H__
 
 #include <wx/wx.h>
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Map.h"
 
 class SP_DS_Graph;

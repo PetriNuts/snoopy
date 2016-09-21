@@ -10,7 +10,8 @@
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 
 #include "sp_gr/base/SP_GR_BaseText.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Core.h"
 
 #include "snoopy.h"

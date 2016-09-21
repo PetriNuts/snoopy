@@ -8,7 +8,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "sp_gr/edges/SP_GR_ArrowEdge.h"
 #include "sp_gr/base/SP_GR_BaseEdge.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Core.h"
 
 // testing

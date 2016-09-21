@@ -9,7 +9,8 @@
 #include "sp_gr/metadata/SP_GR_MetaRectangle.h"
 #include "sp_gr/base/SP_GR_BaseRectangle.h"
 #include "sp_gr/eventhandler/SP_GRM_ShapeHandler.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Core.h"
 
 //---------------------------------------------------------------

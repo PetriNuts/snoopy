@@ -14,7 +14,8 @@
 #include "sp_core/SP_Map.h"
 
 #include "snoopy.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_ds/SP_DS_Node.h"
 
 

@@ -7,7 +7,8 @@
 // Short Description: XML Readr, writes graph structures actually
 //////////////////////////////////////////////////////////////////////
 #include "sp_gui/interaction/SP_IA_XmlReader.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 static wxXmlNode*
 GetNextChild(wxXmlNode* p_pcVal, wxXmlNodeType p_eType = wxXML_ELEMENT_NODE)

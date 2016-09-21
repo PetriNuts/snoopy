@@ -9,7 +9,8 @@
 #include "sp_gr/edges/SP_GR_ExtendedEdge.h"
 #include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 #include "sp_gr/base/SP_GR_BaseEdge.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Core.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_core/SP_GPR_Elements.h"

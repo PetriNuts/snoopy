@@ -29,7 +29,8 @@
 #include "sp_ds/attributes/SP_DS_IdAttribute.h"
 
 #include "snoopy.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_gui/interaction/SP_IA_Manager.h"
 #include "sp_core/SP_GPR_Animation.h"
 

@@ -6,7 +6,8 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "export/SP_ExportColPN2ANDL.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include "sp_ds/SP_DS_Edge.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"

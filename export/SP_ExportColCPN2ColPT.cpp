@@ -11,7 +11,8 @@
 #include "sp_gr/attributes/gra_SPN/SP_GR_StFunctionAttribute.h"
 #include "sp_gr/attributes/gra_SPN/SP_GR_StParameterListAttribute.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_revision.h"
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 #include "sp_ds/extensions/continuous/SP_DS_ContinuousPlaceFormula.h"

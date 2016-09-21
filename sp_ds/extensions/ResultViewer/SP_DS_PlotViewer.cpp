@@ -7,7 +7,8 @@
  * Short Description:
  *///=================================================
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/base/SP_Error.h"
 #include <wx/aui/aui.h>
 #include "sp_ds/SP_DS_Graph.h"

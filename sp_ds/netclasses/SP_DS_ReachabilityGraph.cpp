@@ -31,7 +31,8 @@
 //added by MD
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogShowOnly.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "snoopy.h"
 #include "sp_core/SP_GPR_Elements.h"
 

@@ -7,7 +7,8 @@
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 #include "sp_core/FTree/SP_FTree_TermScanner.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 
 SP_FTree_TermScanner::SP_FTree_TermScanner():

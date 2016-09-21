@@ -6,7 +6,8 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "export/SP_ExportRomeo.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_ds/SP_DS_Graph.h"

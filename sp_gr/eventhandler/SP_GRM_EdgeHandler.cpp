@@ -15,7 +15,8 @@
 #include "sp_gui/mdi/SP_MDI_View.h"
 
 #include "snoopy.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_gui/interaction/SP_IA_Manager.h"
 
 #include "sp_core/base/SP_Graphic.h"

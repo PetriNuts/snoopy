@@ -15,7 +15,8 @@
 #include "sp_core/SP_GPR_Fonts.h"
 
 #include "sp_revision.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "snoopy.h"
 #include "sp_core/SP_Core.h"
 #include "sp_gr/base/SP_GR_BaseText.h"

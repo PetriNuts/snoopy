@@ -30,7 +30,8 @@
 #include "sp_gui/dialogs/SP_DLG_ChooseFTreeCutSet.h"
 #include "sp_ds/extensions/FTree/SP_DS_FTreeCutSetsCreater.h"
 #include "snoopy.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_GPR_Animation.h"
 
 #include "sp_gui/management/SP_GM_Docmanager.h"

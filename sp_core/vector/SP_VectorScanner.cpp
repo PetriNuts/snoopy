@@ -7,7 +7,8 @@
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 #include "sp_core/vector/SP_VectorScanner.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 SP_VectorScanner::SP_VectorScanner() :
 

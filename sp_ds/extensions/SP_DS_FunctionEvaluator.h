@@ -41,6 +41,7 @@ class SP_DS_FunctionEvaluator
 		catch(std::exception& e)
 		{
 			SP_LOGERROR(wxString(e.what(), wxConvUTF8));
+			SP_LOGERROR(wxString(m_Function->toString()));
 		}
 		return m_Default;
 	}
@@ -97,6 +98,7 @@ class SP_DS_FunctionEvaluator
 			catch(std::exception& e)
 			{
 				SP_LOGERROR(wxString(e.what(), wxConvUTF8));
+				SP_LOGERROR(wxString(m_Function->toString()));
 			}
 			return m_Default;
     	}

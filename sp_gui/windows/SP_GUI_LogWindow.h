@@ -8,7 +8,8 @@
 #define __SP_GUI_LOGWINDOW_H__
 
 #include <wx/log.h>
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 class SP_GUI_LogWindow : public wxLogWindow
 {

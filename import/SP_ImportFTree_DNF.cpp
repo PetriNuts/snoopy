@@ -24,7 +24,8 @@
 
 #include "snoopy.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include "sp_core/FTree/SP_FTree_TermScanner.h"
 #include "sp_core/FTree/SP_FTree_TermParser.h"

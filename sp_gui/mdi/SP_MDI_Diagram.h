@@ -13,7 +13,8 @@
 #include <wx/xml/xml.h>
 #include <wx/ogl/ogl.h>
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 //! include not possible
 //#include "sp_gui/mdi/SP_MDI_Doc.h"

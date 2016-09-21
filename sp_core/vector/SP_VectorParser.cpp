@@ -10,7 +10,8 @@
 #include "sp_core/vector/SP_VectorScanner.h"
 #include "sp_core/vector/SP_VectorParser.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 SP_VectorParser::SP_VectorParser(SP_VectorScanner& p_pcScanner) :
 	m_pcScanner(p_pcScanner)

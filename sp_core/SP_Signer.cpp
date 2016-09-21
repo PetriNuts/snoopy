@@ -8,7 +8,8 @@
 // $Date: 2005/02/19 $
 //////////////////////////////////////////////////////////////////////
 #include "sp_core/SP_Signer.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include <wx/filename.h>
 #include <wx/wfstream.h>

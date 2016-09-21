@@ -16,7 +16,8 @@
 #include "sp_gui/mdi/SP_MDI_View.h"
 #include "sp_gui/mdi/SP_MDI_CoarseView.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 SP_DS_Netclass::SP_DS_Netclass(const wxString& p_pchName)
 :SP_Type(SP_ELEMENT_NETCLASS),

@@ -14,7 +14,8 @@
 #include <wx/wx.h>
 #include <wx/gauge.h>
 #include "spsa/spsa.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 class SP_NodeClientData :public wxClientData
 {

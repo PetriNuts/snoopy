@@ -8,7 +8,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "sp_gr/shapes/SP_GR_RectangleNoMerge.h"
 #include "sp_gr/shapes/SP_GR_Rectangle.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Core.h"
 
 

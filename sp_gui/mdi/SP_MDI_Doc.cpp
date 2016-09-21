@@ -18,7 +18,8 @@
 #include "sp_core/SP_Core.h"
 #include "sp_core/SP_GPR_Canvas.h"
 #include "sp_core/tools/SP_StopWatch.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_Signer.h"
 #include <wx/file.h>
 #include <wx/regex.h>

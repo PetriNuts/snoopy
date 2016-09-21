@@ -6,7 +6,8 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "export/SP_ExportTIM.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 
 #include "sp_gui/mdi/SP_MDI_Doc.h"

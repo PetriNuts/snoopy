@@ -10,7 +10,8 @@
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 ////////#include "wx/choicdlg.h"
 #include "wx/msgdlg.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include "sp_gui/management/SP_GM_Docmanager.h"
 #include "sp_gui/windows/SP_GUI_Childframe.h"

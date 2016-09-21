@@ -13,7 +13,8 @@
 #define __SP_DS_ColPN_Unfolding_H__
 
 #include "snoopy.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_Binding.h"
 #include "sp_ds/SP_DS_Graph.h"

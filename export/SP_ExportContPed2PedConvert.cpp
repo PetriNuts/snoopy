@@ -11,7 +11,8 @@
 #include "sp_ds/attributes/SP_DS_NumberAttribute.h"
 #include "sp_gr/attributes/SP_GR_MarkAttribute.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_revision.h"
 
 bool SP_ExportContPed2PedConvert::Write(SP_MDI_Doc* p_doc,

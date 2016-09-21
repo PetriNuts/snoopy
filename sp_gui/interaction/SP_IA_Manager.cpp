@@ -199,9 +199,7 @@ SP_IA_Manager::SP_IA_Manager() {
 
 	l_lCommand = new SP_IA_Command_Insert(wxT("ANIMSTEP_FWD PN->RG: Create resulting state"), 50, 50);
 	l_lCommand->SetTriggerEvent(event);
-	l_lCommand->SetDescription(wxT("creating a node for the resulting state of the made animation step\n\n")
-															wxT("Note: This command can be used for semi-automatic construction of reachability graphs.\n")
-															wxT("Single stepping must be enabled for an accurate result."));
+	l_lCommand->SetDescription(wxT("creating a node for the resulting state of the made animation step\n\nNote: This command can be used for semi-automatic construction of reachability graphs.\nSingle stepping must be enabled for an accurate result."));
 	l_lCommand->SetNetclassNames(SP_DS_PN_CLASS, SP_DS_REACHABILITY_CLASS);
 	l_DP = new SP_IA_DP_SetterByClass(new SP_DS_Nodeclass(0, wxT("Place")), false, false);
 	l_DP->SetProcessSelected(true);
@@ -449,8 +447,7 @@ SP_IA_Manager::RegisterCommand(SP_IA_Command *p_pcCmd) {
 
 	if (p_pcCmd->GetSourceNetclassName().IsNull()
 			|| p_pcCmd->GetTargetNetclassName().IsNull()) {
-		SP_LOGDEBUG(wxT("ERROR in RegisterCommand(...): couldn't register command, ")
-									wxT("because either source or target netclass were not specified."));
+		SP_LOGDEBUG(wxT("ERROR in RegisterCommand(...): couldn't register command, because either source or target netclass were not specified."));
 		return false;
 	}
 

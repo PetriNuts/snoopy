@@ -56,7 +56,8 @@
 #include "sp_core/SP_GPR_Animation.h"
 #include "sp_core/SP_Core.h"
 #include "sp_gui/windows/SP_GUI_Childframe.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/SP_GPR_Elements.h"
 #include "snoopy.h"
 

@@ -15,7 +15,8 @@
 #include "sp_gr/SP_GR_Edge.h"
 #include "snoopy.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include <wx/spinctrl.h>
 

@@ -6,7 +6,8 @@
  * $Date: 10.06.2011
  * Short Description:
  */ //=================================================
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_core/base/SP_Error.h"
 #include "sp_core/SP_Vector.h"
 #include <wx/xy/xyplot.h>

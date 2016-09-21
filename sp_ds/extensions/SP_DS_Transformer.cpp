@@ -13,7 +13,8 @@
 #include "sp_core/SP_GPR_Elements.h"
 #include "sp_ds/SP_DS_Edgeclass.h"
 #include "sp_ds/SP_DS_Nodeclass.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogGraphic.h"
 #include "sp_core/SP_Core.h"
 #include "sp_core/base/SP_ElementClass.h"

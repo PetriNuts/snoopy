@@ -10,7 +10,8 @@
 
 #include "dssz/functions/functions.h"
 #include "dssz/functions/exceptions.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 typedef dsszmc::functions::Function SP_Function;
 typedef std::shared_ptr<SP_Function> SP_FunctionPtr;

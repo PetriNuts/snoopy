@@ -12,7 +12,8 @@
 #include "sp_core/SP_Map.h"
 #include "sp_core/SP_List.h"
 #include "sp_core/base/SP_Error.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 // Equation Object Types
 enum SP_DS_EQUATIONPARSEROBJECT_TYPE

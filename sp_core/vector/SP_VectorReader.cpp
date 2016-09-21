@@ -15,7 +15,8 @@
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include "sp_ds/attributes/SP_DS_TextAttribute.h"
 #include "sp_ds/SP_DS_Nodeclass.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 using namespace std;
 
 SP_VectorReader::SP_VectorReader(SP_DS_Graph* p_pcGraph):

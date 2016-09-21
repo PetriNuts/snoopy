@@ -7,7 +7,8 @@
 // Short Description: Event handler baseclass
 //////////////////////////////////////////////////////////////////////
 #include "sp_gr/eventhandler/SP_GRM_EventHandler.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "snoopy.h"
 #include "sp_gui/interaction/SP_IA_Manager.h"
 

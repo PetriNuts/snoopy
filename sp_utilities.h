@@ -10,14 +10,24 @@
 #define __SP_UTILITIES_H__
 
 #include "sp_defines.h"
+
 #include <wx/gdicmn.h>
 #include <wx/dialog.h>
 #include <wx/grid.h>
 
-void SP_LOGDEBUG(const wxString& s);
-void SP_LOGMESSAGE(const wxString& s);
-void SP_LOGWARNING(const wxString& s);
-void SP_LOGERROR(const wxString& s);
+#define SP_LOGDEBUG(A) \
+        SP_LOGDEBUG_(A)
+#define SP_LOGMESSAGE(A) \
+        SP_LOGMESSAGE_(A)
+#define SP_LOGWARNING(A) \
+        SP_LOGWARNING_(wxString::Format(wxT("%s(%d):  %s"), wxT(__FILE__), __LINE__, A))
+#define SP_LOGERROR(A) \
+        SP_LOGERROR_(wxString::Format(wxT("%s(%d):  %s"), wxT(__FILE__), __LINE__, A))
+
+void SP_LOGDEBUG_(const wxString& s);
+void SP_LOGMESSAGE_(const wxString& s);
+void SP_LOGWARNING_(const wxString& s);
+void SP_LOGERROR_(const wxString& s);
 
 
 /**	\brief	The SP_RectAroundOrigin function

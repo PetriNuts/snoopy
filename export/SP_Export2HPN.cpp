@@ -9,7 +9,8 @@
 //======================================================================================
 #include "export/SP_Export2HPN.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 #include "sp_revision.h"
 
 bool SP_Export2HPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)

@@ -25,7 +25,8 @@
 #include "sp_gui/dialogs/SP_DLG_LayoutProperties.h"
 
 #include "snoopy.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 #include "dssz/andl/andl_reader.h"
 
@@ -217,13 +218,16 @@ bool SP_ImportANDL::CreateConst(const dsszmc::andl::Constants& p_Constants, cons
 			else
 			{
 				l_pcAttr->Clear();
-				for(size_t i = 0; i < constant->values_.size(); ++i)
+				for(size_t i = 0; i < p_Valuesets.size(); ++i)
 				{
 					l_pcAttr->AppendEmptyRow();
 					wxString vset = p_Valuesets[i];
 					l_pcAttr->SetCell(i, 0, vset);
-					wxString value = constant->values_[i];
-					l_pcAttr->SetCell(i, 1, value);
+					if(i < constant->values_.size())
+					{
+						wxString value = constant->values_[i];
+						l_pcAttr->SetCell(i, 1, value);
+					}
 				}
 			}
 		}

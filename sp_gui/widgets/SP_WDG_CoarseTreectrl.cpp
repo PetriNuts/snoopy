@@ -24,7 +24,8 @@
 
 #include "sp_core/SP_Core.h"
 
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 wxTreeItemId
 SP_WDG_CoarseTreectrl::GetNewParentItem(wxTreeItemId p_nId, unsigned int p_nNr, wxTreeItemIdValue  p_nCookie)

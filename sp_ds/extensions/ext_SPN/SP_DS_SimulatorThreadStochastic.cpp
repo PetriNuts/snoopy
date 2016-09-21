@@ -11,7 +11,8 @@
 #include "sp_ds/extensions/ext_SPN/SP_DS_SimulatorThreadStochastic.h"
 #include "sp_gui/dialogs/SP_DLG_Simulation.h"
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StSimulationResults.h"
-#include "sp_defines.h"
+#include "sp_utilities.h"
+
 
 SP_DS_SimulatorThreadStochastic::SP_DS_SimulatorThreadStochastic(wxWindow* p_pcParent, spsim::Simulator* p_pcSimulator) :
 	SP_DS_SimulatorThread(p_pcParent, p_pcSimulator)
