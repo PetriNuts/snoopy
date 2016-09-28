@@ -29,21 +29,21 @@ SP_LayoutOGDF::~SP_LayoutOGDF()
 
 bool SP_LayoutOGDF::DoVisualization()
 {
-	Graph* l_Graph = new Graph();
-	GraphAttributes* l_GraphAttr = new GraphAttributes(*l_Graph, GraphAttributes::nodeGraphics
-																| GraphAttributes::edgeGraphics
-																| GraphAttributes::nodeLabel
-																| GraphAttributes::edgeLabel
-																| GraphAttributes::edgeArrow);
+	Graph l_Graph;
+	GraphAttributes l_GraphAttr(l_Graph, GraphAttributes::nodeGraphics
+											| GraphAttributes::edgeGraphics
+											| GraphAttributes::nodeLabel
+											| GraphAttributes::edgeLabel
+											| GraphAttributes::edgeArrow);
 
 	MapNodeData::iterator l_itN;
 	for(l_itN = m_mNodes.begin(); l_itN != m_mNodes.end(); ++l_itN)
 	{
 		NodeData* l_pcNodeData = l_itN->second;
-		node l_Node = l_Graph->newNode();
-		l_GraphAttr->label(l_Node) = std::to_string(l_pcNodeData->Id);
-		l_GraphAttr->height(l_Node) = l_pcNodeData->H;
-		l_GraphAttr->width(l_Node) = l_pcNodeData->W;
+		node l_Node = l_Graph.newNode();
+		l_GraphAttr.label(l_Node) = std::to_string(l_pcNodeData->Id);
+		l_GraphAttr.height(l_Node) = l_pcNodeData->H;
+		l_GraphAttr.width(l_Node) = l_pcNodeData->W;
 	}
 
 	MapEdgeData::iterator l_itE;
@@ -52,16 +52,16 @@ bool SP_LayoutOGDF::DoVisualization()
 		EdgeData* l_pcEdgeData = l_itE->second;
 		node l_Source = NULL;
 		node l_Target = NULL;
-		node l_Node = l_Graph->firstNode();
+		node l_Node = l_Graph.firstNode();
 		while(l_Node)
 		{
 			std::string l_SourceId = std::to_string(l_pcEdgeData->SourceId);
-			if((l_GraphAttr->label(l_Node)) == l_SourceId)
+			if((l_GraphAttr.label(l_Node)) == l_SourceId)
 			{
 				l_Source = l_Node;
 			}
-			std:string l_TargetId = std::to_string(l_pcEdgeData->TargetId);
-			if(l_GraphAttr->label(l_Node) == l_TargetId)
+			std::string l_TargetId = std::to_string(l_pcEdgeData->TargetId);
+			if(l_GraphAttr.label(l_Node) == l_TargetId)
 			{
 			  l_Target = l_Node;
 			}
@@ -74,9 +74,9 @@ bool SP_LayoutOGDF::DoVisualization()
 			  l_Node = l_Node->succ();
 			}
 		}
-		edge l_Edge = l_Graph->newEdge(l_Source, l_Target);
-		l_GraphAttr->label(l_Edge) = std::to_string(l_pcEdgeData->Id);
-		l_GraphAttr->arrowType(l_Edge) = EdgeArrow::eaLast;
+		edge l_Edge = l_Graph.newEdge(l_Source, l_Target);
+		l_GraphAttr.label(l_Edge) = std::to_string(l_pcEdgeData->Id);
+		l_GraphAttr.arrowType(l_Edge) = EdgeArrow::eaLast;
 	}
 
 	if(m_sLayout == wxT("FMMM"))
@@ -92,21 +92,21 @@ bool SP_LayoutOGDF::DoVisualization()
 		SP_PlanarizationLayout(l_Graph, l_GraphAttr);
 	}
 
-	node l_Node = l_Graph->firstNode();
+	node l_Node = l_Graph.firstNode();
 	while(l_Node)
 	{
-		long l_nId = atol(l_GraphAttr->label(l_Node).c_str());
-		m_mNodes[l_nId]->X = l_GraphAttr->x(l_Node);
-		m_mNodes[l_nId]->Y = l_GraphAttr->y(l_Node);
+		long l_nId = atol(l_GraphAttr.label(l_Node).c_str());
+		m_mNodes[l_nId]->X = l_GraphAttr.x(l_Node);
+		m_mNodes[l_nId]->Y = l_GraphAttr.y(l_Node);
 
 		l_Node = l_Node->succ();
 	}
 
-	edge l_Edge = l_Graph->firstEdge();
+	edge l_Edge = l_Graph.firstEdge();
 	while(l_Edge)
 	{
-		long l_nId = atol(l_GraphAttr->label(l_Edge).c_str());
-		DPolyline &l_Polyline = l_GraphAttr->bends(l_Edge);
+		long l_nId = atol(l_GraphAttr.label(l_Edge).c_str());
+		DPolyline &l_Polyline = l_GraphAttr.bends(l_Edge);
 		m_mEdges[l_nId]->X.resize(l_Polyline.size());
 		m_mEdges[l_nId]->Y.resize(l_Polyline.size());
 		for(int i = 0; i < l_Polyline.size(); ++i)
@@ -117,13 +117,10 @@ bool SP_LayoutOGDF::DoVisualization()
 		l_Edge = l_Edge->succ();
 	}
 
-	delete l_GraphAttr;
-	delete l_Graph;
-
 	return true;
 }
 
-bool SP_LayoutOGDF::SP_FMMMLayout(Graph* p_Graph, GraphAttributes* p_GraphAttr)
+bool SP_LayoutOGDF::SP_FMMMLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr)
 {
 	FMMMLayout l_Layout;
 
@@ -134,12 +131,12 @@ bool SP_LayoutOGDF::SP_FMMMLayout(Graph* p_Graph, GraphAttributes* p_GraphAttr)
 	l_Layout.tipOverCCs(FMMMLayout::toNoGrowingRow);
 	l_Layout.qualityVersusSpeed(FMMMLayout::qvsGorgeousAndEfficient);
 
-	l_Layout.call(*p_GraphAttr);
+	l_Layout.call(p_GraphAttr);
 
 	return true;
 }
 
-bool SP_LayoutOGDF::SP_SugiyamaLayout(Graph* p_Graph, GraphAttributes* p_GraphAttr)
+bool SP_LayoutOGDF::SP_SugiyamaLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr)
 {
 	SugiyamaLayout l_Layout;
 	FastHierarchyLayout* l_FHL = new FastHierarchyLayout();
@@ -147,12 +144,12 @@ bool SP_LayoutOGDF::SP_SugiyamaLayout(Graph* p_Graph, GraphAttributes* p_GraphAt
 	l_FHL->nodeDistance(20.0);
 	l_Layout.setLayout(l_FHL);
 
-	l_Layout.call(*p_GraphAttr);
+	l_Layout.call(p_GraphAttr);
 
 	return true;
 }
 
-bool SP_LayoutOGDF::SP_PlanarizationLayout(Graph* p_Graph, GraphAttributes* p_GraphAttr)
+bool SP_LayoutOGDF::SP_PlanarizationLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr)
 {
 	PlanarizationLayout pl;
 
@@ -174,7 +171,7 @@ bool SP_LayoutOGDF::SP_PlanarizationLayout(Graph* p_Graph, GraphAttributes* p_Gr
 	ol->cOverhang(0.4);
 	pl.setPlanarLayouter(ol);
 
-	pl.call(*p_GraphAttr);
+	pl.call(p_GraphAttr);
 
 	return true;
 }

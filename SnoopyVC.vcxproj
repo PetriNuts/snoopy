@@ -211,8 +211,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
       <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>del $(TargetDir)SP_DLG_About.*
-del $(TargetDir)SP_DLG_CheckForUpdate.*
+      <Command>del $(TargetDir)sp_build.*
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -333,8 +332,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
       <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>del $(TargetDir)SP_DLG_About.*
-del $(TargetDir)SP_DLG_CheckForUpdate.*
+      <Command>del $(TargetDir)sp_build.*
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -476,6 +474,9 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="sp_core\FTree\SP_FTree_TermParser.h" />
     <ClInclude Include="sp_core\FTree\SP_FTree_TermScanner.h" />
     <ClInclude Include="sp_core\TParser\SP_Parser.h" />
+    <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_ColoredPNDirSimulation.h" />
+    <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_ColPN_Coloring.h" />
+    <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_DColTraceAnalyzer.h" />
     <ClInclude Include="sp_ds\extensions\SP_DS_Animation.h" />
     <ClInclude Include="sp_ds\extensions\SP_DS_Function.h" />
     <ClInclude Include="sp_ds\extensions\SP_DS_FunctionEvaluator.h" />
@@ -710,9 +711,19 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="sp_gr\metadata\SP_GR_MetaDrawnShape.h" />
     <ClInclude Include="sp_gr\metadata\SP_GR_MetaRectangle.h" />
     <ClInclude Include="sp_gr\metadata\SP_GR_PlotSymbol.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColCPN\SP_DLG_ColCPNDirSimulationResults.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_DColPlacesSelection.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_DPlacesSelection.h" />
+    <ClInclude Include="sp_gui\dialogs\dia_ContinuousPN\SP_DLG_CPNColDirSimResults.h" />
     <ClInclude Include="sp_gui\dialogs\dia_ContinuousPN\SP_DLG_CSVExport.h" />
     <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_CPNDeclaration.h" />
     <ClInclude Include="sp_gui\dialogs\SP_DLG_BaseSimulation.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ColShowAllModelViewh.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_ColSimulationProperties.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_DirColorSimulation.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_DirColStSimulation.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_DirSimulation.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_DShowAllModelView.h" />
     <ClInclude Include="sp_gui\dialogs\SP_DLG_DuplicateNodes.h" />
     <ClInclude Include="sp_gui\dialogs\SP_DLG_MergeNodes.h" />
     <ClInclude Include="sp_gui\windows\SP_GUI_Canvas.h" />
@@ -1048,6 +1059,9 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile Include="sp_core\FTree\SP_FTree_TermScanner.cpp" />
     <ClCompile Include="sp_core\TParser\SP_Parser.cpp" />
     <ClCompile Include="sp_defines.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_ColoredPNDirSimulation.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_ColPN_Coloring.cpp" />
+    <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_DcolTraceAnalyzer.cpp" />
     <ClCompile Include="sp_ds\extensions\SP_DS_Animation.cpp" />
     <ClCompile Include="sp_ds\extensions\SP_DS_FunctionEvaluator.cpp" />
     <ClCompile Include="sp_ds\extensions\SP_DS_FunctionRegistry.cpp" />
@@ -1273,9 +1287,19 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile Include="sp_gr\metadata\SP_GR_MetaDrawnShape.cpp" />
     <ClCompile Include="sp_gr\metadata\SP_GR_MetaRectangle.cpp" />
     <ClCompile Include="sp_gr\metadata\SP_GR_PlotSymbol.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColCPN\SP_DLG_ColCPNDirSimulationResults.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_DColPlacesSelection.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_DPlacesSelection.cpp" />
+    <ClCompile Include="sp_gui\dialogs\dia_ContinuousPN\SP_DLG_CPNColDirSimResults.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_ContinuousPN\SP_DLG_CSVExport.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_CPNDeclaration.cpp" />
     <ClCompile Include="sp_gui\dialogs\SP_DLG_BaseSimulation.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ColShowAllModelViewh.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_ColSimulationProperties.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_DirColorSimulation.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_DirColStSimulation.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_DirSimulation.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_DShowAllModelView.cpp" />
     <ClCompile Include="sp_gui\dialogs\SP_DLG_DuplicateNodes.cpp" />
     <ClCompile Include="sp_gui\dialogs\SP_DLG_MergeNodes.cpp" />
     <ClCompile Include="sp_gui\windows\SP_GUI_Canvas.cpp" />

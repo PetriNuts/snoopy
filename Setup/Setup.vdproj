@@ -115,6 +115,12 @@
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_17EA207BF28F40D6823F63E5FD5B3FDB"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -1149,15 +1155,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Snoopy"
-        "ProductCode" = "8:{F97F90AD-42B6-4FCC-9149-8DD283F62690}"
-        "PackageCode" = "8:{95B08960-2D4B-403F-82C3-A64D7106CA9C}"
+        "ProductCode" = "8:{322176BA-65B8-4E8A-8B7E-B8BB705303EB}"
+        "PackageCode" = "8:{E8D9264C-4087-4B5A-97AF-D4931CB6E96D}"
         "UpgradeCode" = "8:{F9CD1EE2-1F15-4C53-8CDC-2258C4742F15}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:3.21.4"
+        "ProductVersion" = "8:3.21.5"
         "Manufacturer" = "8:BTU-Cottbus"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www-dssz.informatik.tu-cottbus.de/software/snoopy.html"

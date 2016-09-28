@@ -19,9 +19,9 @@ using namespace ogdf;
 class SP_LayoutOGDF: public SP_Layout
 {
 private:
-	bool SP_FMMMLayout(Graph* p_Graph, GraphAttributes* p_GraphAttr);
-	bool SP_SugiyamaLayout(Graph* p_Graph, GraphAttributes* p_GraphAttr);
-	bool SP_PlanarizationLayout(Graph* p_Graph, GraphAttributes* p_GraphAttr);
+	bool SP_FMMMLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr);
+	bool SP_SugiyamaLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr);
+	bool SP_PlanarizationLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr);
 
 protected:
 	virtual bool DoVisualization();
