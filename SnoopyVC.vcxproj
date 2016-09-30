@@ -171,7 +171,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>$(ProjectDir);$(WXWIN)/include;$(WXWIN)/lib/vc_x64_dll/mswu/;$(OGL)/include/;$(WXCODE)/components/freechart/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(OGDF)/include;$(BOOST_ROOT);$(CVODE)/include;$(CVODE)/build/include;$(GECODEDIR);$(GECODEDIR)/build;$(GECODEDIR)/$(Configuration);$(SP_SIMULATOR)/include;$(SPSA_STEERINGAPI)/include;$(DSSZ_UTIL)/include;$(GMPDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>__SNOOPY__;HAVE_NO_GMP;WIN32;NDEBUG;_WINDOWS;__WXMSW__;UNICODE;_LP64;WXUSINGDLL;wxDEBUG_LEVEL=0;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;SPSIM_USING_DLL;SPSA_STEERINGAPI_USING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__SNOOPY__;HAVE_NO_GMP;WIN32;NDEBUG;_WINDOWS;__WXMSW__;UNICODE;_LP64;WXUSINGDLL;wxDEBUG_LEVEL=1;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;SPSIM_USING_DLL;SPSA_STEERINGAPI_USING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -294,7 +294,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(ProjectDir);$(WXWIN)/include;$(WXWIN)/lib/vc_x64_dll/mswud/;$(OGL)/include/;$(WXCODE)/components/freechart/include/;$(LIBSBML)/src;$(IRRKLANG)/include/;$(OGDF);$(OGDF)/include;$(BOOST_ROOT);$(CVODE)/include;$(CVODE)/build/include;$(GECODEDIR);$(GECODEDIR)/build;$(GECODEDIR)/$(Configuration);$(SP_SIMULATOR)/include;$(SPSA_STEERINGAPI)/include;$(DSSZ_UTIL)/include;$(GECODEDIR)/include;$(GMPDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>__SNOOPY__;HAVE_NO_GMP;_DEBUG;WIN32;_LIB;__WIN32__;_WINDOWS;__WXMSW__;__WINDOWS__;__WXDEBUG__;UNICODE;_LP64;WXUSINGDLL;wxDEBUG_LEVEL=0;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;SPSIM_USING_DLL;SPSA_STEERINGAPI_USING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__SNOOPY__;HAVE_NO_GMP;_DEBUG;WIN32;_LIB;__WIN32__;_WINDOWS;__WXMSW__;__WINDOWS__;__WXDEBUG__;UNICODE;_LP64;WXUSINGDLL;wxDEBUG_LEVEL=1;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;SPSIM_USING_DLL;SPSA_STEERINGAPI_USING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
