@@ -175,6 +175,74 @@
 
 #include <wx/sysopt.h>
 
+namespace {
+
+// Information about the last not yet handled assertion.
+static wxString s_lastAssertMessage;
+
+static wxString FormatAssertMessage(const wxString& file,
+                                    int line,
+                                    const wxString& func,
+                                    const wxString& cond,
+                                    const wxString& msg)
+{
+    wxString str;
+    str << "wxWidgets assert: " << cond << " failed "
+           "at " << file << ":" << line << " in " << func
+        << " with message '" << msg << "'";
+    return str;
+}
+
+static void SnoopyAssertHandler(const wxString& file,
+                              int line,
+                              const wxString& func,
+                              const wxString& cond,
+                              const wxString& msg)
+{
+    // Determine whether we can safely throw an exception to just make the test
+    // fail or whether we need to abort (in this case "msg" will contain the
+    // explanation why did we decide to do it).
+    wxString abortReason;
+
+    const wxString
+        assertMessage = FormatAssertMessage(file, line, func, cond, msg);
+
+    if ( !wxIsMainThread() )
+    {
+        // Exceptions thrown from worker threads are not caught currently and
+        // so we'd just die without any useful information -- abort instead.
+        abortReason << assertMessage << "in a worker thread.";
+    }
+    else if ( uncaught_exception() )
+    {
+        // Throwing while already handling an exception would result in
+        // terminate() being called and we wouldn't get any useful information
+        // about why the test failed then.
+        if ( s_lastAssertMessage.empty() )
+        {
+            abortReason << assertMessage << "while handling an exception";
+        }
+        else // In this case the exception is due to a previous assert.
+        {
+            abortReason << s_lastAssertMessage << "\n  and another "
+                        << assertMessage << " while handling it.";
+        }
+    }
+    else // Can "safely" throw from here.
+    {
+        // Remember this in case another assert happens while handling this
+        // exception: we want to show the original assert as it's usually more
+        // useful to determine the real root of the problem.
+        s_lastAssertMessage = assertMessage;
+
+        //throw TestAssertFailure(file, line, func, cond, msg);
+    }
+
+    SP_LOGDEBUG(abortReason);
+}
+
+}
+
 #ifdef __WIN32__
 #ifdef __WXDEBUG__
 #define _CRTDBG_MAP_ALLOC
@@ -1046,6 +1114,7 @@ bool Snoopy::ReadOptions()
 	m_pcFontPrefs->UpdateFromConfig(config);
 	m_pcElementPrefs->UpdateFromConfig(config);
 
+	wxSetAssertHandler(SnoopyAssertHandler);
 	wxLog::SetLogLevel(wxLOG_Info);
 	wxLog::SetVerbose(m_pcCanvasPrefs->GetLogVerbose());
 
