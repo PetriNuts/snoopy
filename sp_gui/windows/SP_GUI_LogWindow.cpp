@@ -21,6 +21,7 @@ SP_GUI_LogWindow::SP_GUI_LogWindow(wxFrame *pParent,
 				   bool bShow)
   : wxLogWindow(pParent, szTitle, bShow, false)
 {
+    //wxLog::SetRepetitionCounting(true);
 	m_bNewMessages = FALSE;
 	wxGetApp().GetCanvasPrefs()->LoadWindowOptions(GetFrame());
 }

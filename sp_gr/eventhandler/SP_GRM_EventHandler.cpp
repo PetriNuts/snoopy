@@ -208,7 +208,6 @@ SP_GRM_EventHandler::OnEndDragLeft(double p_nX, double p_nY, int p_nKeys, int p_
     double offsetX = xx - g_nDragStartX;
     double offsetY = yy - g_nDragStartY;
 
-    l_pcCanvas->MoveLinePoints(offsetX, offsetY);
     // do the real moving
     l_pcCanvas->MoveShapes(offsetX, offsetY);
 

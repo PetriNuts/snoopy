@@ -68,7 +68,6 @@ SP_GUI_Mainframe::SP_GUI_Mainframe(SP_GM_Docmanager* p_pcDocmanager,
     m_frameManager.Update();
 
     m_pcExpLogWindow = new SP_GUI_LogWindow(this, wxT("Log window"), false);
-    wxLog::SetRepetitionCounting(true);
 
     // create the menubar
     SetMenuBar(CreateMenuBar());

@@ -126,6 +126,7 @@ public:
     void Modify(bool p_bVal);
 
     bool MoveShape(wxShape* p_pcShape, double p_nOffsetX, double p_nOffsetY);
+    bool MoveShapes(const std::list<wxShape*>& p_pcShapes, double p_nOffsetX, double p_nOffsetY);
     bool MoveLinePoints(double p_nOffsetX, double p_nOffsetY);
     bool MoveShapes(double p_nOffsetX, double p_nOffsetY);
 
@@ -136,6 +137,13 @@ public:
     void SetVirtualSizeX(int x) { m_nSizeX = x; }
     void SetVirtualSizeY(int y) { m_nSizeY = y; }
     bool UpdateVirtualSize(int x, int y);
+
+    // Select or deselect all
+    void SelectAll(bool p_bSelect = TRUE);
+    // Select all of the actual class
+    void SelectAllClass(const wxString& p_sClass);
+    // Select all of list of shape
+    void SelectAllShapes(const std::list<wxShape*>& p_lShapes, bool p_bSelect = true);
 
 };
 

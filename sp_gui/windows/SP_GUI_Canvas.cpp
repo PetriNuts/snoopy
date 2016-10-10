@@ -9,6 +9,7 @@
 #include "sp_gui/windows/SP_GUI_Canvas.h"
 #include "sp_gui/windows/SP_GUI_Childframe.h"
 #include "sp_gui/mdi/SP_MDI_View.h"
+#include "sp_gui/commands/SP_CMD_MoveGraphic.h"
 
 #include <wx/dcgraph.h>
 #include <wx/dcmemory.h>
@@ -39,7 +40,7 @@ END_EVENT_TABLE()
 // Define a constructor for my canvas
 SP_GUI_Canvas::SP_GUI_Canvas(SP_MDI_View* p_pcView,
 		SP_GUI_Childframe *p_pcFrame, wxWindowID p_nId, const wxPoint& p_cPos,
-		const wxSize& p_cSize, const long p_nStyle) :
+		const wxSize& p_cSize, long p_nStyle) :
 	wxShapeCanvas(p_pcFrame, p_nId, p_cPos, p_cSize, p_nStyle),
 	m_bBitmapCacheInvalid(true),
 	m_pcView(p_pcView), m_pcParentframe(p_pcFrame),
@@ -205,8 +206,7 @@ SP_Type* SP_GUI_Canvas::SetEditElement(SP_Type* p_pcElement)
 			if(l_pcGr)
 			{
 				wxShape *tmp = l_pcGr->GetPrimitive();
-				SP_LOGDEBUG(wxString::Format(wxT("SP_GUI_Canvas::SetEditElement()")
-								wxT(" delete control points, shape %p"), tmp));
+				SP_LOGDEBUG(wxString::Format(wxT("SP_GUI_Canvas::SetEditElement() delete control points, shape %p"), tmp));
 				if (tmp)
 					tmp->ClearPointList(*m_pcControlPoints);
 				wxDELETE(m_pcControlPoints);
@@ -464,11 +464,10 @@ bool SP_GUI_Canvas::OnEndDragLeftMerge(SP_Graphic* p_pcShape)
 		if (l_pcShape->Selected())
 		{
 			l_pcGraphic = SP_Core::Instance()->ResolveExtern(l_pcShape);
-			if ((!l_pcGraphic) || (l_pcGraphic->GetGraphicType()
-					== SP_GRAPHIC_ATTRIBUTE) ||
-			// SP_STATE_COARSEBORDERDOWN can only be target
-					(l_pcGraphic->GetGraphicState()
-							== SP_STATE_COARSEBORDERDOWN))
+			if ((!l_pcGraphic)
+				|| (l_pcGraphic->GetGraphicType() == SP_GRAPHIC_ATTRIBUTE)
+				|| // SP_STATE_COARSEBORDERDOWN can only be target
+				   (l_pcGraphic->GetGraphicState() == SP_STATE_COARSEBORDERDOWN))
 			{
 				l_pcNode = l_pcNode->GetNext();
 				continue;
@@ -851,14 +850,11 @@ void SP_GUI_Canvas::OnKeyEvent(wxKeyEvent& p_cEvent)
 
 		  if(offsetX!=0 || offsetY!=0)
           {
-
-			  MoveLinePoints(offsetX, offsetY);
 			  // do the real moving
 			  MoveShapes(offsetX, offsetY);
 
 			  Modify(TRUE);
 			  Refresh();
-
           }
 		}
 	}
@@ -947,10 +943,36 @@ bool SP_GUI_Canvas::MoveShape(wxShape* p_pcShape, double p_nOffsetX, double p_nO
 }
 
 bool
+SP_GUI_Canvas::MoveShapes(const std::list<wxShape*>& p_pcShapes, double p_nOffsetX, double p_nOffsetY)
+{
+    if (!GetDiagram())
+        return false;
+
+    wxWindowUpdateLocker noUpdates(this);
+    m_bBitmapCacheInvalid = true;
+    wxClientDC l_cDC(this);
+    DoPrepareDC(l_cDC);
+
+    for(auto l_pcShape : p_pcShapes)
+    {
+        if (l_pcShape->Selected() &&
+            !l_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
+        {
+			double l_nX = l_pcShape->GetX() + p_nOffsetX;
+			double l_nY = l_pcShape->GetY() + p_nOffsetY;
+			// to get the line attachments right
+			l_pcShape->Move(l_cDC, l_nX, l_nY);
+			UpdateVirtualSize(WXROUND(l_nX), WXROUND(l_nY));
+        }
+    }
+    return true;
+}
+
+bool
 SP_GUI_Canvas::MoveLinePoints(double p_nOffsetX, double p_nOffsetY)
 {
     if (!GetDiagram())
-        return FALSE;
+        return false;
 
     // Move line points
     wxNode* l_pcNode = GetDiagram()->GetShapeList()->GetFirst();
@@ -978,7 +1000,7 @@ SP_GUI_Canvas::MoveLinePoints(double p_nOffsetX, double p_nOffsetY)
         }
         l_pcNode = l_pcNode->GetNext();
     }
-    return FALSE;
+    return true;
 }
 
 bool
@@ -987,56 +1009,15 @@ SP_GUI_Canvas::MoveShapes(double p_nOffsetX, double p_nOffsetY)
     if (!GetDiagram())
         return FALSE;
 
-    wxWindowUpdateLocker noUpdates(this);
-    m_bBitmapCacheInvalid = true;
-    wxClientDC l_cDC(this);
-    DoPrepareDC(l_cDC);
-
-    // Add selected node shapes, if any
-    wxNode* l_pcNode = GetDiagram()->GetShapeList()->GetFirst();
-#if 1
-    // slow but no bug
-    while (l_pcNode)
+    if(p_nOffsetX != 0.0 || p_nOffsetY != 0.0)
     {
-        wxShape* l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
-        if (l_pcShape->Selected() &&
-            !l_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
-        {
-        	double l_nX = l_pcShape->GetX() + p_nOffsetX;
-        	double l_nY = l_pcShape->GetY() + p_nOffsetY;
-            // to get the line attachments right
-            l_pcShape->Move(l_cDC, l_nX, l_nY);
-			UpdateVirtualSize(WXROUND(l_nX), WXROUND(l_nY));
-        }
-        l_pcNode = l_pcNode->GetNext();
+    	SP_MDI_Doc *l_pcDoc = (dynamic_cast<SP_MDI_Doc*>(GetView()->GetDocument()))->GetParentDoc();
+   		l_pcDoc->GetCommandProcessor()->Submit(new SP_CMD_MoveGraphic(this, p_nOffsetX, p_nOffsetY));
     }
-#else
-    // fast but bug while moving shapes
-    std::list<wxShape*> l_lSelectedShapes;
-    while (l_pcNode)
+    else
     {
-        wxShape* l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
-        if (l_pcShape->Selected() &&
-            !l_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
-        {
-        	l_pcShape->Select(false, &l_cDC);
-        	l_lSelectedShapes.push_back(l_pcShape);
-        }
-        l_pcNode = l_pcNode->GetNext();
+    	SP_CMD_MoveGraphic{this, p_nOffsetX, p_nOffsetY}.Do();
     }
-    for(auto l_pcShape : l_lSelectedShapes)
-    {
-    	double l_nX = l_pcShape->GetX() + p_nOffsetX;
-    	double l_nY = l_pcShape->GetY() + p_nOffsetY;
-        // to get the line attachments right
-    	l_pcShape->Move(l_cDC, l_nX, l_nY);
-		UpdateVirtualSize(WXROUND(l_nX), WXROUND(l_nY));
-    }
-    for(auto l_pcShape : l_lSelectedShapes)
-    {
-    	l_pcShape->Select(true, &l_cDC);
-    }
-#endif
     return TRUE;
 }
 
@@ -1054,3 +1035,76 @@ bool SP_GUI_Canvas::UpdateVirtualSize(int x, int y)
 	m_bBitmapCacheInvalid = true;
 	return false;
 }
+
+// Select or deselect all
+void SP_GUI_Canvas::SelectAll(bool p_bSelect)
+{
+	wxWindowUpdateLocker noUpdates(this);
+	wxClientDC l_cDC(this);
+	DoPrepareDC(l_cDC);
+
+	auto l_pcNode = GetDiagram()->GetShapeList()->GetFirst();
+	while (l_pcNode)
+	{
+		auto l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
+		if ((l_pcShape->GetParent() == NULL)
+				&& !l_pcShape->IsKindOf(CLASSINFO(wxLabelShape))
+				&& !l_pcShape->IsKindOf(CLASSINFO(wxControlPoint))
+			)
+		{
+			if(!l_pcShape->Selected() && p_bSelect)
+			{
+				l_pcShape->Select(TRUE, &l_cDC);
+			}
+			else if(l_pcShape->Selected() && !p_bSelect)
+			{
+				l_pcShape->Select(FALSE, &l_cDC);
+			}
+		}
+		l_pcNode = l_pcNode->GetNext();
+	}
+}
+
+void SP_GUI_Canvas::SelectAllClass(const wxString& p_sClass)
+{
+	if (p_sClass.IsEmpty())
+		return;
+
+	wxWindowUpdateLocker noUpdates(this);
+	wxClientDC l_cDC(this);
+	DoPrepareDC(l_cDC);
+
+	auto l_pcNode = GetDiagram()->GetShapeList()->GetFirst();
+	while (l_pcNode)
+	{
+		auto l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
+		auto l_pcGraphic = SP_Core::Instance()->ResolveExtern(l_pcShape);
+
+		if (l_pcShape && l_pcGraphic && l_pcShape->GetParent() == NULL
+				&& !l_pcShape->IsKindOf(CLASSINFO(wxControlPoint)) && !l_pcShape->IsKindOf(CLASSINFO(wxLabelShape)) && l_pcGraphic->GetParent()
+				&& p_sClass.Cmp(l_pcGraphic->GetParent()->GetClassName()) == 0)
+		{
+			l_pcShape->Select(TRUE, &l_cDC);
+		}
+		l_pcNode = l_pcNode->GetNext();
+	}
+}
+
+void SP_GUI_Canvas::SelectAllShapes(const std::list<wxShape*>& p_lShapes, bool p_bSelect)
+{
+	if (p_lShapes.empty())
+		return;
+
+	wxWindowUpdateLocker noUpdates(this);
+	wxClientDC l_cDC(this);
+	DoPrepareDC(l_cDC);
+
+	for(auto l_pcShape : p_lShapes)
+	{
+		if(l_pcShape)
+		{
+			l_pcShape->Select(p_bSelect, &l_cDC);
+		}
+	}
+}
+

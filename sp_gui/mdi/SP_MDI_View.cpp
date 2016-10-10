@@ -1191,39 +1191,7 @@ void SP_MDI_View::SelectAll(bool p_bSelect)
 	if (!m_pcCanvas || !GetDocument())
 		return;
 
-	wxWindowUpdateLocker noUpdates(m_pcCanvas);
-	wxClientDC l_cDC(m_pcCanvas);
-	m_pcCanvas->DoPrepareDC(l_cDC);
-
-	if (!p_bSelect)
-	{
-		wxList l_lSelections;
-		FindSelectedShapes(l_lSelections);
-
-		wxNode* l_pcNode = l_lSelections.GetFirst();
-		while (l_pcNode)
-		{
-			wxShape* l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
-			l_pcShape->Select(FALSE, &l_cDC);
-
-			l_pcNode = l_pcNode->GetNext();
-		}
-	}
-	else
-	{
-		SP_MDI_Doc *l_pcDoc = dynamic_cast<SP_MDI_Doc*>(GetDocument());
-		wxNode *l_pcNode = l_pcDoc->GetDiagram()->GetShapeList()->GetFirst();
-		while (l_pcNode)
-		{
-			wxShape *l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
-			if (l_pcShape->GetParent() == NULL
-					&& !l_pcShape->IsKindOf(CLASSINFO(wxControlPoint)) && !l_pcShape->IsKindOf(CLASSINFO(wxLabelShape)))
-			{
-				l_pcShape->Select(TRUE, &l_cDC);
-			}
-			l_pcNode = l_pcNode->GetNext();
-		}
-	}
+	m_pcCanvas->SelectAll(p_bSelect);
 }
 
 void SP_MDI_View::SelectAllClass(const wxString& p_sClass)
@@ -1231,50 +1199,7 @@ void SP_MDI_View::SelectAllClass(const wxString& p_sClass)
 	if (!m_pcCanvas || p_sClass.IsEmpty() || !GetDocument())
 		return;
 
-	wxWindowUpdateLocker noUpdates(m_pcCanvas);
-	wxShape *l_pcShape;
-	SP_Graphic* l_pcGraphic;
-	wxClientDC l_cDC(m_pcCanvas);
-	m_pcCanvas->DoPrepareDC(l_cDC);
-	SP_MDI_Doc *l_pcDoc = dynamic_cast<SP_MDI_Doc*>(GetDocument());
-	if (!l_pcDoc->GetDiagram() || !l_pcDoc->GetDiagram()->GetShapeList())
-		return;
-
-	wxNode *l_pcNode = l_pcDoc->GetDiagram()->GetShapeList()->GetFirst();
-	while (l_pcNode)
-	{
-		l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
-		l_pcGraphic = SP_Core::Instance()->ResolveExtern(l_pcShape);
-
-		if (l_pcShape && l_pcGraphic && l_pcShape->GetParent() == NULL
-				&& !l_pcShape->IsKindOf(CLASSINFO(wxControlPoint)) && !l_pcShape->IsKindOf(CLASSINFO(wxLabelShape)) && l_pcGraphic->GetParent()
-				&& p_sClass.Cmp(l_pcGraphic->GetParent()->GetClassName()) == 0)
-		{
-			l_pcShape->Select(TRUE, &l_cDC);
-		}
-		l_pcNode = l_pcNode->GetNext();
-	}
-}
-
-void SP_MDI_View::SelectAllGraphics(const SP_ListGraphic& p_lGraphics, bool p_bSelect)
-{
-	if (!m_pcCanvas || !GetDocument() || p_lGraphics.empty())
-		return;
-
-	wxWindowUpdateLocker noUpdates(m_pcCanvas);
-	wxClientDC l_cDC(m_pcCanvas);
-	m_pcCanvas->DoPrepareDC(l_cDC);
-
-	SP_ListGraphic::const_iterator l_itGr = p_lGraphics.begin();
-
-	for(; l_itGr != p_lGraphics.end(); ++l_itGr)
-	{
-		wxShape* l_pcShape = (*l_itGr)->GetPrimitive();
-		if(l_pcShape)
-		{
-			l_pcShape->Select(p_bSelect, &l_cDC);
-		}
-	}
+	m_pcCanvas->SelectAllClass(p_sClass);
 }
 
 

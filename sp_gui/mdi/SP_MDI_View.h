@@ -143,8 +143,6 @@ public:
     void SelectAll(bool p_bSelect = TRUE);
     // Select all of the actual class
     void SelectAllClass(const wxString& p_sClass);
-    // Select all of list of graphic
-    void SelectAllGraphics(const SP_ListGraphic& p_lGraphics, bool p_bSelect = true);
 
     //! Event handlers
     //! can be overridden by plugging in a new entry
