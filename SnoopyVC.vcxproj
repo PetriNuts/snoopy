@@ -711,6 +711,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="sp_gr\metadata\SP_GR_MetaDrawnShape.h" />
     <ClInclude Include="sp_gr\metadata\SP_GR_MetaRectangle.h" />
     <ClInclude Include="sp_gr\metadata\SP_GR_PlotSymbol.h" />
+    <ClInclude Include="sp_gui\commands\SP_CMD_MoveGraphic.h" />
     <ClInclude Include="sp_gui\dialogs\dia_ColCPN\SP_DLG_ColCPNDirSimulationResults.h" />
     <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_DColPlacesSelection.h" />
     <ClInclude Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_DPlacesSelection.h" />
@@ -1287,6 +1288,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile Include="sp_gr\metadata\SP_GR_MetaDrawnShape.cpp" />
     <ClCompile Include="sp_gr\metadata\SP_GR_MetaRectangle.cpp" />
     <ClCompile Include="sp_gr\metadata\SP_GR_PlotSymbol.cpp" />
+    <ClCompile Include="sp_gui\commands\SP_CMD_MoveGraphic.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_ColCPN\SP_DLG_ColCPNDirSimulationResults.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_DColPlacesSelection.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_ColSPN\SP_DLG_DPlacesSelection.cpp" />
