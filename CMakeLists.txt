@@ -4,6 +4,13 @@ project(snoopy)
 #custom find 'modules'
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/config/")
 
+#default build type for single configuration targets
+if( NOT CMAKE_BUILD_TYPE )
+    set( CMAKE_BUILD_TYPE Release CACHE STRING
+            "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+            FORCE )
+endif()
+
 #check compiler for C++11 support
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -19,7 +26,7 @@ endif()
 
 #snoopy
 #Optimization flags
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -finline-functions -funroll-loops" )
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=core2 -mtune=core2 -funroll-loops" )
 if(NOT WIN32)
     #Generate position-independent code (PIC)
     add_definitions( -fPIC )
@@ -27,7 +34,7 @@ endif(NOT WIN32)
 add_definitions( -D__SNOOPY__ )
 add_definitions( -D_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_ )
 if(APPLE)
-    add_definitions( -mmacosx-version-min=10.8 )
+    add_definitions( -mmacosx-version-min=10.9 )
 endif()
 add_definitions( -Wno-deprecated )
 add_definitions( -Wno-overloaded-virtual )
@@ -83,6 +90,11 @@ list(APPEND LIBS ${OGDF_LIBRARIES})
 find_package(LibSBML REQUIRED)
 include_directories(${LibSBML_INCLUDE_DIRS})
 list(APPEND LIBS ${LibSBML_LIBRARIES})
+#XML2 used by SBML
+if(NOT WIN32)
+    find_package(LibXml2 REQUIRED)
+    list(APPEND LIBS ${LIBXML2_LIBRARIES})
+endif()
 
 #cvode
 find_package(SUNDIALS REQUIRED cvode nvecserial)
@@ -123,12 +135,14 @@ include_directories(${Snoopy_Simulator_INCLUDE_DIRS})
 list(APPEND LIBS ${Snoopy_Simulator_LIBRARIES})
 
 
-#set(BIN ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+set(BIN ${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_BUILD_TYPE})
 set(INC ${CMAKE_CURRENT_SOURCE_DIR})
 #set(LIB ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(SRC ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(${INC})
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN})
 
 #get_property(inc_dirs DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
 #message("inc_dirs = ${inc_dirs}")
@@ -145,5 +159,15 @@ foreach(d ${SRC_DIRS})
   list(APPEND SOURCE_FILES ${CC_FILES})
 endforeach()
 
-add_executable(snoopy ${SOURCE_FILES})
-target_link_libraries(snoopy ${LIBS})
+add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})
+target_link_libraries(${CMAKE_PROJECT_NAME} ${LIBS})
+
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy sp_build.cpp.in sp_build.cpp
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/)
+
+if(APPLE)
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+        COMMAND ../mkAppBundleOSX.sh ${CMAKE_PROJECT_NAME} beta
+        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/)
+endif()

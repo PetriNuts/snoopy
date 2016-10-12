@@ -26,7 +26,7 @@ find_path(LibSBML_INCLUDE_DIR NAMES sbml/SBMLTypes.h
    PATH_SUFFIXES libsbml
    )
 
-find_library(LibSBML_LIBRARY NAMES sbml libsbml
+find_library(LibSBML_LIBRARY NAMES sbml-static sbml libsbml-static libsbml
    HINTS
    ${PC_LibSBML_LIBDIR}
    ${PC_LibSBML_LIBRARY_DIRS}
