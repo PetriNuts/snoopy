@@ -49,8 +49,8 @@ protected:
     //! while drawing a line
     wxList* m_pcControlPoints;
 
-    int m_nSizeX = 0;
-    int m_nSizeY = 0;
+    long m_nSizeX = 0;
+    long m_nSizeY = 0;
 
     double m_nLastPosX = 0;
     double m_nLastPosY = 0;
@@ -132,11 +132,11 @@ public:
 
     wxOverlay& GetOverlay() { return m_Overlay; }
 
-    int GetVirtualSizeX() { return m_nSizeX; }
-    int GetVirtualSizeY() { return m_nSizeY; }
-    void SetVirtualSizeX(int x) { m_nSizeX = x; }
-    void SetVirtualSizeY(int y) { m_nSizeY = y; }
-    bool UpdateVirtualSize(int x, int y);
+    long GetVirtualSizeX() { return m_nSizeX; }
+    long GetVirtualSizeY() { return m_nSizeY; }
+    void SetVirtualSizeX(long x) { m_nSizeX = x; }
+    void SetVirtualSizeY(long y) { m_nSizeY = y; }
+    bool UpdateVirtualSize(long x, long y);
 
     // Select or deselect all
     void SelectAll(bool p_bSelect = TRUE);

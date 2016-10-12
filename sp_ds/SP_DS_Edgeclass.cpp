@@ -326,15 +326,15 @@ SP_DS_Edgeclass::OnDrawElement(double p_nX, double p_nY, int p_nKeys, int p_nAtt
 SP_DS_Edge*
 SP_DS_Edgeclass::OnEndElement(SP_Graphic* p_pcShape, double p_nX, double p_nY, int p_nKeys, int p_nAttach)
 {
-    CHECK_ENV(return FALSE);
+    CHECK_ENV(return nullptr);
     // if we didn't start a line, what do we do here?
-    CHECK_POINTER(m_pcStartShape, return NULL);
-    CHECK_POINTER(p_pcShape, return NULL);
-    CHECK_POINTER(GetParentGraph(), return NULL);
-    CHECK_POINTER(GetParentGraph()->GetNetclass(), return NULL);
+    CHECK_POINTER(m_pcStartShape, return nullptr);
+    CHECK_POINTER(p_pcShape, return nullptr);
+    CHECK_POINTER(GetParentGraph(), return nullptr);
+    CHECK_POINTER(GetParentGraph()->GetNetclass(), return nullptr);
     // source and target should be in the same net
-    CHECK_BOOL((m_pcStartShape->GetNetnumber() == p_pcShape->GetNetnumber()), return NULL);
-    SP_DS_Edge* l_pcEdge = NULL;
+    CHECK_BOOL((m_pcStartShape->GetNetnumber() == p_pcShape->GetNetnumber()), return nullptr);
+    SP_DS_Edge* l_pcEdge = nullptr;
 
     // never accept an attribute, try to get the parent
     while (p_pcShape->GetGraphicType() == SP_GRAPHIC_ATTRIBUTE)
@@ -384,7 +384,7 @@ SP_DS_Edgeclass::OnEndElement(SP_Graphic* p_pcShape, double p_nX, double p_nY, i
 
         }
     }
-    m_pcStartShape = NULL;
+    m_pcStartShape = nullptr;
 
     return l_pcEdge;
 }

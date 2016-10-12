@@ -55,7 +55,7 @@ SP_GUI_Canvas::SP_GUI_Canvas(SP_MDI_View* p_pcView,
 	SetCursor(wxCursor(wxCURSOR_HAND));
 
 	SetScrollRate(SP_DEFAULT_GRID_SPACING, SP_DEFAULT_GRID_SPACING);
-	SetVirtualSize(m_nSizeX, m_nSizeX);
+	SetVirtualSize(m_nSizeX, m_nSizeY);
 	EnableScrolling(true,true);
 }
 
@@ -396,9 +396,12 @@ bool SP_GUI_Canvas::OnEndDragLeftShape(wxShape* p_pcShape, double p_nX,
 		if (l_pcHit)
 		{
 			ReleaseMouse();
-			l_bReturn = static_cast<SP_DS_Edgeclass*>(m_pcEditElement)->
+			if(static_cast<SP_DS_Edgeclass*>(m_pcEditElement)->
 					OnEndElement(SP_Core::Instance()->ResolveExtern(l_pcHit),
-									p_nX, p_nY, p_nKeys, p_nAttach);
+									p_nX, p_nY, p_nKeys, p_nAttach))
+            {
+                l_bReturn = true;
+            }
 
 			if (m_pcControlPoints)
 			{
@@ -545,8 +548,11 @@ bool SP_GUI_Canvas::OnClickOnShape(wxShape* p_pcShape, double p_nX,
 		// last point to store in the list
 		AddControlPoint(p_nX, p_nY);
 
-		l_bReturn = static_cast<SP_DS_Edgeclass*>(m_pcEditElement)->
-				OnEndElement(SP_Core::Instance()->ResolveExtern(p_pcShape), p_nX, p_nY, p_nKeys, p_nAttach);
+		if(static_cast<SP_DS_Edgeclass*>(m_pcEditElement)->
+				OnEndElement(SP_Core::Instance()->ResolveExtern(p_pcShape), p_nX, p_nY, p_nKeys, p_nAttach))
+        {
+            l_bReturn = true;
+        }
 
 		if (m_pcControlPoints)
 		{
@@ -582,7 +588,7 @@ bool SP_GUI_Canvas::OnDrawLine(wxShape* p_pcShape, double p_nX, double p_nY,
 	if (p_pcShape)
 		p_pcShape->GetAttachmentPosition(p_nAttach, &l_nX, &l_nY);
 
-	int l_nX1,l_nY1,l_nX2,l_nY2;
+	wxCoord l_nX1,l_nY1,l_nX2,l_nY2;
 //TODO: check if neccessary in wx3.0
 #if defined(__WXMAC__) && wxABI_VERSION < 30000
 	CalcScrolledPosition(WXROUND(l_nX), WXROUND(l_nY), &l_nX1, &l_nY1);
@@ -681,11 +687,11 @@ void SP_GUI_Canvas::OnEndDragLeft(double p_nX, double p_nY, int p_nKeys)
 		{
 			if(l_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
 			{
-				wxNode* l_pcNode = dynamic_cast<wxLineShape*>(l_pcShape)->GetLineControlPoints()->GetFirst();
+				wxNode* l_pcNode1 = dynamic_cast<wxLineShape*>(l_pcShape)->GetLineControlPoints()->GetFirst();
 				bool l_bIsSelected = false;
-				while (l_pcNode)
+				while (l_pcNode1)
 				{
-					wxRealPoint* l_pcPoint = (wxRealPoint*)l_pcNode->GetData();
+					wxRealPoint* l_pcPoint = (wxRealPoint*)l_pcNode1->GetData();
 					double l_nImageX = l_pcPoint->x;
 					double l_nImageY = l_pcPoint->y;
 					if (l_nImageX >= l_nMinX && l_nImageX <= l_nMaxX && l_nImageY
@@ -698,7 +704,7 @@ void SP_GUI_Canvas::OnEndDragLeft(double p_nX, double p_nY, int p_nKeys)
 						l_bIsSelected = false;
 						break;
 					}
-					l_pcNode = l_pcNode->GetNext();
+					l_pcNode1 = l_pcNode1->GetNext();
 				}
 				if(l_bIsSelected)
 					l_pcShape->Select(true, &l_cDc);
@@ -885,7 +891,7 @@ bool SP_GUI_Canvas::DrawTempEdge(double p_nX, double p_nY)
 	wxPen* l_cPen = wxThePenList->FindOrCreatePen(*wxBLACK, 1, wxPENSTYLE_DOT);
 	l_cDC.SetPen(*l_cPen);
 
-	int l_nX1,l_nY1,l_nX2,l_nY2;
+	wxCoord l_nX1,l_nY1,l_nX2,l_nY2;
 	wxNode* l_pcNode = m_pcControlPoints->GetFirst();
 	wxRealPoint* l_pcPoint = (wxRealPoint*)l_pcNode->GetData();
 	l_nX1 = WXROUND(l_pcPoint->x);
@@ -1022,7 +1028,7 @@ SP_GUI_Canvas::MoveShapes(double p_nOffsetX, double p_nOffsetY)
 }
 
 
-bool SP_GUI_Canvas::UpdateVirtualSize(int x, int y)
+bool SP_GUI_Canvas::UpdateVirtualSize(long x, long y)
 {
 	if(m_nSizeX < x)
 	{
