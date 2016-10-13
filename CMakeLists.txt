@@ -94,6 +94,10 @@ list(APPEND LIBS ${LibSBML_LIBRARIES})
 if(NOT WIN32)
     find_package(LibXml2 REQUIRED)
     list(APPEND LIBS ${LIBXML2_LIBRARIES})
+    find_package(ZLIB)
+    list(APPEND LIBS ${ZLIB_LIBRARIES})
+    find_package(BZip2)
+    list(APPEND LIBS ${BZIP2_LIBRARIES})
 endif()
 
 #cvode

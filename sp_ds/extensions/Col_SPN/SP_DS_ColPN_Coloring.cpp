@@ -1230,9 +1230,7 @@ wxString SP_DS_ColPN_Coloring::GetArcVariable(SP_DS_Edge* p_pcEdge)
 	wxString l_sArcVariable;
 
 	SP_DS_ColListAttribute* l_pcColList1 = dynamic_cast< SP_DS_ColListAttribute* >(p_pcEdge->GetAttribute(SP_DS_CPN_INSCRIPTION));
-	if (!l_pcColList1)
 
-		wxString l_sArcExpression;
 	wxString l_sArcExpression = l_pcColList1->GetCell(0, 1);
 
 	std::size_t foundEx = l_sArcExpression.find(wxT("dot"));
@@ -1243,30 +1241,28 @@ wxString SP_DS_ColPN_Coloring::GetArcVariable(SP_DS_Edge* p_pcEdge)
 		l_sArcVariable = wxT("dot");
 		return l_sArcVariable;
 	}
+	else if (founddsu != std::string::npos)
+	{
+		auto found = l_sArcExpression.find_last_of("-");
+		l_sArcVariable = l_sArcExpression.substr(found + 1);
+		return l_sArcVariable;
+	}
+	else if (founddash != std::string::npos)
+	{
+		auto found = l_sArcExpression.find_last_of("`");
+		l_sArcVariable = l_sArcExpression.substr(found + 1);
+		return l_sArcVariable;
+	}
+	else if (founddash == std::string::npos && founddsu == std::string::npos)
+	{
+		l_sArcVariable = l_sArcExpression;
+		return l_sArcVariable;
+	}
 	else
-		if (founddsu != std::string::npos)
-		{
-
-			unsigned found = l_sArcExpression.find_last_of("-");
-			l_sArcVariable = l_sArcExpression.substr(found + 1);
-			return l_sArcVariable;
-		}
-		else
-			if (founddash != std::string::npos)
-			{
-
-				unsigned found = l_sArcExpression.find_last_of("`");
-				l_sArcVariable = l_sArcExpression.substr(found + 1);
-				return l_sArcVariable;
-			}
-			else
-				if (founddash == std::string::npos && founddsu == std::string::npos)
-				{
-					l_sArcVariable = l_sArcExpression;
-					return l_sArcVariable;
-				}
-				else
-					l_sArcVariable = l_sArcExpression.Before('++');
+	{
+        auto found = l_sArcExpression.find("++");
+        l_sArcVariable = l_sArcExpression.substr(0,found);
+	}
 
 	return l_sArcVariable;
 }
