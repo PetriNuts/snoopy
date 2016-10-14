@@ -10,16 +10,9 @@
 #include "sp_gr/base/SP_GR_BaseEdge.h"
 #include "sp_gr/SP_GR_Edge.h"
 
-#include "sp_gui/windows/SP_GUI_Canvas.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_gui/mdi/SP_MDI_View.h"
 
-#include "snoopy.h"
-#include "sp_utilities.h"
-
-#include "sp_gui/interaction/SP_IA_Manager.h"
-
-#include "sp_core/base/SP_Graphic.h"
 #include "sp_core/SP_Core.h"
 
 SP_GRM_EdgeHandler::SP_GRM_EdgeHandler(wxShapeEvtHandler* p_pcPrev, wxShape* p_pcShape)

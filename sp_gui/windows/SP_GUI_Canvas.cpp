@@ -8,22 +8,12 @@
 //////////////////////////////////////////////////////////////////////
 #include "sp_gui/windows/SP_GUI_Canvas.h"
 #include "sp_gui/windows/SP_GUI_Childframe.h"
-#include "sp_gui/mdi/SP_MDI_View.h"
 #include "sp_gui/commands/SP_CMD_MoveGraphic.h"
 
-#include <wx/dcgraph.h>
-#include <wx/dcmemory.h>
 #include <wx/dcbuffer.h>
 #include <wx/wupdlock.h>
 
-#include "sp_core/base/SP_Type.h"
 #include "sp_core/SP_Core.h"
-#include "sp_utilities.h"
-
-#include "sp_ds/SP_DS_Nodeclass.h"
-#include "sp_ds/SP_DS_Edgeclass.h"
-#include "sp_ds/SP_DS_Edge.h"
-#include "sp_ds/SP_DS_Graph.h"
 
 #include "snoopy.h"
 #include "sp_core/SP_GPR_Canvas.h"
