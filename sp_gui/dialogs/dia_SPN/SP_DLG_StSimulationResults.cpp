@@ -1552,12 +1552,21 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
 
 		wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue( 1);
+		SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+        SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
+        SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+        wxString l_sFunction(l_pcFunction->toString().c_str(), wxConvUTF8);
+        wxString l_sExpanded(l_pcExpanded->toString().c_str(), wxConvUTF8);
+        wxString l_sMsg = wxT("function: ") + l_sTransitionFunction;
+        l_sMsg << wxT("\nparsed function: ") << l_sFunction;
+		l_sMsg << wxT("\nexpanded function: ") << l_sExpanded;
+        SP_LOGMESSAGE(l_sMsg);
 
 		m_asTransitionNames.push_back(l_sTransitionName);
 
 		m_mTransitionName2Position[l_sTransitionName] = l_nTransitionPosition++;
 
-		m_pcMainSimulator->AddTransition(l_sTransitionName, l_sTransitionFunction, l_nTransitionType);
+		m_pcMainSimulator->AddTransition(l_sTransitionName, l_sExpanded, l_nTransitionType);
 	}
 
 	//Immediate Transition
