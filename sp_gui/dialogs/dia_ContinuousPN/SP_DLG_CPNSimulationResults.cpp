@@ -989,6 +989,8 @@ void SP_DLG_CPNSimulationResults::LoadTransitions()
 	//clear old transitions
 	m_pcMainSimulator->ClearTransitions();
 
+	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
 	//Go through all the transition nodes
 	for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); l_itElem++)
 	{
@@ -997,8 +999,13 @@ void SP_DLG_CPNSimulationResults::LoadTransitions()
 		//Get the transition rate function
 		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>((*l_itElem)->GetAttribute(wxT("FunctionList")));
 
+		wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue( 1);
+		SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
+		SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+		wxString l_sExpanded(l_pcExpanded->toString());
+
 		//add a transition
-		m_pcMainSimulator->AddTransition(l_sName, l_pcColList->GetActiveCellValue(1), spsim::TRANSITION_TYPE_CONTINUOUS);
+		m_pcMainSimulator->AddTransition(l_sName, l_sExpanded, spsim::TRANSITION_TYPE_CONTINUOUS);
 
 		m_asTransitionNames.push_back(l_sName);
 		m_mTransitionName2Position[l_sName] = l_nPosition;

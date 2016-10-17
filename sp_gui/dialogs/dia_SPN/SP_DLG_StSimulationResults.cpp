@@ -595,7 +595,7 @@ void SP_DLG_StSimulationResults::OnPrint(wxCommandEvent& p_cEvent)
 	l_nResolution = l_pcDC->GetPPI().GetX();
 	double l_nFontSize = 7*l_nResolution/72;
 #else
-	l_sFilename = wxFileSelector(wxT("Save..."), wxT(""), l_sFilename, wxT("eps"), +wxT("*.eps"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	l_sFilename = wxFileSelector(wxT("Save..."), wxT(""), l_sFilename, wxT("eps"), wxT("*.eps"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 	if (l_sFilename.empty())
 		return;
 
@@ -1543,6 +1543,8 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 	//if the user wants to run the drawn net as continuous nets, then stochastic transitions need to be added as continuous
 	spsim::TransitionType l_nTransitionType = spsim::TRANSITION_TYPE_STOCHASTIC;
 
+    SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
 	//Stochastic Transition
 	for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
 	{
@@ -1552,15 +1554,9 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
 
 		wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue( 1);
-		SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
         SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
         SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
-        wxString l_sFunction(l_pcFunction->toString().c_str(), wxConvUTF8);
-        wxString l_sExpanded(l_pcExpanded->toString().c_str(), wxConvUTF8);
-        wxString l_sMsg = wxT("function: ") + l_sTransitionFunction;
-        l_sMsg << wxT("\nparsed function: ") << l_sFunction;
-		l_sMsg << wxT("\nexpanded function: ") << l_sExpanded;
-        SP_LOGMESSAGE(l_sMsg);
+        wxString l_sExpanded(l_pcExpanded->toString());
 
 		m_asTransitionNames.push_back(l_sTransitionName);
 
@@ -1579,12 +1575,15 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
 
 		wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue( 1);
+        SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
+        SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+        wxString l_sExpanded(l_pcExpanded->toString());
 
 		m_asTransitionNames.push_back(l_sTransitionName);
 
 		m_mTransitionName2Position[l_sTransitionName] = l_nTransitionPosition++;
 
-		m_pcMainSimulator->AddTransition(l_sTransitionName, l_sTransitionFunction, spsim::TRANSITION_TYPE_IMMEDIATE);
+		m_pcMainSimulator->AddTransition(l_sTransitionName, l_sExpanded, spsim::TRANSITION_TYPE_IMMEDIATE);
 
 	}
 
@@ -1598,12 +1597,15 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("DelayList")));
 
 		wxString l_delayvalue = l_pcColList->GetActiveCellValue( 1);
+        SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_delayvalue);
+        SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+        wxString l_sExpanded(l_pcExpanded->toString());
 
 		m_asTransitionNames.push_back(l_sTransitionName);
 
 		m_mTransitionName2Position[l_sTransitionName] = l_nTransitionPosition++;
 
-		m_pcMainSimulator->AddTransition(l_sTransitionName, l_delayvalue, spsim::TRANSITION_TYPE_DETERMINISTIC);
+		m_pcMainSimulator->AddTransition(l_sTransitionName, l_sExpanded, spsim::TRANSITION_TYPE_DETERMINISTIC);
 	}
 
 	//Scheduled transition
@@ -1618,12 +1620,15 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 		wxString l_Repetition = l_pcColList->GetActiveCellValue( 2); //FixedTimedFiring_Single( . ) not realized
 		wxString l_End = l_pcColList->GetActiveCellValue( 3); //FixedTimedFiring_Periodic( _SimStart, . , _SimEnd )
 		wxString l_sTransitionFunction = wxT("FixedTimedFiring_Periodic(") + l_Begin + wxT(",") + l_Repetition + wxT(",") + l_End + wxT(")");
+        SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
+        SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+        wxString l_sExpanded(l_pcExpanded->toString());
 
 		m_asTransitionNames.push_back(l_sTransitionName);
 
 		m_mTransitionName2Position[l_sTransitionName] = l_nTransitionPosition++;
 
-		m_pcMainSimulator->AddTransition(l_sTransitionName, l_sTransitionFunction, spsim::TRANSITION_TYPE_SCHEDULED);
+		m_pcMainSimulator->AddTransition(l_sTransitionName, l_sExpanded, spsim::TRANSITION_TYPE_SCHEDULED);
 	}
 }
 
