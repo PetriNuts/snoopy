@@ -2286,6 +2286,11 @@ SP_DS_StParser :: CheckFormulaFunction( const wxString& p_sFormula, SP_DS_Node* 
 	l_sConsistenceCheck.Replace(wxT("\n"), wxT(""));
 	l_sConsistenceCheck.Replace(wxT("\t"), wxT(""));
 
+	SP_DS_FunctionRegistry* l_pcFR = p_pcTransitionNode->GetNodeclass()->GetParentGraph()->GetFunctionRegistry();
+	SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sConsistenceCheck);
+	SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+	l_sConsistenceCheck = wxString(l_pcExpanded->toString());
+
 	m_bOnlyCheck = true;
 
 	m_bColoredPN = p_bColoredPN;
