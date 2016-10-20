@@ -211,7 +211,7 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 	m_pcTimeSyncComboBox->Append(wxT("Static (exact)"));
 	m_pcTimeSyncComboBox->Append(wxT("Static (accelerated)"));
 	m_pcTimeSyncComboBox->Append(wxT("Dynamic"));
-	m_pcTimeSyncComboBox->Append(wxT("Approximate"));
+	m_pcTimeSyncComboBox->Append(wxT("Improved HRSSA"));
 	m_pcTimeSyncComboBox->Append(wxT("Continuous"));
 	m_pcTimeSyncComboBox->Append(wxT("Stochastic"));
 	m_pcTimeSyncComboBox->SetSelection(l_nSimulatorType);
@@ -748,7 +748,7 @@ void SP_DLG_HybridSimulationResults::DoStartSimulation()
 	//Create the worker thread for this model
 	if (m_pcWorkerThread->Create() != wxTHREAD_NO_ERROR)
 	{
-		SP_LOGERROR(wxT("Can not start the simulation"));
+		SP_LOGERROR(wxT("Cannot start the simulation"));
 		return;
 	}
 
@@ -758,7 +758,7 @@ void SP_DLG_HybridSimulationResults::DoStartSimulation()
 	//Run the simulation
 	if (m_pcWorkerThread->Run() != wxTHREAD_NO_ERROR)
 	{
-		SP_LOGERROR(wxT("Can not start the simulation"));
+		SP_LOGERROR(wxT("Cannot start the simulation"));
 		return;
 	}
 
@@ -782,8 +782,8 @@ spsim::Simulator* SP_DLG_HybridSimulationResults::CreateSimulator(const int& p_n
 		m_sSimulatorType = wxT("Dynamic");
 		return new spsim::HybridDynamic();
 	case 3: //approximate
-		m_sSimulatorType = wxT("Approximate");
-		return new spsim::HybridApproximate();
+		m_sSimulatorType = wxT("Improved HRSSA");
+		return new spsim::HybridImproved();
 	case 4: //continuous
 		m_sSimulatorType = wxT("Continuous");
 		return new spsim::HybridStatic();
