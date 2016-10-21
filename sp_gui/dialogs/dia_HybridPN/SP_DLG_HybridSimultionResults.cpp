@@ -210,8 +210,8 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 	m_pcTimeSyncComboBox = new wxChoice(m_pcPropertyWindowPropertySizer, SP_ID_CHOICE_TIME_SYNC, wxDefaultPosition, wxSize(100, -1));
 	m_pcTimeSyncComboBox->Append(wxT("Static (exact)"));
 	m_pcTimeSyncComboBox->Append(wxT("Static (accelerated)"));
-	m_pcTimeSyncComboBox->Append(wxT("Dynamic"));
 	m_pcTimeSyncComboBox->Append(wxT("Improved HRSSA"));
+	m_pcTimeSyncComboBox->Append(wxT("Dynamic"));
 	m_pcTimeSyncComboBox->Append(wxT("Continuous"));
 	m_pcTimeSyncComboBox->Append(wxT("Stochastic"));
 	m_pcTimeSyncComboBox->SetSelection(l_nSimulatorType);
@@ -778,12 +778,12 @@ spsim::Simulator* SP_DLG_HybridSimulationResults::CreateSimulator(const int& p_n
 	case 1: //static (exact)
 		m_sSimulatorType = wxT("Static (accelerated)");
 		return new spsim::HybridAccelerated();
-	case 2: //dynamic
-		m_sSimulatorType = wxT("Dynamic");
-		return new spsim::HybridDynamic();
-	case 3: //approximate
+	case 2: //Improved HRSSA
 		m_sSimulatorType = wxT("Improved HRSSA");
 		return new spsim::HybridImproved();
+	case 3: //dynamic
+		m_sSimulatorType = wxT("Dynamic");
+		return new spsim::HybridDynamic();
 	case 4: //continuous
 		m_sSimulatorType = wxT("Continuous");
 		return new spsim::HybridStatic();
