@@ -554,6 +554,11 @@ protected:
 	bool BuildParserTree();
 	bool CheckVariableIsLegal();
 	void CollectVariables();
+
+	//2016.10.31 by Fei
+	//implement the unique function
+	bool m_bTransitionUnique;
+	void ProcessUnique();
 	
 
 	bool ProcessConstantTransition();

@@ -1752,6 +1752,13 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::UnfoldOneTransition()
 	}
 
 	m_ExpressionVector.clear();
+
+	//
+	if (m_bTransitionUnique)
+	{
+		ProcessUnique();
+		m_bTransitionUnique = false;
+	}
 	
 	//get instances
 	if( m_sTransNodeClass.IsSameAs(SP_DS_CONTINUOUS_TRANS)	)
@@ -1770,6 +1777,38 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::UnfoldOneTransition()
 		m_mmUnfoldedSchedTransions[m_sColoredTransName] = m_mTransInstances;	
 
 	return true;
+}
+
+void SP_DS_ColPN_Unfolding::UnfoldThread::ProcessUnique()
+{
+	SP_CPN_UnfoldedTransInfo l_scOneTransInfo;
+
+	SP_CPN_UnfoldedTransition::iterator itMap;
+	for (itMap = m_mTransInstances.begin(); itMap != m_mTransInstances.end(); itMap++)
+	{
+		SP_CPN_UnfoldedTransInfo l_scOneTransInfoTemp;
+		l_scOneTransInfoTemp = itMap->second;
+		l_scOneTransInfo.m_anNetFunctions = l_scOneTransInfoTemp.m_anNetFunctions;
+		l_scOneTransInfo.m_sType = l_scOneTransInfoTemp.m_sType;
+		vector<SP_CPN_UnfoldedArcInfo>	l_vInputArcs;
+		vector<SP_CPN_UnfoldedArcInfo>	l_vOutputArcs;
+		l_vInputArcs = l_scOneTransInfoTemp.m_vInputArcs;
+		l_vOutputArcs = l_scOneTransInfoTemp.m_vOutputArcs;
+		for (unsigned int i = 0; i < l_vInputArcs.size(); i++)
+		{
+			l_scOneTransInfo.m_vInputArcs.push_back(l_vInputArcs[i]);
+		}
+		for (unsigned int i = 0; i < l_vOutputArcs.size(); i++)
+		{
+			l_scOneTransInfo.m_vOutputArcs.push_back(l_vOutputArcs[i]);
+		}
+	}
+
+	l_scOneTransInfo.m_sAnimTransInstName = m_sColoredTransName;
+	
+	m_mTransInstances.clear();
+	m_mTransInstances[m_sColoredTransName] = l_scOneTransInfo;
+	
 }
 
 
@@ -1940,6 +1979,19 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::CollectGuard()
 	l_Expression.m_eExprType = CPN_GUARD_EXPR;	
 
 	l_Expression.m_sExpression = wxString(l_pcColList->GetCell(0, 1).c_str());
+
+	//unique analysis
+	wxString l_sExpressionUnique = l_Expression.m_sExpression;
+	l_sExpressionUnique = l_sExpressionUnique.BeforeFirst(']');
+	l_sExpressionUnique = l_sExpressionUnique.AfterFirst('[');
+	l_sExpressionUnique.Replace(wxT(" "), wxT(""));
+	if (l_sExpressionUnique == wxT("unique"))
+	{
+		m_bTransitionUnique = true;
+		l_Expression.m_sExpression = l_Expression.m_sExpression.AfterFirst(']');
+	}
+	//end analysis
+	
 
 	if(l_Expression.m_sExpression == wxT(""))
 	{
@@ -3151,6 +3203,7 @@ m_pcGraph(p_pcGraph),
 m_bCSPSolve(p_bCSPSolve)
 {		
 	m_nCurrentFinished = 0;
+	m_bTransitionUnique = false;
 }
 
 SP_DS_ColPN_Unfolding::UnfoldThread::~UnfoldThread()

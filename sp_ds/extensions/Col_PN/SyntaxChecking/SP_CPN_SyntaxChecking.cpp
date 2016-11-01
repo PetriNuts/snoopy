@@ -263,6 +263,16 @@ bool SP_CPN_SyntaxChecking::CheckGuard(SP_DS_Node* p_pcTransNode)
 	
 	l_sGuard = l_pcColList->GetCell(0, 1);	
 
+	//unique
+	wxString l_sExpressionUnique = l_sGuard;
+	l_sExpressionUnique = l_sExpressionUnique.BeforeFirst(']');
+	l_sExpressionUnique = l_sExpressionUnique.AfterFirst('[');
+	l_sExpressionUnique.Replace(wxT(" "), wxT(""));
+	if (l_sExpressionUnique == wxT("unique"))
+	{
+		l_sGuard = l_sGuard.AfterFirst(']');
+	}
+
 	//Empty checking
 	l_sGuard.Replace(wxT(" "),wxT(""));
 	l_sGuard.Replace(wxT("\t"),wxT(""));
