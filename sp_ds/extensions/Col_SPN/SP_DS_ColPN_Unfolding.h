@@ -559,6 +559,8 @@ protected:
 	//implement the unique function
 	bool m_bTransitionUnique;
 	void ProcessUnique();
+
+	
 	
 
 	bool ProcessConstantTransition();

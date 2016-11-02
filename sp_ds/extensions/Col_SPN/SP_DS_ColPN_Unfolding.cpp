@@ -1796,11 +1796,26 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::ProcessUnique()
 		l_vOutputArcs = l_scOneTransInfoTemp.m_vOutputArcs;
 		for (unsigned int i = 0; i < l_vInputArcs.size(); i++)
 		{
-			l_scOneTransInfo.m_vInputArcs.push_back(l_vInputArcs[i]);
+			//vector<SP_CPN_UnfoldedArcInfo>::iterator it = std::find_if(l_scOneTransInfo.m_vInputArcs.begin(), l_scOneTransInfo.m_vInputArcs.end(), Compare(l_vInputArcs[i],);
+			bool l_bFound = false;
+			for (unsigned k = 0; k < l_scOneTransInfo.m_vInputArcs.size(); k++)
+			{
+				if (l_scOneTransInfo.m_vInputArcs[k].m_sColPlaceName == l_vInputArcs[i].m_sColPlaceName && l_scOneTransInfo.m_vInputArcs[k].m_sColor == l_vInputArcs[i].m_sColor)
+					l_bFound = true;
+			}
+			if(!l_bFound)
+				l_scOneTransInfo.m_vInputArcs.push_back(l_vInputArcs[i]);
 		}
 		for (unsigned int i = 0; i < l_vOutputArcs.size(); i++)
 		{
-			l_scOneTransInfo.m_vOutputArcs.push_back(l_vOutputArcs[i]);
+				bool l_bFound = false;
+				for (unsigned k = 0; k < l_scOneTransInfo.m_vOutputArcs.size(); k++)
+				{
+					if (l_scOneTransInfo.m_vOutputArcs[k].m_sColPlaceName == l_vOutputArcs[i].m_sColPlaceName && l_scOneTransInfo.m_vOutputArcs[k].m_sColor == l_vOutputArcs[i].m_sColor)
+						l_bFound = true;
+				}
+				if (!l_bFound)
+					l_scOneTransInfo.m_vOutputArcs.push_back(l_vOutputArcs[i]);
 		}
 	}
 
