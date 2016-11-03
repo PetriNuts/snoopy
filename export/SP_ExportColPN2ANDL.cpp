@@ -322,7 +322,11 @@ bool SP_ExportColPN2ANDL::WriteArcs(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unf
 		wxString l_sArcType = l_ArcInfo.m_sArcType ;
 
 		wxString l_sMult;
-		if(l_sDiscContType == wxT("Place"))
+		if(!l_ArcInfo.m_sMultiplicity.IsEmpty())
+        {
+            l_sMult << l_ArcInfo.m_sMultiplicity;
+        }
+        else if(l_sDiscContType == wxT("Place"))
 		{
 			l_sMult << l_ArcInfo.m_nMultiplicity;
 		}
