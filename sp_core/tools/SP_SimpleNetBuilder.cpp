@@ -771,17 +771,22 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("FunctionList")));
 					for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 					{
-						if(i>0)
-						{
-							l_sFunction << wxT(" ++ ");
-						}
 						wxString l_sGuard = l_pcColList->GetCell(i,l_pcColList->GetActiveColumn());
 						l_sGuard.Trim(true).Trim(false);
-						if(!l_sGuard.IsEmpty() && l_sGuard.CmpNoCase(wxT("true")) != 0)
-						{
-							l_sFunction << wxT("[") << l_sGuard << wxT("] ");
-						}
-						l_sFunction << l_pcColList->GetCell(i,l_pcColList->GetActiveColumn()+1);
+                        wxString l_sFunc = l_pcColList->GetCell(i,l_pcColList->GetActiveColumn()+1);
+                        l_sFunc.Trim(true).Trim(false);
+                        if(!l_sFunc.IsEmpty())
+                        {
+                            if(!l_sFunction.IsEmpty())
+                            {
+                                l_sFunction << wxT(" ++ ");
+                            }
+                            if(!l_sGuard.IsEmpty() && l_sGuard.CmpNoCase(wxT("true")) != 0)
+                            {
+                                l_sFunction << wxT("[") << l_sGuard << wxT("] ");
+                            }
+                            l_sFunction << l_sFunc;
+                        }
 					}
 				}
 				else if(l_pcNode->GetAttribute(wxT("DelayList")))
@@ -789,17 +794,22 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("DelayList")));
 					for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 					{
-						if(i>0)
-						{
-							l_sFunction << wxT(" ++ ");
-						}
-						wxString l_sGuard = l_pcColList->GetCell(i,l_pcColList->GetActiveColumn());
-						l_sGuard.Trim(true).Trim(false);
-						if(!l_sGuard.IsEmpty() && l_sGuard.CmpNoCase(wxT("true")) != 0)
-						{
-							l_sFunction << wxT("[") << l_sGuard << wxT("] ");
-						}
-						l_sFunction << l_pcColList->GetCell(i,l_pcColList->GetActiveColumn()+1);
+                        wxString l_sGuard = l_pcColList->GetCell(i,l_pcColList->GetActiveColumn());
+                        l_sGuard.Trim(true).Trim(false);
+                        wxString l_sFunc = l_pcColList->GetCell(i,l_pcColList->GetActiveColumn()+1);
+                        l_sFunc.Trim(true).Trim(false);
+                        if(!l_sFunc.IsEmpty())
+                        {
+                            if(!l_sFunction.IsEmpty())
+                            {
+                                l_sFunction << wxT(" ++ ");
+                            }
+                            if(!l_sGuard.IsEmpty() && l_sGuard.CmpNoCase(wxT("true")) != 0)
+                            {
+                                l_sFunction << wxT("[") << l_sGuard << wxT("] ");
+                            }
+                            l_sFunction << l_sFunc;
+                        }
 					}
 				}
 				else if(l_pcNode->GetAttribute(wxT("PeriodicList")))
@@ -807,19 +817,24 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("PeriodicList")));
 					for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 					{
-						if(i>0)
-						{
-							l_sFunction << wxT(" ++ ");
-						}
-						wxString l_sGuard = l_pcColList->GetCell(i,l_pcColList->GetActiveColumn());
-						l_sGuard.Trim(true).Trim(false);
-						if(!l_sGuard.IsEmpty() && l_sGuard.CmpNoCase(wxT("true")) != 0)
-						{
-							l_sFunction << wxT("[") << l_sGuard << wxT("] ");
-						}
-						l_sFunction << l_pcColList->GetCell(i,l_pcColList->GetActiveColumn()+1)
-								<< wxT(",") << l_pcColList->GetCell(i,l_pcColList->GetActiveColumn()+2)
-								<< wxT(",") << l_pcColList->GetCell(i,l_pcColList->GetActiveColumn()+3);
+                        wxString l_sGuard = l_pcColList->GetCell(i,l_pcColList->GetActiveColumn());
+                        l_sGuard.Trim(true).Trim(false);
+                        wxString l_sFunc = l_pcColList->GetCell(i,l_pcColList->GetActiveColumn()+1)
+                                + wxT(",") + l_pcColList->GetCell(i,l_pcColList->GetActiveColumn()+2)
+                                + wxT(",") + l_pcColList->GetCell(i,l_pcColList->GetActiveColumn()+3);
+                        l_sFunc.Trim(true).Trim(false);
+                        if(!l_sFunc.IsEmpty())
+                        {
+                            if(!l_sFunction.IsEmpty())
+                            {
+                                l_sFunction << wxT(" ++ ");
+                            }
+                            if(!l_sGuard.IsEmpty() && l_sGuard.CmpNoCase(wxT("true")) != 0)
+                            {
+                                l_sFunction << wxT("[") << l_sGuard << wxT("] ");
+                            }
+                            l_sFunction << l_sFunc;
+                        }
 					}
 				}
 				t->function_ = l_sFunction;
