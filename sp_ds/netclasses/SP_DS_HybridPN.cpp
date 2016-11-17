@@ -163,7 +163,7 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
   	 l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
   	 l_pcNC->SetGraphic( l_pcGr );
-  	 l_pcNC->RegisterGraphicWidget( new SP_WDG_DialogExtendedGraphic( wxT("Graphic") ) );
+  	 l_pcNC->RegisterGraphicWidget( new SP_WDG_DialogGraphic( wxT("Graphic") ) );
 
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_LogicAttribute(wxT("Logic"), wxT("Name")));
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogBool(wxT("General")));
@@ -254,7 +254,7 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
   	 l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
   	 l_pcNC->SetGraphic(l_pcGr);
-  	 l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogExtendedGraphic(wxT("Graphic")));
+  	 l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
   	//===========================================================================================================
   	/*
@@ -539,7 +539,7 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 									SP_EXTENDED_ARROW_TYPE_NONE_EDGE,10,SP_EXTENDED_ARROW_TYPE_ARROW_EDGE,10) );
 	  l_pcEC->SetShortcut( wxT("M") );
 
-	  l_pcEC->RegisterGraphicWidget( new SP_WDG_DialogExtendedGraphic( wxT("Graphic") ) );
+	  l_pcEC->RegisterGraphicWidget( new SP_WDG_DialogGraphic( wxT("Graphic") ) );
 
 	  l_pcAttr = l_pcEC->AddAttribute( new SP_DS_TextAttribute( wxT("Comment"), wxT("") ) );
 	  l_pcAttr->RegisterDialogWidget( new SP_WDG_DialogMultiline( wxT("General") ) );
@@ -569,7 +569,7 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
  	 l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("RegEx"), wxT("") ) );
  	 l_pcAttr = l_pcMC->AddAttribute( new SP_DS_BoolAttribute( wxT("RegExInvert"), false ) );
   	 l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("PlaceList"), SP_COLLIST_UNSIGNED_INTEGER, 1 ) );
-  	 
+
   	/*
      * Curve information:
 	* 0: Curve ID
@@ -579,7 +579,7 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 	* 4: Line width
 	* 5: line style
 	*/
-	
+
   	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("CurveInfo"), SP_COLLIST_STRING,7) );
 
 	//Is current view
@@ -624,7 +624,7 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_DoubleAttribute( wxT("X_ZOOM"), 1.0 ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_DoubleAttribute( wxT("Y_ZOOM"), 1.0 ) );
-	
+
 	//sorting
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_NumberAttribute( wxT("SortCurvesBy"), 0 ) );
 

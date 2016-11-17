@@ -95,6 +95,7 @@ protected:
     wxPen* m_pcPen;
     bool m_bBrushSet;
     bool m_bPenSet;
+    int m_nThickness;
     SP_Data* m_pcParent;
     SP_Graphic* m_pcGraphicParent;
 	wxString m_sTextColor;
@@ -467,22 +468,22 @@ public:
 
 	    \return	bool    TRUE in case of succes, FALSE otherwise
     */
-    virtual bool SetDesignType(long p_nDesignType) { return FALSE; };
-    virtual long GetDesignType() { return 0; };
+    virtual bool SetDesignType(long p_nDesignType) { return FALSE; }
+    virtual long GetDesignType() { return 0; }
 /* changing end */
 
-	virtual bool SetDesignArrowTypeRight(long m_nArrowTypeRight) { return FALSE; };
-    virtual long GetDesignArrowTypeRight() { return 0; };
+	virtual bool SetDesignArrowTypeRight(long m_nArrowTypeRight) { return FALSE; }
+    virtual long GetDesignArrowTypeRight() { return 0; }
 
-	virtual bool SetDesignArrowTypeLeft(long m_nArrowTypeLeft) { return FALSE; };
-    virtual long GetDesignArrowTypeLeft() { return 0; };
+	virtual bool SetDesignArrowTypeLeft(long m_nArrowTypeLeft) { return FALSE; }
+    virtual long GetDesignArrowTypeLeft() { return 0; }
 
-	virtual bool SetThickness(size_t p_nThickness) { return FALSE; };
-    virtual size_t GetThickness() { return 0; };
-	virtual bool SetArrowRightThickness(size_t p_nThickness) { return FALSE; };
-    virtual size_t GetArrowRightThickness() { return 0; };
-	virtual bool SetArrowLeftThickness(size_t p_nThickness) { return FALSE; };
-    virtual size_t GetArrowLeftThickness() { return 0; };
+	virtual bool SetThickness(int p_nThickness);
+    virtual int GetThickness();
+	virtual bool SetArrowRightThickness(size_t p_nThickness) { return FALSE; }
+    virtual size_t GetArrowRightThickness() { return 0; }
+	virtual bool SetArrowLeftThickness(size_t p_nThickness) { return FALSE; }
+    virtual size_t GetArrowLeftThickness() { return 0; }
 
     /**	\brief	The GetGraphicChildren function. Accessor
 

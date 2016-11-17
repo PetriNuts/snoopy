@@ -391,7 +391,7 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
    	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 	l_pcNC->SetGraphic( l_pcGr );
-	l_pcNC->RegisterGraphicWidget( new SP_WDG_DialogExtendedGraphic( wxT("Graphic") ) );
+	l_pcNC->RegisterGraphicWidget( new SP_WDG_DialogGraphic( wxT("Graphic") ) );
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->AddNodeclass(new SP_DS_Nodeclass(p_pcGraph, wxT("Coarse Parameter") ));
@@ -420,7 +420,7 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
    	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), wxT("Parameter")));
 	l_pcNC->SetGraphic(l_pcGr);
-	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogExtendedGraphic(wxT("Graphic")));
+	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
 
 

@@ -25,6 +25,7 @@ m_pcBrush(NULL),
 m_pcPen(NULL),
 m_bBrushSet(FALSE),
 m_bPenSet(FALSE),
+m_nThickness(1),
 m_pcParent(NULL),
 m_sTextColor(wxT("BLACK"))
 {
@@ -771,6 +772,26 @@ SP_Graphic::GetPosXY(double* p_pnVal1, double* p_pnVal2)
 {
     *p_pnVal1 = GetPosX();
     *p_pnVal2 = GetPosY();
+}
+
+bool
+SP_Graphic::SetThickness(int p_nThickness)
+{
+    if(p_nThickness <= 0)
+    {
+        m_nThickness = 1;
+    }
+    else
+    {
+        m_nThickness = p_nThickness;
+    }
+    return TRUE;
+}
+
+int
+SP_Graphic::GetThickness()
+{
+    return m_nThickness;
 }
 
 bool

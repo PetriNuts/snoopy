@@ -397,7 +397,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
    	l_pcGr = new SP_GR_ExtendedEllipse(l_pcNC->GetPrototype(),pawidth, paheight,TRUE,SP_EXTENDED_TYPE_DEFAULT,3,wxColour(128, 128, 128));
    	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 	l_pcNC->SetGraphic( l_pcGr );
-	l_pcNC->RegisterGraphicWidget( new SP_WDG_DialogExtendedGraphic( wxT("Graphic") ) );
+	l_pcNC->RegisterGraphicWidget( new SP_WDG_DialogGraphic( wxT("Graphic") ) );
 
 
 
@@ -409,7 +409,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcEC->SetGraphic(new SP_GR_ExtendedEdge(l_pcEC->GetPrototype(),SP_EXTENDED_TYPE_DASHED_EDGE,1,
 								SP_EXTENDED_ARROW_TYPE_NONE_EDGE,10,SP_EXTENDED_ARROW_TYPE_ARROW_EDGE,10) );
 
-	l_pcEC->RegisterGraphicWidget( new SP_WDG_DialogExtendedGraphic( wxT("Graphic") ) );
+	l_pcEC->RegisterGraphicWidget( new SP_WDG_DialogGraphic( wxT("Graphic") ) );
 
 	l_pcAttr = l_pcEC->AddAttribute( new SP_DS_TextAttribute( wxT("Comment"), wxT("") ) );
 	l_pcAttr->RegisterDialogWidget( new SP_WDG_DialogMultiline( wxT("General") ) );

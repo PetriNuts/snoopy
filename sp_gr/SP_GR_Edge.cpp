@@ -25,10 +25,9 @@ const double SP_PI = 3.1415926535897932384626433832795;
 #include "snoopy.h"
 
 SP_GR_Edge::SP_GR_Edge(SP_DS_Edge* p_pcDataParent) :
-	SP_Graphic(SP_GRAPHIC_EDGE), m_pcSource(NULL), m_pcTarget(NULL)
+	SP_Graphic(SP_GRAPHIC_EDGE), m_pcSource(nullptr), m_pcTarget(nullptr)
 {
 	SetDataParent(p_pcDataParent);
-
 }
 
 SP_GR_Edge::~SP_GR_Edge()
@@ -63,12 +62,20 @@ bool SP_GR_Edge::Update(bool p_bLocalOnly)
 
 	if (GetGraphicState() == SP_STATE_COARSEBORDERDOWN)
 	{
-		GetPrimitive()->SetPen(wxGetApp().GetCanvasCoarsePen());
+        auto l_Pen = wxThePenList->FindOrCreatePen(
+                        wxGetApp().GetCanvasCoarsePen()->GetColour(),
+                        GetThickness(),
+                        wxGetApp().GetCanvasCoarsePen()->GetStyle());
+        GetPrimitive()->SetPen(l_Pen);
 		GetPrimitive()->SetBrush(wxGetApp().GetCanvasCoarseBrush());
 	}
 	else
 	{
-		GetPrimitive()->SetPen(GetPen());
+        auto l_Pen = wxThePenList->FindOrCreatePen(
+                        GetPen()->GetColour(),
+                        GetThickness(),
+                        GetPen()->GetStyle());
+        GetPrimitive()->SetPen(l_Pen);
 		GetPrimitive()->SetBrush(GetBrush());
 	}
 

@@ -146,31 +146,20 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
 	{
 		l_pcGr = *m_lGraphics.begin();
 
-		if(l_pcGr->GetThickness()!=0) {
-			int l_intT =(dynamic_cast<SP_GR_ExtendedEdge*>(l_pcGr))->GetThickness();
-			l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-			l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Line Thickness:")), 0, wxALL , 5);
-			m_scThickness = new wxSpinCtrl(l_pcPage, SP_SPINCTRL_HEIGHT + 1000+ SP_ID_LAST_ID, wxString::Format(wxT("%d"), l_intT),
-					wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, INT_MAX, l_intT);
-			l_pcSizer->Add(m_scThickness, 0, wxALL, 5);
-			l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
-
-			SP_Graphic* l_pcGr = *m_lGraphics.begin();
-			l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-			l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Arrow Thickness:")), 0, wxALL , 5);
-			size_t l_intALT = (dynamic_cast<SP_GR_ExtendedEdge*>(l_pcGr))->GetArrowLeftThickness();		
-			m_scArrowLThickness = new wxSpinCtrl(l_pcPage, SP_SPINCTRL_WIDTH + 1000+ SP_ID_LAST_ID, wxString::Format(wxT("%d"), l_intALT),
-						wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, INT_MAX, l_intALT);
-			l_pcSizer->Add(m_scArrowLThickness, 0, wxALL, 5);
-		
-			l_pcGr = *m_lGraphics.begin();
-			size_t l_intART = (dynamic_cast<SP_GR_ExtendedEdge*>(l_pcGr))->GetArrowRightThickness();
-			m_scArrowRThickness = new wxSpinCtrl(l_pcPage, SP_SPINCTRL_WIDTH + 1000+ SP_ID_LAST_ID, wxString::Format(wxT("%d"), l_intART),
-						wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, INT_MAX, l_intART);
-			l_pcSizer->Add(m_scArrowRThickness, 0, wxALL, 5);
-			l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
-		}
-	}
+        int l_intT;
+        // -1 means unmodified
+        if (m_bMultiple) {
+            l_intT = -1;
+        } else {
+            l_intT = l_pcGr->GetThickness();
+        }
+        l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
+        l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Line Thickness:")), 0, wxALL , 5);
+        m_scThickness = new wxSpinCtrl(l_pcPage, SP_SPINCTRL_HEIGHT + 1000+ SP_ID_LAST_ID, wxString::Format(wxT("%d"), l_intT),
+                wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, INT_MAX, l_intT);
+        l_pcSizer->Add(m_scThickness, 0, wxALL, 5);
+        l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
+    }
 
 	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL , 5);
@@ -226,12 +215,9 @@ SP_WDG_DialogGraphic::OnDlgOk()
 
 		if (m_parent_tmp->GetElementType() == SP_ELEMENT_EDGE) //edge
 		{
-			if(l_pcGr->GetThickness()!=0) {
-				SP_GR_ExtendedEdge* l_pcExtGr = dynamic_cast<SP_GR_ExtendedEdge*>(l_pcGr);
-				l_pcExtGr->SetThickness(m_scThickness->GetValue());
-				l_pcExtGr->SetArrowLeftThickness(m_scArrowLThickness->GetValue());
-				l_pcExtGr->SetArrowRightThickness(m_scArrowRThickness->GetValue());
-			}
+            if(m_scThickness->GetValue() >= 1) {
+				l_pcGr->SetThickness(m_scThickness->GetValue());
+            }
 		}
 
        	l_pcGr->Update(true);

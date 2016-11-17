@@ -45,8 +45,6 @@ protected:
 	wxSpinCtrl* m_scWidth;
 	wxSpinCtrl* m_scHeight;
 	wxSpinCtrl* m_scThickness;
-	wxSpinCtrl* m_scArrowLThickness;
-	wxSpinCtrl* m_scArrowRThickness;
 
     bool m_bBrushSet;
     bool m_bPenSet;

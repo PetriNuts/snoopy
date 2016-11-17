@@ -43,7 +43,6 @@ private:
 protected:
     SP_GR_BaseEdge* m_pcPrimitive;
     SP_EXTENDED_TYPE_EDGE m_nType;
-	size_t m_nThickness;
 	SP_EXTENDED_ARROW_TYPE_EDGE m_nArrowTypeRight;
 	size_t m_nArrowLeftSize;
 	SP_EXTENDED_ARROW_TYPE_EDGE m_nArrowTypeLeft;
@@ -70,9 +69,6 @@ public:
     bool SetType(SP_EXTENDED_TYPE_EDGE p_nType);
     SP_EXTENDED_TYPE_EDGE GetType();
 
-	bool SetThickness(size_t p_nThickness);
-    size_t GetThickness();
-    
 	bool SetArrowTypeRight(SP_EXTENDED_ARROW_TYPE_EDGE m_nArrowTypeRight);
     SP_EXTENDED_ARROW_TYPE_EDGE GetArrowTypeRight();
 
@@ -81,9 +77,6 @@ public:
 
 	bool SetDesignType(long p_nType);
     long GetDesignType();
-
-    bool SetDesignThickness(long p_nThickness);
-    long GetDesignThickness();
 
 	bool SetDesignArrowTypeRight(long m_nArrowTypeRight);
     long GetDesignArrowTypeRight();

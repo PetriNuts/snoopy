@@ -22,11 +22,11 @@
 //
 //---------------------------------------------------------------
 SP_GR_ExtendedDrawnShape::SP_GR_ExtendedDrawnShape(SP_DS_Node* p_pcParent, 
-                                                   SP_EXTENDED_TYPE p_nType, size_t p_nThickness)
+                                                   SP_EXTENDED_TYPE p_nType, int p_nThickness)
 :SP_GR_DrawnShape(p_pcParent),
-m_nType(p_nType),
-m_nThickness(p_nThickness)
+m_nType(p_nType)
 {
+    m_nThickness = (p_nThickness > 0 ? p_nThickness : 1);
 	/* changed by ckruege2 17.06.2009 Initial */
 	m_pcCanvasModPen = wxThePenList->FindOrCreatePen(wxColour(0, 0, 0), 1);
 	m_pcCanvasModCoarsePen = wxThePenList->FindOrCreatePen(wxColour(0, 0, 0), 1);
@@ -66,35 +66,6 @@ long
 SP_GR_ExtendedDrawnShape::GetDesignType()
 {
     return (long)m_nType;
-}
-
-bool SP_GR_ExtendedDrawnShape::SetThickness(size_t p_nThickness)
-{
-
-    m_nThickness = p_nThickness;
-    return TRUE;
-}
-
-size_t
-SP_GR_ExtendedDrawnShape::GetThickness()
-{
-    return m_nThickness;
-}
-
-bool
-SP_GR_ExtendedDrawnShape::SetDesignThickness(long p_nThickness)
-{
-	if(p_nThickness<0) {
-		return(FALSE);
-	}
-    m_nThickness = (size_t)p_nThickness;
-    return TRUE;
-}
-
-long
-SP_GR_ExtendedDrawnShape::GetDesignThickness()
-{
-    return (long)m_nThickness;
 }
 
 SP_EXTENDED_TYPE SP_GR_ExtendedDrawnShape::ReadDefaultDesignType()

@@ -51,11 +51,19 @@ SP_GR_Node::Update(bool p_bLocalOnly)
 
     if (GetGraphicState() == SP_STATE_COARSEBORDERDOWN)
     {
-        GetPrimitive()->SetPen(wxGetApp().GetCanvasCoarsePen());
+        auto l_Pen = wxThePenList->FindOrCreatePen(
+                        wxGetApp().GetCanvasCoarsePen()->GetColour(),
+                        GetThickness(),
+                        wxGetApp().GetCanvasCoarsePen()->GetStyle());
+        GetPrimitive()->SetPen(l_Pen);
     }
     else
     {
-        GetPrimitive()->SetPen(GetPen());
+        auto l_Pen = wxThePenList->FindOrCreatePen(
+                        GetPen()->GetColour(),
+                        GetThickness(),
+                        GetPen()->GetStyle());
+        GetPrimitive()->SetPen(l_Pen);
     }
 
     // special logical, set the style to cross hatch

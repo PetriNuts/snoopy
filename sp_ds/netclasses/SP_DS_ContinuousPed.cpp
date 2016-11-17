@@ -151,7 +151,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
 	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 	l_pcNC->SetGraphic(l_pcGr);
-	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogExtendedGraphic(wxT("Graphic")));
+	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
 	/////////////////////////////////////////////////////////////////////////////////////////
     /*
@@ -207,7 +207,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
 	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 	l_pcNC->SetGraphic(l_pcGr);
-	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogExtendedGraphic(wxT("Graphic")));
+	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -238,7 +238,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
 	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), SP_DS_CONTINUOUS_PLACE));
 	l_pcNC->SetGraphic(l_pcGr);
-	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogExtendedGraphic(wxT("Graphic")));
+	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->AddNodeclass(new SP_DS_Nodeclass(p_pcGraph, SP_DS_COARSE_TRANSITION));
@@ -268,7 +268,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
 	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), SP_DS_CONTINUOUS_TRANS));
 	l_pcNC->SetGraphic(l_pcGr);
-	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogExtendedGraphic(wxT("Graphic")));
+	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -352,7 +352,7 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcEC->SetGraphic(new SP_GR_ExtendedEdge(l_pcEC->GetPrototype(),SP_EXTENDED_TYPE_DASHED_EDGE,1,
 								SP_EXTENDED_ARROW_TYPE_NONE_EDGE,10,SP_EXTENDED_ARROW_TYPE_ARROW_EDGE,10) );
 
-	l_pcEC->RegisterGraphicWidget( new SP_WDG_DialogExtendedGraphic( wxT("Graphic") ) );
+	l_pcEC->RegisterGraphicWidget( new SP_WDG_DialogGraphic( wxT("Graphic") ) );
 
 	l_pcAttr = l_pcEC->AddAttribute( new SP_DS_TextAttribute( wxT("Comment"), wxT("") ) );
 	l_pcAttr->RegisterDialogWidget( new SP_WDG_DialogMultiline( wxT("General") ) );

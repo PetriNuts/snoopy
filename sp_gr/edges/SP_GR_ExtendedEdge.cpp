@@ -168,7 +168,7 @@ SP_WDG_DialogExtendedGraphic, SP_GR_ExtendedEdge, shapes/SP_GR_Extended*, SP_GPR
 	SP_EXTENDED_ARROW_TYPE_EDGE l_nArrowTypeLeft = m_nArrowTypeLeft;
 	SP_EXTENDED_ARROW_TYPE_EDGE l_nArrowTypeRight =m_nArrowTypeRight;
 	GetPrimitive()->SetBrush(GetBrush());
-	size_t l_nPenthickness = GetThickness();
+	int l_nPenthickness = GetThickness();
 	
 	
 		if (SP_EXTENDED_TYPE_DOTTED_EDGE == l_nType) 
@@ -302,32 +302,6 @@ SP_GR_ExtendedEdge::SetDesignType(long p_nType)
 long SP_GR_ExtendedEdge::GetDesignType()
 {
     return (long)m_nType;
-}
-
-bool SP_GR_ExtendedEdge::SetThickness(size_t p_nThickness)
-{
-
-    m_nThickness = p_nThickness;
-    return TRUE;
-}
-
-size_t SP_GR_ExtendedEdge::GetThickness()
-{
-    return m_nThickness;
-}
-
-bool SP_GR_ExtendedEdge::SetDesignThickness(long p_nThickness)
-{
-	if(p_nThickness<0) {
-		return(FALSE);
-	}
-    m_nThickness = (size_t)p_nThickness;
-    return TRUE;
-}
-
-long SP_GR_ExtendedEdge::GetDesignThickness()
-{
-    return (long)m_nThickness;
 }
 
 bool SP_GR_ExtendedEdge::SetArrowTypeRight(SP_EXTENDED_ARROW_TYPE_EDGE p_nArrowTypeRight)

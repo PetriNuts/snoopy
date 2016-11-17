@@ -28,26 +28,19 @@ class SP_GR_ExtendedDrawnShape: public SP_GR_DrawnShape
 private:
 protected:
     SP_EXTENDED_TYPE m_nType;
-	size_t m_nThickness;
 	/* changed by ckruege2 17.06.2009 */
 	wxPen* m_pcCanvasModPen;
 	wxPen* m_pcCanvasModCoarsePen;
 	/* changing end */
 public:
-    SP_GR_ExtendedDrawnShape(SP_DS_Node* p_pcParent, SP_EXTENDED_TYPE p_nType = SP_EXTENDED_TYPE_DEFAULT,size_t p_nThickness=1); 
+    SP_GR_ExtendedDrawnShape(SP_DS_Node* p_pcParent, SP_EXTENDED_TYPE p_nType = SP_EXTENDED_TYPE_DEFAULT, int p_nThickness=1);
     virtual ~SP_GR_ExtendedDrawnShape();
 
     bool SetType(SP_EXTENDED_TYPE p_nType);
     SP_EXTENDED_TYPE GetType();
 
-	bool SetThickness(size_t p_nThickness);
-    size_t GetThickness();
-    
 	bool SetDesignType(long p_nType);
     long GetDesignType();
-
-    bool SetDesignThickness(long p_nThickness);
-    long GetDesignThickness();
 
     SP_EXTENDED_TYPE ReadDefaultDesignType();
 
