@@ -275,6 +275,9 @@ DECLARE_EVENT_TABLE()
     virtual void LoadParameters();
 	virtual bool InitializeSimulator()=0;
 
+	//load initial simultor configuration
+	virtual void LoadInitialSimulatorConfig();
+
 	virtual void OnColourClick(wxGridEvent& p_cEvent);
 
 	virtual void OnLabelDClick(wxGridEvent& p_cEvent);
@@ -284,6 +287,8 @@ DECLARE_EVENT_TABLE()
 
 	virtual void OnSimulationProperties(wxCommandEvent& p_cEvent);
 	virtual void OnDirectExportProperties(wxCommandEvent& p_cEvent);
+
+	virtual void OnMoreViewOptions(wxCommandEvent& WXUNUSED(event));
 
 	wxColour GetNodeColour(SP_DS_Node* p_pcNode);
 
