@@ -29,12 +29,14 @@ find_library(SPSA_SteeringAPI_LIBRARY_RELEASE
     NAMES SPSA_SteeringAPI libSPSA_SteeringAPI
     HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Release
           ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Release_MacOSX_Univ
+          ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Release_Linux
     )
 
 find_library(SPSA_SteeringAPI_LIBRARY_DEBUG 
     NAMES SPSA_SteeringAPI libSPSA_SteeringAPI
     HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Debug
           ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Debug_MacOSX_Univ
+          ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Debug_Linux
     )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

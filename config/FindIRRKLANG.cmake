@@ -24,7 +24,7 @@ find_path(IRRKLANG_INCLUDE_DIR NAMES irrKlang.h
     )
 
 find_library(IRRKLANG_LIBRARY 
-    NAMES irrKlang libirrklang libIrrKlang
+    NAMES irrKlang IrrKlang libirrklang libIrrKlang
     )
 
 # handle the QUIETLY and REQUIRED arguments and set IRRKLANG_FOUND to TRUE if
