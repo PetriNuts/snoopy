@@ -128,12 +128,11 @@ struct SP_CPN_Var_Color
 struct SP_CPN_EvaluatedSingleValue
 {
 	wxString						m_ColorValue;
-	struct
-	{
+
 		int							m_Multiplicity;
 		double						m_DoubleMultiplicity;
 		wxString		m_stringMultiplicity;	//for marking-dependent arcs, added by Fei, 09.2015
-	};
+
 	bool							m_Predicate;
 
 	bool					m_bPlaceFlag;	//for marking-dependent arcs, added by Fei, 09.2015
@@ -159,17 +158,13 @@ struct SP_CPN_ParseNode_Info
 	  bool					m_bPlaceFlag;		//for marking-dependent arcs, added by Fei, 09.2015
 	  wxString				m_sColoredPlaceName;//for marking-dependent arcs, added by Fei, 09.2015
 
-	  struct
-	  {
-		  bool				m_Predicate;		// Store the evaluation value of predicate, defalt is true		 
-		  struct
-		  {
+		  bool				m_Predicate;		// Store the evaluation value of predicate, defalt is true
+
 			  int			m_Multiplicity;
 			  double		m_DoubleMultiplicity;
 			  wxString		m_stringMultiplicity;	//for marking-dependent arcs, added by Fei, 09.2015
-		  };
-	  };
-     
+
+
 	  union
       {
 		int					m_IntegerValue;		

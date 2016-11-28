@@ -105,15 +105,20 @@ find_package(SUNDIALS REQUIRED cvode nvecserial)
 include_directories(${SUNDIALS_INCLUDE_DIRS})
 list(APPEND LIBS ${SUNDIALS_LIBRARIES})
 
-#gecode
-find_package(GECODE REQUIRED driver int float kernel minimodel search set support)
-include_directories(${GECODE_INCLUDE_DIRS})
-list(APPEND LIBS ${GECODE_LIBRARIES})
-
 #irrklang
 find_package(IRRKLANG REQUIRED)
 include_directories(${IRRKLANG_INCLUDE_DIRS})
 list(APPEND LIBS ${IRRKLANG_LIBRARIES})
+
+#dssz_util
+find_package(DSSZ_UTIL REQUIRED)
+include_directories(${DSSZ_UTIL_INCLUDE_DIRS})
+list(APPEND LIBS ${DSSZ_UTIL_LIBRARIES})
+
+#gecode
+find_package(GECODE REQUIRED flatzinc driver search minimodel set int float kernel support)
+include_directories(${GECODE_INCLUDE_DIRS})
+list(APPEND LIBS ${GECODE_LIBRARIES})
 
 #gmplib
 find_package(GMP)
@@ -122,11 +127,6 @@ if(GMP_FOUND)
     list(APPEND LIBS ${GMP_LIBRARIES})
     #SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-no_pie" )
 endif(GMP_FOUND)
-
-#dssz_util
-find_package(DSSZ_UTIL REQUIRED)
-include_directories(${DSSZ_UTIL_INCLUDE_DIRS})
-list(APPEND LIBS ${DSSZ_UTIL_LIBRARIES})
 
 #SPSA_STEERINGAPI
 find_package(SPSA_SteeringAPI REQUIRED)
