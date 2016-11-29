@@ -34,6 +34,13 @@ protected:
 	wxSizer* m_pcContentSizer;
 	wxSizer* m_pcLeftSizer;
 
+	//divide the sizers into smaller parts
+	wxSizer* m_pcModelConfigSizer;
+	wxSizer* m_pcModelSimulationSizer;
+	wxSizer* m_pcExportSizer;
+	wxSizer* m_pcViewerSizer;
+
+
 	wxSizer* m_pcPropertySizer;
 	wxSizer* m_pcSetsSizer;
 	wxSizer* m_pcDirectExportSizer;

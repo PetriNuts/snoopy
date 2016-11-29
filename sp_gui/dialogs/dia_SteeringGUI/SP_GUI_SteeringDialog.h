@@ -19,6 +19,8 @@
 #include <wx/file.h>
 
 #include "spsa/helper/resultMatrixInfo.h"
+#include "sp_gui/dialogs/SP_DLG_Simulation.h"
+
 
 #define MAX_VIEWER_TYPES  3
 
@@ -28,7 +30,7 @@
 class SP_DS_ResultViewer;
 class SP_GUI_SteeringSubWindow;
 
-class SP_GUI_SteeringDialog: public wxDialog,public SP_Error
+class SP_GUI_SteeringDialog: public SP_DLG_Simulation
 {
 private:
 	spsa::SteeringClient* m_pcGUIClient;
@@ -103,7 +105,7 @@ private:
 	wxStaticText* m_pcCurrentSimulatorTextBox;
 	wxStaticText* m_pcSimulationProgressPercentage;
 	wxGauge* m_pcSimulationProgressBar;
-	wxChoice* m_pcModelViewBox;
+	//wxChoice* m_pcModelViewBox;
 
 	wxChoice* m_pcSimulatorsAlgorithmBox;
 
@@ -114,13 +116,8 @@ private:
 
 	wxChoice* m_pcModelsBox;
 
-	wxTextCtrl* m_pcStartOutputPointTxtCtrl;
-	wxTextCtrl* m_pcEndOutputPointTxtCtrl;
-	wxTextCtrl* m_pcSamplingPointSizeTxtCtrl;
 
 	wxSizer*  m_pcOutputSizer;
-
-	wxBoxSizer* m_pcMainSizer;
 
 	//Choice box
 	wxCheckListBox* m_pcItemsChoiceCheckListBox;
@@ -132,7 +129,56 @@ private:
 
 	//simulator speed
 	wxSlider* m_pcSimulatorSpeedSlider;
+
+	wxCollapsiblePane *m_pcCollPanalSteeringParamSizer;
+	wxCollapsiblePane *m_pcCollPanalSteeringPlaceSizer;
+
 protected:
+
+	//==========begin new layout
+	virtual void DoStartSimulation() {}
+
+	virtual void UpdateViewer(SP_DS_Metadata* p_pcView = nullptr){}
+	virtual void UpdateXAxisValues(){}
+
+	virtual bool InitializeSimulator(){return false;}
+
+	virtual void OnStartAbortSimulation(wxCommandEvent& p_cEvent){}
+
+	virtual void UpdateSimulationMatrix(SP_DS_Metadata* p_pcView = nullptr){}
+
+	virtual void LoadNetInformation(){}
+
+	virtual void InitializeEmptyView(SP_DS_Metadata* p_pcView){}
+
+	virtual int GetCureentSelectedSimulator(){return 0;}
+
+	virtual spsim::Simulator* CreateSimulator(const int& p_nSimulatorType){
+		return NULL;
+	}
+
+	virtual void SetMinimalLayout();
+
+	virtual void DirectExportToCSV(){}
+
+	//==========end new layout
+
+protected:
+
+	//viewer window handler
+	virtual void OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent);
+
+protected:
+
+	//assistant view functions
+	virtual void OpenViewInSeparateWindow(spsa::ModelView* p_pcModelView);
+
+	virtual spsa::ModelView* FindSteeringView(const wxString& p_sViewName);
+
+protected:
+
+	virtual void CalculateXAxisValues(SP_DS_Metadata* p_pcView, SP_VectorDouble& p_anXAxisValues){}
+
 	//events handlers
 	void OnPauseButton(wxCommandEvent& WXUNUSED(event));
 
@@ -184,6 +230,8 @@ protected:
 
 	void OnOptionButton(wxCommandEvent& WXUNUSED(event));
 
+	void OnMoreOptionButton(wxCommandEvent& WXUNUSED(event));
+
 	void OnExport2CSV(wxCommandEvent& WXUNUSED(event));
 
 	void OnExport2CSVSelected(wxCommandEvent& WXUNUSED(event));
@@ -212,16 +260,12 @@ protected:
 protected:
 	//GUI bars
 	void CreateControlButtonBar(wxSizer* p_pcParentSizer);
-	void CreatModelViewsBar(wxSizer* p_pcParentSizer);
+	//void CreatModelViewsBar(wxSizer* p_pcParentSizer);
 	void CreatStatisticBar(wxSizer* p_pcParentSizer);
 
 	void CreateEditValuesBar(wxSizer* p_pcParentSizer);
 
-	void CreateOutputCtrlBar(wxSizer* p_pcParentSizer);
-
 	void CreateSimulatorBar(wxSizer* p_pcParentSizer);
-
-	void CreateSimulationIntervalBar(wxSizer* p_pcParentSizer);
 
 	void CreateChoiceListBar(wxSizer* p_pcParentSizer);
 protected:
@@ -337,6 +381,8 @@ protected:
 
 	//format the given time in term of the string repr.
 	wxString FormatRuntime(const double& p_nTime);
+
+	virtual void OnInitDialog(wxInitDialogEvent& event){}
 public:
 	SP_GUI_SteeringDialog(wxWindow* p_pcParent,spsa::SteeringClient* p_pcGUIClient,const wxString& p_sTitle);
 	virtual ~SP_GUI_SteeringDialog();

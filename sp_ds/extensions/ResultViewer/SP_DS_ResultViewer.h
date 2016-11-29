@@ -11,6 +11,7 @@
 
 #include <list>
 #include <sp_core/SP_Vector.h>
+#include <sp_core/base/SP_Error.h>
 #include <sp_core/SP_Map.h>
 #include "sp_ds/extensions/ResultViewer/AttributeTypes/SP_DS_ViewerAttribute.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_ViewerCurve.h"

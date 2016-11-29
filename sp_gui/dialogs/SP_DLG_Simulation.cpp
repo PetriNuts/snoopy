@@ -166,9 +166,12 @@ SP_DLG_Simulation::SP_DLG_Simulation(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParen
         m_bComAuxVarSingleRun(false)
 
 {
+	//TODO: find a better way to deal with dialogs without p_pcGraph!
     if(p_pcGraph!=NULL)
+    {
 	   m_sExportFilename=
 			   p_pcGraph->GetParentDoc()->GetFilename();
+    }
 
     m_sExportFilename = m_sExportFilename.BeforeLast('.');
     m_sExportFilename << wxT(".csv");
@@ -178,12 +181,14 @@ SP_DLG_Simulation::SP_DLG_Simulation(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParen
     m_pcXAxisChoices[wxT("Place")] = &m_asPlaceNames;
     m_pcXAxisChoices[wxT("Transition")] = &m_asTransitionNames;
 
-    m_pcTimer = new wxTimer(this, SP_ID_TIMER_UPDATE_DIALOG);
     //ScrollWindow(0, 1000);
     //give the simulator a pointer to Snoopy log
     spsim::Simulator::SetLogFunction(SimulatorLogFunction);
 
 	SetMinimalLayout();
+
+	 //create a timer
+	 m_pcTimer = new wxTimer(this, SP_ID_TIMER_UPDATE_DIALOG);
 
 	//load initial simulator configuration
 	LoadInitialSimulatorConfig();
@@ -241,9 +246,7 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	m_pcPropertyWindowSetsSizer = m_pcCollpaneSetsSizer->GetPane();
 	m_pcPropertyWindowSetsSizer->SetSizerAndFit(m_pcSetsSizer);
 	m_pcSetsSizer->SetSizeHints(m_pcPropertyWindowSetsSizer);
-	m_pcSimulationControlSizer->Add(m_pcCollpaneSetsSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	m_pcSimulationControlSizer->Add(new wxStaticLine(m_pcScrolledWindow), wxSizerFlags(0).Expand().Border(wxALL, 5));
-
+	m_pcModelConfigSizer->Add(m_pcCollpaneSetsSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 	/**********************Simulation Configuration starts*********************/
 	m_pcCollpanePropertySizer = new wxCollapsiblePane(m_pcScrolledWindow, SP_ID_COLLAPSEPANEL_PROPERTY_SIZER, "Simulator Configuration", wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
 	m_pcPropertyWindowPropertySizer = m_pcCollpanePropertySizer->GetPane();
@@ -276,10 +279,7 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
     m_pcPropertyWindowPropertySizer->SetSizerAndFit(m_pcPropertySizer);
 	m_pcPropertySizer->SetSizeHints(m_pcPropertyWindowPropertySizer);
-	m_pcSimulationControlSizer->Add(m_pcCollpanePropertySizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	m_pcSimulationControlSizer->Add(new wxStaticLine(m_pcScrolledWindow), wxSizerFlags(0).Expand().Border(wxALL, 5));
-
-
+	m_pcModelSimulationSizer->Add(m_pcCollpanePropertySizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 	/**********Export and import details starts************/
 	m_pcCollpaneDirectExportSizer = new wxCollapsiblePane(m_pcScrolledWindow, SP_ID_COLLAPSEPANEL_DIRECT_EXPORT_SIZER, "Import/Export Details", wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
 	m_pcPropertyWindowDirectExportSizer = m_pcCollpaneDirectExportSizer->GetPane();
@@ -302,9 +302,7 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
 	m_pcPropertyWindowDirectExportSizer->SetSizerAndFit(m_pcDirectExportSizer);
 	m_pcDirectExportSizer->SetSizeHints(m_pcPropertyWindowDirectExportSizer);
-	m_pcSimulationControlSizer->Add(m_pcCollpaneDirectExportSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	m_pcSimulationControlSizer->Add(new wxStaticLine(m_pcScrolledWindow), wxSizerFlags(0).Expand().Border(wxALL, 5));
-
+	m_pcExportSizer->Add(m_pcCollpaneDirectExportSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
     /***************Simulator starts*********************/
 	// rows of control button#
 	m_pcPropertyWindowSimulationButtonSizer = new wxWindow(m_pcScrolledWindow, -1);
@@ -339,7 +337,21 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	m_pcSimulationButtonSizer->SetSizeHints(m_pcPropertyWindowSimulationButtonSizer);
 	m_pcSimulationControlSizer->Add(m_pcPropertyWindowSimulationButtonSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
-	// start simulation
+	//if the graph is null, there should be something wrong
+	if(m_pcGraph!=NULL)
+	{
+		CreateStartSimulationButton();
+	}
+
+    SetSizerAndFit(m_pcMainSizer);
+
+}
+
+void SP_DLG_Simulation::CreateStartSimulationButton()
+{
+	 wxSizer* l_pcRowSizer;
+
+	 // start simulation
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	m_pcStartButton = new wxButton(this, SP_ID_BUTTON_START_SIMULATION, wxT("Start Simulation"));
 	m_pcStartButton->SetBackgroundColour(*wxGREEN);
@@ -358,8 +370,6 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	m_pcMainSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 	m_pcMainSizer->Add(new wxButton(this, wxID_CANCEL, wxT("Close")), wxSizerFlags(0).Border(wxALL, 5));
-
-    SetSizerAndFit(m_pcMainSizer);
 
 }
 
@@ -463,7 +473,7 @@ void SP_DLG_Simulation::RefreshCurrentExternalView(int p_nCurveIndex, wxString p
 	for (auto l_itWindow : m_pcExternalWindows)
 	{
 
-		if (m_pcCurrentTablePlot == l_itWindow->GetModelView())
+		if (m_pcCurrentTablePlot == (dynamic_cast<SP_DLG_ShowAllModelView*>(l_itWindow))->GetModelView())
 		{
 
 			l_itWindow->RefreshCurrentWindow(p_nCurveIndex, p_nColor, p_nLineWidth, p_nLineStyle);
@@ -1972,32 +1982,35 @@ SP_DLG_Simulation::~SP_DLG_Simulation()
     //Save the current view
     //SaveCurrentView();
 
-    wxDELETE(m_pcMainSimulator);
+	if(m_pcGraph!=NULL)
+	{
+		wxDELETE(m_pcMainSimulator);
 
-    wxDELETEA(m_apColours);
+		wxDELETE(m_pcExport);
+		wxDELETE(m_pcExportBufferdOutputStream);
+		wxDELETE(m_pcExportFileOutputStream);
+	}
 
-    wxDELETE(m_pcExport);
-    wxDELETE(m_pcExportBufferdOutputStream);
-    wxDELETE(m_pcExportFileOutputStream);
-
-     //read all views
-     for (SP_DS_Metadata* l_pcMeta : *m_pcGraph->GetMetadataclass(wxT("Plot"))->GetElements())
-     {
-    	 // clear curveinfo, if we have regex
-         if (!l_pcMeta->GetAttribute(wxT("RegEx"))->GetValueString().IsEmpty())
-         {
-             static_cast<SP_DS_ColListAttribute*>(l_pcMeta->GetAttribute(wxT("CurveInfo")))->Clear();
-         }
-     }
+     wxDELETEA(m_apColours);
 
      //delete the timer
-     wxDELETE(m_pcTimer);
+     // wxDELETE(m_pcTimer);
+
+     //read all views
+     if(m_pcGraph!=NULL)
+		 for (SP_DS_Metadata* l_pcMeta : *m_pcGraph->GetMetadataclass(wxT("Plot"))->GetElements())
+		 {
+			 // clear curveinfo, if we have regex
+			 if (!l_pcMeta->GetAttribute(wxT("RegEx"))->GetValueString().IsEmpty())
+			 {
+				 static_cast<SP_DS_ColListAttribute*>(l_pcMeta->GetAttribute(wxT("CurveInfo")))->Clear();
+			 }
+		 }
 
     //set the pointer of external pointer to NULL
 	for (auto l_itWindow : m_pcExternalWindows)
     {
         l_itWindow->Close(true);
-//        l_itWindow->RemoveExternalWindowsPointer();
     }
 }
 
@@ -2266,7 +2279,7 @@ void SP_DLG_Simulation::OpenViewInSeparateWindow(SP_DS_Metadata* p_pcModelView)
     //check if a view with the same name is already opened
 	for (auto l_itWindow : m_pcExternalWindows)
     {
-        if (p_pcModelView == l_itWindow->GetModelView())
+        if (p_pcModelView ==  (dynamic_cast<SP_DLG_ShowAllModelView*>(l_itWindow))->GetModelView())
         {
             SP_LOGERROR( wxT("this view(") + GetViewAttributeValue(p_pcModelView, wxT("Name")) + wxT(") is already opened.  A view Can't be opened twice"));
 

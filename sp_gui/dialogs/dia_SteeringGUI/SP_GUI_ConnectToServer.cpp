@@ -40,7 +40,7 @@ enum
 {
 	SP_ID_BUTTON_CONNECT, SP_ID_BUTTON_PROPERTIES, SP_ID_BUTTON_CLOSE
 };
-BEGIN_EVENT_TABLE(SP_GUI_ConnectToServer,wxDialog)
+BEGIN_EVENT_TABLE(SP_GUI_ConnectToServer,wxFrame)
 
 EVT_BUTTON(SP_ID_BUTTON_CONNECT,SP_GUI_ConnectToServer::OnConnect)
 EVT_BUTTON(SP_ID_BUTTON_PROPERTIES,SP_GUI_ConnectToServer::OnConnectionProperties)
@@ -51,7 +51,7 @@ EVT_BUTTON(wxID_CLOSE, SP_GUI_ConnectToServer::OnClose)
 END_EVENT_TABLE()
 
 SP_GUI_ConnectToServer::SP_GUI_ConnectToServer(wxWindow* p_pcParent, const wxString& p_sTitle, long p_nStyle) :
-		wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP), m_sPort(wxT("3000")), m_sIP(wxT("Localhost")), m_pcGUIClient(NULL)
+wxFrame(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE), m_sPort(wxT("3000")), m_sIP(wxT("Localhost")), m_pcGUIClient(NULL)
 {
 
 	//Main Sizer
@@ -201,7 +201,7 @@ void SP_GUI_ConnectToServer::OnConnectionProperties(wxCommandEvent& event)
 }
 void SP_GUI_ConnectToServer::OnClose(wxCommandEvent& event)
 {
-	if (IsModal() )
+	/*if (IsModal() )
 	{
 		EndModal(wxID_CANCEL);
 	}
@@ -209,7 +209,9 @@ void SP_GUI_ConnectToServer::OnClose(wxCommandEvent& event)
 	{
 		SetReturnCode(wxID_CANCEL);
 		this->Show(false);
-	}
+	}*/
+
+	this->Close();
 }
 bool SP_GUI_ConnectToServer::ConnectToServer()
 {
@@ -331,7 +333,7 @@ bool SP_GUI_ConnectToServer::ConnectToServer()
 
 				l_nIsInitialized = m_pcGUIClient->Initialize(l_pcModel);
 
-				//output the initalization time in debug mode
+				//output the initialization time in debug mode
 				SP_LOGDEBUG(wxT("Steering initialization time=") + wxString::Format(wxT("%gs"), (double) (l_sw.Time()) / 1000));
 			}
 
@@ -339,7 +341,9 @@ bool SP_GUI_ConnectToServer::ConnectToServer()
 			{
 				SP_GUI_SteeringDialog* l_pcSteeringDlg = new SP_GUI_SteeringDialog(this, m_pcGUIClient, wxT("Steering GUI"));
 
-				l_pcSteeringDlg->ShowModal();
+				l_pcSteeringDlg->Show();
+
+				//this->Show(false);
 			}
 			else
 			{

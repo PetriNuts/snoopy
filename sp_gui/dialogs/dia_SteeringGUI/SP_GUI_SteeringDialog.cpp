@@ -31,11 +31,17 @@
 
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StDirectExportProperties.h"
 
+#include <sp_gui/dialogs/SP_DLG_ViewerWindowSteering.h>
+
+
 #include <wx/textdlg.h>
 #include <wx/config.h>
 #include <wx/msgdlg.h>
 #include "wx/busyinfo.h"
 #include <wx/filedlg.h>
+
+#include <wx/statline.h>
+
 
 enum
 {
@@ -75,14 +81,17 @@ enum
 	SP_ID_GUI_STEERING_DIALOG_CSV_EXPORT_ALL,
 	SP_ID_GUI_STEERING_DIALOG_CSV_EXPORT_COLOURED,
 	SP_ID_GUI_STEERING_DIALOG_IMG_EXPORT,
-	SP_ID_GUI_STEERING_DIALOG_SIM_SPEED_CHANGED
+	SP_ID_GUI_STEERING_DIALOG_SIM_SPEED_CHANGED,
+	SP_ID_COLLAPSEPANEL_SETS_SIZER,
+	SP_ID_GUI_STEERING_DIALOG_MORE
 };
 
 enum
 {
 	SP_VIEW_MARKING = 0, SP_VIEW_RATE, SP_VIEW_MARKIG_DS
 };
-BEGIN_EVENT_TABLE(SP_GUI_SteeringDialog,wxDialog) EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_PAUSE_BUTTON,SP_GUI_SteeringDialog::OnPauseButton)
+BEGIN_EVENT_TABLE(SP_GUI_SteeringDialog,SP_DLG_Simulation)
+EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_PAUSE_BUTTON,SP_GUI_SteeringDialog::OnPauseButton)
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_START_BUTTON,SP_GUI_SteeringDialog::OnStartButton)
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_STOP_BUTTON,SP_GUI_SteeringDialog::OnStopButton)
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_RESTART_BUTTON,SP_GUI_SteeringDialog::OnRestartButton)
@@ -110,6 +119,9 @@ EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_REFRESH_MODELNAMES,SP_GUI_SteeringDialog::O
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_REMOVE_CURRENT_VIEW,SP_GUI_SteeringDialog::OnRemoveCurrentView)
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_REFRESH_MODELVIEWS,SP_GUI_SteeringDialog::OnRefreshModelViews)
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_EDITVIEWS,SP_GUI_SteeringDialog::OnOptionButton)
+EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_MORE,SP_GUI_SteeringDialog::OnMoreOptionButton)
+
+
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_DOEDIT_VIEWER_PROPERTIES,SP_GUI_SteeringDialog::OnDoEditViewerProperties)
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_CHANGE_XAXIS_VARIABLE,SP_GUI_SteeringDialog::OnChangeXAxisVariable)
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_EDIT_CURRENT_VIEW,SP_GUI_SteeringDialog::OnEditCurrentViewMenu)
@@ -120,11 +132,11 @@ EVT_MENU(SP_ID_GUI_STEERING_DIALOG_CSV_EXPORT_COLOURED,SP_GUI_SteeringDialog::On
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_CSV_EXPORT,SP_GUI_SteeringDialog::OnExport2CSVAllColoured)
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_IMG_EXPORT,SP_GUI_SteeringDialog::OnImageExport)
 EVT_COMMAND_SCROLL_THUMBRELEASE(SP_ID_GUI_STEERING_DIALOG_SIM_SPEED_CHANGED,SP_GUI_SteeringDialog::OnSimulationSpeedChanged)
-
+EVT_COLLAPSIBLEPANE_CHANGED(SP_ID_COLLAPSEPANEL_SETS_SIZER, SP_DLG_Simulation :: OnCollapseSetsSizer)
 END_EVENT_TABLE()
 
 SP_GUI_SteeringDialog::SP_GUI_SteeringDialog(wxWindow* p_pcParent, spsa::SteeringClient* p_pcGUIClient, const wxString& p_sTitle) :
-		wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
+SP_DLG_Simulation(NULL, p_pcParent),
 		m_pcGUIClient(p_pcGUIClient), m_nCurrentViewerIndex(1), m_nViewMatrixType(SP_VIEW_MARKING),
 		m_bRefreshResult(false), m_bRefreshRuntime(false), m_nRefreshResultDuration(5000), m_nRefreshRuntimeDuration(5000),
 		m_pcResultRefershTimer(NULL), m_pcRuntimeRefershTimer(NULL), m_nOldSimulationState(0), m_nCurrentView(0),
@@ -133,38 +145,19 @@ SP_GUI_SteeringDialog::SP_GUI_SteeringDialog(wxWindow* p_pcParent, spsa::Steerin
 {
 	m_pcResultMatrixInfo = new spsa::ResultMatrixInfo();
 
-	m_pcMainSizer = new wxBoxSizer(wxVERTICAL);
+	SetMinimalLayout();
 
-	//divide the main sizer into two parts: top and down
-	wxBoxSizer* l_pcTopSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	m_pcMainSizer->Add(l_pcTopSizer, 1, wxEXPAND );
+	CreateSimulatorBar(m_pcMainSizer);
+
+	CreatStatisticBar(m_pcMainSizer);
 
 	CreateControlButtonBar(m_pcMainSizer);
 
-	//Dividing the top sizer into left, middle, and right
-	wxBoxSizer* l_pcLeftSizer = new wxBoxSizer(wxVERTICAL);
-	wxBoxSizer* l_pcMiddleSizer = new wxBoxSizer(wxVERTICAL);
-	wxBoxSizer* l_pcRightSizer = new wxBoxSizer(wxVERTICAL);
-	l_pcTopSizer->Add(l_pcLeftSizer, 0, wxEXPAND );
-	l_pcTopSizer->Add(l_pcMiddleSizer, 1, wxEXPAND );
-	l_pcTopSizer->Add(l_pcRightSizer, 0, wxEXPAND );
-
-	//left sizer
-	CreateEditValuesBar(l_pcLeftSizer);
-
-	//middle sizer
-	CreateOutputCtrlBar(l_pcMiddleSizer);
-	CreateSimulatorBar(l_pcMiddleSizer);
-	CreatStatisticBar(l_pcMiddleSizer);
-
-	//right sizer
-	CreateSimulationIntervalBar(l_pcRightSizer);
-
 	//Model views bar
-	CreatModelViewsBar(l_pcRightSizer);
+	//CreatModelViewsBar(l_pcRightSizer);
 
-	CreateChoiceListBar(l_pcRightSizer);
+	//CreateChoiceListBar(l_pcRightSizer);
 
 	//Update the simulation intervals
 	m_nOutputStartPoint = m_pcGUIClient->GetCurrentModel()->GetOutputStartPoint();
@@ -175,17 +168,44 @@ SP_GUI_SteeringDialog::SP_GUI_SteeringDialog(wxWindow* p_pcParent, spsa::Steerin
 
 	//m_pcOutputViewerType->SetSelection(m_nCurrentViewerIndex);
 
-	Centre(wxBOTH);
+
 	if (Initialize() == false)
 	{
 		SP_MESSAGEBOX(wxT("Can not initialize the GUI"), wxT("Information"));
 		EndModal(wxID_CANCEL);
 	}
 
-	//Set the final alignment
-	SetSizerAndFit(m_pcMainSizer);
-	Centre(wxBOTH);
 
+	//Set the final alignment
+	SetSizerAndFit(SP_DLG_Simulation::m_pcMainSizer);
+
+	Layout();
+
+	//Centre(wxBOTH);
+
+}
+
+void SP_GUI_SteeringDialog::SetMinimalLayout()
+{
+  wxSizer* l_pcRowSizer = NULL;
+
+	  // SP_DLG_Simulation::SetMinimalLayout();
+
+	    //Models
+		l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(m_pcPropertyWindowSetsSizer, wxID_ANY, wxT("Models")), wxHORIZONTAL);
+		m_pcModelsBox = new wxChoice(m_pcPropertyWindowSetsSizer, SP_ID_GUI_STEERING_DIALOG_CURRENTMODEL_CHANGED_CHOICE, wxDefaultPosition, wxSize(100, -1));
+
+		l_pcRowSizer->Add(m_pcModelsBox, 1, wxALL);
+
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_GUI_STEERING_DIALOG_REFRESH_MODELNAMES, wxT("Refresh")), 0, wxALL);
+
+		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+
+		CreateEditValuesBar(NULL);
+
+		Layout();
+
+		//m_pcSetsSizer->Add(l_pcRowSizer, 0, wxLEFT | wxRIGHT | wxEXPAND);
 }
 
 void SP_GUI_SteeringDialog::CreateControlButtonBar(wxSizer* p_pcParentSizer)
@@ -195,17 +215,13 @@ void SP_GUI_SteeringDialog::CreateControlButtonBar(wxSizer* p_pcParentSizer)
 	//Control Buttons
 	l_pcBottomSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_START_BUTTON, wxT("&Start")), 0, wxEXPAND | wxALL , 5);
 	l_pcBottomSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_STOP_BUTTON, wxT("&Stop")), 0, wxEXPAND | wxALL , 5);
-	l_pcBottomSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_RESTART_BUTTON, wxT("&Restart")), 0, wxEXPAND | wxALL , 5);
-	l_pcBottomSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_PAUSE_BUTTON, wxT("&Pause")), 0, wxEXPAND | wxALL , 5);
-	l_pcBottomSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_RESUME_BUTTON, wxT("&Resume")), 0, wxEXPAND | wxALL , 5);
 	l_pcBottomSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_REFRESH_BUTTON, wxT("&Refresh")), 0, wxEXPAND | wxALL , 5);
-	l_pcBottomSizer->Add(new wxButton(this, wxID_ANY, wxT("&Compare with")), 0, wxEXPAND | wxALL , 5);
-	l_pcBottomSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_SETTING, wxT("&Setting")), 0, wxEXPAND | wxALL , 5);
+	l_pcBottomSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_MORE, wxT("&...")), 0, wxEXPAND | wxALL , 5);
 	l_pcBottomSizer->Add(new wxButton(this, wxID_CANCEL, wxT("&Close")), 0, wxEXPAND | wxALL , 5);
 
 	p_pcParentSizer->Add(l_pcBottomSizer, 0);
 }
-void SP_GUI_SteeringDialog::CreatModelViewsBar(wxSizer* p_pcParentSizer)
+/*void SP_GUI_SteeringDialog::CreatModelViewsBar(wxSizer* p_pcParentSizer)
 {
 	wxSizer* l_pcOuterSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Model Views")), wxVERTICAL);
 
@@ -226,7 +242,7 @@ void SP_GUI_SteeringDialog::CreatModelViewsBar(wxSizer* p_pcParentSizer)
 
 	//Add to the main sizer
 	p_pcParentSizer->Add(l_pcOuterSizer, 0, wxLEFT | wxRIGHT | wxEXPAND);
-}
+}*/
 
 void SP_GUI_SteeringDialog::CreatStatisticBar(wxSizer* p_pcParentSizer)
 {
@@ -236,26 +252,26 @@ void SP_GUI_SteeringDialog::CreatStatisticBar(wxSizer* p_pcParentSizer)
 	m_pcSimulatorState = new wxStaticText(this, wxID_ANY, wxT("Stopped"));
 	m_pcSimulatorState->SetToolTip(wxT("Simulator's current state"));
 	l_pcStatisticsSizer->Add(m_pcSimulatorState, 1, wxEXPAND | wxALL, 5);
-	l_pcStatisticsSizer->AddSpacer(5);
+	l_pcStatisticsSizer->AddSpacer(1);
 
 	m_pcSimulationRunTime = new wxStaticText(this, wxID_ANY, wxT("0.000 sec."));
 	m_pcSimulationRunTime->SetToolTip(wxT("Simulation run time"));
 	l_pcStatisticsSizer->Add(m_pcSimulationRunTime, 1, wxEXPAND | wxALL, 5);
-	l_pcStatisticsSizer->AddSpacer(5);
+	l_pcStatisticsSizer->AddSpacer(1);
 
-	m_pcCurrentSimulatorTextBox = new wxStaticText(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(200, -1), wxCENTER);
+	m_pcCurrentSimulatorTextBox = new wxStaticText(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(150, -1), wxCENTER);
 	m_pcCurrentSimulatorTextBox->SetToolTip(wxT("Current Simulator"));
 	l_pcStatisticsSizer->Add(m_pcCurrentSimulatorTextBox, 0, wxEXPAND | wxALL , 5);
-	l_pcStatisticsSizer->AddSpacer(5);
+	l_pcStatisticsSizer->AddSpacer(1);
 
 	m_pcSimulationProgressPercentage = new wxStaticText(this, wxID_ANY, wxT("0 %"));
 	m_pcSimulationProgressPercentage->SetToolTip(wxT("Simulator progress (percentage)"));
 	l_pcStatisticsSizer->Add(m_pcSimulationProgressPercentage, 1, wxSHAPED | wxALL, 5);
-	l_pcStatisticsSizer->AddSpacer(5);
+	l_pcStatisticsSizer->AddSpacer(1);
 
-	m_pcSimulationProgressBar = new wxGauge(this, -1, 100, wxDefaultPosition, wxSize(120, 20), 0);
+	m_pcSimulationProgressBar = new wxGauge(this, -1, 100, wxDefaultPosition, wxSize(100, 20), 0);
 	l_pcStatisticsSizer->Add(m_pcSimulationProgressBar, 0, wxEXPAND | wxALL, 5);
-	l_pcStatisticsSizer->AddSpacer(5);
+	l_pcStatisticsSizer->AddSpacer(1);
 
 	m_pcSimulationProgressBar->SetRange(100);
 	m_pcSimulationProgressBar->SetToolTip(wxT("simulator progress"));
@@ -265,12 +281,13 @@ void SP_GUI_SteeringDialog::CreatStatisticBar(wxSizer* p_pcParentSizer)
 }
 void SP_GUI_SteeringDialog::CreateEditValuesBar(wxSizer* p_pcParentSizer)
 {
-//Left sizer
-	wxBoxSizer* l_pcEditPlaceSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Edit Place Values")), wxVERTICAL);
-	wxBoxSizer* l_pcEditParameterSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Edit Parameter Values")), wxVERTICAL);
+	m_pcModelConfigSizer->Add(new wxStaticLine(m_pcScrolledWindow), wxSizerFlags(0).Expand().Border(wxALL, 5));
+    m_pcCollPanalSteeringPlaceSizer=
+			new wxCollapsiblePane(m_pcScrolledWindow,SP_ID_COLLAPSEPANEL_SETS_SIZER, "Steered places", wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
+	m_pcPropertyWindowSetsSizer = m_pcCollPanalSteeringPlaceSizer->GetPane();
 
-	p_pcParentSizer->Add(l_pcEditParameterSizer, 1, wxEXPAND );
-	p_pcParentSizer->Add(l_pcEditPlaceSizer, 1, wxEXPAND );
+
+	wxBoxSizer* l_pcEditPlaceSizer = new wxStaticBoxSizer(new wxStaticBox(m_pcPropertyWindowSetsSizer, wxID_ANY, wxT("Edit Place Values")), wxVERTICAL);
 
 	//Places
 	wxBoxSizer* l_pcPlaceTreeSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -279,109 +296,84 @@ void SP_GUI_SteeringDialog::CreateEditValuesBar(wxSizer* p_pcParentSizer)
 	l_pcEditPlaceSizer->Add(l_pcPlaceTreeSizer, 1, wxEXPAND );
 	l_pcEditPlaceSizer->Add(l_pcEditPlaceButtonsSizer, 0, wxEXPAND );
 
-	m_pcPlaceEditingWindow = new SP_GUI_SteeringSubWindow(this, m_pcGUIClient, wxT("Places"));
+	m_pcPlaceEditingWindow = new SP_GUI_SteeringSubWindow(m_pcPropertyWindowSetsSizer, m_pcGUIClient, wxT("Places"));
 
 	l_pcPlaceTreeSizer->Add(m_pcPlaceEditingWindow, 1, wxEXPAND );
 
-	l_pcEditPlaceButtonsSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_SELECT_PLACES_TO_EDIT_BUTTON, wxT("&Select")), 0, wxEXPAND , 5);
-	l_pcEditPlaceButtonsSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_RESET_PLACE_VALUES, wxT("&Reset")), 0, wxEXPAND , 5);
+	l_pcEditPlaceButtonsSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_GUI_STEERING_DIALOG_SELECT_PLACES_TO_EDIT_BUTTON, wxT("&Select")), 0, wxEXPAND , 5);
+	l_pcEditPlaceButtonsSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_GUI_STEERING_DIALOG_RESET_PLACE_VALUES, wxT("&Reset")), 0, wxEXPAND , 5);
 	//l_pcEditPlaceButtonsSizer->Add(new wxButton( this, wxID_ANY, wxT("&Use as initial") ), 0, wxEXPAND ,5);
 
-	//Parameters
-	wxBoxSizer* l_pcParameterTreeSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxBoxSizer* l_pcEditParameterButtonsSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	l_pcEditParameterSizer->Add(l_pcParameterTreeSizer, 1, wxEXPAND );
-	l_pcEditParameterSizer->Add(l_pcEditParameterButtonsSizer, 0, wxEXPAND );
+	m_pcPropertyWindowSetsSizer->SetSizerAndFit(l_pcEditPlaceSizer);
+	m_pcSetsSizer->SetSizeHints(m_pcPropertyWindowSetsSizer);
+	m_pcModelConfigSizer->Add(m_pcCollPanalSteeringPlaceSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 
-	m_pcParameterEditingWindow = new SP_GUI_SteeringSubWindow(this, m_pcGUIClient, wxT("Parameters"));
+    //parameters
+	m_pcModelConfigSizer->Add(new wxStaticLine(m_pcScrolledWindow), wxSizerFlags(0).Expand().Border(wxALL, 5));
 
-	l_pcParameterTreeSizer->Add(m_pcParameterEditingWindow, 1, wxEXPAND );
+	//Left sizer
+	m_pcCollPanalSteeringParamSizer=
+			new wxCollapsiblePane(m_pcScrolledWindow,SP_ID_COLLAPSEPANEL_SETS_SIZER, "Steered parameters", wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
+	m_pcPropertyWindowSetsSizer = m_pcCollPanalSteeringParamSizer->GetPane();
 
-	l_pcEditParameterButtonsSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_SELECT_PARAMETERS_TO_EDIT_BUTTON, wxT("&Select")), 0, wxEXPAND , 5);
-	l_pcEditParameterButtonsSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_RESET_PARAMETER_VALUES, wxT("&Reset")), 0, wxEXPAND , 5);
+    wxBoxSizer* l_pcEditParameterSizer = new wxStaticBoxSizer(new wxStaticBox(m_pcPropertyWindowSetsSizer, wxID_ANY, wxT("Edit Parameter Values")), wxVERTICAL);
+
+    wxBoxSizer* l_pcParameterTreeSizer = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer* l_pcEditParameterButtonsSizer = new wxBoxSizer(wxHORIZONTAL);
+
+    l_pcEditParameterSizer->Add(l_pcParameterTreeSizer, 1, wxEXPAND );
+    l_pcEditParameterSizer->Add(l_pcEditParameterButtonsSizer, 0, wxEXPAND );
+
+    m_pcParameterEditingWindow = new SP_GUI_SteeringSubWindow(m_pcPropertyWindowSetsSizer, m_pcGUIClient, wxT("Parameters"));
+
+    l_pcParameterTreeSizer->Add(m_pcParameterEditingWindow, 1, wxEXPAND );
+
+    l_pcEditParameterButtonsSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_GUI_STEERING_DIALOG_SELECT_PARAMETERS_TO_EDIT_BUTTON, wxT("&Select")), 0, wxEXPAND , 5);
+    l_pcEditParameterButtonsSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_GUI_STEERING_DIALOG_RESET_PARAMETER_VALUES, wxT("&Reset")), 0, wxEXPAND , 5);
+
+
+	m_pcPropertyWindowSetsSizer->SetSizerAndFit(l_pcEditParameterSizer);
+	l_pcEditPlaceSizer->SetSizeHints(m_pcPropertyWindowSetsSizer);
+	m_pcModelConfigSizer->Add(m_pcCollPanalSteeringParamSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 }
-void SP_GUI_SteeringDialog::CreateOutputCtrlBar(wxSizer* p_pcParentSizer)
-{
-	m_pcOutputSizer = new wxBoxSizer(wxVERTICAL);
-	p_pcParentSizer->Add(m_pcOutputSizer, 1, wxEXPAND );
 
-}
 void SP_GUI_SteeringDialog::CreateSimulatorBar(wxSizer* p_pcParentSizer)
 {
 	wxBoxSizer* l_pcSimulatorSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Simulator")), wxHORIZONTAL);
 
-	wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Type:")), 0, wxALL);
-	l_pcRowSizer->AddSpacer(2);
-	m_pcSimulatorsCategoryBox = new wxChoice(this, SP_ID_GUI_STEERING_DIALOG_SIMULATOR_CATEGORY_CHANGED, wxDefaultPosition, wxSize(150, -1));
-	l_pcRowSizer->Add(m_pcSimulatorsCategoryBox, 0, wxALL);
-	l_pcSimulatorSizer->Add(l_pcRowSizer, 1, wxEXPAND);
-	l_pcSimulatorSizer->AddSpacer(5);
+		wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Type:")), 0, wxALL);
+		//l_pcRowSizer->AddSpacer(1);
+		m_pcSimulatorsCategoryBox = new wxChoice(this, SP_ID_GUI_STEERING_DIALOG_SIMULATOR_CATEGORY_CHANGED, wxDefaultPosition, wxSize(70, -1));
+		l_pcRowSizer->Add(m_pcSimulatorsCategoryBox, 0, wxALL);
+		l_pcSimulatorSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+		l_pcSimulatorSizer->AddSpacer(1);
 
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Algorithm:")), 0, wxALL);
-	l_pcRowSizer->AddSpacer(2);
-	m_pcSimulatorsAlgorithmBox = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxSize(150, -1));
-	l_pcRowSizer->Add(m_pcSimulatorsAlgorithmBox, 0, wxALL);
-	l_pcSimulatorSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Algorithm:")), 0, wxALL);
+		//l_pcRowSizer->AddSpacer(2);
+		m_pcSimulatorsAlgorithmBox = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxSize(100, -1));
+		l_pcRowSizer->Add(m_pcSimulatorsAlgorithmBox, 0, wxALL);
+		l_pcSimulatorSizer->Add(l_pcRowSizer, 1, wxALL);
 
-	m_pcSimulatorSpeedSlider =
-			new wxSlider(this, SP_ID_GUI_STEERING_DIALOG_SIM_SPEED_CHANGED, spsa::MAX_SIMULATION_SPEED, 1, spsa::MAX_SIMULATION_SPEED, wxDefaultPosition, wxSize(100, -1),
-					wxSL_HORIZONTAL | wxSL_LABELS | wxSL_AUTOTICKS);
+		m_pcSimulatorSpeedSlider =
+				new wxSlider(this, SP_ID_GUI_STEERING_DIALOG_SIM_SPEED_CHANGED, spsa::MAX_SIMULATION_SPEED, 1, spsa::MAX_SIMULATION_SPEED, wxDefaultPosition, wxSize(100, -1),
+						wxSL_HORIZONTAL | wxSL_LABELS | wxSL_AUTOTICKS);
 
-	m_pcSimulatorSpeedSlider->SetToolTip(wxT("Simulator Speed (lower <-> higher)"));
-	l_pcSimulatorSizer->Add(m_pcSimulatorSpeedSlider, 0, wxEXPAND);
-	l_pcSimulatorSizer->AddSpacer(5);
+		m_pcSimulatorSpeedSlider->SetToolTip(wxT("Simulator Speed (lower <-> higher)"));
 
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_SIMULATOR_SETTING, wxT("&Setting ...")), 0, wxALL);
-	l_pcSimulatorSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		l_pcRowSizer->Add(m_pcSimulatorSpeedSlider, 0, wxALL);
 
-	p_pcParentSizer->Add(l_pcSimulatorSizer, 0);
+		l_pcSimulatorSizer->AddSpacer(1);
+		l_pcRowSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_SIMULATOR_SETTING, wxT("&Setting ...")), 0, wxALL);
+
+		l_pcSimulatorSizer->Add(l_pcRowSizer, 0, wxALL);
+
+		p_pcParentSizer->Add(l_pcSimulatorSizer, 0);
 }
-void SP_GUI_SteeringDialog::CreateSimulationIntervalBar(wxSizer* p_pcParentSizer)
-{
-	//Right Sizer
-	wxBoxSizer* l_pcIntervalsSizer = new wxBoxSizer(wxVERTICAL);
-	p_pcParentSizer->Add(l_pcIntervalsSizer, 0, wxLEFT | wxRIGHT | wxEXPAND);
 
-	//Intervals
-	wxBoxSizer* l_pcSubIntervalsSizer = new wxBoxSizer(wxVERTICAL);
-	l_pcIntervalsSizer->Add(l_pcSubIntervalsSizer, 1, wxLEFT | wxRIGHT | wxEXPAND);
-	wxBoxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Output start point:")), 1, wxALL);
-	l_pcRowSizer->AddSpacer(10);
-	m_pcStartOutputPointTxtCtrl = new wxTextCtrl(this, -1, wxT("0"), wxDefaultPosition, wxSize(70, -1), 0);
-	l_pcRowSizer->Add(m_pcStartOutputPointTxtCtrl, 0, wxALL);
-	l_pcSubIntervalsSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALL);
-	l_pcSubIntervalsSizer->AddSpacer(15);
-
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Output end point:")), 1, wxALL);
-	l_pcRowSizer->AddSpacer(10);
-	m_pcEndOutputPointTxtCtrl = new wxTextCtrl(this, -1, wxT("100"), wxDefaultPosition, wxSize(70, -1), 0);
-	l_pcRowSizer->Add(m_pcEndOutputPointTxtCtrl, 0, wxALL);
-	l_pcSubIntervalsSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALL);
-	l_pcSubIntervalsSizer->AddSpacer(15);
-
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(this, wxID_ANY, wxT("Output step size:")), 1, wxALL);
-	l_pcRowSizer->AddSpacer(10);
-	m_pcSamplingPointSizeTxtCtrl = new wxTextCtrl(this, -1, wxT("1"), wxDefaultPosition, wxSize(70, -1), 0);
-	l_pcRowSizer->Add(m_pcSamplingPointSizeTxtCtrl, 0, wxALL);
-	l_pcSubIntervalsSizer->Add(l_pcRowSizer, 0, wxEXPAND | wxALL);
-
-	//Models
-	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Models")), wxHORIZONTAL);
-	m_pcModelsBox = new wxChoice(this, SP_ID_GUI_STEERING_DIALOG_CURRENTMODEL_CHANGED_CHOICE, wxDefaultPosition, wxSize(100, -1));
-
-	l_pcRowSizer->Add(m_pcModelsBox, 1, wxALL);
-
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_REFRESH_MODELNAMES, wxT("Refresh")), 0, wxALL);
-
-	p_pcParentSizer->Add(l_pcRowSizer, 0, wxLEFT | wxRIGHT | wxEXPAND);
-}
 void SP_GUI_SteeringDialog::CreateChoiceListBar(wxSizer* p_pcParentSizer)
 {
 	wxBoxSizer* l_pcItemChoiceSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Select an item to view:")), wxVERTICAL);
@@ -404,9 +396,9 @@ bool SP_GUI_SteeringDialog::Initialize()
 	m_pcRuntimeRefershTimer = new wxTimer(this, SP_ID_GUI_STEERING_DIALOG_RUNTIME_REFRESH_TIMER);
 
 	//Add the viewer to the list
-	InitializeResultViewers();
+	//InitializeResultViewers();
 
-	m_apcResultViewers[m_nCurrentViewerIndex]->Create();
+	//m_apcResultViewers[m_nCurrentViewerIndex]->Create();
 
 	ReadSettingFromRegistery();
 
@@ -505,15 +497,13 @@ void SP_GUI_SteeringDialog::SelectCurrentSimulator()
 SP_GUI_SteeringDialog::~SP_GUI_SteeringDialog()
 {
 
-	std::vector<SP_DS_ResultViewer*>::iterator l_itViewer;
-
 	//write setting to registery
 	WriteSettingToRegistery();
 
-	for (l_itViewer = m_apcResultViewers.begin(); l_itViewer != m_apcResultViewers.end(); l_itViewer++)
+	/*for (l_itViewer = m_apcResultViewers.begin(); l_itViewer != m_apcResultViewers.end(); l_itViewer++)
 	{
 		wxDELETE((*l_itViewer));
-	}
+	}*/
 
 	//delete the timer
 	wxDELETE(m_pcResultRefershTimer);
@@ -596,9 +586,9 @@ void SP_GUI_SteeringDialog::OnStartButton(wxCommandEvent& WXUNUSED(event))
 		UpdateView();
 
 		//say that we can accept interval update
-		m_pcStartOutputPointTxtCtrl->SetModified(false);
-		m_pcEndOutputPointTxtCtrl->SetModified(false);
-		m_pcSamplingPointSizeTxtCtrl->SetModified(false);
+		m_pcIntervalStartTextCtrl->SetModified(false);
+		m_pcIntervalEndTextCtrl->SetModified(false);
+		m_pcResultPointCountTextCtrl->SetModified(false);
 	}
 }
 
@@ -887,9 +877,10 @@ void SP_GUI_SteeringDialog::UpdateView()
 		return;
 	}
 	//Update the plot
-	m_apcResultViewers[m_nCurrentViewerIndex]->SetXAxisValues(&m_anXAxisValues);
+	//m_apcResultViewers[m_nCurrentViewerIndex]->SetXAxisValues(&m_anXAxisValues);
 
-	m_apcResultViewers[m_nCurrentViewerIndex]->Update();
+	//TODO: update all open view windows
+	//m_apcResultViewers[m_nCurrentViewerIndex]->Update();
 }
 
 bool SP_GUI_SteeringDialog::UpdateSimulationIntervals()
@@ -920,19 +911,19 @@ bool SP_GUI_SteeringDialog::UpdateSimulationIntervals()
 void SP_GUI_SteeringDialog::ShowSimulationIntervals()
 {
 
-	if (m_pcStartOutputPointTxtCtrl->IsModified() == false)
+	if (m_pcIntervalStartTextCtrl->IsModified() == false)
 	{
-		m_pcStartOutputPointTxtCtrl->SetValue(wxString::Format(wxT("%g"), m_nOutputStartPoint));
+		m_pcIntervalStartTextCtrl->SetValue(wxString::Format(wxT("%g"), m_nOutputStartPoint));
 	}
 
-	if (m_pcEndOutputPointTxtCtrl->IsModified() == false)
+	if (m_pcIntervalEndTextCtrl->IsModified() == false)
 	{
-		m_pcEndOutputPointTxtCtrl->SetValue(wxString::Format(wxT("%g"), m_nOutputEndPoint));
+		m_pcIntervalEndTextCtrl->SetValue(wxString::Format(wxT("%g"), m_nOutputEndPoint));
 	}
 
-	if (m_pcSamplingPointSizeTxtCtrl->IsModified() == false)
+	if (m_pcResultPointCountTextCtrl->IsModified() == false)
 	{
-		m_pcSamplingPointSizeTxtCtrl->SetValue(wxString::Format(wxT("%g"), m_nOutputSamplingSize));
+		m_pcResultPointCountTextCtrl->SetValue(wxString::Format(wxT("%g"), m_nOutputSamplingSize));
 	}
 }
 
@@ -946,7 +937,7 @@ double SP_GUI_SteeringDialog::GetStartOutputPoint()
 	double l_nValue = 0;
 	wxString l_sValueString;
 
-	l_sValueString = m_pcStartOutputPointTxtCtrl->GetValue();
+	l_sValueString = m_pcIntervalStartTextCtrl->GetValue();
 	l_sValueString.ToDouble(&l_nValue);
 
 	//Check The Value
@@ -963,7 +954,7 @@ double SP_GUI_SteeringDialog::GetEndOutputPoint()
 	double l_nValue;
 	wxString l_sValueString;
 
-	l_sValueString = m_pcEndOutputPointTxtCtrl->GetValue();
+	l_sValueString = m_pcIntervalEndTextCtrl->GetValue();
 	l_sValueString.ToDouble(&l_nValue);
 
 	//Check The Value
@@ -980,7 +971,7 @@ double SP_GUI_SteeringDialog::GetSamplingStepSize()
 	double l_nValue = 0;
 	wxString l_sValueString;
 
-	l_sValueString = m_pcSamplingPointSizeTxtCtrl->GetValue();
+	l_sValueString = m_pcResultPointCountTextCtrl->GetValue();
 	l_sValueString.ToDouble(&l_nValue);
 
 	//Check The Value
@@ -1088,16 +1079,6 @@ void SP_GUI_SteeringDialog::OnViewerPropertiesButton(wxCommandEvent& event)
 void SP_GUI_SteeringDialog::RefreshResultMatrix()
 {
 	int l_nReturn = 0;
-
-	//Get x axis variable type
-	/*l_pcAttribute=(*m_pcModelViews)[m_nCurrentView]->GetAttribute(wxT("X_AXIS_VAR_TYPE"));
-	 CHECK_POINTER(l_pcAttribute,return);
-	 unsigned int l_nXAxisVarType=(dynamic_cast<AttributeInt*>(l_pcAttribute))->GetValue();
-
-	 //Get x axis variable type
-	 l_pcAttribute=(*m_pcModelViews)[m_nCurrentView]->GetAttribute(wxT("X_AXIS_VAR_NAME"));
-	 CHECK_POINTER(l_pcAttribute,return);
-	 wxString l_sVariableName=l_pcAttribute->GetValueString();*/
 
 	//Update the simulation intervals
 	m_pcGUIClient->ReadSimulationInterval(m_nOutputStartPoint, m_nOutputEndPoint, m_nOutputSamplingSize);
@@ -1469,20 +1450,20 @@ void SP_GUI_SteeringDialog::UpdateModelViews()
 	CHECK_POINTER(m_pcModelViews, return);
 
 	//clear old views if any
-	m_pcModelViewBox->Clear();
+	m_pcListboxShowAllGraphViewName->Clear();
 
 	if (m_pcModelViews->size() == 0)
 	{
-		m_pcModelViewBox->Append(wxT("Default view"));
-		m_pcModelViewBox->SetSelection(0);
+		m_pcListboxShowAllGraphViewName->Append(wxT("Default view"));
+		m_pcListboxShowAllGraphViewName->SetSelection(0);
 		m_pcModelViews->push_back(CreateNewView(wxT("Default view")));
 	}
 	else
 	{
 		for (unsigned int l_nView = 0; l_nView < m_pcModelViews->size(); l_nView++)
 		{
-			m_pcModelViewBox->Append(((*m_pcModelViews)[l_nView])->GetName());
-			m_pcModelViewBox->SetSelection(0);
+			m_pcListboxShowAllGraphViewName->Append(((*m_pcModelViews)[l_nView])->GetName());
+			m_pcListboxShowAllGraphViewName->SetSelection(0);
 		}
 	}
 }
@@ -1540,7 +1521,7 @@ void SP_GUI_SteeringDialog::OnAddNewView(wxCommandEvent& WXUNUSED(event))
 	UpdateModelViews();
 
 	//select the new view as the current one
-	m_pcModelViewBox->SetSelection(l_nNewView);
+	//m_pcModelViewBox->SetSelection(l_nNewView);
 
 	//change the view matrix type to the current view type;
 	ChangeViewTo(l_nNewView);
@@ -1642,7 +1623,7 @@ void SP_GUI_SteeringDialog::OnModelViewChanged(wxCommandEvent& event)
 
 void SP_GUI_SteeringDialog::ChangeViewTo(const unsigned int& l_ViewIndex)
 {
-	spsa::Attribute* l_pcAttribute = NULL;
+	/*spsa::Attribute* l_pcAttribute = NULL;
 
 	m_nCurrentView = l_ViewIndex;
 
@@ -1654,7 +1635,7 @@ void SP_GUI_SteeringDialog::ChangeViewTo(const unsigned int& l_ViewIndex)
 
 		m_nCurrentView = 0;
 	}
-	m_pcModelViewBox->SetSelection(m_nCurrentView);
+	UpdateModelViews->SetSelection(m_nCurrentView);
 
 	//get current viewer type
 	l_pcAttribute = (*m_pcModelViews)[m_nCurrentView]->GetAttribute(wxT("VIEWER_TYPE"));
@@ -1687,7 +1668,7 @@ void SP_GUI_SteeringDialog::ChangeViewTo(const unsigned int& l_ViewIndex)
 	LoadCurrentView();
 
 	//refresh the result matrix
-	RefreshResultMatrix();
+	RefreshResultMatrix();*/
 }
 
 void SP_GUI_SteeringDialog::SaveCurrentViewSetting()
@@ -2259,3 +2240,85 @@ void SP_GUI_SteeringDialog::StopRefreshTimers()
 
 	m_pcRuntimeRefershTimer->Stop();
 }
+
+void SP_GUI_SteeringDialog::OnMoreOptionButton(wxCommandEvent& WXUNUSED(event))
+{
+	    wxMenu *l_pcEditViewMenu = new wxMenu;
+
+		l_pcEditViewMenu->Append(SP_ID_GUI_STEERING_DIALOG_RESTART_BUTTON, wxT("&Restart"));
+		l_pcEditViewMenu->Append(SP_ID_GUI_STEERING_DIALOG_PAUSE_BUTTON, wxT("&Pause"));
+		l_pcEditViewMenu->Append(SP_ID_GUI_STEERING_DIALOG_RESUME_BUTTON, wxT("&Resume"));
+		l_pcEditViewMenu->Append(wxID_ANY, wxT("&Compare with"));
+		l_pcEditViewMenu->Append(SP_ID_GUI_STEERING_DIALOG_SETTING, wxT("&Setting"));
+
+		PopupMenu(l_pcEditViewMenu);
+}
+
+void SP_GUI_SteeringDialog :: OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent) {
+
+
+	    wxArrayInt currentSelections;
+		currentSelections.Clear();
+		m_pcListboxShowAllGraphViewName->GetSelections(currentSelections);
+		size_t tmp = currentSelections.GetCount();
+
+		spsa::ModelView* l_pcView;
+
+		for (size_t i = 0; i < tmp; ++i) {
+
+			// get a pointer to the view
+			wxString l_sViewName=m_pcListboxShowAllGraphViewName->GetString(currentSelections[i]);
+
+			l_pcView = FindSteeringView(l_sViewName);
+
+			OpenViewInSeparateWindow(l_pcView);
+
+	        //ChangeCurrentView(l_pcView);
+		}
+
+}
+
+spsa::ModelView* SP_GUI_SteeringDialog::FindSteeringView(const wxString& p_sViewName)
+{
+			for(auto l_pcView:(*m_pcModelViews))
+			{
+				if(l_pcView->GetName()==p_sViewName)
+				{
+					return l_pcView;
+				}
+			}
+
+    //if we didn't find it, return NULL
+    return NULL;
+}
+
+void SP_GUI_SteeringDialog::OpenViewInSeparateWindow(spsa::ModelView* p_pcModelView)
+{
+    //check if a view with the same name is already opened
+	for (auto l_itWindow : m_pcExternalWindows)
+    {
+        if (p_pcModelView ==  (dynamic_cast<SP_DLG_ViewerWindowSteering*>(l_itWindow))->GetModelView())
+        {
+            SP_LOGERROR( wxT("this view(") + l_itWindow->GetName() + wxT(") is already opened.  A view Can't be opened twice"));
+
+            return;
+        }
+    }
+
+	SP_DLG_ViewerWindowSteering* l_pcViewerWindow=
+			new SP_DLG_ViewerWindowSteering(this,
+					                        p_pcModelView,
+											m_pcResultMatrixInfo,
+											&m_an2DResultMatrix);
+
+    // check if the window is created correctly
+    if (l_pcViewerWindow != NULL)
+    {
+        m_pcExternalWindows.push_back(l_pcViewerWindow);
+
+        l_pcViewerWindow->Show(true);
+    }
+
+}
+
+

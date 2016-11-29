@@ -52,7 +52,7 @@ typedef enum
 
 class SP_DS_Simulation;
 class SP_DS_ResultViewer;
-class SP_DLG_ShowAllModelView;
+class SP_DLG_ViewerWindow;
 
 class SP_DLG_Simulation: public SP_DLG_BaseSimulation
 {
@@ -122,11 +122,6 @@ protected:
 	wxRadioButton* m_pcDirectSingleExportRadioButton;
 	wxRadioButton* m_pcDirectSingleExactExportRadioButton;
 
-/*	//Input parameters for simulation
-	wxTextCtrl* m_pcIntervalStartTextCtrl;
-	wxTextCtrl* m_pcIntervalEndTextCtrl;
-	wxTextCtrl* m_pcResultPointCountTextCtrl;*/
-
 	//Simulation status controls
 	wxStaticText* m_pcPlotStatusText;
 	wxStaticText* m_pcSimulationStopWatch;
@@ -164,7 +159,7 @@ protected:
 	wxTimer* m_pcTimer;
 
 	//a list of pointer to currently opened windows
-	std::list<SP_DLG_ShowAllModelView*> m_pcExternalWindows;
+	std::list<SP_DLG_ViewerWindow*> m_pcExternalWindows;
 
 public:
 	wxArrayString m_ArrayUnPlaces, m_ArrayUnTranstions;
@@ -256,7 +251,7 @@ public:
 	}
 
 	//remove an external window from the maintained external window list
-	void RemoveExternalWindow(SP_DLG_ShowAllModelView* p_pcWindow)
+	void RemoveExternalWindow(SP_DLG_ViewerWindow* p_pcWindow)
 	{
 		m_pcExternalWindows.remove(p_pcWindow);
 	}
@@ -308,22 +303,23 @@ DECLARE_EVENT_TABLE()
 
 	virtual void OnExportToCSV();
 
-	virtual void OnCollapsePropertySizer(wxCollapsiblePaneEvent& event);
-	virtual void OnCollapseSetsSizer(wxCollapsiblePaneEvent& event);
-	virtual void OnCollapseDirectExportSizer(wxCollapsiblePaneEvent& event);
 	virtual void OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent);
 	virtual void OnAddingNewModalView(wxCommandEvent& p_cEvent);
 	virtual void OnRemovingModalViews(wxCommandEvent& p_cEvent);
 	virtual void OnRenameModalView(wxCommandEvent& p_cEvent);
+
 	//overwrite this function in child class to give periodic update
-	virtual void OnTimer(wxTimerEvent& event)
-	{
-	}
+	virtual void OnTimer(wxTimerEvent& event){  }
 
 	//on initialize dialog
 	virtual void OnInitDialog(wxInitDialogEvent& event);
 
 	virtual void OnModifyConstantSets(wxCommandEvent& p_cEvent);
+
+public:
+	virtual void OnCollapsePropertySizer(wxCollapsiblePaneEvent& event);
+	virtual void OnCollapseSetsSizer(wxCollapsiblePaneEvent& event);
+    virtual void OnCollapseDirectExportSizer(wxCollapsiblePaneEvent& event);
 
 protected:
 
@@ -360,6 +356,8 @@ protected:
 
 	//Create a new view
 	SP_DS_Metadata* CreateNewView(const wxString& p_sName, bool p_bCloneCurrent = false);
+
+	virtual void CreateStartSimulationButton();
 
 	//initialize empty view with data
 	virtual void InitializeEmptyView(SP_DS_Metadata* p_pcView)=0;

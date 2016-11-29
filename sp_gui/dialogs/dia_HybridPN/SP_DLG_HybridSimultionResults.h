@@ -135,7 +135,7 @@ protected:
 public:
 
 	virtual void OnStartAbortSimulation(wxCommandEvent& p_cEvent);DECLARE_CLASS( SP_DLG_HybridSimulationResults )
-	SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), wxString p_sTitle = wxT("Hybrid Simulation results"), long p_nStyle =
+	SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), wxString p_sTitle = wxT("Hybrid Simulation Results"), long p_nStyle =
 			wxDEFAULT_DIALOG_STYLE);
 	virtual ~SP_DLG_HybridSimulationResults();
 

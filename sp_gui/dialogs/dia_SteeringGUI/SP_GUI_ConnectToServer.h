@@ -19,7 +19,7 @@
  * try to connect to the server
  */
 
-class SP_GUI_ConnectToServer :  public wxDialog, public SP_Error
+class SP_GUI_ConnectToServer :  public wxFrame, public SP_Error
 {
 private:
 	   wxButton* m_pcConnectButtonCtrl;
@@ -111,7 +111,7 @@ public:
 		SP_GUI_ConnectToServer(wxWindow* p_pcParent,const wxString& p_sTitle=wxT("Connect to the server"),long p_nStyle=wxDEFAULT_DIALOG_STYLE);
 		virtual ~SP_GUI_ConnectToServer();
 
-	 DECLARE_EVENT_TABLE()
+	    DECLARE_EVENT_TABLE()
 };
 
 #endif /* SP_GUI_CONNECTTOSERVER_H_ */
