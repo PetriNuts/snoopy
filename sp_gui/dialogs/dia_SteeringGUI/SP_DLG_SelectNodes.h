@@ -50,7 +50,7 @@ private:
 	      bool m_bIsColoredModel;
 
 	      //current view ID
-	      unsigned int m_nCurrentView;
+	      spsa::ModelView* m_pcModelView;
 
 	      spsa::Model * m_pcCurrentModel;
 private:
@@ -113,7 +113,7 @@ protected:	      //move selected elements from source list to dest list
 
 	      DECLARE_EVENT_TABLE();
 public:
-	      SP_DLG_SelectNodes(wxWindow* p_pcParentWnd,spsa::Model * p_pcCurrentModel,const unsigned int& p_nCurrentView);
+	      SP_DLG_SelectNodes(wxWindow* p_pcParentWnd,spsa::Model * p_pcCurrentModel,spsa::ModelView* p_pcModelView);
 	      virtual ~SP_DLG_SelectNodes();
 };
 

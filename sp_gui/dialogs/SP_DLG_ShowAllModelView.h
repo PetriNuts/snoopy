@@ -28,13 +28,8 @@ protected:
 
 	virtual void OnRefresh(wxCommandEvent& event);
 
-	virtual void OnClose(wxCommandEvent& event);
-	virtual void OnWindowClose(wxCloseEvent& event);
-	virtual void DoClose();
-
 	virtual void OnWindowActivate(wxActivateEvent& event);
 
-	virtual void OnDisconnect(wxCommandEvent &event);
 	virtual void OnPlaceCheckUncheck(wxCommandEvent& p_cEvent);
 	virtual void OnItemDoubleClick(wxCommandEvent& p_cEvent);
 	virtual void OnSelectClearAllItems(wxCommandEvent& p_cEvent);
@@ -43,7 +38,6 @@ protected:
 	virtual void OnExportClick(wxCommandEvent& event);
 	virtual void OnChangeXAxis(wxCommandEvent& event);
 	virtual void OnEditNodeList(wxCommandEvent& event);
-	virtual void OnShowHideNodeList(wxCommandEvent& event);
 
 protected:
 	wxString GetViewAttributeValue(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName);

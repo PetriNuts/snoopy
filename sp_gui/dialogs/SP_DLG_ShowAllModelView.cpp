@@ -109,25 +109,6 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	wxSize size = p_pcWnd->GetSize();
 	pos.x += size.GetX() + 10;
 	SetPosition(pos);
-
-	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnClose, this, wxID_CANCEL);
-	Bind(wxEVT_CLOSE_WINDOW, &SP_DLG_ShowAllModelView::OnWindowClose, this);
-
-	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnRefresh, this, SP_ID_BUTTON_REFRESH);
-
-	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnDisconnect, this, SP_ID_BUTTON_DISCONNECT);
-
-	Bind(wxEVT_LISTBOX_DCLICK, &SP_DLG_ShowAllModelView::OnItemDoubleClick, this, SP_ID_CHECKLISTBOX_PLACE_CHOICE);
-	Bind(wxEVT_CHECKLISTBOX, &SP_DLG_ShowAllModelView::OnPlaceCheckUncheck, this, SP_ID_CHECKLISTBOX_PLACE_CHOICE);
-	Bind(wxEVT_CHECKBOX, &SP_DLG_ShowAllModelView::OnSelectClearAllItems, this, SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS);
-	Bind(wxEVT_CHOICE, &SP_DLG_ShowAllModelView::OnChangeResultViewer, this, SP_ID_CHOICE_RESULT_VIEWER_TYPE);
-	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnEditViewerProperties, this, SP_ID_BUTTON_EDIT_VIEWER_PROPERTIES);
-	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnExportClick, this, SP_ID_BUTTON_EXPORT);
-	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnChangeXAxis, this, SP_ID_CHANGE_X_AXIS);
-	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnEditNodeList, this, SP_ID_BUTTON_EDIT_NODE_LIST);
-	Bind(wxEVT_BUTTON, &SP_DLG_ShowAllModelView::OnShowHideNodeList, this, SP_ID_BUTTON_SHOW_HIDE_NODE_LIST);
-
-	Bind(wxEVT_ACTIVATE, &SP_DLG_ShowAllModelView::OnWindowActivate, this);
 }
 
 wxString SP_DLG_ShowAllModelView::GetViewerType()
@@ -377,24 +358,9 @@ void SP_DLG_ShowAllModelView::OnEditNodeList(wxCommandEvent& event)
 	}
 }
 
-void SP_DLG_ShowAllModelView::OnShowHideNodeList(wxCommandEvent& event)
-{
-	m_bIsShown = !m_bIsShown;
-	if (m_bIsShown)
-	{
-		m_pcRightSizer->Show(true);
-		m_pcShowHideButton->SetLabel("Hide Node List");
-	}
-	else
-	{
-		m_pcRightSizer->Show(false);
-		m_pcShowHideButton->SetLabel("Show Node List");
-	}
-	m_pcContentSizer->Layout();
-}
 
 bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_DS_Metadata* p_pcModelView)
-{	//SP_LOGMESSAGE(wxT("Separate view load view"));
+{
 
 	CHECK_POINTER(m_pcParentWnd, return false);
 
@@ -458,25 +424,6 @@ void SP_DLG_ShowAllModelView::OnRefresh(wxCommandEvent& event)
 }
 
 
-void SP_DLG_ShowAllModelView::OnClose(wxCommandEvent& event)
-{
-	DoClose();
-	Close(true);
-}
-
-void SP_DLG_ShowAllModelView::OnWindowClose(wxCloseEvent& event)
-{
-	DoClose();
-	event.Skip();
-}
-
-void SP_DLG_ShowAllModelView::DoClose()
-{
-	if (m_pcParentWnd != NULL)
-	{
-		m_pcParentWnd->RemoveExternalWindow(this);
-	}
-}
 
 void SP_DLG_ShowAllModelView::RemoveExternalWindowsPointer()
 {
@@ -559,41 +506,5 @@ wxString SP_DLG_ShowAllModelView::GetViewAttributeValue(SP_DS_Metadata* p_pcView
 	CHECK_POINTER(l_pcAttribute, return wxT(""));
 
 	return l_pcAttribute->GetValueString();
-}
-
-void SP_DLG_ShowAllModelView::OnDisconnect(wxCommandEvent &event)
-{
-	if (!m_bIsDisconnected)
-	{
-		//mark this window as disconnected from getting update from the simulator
-		m_bIsDisconnected = true;
-		m_pcRefreshButton->Enable(false);
-		m_pcConnectButton->SetLabel(wxT("Connect"));
-
-		m_pcShowHideButton->Enable(false);
-		m_pcRightSizer->Show(false);
-		m_isShown = false;
-		m_pcShowHideButton->SetLabel("Show Node List");
-		m_pcOutputViewerType->Enable(false);
-		m_pcViewerTypeButton->Enable(false);
-		m_pcXAxis->Enable(false);
-		m_pcEditNodeListButton->Enable(false);
-	}
-	else
-	{
-		m_bIsDisconnected = false;
-		m_pcRefreshButton->Enable(true);
-		m_pcConnectButton->SetLabel(wxT("Disconnect"));
-
-		m_pcShowHideButton->Enable(true);
-		m_pcRightSizer->Show(true);
-		m_isShown = true;
-		m_pcShowHideButton->SetLabel("Hide Node List");
-		m_pcOutputViewerType->Enable(true);
-		m_pcViewerTypeButton->Enable(true);
-		m_pcXAxis->Enable(true);
-		m_pcEditNodeListButton->Enable(true);
-	}
-	m_pcContentSizer->Layout();
 }
 

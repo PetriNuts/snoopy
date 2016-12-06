@@ -523,8 +523,13 @@ SP_GUI_Mainframe::GetExportLogWindow()
 }
 void SP_GUI_Mainframe::OnSteeringMode(wxCommandEvent& p_cEvent)
 {
-	SP_GUI_ConnectToServer* l_pcDlg=new SP_GUI_ConnectToServer(NULL);
+	SP_GUI_ConnectToServer* l_pcDlg=NULL;
 
-	                       l_pcDlg->Show(true);
+	                    l_pcDlg=new SP_GUI_ConnectToServer(this);
+
+	                    if(l_pcDlg!=NULL)
+	                    {
+	                       l_pcDlg->Show();
+	                    }
 }
 

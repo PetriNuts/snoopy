@@ -196,11 +196,9 @@ protected:
 
 	void OnItemStateChanged(wxCommandEvent& event);
 
-	void OnItemDClick(wxCommandEvent& event);
-
 	void OnModelNameChanged(wxCommandEvent& WXUNUSED(event));
 
-	void OnViewerPropertiesButton(wxCommandEvent& event);
+	//void OnViewerPropertiesButton(wxCommandEvent& event);
 
 	void OnResultRefreshTimer(wxTimerEvent& WXUNUSED(event));
 
@@ -228,8 +226,6 @@ protected:
 
 	void OnRefreshModelViews(wxCommandEvent& WXUNUSED(event));
 
-	void OnOptionButton(wxCommandEvent& WXUNUSED(event));
-
 	void OnMoreOptionButton(wxCommandEvent& WXUNUSED(event));
 
 	void OnExport2CSV(wxCommandEvent& WXUNUSED(event));
@@ -242,15 +238,11 @@ protected:
 
 	void OnImageExport(wxCommandEvent &event);
 
-	void OnDoEditViewerProperties(wxCommandEvent& WXUNUSED(event));
-
-	void OnChangeXAxisVariable(wxCommandEvent& WXUNUSED(event));
+	//void OnDoEditViewerProperties(wxCommandEvent& WXUNUSED(event));
 
 	void OnResetParameterValues(wxCommandEvent& WXUNUSED(event));
 
 	void OnResetMarkingValues(wxCommandEvent& WXUNUSED(event));
-
-	void OnEditCurrentViewMenu(wxCommandEvent& WXUNUSED(event));
 
 	void OnSimulatorSetting(wxCommandEvent& WXUNUSED(event));
 
@@ -267,7 +259,6 @@ protected:
 
 	void CreateSimulatorBar(wxSizer* p_pcParentSizer);
 
-	void CreateChoiceListBar(wxSizer* p_pcParentSizer);
 protected:
 
 	void UpdateModelNames();

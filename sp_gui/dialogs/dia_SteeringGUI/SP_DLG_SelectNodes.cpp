@@ -47,11 +47,11 @@ EVT_CHOICE(SP_GUI_STEERINGNODES_CURRENT_COLOR_NAME, SP_DLG_SelectNodes::OnColorN
 
 END_EVENT_TABLE()
 
-SP_DLG_SelectNodes::SP_DLG_SelectNodes(wxWindow* p_pcParentWnd, spsa::Model * p_pcCurrentModel, const unsigned int& p_nCurrentView) :
+SP_DLG_SelectNodes::SP_DLG_SelectNodes(wxWindow* p_pcParentWnd, spsa::Model * p_pcCurrentModel, spsa::ModelView* p_pcModelView) :
 		wxDialog(p_pcParentWnd, -1, wxT("Select curves"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER),
 		m_bIsColoredModel(false),
-		m_nCurrentView(p_nCurrentView),
-		m_pcCurrentModel(p_pcCurrentModel)
+		m_pcCurrentModel(p_pcCurrentModel),
+		m_pcModelView(p_pcModelView)
 {
 	CHECK_POINTER(m_pcCurrentModel, return);
 
@@ -150,14 +150,12 @@ void SP_DLG_SelectNodes::LoadData()
 {
 	spsa::Attribute* l_pcAttribute = NULL;
 
-	spsa::ModelView* l_pcCurrentView = (*m_pcCurrentModel->GetViews())[m_nCurrentView];
-
 	unsigned int l_nNodeType;
 	SP_VectorString l_asNodeNames;
 
 	spsa::RM_ROW_TYPE l_nCurveType;
 
-	l_pcAttribute = l_pcCurrentView->GetAttribute(wxT("VIEW_MATRIX_TYPE"));
+	l_pcAttribute = m_pcModelView->GetAttribute(wxT("VIEW_MATRIX_TYPE"));
 	CHECK_POINTER(l_pcAttribute, return);
 
 	//get view node type
@@ -224,11 +222,10 @@ void SP_DLG_SelectNodes::OnNodeTypeChanged(wxCommandEvent& event)
 {
 	spsa::Attribute* l_pcAttribute = NULL;
 
-	spsa::ModelView* l_pcCurrentView = (*m_pcCurrentModel->GetViews())[m_nCurrentView];
 
 	SP_VectorString l_asNodeNames;
 
-	l_pcAttribute = l_pcCurrentView->GetAttribute(wxT("VIEW_MATRIX_TYPE"));
+	l_pcAttribute = m_pcModelView->GetAttribute(wxT("VIEW_MATRIX_TYPE"));
 	CHECK_POINTER(l_pcAttribute, return);
 
 	//get view node type
@@ -335,11 +332,10 @@ void SP_DLG_SelectNodes::OnMoveAllRightToLeft(wxCommandEvent& event)
 
 void SP_DLG_SelectNodes::OnOk(wxCommandEvent& event)
 {
-	spsa::ModelView* l_pcCurrentView = (*m_pcCurrentModel->GetViews())[m_nCurrentView];
 
-	CHECK_POINTER(l_pcCurrentView, return);
+	CHECK_POINTER(m_pcModelView, return);
 
-	l_pcCurrentView->RemoveAllCurves();
+	m_pcModelView->RemoveAllCurves();
 
 	for (unsigned long l_nElement = 0; l_nElement < m_pcSelectedNodes->GetCount(); l_nElement++)
 	{
@@ -354,26 +350,24 @@ void SP_DLG_SelectNodes::OnOk(wxCommandEvent& event)
 		spsa::RM_ROW_TYPE l_nNodeType = l_pcClientData->GetNodeType();
 
 		//add new curve to the view
-		l_pcCurrentView->AddNewCurve(l_nPosition, l_sCurveName, -1, -1, l_nNodeType);
+		m_pcModelView->AddNewCurve(l_nPosition, l_sCurveName, -1, -1, l_nNodeType);
 	}
 
 	EndModal(wxID_OK);
 }
 void SP_DLG_SelectNodes::ReadOldUserSelection()
 {
-	spsa::ModelView* l_pcCurrentView = (*m_pcCurrentModel->GetViews())[m_nCurrentView];
-
 	spsa::AttributeVectorAttribute* l_pcCurveInfo;
 
 	wxString l_sItemName;
 
 	spsa::RM_ROW_TYPE l_nType;
 
-	CHECK_POINTER(l_pcCurrentView, return);
+	CHECK_POINTER(m_pcModelView, return);
 
-	CHECK_POINTER(l_pcCurrentView->GetCurveInfo(), return);
+	CHECK_POINTER(m_pcModelView->GetCurveInfo(), return);
 
-	l_pcCurveInfo = dynamic_cast<spsa::AttributeVectorAttribute*>(l_pcCurrentView->GetCurveInfo());
+	l_pcCurveInfo = dynamic_cast<spsa::AttributeVectorAttribute*>(m_pcModelView->GetCurveInfo());
 
 	SP_VectorString l_asItemsToDelete;
 

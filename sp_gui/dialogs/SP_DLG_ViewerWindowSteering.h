@@ -27,27 +27,28 @@ private:
 
 	    //pointer to result matrix
 	    spsa::Vector2DDouble* m_an2DResultMatrix;
+
+	    //x axis values
+	    SP_VectorDouble*  m_pcXAxisValues;
+
+	    spsa::Model * m_pcCurrentModel;
 protected:
 	    virtual void OnRefresh(wxCommandEvent& event){}
 
-		virtual void OnClose(wxCommandEvent& event){}
-		virtual void OnWindowClose(wxCloseEvent& event){}
-		virtual void DoClose(){}
-
 		virtual void OnWindowActivate(wxActivateEvent& event);
 
-		virtual void OnDisconnect(wxCommandEvent &event){}
 		virtual void OnPlaceCheckUncheck(wxCommandEvent& p_cEvent){}
-		virtual void OnItemDoubleClick(wxCommandEvent& p_cEvent){}
+		virtual void OnItemDoubleClick(wxCommandEvent& p_cEvent);
 		virtual void OnSelectClearAllItems(wxCommandEvent& p_cEvent){}
-		virtual void OnEditViewerProperties(wxCommandEvent& p_cEvent){}
-		virtual void OnChangeResultViewer(wxCommandEvent& event){}
+		virtual void OnEditViewerProperties(wxCommandEvent& p_cEvent);
+		virtual void OnChangeResultViewer(wxCommandEvent& event);
 		virtual void OnExportClick(wxCommandEvent& event){}
-		virtual void OnChangeXAxis(wxCommandEvent& event){}
-		virtual void OnEditNodeList(wxCommandEvent& event){}
-		virtual void OnShowHideNodeList(wxCommandEvent& event){}
+		virtual void OnChangeXAxis(wxCommandEvent& event);
+		virtual void OnEditNodeList(wxCommandEvent& event);
 protected:
 		bool LoadView(SP_DS_ResultViewer* p_pcResultViewer, spsa::ModelView* p_pcModelView);
+
+		wxString GetViewerType(const int& p_nViewerIndex);
 public:
 		virtual void RefreshWindow(){}
 	    virtual void RefreshCurrentWindow(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle){}
@@ -56,7 +57,9 @@ public:
 	  SP_DLG_ViewerWindowSteering(SP_DLG_Simulation* p_pcParentWnd,
 			                      spsa::ModelView* p_pcModelView,
 								  spsa::ResultMatrixInfo* p_pcResultMatrixInfo,
-								  spsa::Vector2DDouble* p_an2DResultMatrix);
+								  spsa::Vector2DDouble* p_an2DResultMatrix,
+								  SP_VectorDouble*  p_pcXAxisValues,
+								  spsa::Model * p_pcCurrentModel);
 	  virtual ~SP_DLG_ViewerWindowSteering();
 
 	  spsa::ModelView* GetModelView(){ return m_pcModelView; }

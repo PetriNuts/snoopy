@@ -60,13 +60,12 @@ private:
 protected:
 		virtual void OnRefresh(wxCommandEvent& event)=0;
 
-		virtual void OnClose(wxCommandEvent& event)=0;
-		virtual void OnWindowClose(wxCloseEvent& event)=0;
-		virtual void DoClose()=0;
+		virtual void OnClose(wxCommandEvent& event);
+		virtual void OnWindowClose(wxCloseEvent& event);
+		virtual void DoClose();
+		virtual void OnDisconnect(wxCommandEvent &event);
 
 		virtual void OnWindowActivate(wxActivateEvent& event)=0;
-
-		virtual void OnDisconnect(wxCommandEvent &event)=0;
 		virtual void OnPlaceCheckUncheck(wxCommandEvent& p_cEvent)=0;
 		virtual void OnItemDoubleClick(wxCommandEvent& p_cEvent)=0;
 		virtual void OnSelectClearAllItems(wxCommandEvent& p_cEvent)=0;
@@ -75,7 +74,7 @@ protected:
 		virtual void OnExportClick(wxCommandEvent& event)=0;
 		virtual void OnChangeXAxis(wxCommandEvent& event)=0;
 		virtual void OnEditNodeList(wxCommandEvent& event)=0;
-		virtual void OnShowHideNodeList(wxCommandEvent& event)=0;
+		virtual void OnShowHideNodeList(wxCommandEvent& event);
 
 protected:
 		virtual void CreateResultViewer(const wxString& p_sViewerType);

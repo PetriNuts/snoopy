@@ -113,6 +113,23 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 		m_pcMainSizer->Add(l_pcViewSizer, 0, wxALL, 1);
 		SetSizerAndFit(m_pcMainSizer);
 
+		//event handler
+		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnClose, this, wxID_CANCEL);
+		Bind(wxEVT_CLOSE_WINDOW, &SP_DLG_ViewerWindow::OnWindowClose, this);
+		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnShowHideNodeList, this, SP_ID_BUTTON_SHOW_HIDE_NODE_LIST);
+		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnDisconnect, this, SP_ID_BUTTON_DISCONNECT);
+		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnEditNodeList, this, SP_ID_BUTTON_EDIT_NODE_LIST);
+		Bind(wxEVT_LISTBOX_DCLICK, &SP_DLG_ViewerWindow::OnItemDoubleClick, this, SP_ID_CHECKLISTBOX_PLACE_CHOICE);
+
+		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnRefresh, this, SP_ID_BUTTON_REFRESH);
+		Bind(wxEVT_CHECKLISTBOX, &SP_DLG_ViewerWindow::OnPlaceCheckUncheck, this, SP_ID_CHECKLISTBOX_PLACE_CHOICE);
+		Bind(wxEVT_CHECKBOX, &SP_DLG_ViewerWindow::OnSelectClearAllItems, this, SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS);
+		Bind(wxEVT_CHOICE, &SP_DLG_ViewerWindow::OnChangeResultViewer, this, SP_ID_CHOICE_RESULT_VIEWER_TYPE);
+		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnEditViewerProperties, this, SP_ID_BUTTON_EDIT_VIEWER_PROPERTIES);
+		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnExportClick, this, SP_ID_BUTTON_EXPORT);
+		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnChangeXAxis, this, SP_ID_CHANGE_X_AXIS);
+		Bind(wxEVT_ACTIVATE, &SP_DLG_ViewerWindow::OnWindowActivate, this);
+
 }
 
 SP_DLG_ViewerWindow::~SP_DLG_ViewerWindow()
@@ -152,5 +169,82 @@ void SP_DLG_ViewerWindow::CreateResultViewer(const wxString& p_sViewerType)
 
 	m_pcResultViewer->SetXAxisValues(&m_anXValues);
 }
+
+void SP_DLG_ViewerWindow::OnWindowClose(wxCloseEvent& event)
+{
+	DoClose();
+	event.Skip();
+}
+
+void SP_DLG_ViewerWindow::DoClose()
+{
+	if (m_pcParentWnd != NULL)
+	{
+		m_pcParentWnd->RemoveExternalWindow(this);
+	}
+}
+
+void SP_DLG_ViewerWindow::OnClose(wxCommandEvent& event)
+{
+	DoClose();
+
+	event.Skip();
+}
+
+
+void SP_DLG_ViewerWindow::OnShowHideNodeList(wxCommandEvent& event)
+{
+	m_bIsShown = !m_bIsShown;
+	if (m_bIsShown)
+	{
+		m_pcRightSizer->Show(true);
+		m_pcShowHideButton->SetLabel("Hide Node List");
+	}
+	else
+	{
+		m_pcRightSizer->Show(false);
+		m_pcShowHideButton->SetLabel("Show Node List");
+	}
+	m_pcContentSizer->Layout();
+}
+
+void SP_DLG_ViewerWindow::OnDisconnect(wxCommandEvent &event)
+{
+	if (!m_bIsDisconnected)
+	{
+		//mark this window as disconnected from getting update from the simulator
+		m_bIsDisconnected = true;
+		m_pcRefreshButton->Enable(false);
+		m_pcConnectButton->SetLabel(wxT("Connect"));
+
+		m_pcShowHideButton->Enable(false);
+		m_pcRightSizer->Show(false);
+		m_isShown = false;
+		m_pcShowHideButton->SetLabel("Show Node List");
+		m_pcOutputViewerType->Enable(false);
+		m_pcViewerTypeButton->Enable(false);
+		m_pcXAxis->Enable(false);
+		m_pcEditNodeListButton->Enable(false);
+	}
+	else
+	{
+		m_bIsDisconnected = false;
+		m_pcRefreshButton->Enable(true);
+		m_pcConnectButton->SetLabel(wxT("Disconnect"));
+
+		m_pcShowHideButton->Enable(true);
+		m_pcRightSizer->Show(true);
+		m_isShown = true;
+		m_pcShowHideButton->SetLabel("Hide Node List");
+		m_pcOutputViewerType->Enable(true);
+		m_pcViewerTypeButton->Enable(true);
+		m_pcXAxis->Enable(true);
+		m_pcEditNodeListButton->Enable(true);
+	}
+	m_pcContentSizer->Layout();
+}
+
+
+
 
 

@@ -77,6 +77,8 @@
 
 //Amr
 #include "sp_gui/dialogs/SP_DLG_DirColorSimulation.h"
+#include "sp_gui/dialogs/dia_SteeringGUI/SP_GUI_ConnectToServer.h"
+
 
 
 #include <wx/busyinfo.h> 
@@ -1865,8 +1867,10 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 				 SP_MESSAGEBOX(wxT("Simulation can not initialize"),wxT("Hybrid Simulation"));
 				 return; //there is error in one of the transitions rate functions
 			 }
+
 	*/
-			l_pcDlg = new SP_DLG_HybridSimulationResults( l_pcGraph, m_pcFrame );
+		    l_pcDlg = new SP_DLG_HybridSimulationResults( l_pcGraph, m_pcFrame );
+
 		}
 
 		if(l_pcDlg != NULL)

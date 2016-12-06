@@ -17,15 +17,11 @@
 #include "sp_ds/extensions/ResultViewer/SP_DS_xyPlotViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_HistogramPlotViewer.h"
 
-#include "sp_gui/dialogs/SP_DLG_ResultViewerProperties.h"
-
 #include "sp_gui/dialogs/dia_SteeringGUI/SP_GUI_SteeringSubWindow.h"
 
 #include "sp_gui/dialogs/dia_SteeringGUI/SP_GUI_SteeringDialog.h"
 
-#include "sp_gui/dialogs/dia_SteeringGUI/SP_DLG_ChangeCurveAttributes.h"
 #include "sp_gui/dialogs/dia_SteeringGUI/SP_DS_GUI_SteeringSetting.h"
-#include "sp_gui/dialogs/SP_DLG_SelectXAxisVariable.h"
 #include "sp_gui/dialogs/dia_SteeringGUI/SP_DLG_SelectNodes.h"
 #include "sp_gui/dialogs/dia_SteeringGUI/SP_DLG_SimulatorSetting.h"
 
@@ -53,8 +49,6 @@ enum
 	SP_ID_GUI_STEERING_DIALOG_SELECT_PARAMETERS_TO_EDIT_BUTTON,
 	SP_ID_GUI_STEERING_DIALOG_RESUME_BUTTON,
 	SP_ID_GUI_STEERING_DIALOG_REFRESH_BUTTON,
-	SP_ID_GUI_STEERING_DIALOG_VIEWER_PROPERTIES_BUTTON,
-	SP_ID_GUI_STEERING_DIALOG_ITEMCHANGED_CHOICELISTBOX,
 	SP_ID_GUI_STEERING_DIALOG_CHANGEVIEW_CHOICE,
 	SP_ID_GUI_STEERING_DIALOG_CURRENTMODEL_CHANGED_CHOICE,
 	SP_ID_GUI_STEERING_DIALOG_RESULT_REFRESH_TIMER,
@@ -69,11 +63,8 @@ enum
 	SP_ID_GUI_STEERING_DIALOG_SAVE_RESULTVIEWER_OUTPUT,
 	SP_ID_GUI_STEERING_DIALOG_REFRESH_MODELVIEWS,
 	SP_ID_GUI_STEERING_DIALOG_EDITVIEWS,
-	SP_ID_GUI_STEERING_DIALOG_DOEDIT_VIEWER_PROPERTIES,
-	SP_ID_GUI_STEERING_DIALOG_CHANGE_XAXIS_VARIABLE,
 	SP_ID_GUI_STEERING_DIALOG_RESET_PARAMETER_VALUES,
 	SP_ID_GUI_STEERING_DIALOG_RESET_PLACE_VALUES,
-	SP_ID_GUI_STEERING_DIALOG_EDIT_CURRENT_VIEW,
 	SP_ID_GUI_STEERING_DIALOG_SIMULATOR_SETTING,
 	SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS,
 	SP_ID_GUI_STEERING_DIALOG_CSV_EXPORT,
@@ -101,10 +92,7 @@ EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_RESET_PLACE_VALUES,SP_GUI_SteeringDialog::O
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_SELECT_PARAMETERS_TO_EDIT_BUTTON,SP_GUI_SteeringDialog::OnSelectParametersToEdit)
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_RESET_PARAMETER_VALUES,SP_GUI_SteeringDialog::OnResetParameterValues)
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_REFRESH_BUTTON,SP_GUI_SteeringDialog::OnRefreshButton)
-EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_VIEWER_PROPERTIES_BUTTON,SP_GUI_SteeringDialog::OnViewerPropertiesButton)
 EVT_CHOICE(SP_ID_GUI_STEERING_DIALOG_CHANGEVIEW_CHOICE,SP_GUI_SteeringDialog::OnChangeViewCombobox)
-EVT_CHECKLISTBOX(SP_ID_GUI_STEERING_DIALOG_ITEMCHANGED_CHOICELISTBOX, SP_GUI_SteeringDialog::OnItemStateChanged)
-EVT_LISTBOX_DCLICK(SP_ID_GUI_STEERING_DIALOG_ITEMCHANGED_CHOICELISTBOX,SP_GUI_SteeringDialog::OnItemDClick)
 EVT_CHOICE(SP_ID_GUI_STEERING_DIALOG_CURRENTMODEL_CHANGED_CHOICE, SP_GUI_SteeringDialog::OnModelNameChanged)
 EVT_TIMER(SP_ID_GUI_STEERING_DIALOG_RESULT_REFRESH_TIMER,SP_GUI_SteeringDialog::OnResultRefreshTimer)
 EVT_TIMER(SP_ID_GUI_STEERING_DIALOG_RUNTIME_REFRESH_TIMER,SP_GUI_SteeringDialog::OnRuntimeRefreshTimer)
@@ -118,13 +106,7 @@ EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_SIMULATOR_SETTING,SP_GUI_SteeringDialog::On
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_REFRESH_MODELNAMES,SP_GUI_SteeringDialog::OnRefershModelNames)
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_REMOVE_CURRENT_VIEW,SP_GUI_SteeringDialog::OnRemoveCurrentView)
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_REFRESH_MODELVIEWS,SP_GUI_SteeringDialog::OnRefreshModelViews)
-EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_EDITVIEWS,SP_GUI_SteeringDialog::OnOptionButton)
 EVT_BUTTON(SP_ID_GUI_STEERING_DIALOG_MORE,SP_GUI_SteeringDialog::OnMoreOptionButton)
-
-
-EVT_MENU(SP_ID_GUI_STEERING_DIALOG_DOEDIT_VIEWER_PROPERTIES,SP_GUI_SteeringDialog::OnDoEditViewerProperties)
-EVT_MENU(SP_ID_GUI_STEERING_DIALOG_CHANGE_XAXIS_VARIABLE,SP_GUI_SteeringDialog::OnChangeXAxisVariable)
-EVT_MENU(SP_ID_GUI_STEERING_DIALOG_EDIT_CURRENT_VIEW,SP_GUI_SteeringDialog::OnEditCurrentViewMenu)
 EVT_CHECKBOX( SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS, SP_GUI_SteeringDialog :: OnSelectClearAllItems )
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_CSV_EXPORT,SP_GUI_SteeringDialog::OnExport2CSV)
 EVT_MENU(SP_ID_GUI_STEERING_DIALOG_CSV_EXPORT_SELECTED,SP_GUI_SteeringDialog::OnExport2CSVSelected)
@@ -154,10 +136,6 @@ SP_DLG_Simulation(NULL, p_pcParent),
 
 	CreateControlButtonBar(m_pcMainSizer);
 
-	//Model views bar
-	//CreatModelViewsBar(l_pcRightSizer);
-
-	//CreateChoiceListBar(l_pcRightSizer);
 
 	//Update the simulation intervals
 	m_nOutputStartPoint = m_pcGUIClient->GetCurrentModel()->GetOutputStartPoint();
@@ -166,8 +144,6 @@ SP_DLG_Simulation(NULL, p_pcParent),
 
 	ShowSimulationIntervals();
 
-	//m_pcOutputViewerType->SetSelection(m_nCurrentViewerIndex);
-
 
 	if (Initialize() == false)
 	{
@@ -175,9 +151,8 @@ SP_DLG_Simulation(NULL, p_pcParent),
 		EndModal(wxID_CANCEL);
 	}
 
-
 	//Set the final alignment
-	SetSizerAndFit(SP_DLG_Simulation::m_pcMainSizer);
+	SetSizerAndFit(m_pcMainSizer);
 
 	Layout();
 
@@ -221,28 +196,7 @@ void SP_GUI_SteeringDialog::CreateControlButtonBar(wxSizer* p_pcParentSizer)
 
 	p_pcParentSizer->Add(l_pcBottomSizer, 0);
 }
-/*void SP_GUI_SteeringDialog::CreatModelViewsBar(wxSizer* p_pcParentSizer)
-{
-	wxSizer* l_pcOuterSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Model Views")), wxVERTICAL);
 
-	wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	m_pcModelViewBox = new wxChoice(this, SP_ID_GUI_STEERING_DIALOG_CHANGE_MODEL_VIEW, wxDefaultPosition, wxSize(100, -1));
-	l_pcRowSizer->Add(m_pcModelViewBox, 1, wxALL);
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_EDITVIEWS, wxT("Options...")), 1, wxALL);
-	l_pcOuterSizer->Add(l_pcRowSizer, 1, wxEXPAND);
-
-	l_pcOuterSizer->AddSpacer(10);
-
-	//result viewer
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	m_pcOutputViewerType = new wxChoice(this, SP_ID_GUI_STEERING_DIALOG_CHANGEVIEW_CHOICE,wxDefaultPosition, wxSize(100, -1));
-	l_pcRowSizer->Add(m_pcOutputViewerType, 1, wxALL);
-	l_pcRowSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_VIEWER_PROPERTIES_BUTTON, wxT("&Edit...")), 1, wxALL);
-	l_pcOuterSizer->Add(l_pcRowSizer, 1, wxEXPAND);
-
-	//Add to the main sizer
-	p_pcParentSizer->Add(l_pcOuterSizer, 0, wxLEFT | wxRIGHT | wxEXPAND);
-}*/
 
 void SP_GUI_SteeringDialog::CreatStatisticBar(wxSizer* p_pcParentSizer)
 {
@@ -368,27 +322,12 @@ void SP_GUI_SteeringDialog::CreateSimulatorBar(wxSizer* p_pcParentSizer)
 
 		l_pcSimulatorSizer->AddSpacer(1);
 		l_pcRowSizer->Add(new wxButton(this, SP_ID_GUI_STEERING_DIALOG_SIMULATOR_SETTING, wxT("&Setting ...")), 0, wxALL);
-
 		l_pcSimulatorSizer->Add(l_pcRowSizer, 0, wxALL);
 
 		p_pcParentSizer->Add(l_pcSimulatorSizer, 0);
 }
 
-void SP_GUI_SteeringDialog::CreateChoiceListBar(wxSizer* p_pcParentSizer)
-{
-	wxBoxSizer* l_pcItemChoiceSizer = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Select an item to view:")), wxVERTICAL);
-	p_pcParentSizer->Add(l_pcItemChoiceSizer, 1, wxLEFT | wxRIGHT | wxEXPAND);
-	m_pcItemsChoiceCheckListBox = new wxCheckListBox(this, SP_ID_GUI_STEERING_DIALOG_ITEMCHANGED_CHOICELISTBOX, wxDefaultPosition, wxSize(50, 50));
-	l_pcItemChoiceSizer->Add(m_pcItemsChoiceCheckListBox, 1, wxEXPAND);
 
-	wxSizer* l_pcSelectDeselecteSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcItemChoiceSizer->Add(l_pcSelectDeselecteSizer, 0, wxEXPAND);
-
-	//select/deselect all
-	m_pcSelectClearAllChkBox = new wxCheckBox(this, SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS, wxT("Select/deselect all"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE);
-	l_pcSelectDeselecteSizer->Add(m_pcSelectClearAllChkBox, 1, wxEXPAND);
-	m_pcSelectClearAllChkBox->Set3StateValue(wxCHK_UNDETERMINED);
-}
 bool SP_GUI_SteeringDialog::Initialize()
 {
 	//create a timer
@@ -397,8 +336,6 @@ bool SP_GUI_SteeringDialog::Initialize()
 
 	//Add the viewer to the list
 	//InitializeResultViewers();
-
-	//m_apcResultViewers[m_nCurrentViewerIndex]->Create();
 
 	ReadSettingFromRegistery();
 
@@ -413,8 +350,6 @@ bool SP_GUI_SteeringDialog::Initialize()
 	SelectCurrentSimulator();
 
 	UpdateModelViews();
-
-	ChangeViewTo(m_pcCurrentModel->GetActiveView());
 
 	//update simulator statistics
 	UpdateStatistics();
@@ -499,11 +434,6 @@ SP_GUI_SteeringDialog::~SP_GUI_SteeringDialog()
 
 	//write setting to registery
 	WriteSettingToRegistery();
-
-	/*for (l_itViewer = m_apcResultViewers.begin(); l_itViewer != m_apcResultViewers.end(); l_itViewer++)
-	{
-		wxDELETE((*l_itViewer));
-	}*/
 
 	//delete the timer
 	wxDELETE(m_pcResultRefershTimer);
@@ -872,10 +802,14 @@ void SP_GUI_SteeringDialog::OnRuntimeRefreshTimer(wxTimerEvent& WXUNUSED(event))
 
 void SP_GUI_SteeringDialog::UpdateView()
 {
-	if (m_an2DResultMatrix.size() == 0)
-	{
-		return;
-	}
+		if (m_an2DResultMatrix.size() == 0)
+		{
+			return;
+		}
+
+		//TODO:update all view window here
+
+
 	//Update the plot
 	//m_apcResultViewers[m_nCurrentViewerIndex]->SetXAxisValues(&m_anXAxisValues);
 
@@ -885,7 +819,6 @@ void SP_GUI_SteeringDialog::UpdateView()
 
 bool SP_GUI_SteeringDialog::UpdateSimulationIntervals()
 {
-
 	//check the user input
 	if (GetStartOutputPoint() > GetEndOutputPoint())
 	{
@@ -1072,10 +1005,10 @@ void SP_GUI_SteeringDialog::OnModelNameChanged(wxCommandEvent& WXUNUSED(event))
 
 	StartRefreshTimers();
 }
-void SP_GUI_SteeringDialog::OnViewerPropertiesButton(wxCommandEvent& event)
+/*void SP_GUI_SteeringDialog::OnViewerPropertiesButton(wxCommandEvent& event)
 {
 	OnDoEditViewerProperties(event);
-}
+}*/
 void SP_GUI_SteeringDialog::RefreshResultMatrix()
 {
 	int l_nReturn = 0;
@@ -1289,40 +1222,6 @@ void SP_GUI_SteeringDialog::OnSettingButton(wxCommandEvent& WXUNUSED(event))
 
 }
 
-void SP_GUI_SteeringDialog::OnItemDClick(wxCommandEvent& event)
-{
-
-	if (event.GetSelection() < 0 && (unsigned int) event.GetSelection() >= m_pcItemsChoiceCheckListBox->GetCount())
-	{
-		return;
-	}
-
-	SP_DS_ResultViewer* l_pcCurrentResultViewer = m_apcResultViewers[m_nCurrentViewerIndex];
-
-	CHECK_POINTER(l_pcCurrentResultViewer, return);
-
-	int l_nCurveIndex = m_pcItemsChoiceCheckListBox->GetSelection();
-
-	SP_DLG_ChangeCurveAttributes l_dial(this, l_pcCurrentResultViewer->GetCurveColor(l_nCurveIndex), l_pcCurrentResultViewer->GetCurveLineWidth(l_nCurveIndex),
-			l_pcCurrentResultViewer->GetCurveLineStyle(l_nCurveIndex));
-
-	if (l_dial.ShowModal() == wxID_OK)
-	{
-		l_pcCurrentResultViewer->SetCurveLineWidth(l_nCurveIndex, l_dial.GetLineWidth());
-
-		l_pcCurrentResultViewer->SetCurveLineStyle(l_nCurveIndex, l_dial.GetLineStyle());
-
-		wxColour l_nColor = l_dial.GetLineColor();
-
-		l_pcCurrentResultViewer->SetCurveColor(l_nCurveIndex, l_nColor.GetAsString(wxC2S_HTML_SYNTAX));
-
-		//Update the current viewer
-		UpdateView();
-
-		//we need to ask the user about saving the model
-		SetModified();
-	}
-}
 
 void SP_GUI_SteeringDialog::OnSimulatorCategoryChanged(wxCommandEvent& event)
 {
@@ -1623,7 +1522,7 @@ void SP_GUI_SteeringDialog::OnModelViewChanged(wxCommandEvent& event)
 
 void SP_GUI_SteeringDialog::ChangeViewTo(const unsigned int& l_ViewIndex)
 {
-	/*spsa::Attribute* l_pcAttribute = NULL;
+	spsa::Attribute* l_pcAttribute = NULL;
 
 	m_nCurrentView = l_ViewIndex;
 
@@ -1635,7 +1534,7 @@ void SP_GUI_SteeringDialog::ChangeViewTo(const unsigned int& l_ViewIndex)
 
 		m_nCurrentView = 0;
 	}
-	UpdateModelViews->SetSelection(m_nCurrentView);
+	//UpdateModelViews->SetSelection(m_nCurrentView);
 
 	//get current viewer type
 	l_pcAttribute = (*m_pcModelViews)[m_nCurrentView]->GetAttribute(wxT("VIEWER_TYPE"));
@@ -1668,7 +1567,7 @@ void SP_GUI_SteeringDialog::ChangeViewTo(const unsigned int& l_ViewIndex)
 	LoadCurrentView();
 
 	//refresh the result matrix
-	RefreshResultMatrix();*/
+	RefreshResultMatrix();
 }
 
 void SP_GUI_SteeringDialog::SaveCurrentViewSetting()
@@ -1736,6 +1635,19 @@ void SP_GUI_SteeringDialog::OnCloseDlg(wxCommandEvent& WXUNUSED(event))
 
 	}
 
+    SP_Core::Instance()->SetSimulationMode(false);
+
+
+	//close external windows
+	for (auto l_itWindow : m_pcExternalWindows)
+	{
+		l_itWindow->Destroy();
+	}
+
+	//clear pointers
+	m_pcExternalWindows.clear();
+
+	//end the dialog
 	if (IsModal())
 	{
 		EndModal(wxID_CANCEL);
@@ -1743,7 +1655,8 @@ void SP_GUI_SteeringDialog::OnCloseDlg(wxCommandEvent& WXUNUSED(event))
 	else
 	{
 		SetReturnCode(wxID_CANCEL);
-		this->Show(false);
+		Show(FALSE);
+		Destroy();
 	}
 }
 
@@ -1811,40 +1724,6 @@ void SP_GUI_SteeringDialog::OnRefreshModelViews(wxCommandEvent& WXUNUSED(event))
 
 }
 
-void SP_GUI_SteeringDialog::OnOptionButton(wxCommandEvent& WXUNUSED(event))
-{
-	wxMenu *l_pcEditViewMenu = new wxMenu;
-
-	l_pcEditViewMenu->Append(SP_ID_GUI_STEERING_DIALOG_ADD_NEW_VIEW, wxT("New"));
-	l_pcEditViewMenu->Append(SP_ID_GUI_STEERING_DIALOG_REMOVE_CURRENT_VIEW, wxT("Remove"));
-	l_pcEditViewMenu->Append(SP_ID_GUI_STEERING_DIALOG_EDIT_CURRENT_VIEW, wxT("Edit"));
-
-	l_pcEditViewMenu->AppendSeparator();
-
-	//add the export sub menu
-	wxMenu *l_pcExportMenu = new wxMenu;
-
-	l_pcExportMenu->Append(SP_ID_GUI_STEERING_DIALOG_CSV_EXPORT_SELECTED, wxT("Selected"));
-	l_pcExportMenu->Append(SP_ID_GUI_STEERING_DIALOG_CSV_EXPORT_ALL, wxT("All"));
-
-	if (m_pcCurrentModel->GetModelType() == spsa::COLORED_MODEL)
-	{
-		l_pcExportMenu->Append(SP_ID_GUI_STEERING_DIALOG_CSV_EXPORT_COLOURED, wxT("All Coloured"));
-	}
-
-	l_pcEditViewMenu->AppendSubMenu(l_pcExportMenu, wxT("CSV Export"));
-
-	l_pcEditViewMenu->Append(SP_ID_GUI_STEERING_DIALOG_IMG_EXPORT, wxT("Image Export"));
-
-	l_pcEditViewMenu->AppendSeparator();
-	l_pcEditViewMenu->Append(wxID_ANY, wxT("Change X axis"));
-
-	l_pcEditViewMenu->AppendSeparator();
-	l_pcEditViewMenu->Append(SP_ID_GUI_STEERING_DIALOG_OVERWRITE_MODEL_SETTING, wxT("Save"));
-	l_pcEditViewMenu->Append(SP_ID_GUI_STEERING_DIALOG_REFRESH_MODELVIEWS, wxT("Refresh"));
-
-	PopupMenu(l_pcEditViewMenu);
-}
 
 void SP_GUI_SteeringDialog::OnExport2CSV(wxCommandEvent& WXUNUSED(event))
 {
@@ -2069,7 +1948,7 @@ void SP_GUI_SteeringDialog::OnImageExport(wxCommandEvent &event)
 	}
 }
 
-void SP_GUI_SteeringDialog::OnEditCurrentViewMenu(wxCommandEvent& WXUNUSED(event))
+/*void SP_GUI_SteeringDialog::OnEditCurrentViewMenu(wxCommandEvent& WXUNUSED(event))
 {
 	SP_DLG_SelectNodes* l_pcSelectCurvsDlg;
 
@@ -2082,8 +1961,8 @@ void SP_GUI_SteeringDialog::OnEditCurrentViewMenu(wxCommandEvent& WXUNUSED(event
 	}
 
 	l_pcSelectCurvsDlg->Destroy();
-}
-void SP_GUI_SteeringDialog::OnDoEditViewerProperties(wxCommandEvent& WXUNUSED(event))
+}*/
+/*void SP_GUI_SteeringDialog::OnDoEditViewerProperties(wxCommandEvent& WXUNUSED(event))
 {
 	SP_DLG_ResultViewerProperties* l_pcViewerProperties = new SP_DLG_ResultViewerProperties(m_apcResultViewers[m_nCurrentViewerIndex], this);
 
@@ -2095,29 +1974,8 @@ void SP_GUI_SteeringDialog::OnDoEditViewerProperties(wxCommandEvent& WXUNUSED(ev
 		SetModified();
 	}
 	l_pcViewerProperties->Destroy();
-}
+}*/
 
-void SP_GUI_SteeringDialog::OnChangeXAxisVariable(wxCommandEvent& WXUNUSED(event))
-{
-	/*SP_DLG_SelectXAxisVariable* l_pcSelectXAxis=new SP_DLG_SelectXAxisVariable(this,(*m_pcModelViews)[m_nCurrentView]->GetXAxisVariableType()
-	 ,m_pcCurrentModel->GetPlaceNames(),
-	 m_pcCurrentModel->GetTransitionNames(),
-	 m_pcCurrentModel->GetParameterNames(),
-	 (*m_pcModelViews)[m_nCurrentView]->GetXAxisVariableName());
-
-	 if(m_nCurrentView<m_pcModelViews->size() && l_pcSelectXAxis->ShowModal()==wxID_OK)
-	 {
-	 (*m_pcModelViews)[m_nCurrentView]->SetXAxisVariableType(l_pcSelectXAxis->GetSelectedVariableType());
-
-	 (*m_pcModelViews)[m_nCurrentView]->SetXAxisVariableName(l_pcSelectXAxis->GetSelectedVariableName());
-
-	 RefreshResultMatrix();
-
-	 UpdateView();
-	 }
-	 l_pcSelectXAxis->Destroy();
-	 */
-}
 
 void SP_GUI_SteeringDialog::OnResetParameterValues(wxCommandEvent& WXUNUSED(event))
 {
@@ -2309,7 +2167,9 @@ void SP_GUI_SteeringDialog::OpenViewInSeparateWindow(spsa::ModelView* p_pcModelV
 			new SP_DLG_ViewerWindowSteering(this,
 					                        p_pcModelView,
 											m_pcResultMatrixInfo,
-											&m_an2DResultMatrix);
+											&m_an2DResultMatrix,
+											&m_anXAxisValues,
+											m_pcCurrentModel);
 
     // check if the window is created correctly
     if (l_pcViewerWindow != NULL)

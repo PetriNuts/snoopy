@@ -211,7 +211,7 @@ void SP_GUI_ConnectToServer::OnClose(wxCommandEvent& event)
 		this->Show(false);
 	}*/
 
-	this->Close();
+	this->Show(false);
 }
 bool SP_GUI_ConnectToServer::ConnectToServer()
 {
@@ -226,6 +226,8 @@ bool SP_GUI_ConnectToServer::ConnectToServer()
 	wxString l_sName;
 
 	Model* l_pcModel = NULL;
+
+	SP_GUI_SteeringDialog* l_pcSteeringDlg=NULL;
 
 	//Get Port and IP
 	m_sPort = m_pcPortComboCtrl->GetValue();
@@ -337,11 +339,16 @@ bool SP_GUI_ConnectToServer::ConnectToServer()
 				SP_LOGDEBUG(wxT("Steering initialization time=") + wxString::Format(wxT("%gs"), (double) (l_sw.Time()) / 1000));
 			}
 
+
 			if (l_nIsInitialized == spsa::SUCCESS)
 			{
-				SP_GUI_SteeringDialog* l_pcSteeringDlg = new SP_GUI_SteeringDialog(this, m_pcGUIClient, wxT("Steering GUI"));
 
-				l_pcSteeringDlg->Show();
+				l_pcSteeringDlg = new SP_GUI_SteeringDialog(this, m_pcGUIClient, wxT("Steering GUI"));
+
+				//SP_MESSAGEBOX(wxT("Here"), wxT("Error"));
+
+				if(l_pcSteeringDlg!=NULL)
+				   l_pcSteeringDlg->Show();
 
 				//this->Show(false);
 			}
