@@ -590,8 +590,7 @@ void SP_DLG_Simulation::OnRemovingModalViews(wxCommandEvent& p_cEvent) {
 		LoadData(true);
 	}
 
-
-
+	SP_Core::Instance()->GetRootDocument()->Modify(true);
 }
 
 void SP_DLG_Simulation::OnRenameModalView(wxCommandEvent& p_cEvent) {
@@ -663,6 +662,9 @@ void SP_DLG_Simulation::OnRenameModalView(wxCommandEvent& p_cEvent) {
 
 	//reload the curves
 	LoadData(true);
+
+	SP_Core::Instance()->GetRootDocument()->Modify(true);
+
 }
 
 void SP_DLG_Simulation::OnEditXAxis(wxWindow *p_pcExternalWindowDialog) {
@@ -1627,12 +1629,17 @@ void SP_DLG_Simulation::OnSimulationProperties(wxCommandEvent& p_cEvent)
 
     l_pcDlg->Destroy();
 
+    SetFocus();
+
     CHECK_POINTER(m_pcMainSimulator->GetSimulatorOptions(),return);
     spsim::Property* l_pcRefershRate=m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("Refreshrate"));
 
     CHECK_POINTER(l_pcRefershRate,return);
 
     m_nRefreshRate=l_pcRefershRate->GetValuelong();
+
+	SP_Core::Instance()->GetRootDocument()->Modify(true);
+
 }
 
 wxColour SP_DLG_Simulation::GetNodeColour(SP_DS_Node* p_pcNode)
