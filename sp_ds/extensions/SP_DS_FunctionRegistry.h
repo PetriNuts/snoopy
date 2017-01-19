@@ -55,7 +55,7 @@ public:
 
 	SP_FunctionPtr parseFunctionString(wxString p_sFunction);
 
-	void registerFunction(SP_FunctionPtr p_Signature, SP_FunctionPtr p_Definition);
+	void registerFunction(wxString p_Signature, wxString p_Definition);
 
 	void removeFunction(const wxString& p_sName);
 

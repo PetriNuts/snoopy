@@ -556,9 +556,7 @@ void SP_ImportSBML2sPn::getModelCompartments()
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
 		l_pcColAttr->SetCell(0, 1, l_parameterValue);
 
-		SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_CompId);
-		SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_parameterValue);
-		m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
+		m_pcGraph->GetFunctionRegistry()->registerFunction(l_CompId, l_parameterValue);
 	}
 }
 
@@ -624,9 +622,7 @@ void SP_ImportSBML2sPn::getModelParameters()
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
 		l_pcColAttr->SetCell(0, 1, l_parameterValue);
 
-		SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_ParamId);
-		SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_parameterValue);
-		m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
+		m_pcGraph->GetFunctionRegistry()->registerFunction(l_ParamId, l_parameterValue);
 	}
 }
 
@@ -697,9 +693,7 @@ void SP_ImportSBML2sPn::getReactionParameters(Reaction*  l_sbmlReaction, ASTNode
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
 		l_pcColAttr->SetCell(0, 1, l_parameterValue);
 
-		SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_ParamIdNew);
-		SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_parameterValue);
-		m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
+		m_pcGraph->GetFunctionRegistry()->registerFunction(l_ParamIdNew, l_parameterValue);
 
 	}
 }

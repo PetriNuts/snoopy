@@ -597,14 +597,14 @@ bool SP_DLG_CPNSimulationResults::InitializeSimulator()
 	if (!m_bIsSimulatorInitialized)
 	{
 		wxBusyInfo l_Info(wxT("Loading data, please wait...."), this);
+		//Parameters
+		LoadParameters();
+
 		//Places
 		LoadPlaces();
 
 		//Transitions
 		LoadTransitions();
-
-		//Parameters
-		LoadParameters();
 
 		//Load Connections
 		LoadConnections();

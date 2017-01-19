@@ -541,13 +541,7 @@ bool SP_DLG_NewConstantDefinition::SaveData()
 			l_pcColList->SetCell(l_nRowCol, 1, m_pcConstantSetGrid->GetCellValue(l_nRow, j));
 		}
 
-		SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_sName);
-		SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(m_pcConstantSetGrid->GetCellValue(l_nRow, m_nMainSet));
-/*		wxString l_sSig(l_pcSig->toString().c_str(), wxConvUTF8);
-		wxString l_sDef(l_pcDef->toString().c_str(), wxConvUTF8);
-		SP_LOGMESSAGE( wxT("Signature: ") + l_sSig);
-		SP_LOGMESSAGE( wxT("Definition: ") + l_sDef);
-*/		m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
+		m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, m_pcConstantSetGrid->GetCellValue(l_nRow, m_nMainSet));
 
 		l_pcColList->UpdateActiveListColumnPtr();
 

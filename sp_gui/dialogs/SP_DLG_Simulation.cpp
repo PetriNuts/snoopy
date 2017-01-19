@@ -1117,9 +1117,10 @@ void SP_DLG_Simulation::LoadParameters()
                 	l_nValue = SP_DS_FunctionEvaluatorLong{l_pcFR, l_Function}();
                 }
                 else if(l_sType == wxT("double"))
-                {
-                	l_nValue = SP_DS_FunctionEvaluatorDouble{l_pcFR, l_Function}();
-                }
+				{
+					l_nValue = SP_DS_FunctionEvaluatorDouble{l_pcFR, l_Function}();
+				}
+				l_pcFR->registerFunction(l_sName, to_string(l_nValue));
             }
             //****************************************************************************************
 

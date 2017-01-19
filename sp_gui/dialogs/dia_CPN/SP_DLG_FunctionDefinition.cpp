@@ -462,14 +462,9 @@ bool SP_DLG_FunctionDefinition::SaveData()
 			l_pcMetadata->GetAttribute(wxT("Body"))->SetValueString(m_pcGrid->GetCellValue(i, BODY));
 			l_pcMetadata->GetAttribute(wxT("Comment"))->SetValueString(m_pcGrid->GetCellValue(i, COMMENT));
 
-			SP_FunctionPtr l_pcSig = m_pcGraph->GetFunctionRegistry()->parseFunctionString(
-					m_pcGrid->GetCellValue(i, NAME) + wxT("(") + m_pcGrid->GetCellValue(i, PARAMETER) + wxT(")"));
-			SP_FunctionPtr l_pcDef = m_pcGraph->GetFunctionRegistry()->parseFunctionString(m_pcGrid->GetCellValue(i, BODY));
-			//wxString l_sSig(l_pcSig->toString().c_str(), wxConvUTF8);
-			//wxString l_sDef(l_pcDef->toString().c_str(), wxConvUTF8);
-			//SP_LOGMESSAGE( wxT("Signature: ") + l_sSig);
-			//SP_LOGMESSAGE( wxT("Definition: ") + l_sDef);
-			m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcSig, l_pcDef);
+			m_pcGraph->GetFunctionRegistry()->registerFunction(
+					m_pcGrid->GetCellValue(i, NAME) + wxT("(") + m_pcGrid->GetCellValue(i, PARAMETER) + wxT(")"),
+					m_pcGrid->GetCellValue(i, BODY));
 
 			bool l_bShow = m_pcGrid->GetCellValue(i, SHOW) == wxT("1") ? true : false;
 			l_pcMetadata->SetShow(l_bShow);

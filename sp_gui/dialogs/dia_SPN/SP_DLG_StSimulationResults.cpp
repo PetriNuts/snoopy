@@ -1438,14 +1438,14 @@ bool SP_DLG_StSimulationResults::InitializeSimulator()
 
 	SetSimulationProgressGaugeRange(100);
 
+	//Parameters
+	LoadParameters();
+
 	//Places
 	LoadPlaces();
 
 	//Transitions
 	LoadTransitions();
-
-	//Parameters
-	LoadParameters();
 
 	//Load Connections
 	LoadConnections();

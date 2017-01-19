@@ -93,12 +93,7 @@ SP_DS_FunctionRegistry::LoadFromNet(SP_DS_Graph* p_pcGraph)
 			wxString l_sParam = l_pcMeta->GetAttribute(wxT("Parameter"))->GetValueString();
 			wxString l_sBody = l_pcMeta->GetAttribute(wxT("Body"))->GetValueString();
 
-			SP_FunctionPtr l_pcName(parseFunctionString(l_sName + wxT("(") + l_sParam + wxT(")")));
-			SP_FunctionPtr l_pcBody(parseFunctionString(l_sBody));
-			if(l_pcName != NULL && l_pcBody != NULL)
-			{
-				registerFunction(l_pcName, l_pcBody);
-			}
+			registerFunction(l_sName + wxT("(") + l_sParam + wxT(")"), l_sBody);
 		}
 	}
 	//load constants
@@ -110,12 +105,7 @@ SP_DS_FunctionRegistry::LoadFromNet(SP_DS_Graph* p_pcGraph)
 			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMeta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 			wxString l_sValue = dynamic_cast<SP_DS_ColListAttribute*>(l_pcMeta->GetAttribute(wxT("ValueList")))->GetActiveCellValue(1);
 
-			SP_FunctionPtr l_pcName(parseFunctionString(l_sName));
-			SP_FunctionPtr l_pcValue(parseFunctionString(l_sValue));
-			if(l_pcName != NULL && l_pcValue != NULL)
-			{
-				registerFunction(l_pcName, l_pcValue);
-			}
+			registerFunction(l_sName, l_sValue);
 		}
 	}
 	m_bIsValid = true;
@@ -147,21 +137,23 @@ SP_DS_FunctionRegistry::parseFunctionString(wxString p_sFunction)
 }
 
 void
-SP_DS_FunctionRegistry::registerFunction(SP_FunctionPtr p_Signature, SP_FunctionPtr p_Definition)
+SP_DS_FunctionRegistry::registerFunction(wxString p_Signature, wxString p_Definition)
 {
-	if(!p_Signature)
+    auto l_Signature = parseFunctionString(p_Signature);
+	if(!l_Signature)
 	{
 		SP_LOGERROR(wxT("register function: invalid signature"));
 		return;
 	}
-	if(!p_Definition)
+    auto l_Definition = parseFunctionString(p_Definition);
+	if(!l_Definition)
 	{
 		SP_LOGERROR(wxT("register function: invalid definition"));
 		return;
 	}
 	try
 	{
-		m_pcBuilder->registerFunctionTemplate(p_Signature->copy(), p_Definition->copy());
+		m_pcBuilder->registerFunctionTemplate(l_Signature->copy(), l_Definition->copy());
 	}
 	catch(std::exception& e)
 	{

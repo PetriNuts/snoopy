@@ -188,9 +188,7 @@ void SP_ImportSBML2extPN::getModelCompartments()
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
 		l_pcColAttr->SetCell(0, 1, l_parameterValue);
 
-		SP_FunctionPtr l_pcName = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_CompId);
-		SP_FunctionPtr l_pcValue = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_parameterValue);
-		m_pcGraph->GetFunctionRegistry()->registerFunction(l_pcName, l_pcValue);
+		m_pcGraph->GetFunctionRegistry()->registerFunction(l_CompId, l_parameterValue);
 	}
 }
 
