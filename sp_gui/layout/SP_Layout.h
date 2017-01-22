@@ -20,29 +20,27 @@
 
 struct NodeData
 {
-	unsigned long Id;
-	std::string Name;
-	double X;
-	double Y;
-	double W;
-	double H;
-	SP_GR_Node* NodeGr;
-	NodeData():Id(0), Name(""), X(0), Y(0), W(20), H(20), NodeGr(NULL) {}
+	unsigned long Id = 0;
+	std::string Name = "";
+	double X = 0.0;
+	double Y = 0.0;
+	double W = 20.0;
+	double H = 20.0;
+	SP_GR_Node* NodeGr = nullptr;
 };
 
 struct EdgeData
 {
-	unsigned long Id;
-	unsigned long SourceId;
-	unsigned long TargetId;
-	SP_GR_Edge* EdgeGr;
+	unsigned long Id = 0;
+	unsigned long SourceId = 0;
+	unsigned long TargetId = 0;
+	SP_GR_Edge* EdgeGr = nullptr;
 	std::vector<double> X;
 	std::vector<double> Y;
-	EdgeData():Id(0), SourceId(0), TargetId(0), EdgeGr(NULL) {}
 };
 
-typedef map<unsigned long, NodeData*> MapNodeData;
-typedef map<unsigned long, EdgeData*> MapEdgeData;
+typedef map<unsigned long, NodeData> MapNodeData;
+typedef map<unsigned long, EdgeData> MapEdgeData;
 
 class SP_Layout: public SP_Error
 {

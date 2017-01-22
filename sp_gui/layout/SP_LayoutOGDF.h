@@ -14,7 +14,10 @@
 #include <ogdf/basic/Graph.h>
 #include <ogdf/basic/GraphAttributes.h>
 
-using namespace ogdf;
+using ogdf::node;
+using ogdf::edge;
+using ogdf::Graph;
+using ogdf::GraphAttributes;
 
 class SP_LayoutOGDF: public SP_Layout
 {
@@ -22,6 +25,10 @@ private:
 	bool SP_FMMMLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr);
 	bool SP_SugiyamaLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr);
 	bool SP_PlanarizationLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr);
+
+	std::map<node, unsigned long> node2id;
+    std::map<unsigned long, node> id2node;
+    std::map<edge, unsigned long> edge2id;
 
 protected:
 	virtual bool DoVisualization();

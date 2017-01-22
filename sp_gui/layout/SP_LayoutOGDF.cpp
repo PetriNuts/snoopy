@@ -32,51 +32,34 @@ bool SP_LayoutOGDF::DoVisualization()
 	Graph l_Graph;
 	GraphAttributes l_GraphAttr(l_Graph, GraphAttributes::nodeGraphics
 											| GraphAttributes::edgeGraphics
-											| GraphAttributes::nodeLabel
-											| GraphAttributes::edgeLabel
 											| GraphAttributes::edgeArrow);
 
-	MapNodeData::iterator l_itN;
-	for(l_itN = m_mNodes.begin(); l_itN != m_mNodes.end(); ++l_itN)
+	for(const auto l_itN : m_mNodes)
 	{
-		NodeData* l_pcNodeData = l_itN->second;
+		const NodeData& l_pcNodeData = l_itN.second;
 		node l_Node = l_Graph.newNode();
-		l_GraphAttr.label(l_Node) = std::to_string(l_pcNodeData->Id);
-		l_GraphAttr.height(l_Node) = l_pcNodeData->H;
-		l_GraphAttr.width(l_Node) = l_pcNodeData->W;
+		l_GraphAttr.height(l_Node) = l_pcNodeData.H;
+		l_GraphAttr.width(l_Node) = l_pcNodeData.W;
+        node2id[l_Node] = l_pcNodeData.Id;
+        id2node[l_pcNodeData.Id] = l_Node;
 	}
 
-	MapEdgeData::iterator l_itE;
-	for(l_itE = m_mEdges.begin(); l_itE != m_mEdges.end(); ++l_itE)
+	for(const auto l_itE : m_mEdges)
 	{
-		EdgeData* l_pcEdgeData = l_itE->second;
-		node l_Source = NULL;
-		node l_Target = NULL;
-		node l_Node = l_Graph.firstNode();
-		while(l_Node)
+		const EdgeData& l_pcEdgeData = l_itE.second;
+		node l_Source = id2node[l_pcEdgeData.SourceId];
+		node l_Target = id2node[l_pcEdgeData.TargetId];
+		if(l_Source && l_Target)
 		{
-			std::string l_SourceId = std::to_string(l_pcEdgeData->SourceId);
-			if((l_GraphAttr.label(l_Node)) == l_SourceId)
-			{
-				l_Source = l_Node;
-			}
-			std::string l_TargetId = std::to_string(l_pcEdgeData->TargetId);
-			if(l_GraphAttr.label(l_Node) == l_TargetId)
-			{
-			  l_Target = l_Node;
-			}
-			if(l_Source && l_Target)
-			{
-			  l_Node = NULL;
-			}
-			else
-			{
-			  l_Node = l_Node->succ();
-			}
+			edge l_Edge = l_Graph.newEdge(l_Source, l_Target);
+			l_GraphAttr.arrowType(l_Edge) = ogdf::EdgeArrow::eaLast;
+			edge2id[l_Edge] = l_pcEdgeData.Id;
 		}
-		edge l_Edge = l_Graph.newEdge(l_Source, l_Target);
-		l_GraphAttr.label(l_Edge) = std::to_string(l_pcEdgeData->Id);
-		l_GraphAttr.arrowType(l_Edge) = EdgeArrow::eaLast;
+		else
+		{
+			SP_LOGERROR(wxT("adding edge between node(") + std::to_string(l_pcEdgeData.SourceId)
+				+ wxT(") and node(") + std::to_string(l_pcEdgeData.TargetId) + wxT(")"));
+		}
 	}
 
 	if(m_sLayout == wxT("FMMM"))
@@ -95,9 +78,9 @@ bool SP_LayoutOGDF::DoVisualization()
 	node l_Node = l_Graph.firstNode();
 	while(l_Node)
 	{
-		long l_nId = atol(l_GraphAttr.label(l_Node).c_str());
-		m_mNodes[l_nId]->X = l_GraphAttr.x(l_Node);
-		m_mNodes[l_nId]->Y = l_GraphAttr.y(l_Node);
+		unsigned long l_nId = node2id[l_Node];
+		m_mNodes[l_nId].X = l_GraphAttr.x(l_Node);
+		m_mNodes[l_nId].Y = l_GraphAttr.y(l_Node);
 
 		l_Node = l_Node->succ();
 	}
@@ -105,14 +88,14 @@ bool SP_LayoutOGDF::DoVisualization()
 	edge l_Edge = l_Graph.firstEdge();
 	while(l_Edge)
 	{
-		long l_nId = atol(l_GraphAttr.label(l_Edge).c_str());
-		DPolyline &l_Polyline = l_GraphAttr.bends(l_Edge);
-		m_mEdges[l_nId]->X.resize(l_Polyline.size());
-		m_mEdges[l_nId]->Y.resize(l_Polyline.size());
+		unsigned long l_nId = edge2id[l_Edge];
+		ogdf::DPolyline &l_Polyline = l_GraphAttr.bends(l_Edge);
+		m_mEdges[l_nId].X.resize(l_Polyline.size());
+		m_mEdges[l_nId].Y.resize(l_Polyline.size());
 		for(int i = 0; i < l_Polyline.size(); ++i)
 		{
-			m_mEdges[l_nId]->X[i] = (*(l_Polyline.get(i))).m_x;
-			m_mEdges[l_nId]->Y[i] = (*(l_Polyline.get(i))).m_y;
+			m_mEdges[l_nId].X[i] = (*(l_Polyline.get(i))).m_x;
+			m_mEdges[l_nId].Y[i] = (*(l_Polyline.get(i))).m_y;
 		}
 		l_Edge = l_Edge->succ();
 	}
@@ -122,6 +105,7 @@ bool SP_LayoutOGDF::DoVisualization()
 
 bool SP_LayoutOGDF::SP_FMMMLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr)
 {
+	using ogdf::FMMMLayout;
 	FMMMLayout l_Layout;
 
 	l_Layout.useHighLevelOptions(true);
@@ -138,8 +122,8 @@ bool SP_LayoutOGDF::SP_FMMMLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr)
 
 bool SP_LayoutOGDF::SP_SugiyamaLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr)
 {
-	SugiyamaLayout l_Layout;
-	FastHierarchyLayout* l_FHL = new FastHierarchyLayout();
+	ogdf::SugiyamaLayout l_Layout;
+	auto* l_FHL = new ogdf::FastHierarchyLayout();
 	l_FHL->layerDistance(20.0);
 	l_FHL->nodeDistance(20.0);
 	l_Layout.setLayout(l_FHL);
@@ -151,22 +135,22 @@ bool SP_LayoutOGDF::SP_SugiyamaLayout(Graph& p_Graph, GraphAttributes& p_GraphAt
 
 bool SP_LayoutOGDF::SP_PlanarizationLayout(Graph& p_Graph, GraphAttributes& p_GraphAttr)
 {
-	PlanarizationLayout pl;
+	ogdf::PlanarizationLayout pl;
 
-	SubgraphPlanarizer *crossMin = new SubgraphPlanarizer();
+	auto *crossMin = new ogdf::SubgraphPlanarizer();
 
-	FastPlanarSubgraph *ps = new FastPlanarSubgraph;
+	auto *ps = new ogdf::FastPlanarSubgraph;
 	ps->runs(100);
-	VariableEmbeddingInserter *ves = new VariableEmbeddingInserter();
-	ves->removeReinsert(rrAll);
+	auto *ves = new ogdf::VariableEmbeddingInserter();
+	ves->removeReinsert(ogdf::rrAll);
 
 	crossMin->setSubgraph(ps);
 	crossMin->setInserter(ves);
 
-	EmbedderMinDepthMaxFaceLayers *emb = new EmbedderMinDepthMaxFaceLayers();
+	auto *emb = new ogdf::EmbedderMinDepthMaxFaceLayers();
 	pl.setEmbedder(emb);
 
-	OrthoLayout *ol = new OrthoLayout();
+	auto *ol = new ogdf::OrthoLayout();
 	ol->separation(20.0);
 	ol->cOverhang(0.4);
 	pl.setPlanarLayouter(ol);

@@ -7,17 +7,12 @@
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 #include "SP_Layout.h"
-#include "sp_ds/SP_DS_Netclass.h"
-#include "sp_ds/SP_DS_Nodeclass.h"
-#include "sp_ds/SP_DS_Edgeclass.h"
 #include "sp_ds/extensions/SP_DS_Coarse.h"
 #include "sp_gr/SP_GR_Attribute.h"
 #include "sp_gui/mdi/SP_MDI_View.h"
-#include "sp_core/SP_GPR_Canvas.h"
 
 #include "snoopy.h"
 #include "sp_core/SP_Core.h"
-#include "sp_gui/windows/SP_GUI_Childframe.h"
 #include <wx/busyinfo.h>
 
 SP_Layout::SP_Layout():
@@ -112,32 +107,32 @@ void SP_Layout::Init(unsigned int p_nNetNumber)
 				SP_GR_Edge* l_pcGrEdge = dynamic_cast<SP_GR_Edge*>(*l_GrIter);
 				if (l_pcGrEdge->GetNetnumber() == p_nNetNumber)
 				{
-					EdgeData* l_pcEdgeData = new EdgeData();
-					l_pcEdgeData->EdgeGr = l_pcGrEdge;
-					l_pcEdgeData->Id = l_pcGrEdge->GetId();
-					l_pcEdgeData->SourceId = l_pcGrEdge->GetSource()->GetId();
-					l_pcEdgeData->TargetId = l_pcGrEdge->GetTarget()->GetId();
-					m_mEdges.insert(make_pair(l_pcEdgeData->Id, l_pcEdgeData));
+					EdgeData l_pcEdgeData;
+					l_pcEdgeData.EdgeGr = l_pcGrEdge;
+					l_pcEdgeData.Id = l_pcGrEdge->GetId();
+					l_pcEdgeData.SourceId = l_pcGrEdge->GetSource()->GetId();
+					l_pcEdgeData.TargetId = l_pcGrEdge->GetTarget()->GetId();
+					m_mEdges.insert(make_pair(l_pcEdgeData.Id, l_pcEdgeData));
 
-					if(m_mNodes.find(l_pcEdgeData->SourceId) == m_mNodes.end())
+					if(m_mNodes.find(l_pcEdgeData.SourceId) == m_mNodes.end())
 					{
 						SP_GR_Node* l_pcGrNode = dynamic_cast<SP_GR_Node*>(l_pcGrEdge->GetSource());
-						NodeData* l_pcNodeData = new NodeData();
-						l_pcNodeData->NodeGr = l_pcGrNode;
-						l_pcNodeData->Id = l_pcGrNode->GetId();
-						l_pcNodeData->H = l_pcGrNode->GetHeight();
-						l_pcNodeData->W = l_pcGrNode->GetWidth();
-						m_mNodes.insert(make_pair(l_pcNodeData->Id, l_pcNodeData));
+						NodeData l_pcNodeData;
+						l_pcNodeData.NodeGr = l_pcGrNode;
+						l_pcNodeData.Id = l_pcGrNode->GetId();
+						l_pcNodeData.H = l_pcGrNode->GetHeight();
+						l_pcNodeData.W = l_pcGrNode->GetWidth();
+						m_mNodes.insert(make_pair(l_pcNodeData.Id, l_pcNodeData));
 					}
-					if(m_mNodes.find(l_pcEdgeData->TargetId) == m_mNodes.end())
+					if(m_mNodes.find(l_pcEdgeData.TargetId) == m_mNodes.end())
 					{
 						SP_GR_Node* l_pcGrNode = dynamic_cast<SP_GR_Node*>(l_pcGrEdge->GetTarget());
-						NodeData* l_pcNodeData = new NodeData();
-						l_pcNodeData->NodeGr = l_pcGrNode;
-						l_pcNodeData->Id = l_pcGrNode->GetId();
-						l_pcNodeData->H = l_pcGrNode->GetHeight();
-						l_pcNodeData->W = l_pcGrNode->GetWidth();
-						m_mNodes.insert(make_pair(l_pcNodeData->Id, l_pcNodeData));
+						NodeData l_pcNodeData;
+						l_pcNodeData.NodeGr = l_pcGrNode;
+						l_pcNodeData.Id = l_pcGrNode->GetId();
+						l_pcNodeData.H = l_pcGrNode->GetHeight();
+						l_pcNodeData.W = l_pcGrNode->GetWidth();
+						m_mNodes.insert(make_pair(l_pcNodeData.Id, l_pcNodeData));
 					}
 
 				} //end if
@@ -149,25 +144,8 @@ void SP_Layout::Init(unsigned int p_nNetNumber)
 
 void SP_Layout::Clear()
 {
-	MapNodeData::iterator l_itN = m_mNodes.begin();
-
-	while(l_itN != m_mNodes.end())
-	{
-		NodeData* l_pcNodeData = l_itN->second;
-		delete l_pcNodeData;
-		m_mNodes.erase(l_itN);
-		l_itN = m_mNodes.begin();
-	}
-
-	MapEdgeData::iterator l_itE = m_mEdges.begin();
-
-	while(l_itE != m_mEdges.end())
-	{
-		EdgeData* l_pcEdgeData = l_itE->second;
-		delete l_pcEdgeData;
-		m_mEdges.erase(l_itE);
-		l_itE = m_mEdges.begin();
-	}
+	m_mNodes.clear();
+	m_mEdges.clear();
 }
 
 bool SP_Layout::ResetNodes()
@@ -176,10 +154,10 @@ bool SP_Layout::ResetNodes()
 	MapNodeData::iterator l_itN;
 	for(l_itN = m_mNodes.begin(); l_itN != m_mNodes.end(); ++l_itN)
 	{
-		SP_GR_Node* l_pcGrNode = l_itN->second->NodeGr;
+		SP_GR_Node* l_pcGrNode = l_itN->second.NodeGr;
 
-		double l_nX = l_itN->second->X;
-		double l_nY = l_itN->second->Y;
+		double l_nX = l_itN->second.X;
+		double l_nY = l_itN->second.Y;
 
 		if(l_nX > m_nMaxX) m_nMaxX = l_nX;
 		if(l_nY > m_nMaxY) m_nMaxY = l_nY;
@@ -200,7 +178,7 @@ bool SP_Layout::ResetNodes()
 				SP_GR_Attribute* l_pcAttr =	dynamic_cast<SP_GR_Attribute*>(*l_GrAttrIter);
 				if (l_pcAttr)
 				{
-					if (l_pcAttr->GetGraphicParent()->GetId() == l_itN->second->Id)
+					if (l_pcAttr->GetGraphicParent()->GetId() == l_itN->second.Id)
 					{
 						double l_nOffsetX = l_pcAttr->GetOffsetX();
 						double l_nOffsetY = l_pcAttr->GetOffsetY();
@@ -235,19 +213,19 @@ bool SP_Layout::ResetEdges()
 	MapEdgeData::iterator l_itE;
 	for(l_itE = m_mEdges.begin(); l_itE != m_mEdges.end(); ++l_itE)
 	{
-		SP_GR_Edge* l_pcEdge = l_itE->second->EdgeGr;
-		std::vector<double> l_aX = l_itE->second->X;
-		std::vector<double> l_aY = l_itE->second->Y;
+		SP_GR_Edge* l_pcEdge = l_itE->second.EdgeGr;
+		const std::vector<double>& l_aX = l_itE->second.X;
+		const std::vector<double>& l_aY = l_itE->second.Y;
 
 		wxList l_lPoints;
 		if(l_aX.size() < 2 || l_aY.size() < 2)
 		{
 			double l_nX, l_nY;
-			l_nX = m_mNodes[l_itE->second->SourceId]->X;
-			l_nY = m_mNodes[l_itE->second->SourceId]->Y;
+			l_nX = m_mNodes[l_itE->second.SourceId].X;
+			l_nY = m_mNodes[l_itE->second.SourceId].Y;
 			l_lPoints.Append((wxObject*) new wxRealPoint(l_nX, l_nY));
-			l_nX = m_mNodes[l_itE->second->TargetId]->X;
-			l_nY = m_mNodes[l_itE->second->TargetId]->Y;
+			l_nX = m_mNodes[l_itE->second.TargetId].X;
+			l_nY = m_mNodes[l_itE->second.TargetId].Y;
 			l_lPoints.Append((wxObject*) new wxRealPoint(l_nX, l_nY));
 		}
 		else
@@ -276,7 +254,7 @@ bool SP_Layout::ResetEdgesAttributes()
 	MapEdgeData::iterator l_itE;
 	for(l_itE = m_mEdges.begin(); l_itE != m_mEdges.end(); ++l_itE)
 	{
-		SP_GR_Edge* l_pcEdge = l_itE->second->EdgeGr;
+		SP_GR_Edge* l_pcEdge = l_itE->second.EdgeGr;
 		//Set Attributes
 		SP_ListAttribute::const_iterator l_AIter;
 		const SP_ListAttribute* l_plAttributes = l_pcEdge->GetParent()->GetAttributes();
@@ -287,7 +265,7 @@ bool SP_Layout::ResetEdgesAttributes()
 			for (l_GrAttrIter = l_plGrAttr->begin(); l_GrAttrIter != l_plGrAttr->end(); l_GrAttrIter++)
 			{
 				SP_GR_Attribute* l_pcAttr =	dynamic_cast<SP_GR_Attribute*>(*l_GrAttrIter);
-				if (l_pcAttr->GetGraphicParent()->GetId() == l_itE->second->Id)
+				if (l_pcAttr->GetGraphicParent()->GetId() == l_itE->second.Id)
 				{
 					l_pcAttr->SetPosX((l_pcAttr->GetGraphicParent())->GetPosX());
 					l_pcAttr->SetPosY((l_pcAttr->GetGraphicParent())->GetPosY());
