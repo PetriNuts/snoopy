@@ -264,7 +264,7 @@ void SP_GUI_SteeringDialog::CreateEditValuesBar(wxSizer* p_pcParentSizer)
 	m_pcModelConfigSizer->Add(m_pcCollPanalSteeringPlaceSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 
     //parameters
-	m_pcModelConfigSizer->Add(new wxStaticLine(m_pcScrolledWindow), wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_pcModelConfigSizer->Add(new wxStaticLine(m_pcScrolledWindow,wxID_ANY,wxDefaultPosition), wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 	//Left sizer
 	m_pcCollPanalSteeringParamSizer=

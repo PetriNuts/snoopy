@@ -644,6 +644,10 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
     l_pcAttr = l_pcMC->AddAttribute( new SP_DS_NumberAttribute( wxT("ODE Solver"), 2 ));
     l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("simulator properties"), SP_COLLIST_STRING, 2 ) );
 
+    //properties of ODE solver
+    l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("ODE Solver properties"), SP_COLLIST_STRING, 2 ) );
+
+
  	//////////////////////////////////////////////////////////////////////////////
  	l_pcMC = p_pcGraph->AddMetadataclass( new SP_DS_Metadataclass( p_pcGraph, wxT("Simulation Results") ) );
 

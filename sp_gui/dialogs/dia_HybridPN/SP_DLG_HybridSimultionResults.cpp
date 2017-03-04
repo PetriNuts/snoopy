@@ -1621,6 +1621,9 @@ int SP_DLG_HybridSimulationResults::LoadSimulatorProperties()
 
 	m_nCurrentODESimulator = l_nODESolverType;
 
+	//load ODE solver properties
+	LoadODESolverProperties();
+
 	return l_nSimulatorType;
 }
 
@@ -1637,5 +1640,86 @@ void SP_DLG_HybridSimulationResults::SaveSimulatorProperties()
 	int l_nODESolverType = m_pcContinuousSolver->GetCurrentSelection();
 
 	(dynamic_cast<SP_DS_NumberAttribute*>(l_pcAttr))->SetValue(l_nODESolverType);
+
+	//save ODE solver properties
+	SaveODESolverProperties();
+}
+
+void SP_DLG_HybridSimulationResults::LoadODESolverProperties()
+{
+	    SP_DS_ColListAttribute* l_pcSimulatorProperties;
+	    int l_nCount = 0;
+
+	    //Retrieve simulator name
+	    SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("Simulation Properties"))->GetElements()->begin());
+	    SP_DS_Attribute* l_pcAttr = NULL;
+
+
+	    //get the ODE solver
+	    spsim::Simulator* l_pcODESolver = ((dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))
+	    			                         ->GetContinuousSimulator());
+
+	    //load simulator properties
+	    l_pcAttr = l_pcSimProp->GetAttribute(wxT("ODE Solver properties"));
+	    CHECK_POINTER(l_pcAttr, return );
+
+	    l_pcSimulatorProperties = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttr);
+
+	    spsim::VectorProperty* l_pcProperties = l_pcODESolver->GetSimulatorOptions()->GetAllOptions();
+	    spsim::VectorProperty::iterator l_itProperty;
+
+	    if (l_pcProperties->size() != l_pcSimulatorProperties->GetRowCount())
+	    {
+	        return;
+	    }
+
+	    for (l_itProperty = l_pcProperties->begin(); l_itProperty != l_pcProperties->end(); l_itProperty++, l_nCount++)
+	    {
+	        //read data from the saved list
+	        wxString l_sName = l_pcSimulatorProperties->GetCell(l_nCount, 0);
+	        wxString l_sValue = l_pcSimulatorProperties->GetCell(l_nCount, 1);
+
+	        if ((*l_pcProperties)[l_nCount]->GetName() == l_sName)
+	        {
+	            (*l_pcProperties)[l_nCount]->SetValue(l_sValue);
+	        }
+	    }
+}
+void SP_DLG_HybridSimulationResults::SaveODESolverProperties()
+{
+	    SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("Simulation Properties"))->GetElements()->begin());
+	    SP_DS_Attribute* l_pcAttr = NULL;
+
+	    SP_DS_ColListAttribute* l_pcSimulatorProperties;
+	    int l_nCount = 0;
+
+	    //get the ODE solver
+		spsim::Simulator* l_pcODESolver = ((dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))
+											 ->GetContinuousSimulator());
+
+	    //save simulator properties
+	    l_pcAttr = l_pcSimProp->GetAttribute(wxT("ODE Solver properties"));
+	    CHECK_POINTER(l_pcAttr, return);
+
+	    l_pcSimulatorProperties = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttr);
+
+	    l_pcSimulatorProperties->Clear();
+
+	    spsim::VectorProperty* l_pcProperties = l_pcODESolver->GetSimulatorOptions()->GetAllOptions();
+	    spsim::VectorProperty::iterator l_itProperty;
+
+	    for (l_itProperty = l_pcProperties->begin(); l_itProperty != l_pcProperties->end(); l_itProperty++, l_nCount++)
+	    {
+	        //read data from the saved list
+	        wxString l_sName = (*l_pcProperties)[l_nCount]->GetName();
+	        wxString l_sValue = (*l_pcProperties)[l_nCount]->GetValue();
+
+	        l_pcSimulatorProperties->AppendEmptyRow();
+
+	        l_pcSimulatorProperties->SetCell(l_nCount, 0, l_sName);
+
+	        l_pcSimulatorProperties->SetCell(l_nCount, 1, l_sValue);
+
+	    }
 }
 

@@ -132,6 +132,12 @@ protected:
 
 	virtual void SaveSimulatorProperties();
 
+	//ODE solver properties
+	virtual void LoadODESolverProperties();
+
+    virtual void SaveODESolverProperties();
+
+
 public:
 
 	virtual void OnStartAbortSimulation(wxCommandEvent& p_cEvent);DECLARE_CLASS( SP_DLG_HybridSimulationResults )
