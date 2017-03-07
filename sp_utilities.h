@@ -11,6 +11,8 @@
 
 #include "sp_defines.h"
 
+#include <dssz/auxi/exceptions.h>
+
 #include <wx/gdicmn.h>
 #include <wx/dialog.h>
 #include <wx/grid.h>
@@ -20,9 +22,9 @@
 #define SP_LOGMESSAGE(A) \
         SP_LOGMESSAGE_(A)
 #define SP_LOGWARNING(A) \
-        SP_LOGWARNING_(wxString::Format(wxT("%s(%d):  %s"), wxT(__FILE__), __LINE__, A))
+        SP_LOGWARNING_(wxString::Format(wxT("%s(%d):  %s"), file_name(__FILE__), __LINE__, A))
 #define SP_LOGERROR(A) \
-        SP_LOGERROR_(wxString::Format(wxT("%s(%d):  %s"), wxT(__FILE__), __LINE__, A))
+        SP_LOGERROR_(wxString::Format(wxT("%s(%d):  %s"), file_name(__FILE__), __LINE__, A))
 
 void SP_LOGDEBUG_(const wxString& s);
 void SP_LOGMESSAGE_(const wxString& s);
