@@ -230,6 +230,7 @@ bool SP_ImportANDL::CreateConst(const dsszmc::andl::Constants& p_Constants, cons
 					}
 				}
 			}
+            l_pcAttr->UpdateActiveListColumnPtr();
 		}
 	}
 
