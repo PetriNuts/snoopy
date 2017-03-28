@@ -22,6 +22,8 @@ bool SP_ExportContPed2PedRed::Write(SP_MDI_Doc* p_doc,
 	CHECK_POINTER(p_doc->GetGraph(), return false);
 	CHECK_BOOL((!p_fileName.IsEmpty()), return false);
 
+	SP_LOGWARNING(wxT("Tokens and Multiplicities are converted to the smallest integer value not less than value!"));
+
 	m_doc = p_doc;
 	m_graph = m_doc->GetGraph();
 	m_fileName = p_fileName;
@@ -249,7 +251,7 @@ SP_ExportContPed2PedRed::WriteAttribute( SP_DS_Attribute* p_pcVal, wxXmlNode* p_
     if((l_sName == wxT("Marking") || l_sName == wxT("Multiplicity"))
     		&& l_sVal.ToDouble(&l_nVal))
     {
-    	unsigned l_newVal = l_nVal;
+    	unsigned l_newVal = std::ceil(l_nVal);
     	l_sVal = wxString::Format(wxT("%u"), l_newVal);
     }
 
