@@ -1001,8 +1001,15 @@ void SP_DLG_CPNSimulationResults::LoadTransitions()
 
 		wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue( 1);
 		SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
-		SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
-		wxString l_sExpanded(l_pcExpanded->toString());
+		wxString l_sExpanded;
+		if(l_pcFunction)
+        {
+            SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+            l_sExpanded = l_pcExpanded->toString();
+        } else
+        {
+            l_sExpanded = l_sTransitionFunction;
+        }
 
 		//add a transition
 		m_pcMainSimulator->AddTransition(l_sName, l_sExpanded, spsim::TRANSITION_TYPE_CONTINUOUS);

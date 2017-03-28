@@ -1554,9 +1554,16 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
 
 		wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue( 1);
-        SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
-        SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
-        wxString l_sExpanded(l_pcExpanded->toString());
+		SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
+		wxString l_sExpanded;
+		if(l_pcFunction)
+		{
+			SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+			l_sExpanded = l_pcExpanded->toString();
+		} else
+		{
+			l_sExpanded = l_sTransitionFunction;
+		}
 
 		m_asTransitionNames.push_back(l_sTransitionName);
 
@@ -1575,9 +1582,16 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
 
 		wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue( 1);
-        SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
-        SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
-        wxString l_sExpanded(l_pcExpanded->toString());
+		SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
+		wxString l_sExpanded;
+		if(l_pcFunction)
+		{
+			SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+			l_sExpanded = l_pcExpanded->toString();
+		} else
+		{
+			l_sExpanded = l_sTransitionFunction;
+		}
 
 		m_asTransitionNames.push_back(l_sTransitionName);
 
@@ -1598,8 +1612,15 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 
 		wxString l_delayvalue = l_pcColList->GetActiveCellValue( 1);
         SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_delayvalue);
-        SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
-        wxString l_sExpanded(l_pcExpanded->toString());
+		wxString l_sExpanded;
+		if(l_pcFunction)
+		{
+			SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+			l_sExpanded = l_pcExpanded->toString();
+		} else
+		{
+			l_sExpanded = l_delayvalue;
+		}
 
 		m_asTransitionNames.push_back(l_sTransitionName);
 
@@ -1620,9 +1641,16 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 		wxString l_Repetition = l_pcColList->GetActiveCellValue( 2); //FixedTimedFiring_Single( . ) not realized
 		wxString l_End = l_pcColList->GetActiveCellValue( 3); //FixedTimedFiring_Periodic( _SimStart, . , _SimEnd )
 		wxString l_sTransitionFunction = wxT("FixedTimedFiring_Periodic(") + l_Begin + wxT(",") + l_Repetition + wxT(",") + l_End + wxT(")");
-        SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
-        SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
-        wxString l_sExpanded(l_pcExpanded->toString());
+		SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
+		wxString l_sExpanded;
+		if(l_pcFunction)
+		{
+			SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+			l_sExpanded = l_pcExpanded->toString();
+		} else
+		{
+			l_sExpanded = l_sTransitionFunction;
+		}
 
 		m_asTransitionNames.push_back(l_sTransitionName);
 

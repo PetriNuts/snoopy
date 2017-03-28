@@ -341,6 +341,16 @@ void SP_DLG_StFunctionAssistent::LoadFunctions()
 	l_cItem.m_text << wxT("MichaelisMenten( , )");
     m_pcFunctionListCtrl->InsertItem(l_cItem);
 
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("linlog( . )");
+	m_pcFunctionListCtrl->InsertItem(l_cItem);
+
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("nlinlog( . )");
+	m_pcFunctionListCtrl->InsertItem(l_cItem);
+
 	while (l_pcFunction0ParamOperator->ptr)
 	{
 

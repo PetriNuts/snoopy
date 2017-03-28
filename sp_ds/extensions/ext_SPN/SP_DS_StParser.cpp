@@ -121,7 +121,7 @@ m_bColoredPN(false)
 	m_pcInfixOperatorList[ i ].chr = wxT(' ');
 	m_pcInfixOperatorList[ i ].ptr = NULL;
 
-    m_pcPrefixOperatorList = new PrefixOperator[ 25 ];
+    m_pcPrefixOperatorList = new PrefixOperator[ 27 ];
 	i=0;
 	m_pcPrefixOperatorList[ i ].string = wxT("MassAction");
 	m_pcPrefixOperatorList[ i ].match_string = wxT("MassAction(");
@@ -134,6 +134,18 @@ m_bColoredPN(false)
 	m_pcPrefixOperatorList[ i ].ptr = &SP_DS_StParser::CalcMassAction;
     m_pcPrefixOperatorList[ i ].bOnlyFirstOperator = true;
 	m_pcPrefixOperatorList[ i ].visibleGroup = SP_ST_PARSER_FUNCTION_VISIBLE_GROUP_UNVISIBLE;
+	i++;
+	m_pcPrefixOperatorList[ i ].string = wxT("linlog");
+	m_pcPrefixOperatorList[ i ].match_string = wxT("linlog(");
+	m_pcPrefixOperatorList[ i ].ptr = &SP_DS_StParser::DummyFunction1Param;
+	m_pcPrefixOperatorList[ i ].bOnlyFirstOperator = true;
+	m_pcPrefixOperatorList[ i ].visibleGroup = SP_ST_PARSER_FUNCTION_VISIBLE_GROUP_SPECIAL_HAZARD;
+	i++;
+	m_pcPrefixOperatorList[ i ].string = wxT("nlinlog");
+	m_pcPrefixOperatorList[ i ].match_string = wxT("nlinlog(");
+	m_pcPrefixOperatorList[ i ].ptr = &SP_DS_StParser::DummyFunction1Param;
+	m_pcPrefixOperatorList[ i ].bOnlyFirstOperator = true;
+	m_pcPrefixOperatorList[ i ].visibleGroup = SP_ST_PARSER_FUNCTION_VISIBLE_GROUP_SPECIAL_HAZARD;
 	i++;
 	m_pcPrefixOperatorList[ i ].string = wxT("ImmediateFiring");
 	m_pcPrefixOperatorList[ i ].match_string = wxT("ImmediateFiring(");
@@ -2288,9 +2300,10 @@ SP_DS_StParser :: CheckFormulaFunction( const wxString& p_sFormula, SP_DS_Node* 
 
 	SP_DS_FunctionRegistry* l_pcFR = p_pcTransitionNode->GetNodeclass()->GetParentGraph()->GetFunctionRegistry();
 	SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sConsistenceCheck);
-	SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
-	l_sConsistenceCheck = wxString(l_pcExpanded->toString());
-
+    if(l_pcFunction) {
+        SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+        l_sConsistenceCheck = wxString(l_pcExpanded->toString());
+    }
 	m_bOnlyCheck = true;
 
 	m_bColoredPN = p_bColoredPN;
