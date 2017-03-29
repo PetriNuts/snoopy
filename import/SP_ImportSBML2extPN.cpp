@@ -234,13 +234,17 @@ void SP_ImportSBML2extPN::getSpecies()
 
 				if (l_sbmlSpecies->isSetInitialAmount())
 				{
-					wxString l_sMarking = wxString::Format(wxT("%.0f"),l_sbmlSpecies->getInitialAmount());
+					double l_Init = l_sbmlSpecies->getInitialAmount();
+					wxString l_sMarking = wxString::Format(wxT("%.0f"), ceil(l_Init));
 					l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
+					l_comment << wxT("initialAmount=\"") << l_Init << wxT("\"\n");
 				}
 				else if(l_sbmlSpecies->isSetInitialConcentration())
 				{
-					wxString l_sMarking = wxString::Format(wxT("%.0f"),l_sbmlSpecies->getInitialConcentration());
+					double l_Init = l_sbmlSpecies->getInitialConcentration();
+					wxString l_sMarking = wxString::Format(wxT("%.0f"), ceil(l_Init));
 					l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
+					l_comment << wxT("initialConcentration=\"") << l_Init << wxT("\"\n");
 				}
 
 				numBoundaryConditions += l_sbmlSpecies->getBoundaryCondition();
@@ -389,9 +393,11 @@ void SP_ImportSBML2extPN::getReactions ()
 
 				double l_sbmlStoichiometry = l_sbmlReactant->getStoichiometry();
 				wxString l_stoichiometry =
-						wxString::Format(wxT("%li"), lround(l_sbmlStoichiometry));
+						wxString::Format(wxT("%.0f"), ceil(l_sbmlStoichiometry));
+				wxString l_comment = wxT("stoichiometry=\"") + wxString::Format(wxT("%g"), l_sbmlStoichiometry) + wxT("\"\n");
 				SP_DS_Edge* l_pcEdge =
 						drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
+				l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 				if(m_NormalizeStoichiometries)
 				{
 					l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
@@ -400,6 +406,7 @@ void SP_ImportSBML2extPN::getReactions ()
 				{
 					l_pcEdge =
 							drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+					l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 					if(m_NormalizeStoichiometries)
 					{
 						l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
@@ -409,6 +416,7 @@ void SP_ImportSBML2extPN::getReactions ()
 				{
 					l_pcEdge =
 							drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+					l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 					if(m_NormalizeStoichiometries)
 					{
 						l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
@@ -417,6 +425,7 @@ void SP_ImportSBML2extPN::getReactions ()
 					{
 						l_pcEdge =
 								drawEdge(l_pcNode,l_revReactionNode,SP_DS_EDGE,l_stoichiometry);
+						l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 						if(m_NormalizeStoichiometries)
 						{
 							l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
@@ -435,9 +444,11 @@ void SP_ImportSBML2extPN::getReactions ()
 
 				double l_sbmlStoichiometry = l_sbmlProduct->getStoichiometry();
 				wxString l_stoichiometry =
-						wxString::Format(wxT("%li"), lround(l_sbmlStoichiometry));
+						wxString::Format(wxT("%.0f"), ceil(l_sbmlStoichiometry));
+				wxString l_comment = wxT("stoichiometry=\"") + wxString::Format(wxT("%g"), l_sbmlStoichiometry) + wxT("\"\n");
 				SP_DS_Edge* l_pcEdge =
 						drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+				l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 				if(m_NormalizeStoichiometries)
 				{
 					l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
@@ -446,6 +457,7 @@ void SP_ImportSBML2extPN::getReactions ()
 				{
 					l_pcEdge =
 							drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
+					l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 					if(m_NormalizeStoichiometries)
 					{
 						l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
@@ -455,6 +467,7 @@ void SP_ImportSBML2extPN::getReactions ()
 				{
 					l_pcEdge =
 							drawEdge(l_pcNode, l_revReactionNode, SP_DS_EDGE,l_stoichiometry);
+					l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 					if(m_NormalizeStoichiometries)
 					{
 						l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
@@ -463,6 +476,7 @@ void SP_ImportSBML2extPN::getReactions ()
 					{
 						l_pcEdge =
 								drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+						l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 						if(m_NormalizeStoichiometries)
 						{
 							l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));

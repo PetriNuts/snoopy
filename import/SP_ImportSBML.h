@@ -25,9 +25,27 @@ class SP_ImportSBML: public SP_ImportRoutine,
 private:
 
 protected:
+	bool m_HighlightReversibleReactions;
+	bool m_CreateReverseReactions;
+	bool m_CreateBoundaryConditions;
+	bool m_NormalizeStoichiometries;
+
+	SP_DS_Graph* m_pcGraph = nullptr;
+	Model* m_sbmlModel = nullptr;
+
+	SP_MapString2Node m_Species;
+	SP_MapString2Node m_Reactions;
+
+	int yComRea;
+	int xPara;
+	int yPara;
+
+	size_t numReverseReactions = 0;
+	size_t numBoundaryConditions = 0;
+
+
 	bool NormalizeStoichiometries(const std::map<SP_DS_Edge*, double>& s);
 
-public:
 	wxString formulaToString(const ASTNode* p_Math);
 
 	bool getSBMLSpeciesName(Species* p_Species, wxString& p_Id, wxString& p_Name);
@@ -50,18 +68,7 @@ public:
 
 	bool ValidateSBML(SBMLDocument* p_sbmlDoc);
 
-	SP_DS_Graph* m_pcGraph = nullptr;
-	Model* m_sbmlModel = nullptr;
-
-	SP_MapString2Node m_Species;
-	SP_MapString2Node m_Reactions;
-
-	int yComRea;
-	int xPara;
-	int yPara;
-
-	size_t numReverseReactions = 0;
-	size_t numBoundaryConditions = 0;
+public:
 
 };
 

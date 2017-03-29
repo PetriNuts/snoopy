@@ -7,7 +7,7 @@
 
 #include "import/SP_ImportSBML2cntPn.h"
 
-#include "sp_ds/netclasses/SP_DS_ContinuousPed.h"
+#include "sp_gui/dialogs/SP_DLG_ImportSBML2extPN.h"
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 
 #include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
@@ -35,40 +35,51 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 
 	SBMLDocument* l_sbmlDocument;
 
-	l_sbmlDocument = readSBML(p_sFile.mb_str());
-	CHECK_POINTER(l_sbmlDocument, return FALSE);
+	SP_DLG_ImportSBML2extPN l_cDlg(NULL);
 
-	if(ValidateSBML(l_sbmlDocument))
-	{
-		m_sbmlModel = l_sbmlDocument->getModel();
-		CHECK_POINTER(m_sbmlModel, return FALSE);
+	if (l_cDlg.ShowModal() ==  wxID_OK) {
+		m_CreateReverseReactions = l_cDlg.GetCreateReverseReactions();
+		m_HighlightReversibleReactions = l_cDlg.GetHighlightReverseReactions();
+		m_CreateBoundaryConditions = l_cDlg.GetCreateBoundaryConditions();
+		m_NormalizeStoichiometries = l_cDlg.GetNormalizeStoichiometries();
 
-		m_pcGraph = CreateDocument(SP_DS_CONTINUOUSPED_CLASS);
 
-		getModelDescription();
-		getModelCompartments();
-		// first we have to get model parameters, later the reaction parameters
-		getModelParameters();
-		getSpecies();
-		getReactions();
+		l_sbmlDocument = readSBML(p_sFile.mb_str());
+		CHECK_POINTER(l_sbmlDocument, return FALSE);
 
-		m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
+		if (ValidateSBML(l_sbmlDocument)) {
+			m_sbmlModel = l_sbmlDocument->getModel();
+			CHECK_POINTER(m_sbmlModel, return FALSE);
 
-		SP_LOGMESSAGE(wxString::Format(wxT("The imported SBML contains:\n\t - %u boundary condition(s),\n\t - %u reversible reaction(s)."), numBoundaryConditions, numReverseReactions));
+			m_pcGraph = CreateDocument(SP_DS_CONTINUOUSPED_CLASS);
 
-		DoVisualization();
+			getModelDescription();
+			getModelCompartments();
+			// first we have to get model parameters, later the reaction parameters
+			getModelParameters();
+			getSpecies();
+			getReactions();
 
-		SP_MESSAGEBOX(wxT("The SBML import is experimental!\nPlease note: rules, events and functions are not supported yet.\nPlease check the result!"),wxT("Notice"), wxOK | wxICON_INFORMATION);
+			m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
 
-		m_pcMyDoc->Modify(true);
+			SP_LOGMESSAGE(wxString::Format(
+					wxT("The imported SBML contains:\n\t - %u boundary condition(s),\n\t - %u reversible reaction(s)."),
+					numBoundaryConditions, numReverseReactions));
 
-		wxDELETE(l_sbmlDocument);
-		return true;
-	}
-	else
-	{
-		wxDELETE(l_sbmlDocument);
-		return false;
+			DoVisualization();
+
+			SP_MESSAGEBOX(
+					wxT("The SBML import is experimental!\nPlease note: rules, events and functions are not supported yet.\nPlease check the result!"),
+					wxT("Notice"), wxOK | wxICON_INFORMATION);
+
+			m_pcMyDoc->Modify(true);
+
+			wxDELETE(l_sbmlDocument);
+			return true;
+		} else {
+			wxDELETE(l_sbmlDocument);
+			return false;
+		}
 	}
 }
 
