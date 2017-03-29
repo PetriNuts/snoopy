@@ -60,6 +60,8 @@ bool SP_ImportSBML2extPN::ReadFile(const wxString& p_sFile)
 			getSpecies();
 			getReactions();
 
+			SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+			l_pcFR->LoadFromNet(m_pcGraph);
 			m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
 
 			SP_LOGMESSAGE(wxString::Format(wxT("The imported SBML contains:\n\t - %u boundary condition(s),\n\t - %u reversible reaction(s)."), numBoundaryConditions, numReverseReactions));
@@ -142,7 +144,7 @@ void SP_ImportSBML2extPN::getModelCompartments()
 
 		wxString l_CompId;
 		wxString l_CompName;
-		getSBMLCompartmentName(l_sbmlCompartment, l_CompId, l_CompName);
+		getSBMLName(l_sbmlCompartment, l_CompId, l_CompName);
 
 		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_CompId);
 		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("compartment"));
@@ -187,9 +189,7 @@ void SP_ImportSBML2extPN::getModelCompartments()
 		}
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
 		l_pcColAttr->SetCell(0, 1, l_parameterValue);
-
-		m_pcGraph->GetFunctionRegistry()->registerFunction(l_CompId, l_parameterValue);
-	}
+    }
 }
 
 void SP_ImportSBML2extPN::getSpecies()
@@ -202,7 +202,7 @@ void SP_ImportSBML2extPN::getSpecies()
 		wxString l_speciesId;
 		wxString l_speciesName;
 
-		getSBMLSpeciesName(l_sbmlSpecies, l_speciesId, l_speciesName);
+		getSBMLName(l_sbmlSpecies, l_speciesId, l_speciesName);
 
 		// Species _void_ is only for Gepasi, don't import
 		if (l_speciesName != wxT("_void_"))
@@ -301,7 +301,7 @@ void SP_ImportSBML2extPN::getReactions ()
 
 		wxString l_ReactionId;
 		wxString l_ReactionName;
-		getSBMLReactionName(l_sbmlReaction, l_ReactionId, l_ReactionName);
+		getSBMLName(l_sbmlReaction, l_ReactionId, l_ReactionName);
 
 		SP_DS_Node* l_reactionNode = extTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
 		SP_DS_Node* l_revReactionNode = NULL;

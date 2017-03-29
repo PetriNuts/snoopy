@@ -18,107 +18,6 @@ SP_ImportSBML::formulaToString(const ASTNode* p_Math)
 	return ret;
 }
 
-bool
-SP_ImportSBML::getSBMLSpeciesName(Species* p_Species, wxString& p_Id, wxString& p_Name)
-{
-	CHECK_POINTER(p_Species, return false);
-	bool ret = false;
-	// is ID or Name set
-	wxString l_Name;
-	if (p_Species->isSetId())
-	{
-		p_Id = p_Species->getId();
-		ret = true;
-	}
-	if (p_Species->isSetName())
-	{
-		p_Name = p_Species->getName();
-		ret = true;
-	}
-	return ret;
-}
-
-bool
-SP_ImportSBML::getSBMLEventName(Event* p_Event, wxString& p_Id, wxString& p_Name)
-{
-	CHECK_POINTER(p_Event, return false);
-	bool ret = false;
-	// is ID or Name set
-	wxString l_Name;
-	if (p_Event->isSetId())
-	{
-		p_Id = p_Event->getId();
-		ret = true;
-	}
-	if (p_Event->isSetName())
-	{
-		p_Name = p_Event->getName();
-		ret = true;
-	}
-	return ret;
-}
-
-bool
-SP_ImportSBML::getSBMLReactionName(Reaction* p_Reaction, wxString& p_Id, wxString& p_Name)
-{
-	CHECK_POINTER(p_Reaction, return false);
-	bool ret = false;
-	// is ID or Name set
-	wxString l_Name;
-	if (p_Reaction->isSetId())
-	{
-		p_Id = p_Reaction->getId();
-		ret = true;
-	}
-	if (p_Reaction->isSetName())
-	{
-		p_Name = p_Reaction->getName();
-		ret = true;
-	}
-	return ret;
-}
-
-
-bool
-SP_ImportSBML::getSBMLParameterName(Parameter* p_Parameter, wxString& p_Id, wxString& p_Name)
-{
-	CHECK_POINTER(p_Parameter, return false);
-	bool ret = false;
-	// is ID or Name set
-	wxString l_Name;
-	if (p_Parameter->isSetId())
-	{
-		p_Id = p_Parameter->getId();
-		ret = true;
-	}
-	if (p_Parameter->isSetName())
-	{
-		p_Name = p_Parameter->getName();
-		ret = true;
-	}
-	return ret;
-}
-
-bool
-SP_ImportSBML::getSBMLCompartmentName(Compartment* p_Compartment, wxString& p_Id, wxString& p_Name)
-{
-	CHECK_POINTER(p_Compartment, return false);
-	bool ret = false;
-	// is ID or Name set
-	wxString l_Name;
-	if (p_Compartment->isSetId())
-	{
-		p_Id = p_Compartment->getId();
-		ret = true;
-	}
-	if (p_Compartment->isSetName())
-	{
-		p_Name = p_Compartment->getName();
-		ret = true;
-	}
-	return ret;
-}
-
 SP_DS_Node* SP_ImportSBML::getSpeciesNode(const wxString& searchName)
 {
 	auto speciesIt = m_Species.find(searchName);
@@ -280,3 +179,4 @@ bool SP_ImportSBML::NormalizeStoichiometries(const std::map<SP_DS_Edge*, double>
 	}
 	return true;
 }
+

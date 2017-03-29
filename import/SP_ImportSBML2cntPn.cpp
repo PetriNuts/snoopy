@@ -55,11 +55,14 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 
 			getModelDescription();
 			getModelCompartments();
+            getFunctionDefinitions();
 			// first we have to get model parameters, later the reaction parameters
 			getModelParameters();
 			getSpecies();
 			getReactions();
 
+            SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+            l_pcFR->LoadFromNet(m_pcGraph);
 			m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
 
 			SP_LOGMESSAGE(wxString::Format(
@@ -81,6 +84,7 @@ bool SP_ImportSBML2cntPn::ReadFile(const wxString& p_sFile)
 			return false;
 		}
 	}
+    return false;
 }
 
 // get Model Description
@@ -137,7 +141,7 @@ void SP_ImportSBML2cntPn::getSpecies()
 		wxString l_speciesId;
 		wxString l_speciesName;
 
-		getSBMLSpeciesName(l_sbmlSpecies, l_speciesId, l_speciesName);
+        getSBMLName(l_sbmlSpecies, l_speciesId, l_speciesName);
 
 		// Species _void_ is only for Gepasi, don't import
 		if (l_speciesName != wxT("_void_"))
@@ -193,7 +197,27 @@ void SP_ImportSBML2cntPn::getSpecies()
 
 				// if set BoundaryCondition (0,1 for false,true) or 0 for default (false)
 				numBoundaryConditions += l_sbmlSpecies->getBoundaryCondition();
-				l_pcNode->GetAttribute(wxT("Fixed"))->SetValueString(wxString::Format(wxT("%d"), l_sbmlSpecies->getBoundaryCondition()));
+				if(m_CreateBoundaryConditions
+				   && l_sbmlSpecies->getBoundaryCondition()
+				   && !l_sbmlSpecies->getConstant())
+				{
+					SP_DS_Nodeclass* contTransitionClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS);
+					SP_DS_Node* l_inNode = contTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
+					l_inNode->GetAttribute(wxT("Name"))->SetValueString(wxT("in_")+l_speciesId);
+					l_inNode->GetGraphics()->front()->SetBrushColour(*wxGREEN);
+					l_inNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
+					drawEdge(l_inNode,l_pcNode,wxT("Edge"),wxT("1"));
+
+					SP_DS_Node* l_outNode = contTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
+					l_outNode->GetAttribute(wxT("Name"))->SetValueString(wxT("out_")+l_speciesId);
+					l_outNode->GetGraphics()->front()->SetBrushColour(*wxGREEN);
+					l_outNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
+					drawEdge(l_pcNode,l_outNode,wxT("Edge"),wxT("1"));
+				}
+				else
+				{
+					l_pcNode->GetAttribute(wxT("Fixed"))->SetValueString(wxString::Format(wxT("%d"), l_sbmlSpecies->getBoundaryCondition()));
+				}
 				l_pcNode->ShowOnCanvas(m_pcCanvas, FALSE, 50, yComRea,0);
 
 				m_Species.insert(std::make_pair(l_speciesId,l_pcNode));
@@ -216,9 +240,10 @@ void SP_ImportSBML2cntPn::getReactions ()
 
 		wxString l_ReactionId;
 		wxString l_ReactionName;
-		getSBMLReactionName(l_sbmlReaction, l_ReactionId, l_ReactionName);
+        getSBMLName(l_sbmlReaction, l_ReactionId, l_ReactionName);
 
 		SP_DS_Node* l_reactionNode = contTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
+		SP_DS_Node* l_revReactionNode = NULL;
 		if (l_reactionNode)
 		{
 			++yComRea;
@@ -251,20 +276,8 @@ void SP_ImportSBML2cntPn::getReactions ()
 				l_sAnnotation = l_sbmlReaction->getAnnotationString()+wxT("\n");
 			}
 
-			l_pcAttrComment->SetValueString(l_ReactionName+l_metaid+l_sNotes+l_sAnnotation);
-			l_pcAttrComment->SetShow(false);
-
-			// is reversible (0,1 for false,true) or 0 for default (false)
-			bool b_IsReversible = l_sbmlReaction->getReversible();
-
-			if(b_IsReversible)
-			{
-				++numReverseReactions;
-			}
-
-			l_reactionNode->GetAttribute(wxT("Reversible"))->SetValueString(wxString::Format(wxT("%d"), b_IsReversible));
-
 			// get KineticLaw
+			wxString l_kinetic;
 			if (l_sbmlReaction->isSetKineticLaw())
 			{
 				KineticLaw* l_sbmlKineticLaw =  l_sbmlReaction->getKineticLaw();
@@ -276,7 +289,7 @@ void SP_ImportSBML2cntPn::getReactions ()
 				//position is important, because we change id of reaction parameters
 				getReactionParameters(l_sbmlReaction, l_sbmlMath);
 
-				wxString l_kinetic =  formulaToString(getSBMLFormula(l_sbmlMath));
+				l_kinetic =  formulaToString(getSBMLFormula(l_sbmlMath));
 				if(!l_kinetic.IsEmpty())
 				{
 					SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_reactionNode->GetAttribute(wxT("FunctionList")));
@@ -284,6 +297,47 @@ void SP_ImportSBML2cntPn::getReactions ()
 				}
 				wxDELETE(l_sbmlMath);
 			}
+
+			// is reversible (0,1 for false,true) or 0 for default (false)
+			bool b_IsReversible = l_sbmlReaction->getReversible();
+			wxString l_sReversible = wxT("reversible=\"false\"\n");
+
+			if(b_IsReversible)
+			{
+				++numReverseReactions;
+				l_sReversible = wxT("reversible=\"true\"\n");
+			}
+
+			if(b_IsReversible && m_HighlightReversibleReactions)
+			{
+				l_reactionNode->GetGraphics()->front()->SetBrushColour(*wxBLUE);
+			}
+
+			if (b_IsReversible && m_CreateReverseReactions)
+			{
+				++yComRea;
+				l_revReactionNode = contTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
+				l_revReactionNode->GetAttribute(wxT("Name"))->SetValueString(wxT("re_")+l_ReactionId);
+				l_revReactionNode->GetAttribute(wxT("Name"))->SetShow(TRUE);
+				SP_DS_ColListAttribute* l_pcFuncAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_revReactionNode->GetAttribute(wxT("FunctionList")));
+				//set ratefunction the same as reversible transition, because we dont know it
+				if(!l_kinetic.IsEmpty())
+				{
+					l_pcFuncAttr->SetCell(0,1, l_kinetic);
+				}
+				l_revReactionNode->GetGraphics()->front()->SetBrushColour(*wxRED);
+				SP_DS_Attribute* l_pcAttrRevComment = l_revReactionNode->GetAttribute(wxT("Comment"));
+				l_pcAttrRevComment->SetValueString(l_sReversible);
+				l_pcAttrRevComment->SetShow(false);
+				l_revReactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
+			}
+			else
+			{
+				l_reactionNode->GetAttribute(wxT("Reversible"))->SetValueString(wxString::Format(wxT("%d"), b_IsReversible));
+			}
+
+			l_pcAttrComment->SetValueString(l_ReactionName+l_metaid+l_sReversible+l_sNotes+l_sAnnotation);
+			l_pcAttrComment->SetShow(false);
 
 			l_reactionNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 
@@ -307,6 +361,18 @@ void SP_ImportSBML2cntPn::getReactions ()
 				{
 					drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
 				}
+				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
+				{
+					drawEdge(l_revReactionNode, l_pcNode, SP_DS_EDGE, l_stoichiometry);
+					if(l_sbmlSpecies->getConstant())
+					{
+						drawEdge(l_pcNode,l_revReactionNode,SP_DS_EDGE,l_stoichiometry);
+					}
+                    else
+                    {
+                        drawEdge(l_pcNode, l_revReactionNode, SP_DS_MODIFIER_EDGE, wxT("0"));
+                    }
+				}
 			}
 
 			// get products of actual reaction
@@ -323,6 +389,14 @@ void SP_ImportSBML2cntPn::getReactions ()
 				if(l_sbmlSpecies->getConstant())
 				{
 					drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
+				}
+				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
+				{
+					drawEdge(l_pcNode,l_revReactionNode, SP_DS_EDGE, l_stoichiometry);
+					if(l_sbmlSpecies->getConstant())
+					{
+						drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+					}
 				}
 				if(l_sbmlReaction->isSetKineticLaw())
 				{
@@ -344,6 +418,10 @@ void SP_ImportSBML2cntPn::getReactions ()
 
 				wxString l_stoichiometry = wxT("0"); // no info about in sbml
 				drawEdge( l_pcNode, l_reactionNode, SP_DS_MODIFIER_EDGE, l_stoichiometry);
+                if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
+                {
+                    drawEdge(l_pcNode, l_revReactionNode,SP_DS_MODIFIER_EDGE,l_stoichiometry);
+                }
 			}
 		}
     }
@@ -364,7 +442,7 @@ void SP_ImportSBML2cntPn::getModelCompartments()
 
 		wxString l_CompId;
 		wxString l_CompName;
-		getSBMLCompartmentName(l_sbmlCompartment, l_CompId, l_CompName);
+        getSBMLName(l_sbmlCompartment, l_CompId, l_CompName);
 
 		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_CompId);
 		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("compartment"));
@@ -408,8 +486,6 @@ void SP_ImportSBML2cntPn::getModelCompartments()
 		}
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
 		l_pcColAttr->SetCell(0, 1, l_parameterValue);
-
-		m_pcGraph->GetFunctionRegistry()->registerFunction(l_CompId, l_parameterValue);
 	}
 }
 
@@ -429,7 +505,7 @@ void SP_ImportSBML2cntPn::getModelParameters()
 
 		wxString l_ParamId;
 		wxString l_ParamName;
-		getSBMLParameterName(l_sbmlParameter, l_ParamId, l_ParamName);
+        getSBMLName(l_sbmlParameter, l_ParamId, l_ParamName);
 
 		l_constant->GetAttribute(wxT("Name"))->SetValueString(l_ParamId);
 		l_constant->GetAttribute(wxT("Group"))->SetValueString(wxT("parameter"));
@@ -474,8 +550,6 @@ void SP_ImportSBML2cntPn::getModelParameters()
 		}
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
 		l_pcColAttr->SetCell(0, 1, l_parameterValue);
-
-		m_pcGraph->GetFunctionRegistry()->registerFunction(l_ParamId, l_parameterValue);
 	}
 }
 
@@ -492,7 +566,7 @@ void SP_ImportSBML2cntPn::getReactionParameters(Reaction*  l_sbmlReaction, ASTNo
 		// Parameter Name or Id
 		wxString l_ParamId;
 		wxString l_ParamName;
-		getSBMLParameterName(l_sbmlParameter, l_ParamId, l_ParamName);
+        getSBMLName(l_sbmlParameter, l_ParamId, l_ParamName);
 
 		wxString l_ParamIdNew = l_ReactionId+wxT("_")+l_ParamId;
 		changeInReactionFormula(l_ParamId, l_ParamIdNew, l_sbmlMath);
@@ -545,8 +619,67 @@ void SP_ImportSBML2cntPn::getReactionParameters(Reaction*  l_sbmlReaction, ASTNo
 		}
 		SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_constant->GetAttribute(wxT("ValueList")));
 		l_pcColAttr->SetCell(0, 1, l_parameterValue);
-
-		m_pcGraph->GetFunctionRegistry()->registerFunction(l_ParamIdNew, l_parameterValue);
-
 	}
+}
+
+void SP_ImportSBML2cntPn::getFunctionDefinitions() {
+    auto l_sbmlFunctions = m_sbmlModel->getListOfFunctionDefinitions();
+
+    for (unsigned int i = 0; i < l_sbmlFunctions->size(); ++i) {
+        auto l_sbmlFunction = l_sbmlFunctions->get(i);
+
+        // add Constant for Compartment
+        SP_DS_Metadataclass* l_pcMC = m_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);
+
+        SP_DS_Metadata* l_function = l_pcMC->NewElement(1);
+
+        wxString l_FuncId;
+        wxString l_FuncName;
+        getSBMLName(l_sbmlFunction, l_FuncId, l_FuncName);
+
+        l_function->GetAttribute(wxT("Name"))->SetValueString(l_FuncId);
+
+        SP_DS_Attribute* l_pcAttrComment = l_function->GetAttribute(wxT("Comment"));
+
+        if(!l_FuncName.IsEmpty())
+        {
+            l_FuncName = wxT("name=\"") + l_FuncName + wxT("\"\n");
+        }
+
+        wxString l_metaid;
+        if(l_sbmlFunction->isSetMetaId())
+        {
+            l_metaid << wxT("metaid=\"") << l_sbmlFunction->getMetaId() << wxT("\"\n");
+        }
+
+        wxString l_sNotes;
+        if(l_sbmlFunction->isSetNotes())
+        {
+            l_sNotes = l_sbmlFunction->getNotesString()+wxT("\n");
+        }
+
+        wxString l_sAnnotation;
+        if(l_sbmlFunction->isSetAnnotation())
+        {
+            l_sAnnotation = l_sbmlFunction->getAnnotationString()+wxT("\n");
+        }
+
+        l_pcAttrComment->SetValueString(l_FuncName+l_metaid+l_sNotes+l_sAnnotation);
+        l_pcAttrComment->SetShow(false);
+
+        wxString l_functionParam;
+        for (unsigned int j = 0; j < l_sbmlFunction->getNumArguments(); ++j) {
+            if(j > 0) l_functionParam << ",";
+            l_functionParam << formulaToString(l_sbmlFunction->getArgument(j));
+        }
+        wxString l_functionBody;
+        if (l_sbmlFunction->isSetBody())
+        {
+            l_functionBody = formulaToString(l_sbmlFunction->getBody());
+        }
+        l_function->GetAttribute(wxT("Parameter"))->SetValueString(l_functionParam);
+        l_function->GetAttribute(wxT("Body"))->SetValueString(l_functionBody);
+
+    }
+
 }

@@ -124,6 +124,8 @@ SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_
 	if(p_Net.color_functions_)
 		CreateFunctions(*p_Net.color_functions_);
 
+	m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
+
 	if(p_Net.places_)
 		CreatePlaces(*p_Net.places_);
 

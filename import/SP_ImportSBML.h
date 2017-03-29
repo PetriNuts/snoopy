@@ -48,15 +48,25 @@ protected:
 
 	wxString formulaToString(const ASTNode* p_Math);
 
-	bool getSBMLSpeciesName(Species* p_Species, wxString& p_Id, wxString& p_Name);
-
-	bool getSBMLEventName(Event* p_Event, wxString& p_Id, wxString& p_Name);
-
-	bool getSBMLReactionName(Reaction* p_Reaction, wxString& p_Id, wxString& p_Name);
-
-	bool getSBMLParameterName(Parameter* p_Parameter, wxString& p_Id, wxString& p_Name);
-
-	bool getSBMLCompartmentName(Compartment* p_Compartment, wxString& p_Id, wxString& p_Name);
+	template<typename T>
+	bool getSBMLName(T* p_Elem, wxString& p_Id, wxString& p_Name)
+	{
+		CHECK_POINTER(p_Elem, return false);
+		bool ret = false;
+		// is ID or Name set
+		wxString l_Name;
+		if (p_Elem->isSetId())
+		{
+			p_Id = p_Elem->getId();
+			ret = true;
+		}
+		if (p_Elem->isSetName())
+		{
+			p_Name = p_Elem->getName();
+			ret = true;
+		}
+		return ret;
+	}
 
 	const ASTNode* getSBMLFormula(ASTNode* p_sbmlFormula);
 

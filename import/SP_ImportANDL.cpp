@@ -104,9 +104,12 @@ void SP_ImportANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net
 		CreateFunc(*p_Net.functions_);
 	if(p_Net.constants_ && p_Net.valuesets_)
 		CreateConst(*p_Net.constants_, *p_Net.valuesets_);
+
 	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
 	l_pcFR->LoadFromNet(m_pcGraph);
-	if(p_Net.places_)
+    m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
+
+    if(p_Net.places_)
 		CreatePlaces(*p_Net.places_);
 	if(p_Net.observers_)
 		CreateObservers(*p_Net.observers_);

@@ -28,6 +28,12 @@ private:
 	void getModelCompartments();
 
 	/**
+	\brief  Add model functions to the a net
+
+	 */
+	void getFunctionDefinitions();
+
+	/**
 	\brief  Add all model parameters as a parameter node to the a net
 
 	 */
