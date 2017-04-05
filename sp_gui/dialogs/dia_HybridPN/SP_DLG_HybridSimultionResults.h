@@ -137,6 +137,8 @@ protected:
 
     virtual void SaveODESolverProperties();
 
+    //load fixed flags for continuous places
+    virtual void LoadFixedFlag();
 
 public:
 

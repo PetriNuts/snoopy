@@ -1219,6 +1219,9 @@ void SP_DLG_HybridSimulationResults::LoadPlaces()
 		l_abPlaceType.resize(l_nPosition, false);
 	}
 
+	//load fixed flag for continuous places
+	LoadFixedFlag();
+
 	if (m_sSimulatorType == wxT("Stochastic"))
 	{
 		SP_VectorLong l_anCurrentMarking;
@@ -1244,6 +1247,33 @@ void SP_DLG_HybridSimulationResults::LoadPlaces()
 
 	//set place names
 	m_pcMainSimulator->SetPlaceNames(m_asPlaceNames);
+}
+
+void SP_DLG_HybridSimulationResults::LoadFixedFlag()
+{
+	SP_DS_Nodeclass* l_pcNodeclass;
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+
+	unsigned long l_nPlaceCount = l_pcNodeclass->GetElements()->size();
+
+    SP_VectorBool l_abIsFixed;
+
+	l_abIsFixed.assign(l_nPlaceCount,false);
+
+	unsigned long l_nPosition=0;
+
+	for (auto l_pcElement:(*l_pcNodeclass->GetElements()))
+	{
+		//get fixed flag
+		bool l_bFixedFlag = dynamic_cast<SP_DS_BoolAttribute*>(l_pcElement->GetAttribute(wxT("Fixed")))->GetValue();
+
+		l_abIsFixed[l_nPosition]=l_bFixedFlag;
+
+		l_nPosition++;
+	}
+
+	(dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))->SetFixedFlag(l_abIsFixed);
+
 }
 void SP_DLG_HybridSimulationResults::LoadTransitions()
 {

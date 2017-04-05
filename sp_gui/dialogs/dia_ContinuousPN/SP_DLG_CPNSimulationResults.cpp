@@ -1179,6 +1179,11 @@ void SP_DLG_CPNSimulationResults::LoadPlaces()
 
 	m_asPlaceNames.clear();
 
+	SP_VectorBool l_abIsFixed;
+
+	l_abIsFixed.assign(l_nPlaceCount,false);
+
+
 	unsigned long l_nPosition = 0;
 
 	for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
@@ -1193,12 +1198,20 @@ void SP_DLG_CPNSimulationResults::LoadPlaces()
 		m_asPlaceNames.push_back(l_sName);
 		m_mPlaceName2Position[l_sName] = l_nPosition;
 
+		//get fixed flag
+		bool l_bFixedFlag = dynamic_cast<SP_DS_BoolAttribute*>((*l_itElem)->GetAttribute(wxT("Fixed")))->GetValue();
+
+		l_abIsFixed[l_nPosition]=l_bFixedFlag;
+
 		l_nPosition++;
 	}
 
 	m_pcMainSimulator->SetPlaceNames(l_asPlaceNames);
 
 	(dynamic_cast<spsim::ContinuousSimulator*>(m_pcMainSimulator))->SetInitialMarking(l_anCurrentMarking);
+
+	//set fixed flag
+	(dynamic_cast<spsim::ContinuousSimulator*>(m_pcMainSimulator))->SetFixedFlag(l_abIsFixed);
 }
 
 void SP_DLG_CPNSimulationResults::UpdateViewer(SP_DS_Metadata* p_pcView)
