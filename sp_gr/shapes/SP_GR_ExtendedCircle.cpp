@@ -126,12 +126,12 @@ SP_WDG_DialogExtendedGraphic, SP_GR_ExtendedEdge, shapes/SP_GR_Extended*, SP_GPR
         if (l_pcBoolAttr->GetValue())
         {
           m_pcPrimitive->SetDrawnPen(m_pcPrimitive->GetPen());
-          int l_nSinX = wxRound(l_nX * sin(0.6 * 3.1415927 * 0.5));
-          int l_nSinY = wxRound(l_nY * cos(0.6 * 3.1415927 * 0.5));
+          int l_nSinX = wxRound(l_nX * sin(0.6 * SP_PI * 0.5));
+          int l_nSinY = wxRound(l_nY * cos(0.6 * SP_PI * 0.5));
           m_pcPrimitive->DrawLine(wxPoint(-l_nSinX,  l_nSinY),
                                   wxPoint( l_nSinX,  l_nSinY));
-          m_pcPrimitive->DrawLine(wxPoint(-l_nSinX, -l_nSinY - 1),
-                                  wxPoint( l_nSinX, -l_nSinY - 1));
+          m_pcPrimitive->DrawLine(wxPoint(-l_nSinX, -l_nSinY),
+                                  wxPoint( l_nSinX, -l_nSinY));
         }
       }
     }

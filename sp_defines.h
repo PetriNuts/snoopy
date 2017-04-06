@@ -44,7 +44,7 @@ typedef SP_Matrix<SP_PairLong> SP_MatrixPairLong;
 typedef SP_Matrix<SP_PairDouble> SP_MatrixPairDouble;
 
 extern const unsigned SP_INFINITY;
-
+extern const double SP_PI;
 extern const wxString SP_WILDCARD;
 
 //------------------------------------------------------------------------

@@ -134,6 +134,7 @@ void SP_ImportSBML2cntPn::getModelDescription()
 
 void SP_ImportSBML2cntPn::getSpecies()
 {
+    SP_DS_Nodeclass* contPlaceClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
     for (unsigned int n = 0; n < m_sbmlModel->getNumSpecies() ; ++n)
     {
 		Species* l_sbmlSpecies = m_sbmlModel->getSpecies(n);
@@ -146,7 +147,6 @@ void SP_ImportSBML2cntPn::getSpecies()
 		// Species _void_ is only for Gepasi, don't import
 		if (l_speciesName != wxT("_void_"))
 		{
-			SP_DS_Nodeclass* contPlaceClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
 			SP_DS_Node* l_pcNode = contPlaceClass->NewElement(m_pcCanvas->GetNetnumber());
 			if (l_pcNode)
 			{
@@ -198,8 +198,7 @@ void SP_ImportSBML2cntPn::getSpecies()
 				// if set BoundaryCondition (0,1 for false,true) or 0 for default (false)
 				numBoundaryConditions += l_sbmlSpecies->getBoundaryCondition();
 				if(m_CreateBoundaryConditions
-				   && l_sbmlSpecies->getBoundaryCondition()
-				   && !l_sbmlSpecies->getConstant())
+				   && l_sbmlSpecies->getBoundaryCondition())
 				{
 					SP_DS_Nodeclass* contTransitionClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS);
 					SP_DS_Node* l_inNode = contTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
@@ -213,11 +212,11 @@ void SP_ImportSBML2cntPn::getSpecies()
 					l_outNode->GetGraphics()->front()->SetBrushColour(*wxGREEN);
 					l_outNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 					drawEdge(l_pcNode,l_outNode,wxT("Edge"),wxT("1"));
-				}
-				else
-				{
-					l_pcNode->GetAttribute(wxT("Fixed"))->SetValueString(wxString::Format(wxT("%d"), l_sbmlSpecies->getBoundaryCondition()));
-				}
+                }
+                else
+                {
+                    l_pcNode->GetAttribute(wxT("Fixed"))->SetValueString(wxString::Format(wxT("%d"), l_sbmlSpecies->getBoundaryCondition() || l_sbmlSpecies->getConstant()));
+                }
 				l_pcNode->ShowOnCanvas(m_pcCanvas, FALSE, 50, yComRea,0);
 
 				m_Species.insert(std::make_pair(l_speciesId,l_pcNode));
@@ -346,7 +345,7 @@ void SP_ImportSBML2cntPn::getReactions ()
 			const ListOfSpeciesReferences* products = l_sbmlReaction->getListOfProducts();
 			const ListOfSpeciesReferences* modifiers = l_sbmlReaction->getListOfModifiers();
 
-			// get rectants of actual reaction
+			// get reactants of actual reaction
 			for (unsigned int lor = 0; lor < rectants->size() ; ++lor)
 			{
 				auto l_sbmlReactant = l_sbmlReaction->getReactant(lor);
@@ -357,21 +356,10 @@ void SP_ImportSBML2cntPn::getReactions ()
 				wxString l_stoichiometry =
 						wxString::Format(wxT("%g"),l_sbmlReactant->getStoichiometry());
 				drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
-				if(l_sbmlSpecies->getConstant())
-				{
-					drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
-				}
 				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 				{
 					drawEdge(l_revReactionNode, l_pcNode, SP_DS_EDGE, l_stoichiometry);
-					if(l_sbmlSpecies->getConstant())
-					{
-						drawEdge(l_pcNode,l_revReactionNode,SP_DS_EDGE,l_stoichiometry);
-					}
-                    else
-                    {
-                        drawEdge(l_pcNode, l_revReactionNode, SP_DS_MODIFIER_EDGE, wxT("0"));
-                    }
+                    drawEdge(l_pcNode, l_revReactionNode, SP_DS_MODIFIER_EDGE, wxT("0"));
 				}
 			}
 
@@ -386,17 +374,9 @@ void SP_ImportSBML2cntPn::getReactions ()
 				wxString l_stoichiometry =
 						wxString::Format(wxT("%g"),l_sbmlProduct->getStoichiometry());
 				drawEdge(l_reactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
-				if(l_sbmlSpecies->getConstant())
-				{
-					drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
-				}
 				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 				{
 					drawEdge(l_pcNode,l_revReactionNode, SP_DS_EDGE, l_stoichiometry);
-					if(l_sbmlSpecies->getConstant())
-					{
-						drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
-					}
 				}
 				if(l_sbmlReaction->isSetKineticLaw())
 				{
@@ -416,11 +396,14 @@ void SP_ImportSBML2cntPn::getReactions ()
 				wxString l_modifierName = l_sbmlModifier->getSpecies();
 				SP_DS_Node* l_pcNode = getSpeciesNode(l_modifierName);
 
-				wxString l_stoichiometry = wxT("0"); // no info about in sbml
-				drawEdge( l_pcNode, l_reactionNode, SP_DS_MODIFIER_EDGE, l_stoichiometry);
-                if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
+                if(!l_reactionNode->IsTargetOf(l_pcNode))
                 {
-                    drawEdge(l_pcNode, l_revReactionNode,SP_DS_MODIFIER_EDGE,l_stoichiometry);
+                    wxString l_stoichiometry = wxT("0"); // no info about in sbml
+                    drawEdge(l_pcNode, l_reactionNode, SP_DS_MODIFIER_EDGE, l_stoichiometry);
+                    if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
+                    {
+                        drawEdge(l_pcNode, l_revReactionNode, SP_DS_MODIFIER_EDGE, l_stoichiometry);
+                    }
                 }
 			}
 		}

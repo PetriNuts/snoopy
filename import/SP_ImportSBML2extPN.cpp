@@ -194,7 +194,8 @@ void SP_ImportSBML2extPN::getModelCompartments()
 
 void SP_ImportSBML2extPN::getSpecies()
 {
-	SP_DS_Nodeclass* placeClass = m_pcGraph->GetNodeclass(wxT("Place"));
+    SP_DS_Nodeclass* l_pcNodeClass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+
 	for (unsigned int n = 0; n < m_sbmlModel->getNumSpecies() ; ++n)
     {
 		Species* l_sbmlSpecies = m_sbmlModel->getSpecies(n);
@@ -207,7 +208,7 @@ void SP_ImportSBML2extPN::getSpecies()
 		// Species _void_ is only for Gepasi, don't import
 		if (l_speciesName != wxT("_void_"))
 		{
-			SP_DS_Node* l_pcNode = placeClass->NewElement(m_pcCanvas->GetNetnumber());
+			SP_DS_Node* l_pcNode = l_pcNodeClass->NewElement(m_pcCanvas->GetNetnumber());
 			if (l_pcNode)
 			{
 				++yComRea;
@@ -232,25 +233,24 @@ void SP_ImportSBML2extPN::getSpecies()
 					l_comment << wxT("metaid=\"") << l_sbmlSpecies->getMetaId() << wxT("\"\n");
 				}
 
-				if (l_sbmlSpecies->isSetInitialAmount())
-				{
-					double l_Init = l_sbmlSpecies->getInitialAmount();
-					wxString l_sMarking = wxString::Format(wxT("%.0f"), ceil(l_Init));
-					l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
-					l_comment << wxT("initialAmount=\"") << l_Init << wxT("\"\n");
-				}
-				else if(l_sbmlSpecies->isSetInitialConcentration())
-				{
-					double l_Init = l_sbmlSpecies->getInitialConcentration();
-					wxString l_sMarking = wxString::Format(wxT("%.0f"), ceil(l_Init));
-					l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
-					l_comment << wxT("initialConcentration=\"") << l_Init << wxT("\"\n");
-				}
+                wxString l_sMarking;
+                double l_Init = 0.0;
+                if (l_sbmlSpecies->isSetInitialAmount())
+                {
+                    l_Init = l_sbmlSpecies->getInitialAmount();
+                    l_comment << wxT("initialAmount=\"") << l_Init << wxT("\"\n");
+                }
+                else if(l_sbmlSpecies->isSetInitialConcentration())
+                {
+                    l_Init = l_sbmlSpecies->getInitialConcentration();
+                    l_comment << wxT("initialConcentration=\"") << l_Init << wxT("\"\n");
+                }
+                l_sMarking = wxString::Format(wxT("%.0f"), ceil(l_Init));
+                l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
 
 				numBoundaryConditions += l_sbmlSpecies->getBoundaryCondition();
 				if(m_CreateBoundaryConditions
-					&& l_sbmlSpecies->getBoundaryCondition()
-					&& !l_sbmlSpecies->getConstant())
+					&& l_sbmlSpecies->getBoundaryCondition())
 				{
 					SP_DS_Nodeclass* extTransitionClass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_TRANS);
 					SP_DS_Node* l_inNode = extTransitionClass->NewElement(m_pcCanvas->GetNetnumber());
@@ -265,9 +265,17 @@ void SP_ImportSBML2extPN::getSpecies()
 					l_outNode->ShowOnCanvas(m_pcCanvas, FALSE, 100, yComRea, 0);
 					drawEdge(l_pcNode,l_outNode,wxT("Edge"),wxT("1"));
 				}
-				else if(l_sbmlSpecies->getBoundaryCondition())
+                else
+                {
+                    l_pcNode->GetAttribute(wxT("Fixed"))->SetValueString(wxString::Format(wxT("%d"), l_sbmlSpecies->getBoundaryCondition() || l_sbmlSpecies->getConstant()));
+                }
+				if(l_sbmlSpecies->getBoundaryCondition())
 				{
 					l_comment << wxT("boundaryCondition=\"true\"\n");
+				}
+				if(l_sbmlSpecies->getConstant())
+				{
+					l_comment << wxT("constant=\"true\"\n");
 				}
 
 				if(l_sbmlSpecies->isSetNotes())
@@ -392,44 +400,22 @@ void SP_ImportSBML2extPN::getReactions ()
 				SP_DS_Node* l_pcNode = getSpeciesNode(l_eductName);
 
 				double l_sbmlStoichiometry = l_sbmlReactant->getStoichiometry();
-				wxString l_stoichiometry =
-						wxString::Format(wxT("%.0f"), ceil(l_sbmlStoichiometry));
+				wxString l_stoichiometry = wxString::Format(wxT("%.0f"), ceil(l_sbmlStoichiometry));
 				wxString l_comment = wxT("stoichiometry=\"") + wxString::Format(wxT("%g"), l_sbmlStoichiometry) + wxT("\"\n");
-				SP_DS_Edge* l_pcEdge =
-						drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
-				l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
+                SP_DS_Edge* l_pcEdge = nullptr;
+                l_pcEdge = drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
+                l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 				if(m_NormalizeStoichiometries)
 				{
 					l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
 				}
-				if(l_sbmlSpecies->getConstant())
-				{
-					l_pcEdge =
-							drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
-					l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
-					if(m_NormalizeStoichiometries)
-					{
-						l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
-					}
-				}
 				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 				{
-					l_pcEdge =
-							drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+					l_pcEdge = drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
 					l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 					if(m_NormalizeStoichiometries)
 					{
 						l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
-					}
-					if(l_sbmlSpecies->getConstant())
-					{
-						l_pcEdge =
-								drawEdge(l_pcNode,l_revReactionNode,SP_DS_EDGE,l_stoichiometry);
-						l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
-						if(m_NormalizeStoichiometries)
-						{
-							l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
-						}
 					}
 				}
 			}
@@ -443,77 +429,27 @@ void SP_ImportSBML2extPN::getReactions ()
 				SP_DS_Node* l_pcNode = getSpeciesNode(l_productName);
 
 				double l_sbmlStoichiometry = l_sbmlProduct->getStoichiometry();
-				wxString l_stoichiometry =
-						wxString::Format(wxT("%.0f"), ceil(l_sbmlStoichiometry));
+				wxString l_stoichiometry = wxString::Format(wxT("%.0f"), ceil(l_sbmlStoichiometry));
 				wxString l_comment = wxT("stoichiometry=\"") + wxString::Format(wxT("%g"), l_sbmlStoichiometry) + wxT("\"\n");
-				SP_DS_Edge* l_pcEdge =
-						drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
+				SP_DS_Edge* l_pcEdge = drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
 				l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 				if(m_NormalizeStoichiometries)
 				{
 					l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
 				}
-				if(l_sbmlSpecies->getConstant())
-				{
-					l_pcEdge =
-							drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
-					l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
-					if(m_NormalizeStoichiometries)
-					{
-						l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
-					}
-				}
 				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 				{
-					l_pcEdge =
-							drawEdge(l_pcNode, l_revReactionNode, SP_DS_EDGE,l_stoichiometry);
+					l_pcEdge = drawEdge(l_pcNode, l_revReactionNode, SP_DS_EDGE,l_stoichiometry);
 					l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 					if(m_NormalizeStoichiometries)
 					{
 						l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
-					}
-					if(l_sbmlSpecies->getConstant())
-					{
-						l_pcEdge =
-								drawEdge(l_revReactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
-						l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
-						if(m_NormalizeStoichiometries)
-						{
-							l_Stoichiometries.insert(std::make_pair(l_pcEdge, l_sbmlStoichiometry));
-						}
-					}
-				}
-				if(l_sbmlReaction->isSetKineticLaw())
-				{
-					const ASTNode* l_sbmlMath = l_sbmlReaction->getKineticLaw()->getMath();
-					if(existInReactionFormula(l_productName, l_sbmlMath) &&
-						!l_reactionNode->IsTargetOf(l_pcNode))
-					{
-						drawEdge( l_pcNode, l_reactionNode, SP_DS_READ_EDGE, wxT("0"));
-						wxString l_sText = wxT("The semantics of reaction \"") + l_ReactionId +
-							wxT("\" is defined by it's kinetic law\nand there is no known way to decide the structure in general.\n") +
-							wxT("Please check the resulting transition.");
-						SP_LOGWARNING( l_sText);
 					}
 				}
 			}
 			if(m_NormalizeStoichiometries)
 			{
 				NormalizeStoichiometries(l_Stoichiometries);
-			}
-			// get modifiers of actual reaction
-			for (unsigned int lom = 0; lom < modifiers->size() ; ++lom)
-			{
-				auto l_sbmlModifier = l_sbmlReaction->getModifier(lom);
-				wxString l_modifierName = l_sbmlModifier->getSpecies();
-				SP_DS_Node* l_pcNode = getSpeciesNode(l_modifierName);
-
-				wxString l_stoichiometry = wxT("0"); // no info about in sbml
-				drawEdge( l_pcNode, l_reactionNode, SP_DS_READ_EDGE, l_stoichiometry);
-				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
-				{
-					drawEdge(l_pcNode, l_revReactionNode,SP_DS_READ_EDGE,l_stoichiometry);
-				}
 			}
 		}
     }

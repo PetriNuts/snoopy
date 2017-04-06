@@ -9,10 +9,7 @@
 
 #include "sp_ds/netclasses/SP_DS_ExtPT.h"
 
-#include "sp_ds/SP_DS_Edgeclass.h"
-#include "sp_ds/SP_DS_Nodeclass.h"
-
-#include "sp_ds/attributes/SP_DS_NameAttribute.h"
+#include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 #include "sp_ds/attributes/SP_DS_MultiplicityAttribute.h"
 #include "sp_ds/attributes/SP_DS_TextAttribute.h"
 #include "sp_ds/attributes/SP_DS_MarkingDependentMultiplicity.h"
@@ -20,10 +17,12 @@
 
 #include "sp_ds/extensions/SP_DS_Coarse.h"
 
+#include "sp_gr/shapes/SP_GR_ExtendedCircle.h"
 #include "sp_gr/edges/SP_GR_ArrowEdge.h"
 #include "sp_gr/attributes/SP_GR_TextAttribute.h"
 #include "sp_gr/attributes/SP_GR_MultiplicityAttribute.h"
 
+#include "sp_gui/widgets/dialogs/SP_WDG_DialogBool.h"
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogUnsigned.h"
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogText.h"
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogGraphic.h"
@@ -31,6 +30,9 @@
 
 #include "sp_ds/animators/SP_DS_ExtPTPlaceAnimator.h"
 #include "sp_ds/animators/SP_DS_ExtPTTransAnimator.h"
+
+#include "snoopy.h"
+#include "sp_core/SP_GPR_Elements.h"
 
 
 SP_DS_ExtPT::SP_DS_ExtPT() :
@@ -57,9 +59,19 @@ SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph)
 	SP_DS_Edgeclass* ec;
 	SP_DS_Attribute* attr;
 	SP_Graphic* gr;
+    SP_GR_Node* gn;
 
 	//////////////////////////////////////////////////////////////////////////////
 	nc = p_graph->GetNodeclass(wxT("Place"));
+	attr = nc->AddAttribute(new SP_DS_BoolAttribute(wxT("Fixed"), FALSE));//Fixed
+	attr->RegisterDialogWidget(new SP_WDG_DialogBool(wxT("General")));
+
+    int pwidth = wxGetApp().GetElementPrefs()->GetNodeWidth(GetName(), SP_DS_DISCRETE_PLACE);
+
+    gn = new SP_GR_ExtendedCircle(nc->GetPrototype(), pwidth);
+    gn->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), nc->GetName()));
+    nc->SetGraphic(gn);
+
 	nc->AddAnimator(new SP_DS_ExtPTPlaceAnimator(wxT("Marking")));
 
 	nc = p_graph->GetNodeclass(wxT("Transition"));

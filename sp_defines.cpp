@@ -3,6 +3,8 @@
 
 const unsigned SP_INFINITY = std::numeric_limits<unsigned>::max();
 
+const double SP_PI = 3.14159265358979323846264338328;
+
 const wxString SP_WILDCARD = wxT("<*>");
 
 /**
