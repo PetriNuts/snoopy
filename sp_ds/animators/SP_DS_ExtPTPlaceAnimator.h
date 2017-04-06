@@ -12,11 +12,11 @@
 class SP_DS_ExtPTPlaceAnimator: public SP_DS_PlaceAnimator
 {
  private:
+  bool m_fixed;
 
  protected:
   virtual bool DecrementMark();
-  bool TestMarking(const SP_ListEdge* p_edges,
-		   long p_tokens);
+  bool TestMarking(const SP_ListEdge* p_edges, long p_tokens);
 
   // Added by Erik Jongsma, changed to pass the transanimation pointer as well
   long DecrementedMarking(const SP_ListEdge* p_edges,
@@ -43,6 +43,8 @@ class SP_DS_ExtPTPlaceAnimator: public SP_DS_PlaceAnimator
   virtual bool BuildAutoConflictList (list<SP_DS_TransAnimator*> &p_lConflictTransAnimators);
   virtual bool DecrementSimValue (SP_DS_TransAnimator* p_pcTrans);
   virtual bool DecrementSimValueAutoConcurrency (SP_DS_TransAnimator* p_pcTrans);
+
+  virtual bool IncrementMark(SP_DS_Edge* p_pcEdge);
 
   //by sl
   bool OnRightClick();

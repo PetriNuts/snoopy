@@ -76,7 +76,7 @@ public:
 
     bool Enable(SP_DS_TransAnimator* p_pcAnim);
 
-    bool IncrementMark(SP_DS_Edge* p_pcEdge);
+    virtual bool IncrementMark(SP_DS_Edge* p_pcEdge);
 
     SP_DS_Node* GetNode() { return m_pcNode; }
 

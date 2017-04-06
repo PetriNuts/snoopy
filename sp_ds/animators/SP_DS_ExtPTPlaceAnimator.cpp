@@ -5,6 +5,7 @@
 // Short Description: place animator for Extended PT nets
 //////////////////////////////////////////////////////////////////////
 
+#include <sp_ds/attributes/SP_DS_BoolAttribute.h>
 #include "sp_ds/extensions/SP_DS_Animation.h"
 #include "sp_ds/animators/SP_DS_ExtPTPlaceAnimator.h"
 #include "sp_ds/animators/SP_DS_TransAnimator.h"
@@ -14,8 +15,11 @@
 SP_DS_ExtPTPlaceAnimator::SP_DS_ExtPTPlaceAnimator(const wxString& p_pchAttributeName,
 						   SP_DS_Animation* p_pcAnim,
 						   SP_DS_Node* p_pcParent)
-  : SP_DS_PlaceAnimator(p_pchAttributeName, p_pcAnim, p_pcParent)
+  : SP_DS_PlaceAnimator(p_pchAttributeName, p_pcAnim, p_pcParent),
+	m_fixed(false)
 {
+    if(p_pcParent)
+        m_fixed = static_cast<SP_DS_BoolAttribute*>(p_pcParent->GetAttribute(wxT("Fixed")))->GetValue();
 }
 
 SP_DS_ExtPTPlaceAnimator::~SP_DS_ExtPTPlaceAnimator()
@@ -323,8 +327,17 @@ long SP_DS_ExtPTPlaceAnimator::DecrementedMarking(const SP_ListEdge* p_edges, lo
 	return p_tokens;
 }
 
+bool SP_DS_ExtPTPlaceAnimator::IncrementMark(SP_DS_Edge* p_pcEdge)
+{
+	if (m_fixed) { return true; }
+
+	return SP_DS_PlaceAnimator::IncrementMark(p_pcEdge);
+}
+
 bool SP_DS_ExtPTPlaceAnimator::DecrementMark()
 {
+	if(m_fixed) { return true; }
+
 	CHECK_POINTER(m_pcAttribute, return FALSE);
 	CHECK_POINTER(m_pcNode, return FALSE);
 
