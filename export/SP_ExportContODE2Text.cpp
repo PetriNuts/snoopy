@@ -11,7 +11,7 @@
 #include "export/SP_ExportContODE2Text.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_ds/SP_DS_Graph.h"
-#include "sp_ds/attributes/SP_DS_ColListAttribute.h"
+#include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include "sp_ds/extensions/continuous/SP_DS_PlaceODE.h"
 
@@ -38,7 +38,6 @@ bool SP_ExportContODE2Text::DoWrite()
 	    SP_DS_PlaceODE* l_pcPlaceODEConstructor;
 		wxString l_sResult = wxT("");
 	    const SP_ListNode *l_places=m_graph->GetNodeclass(SP_DS_CONTINUOUS_PLACE)->GetElements();
-	    SP_ListNode::const_iterator l_itPlace;
 
 	    l_pcPlaceODEConstructor=new SP_DS_PlaceODE(m_graph);
 
@@ -50,12 +49,18 @@ bool SP_ExportContODE2Text::DoWrite()
 
 	    long l_nPlacePos=0;
 	    //Iterate for all the places
-	    for(l_itPlace=l_places->begin();l_itPlace!=l_places->end();l_itPlace++)
+	    for(auto l_itPlace : *l_places)
 		{
-			wxString l_sName=(dynamic_cast<SP_DS_NameAttribute*>((*l_itPlace)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)))->GetValue();
+			wxString l_sName=(dynamic_cast<SP_DS_NameAttribute*>(l_itPlace->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)))->GetValue();
 			l_sResult<<wxT("d")<<l_sName<<wxT("/dt = ");
-			l_sResult <<l_pcPlaceODEConstructor->ConstructODE(l_nPlacePos)<<wxT("\n\n");
-
+			if((dynamic_cast<SP_DS_BoolAttribute*>(l_itPlace->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_BOOL)))->GetValue())
+			{
+				l_sResult << wxT("0");
+			}
+			else
+			{
+				l_sResult << l_pcPlaceODEConstructor->ConstructODE(l_nPlacePos) << wxT("\n\n");
+			}
 			l_nPlacePos++;
 		}
 		m_file.Write(l_sResult);

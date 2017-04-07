@@ -62,14 +62,6 @@ bool SP_ExportContPed2PedConservative::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 	if (SP_DS_CONTINUOUS_PLACE == l_sNodeclassName)
 	{
 		l_pcNodeclassName = wxT("Place");
-		l_pcElem->AddAttribute(wxT("name"), l_pcNodeclassName);
-		p_pcRoot->AddChild(l_pcElem);
-
-		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
-		{
-			WritePlace((*l_Iter), l_pcElem);
-		}
-		return true;
 	}
 	else if (SP_DS_CONTINUOUS_TRANS == l_sNodeclassName)
 	{
@@ -106,31 +98,6 @@ bool SP_ExportContPed2PedConservative::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		WriteNode((*l_Iter), l_pcElem);
 
 	return TRUE;
-}
-
-bool
-SP_ExportContPed2PedConservative::WritePlace( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot)
-{
-	CHECK_POINTER( p_pcVal, return FALSE );
-	CHECK_POINTER( p_pcRoot, return FALSE );
-	
-
-	SP_ListAttribute::const_iterator l_Iter;
-	const SP_ListAttribute* l_plAttributes = p_pcVal->GetAttributes();
-	CHECK_POINTER( l_plAttributes, return FALSE );
-
-	wxXmlNode*  l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE,  wxT("node"));
-	p_pcRoot->AddChild( l_pcElem );
-
-	for( l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter )
-	{
-	  if ((*l_Iter)->GetName() != wxT("Fixed") )
-	  {
-		  WriteAttribute( ( *l_Iter ), l_pcElem );
-	  }
-	}
-
-	return WriteData(p_pcVal, l_pcElem);
 }
 
 bool SP_ExportContPed2PedConservative::WriteEdgeclass(SP_DS_Edgeclass* p_pcVal,
@@ -170,41 +137,6 @@ bool SP_ExportContPed2PedConservative::WriteEdgeclass(SP_DS_Edgeclass* p_pcVal,
 	return TRUE;
 }
 
-bool SP_ExportContPed2PedConservative::WriteEdge(SP_DS_Edge* p_pcVal,
-		wxXmlNode* p_pcRoot)
-{
-	CHECK_POINTER(p_pcVal, return FALSE);
-	CHECK_POINTER(p_pcRoot, return FALSE);
-	
-
-	SP_ListAttribute::const_iterator l_Iter;
-	const SP_ListAttribute* l_plAttributes = p_pcVal->GetAttributes();
-	CHECK_POINTER(l_plAttributes, return FALSE);
-
-	wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("edge"));
-	if (p_pcVal->GetSource())
-		l_pcElem->AddAttribute(wxT("source"),wxString::Format( wxT("%ld"), p_pcVal->GetSource()->GetId()));
-	if (p_pcVal->GetTarget())
-		l_pcElem->AddAttribute(wxT("target"),wxString::Format( wxT("%ld"), p_pcVal->GetTarget()->GetId()));
-	p_pcRoot->AddChild(l_pcElem);
-
-	for (l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter)
-	{
-		if ((*l_Iter)->GetName() == wxT("Equation"))
-		{
-			(*l_Iter)->SetName(wxT("Multiplicity"));
-			WriteAttribute((*l_Iter), l_pcElem);
-			(*l_Iter)->SetName(wxT("Equation"));
-		}
-		else
-		{
-			WriteAttribute((*l_Iter), l_pcElem);
-		}
-	}
-
-	return WriteData(p_pcVal, l_pcElem);
-}
-
 bool SP_ExportContPed2PedConservative::AcceptsDoc(SP_MDI_Doc* p_doc)
 {
 	CHECK_POINTER(p_doc, return false);
@@ -216,34 +148,43 @@ bool SP_ExportContPed2PedConservative::AcceptsDoc(SP_MDI_Doc* p_doc)
 bool
 SP_ExportContPed2PedConservative::WriteAttribute( SP_DS_Attribute* p_pcVal, wxXmlNode* p_pcRoot )
 {
-    CHECK_POINTER( p_pcVal, return FALSE );
-    CHECK_POINTER( p_pcRoot, return FALSE );
+	CHECK_POINTER( p_pcVal, return FALSE );
+	CHECK_POINTER( p_pcRoot, return FALSE );
 
-    if( p_pcVal->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST )
-    {
-      return WriteColListAttribute( dynamic_cast< SP_DS_ColListAttribute* >( p_pcVal ), p_pcRoot );
-    }
+	wxString l_sName = p_pcVal->GetName();
 
-    wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("attribute"));
-    wxString l_sVal = p_pcVal->GetValueString();
-    wxString l_sName = p_pcVal->GetName();
-    double l_nVal = 0;
+	if(l_sName == wxT("Reversible") || l_sName == wxT("Fixed"))
+	{
+		return true;
+	}
 
-    if((l_sName == wxT("Marking") || l_sName == wxT("Multiplicity"))
-    		&& l_sVal.ToDouble(&l_nVal))
-    {
-    	unsigned l_newVal = std::ceil(l_nVal);
-    	l_sVal = wxString::Format(wxT("%u"), l_newVal);
-    }
+	if( p_pcVal->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST )
+	{
+		return WriteColListAttribute( dynamic_cast< SP_DS_ColListAttribute* >( p_pcVal ), p_pcRoot );
+	}
 
-    l_pcElem->AddAttribute(wxT("name"), l_sName);
-    p_pcRoot->AddChild(l_pcElem);
+	wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("attribute"));
+	wxString l_sVal = p_pcVal->GetValueString();
+	double l_nVal = 0;
 
-    wxXmlNode* l_pcCDATA = new wxXmlNode(NULL, wxXML_CDATA_SECTION_NODE, wxT(""), l_sVal);
-    l_pcElem->AddChild(l_pcCDATA);
+	if((l_sName == wxT("Marking") || l_sName == wxT("Multiplicity"))
+	   && l_sVal.ToDouble(&l_nVal))
+	{
+		unsigned l_newVal = std::ceil(l_nVal);
+		l_sVal = wxString::Format(wxT("%u"), l_newVal);
+	}
+	else if(l_sName == wxT("Equation"))
+	{
+		l_sName = wxT("Multiplicity");
+	}
 
-    return WriteData( p_pcVal, l_pcElem );
+	l_pcElem->AddAttribute(wxT("name"), l_sName);
+	p_pcRoot->AddChild(l_pcElem);
 
+	wxXmlNode* l_pcCDATA = new wxXmlNode(NULL, wxXML_CDATA_SECTION_NODE, wxT(""), l_sVal);
+	l_pcElem->AddChild(l_pcCDATA);
+
+	return WriteData( p_pcVal, l_pcElem );
 }
 
 bool SP_ExportContPed2PedConservative::WriteMetadata(SP_DS_Metadata *p_pcVal, wxXmlNode *p_pcRoot) {

@@ -1055,54 +1055,71 @@ void SP_DLG_ColHPNSimultionResults::LoadPlaces()
 
 	 // m_pcMainSimulator->SetInitialMarking(*m_pcUnfoldedNet->GetCurHybPNMarking());
 
-	 SP_VectorBool l_abPlaceType;
-
-	 l_abPlaceType.clear();
-
 	 //continuous place count: workaround
 	 m_nContinuousPlaceCount=m_pcUnfoldedNet->GetContinuousPlaceCount();
 
-	 l_abPlaceType.assign(m_nContinuousPlaceCount,true);
+	SP_VectorBool l_abPlaceType(m_nContinuousPlaceCount,true);
 
-	  if( m_sSimulatorType==wxT("Continuous"))
-	   {
-		  l_abPlaceType.resize(l_nPlaceCount,true);
+	if( m_sSimulatorType==wxT("Continuous"))
+	{
+		l_abPlaceType.resize(l_nPlaceCount,true);
 
-		  m_nContinuousPlaceCount=l_nPlaceCount;
-	   }
-	   else
-	   {
-		  l_abPlaceType.resize(l_nPlaceCount,false);
-	   }
+	  	m_nContinuousPlaceCount=l_nPlaceCount;
+	}
+	else
+	{
+		l_abPlaceType.resize(l_nPlaceCount,false);
+	}
 
-	 
-	  m_anCurrentMarking.clear();
-	  m_anCurrentMarking = *m_pcUnfoldedNet->GetCurHybPNMarking();	  
-      
-     // int l_nMethodType=m_pcTimeSyncComboBox->GetSelection();
-      
-      if(m_sSimulatorType==wxT("Stochastic"))
-      {
-          SP_VectorLong l_anCurrentMarking;
-         
-          l_anCurrentMarking.clear();
-         
-          l_anCurrentMarking.assign(m_anCurrentMarking.size(),0);
-          
-          for(unsigned long l_nPlace=0; l_nPlace<m_anCurrentMarking.size();l_nPlace++)
-          {
-             l_anCurrentMarking[l_nPlace]=m_anCurrentMarking[l_nPlace];
-          }
-          
-          m_pcMainSimulator->SetInitialMarking(l_anCurrentMarking);
-      }
-      else
-      {
-          //set initial marking
-          m_pcMainSimulator->SetInitialMarking(m_anCurrentMarking);	
+	SP_VectorBool l_abIsFixed(l_nPlaceCount,false);
+	unsigned long l_nPosition = 0;
+	for(auto const& it : m_pcUnfoldedNet->GetUnfoldedContPlaces())
+	{
+		for(auto const& it2 : it.second)
+		{
+			l_abIsFixed[l_nPosition] = it2.second.m_bFixed;
+			++l_nPosition;
+		}
+	}
+	for(auto const& it : m_pcUnfoldedNet->GetUnfoldedDiscPlaces())
+	{
+		for(auto const& it2 : it.second)
+		{
+			l_abIsFixed[l_nPosition] = it2.second.m_bFixed;
+			++l_nPosition;
+		}
+	}
+	//set fixed flag
+	(dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))->SetFixedFlag(l_abIsFixed);
 
-          (dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))->SetPlaceTypes(l_abPlaceType);
-      }
+
+	m_anCurrentMarking.clear();
+	m_anCurrentMarking = *m_pcUnfoldedNet->GetCurHybPNMarking();
+
+	// int l_nMethodType=m_pcTimeSyncComboBox->GetSelection();
+
+	if(m_sSimulatorType==wxT("Stochastic"))
+	{
+	  SP_VectorLong l_anCurrentMarking;
+
+	  l_anCurrentMarking.clear();
+
+	  l_anCurrentMarking.assign(m_anCurrentMarking.size(),0);
+
+	  for(unsigned long l_nPlace=0; l_nPlace<m_anCurrentMarking.size();l_nPlace++)
+	  {
+		 l_anCurrentMarking[l_nPlace]=m_anCurrentMarking[l_nPlace];
+	  }
+
+	  m_pcMainSimulator->SetInitialMarking(l_anCurrentMarking);
+	}
+	else
+	{
+	  //set initial marking
+	  m_pcMainSimulator->SetInitialMarking(m_anCurrentMarking);
+
+	  (dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))->SetPlaceTypes(l_abPlaceType);
+	}
        
 }
 

@@ -181,6 +181,14 @@ bool SP_ImportANDL::CreatePlaces(const dsszmc::andl::Places& p_Places)
 		{
 			l_pcAttr->SetValueString(marking);
 		}
+		if (p->fixed_)
+		{
+			l_pcAttr = l_node->GetAttribute(wxT("Fixed"));
+			if (l_pcAttr)
+			{
+				l_pcAttr->SetValueString(wxT("1"));
+			}
+		}
 		l_node->ShowOnCanvas(l_pcCanvas, FALSE, x, y, 0);
 		lookupPlaces[p->name_] = l_node;
 	}
@@ -295,6 +303,15 @@ bool SP_ImportANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transit
 		l_node = nodeClass->NewElement(l_pcCanvas->GetNetnumber());
 		l_node->GetAttribute(wxT("Name"))->SetValueString(name);
 		l_node->GetAttribute(wxT("Name"))->SetShow(TRUE);
+
+		if(t->reversible_)
+		{
+			SP_DS_Attribute* l_pcAttr = l_node->GetAttribute(wxT("Reversible"));
+			if(l_pcAttr)
+			{
+				l_pcAttr->SetValueString(wxT("1"));
+			}
+		}
 
 		if (m_eNetType == dsszmc::andl::NetType::SPN_T
 			|| m_eNetType == dsszmc::andl::NetType::GSPN_T

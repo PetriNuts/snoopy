@@ -213,6 +213,15 @@ SP_ImportCANDL::CreatePlaces(const dsszmc::andl::Places& p_Places)
 			l_pcColAttr->SetCell(l_nNewRow,1, token);
 		}
 
+		if (p->fixed_)
+		{
+			l_pcAttr = l_node->GetAttribute(wxT("Fixed"));
+			if (l_pcAttr)
+			{
+				l_pcAttr->SetValueString(wxT("1"));
+			}
+		}
+
 		l_node->ShowOnCanvas(l_pcCanvas, FALSE, x, y, 0);
 		lookupPlaces[p->name_] = l_node;
 	}
@@ -518,6 +527,15 @@ SP_ImportCANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions
 		l_node = nodeClass->NewElement(l_pcCanvas->GetNetnumber());
 		l_node->GetAttribute(wxT("Name"))->SetValueString(name);
 		l_node->GetAttribute(wxT("Name"))->SetShow(TRUE);
+
+		if(t->reversible_)
+		{
+			SP_DS_Attribute* l_pcAttr = l_node->GetAttribute(wxT("Reversible"));
+			if(l_pcAttr)
+			{
+				l_pcAttr->SetValueString(wxT("1"));
+			}
+		}
 
 		wxString guard = t->guard_;
 		AdaptColorExpression(guard);

@@ -304,6 +304,23 @@ SP_ExportColHPN2ColPN::WriteEdgeGraphic(SP_GR_Edge* p_pcVal,
 }
 
 bool
+SP_ExportColHPN2ColPN::WriteAttribute( SP_DS_Attribute* p_pcVal, wxXmlNode* p_pcRoot )
+{
+	CHECK_POINTER(p_pcVal, return FALSE);
+	CHECK_POINTER(p_pcRoot, return FALSE);
+
+	wxString l_sName = p_pcVal->GetName();
+
+	if (l_sName == wxT("Fixed"))
+	{
+		return true;
+	}
+
+	return SP_XmlWriter::WriteAttribute(p_pcVal, p_pcRoot);
+}
+
+
+bool
 SP_ExportColHPN2ColPN::WriteColourInformation(SP_Graphic* p_pcVal,
 					   wxXmlNode* p_pcNode)
 {

@@ -118,6 +118,21 @@ SP_ExportExtPT2Ped::WriteEdge(SP_DS_Edge* p_pcVal,
 	return l_bReturn;
 }
 
+bool
+SP_ExportExtPT2Ped::WriteAttribute( SP_DS_Attribute* p_pcVal, wxXmlNode* p_pcRoot )
+{
+	CHECK_POINTER(p_pcVal, return FALSE);
+	CHECK_POINTER(p_pcRoot, return FALSE);
+
+	wxString l_sName = p_pcVal->GetName();
+
+	if (l_sName == wxT("Fixed"))
+	{
+		return true;
+	}
+
+	return SP_XmlWriter::WriteAttribute(p_pcVal, p_pcRoot);
+}
 
 bool
 SP_ExportExtPT2Ped::WriteColourInformation(SP_Graphic* p_pcVal,

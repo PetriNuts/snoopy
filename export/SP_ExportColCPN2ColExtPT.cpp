@@ -118,11 +118,6 @@ SP_ExportColCPN2ColExtPT :: WriteStochPlace( SP_DS_Node* p_pcVal, wxXmlNode* p_p
 	{
 		SP_DS_Attribute* l_pcAttribute = *l_Iter;
 
-		if ((*l_Iter)->GetName() == wxT("Fixed") )
-		{
-			continue;
-		}
-
 		if (( *l_Iter )->GetName() == SP_DS_CPN_MARKINGLIST)
 		{			
 			l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcAttribute);

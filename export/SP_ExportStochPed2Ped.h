@@ -40,6 +40,8 @@ class SP_ExportStochPed2Ped:  public SP_ExportRoutine, private SP_XmlWriter
 
   virtual bool WriteMetadata(SP_DS_Metadata* p_pcVal, wxXmlNode* p_pcRoot);
 
+  virtual bool WriteAttribute(SP_DS_Attribute* p_pcVal, wxXmlNode* p_pcRoot);
+
   bool WriteTransition( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
   
  public:

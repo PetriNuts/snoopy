@@ -16,6 +16,7 @@
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include "sp_ds/attributes/SP_DS_TextAttribute.h"
+#include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 
 #include "dssz/andl/andl_builder.h"
 #include "dssz/auxi/auxi.h"
@@ -133,9 +134,10 @@ bool SP_SimpleNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
 			{
 				std::string l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 				std::string l_sMarking;
-				if(l_pcNode->GetAttribute(wxT("MarkingList")))
+				SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("MarkingList"));
+				if(l_pcAttr)
 				{
-					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("MarkingList")));
+					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcAttr);
 					l_sMarking = l_pcColList->GetActiveCellValue(1);
 				}
 				else
@@ -143,6 +145,11 @@ bool SP_SimpleNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
 					l_sMarking = l_pcNode->GetAttribute(wxT("Marking"))->GetValueString();
 				}
 				auto p = std::make_shared<dsszmc::andl::Place>(l_Type, l_sName, l_sMarking);
+				l_pcAttr = l_pcNode->GetAttribute(wxT("Fixed"));
+				if(l_pcAttr)
+				{
+					p->fixed_ = dynamic_cast< SP_DS_BoolAttribute* >(l_pcAttr)->GetValue();
+				}
 				b.addPlace(p);
 			}
 		}
@@ -273,6 +280,12 @@ bool SP_SimpleNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b)
 					l_sFunction << wxT(",") << l_pcColList->GetActiveCellValue(3);
 				}
 				t->function_ = l_sFunction;
+
+				SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("Reversible"));
+				if(l_pcAttr)
+				{
+					t->reversible_ = dynamic_cast< SP_DS_BoolAttribute* >(l_pcAttr)->GetValue();
+				}
 
 				b.addTransition(t);
 			}
@@ -647,6 +660,11 @@ bool SP_ColoredNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
 				dsszmc::aux::replaceAll(l_sMarking, "auto()", "auto");
 				dsszmc::aux::replaceAll(l_sMarking, "<>", "!=");
 				auto p = std::make_shared<dsszmc::andl::Place>(l_Type, l_sName, l_sMarking, l_sColorset);
+				SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("Fixed"));
+				if(l_pcAttr)
+				{
+					p->fixed_ = dynamic_cast< SP_DS_BoolAttribute* >(l_pcAttr)->GetValue();
+				}
 				b.addPlace(p);
 			}
 		}
@@ -841,6 +859,12 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 				dsszmc::aux::replaceAll(t->function_, "all()", "all");
 				dsszmc::aux::replaceAll(t->function_, "auto()", "auto");
 				dsszmc::aux::replaceAll(t->function_, "<>", "!=");
+
+				l_pcAttr = l_pcNode->GetAttribute(wxT("Reversible"));
+				if(l_pcAttr)
+				{
+					t->reversible_ = dynamic_cast< SP_DS_BoolAttribute* >(l_pcAttr)->GetValue();
+				}
 
 				b.addTransition(t);
 			}

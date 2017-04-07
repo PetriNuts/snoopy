@@ -39,7 +39,8 @@ class SP_ExportColHPN2ColPN:  public SP_ExportRoutine, private SP_XmlWriter
   bool WriteTransition( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
   bool WriteParameter( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
 
-  
+  virtual bool WriteAttribute(SP_DS_Attribute* p_pcVal, wxXmlNode* p_pcRoot);
+
   virtual bool WriteColourInformation(SP_Graphic* p_pcVal,wxXmlNode* p_pcNode);
   virtual bool WriteEdgeGraphic(SP_GR_Edge* p_pcVal,wxXmlNode* p_pcRoot);
 

@@ -691,6 +691,20 @@ void SP_DLG_ColCPNSimulationResults::LoadPlaces()
 
 	m_pcMainSimulator->SetPlaceNames(*m_pcUnfoldedNet->GetPlaceNames());
 
+	SP_VectorBool l_abIsFixed(m_pcUnfoldedNet->GetPlaceNames()->size(),false);
+	unsigned long l_nPosition = 0;
+	for(auto const& it : m_pcUnfoldedNet->GetUnfoldedContPlaces())
+	{
+		for(auto const& it2 : it.second)
+		{
+			l_abIsFixed[l_nPosition] = it2.second.m_bFixed;
+			++l_nPosition;
+		}
+	}
+
+	//set fixed flag
+	(dynamic_cast<spsim::ContinuousSimulator*>(m_pcMainSimulator))->SetFixedFlag(l_abIsFixed);
+
 	(dynamic_cast<spsim::ContinuousSimulator*>(m_pcMainSimulator))->SetInitialMarking(*m_pcUnfoldedNet->GetCurCPNMarking());
 }
 

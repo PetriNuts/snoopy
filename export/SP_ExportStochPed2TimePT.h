@@ -39,6 +39,8 @@ class SP_ExportStochPed2TimePT:  public SP_ExportRoutine, private SP_XmlWriter
   virtual bool WriteColourInformation(SP_Graphic* p_pcVal,wxXmlNode* p_pcNode);
   virtual bool WriteEdgeGraphic(SP_GR_Edge* p_pcVal,wxXmlNode* p_pcRoot);
 
+  virtual bool WriteAttribute(SP_DS_Attribute* p_pcVal, wxXmlNode* p_pcRoot);
+
   bool WriteTransition( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
   
  public:

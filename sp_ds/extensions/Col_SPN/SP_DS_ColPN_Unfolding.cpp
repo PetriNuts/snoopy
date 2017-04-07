@@ -19,6 +19,7 @@
 #include <wx/busyinfo.h> 
 #include <wx/regex.h>
 #include <sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStUnfolding.h>
+#include <sp_ds/attributes/SP_DS_BoolAttribute.h>
 
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColUnfoldFile.h"
 
@@ -417,7 +418,12 @@ bool SP_DS_ColPN_Unfolding::UnfoldPlaceNodeClass(wxString p_sPlaceNodeClass)
 		{
 			SP_DS_Node* l_pcNode = *l_itElem;	
 			wxString l_sColPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-	
+			bool l_bColPlaceFixed = false;
+			if(l_pcNode->GetAttribute(wxT("Fixed")))
+			{
+				l_bColPlaceFixed = dynamic_cast<SP_DS_BoolAttribute*>(l_pcNode->GetAttribute(wxT("Fixed")))->GetValue();
+			}
+
 	//get the color set
 			SP_DS_TextAttribute* l_pcCSAttibute = dynamic_cast< SP_DS_TextAttribute* >(l_pcNode->GetAttribute(SP_DS_CPN_COLORSETNAME) );
 			CHECK_POINTER(l_pcCSAttibute, return false);
@@ -445,6 +451,7 @@ bool SP_DS_ColPN_Unfolding::UnfoldPlaceNodeClass(wxString p_sPlaceNodeClass)
 				SP_CPN_UnfoldedPlaceInfo l_structDetails;
 				l_structDetails.m_sNodeType = p_sPlaceNodeClass;
 				l_structDetails.m_sColorSet = l_sColorSetName;
+				l_structDetails.m_bFixed = l_bColPlaceFixed;
 
 				wxString l_sColor = itMap->first;
 				if( p_sPlaceNodeClass == SP_DS_CONTINUOUS_PLACE )

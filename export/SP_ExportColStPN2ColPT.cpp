@@ -138,7 +138,12 @@ bool SP_ExportColStPN2ColPT::WritePlace(SP_DS_Node* p_pcVal,
 			continue;			
 		}
 
-		WriteAttribute( ( *l_Iter ), l_pcElem);	
+		if (( *l_Iter )->GetName() == wxT("Fixed"))
+		{
+			continue;
+		}
+
+		WriteAttribute( ( *l_Iter ), l_pcElem);
 	}
 
 	unsigned int l_nActiveColumn =  l_pcColList->GetActiveColumn();

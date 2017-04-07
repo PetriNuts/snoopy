@@ -28,6 +28,8 @@ class SP_ExportExtPT2Ped:  public SP_ExportRoutine, private SP_XmlWriter
   virtual bool WriteEdge(SP_DS_Edge* p_pcVal,
 				  wxXmlNode* p_pcRoot);
 
+  virtual bool WriteAttribute(SP_DS_Attribute* p_pcVal, wxXmlNode* p_pcRoot);
+
   virtual bool WriteColourInformation(SP_Graphic* p_pcVal,
 				      wxXmlNode* p_pcNode);
 

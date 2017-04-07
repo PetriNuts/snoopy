@@ -1486,6 +1486,11 @@ void SP_DLG_StSimulationResults::LoadPlacesOfType(const wxString& p_sPlaceType, 
 
 	m_anCurrentMarking.resize(l_nPlaceSize);
 
+	SP_VectorBool l_abIsFixed;
+
+	l_abIsFixed.assign(l_nPlaceSize,false);
+
+
 	for (SP_ListNode::const_iterator l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
 	{
 		SP_DS_Node* l_pcNode = (*l_itElem);
@@ -1503,8 +1508,16 @@ void SP_DLG_StSimulationResults::LoadPlacesOfType(const wxString& p_sPlaceType, 
 
 		m_anCurrentMarking[p_nPosition] = l_nValue;
 
+		//get fixed flag
+		bool l_bFixedFlag = dynamic_cast<SP_DS_BoolAttribute*>((*l_itElem)->GetAttribute(wxT("Fixed")))->GetValue();
+
+		l_abIsFixed[p_nPosition]=l_bFixedFlag;
+
 		p_nPosition++;
 	}
+	//set fixed flag
+	(dynamic_cast<spsim::StochasticSimulator*>(m_pcMainSimulator))->SetFixedFlag(l_abIsFixed);
+
 }
 void SP_DLG_StSimulationResults::LoadTransitions()
 {

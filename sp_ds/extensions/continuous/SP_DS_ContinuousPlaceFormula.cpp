@@ -801,20 +801,13 @@ SP_DS_ContinuousPlaceFormula::Eval(const RFDAG& p_Expression)
 	 		if(m_vsTransitionPrePlaces.size()>0)
 	 		{
 	 			l_sPrePlacesProduct=m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[0]]==wxT("1") ? m_vsTransitionPrePlaces[0]:
+	 			                         m_vsTransitionPrePlaces[0] + wxT("^")+ m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[0]];
 
-	 			                         m_vsTransitionPrePlaces[0]+
-	 			                                                  wxT("^")+
-	 			                                                           m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[0]];
+		 		for(l_nPrePlace=1;l_nPrePlace<m_vsTransitionPrePlaces.size();l_nPrePlace++)
+	 				l_sPrePlacesProduct+=m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[l_nPrePlace]]==wxT("1") ? wxT("*")+m_vsTransitionPrePlaces[l_nPrePlace]:
+										 wxT("*")+ m_vsTransitionPrePlaces[l_nPrePlace]+ wxT("^")+ m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[l_nPrePlace]];
 
-	 		for(l_nPrePlace=1;l_nPrePlace<m_vsTransitionPrePlaces.size();l_nPrePlace++)
-	 			l_sPrePlacesProduct+=m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[l_nPrePlace]]==wxT("1") ? wxT("*")+m_vsTransitionPrePlaces[l_nPrePlace]:
-
-	 				 			             wxT("*")+
-	 				 			                         m_vsTransitionPrePlaces[l_nPrePlace]+
-	 				 			                                                  wxT("^")+
-	 				 			                                                           m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[l_nPrePlace]];
-
-	 		l_nReturn+=EliminatePattern(p_Expression.children[0],p_bUseModelicaNaming)+wxT("*")+l_sPrePlacesProduct;
+		 		l_nReturn+=EliminatePattern(p_Expression.children[0],p_bUseModelicaNaming)+wxT("*")+l_sPrePlacesProduct;
 	 		}
 	 		else
 	 			l_nReturn+=EliminatePattern(p_Expression.children[0],p_bUseModelicaNaming);
@@ -823,21 +816,14 @@ SP_DS_ContinuousPlaceFormula::Eval(const RFDAG& p_Expression)
 	 		//Here the transformation of Miachaels Mentan Equation will take place
 	 		if(m_vsTransitionPrePlaces.size()>0)
 	 		{
-	 			 			l_sPrePlacesProduct=m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[0]]==wxT("1") ? m_vsTransitionPrePlaces[0]:
+				l_sPrePlacesProduct=m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[0]]==wxT("1") ? m_vsTransitionPrePlaces[0]:
+									 m_vsTransitionPrePlaces[0]+ wxT("^")+ m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[0]];
 
-	 			 			                         m_vsTransitionPrePlaces[0]+
-	 			 			                                                  wxT("^")+
-	 			 			                                                           m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[0]];
+				for(l_nPrePlace=1;l_nPrePlace<m_vsTransitionPrePlaces.size();l_nPrePlace++)
+					l_sPrePlacesProduct+=m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[l_nPrePlace]]==wxT("1") ? wxT("*")+m_vsTransitionPrePlaces[l_nPrePlace]:
+								  wxT("*")+ m_vsTransitionPrePlaces[l_nPrePlace]+ wxT("^")+ m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[l_nPrePlace]];
 
-	 			 		for(l_nPrePlace=1;l_nPrePlace<m_vsTransitionPrePlaces.size();l_nPrePlace++)
-	 			 			l_sPrePlacesProduct+=m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[l_nPrePlace]]==wxT("1") ? wxT("*")+m_vsTransitionPrePlaces[l_nPrePlace]:
-
-	 			 				 			              wxT("*")+
-	 			 				 			                         m_vsTransitionPrePlaces[l_nPrePlace]+
-	 			 				 			                                                  wxT("^")+
-	 			 				 			                                                           m_mPlaceTransitionMultiplicity[m_vsTransitionPrePlaces[l_nPrePlace]];
-
-	 		 l_nReturn+=wxT("(")+EliminatePattern(p_Expression.children[0],p_bUseModelicaNaming)+wxT("*")+l_sPrePlacesProduct+wxT(")")+wxT("/")+wxT("(")+l_sPrePlacesProduct+wxT("+")+EliminatePattern(p_Expression.children[1],p_bUseModelicaNaming)+wxT(")");
+		 		 l_nReturn+=wxT("(")+EliminatePattern(p_Expression.children[0],p_bUseModelicaNaming)+wxT("*")+l_sPrePlacesProduct+wxT(")")+wxT("/")+wxT("(")+l_sPrePlacesProduct+wxT("+")+EliminatePattern(p_Expression.children[1],p_bUseModelicaNaming)+wxT(")");
 	 		}
 	 		else
 	 			l_nReturn+=EliminatePattern(p_Expression.children[0],p_bUseModelicaNaming)+wxT("/")+EliminatePattern(p_Expression.children[1],p_bUseModelicaNaming);

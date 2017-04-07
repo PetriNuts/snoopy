@@ -156,6 +156,11 @@ bool SP_ExportColPN2ANDL::WritePlaceClass(std::shared_ptr<SP_DS_ColPN_Unfolding>
 
 			wxString l_sBuffer = wxT("    ") + l_sColPlName + wxT("_") + l_sColor;
 
+			if(itMap2->second.m_bFixed)
+			{
+				l_sBuffer << wxT("{fix}");
+			}
+
 			if(l_sNodeType == SP_DS_DISCRETE_PLACE)
 			{
 				l_sBuffer << wxT(" = ") << itMap2->second.m_anNetMarkings[l_nCurrentColumn];
@@ -265,6 +270,11 @@ bool SP_ExportColPN2ANDL::WriteTransitionClass(std::shared_ptr<SP_DS_ColPN_Unfol
 			p_Unfolding->ModifyName(l_sBinding);
 
 			wxString l_sBuffer = wxT("    ") + l_sColTRName + wxT("_") + l_sBinding;
+
+			if(itMap2->second.m_bReversible)
+			{
+				l_sBuffer << wxT("{rev}");
+			}
 
 			wxString l_sFunction;
 			if( m_sNetClass ==  SP_DS_COLSPN_CLASS ||

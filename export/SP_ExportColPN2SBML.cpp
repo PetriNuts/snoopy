@@ -318,7 +318,7 @@ bool SP_ExportColPN2SBML::WritePlaceClass(std::shared_ptr<SP_DS_ColPN_Unfolding>
 		}
 	}
 
-				return l_bReturn;
+	return l_bReturn;
 }
 
 bool SP_ExportColPN2SBML::WriteTransitions(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding)

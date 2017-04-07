@@ -113,7 +113,8 @@ struct SP_CPN_CountInterval
 
 struct SP_CPN_UnfoldedPlaceInfo
 {
-	bool			m_bIsolated;	
+	bool			m_bIsolated;
+	bool 			m_bFixed;
 	SP_VectorLong	m_anNetMarkings;
 	SP_VectorDouble m_adNetMarkings;
 	wxString		m_sNodeType; 
@@ -134,6 +135,7 @@ struct SP_CPN_UnfoldedArcInfo
 
 struct SP_CPN_UnfoldedTransInfo
 {
+	bool 							m_bReversible;
 	wxString						m_sAnimTransInstName;
 	SP_VectorString					m_anNetFunctions;
 	wxString						m_sType;	

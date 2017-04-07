@@ -102,9 +102,9 @@ bool SP_DS_PlaceODE::LoadTransitions()
 			wxString l_TransRatFunction= l_pcColList->GetActiveCellValue( 1);
 			SP_DS_ContinuousPlaceFormula l_continuousParser(l_TransRatFunction);
 
-			m_asTransRateFunction[l_nPos]=wxT("(")+
-								                               l_continuousParser.ReplacePatternInTransitionFormula((*l_itElem))
-								                                                                                                +wxT(")");
+			m_asTransRateFunction[l_nPos]=wxT("(")
+										  + l_continuousParser.ReplacePatternInTransitionFormula((*l_itElem))
+                                          +wxT(")");
 
 
 			m_mTransitionsPosByID[l_nPos]=GetNodeID((*l_itElem));
@@ -370,26 +370,20 @@ wxString SP_DS_PlaceODE::ConstructExtendedFunction(const unsigned long& p_nTrans
 	 */
 	 wxString l_sRatio=m_a2DPlacePostTransitions[p_nPlacePos][p_nTransPos].sConWeight+wxT(",")+ asPlaceNames[p_nPlacePos];
 
-	              switch(l_nType)
-	               {
-					case SP_READ_ARC:
-									l_sReturn=wxT("Read(")+
-									                       l_sRatio+
-									                                 wxT(")");
-									break;
-					case SP_INHIBITOR_ARC:
-									 l_sReturn=wxT("Inhibit(")+
-															   l_sRatio+
-																		  wxT(")");
-									break;
-					case SP_EQUAL_ARC:
-						             l_sReturn=wxT("Equal(")+
-														    l_sRatio+
-																	  wxT(")");
-									break;
-					default:
-									l_sReturn=wxT("");
-	               }
+	switch(l_nType)
+	{
+	case SP_READ_ARC:
+		l_sReturn=wxT("Read(")+l_sRatio+wxT(")");
+		break;
+	case SP_INHIBITOR_ARC:
+		 l_sReturn=wxT("Inhibit(")+l_sRatio+wxT(")");
+		break;
+	case SP_EQUAL_ARC:
+		 l_sReturn=wxT("Equal(")+l_sRatio+wxT(")");
+		break;
+	default:
+		l_sReturn=wxT("");
+	}
   return l_sReturn;
 }
 wxString SP_DS_PlaceODE::ConstructODE(const long& p_nPlacePos)
@@ -411,14 +405,11 @@ wxString SP_DS_PlaceODE::ConstructODE(const long& p_nPlacePos)
 			   if(l_TransInfo.sConWeight!=wxT("1"))
 			   {
 				   l_sReturnEq+= wxT("+") + l_TransInfo.sConWeight+
-															        wxT("*")+
-																			 m_asTransRateFunction[l_nTransPos];
-
-
+								 wxT("*") + m_asTransRateFunction[l_nTransPos];
 			   }
 			   else
 			   {
-			     l_sReturnEq+= wxT("+") +m_asTransRateFunction[l_nTransPos];
+			     l_sReturnEq+= wxT("+") + m_asTransRateFunction[l_nTransPos];
 			   }
 		   }
 	   }
@@ -439,14 +430,11 @@ wxString SP_DS_PlaceODE::ConstructODE(const long& p_nPlacePos)
 			   if(l_TransInfo.sConWeight!=wxT("1"))
 			   {
 				   l_sReturnEq+= wxT("-") + l_TransInfo.sConWeight+
-																	wxT("*")+
-																			 m_asTransRateFunction[l_nTransPos];
-
-
+								 wxT("*") + m_asTransRateFunction[l_nTransPos];
 			   }
 			   else
 			   {
-				 l_sReturnEq+= wxT("-") +m_asTransRateFunction[l_nTransPos];
+				   l_sReturnEq+= wxT("-") +m_asTransRateFunction[l_nTransPos];
 			   }
 
 		   }

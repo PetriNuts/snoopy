@@ -129,6 +129,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 			l_UnfoldedPlaceInfo.m_bIsolated = false;
 			l_UnfoldedPlaceInfo.m_sColorSet = coloredPlace->colorset_;
 			l_UnfoldedPlaceInfo.m_sNodeType = SP_DS_CONTINUOUS_PLACE;
+			l_UnfoldedPlaceInfo.m_bFixed = p->fixed_;
 			wxString l_Marking = p->marking_;
 			double l_nMarking = 0;
 			if(!l_Marking.ToDouble(&l_nMarking))
@@ -145,6 +146,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 			l_UnfoldedPlaceInfo.m_bIsolated = false;
 			l_UnfoldedPlaceInfo.m_sColorSet = coloredPlace->colorset_;
 			l_UnfoldedPlaceInfo.m_sNodeType = SP_DS_DISCRETE_PLACE;
+			l_UnfoldedPlaceInfo.m_bFixed = p->fixed_;
 			SP_VectorLong l_vMarkings;
 			wxString l_Marking = p->marking_;
 			long l_nMarking = 0;
@@ -211,7 +213,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 		l_UnfoldedTransInfo->m_sAnimTransInstName = l_sBinding;
 		wxString l_sFunction = t->function_;
 		l_UnfoldedTransInfo->m_anNetFunctions.push_back(l_sFunction);
-
+		l_UnfoldedTransInfo->m_bReversible = t->reversible_;
 		//arcs
 
 		for(auto& c : *t->conditions_)

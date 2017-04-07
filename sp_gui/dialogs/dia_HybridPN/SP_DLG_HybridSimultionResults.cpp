@@ -1219,7 +1219,7 @@ void SP_DLG_HybridSimulationResults::LoadPlaces()
 		l_abPlaceType.resize(l_nPosition, false);
 	}
 
-	//load fixed flag for continuous places
+	//load fixed flag for continuous/discrete places
 	LoadFixedFlag();
 
 	if (m_sSimulatorType == wxT("Stochastic"))
@@ -1262,6 +1262,18 @@ void SP_DLG_HybridSimulationResults::LoadFixedFlag()
 
 	unsigned long l_nPosition=0;
 
+	for (auto l_pcElement:(*l_pcNodeclass->GetElements()))
+	{
+		//get fixed flag
+		bool l_bFixedFlag = dynamic_cast<SP_DS_BoolAttribute*>(l_pcElement->GetAttribute(wxT("Fixed")))->GetValue();
+
+		l_abIsFixed[l_nPosition]=l_bFixedFlag;
+
+		l_nPosition++;
+	}
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+	l_nPlaceCount += l_pcNodeclass->GetElements()->size();
+	l_abIsFixed.resize(l_nPlaceCount, false);
 	for (auto l_pcElement:(*l_pcNodeclass->GetElements()))
 	{
 		//get fixed flag

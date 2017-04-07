@@ -134,10 +134,7 @@ SP_ExportColCPN2ColSPN :: WriteStochPlace( SP_DS_Node* p_pcVal, wxXmlNode* p_pcR
 
   for( l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter )
   {
-	  if ((*l_Iter)->GetName() != wxT("Fixed") )
-	  {
-		WriteAttribute( ( *l_Iter ), l_pcElem );
-	  }
+	WriteAttribute( ( *l_Iter ), l_pcElem );
   }
 
   return WriteData(p_pcVal, l_pcElem);

@@ -23,12 +23,7 @@ protected:
   virtual bool WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcRoot);
   virtual bool WriteEdgeclass(SP_DS_Edgeclass* p_pcVal, wxXmlNode* p_pcRoot);
 
-  virtual bool WriteEdge(SP_DS_Edge* p_pcVal, wxXmlNode* p_pcRoot);
-
   virtual bool WriteAttribute(SP_DS_Attribute* p_pcVal, wxXmlNode* p_pcRoot);
-
-  bool WriteStochPlace( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
-  bool WriteStochTransition( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
 
 public:
 
@@ -45,13 +40,6 @@ public:
     { return wxT("spn");}
   virtual wxString GetFileDescr()
     { return wxT("Stochastic Petri Net Files");}
-
-  public :
-
-    
-    
-    
-
 
 };
 

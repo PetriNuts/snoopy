@@ -10,7 +10,7 @@
 #include "export/SP_ExportContODE2Octave.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_ds/SP_DS_Graph.h"
-#include "sp_ds/attributes/SP_DS_ColListAttribute.h"
+#include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include "sp_ds/extensions/continuous/SP_DS_PlaceODE.h"
 
@@ -75,41 +75,47 @@ bool SP_ExportContODE2Octave::DoWrite()
 	wxString l_sPlaces = wxT("% place variables for initial marking\n");
 	wxString l_sInitMarking = wxT("% initial marking\n m0 = [\n");
 	long l_nPlacePos = 0;
-	SP_ListNode::const_iterator l_itPlace;
 	//Iterate for all the places
-	for (l_itPlace = l_places->begin(); l_itPlace != l_places->end(); l_itPlace++)
+	for (auto l_itPlace : *l_places)
 	{
-		wxString l_sName = (dynamic_cast<SP_DS_NameAttribute*>((*l_itPlace)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)))->GetValue();
+		wxString l_sName = (dynamic_cast<SP_DS_NameAttribute*>(l_itPlace->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)))->GetValue();
 		l_sPlacenames << (l_nPlacePos > 0 ? wxT(",") : wxEmptyString )
 						<< wxT("'") << l_sName << wxT("'");
 		l_sPlaces << l_sName << wxT(" = ")
-						<< (*l_itPlace)->GetAttribute(wxT("Marking"))->GetValueString()
+						<< l_itPlace->GetAttribute(wxT("Marking"))->GetValueString()
 						<< wxT(";\n");
 		l_sInitMarking << (l_nPlacePos > 0 ? wxT(",") : wxEmptyString )
 						<< l_sName;
 		l_sODE << wxT("xdot(") << (l_nPlacePos+1) << wxT(") = ");
-		wxString l_sTmp = l_pcPlaceODEConstructor->ConstructODE(l_nPlacePos);
 		wxString l_sResultFunction;
-		wxStringTokenizer l_StringTok(l_sTmp, wxT("()+*/^=<>!%&|,-"),  wxTOKEN_RET_EMPTY_ALL );
-		while(l_StringTok.HasMoreTokens())
+		if((dynamic_cast<SP_DS_BoolAttribute*>(l_itPlace->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_BOOL)))->GetValue())
 		{
-			wxString l_sToken = l_StringTok.GetNextToken();
-			if(!l_sToken.IsEmpty())
+			l_sResultFunction = wxT("0");
+		}
+		else
+		{
+			wxString l_sTmp = l_pcPlaceODEConstructor->ConstructODE(l_nPlacePos);
+			wxStringTokenizer l_StringTok(l_sTmp, wxT("()+*/^=<>!%&|,-"),  wxTOKEN_RET_EMPTY_ALL );
+			while(l_StringTok.HasMoreTokens())
 			{
-				ContPlaceMap::const_iterator it = m_contPlaceNameMap.find(l_sToken);
-				if(it != m_contPlaceNameMap.end())
+				wxString l_sToken = l_StringTok.GetNextToken();
+				if(!l_sToken.IsEmpty())
 				{
-					l_sResultFunction << wxT("x(") << it->second->m_id+1 << wxT(")");
+					ContPlaceMap::const_iterator it = m_contPlaceNameMap.find(l_sToken);
+					if(it != m_contPlaceNameMap.end())
+					{
+						l_sResultFunction << wxT("x(") << it->second->m_id+1 << wxT(")");
+					}
+					else
+					{
+						l_sResultFunction << l_sToken;
+					}
 				}
-				else
+				wxChar l_chDelim = l_StringTok.GetLastDelimiter();
+				if(l_chDelim != '\0')
 				{
-					l_sResultFunction << l_sToken;
+					l_sResultFunction << l_chDelim;
 				}
-			}
-			wxChar l_chDelim = l_StringTok.GetLastDelimiter();
-			if(l_chDelim != '\0')
-			{
-				l_sResultFunction << l_chDelim;
 			}
 		}
 		l_sODE << l_sResultFunction << wxT(";\n");
