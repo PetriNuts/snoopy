@@ -11,6 +11,7 @@
 
 #include "sp_defines.h"
 
+#include <dssz/auxi/auxi.h>
 #include <dssz/auxi/exceptions.h>
 
 #include <wx/gdicmn.h>

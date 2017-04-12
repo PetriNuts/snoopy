@@ -5,6 +5,7 @@
 // Short Description: creates a continious petrinet on a SBML file
 //////////////////////////////////////////////////////////////////////
 
+#include <dssz/auxi/auxi.h>
 #include "import/SP_ImportSBML2cntPn.h"
 
 #include "sp_gui/dialogs/SP_DLG_ImportSBML2extPN.h"
@@ -184,14 +185,12 @@ void SP_ImportSBML2cntPn::getSpecies()
 
 				if(l_sbmlSpecies->isSetInitialConcentration())
 				{
-					wxString l_sMarking;
-					l_sMarking << l_sbmlSpecies->getInitialConcentration();
+					wxString l_sMarking = dsszmc::aux::toString(l_sbmlSpecies->getInitialConcentration());
 					l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
 				}
 				else if (l_sbmlSpecies->isSetInitialAmount())
 				{
-					wxString l_sMarking;
-					l_sMarking << l_sbmlSpecies->getInitialAmount();
+					wxString l_sMarking = dsszmc::aux::toString(l_sbmlSpecies->getInitialAmount());
 					l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
 				}
 
@@ -353,8 +352,7 @@ void SP_ImportSBML2cntPn::getReactions ()
 				auto l_sbmlSpecies = m_sbmlModel->getSpecies(l_eductName);
 				SP_DS_Node* l_pcNode = getSpeciesNode(l_eductName);
 
-				wxString l_stoichiometry =
-						wxString::Format(wxT("%g"),l_sbmlReactant->getStoichiometry());
+				wxString l_stoichiometry = dsszmc::aux::toString(l_sbmlReactant->getStoichiometry());
 				drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
 				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 				{
@@ -371,8 +369,7 @@ void SP_ImportSBML2cntPn::getReactions ()
 				auto l_sbmlSpecies = m_sbmlModel->getSpecies(l_productName);
 				SP_DS_Node* l_pcNode = getSpeciesNode(l_productName);
 
-				wxString l_stoichiometry =
-						wxString::Format(wxT("%g"),l_sbmlProduct->getStoichiometry());
+				wxString l_stoichiometry = dsszmc::aux::toString(l_sbmlProduct->getStoichiometry());
 				drawEdge(l_reactionNode, l_pcNode,SP_DS_EDGE,l_stoichiometry);
 				if (b_IsReversible && l_revReactionNode && m_CreateReverseReactions)
 				{
@@ -461,7 +458,7 @@ void SP_ImportSBML2cntPn::getModelCompartments()
 		wxString l_parameterValue;
 		if (l_sbmlCompartment->isSetSize())
 		{
-			l_parameterValue << l_sbmlCompartment->getSize();
+			l_parameterValue = dsszmc::aux::toString(l_sbmlCompartment->getSize());
 		}
 		else
 		{
@@ -525,7 +522,7 @@ void SP_ImportSBML2cntPn::getModelParameters()
 		wxString l_parameterValue;
 		if (l_sbmlParameter->isSetValue())
 		{
-			l_parameterValue << l_sbmlParameter->getValue();
+            l_parameterValue = dsszmc::aux::toString(l_sbmlParameter->getValue());
 		}
 		else
 		{
@@ -594,8 +591,8 @@ void SP_ImportSBML2cntPn::getReactionParameters(Reaction*  l_sbmlReaction, ASTNo
 		wxString l_parameterValue;
 		if (l_sbmlParameter->isSetValue())
 		{
-			l_parameterValue << l_sbmlParameter->getValue();
-		}
+			l_parameterValue = dsszmc::aux::toString(l_sbmlParameter->getValue());
+        }
 		else
 		{
 			l_parameterValue = wxT("0");

@@ -1124,7 +1124,7 @@ void SP_DS_ColPN_Unfolding::SetContInputArcDeltaVector(long p_nTransArrayPos, ve
 			//l_sMultiplicity = wxString::Format(wxT("%ld"), l_ArcInfo.m_nMultiplicity);
 			l_sMultiplicity = l_ArcInfo.m_sMultiplicity;
 		else
-			//l_sMultiplicity = wxString::Format(wxT("%g"), l_ArcInfo.m_dMultiplicity);
+			//l_sMultiplicity = dsszmc::aux::toString(l_ArcInfo.m_dMultiplicity);
 			l_sMultiplicity = l_ArcInfo.m_sMultiplicity;
 
 		SP_CPN_ContinuousArc l_structContinuousArc;

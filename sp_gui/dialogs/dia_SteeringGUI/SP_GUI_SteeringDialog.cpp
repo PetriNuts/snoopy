@@ -846,17 +846,17 @@ void SP_GUI_SteeringDialog::ShowSimulationIntervals()
 
 	if (m_pcIntervalStartTextCtrl->IsModified() == false)
 	{
-		m_pcIntervalStartTextCtrl->SetValue(wxString::Format(wxT("%g"), m_nOutputStartPoint));
+		m_pcIntervalStartTextCtrl->SetValue(dsszmc::aux::toString(m_nOutputStartPoint));
 	}
 
 	if (m_pcIntervalEndTextCtrl->IsModified() == false)
 	{
-		m_pcIntervalEndTextCtrl->SetValue(wxString::Format(wxT("%g"), m_nOutputEndPoint));
+		m_pcIntervalEndTextCtrl->SetValue(dsszmc::aux::toString(m_nOutputEndPoint));
 	}
 
 	if (m_pcResultPointCountTextCtrl->IsModified() == false)
 	{
-		m_pcResultPointCountTextCtrl->SetValue(wxString::Format(wxT("%g"), m_nOutputSamplingSize));
+		m_pcResultPointCountTextCtrl->SetValue(dsszmc::aux::toString(m_nOutputSamplingSize));
 	}
 }
 
@@ -1099,7 +1099,7 @@ void SP_GUI_SteeringDialog::UpdateStatistics()
 	//simulator progress
 	double l_nSimulatorProgress = l_ModelStatistics.GetSimulatorProgress();
 
-	m_pcSimulationProgressPercentage->SetLabel(wxString::Format(wxT("%g"), l_nSimulatorProgress) + wxT("%"));
+	m_pcSimulationProgressPercentage->SetLabel(dsszmc::aux::toString(l_nSimulatorProgress) + wxT("%"));
 
 	//simulator progress bar
 	m_pcSimulationProgressBar->SetValue(l_nSimulatorProgress);

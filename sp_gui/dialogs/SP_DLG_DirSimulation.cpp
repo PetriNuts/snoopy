@@ -1357,7 +1357,7 @@ void SP_DLG_DirSimulation::AddNewMarkingSet(const wxString& p_sMarkingSetName, c
 
 			l_pcColList->SetCell(l_nNewRow, 0, p_sMarkingSetName);
 
-			wxString l_sValue = wxString::Format(wxT("%g"), *l_itCol);
+			wxString l_sValue = dsszmc::aux::toString(*l_itCol);
 
 			l_pcColList->SetCell(l_nNewRow, 1, l_sValue);
 

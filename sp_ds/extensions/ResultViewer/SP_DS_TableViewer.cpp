@@ -6,6 +6,7 @@
  * $Date: 06.06.2011
  * Short Description:
  *///=================================================
+#include <dssz/auxi/auxi.h>
 #include "sp_utilities.h"
 
 #include "sp_core/base/SP_Error.h"
@@ -98,7 +99,7 @@ int l_nCol=0;
 		  {
 				for(int l_nRow=0;l_nRow<m_pcTableViewGrid->GetNumberRows();l_nRow++)
 				{
-					wxString l_sYValue=wxString::Format(wxT("%g"), m_aPlotCurves[(*l_itCurve)]->GetValue(l_nRow));
+					wxString l_sYValue=dsszmc::aux::toString(m_aPlotCurves[(*l_itCurve)]->GetValue(l_nRow));
 					m_pcTableViewGrid->SetCellValue(l_nRow, l_nCol, l_sYValue );
 				}
 				l_nCol++;

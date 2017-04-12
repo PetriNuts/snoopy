@@ -46,6 +46,7 @@
 #include <wx/statline.h>
 #include <wx/regex.h>
 #include <iostream>
+#include <dssz/auxi/auxi.h>
 //#include "sp_gui/widgets/sp_plot/plot_up.xpm"
 //#include "sp_gui/widgets/sp_plot/plot_dwn.xpm"
 #endif
@@ -1090,7 +1091,7 @@ void SP_DLG_DirColorSimulation::AddNewMarkingSet(const wxString& p_sMarkingSetNa
 
 			l_pcColList->SetCell(l_nNewRow, 0, p_sMarkingSetName);
 
-			wxString l_sValue = wxString::Format(wxT("%g"), *l_itCol);
+			wxString l_sValue = dsszmc::aux::toString(*l_itCol);
 
 			l_pcColList->SetCell(l_nNewRow, 1, l_sValue);
 

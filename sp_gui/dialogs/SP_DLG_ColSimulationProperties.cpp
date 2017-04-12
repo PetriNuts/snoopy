@@ -7,6 +7,7 @@
 // Short Description: 
 //////////////////////////////////////////////////////////////////////
 #include <wx/valgen.h>
+#include <dssz/auxi/auxi.h>
 #include "sp_gui/dialogs/SP_DLG_ColSimulationProperties.h"
 #include "spsim/helpers/simulationOptions.h"
 #include "sp_ds/SP_DS_Graph.h"
@@ -158,8 +159,8 @@ void SP_DLG_ColSimulationProperties::GetProperties()
 			if (l_nValue<(*l_itProperty)->GetMinValue() || l_nValue>(*l_itProperty)->GetMaxValue())
 			{
 				SP_MESSAGEBOX(wxT("Invalid input. The value of ") + (*l_itProperty)->GetDisplayedText() +
-					wxT(" Should be between ") + wxString::Format(wxT("%g"), (*l_itProperty)->GetMinValue())
-					+ wxT(" and ") + wxString::Format(wxT("%g"), (*l_itProperty)->GetMaxValue()));
+					wxT(" Should be between ") + dsszmc::aux::toString((*l_itProperty)->GetMinValue())
+					+ wxT(" and ") + dsszmc::aux::toString((*l_itProperty)->GetMaxValue()));
 				return;
 			}
 
