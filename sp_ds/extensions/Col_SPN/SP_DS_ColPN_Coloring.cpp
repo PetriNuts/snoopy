@@ -918,7 +918,7 @@ wxString SP_DS_ColPN_Coloring::ColTransitionsRatfn(SP_DS_Node* p_pcTransNode)
 	l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(p_pcTransNode->GetAttribute(wxT("FunctionList")));
 	wxString l_TransRatFunction = l_pcColList->GetActiveCellValue(1);
 
-	stringstream testTrans(l_TransRatFunction);
+	//stringstream testTrans(l_TransRatFunction);
 	std::size_t foundMA = l_TransRatFunction.find("MassAction");
          size_t s = l_TransRatFunction.find("(");
 	     size_t e = l_TransRatFunction.find(")", s);

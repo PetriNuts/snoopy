@@ -186,6 +186,31 @@ bool SP_CPN_SyntaxChecking::CheckArcExpression(SP_DS_Node* p_pcPlaceNode,SP_DS_E
 							
 	l_sExpression = l_pcColList->GetCell(0, 1);
 
+	//deal with P[all()]`all() case check
+	wxString l_sExpCase = l_sExpression;
+	l_sExpCase.Replace(wxT(" "), wxT(""));
+	l_sExpCase.Replace(wxT("\t"), wxT(""));
+	l_sExpCase.Replace(wxT("\n"), wxT(""));
+	if (l_sExpCase.Find(wxT("[all()]`all()")) != wxNOT_FOUND)
+	{
+		wxString l_sPlaceName = wxString(dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue().c_str());
+
+		SP_CPN_ColorSet* l_pcColorSet = m_cColorSetClass.LookupColorSet(l_sColorSetName);
+		if (!l_pcColorSet)
+			return false;
+		vector<wxString> l_ColorVector = l_pcColorSet->GetStringValue();
+		wxString l_sNewExp = wxT("");
+		for (unsigned int i = 0; i<l_ColorVector.size(); i++)
+		{
+			if (i == 0)
+				l_sNewExp = l_sPlaceName + wxT("[") + l_ColorVector[i] + wxT("]");
+			else
+				l_sNewExp = l_sNewExp + wxT("++") + l_sPlaceName + wxT("[") + l_ColorVector[i] + wxT("]");
+		}
+		l_sExpression = l_sNewExp;
+	}
+	//end
+
 	//deal with the diffusion function all() on an arc;
 	SP_CPN_Binding l_cBinding;
 	if( ! l_cBinding.Diffusion(l_sColorSetName, l_sExpression, &m_cColorSetClass) )
@@ -529,7 +554,8 @@ bool SP_CPN_SyntaxChecking::CheckFormula(SP_DS_Node* p_pcTransNode, wxString p_s
 	SP_ColPN_ProcessRateFunction l_cProcessRateFunc;
 	if( ! l_cProcessRateFunc.CheckColoredRateFunction(l_sRatefunction,p_pcTransNode) )
 		return false;
-	if( ! l_cProcessRateFunc.ProceedRateFunction(l_sRatefunction,p_pcTransNode,&l_mColPlace2Color) )
+	map<wxString, wxString> l_mPlaceName2ColorSetName;
+	if( ! l_cProcessRateFunc.ProceedRateFunction(l_sRatefunction,p_pcTransNode,&l_mColPlace2Color, &l_mPlaceName2ColorSetName) )
 		return false;
 
 	map<wxString, SP_ColPN_RateFunction>::iterator itMap;

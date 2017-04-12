@@ -1897,7 +1897,7 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::CollectPreArcExprs()
 			l_Expression.m_sEdgeClass =wxString((*l_itEdges)->GetClassName().c_str());
 			//m_InitGraphMutex.Unlock();
 
-			
+			m_mPlaceName2ColorSetName[l_sPlaceName] = l_Expression.m_sColorSetName;
 
 			l_Expression.m_pcPlaceNode = l_pcPlaceNode;
 			l_Expression.m_sColPlaceName = l_sPlaceName;
@@ -1924,10 +1924,37 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::CollectPreArcExprs()
 									
 			l_Expression.m_sErrorPosition  = l_sPlaceName + wxT("->") + m_sColoredTransName;
 
+
+			//deal with P[all()]`all() case
+			wxString l_sExpCase = l_Expression.m_sExpression;
+			l_sExpCase.Replace(wxT(" "), wxT(""));
+			l_sExpCase.Replace(wxT("\t"), wxT(""));
+			l_sExpCase.Replace(wxT("\n"), wxT(""));
+			if (l_sExpCase.Find(wxT("[all()]`all()")) != wxNOT_FOUND)
+			{
+				SP_CPN_ColorSet* l_pcColorSet = m_ColorSetClass.LookupColorSet(l_Expression.m_sColorSetName);
+				if (!l_pcColorSet)
+					return false;
+				vector<wxString> l_ColorVector = l_pcColorSet->GetStringValue();
+				wxString l_sprefixstring = l_sExpCase.BeforeFirst('[');
+				wxString l_sNewExp = wxT("");
+				for (unsigned int i = 0; i<l_ColorVector.size(); i++)
+				{
+					if (i == 0)
+						l_sNewExp = l_sprefixstring + wxT("[") + l_ColorVector[i] + wxT("]`")+ l_ColorVector[i];
+					else
+						l_sNewExp = l_sNewExp + wxT("++") + l_sprefixstring + wxT("[") + l_ColorVector[i] + wxT("]`") + l_ColorVector[i];
+				}
+				l_Expression.m_sExpression = l_sNewExp;
+			}
+			//end
+
+
 			m_ExpressionVector.push_back(l_Expression);
 
 			// for sumPlaceInstances function					
-			m_mPrePlaceName2ColorSetName[l_sPlaceName] = l_Expression.m_sColorSetName;			
+			m_mPrePlaceName2ColorSetName[l_sPlaceName] = l_Expression.m_sColorSetName;					
+
 		}	
 	}
 	
@@ -1962,6 +1989,7 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::CollectPostArcExprs()
 
 			l_Expression.m_sEdgeClass = wxString((*l_itEdges)->GetClassName().c_str());
 
+			m_mPlaceName2ColorSetName[l_sPlaceName] = l_Expression.m_sColorSetName;
 			//SP_DS_Node* l_pcTransNode = dynamic_cast<SP_DS_Node*>((*l_itEdges)->GetSource());
 			l_Expression.m_eExprType = CPN_OUTPUT_EXPR;
 			
@@ -1984,6 +2012,29 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::CollectPostArcExprs()
 			
 			l_Expression.m_sErrorPosition  = m_sColoredTransName + wxT("->") + l_sPlaceName;
 
+			//deal with P[all()]`all() case
+			wxString l_sExpCase = l_Expression.m_sExpression;
+			l_sExpCase.Replace(wxT(" "), wxT(""));
+			l_sExpCase.Replace(wxT("\t"), wxT(""));
+			l_sExpCase.Replace(wxT("\n"), wxT(""));
+			if (l_sExpCase.Find(wxT("[all()]`all()")) != wxNOT_FOUND)
+			{
+				SP_CPN_ColorSet* l_pcColorSet = m_ColorSetClass.LookupColorSet(l_Expression.m_sColorSetName);
+				if (!l_pcColorSet)
+					return false;
+				vector<wxString> l_ColorVector = l_pcColorSet->GetStringValue();
+				wxString l_sprefixstring = l_sExpCase.BeforeFirst('[');
+				wxString l_sNewExp = wxT("");
+				for (unsigned int i = 0; i<l_ColorVector.size(); i++)
+				{
+					if (i == 0)
+						l_sNewExp = l_sprefixstring + wxT("[") + l_ColorVector[i] + wxT("]`") + l_ColorVector[i];
+					else
+						l_sNewExp = l_sNewExp + wxT("++") + l_sprefixstring + wxT("[") + l_ColorVector[i] + wxT("]`") + l_ColorVector[i];
+				}
+				l_Expression.m_sExpression = l_sNewExp;
+			}
+			//end
 
 			m_ExpressionVector.push_back(l_Expression);
 		}	
@@ -2066,7 +2117,7 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::CollectStochContRateFunction()
 					map<wxString, SP_ColPN_RateFunction> l_mColPlace2Color;
 					SP_ColPN_ProcessRateFunction l_cProcessRateFunc;
 					//m_InitGraphMutex.Lock();
-					if( ! l_cProcessRateFunc.ProceedRateFunction(l_sFormula,m_pcTransNode,&l_mColPlace2Color) )
+					if( ! l_cProcessRateFunc.ProceedRateFunction(l_sFormula,m_pcTransNode,&l_mColPlace2Color, &m_mPlaceName2ColorSetName) )
 					{
 						//m_InitGraphMutex.Unlock();
 						return false;
@@ -2723,12 +2774,12 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::ProcessTransition()
 				m_scOneTransInfo.m_anNetFunctions = m_ExpressionVector[k].m_RateFunctionVector;
 			}
 			//Get the colored place name and its current color
-			map<wxString, wxString> l_mPlaceToColor;
-			CollectPlace2ColorMapforATransition( l_mPlaceToColor);
+			map<wxString, vector<wxString> > l_mPlaceToColors;
+			CollectPlace2ColorMapforATransition(l_mPlaceToColors);
 
 			//Get an unfolded name for a colored place in a rate function
 			vector<wxString> l_sUnfoldedRateFunctionVector;
-			GenerateUnfoledRateFunction(l_mPlaceToColor, m_scOneTransInfo.m_anNetFunctions, l_sUnfoldedRateFunctionVector);
+			GenerateUnfoledRateFunction(l_mPlaceToColors, m_scOneTransInfo.m_anNetFunctions, l_sUnfoldedRateFunctionVector);
 			for(unsigned i = 0; i < l_sUnfoldedRateFunctionVector.size(); i++)
 			{
 				m_scOneTransInfo.m_anNetFunctions[i] = l_sUnfoldedRateFunctionVector[i];				
@@ -2791,7 +2842,7 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::ProcessRateFunction(SP_CPN_Expression*
 		wxString l_sRateFunction = p_eExpression->m_RateFunctionVector[i];
 
 		SP_ColPN_ProcessRateFunction l_cProcessRateFunction;
-		l_cProcessRateFunction.ReplaceRateFunction(l_sRateFunction,&(p_eExpression->m_RateFunctionTransformation[i]),p_bExport);
+		l_cProcessRateFunction.ReplaceRateFunction(l_sRateFunction,&(p_eExpression->m_RateFunctionTransformation[i]), &m_ColorSetClass, p_bExport);
 		p_sNetFunctions[i] = l_sRateFunction;
 	}
 
@@ -2799,7 +2850,7 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::ProcessRateFunction(SP_CPN_Expression*
 }
 
 
-void SP_DS_ColPN_Unfolding::UnfoldThread::CollectPlace2ColorMapforATransition( map<wxString, wxString> &p_mPlace2ColorMap )
+void SP_DS_ColPN_Unfolding::UnfoldThread::CollectPlace2ColorMapforATransition( map<wxString, vector<wxString> > &p_mPlace2ColorsMap )
 {
 		//map<wxString, wxString> l_mPlaceToColor;
 	    for(unsigned i =0; i < m_ExpressionVector.size(); i++)
@@ -2810,7 +2861,7 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::CollectPlace2ColorMapforATransition( m
 
 				wxString l_sPlaceName = m_ExpressionVector[i].m_sColPlaceName;
 
-				wxString l_sColor = wxT("");
+				vector<wxString> l_sColors;
 
 				vector<SP_CPN_EvaluatedSingleValue>	l_ParsedInfo = m_ExpressionVector[i].m_ParsedInfo;
 
@@ -2819,23 +2870,25 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::CollectPlace2ColorMapforATransition( m
 					SP_CPN_EvaluatedSingleValue l_EvalInfo = l_ParsedInfo[j];
 					if( m_ExpressionVector[i].m_sPlaceNodeClass == wxT("Place") && l_EvalInfo.m_Multiplicity > 0 )
 					{
-						l_sColor = l_EvalInfo.m_ColorValue;
-						break;
+						wxString l_sColor = l_EvalInfo.m_ColorValue;
+						l_sColors.push_back(l_sColor);
+						//break;
 					}
 
 					if( m_ExpressionVector[i].m_sPlaceNodeClass == SP_DS_CONTINUOUS_PLACE && l_EvalInfo.m_DoubleMultiplicity > 0 )
 					{
-						l_sColor = l_EvalInfo.m_ColorValue;
-						break;
+						wxString l_sColor = l_EvalInfo.m_ColorValue;
+						l_sColors.push_back(l_sColor);
+						//break;
 					}
 				}		
 
-				p_mPlace2ColorMap[l_sPlaceName] = l_sColor;
+				p_mPlace2ColorsMap[l_sPlaceName] = l_sColors;
 			}
 		}
 }
 
-void SP_DS_ColPN_Unfolding::UnfoldThread::GenerateUnfoledRateFunction(map<wxString, wxString> p_mPlaceToColor, vector<wxString> p_sColoredRateFunctionVector, vector<wxString> &p_sUnfoldedRateFunctionVector)
+void SP_DS_ColPN_Unfolding::UnfoldThread::GenerateUnfoledRateFunction(map<wxString, vector<wxString> > p_mPlaceToColors, vector<wxString> p_sColoredRateFunctionVector, vector<wxString> &p_sUnfoldedRateFunctionVector)
 {
 	map<wxString, wxString> l_mReplaceString;
 	int l_nCount = 0;		
@@ -2849,8 +2902,8 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::GenerateUnfoledRateFunction(map<wxStri
 		l_sColoredRateFunction.Replace(wxT("\n"),wxT(""));				
 		
 		wxRegEx l_cUnfoldRateFunction;
-		map<wxString, wxString>::iterator itMap;
-		for(itMap = p_mPlaceToColor.begin(); itMap != p_mPlaceToColor.end(); itMap++ )
+		map<wxString, vector<wxString> >::iterator itMap;
+		for(itMap = p_mPlaceToColors.begin(); itMap != p_mPlaceToColors.end(); itMap++ )
 		{
 			wxString l_sColoredPlace = itMap->first;
 			wxString l_sSeparator = wxT("[\\(\\)\\+\\*\\/\\^\\=\\<\\>\\!\\%\\&\\|\\,\\-]");
@@ -2866,8 +2919,22 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::GenerateUnfoledRateFunction(map<wxStri
 					l_cUnfoldRateFunction.Replace(&l_sColoredRateFunction,
 												wxT("\\1")+l_sReplaceSymbol+wxT("\\3")
 												,1);
-					wxString l_sUnfoldedPlace = l_sColoredPlace + wxT("_") + itMap->second ;
+					
+					wxString l_sUnfoldedPlace = wxT("");
+					for (unsigned jj = 0; jj < itMap->second.size(); jj++)
+					{
+						if (jj == 0)
+						{
+							l_sUnfoldedPlace = l_sColoredPlace + wxT("_") + itMap->second[jj];
+						}
+						else
+						{
+							l_sUnfoldedPlace = l_sUnfoldedPlace + wxT("+") + l_sColoredPlace + wxT("_") + itMap->second[jj];
+						}
+					}
 					ModifyPlaceName(l_sUnfoldedPlace);
+					if(itMap->second.size()>1)
+						l_sUnfoldedPlace =  wxT("(") + l_sUnfoldedPlace + wxT(")");
 					l_mReplaceString[l_sReplaceSymbol] = l_sUnfoldedPlace;
 				}
 			}

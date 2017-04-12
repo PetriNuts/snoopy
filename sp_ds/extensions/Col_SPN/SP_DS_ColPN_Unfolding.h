@@ -504,6 +504,7 @@ protected:
 	
 	map<wxString, wxString> m_mPrePlaceName2ColorSetName;  //record the preplace and its color set name for one transition
 	unsigned int m_nTransRateColumn;  //record the column number of the current transition
+	map<wxString, wxString> m_mPlaceName2ColorSetName;
 
 protected: //for one transition
 	map<wxString, wxString> m_mBindVar2Val;
@@ -577,8 +578,8 @@ protected:
 	wxString GetEdgeName(SP_DS_Edge* p_pcEdge);
 
 	bool ProcessRateFunction(SP_CPN_Expression* p_eExpression, SP_VectorString& p_sNetFunctions, bool p_bExport = false);
-	void CollectPlace2ColorMapforATransition( map<wxString, wxString> &p_mPlace2ColorMap );
-	void GenerateUnfoledRateFunction(map<wxString, wxString> p_mPlaceToColor, vector<wxString> p_sColoredRateFunctionVector, vector<wxString> &p_sUnfoldedRateFunctionVector);
+	void CollectPlace2ColorMapforATransition( map<wxString, vector<wxString> > &p_mPlace2ColorsMap );
+	void GenerateUnfoledRateFunction(map<wxString, vector<wxString> > p_mPlaceToColors, vector<wxString> p_sColoredRateFunctionVector, vector<wxString> &p_sUnfoldedRateFunctionVector);
 
 	void ProcessArcs();
 	void ModifyPlaceName(wxString &p_sPlaceName);

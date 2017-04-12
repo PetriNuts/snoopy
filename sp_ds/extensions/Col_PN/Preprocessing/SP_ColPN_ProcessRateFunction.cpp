@@ -24,7 +24,7 @@ SP_ColPN_ProcessRateFunction::~SP_ColPN_ProcessRateFunction()
 
 }
 
-bool SP_ColPN_ProcessRateFunction::ProceedRateFunction(wxString &p_sRateFunction, SP_DS_Node* p_pcNode, map<wxString, SP_ColPN_RateFunction>* p_pmColPlace2Color)
+bool SP_ColPN_ProcessRateFunction::ProceedRateFunction(wxString &p_sRateFunction, SP_DS_Node* p_pcNode, map<wxString, SP_ColPN_RateFunction>* p_pmColPlace2Color, map<wxString, wxString>* p_mPlaceName2ColorSetName)
 {
 
 	if( !TransformRateFunction(p_sRateFunction,p_pmColPlace2Color))
@@ -32,7 +32,7 @@ bool SP_ColPN_ProcessRateFunction::ProceedRateFunction(wxString &p_sRateFunction
 
 	if( p_sRateFunction.Find( wxT('?') ) != wxNOT_FOUND )
 	{
-		if( !GetColoredPlaces(p_sRateFunction, p_pcNode,p_pmColPlace2Color) )
+		if( !GetColoredPlaces(p_sRateFunction, p_pcNode,p_pmColPlace2Color, p_mPlaceName2ColorSetName) )
 			return false;
 	}
 
@@ -45,6 +45,12 @@ bool SP_ColPN_ProcessRateFunction::TransformRateFunction(wxString &p_sRateFuncti
 
 	map<wxString, SP_ColPN_RateFunction> l_mColPlace2Color;
 	wxString l_sNewRateF = p_sRateFunction;
+
+	//if (l_sNewRateF.Find(wxT('all()')) != wxNOT_FOUND)
+	//{
+		//return true;
+	//}
+
 	int l_nCount = 0;
 	while( l_sNewRateF.Find( wxT('[') ) != wxNOT_FOUND )
 	{
@@ -114,7 +120,7 @@ bool SP_ColPN_ProcessRateFunction::CheckColoredRateFunction(wxString p_sCheckFor
 	return true;
 }
 
-bool SP_ColPN_ProcessRateFunction::GetColoredPlaces(wxString p_sFormula, SP_DS_Node* p_pcNode,map<wxString, SP_ColPN_RateFunction>* p_pmColPlace2Color)
+bool SP_ColPN_ProcessRateFunction::GetColoredPlaces(wxString p_sFormula, SP_DS_Node* p_pcNode,map<wxString, SP_ColPN_RateFunction>* p_pmColPlace2Color, map<wxString, wxString>* p_mPlaceName2ColorSetName)
 {
 #if 0
 	SP_DS_StParser l_cParser;
@@ -151,6 +157,7 @@ bool SP_ColPN_ProcessRateFunction::GetColoredPlaces(wxString p_sFormula, SP_DS_N
 				wxString l_sPlaceName = l_vPreplaces[i];
 				l_sPlaceName = l_sPlaceName.BeforeFirst(wxT('?'));
 				itMap->second.m_sColPlace = l_sPlaceName;
+				itMap->second.m_sColorSet = (*p_mPlaceName2ColorSetName)[l_sPlaceName];
 				break;
 			}
 		}
@@ -165,25 +172,52 @@ bool SP_ColPN_ProcessRateFunction::GetColoredPlaces(wxString p_sFormula, SP_DS_N
 	return true;
 }
 
-bool SP_ColPN_ProcessRateFunction::ReplaceRateFunction(wxString &p_sFormula,map<wxString, SP_ColPN_RateFunction>* p_pmColPlace2Color, bool p_bExport)
+bool SP_ColPN_ProcessRateFunction::ReplaceRateFunction(wxString &p_sFormula, map<wxString, SP_ColPN_RateFunction>* p_pmColPlace2Color, SP_CPN_ColorSetClass* p_ColorSetClass, bool p_bExport)
 {
 	map<wxString, SP_ColPN_RateFunction>::iterator itMap;
-	for(itMap = p_pmColPlace2Color->begin(); itMap != p_pmColPlace2Color->end(); itMap++)
+	for (itMap = p_pmColPlace2Color->begin(); itMap != p_pmColPlace2Color->end(); itMap++)
 	{
-		wxString l_sColor = itMap->second.m_sValue;
-		//if(p_bExport)
+		if (itMap->second.m_sFormula == wxT("all()"))
 		{
-			l_sColor.Replace(wxT("("),wxT("_"));
-			l_sColor.Replace(wxT(")"),wxT("_"));
-			l_sColor.Replace(wxT(","),wxT("_"));
-		}
-		if( itMap->second.m_sFormula.Find(wxT("val(")) != wxNOT_FOUND)
-		{
-			p_sFormula.Replace(itMap->first,l_sColor);
+			SP_CPN_ColorSet* l_pcColorSet = p_ColorSetClass->LookupColorSet(itMap->second.m_sColorSet);
+			if (!l_pcColorSet)
+				return false;
+			vector<wxString> l_ColorVector = l_pcColorSet->GetStringValue();
+			wxString l_sPlaceName = itMap->second.m_sColPlace;
+			wxString l_sAdd = wxT("");
+			for (unsigned int i = 0; i<l_ColorVector.size(); i++)
+			{
+				wxString l_sColor = l_ColorVector[i];
+				l_sColor.Replace(wxT("("), wxT("_"));
+				l_sColor.Replace(wxT(")"), wxT("_"));
+				l_sColor.Replace(wxT(","), wxT("_"));
+				
+				if (i == 0)
+					l_sAdd = l_sPlaceName + wxT("_") + l_sColor;
+				else
+					l_sAdd = l_sAdd + wxT("+") + l_sPlaceName + wxT("_") + l_sColor;
+				
+			}
+			l_sAdd = wxT("(") + l_sAdd + wxT(")");
+			p_sFormula.Replace(l_sPlaceName+itMap->first, l_sAdd);
 		}
 		else
 		{
-			p_sFormula.Replace(itMap->first,wxT("_") + l_sColor);
+			wxString l_sColor = itMap->second.m_sValue;
+			//if(p_bExport)
+			{
+				l_sColor.Replace(wxT("("), wxT("_"));
+				l_sColor.Replace(wxT(")"), wxT("_"));
+				l_sColor.Replace(wxT(","), wxT("_"));
+			}
+			if (itMap->second.m_sFormula.Find(wxT("val(")) != wxNOT_FOUND)
+			{
+				p_sFormula.Replace(itMap->first, l_sColor);
+			}
+			else
+			{
+				p_sFormula.Replace(itMap->first, wxT("_") + l_sColor);
+			}
 		}
 	}
 
