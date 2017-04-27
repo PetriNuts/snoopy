@@ -681,37 +681,23 @@ bool SP_DLG_FunctionDefinition::DoCheckFunction()
 				SP_LOGERROR( wxT("empty function name!"));
 				return false;
 			}
-/*
-			else
-			{
-				wxRegEx l_reName(wxT("[[:alnum:]_]+"));
-				if(!l_reName.Matches(l_sName))
-				{
-					SP_LOGERROR( wxT("in function name: only alphanumeric (letter or digit) and underscore (_) are allowed."));
-					return false;
-				}
-			}
-			if(!l_sParameter.IsEmpty())
-			{
-				wxRegEx l_reParam(wxT("([[:alnum:]_]+)(,([[:alnum:]_]+))*"));
-				if(!l_reParam.Matches(l_sParameter))
-				{
-					SP_LOGERROR( wxT("in function parameter: only names separated by comma are allowed."));
-					return false;
-				}
-			}
-*/
 			if(l_sBody.IsEmpty())
 			{
 				SP_LOGERROR( wxT("empty function body!"));
 				return false;
 			}
-			if(!m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_sName + wxT("(") + l_sParameter + wxT(")"))
-				||
-				!m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_sBody))
+			SP_FunctionPtr l_pcFunction;
+			if(l_sParameter.IsEmpty())
 			{
-				return false;
+				l_pcFunction = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_sName);
 			}
+			else
+			{
+				l_pcFunction = m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_sName + wxT("(") + l_sParameter + wxT(")"));
+			}
+			if(!l_pcFunction) return false;
+
+			if(!m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_sBody)) return false;
 		}
 	}
 	wxString l_sVariables = wxT("");

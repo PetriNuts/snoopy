@@ -596,16 +596,38 @@ bool SP_DLG_NewConstantDefinition::DoCheckFunction(const wxString& p_sName, cons
 		SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" is empty "), wxT("Check Constant"), wxOK | wxICON_ERROR);
 		return false;
 	}
-	if (p_sType != wxT("int") && p_sType != wxT("double"))
+	if (m_datatypes.Index(p_sType) == wxNOT_FOUND)
 	{
 		SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" has unknown type ") + p_sType, wxT("Check Constant"), wxOK | wxICON_ERROR);
 		return false;
 	}
 
+	bool l_bOk = false;
 	wxString l_sValue;
 	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
 	SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(p_sValue));
-	if(!l_pcFunction)
+	if(l_pcFunction)
+	{
+		SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
+
+		std::set<std::string> l_Vars;
+		l_pcExpanded->getVariables(l_Vars);
+
+		if(l_Vars.empty())
+		{
+			l_bOk = true;
+		}
+		else
+		{
+			wxString l_sMsg = wxT("\nThe following identifiers are not valid:");
+			for(auto const & s : l_Vars)
+			{
+				l_sMsg << " " << s;
+			}
+			SP_LOGERROR(l_sMsg);
+		}
+	}
+	if(!l_bOk)
 	{
 		SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" with value ") + p_sValue + wxT(" is not correct"), wxT("Check Constant"), wxOK | wxICON_ERROR);
 		return false;
