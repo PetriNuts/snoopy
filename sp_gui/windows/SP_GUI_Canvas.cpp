@@ -816,13 +816,13 @@ void SP_GUI_Canvas::OnMouseEvent(wxMouseEvent& p_cEvent)
 
 void SP_GUI_Canvas::OnKeyEvent(wxKeyEvent& p_cEvent)
 {
-/*
-	wxString l_sMsg = "SP_GUI_Canvas::OnKeyEvent = ";
-	l_sMsg << p_cEvent.GetUnicodeKey();
-	SP_LOGDEBUG(l_sMsg);
-*/
-	if(p_cEvent.ShiftDown())
-	{
+
+		double l_nIncreaseValue=1;
+
+		if(p_cEvent.ShiftDown())
+		{
+			l_nIncreaseValue=GetDiagram()->GetGridSpacing();
+		}
 		//check if are we in the edit mode?
 		if (!m_pcControlPoints || !SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode())
 		{
@@ -830,17 +830,17 @@ void SP_GUI_Canvas::OnKeyEvent(wxKeyEvent& p_cEvent)
 		  switch(p_cEvent.GetKeyCode())
 	      {
 		   case WXK_LEFT:
-			           offsetX=-GetDiagram()->GetGridSpacing();
+			           offsetX=-l_nIncreaseValue;//GetDiagram()->GetGridSpacing();
 			   	       break;
 	       case WXK_RIGHT:
-	    	            offsetX=GetDiagram()->GetGridSpacing();
+	    	            offsetX=l_nIncreaseValue;//GetDiagram()->GetGridSpacing();
 
 	    	   		    break;
 	       case WXK_DOWN:
-	    	            offsetY=GetDiagram()->GetGridSpacing();
+	    	            offsetY=l_nIncreaseValue;//GetDiagram()->GetGridSpacing();
 	    	            break;
 	       case WXK_UP:
-	    	           offsetY=-GetDiagram()->GetGridSpacing();
+	    	           offsetY=-l_nIncreaseValue;//GetDiagram()->GetGridSpacing();
 	    	   	       break;
 	      }
 
@@ -853,7 +853,6 @@ void SP_GUI_Canvas::OnKeyEvent(wxKeyEvent& p_cEvent)
 			  Refresh();
           }
 		}
-	}
 
 	p_cEvent.Skip();
 
