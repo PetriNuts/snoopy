@@ -24,6 +24,7 @@
 
 // bysl
 #include "sp_gui/dialogs/SP_DLG_NewConstantDefinition.h"
+#include "sp_gui/dialogs/SP_DLG_NewObserverDefinition.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 
 #include "sp_gui/mdi/SP_MDI_CoarseDoc.h"
@@ -136,9 +137,15 @@ SP_WDG_DeclarationTreectrl::OnDoubleClick(wxTreeEvent& p_cEvent)
 		l_cVariableDlg.ShowModal();
 	}
 
-	if(l_label== wxT("Functions"))
+	if (l_label == wxT("Functions"))
 	{
 		SP_DLG_FunctionDefinition l_cFunctionDlg(NULL);
+		l_cFunctionDlg.ShowModal();
+	}
+
+	if (l_label == wxT("Observers"))
+	{
+		SP_DLG_NewObserverDefinition l_cFunctionDlg(NULL);
 		l_cFunctionDlg.ShowModal();
 	}
 
@@ -187,7 +194,7 @@ SP_WDG_DeclarationTreectrl::AppendFileItem(wxTreeItemId p_cId, const wxString& p
 //bysl
 void
 SP_WDG_DeclarationTreectrl::UpdateOtherTree()
-{
+{ 
 	wxTreeItemId l_cRootId=GetRootItem();
 	wxTreeItemIdValue l_nCookie= NULL;
 
@@ -227,20 +234,38 @@ SP_WDG_DeclarationTreectrl::UpdateOtherTree()
 	DeleteChildren(l_cThirdChild);
 
 	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);
-	if(l_pcMetadataclass)
+	if (l_pcMetadataclass)
 	{
 		SP_ListMetadata::const_iterator l_itElem;
 		for (l_itElem = l_pcMetadataclass->GetElements()->begin();
-				l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+			l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
 		{
 			SP_DS_Metadata* l_pcMetadata = *l_itElem;
 			wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
 			wxString l_sParam = l_pcMetadata->GetAttribute(wxT("Parameter"))->GetValueString();
 			wxString l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
 			m_ColorsMap[l_sName] = l_sName + wxT("(") + l_sParam + wxT(") = ") + l_sBody;
-			AppendFileItem(l_cThirdChild,l_sName + wxT("(") + l_sParam + wxT(") = ") + l_sBody,NULL);
+			AppendFileItem(l_cThirdChild, l_sName + wxT("(") + l_sParam + wxT(") = ") + l_sBody, NULL);
 		}
 	}
+
+	wxTreeItemId l_cFourthChild = GetNextChild(l_cRootId, l_nCookie);
+	DeleteChildren(l_cFourthChild);
+
+	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+	if (l_pcMetadataclass)
+	{
+		SP_ListMetadata::const_iterator l_itElem;
+		for (l_itElem = l_pcMetadataclass->GetElements()->begin();
+			l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+		{
+			SP_DS_Metadata* l_pcMetadata = *l_itElem;
+			wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+			wxString l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
+			m_ColorsMap[l_sName] = l_sName + wxT(": ") + l_sBody;
+			AppendFileItem(l_cFourthChild, l_sName + wxT(" = ") + l_sBody, NULL);
+		}
+	} 
 }
 
 

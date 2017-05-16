@@ -361,6 +361,7 @@ extern const wxString SP_DS_TIMEPN_CLASS;
 // SP_DS_Metadataclass constants
 extern const wxString SP_DS_META_CONSTANT;
 extern const wxString SP_DS_META_FUNCTION;
+extern const wxString SP_DS_META_OBSERVER;
 
 // SP_DS_Colored Petri Nets
 extern const wxString SP_DS_COLEPN_CLASS;

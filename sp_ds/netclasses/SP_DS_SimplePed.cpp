@@ -359,6 +359,43 @@ SP_DS_SimplePed::CreateGraph(SP_DS_Graph* p_pcGraph)
     l_pcMC->SetGraphic(l_pcGrMeta);
 	l_pcMC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
+	/////////////////////////////////////////////////////////////////////////////////////
+	l_pcMC = p_pcGraph->AddMetadataclass(new SP_DS_Metadataclass(p_pcGraph, SP_DS_META_OBSERVER));
+
+	l_pcMC->SetDisplayName(wxT("Observers"));
+
+	l_pcMC->SetShowInElementTree(false);
+	l_pcMC->SetShowInDeclarationTreeOther(true);
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NameAttribute(wxT("Name")));
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
+	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr, wxT("%")));
+	l_pcGrAttr->SetShow(false);
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TypeAttribute(wxT("Type"), wxT("Place")));
+	SP_DS_TypeAttribute* l_pcType = dynamic_cast< SP_DS_TypeAttribute* >(l_pcAttr);
+	l_pcType->AddPossibleValue(wxT("Transition"));
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
+	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
+	l_pcGrAttr->SetShow(false);
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_EquationAttribute(wxT("Body")));
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
+	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr, wxT("=  %;")));
+	l_pcGrAttr->SetShow(false);
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TextAttribute(wxT("Comment")));
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogMultiline(wxT("General")));
+	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr, wxT("//%")));
+	l_pcGrAttr->SetShow(false);
+
+	l_pcGrMeta = new SP_GR_MetaComposite(l_pcMC->GetPrototype());
+	l_pcGrMeta->SetFixedSize(true);
+	l_pcGrMeta->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255, 255, 255), 1));
+	l_pcGrMeta->SetShow(false);
+	l_pcMC->SetGraphic(l_pcGrMeta);
+	l_pcMC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
+
 	//////////////////////////////////////////////////////////////////////////
 		int	refresh = wxGetApp().GetAnimationPrefs()->GetRefresh(GetName());
 		int duration = wxGetApp().GetAnimationPrefs()->GetDuration(GetName());
