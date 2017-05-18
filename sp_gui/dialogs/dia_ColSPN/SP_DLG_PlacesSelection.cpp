@@ -15,6 +15,7 @@
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_core/SP_Core.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 #include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 
 IMPLEMENT_CLASS( SP_DLG_PlacesSelection, wxDialog )
@@ -746,6 +747,7 @@ void SP_DLG_PlacesSelection::Initialize()
 		}	
 	}
 
+	long l_nPosPlaces = l_nPos; // save counter for adding the observers later
 	l_nPos = 0;
 
 	l_pcNodeclass= m_pcGraph->GetNodeclass(SP_DS_STOCHASTIC_TRANS);
@@ -819,7 +821,35 @@ void SP_DLG_PlacesSelection::Initialize()
 			m_ArrayUnTranstions.Add(l_sPlaceName);	
 			l_nPos++;
 		}	
-	}	
+	}
+
+	// decide for each observer if place or transition
+	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+	if (l_pcMetadataclass)
+	{
+		SP_ListMetadata::const_iterator l_itElem;
+		for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+		{
+			SP_DS_Metadata* l_pcMetadata = *l_itElem;
+			wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+			wxString l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
+
+			if (l_sType == wxT("Place"))
+			{
+				m_mPlaceID2Name[l_nPosPlaces] = l_sName;
+				m_mPlaceName2ID[l_sName] = l_nPosPlaces;
+				m_ArrayUnPlaces.Add(l_sName);
+				l_nPosPlaces++;
+
+			} else {
+
+				m_mTransID2Name[l_nPos] = l_sName;
+				m_mTransName2ID[l_sName] = l_nPos;
+				m_ArrayUnTranstions.Add(l_sName);
+				l_nPos++;
+			}
+		}
+	}
 
 	m_msaCurLBInStrings[wxT("Place:Unfolded")] = m_ArrayUnPlaces;
 	m_msaCurLBInStrings[wxT("Place:Auxiliary variables")] = m_ArrayPlaceAuxVar;
