@@ -92,6 +92,8 @@ public:
             new SP_DeclarationTreeItemdata(p_pchLabel, NULL));
     }
 
+	void DeleteChildren(const wxTreeItemId& item);
+
 	void UpdateColorSetTree();
 
 	//by sl
