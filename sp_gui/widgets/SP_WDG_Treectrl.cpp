@@ -232,3 +232,10 @@ wxTreeItemData* SP_WDG_Treectrl::GetItemData(const wxTreeItemId& p_cItem) const
 	return NULL;
 }
 
+void SP_WDG_Treectrl::DeleteChildren(const wxTreeItemId &p_cItem)
+{
+	if (p_cItem.IsOk())
+	{
+		wxTreeCtrl::DeleteChildren(p_cItem);
+	}
+}

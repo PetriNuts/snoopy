@@ -137,6 +137,8 @@ public:
     void DoToggleIcon(const wxTreeItemId& p_cId);
 
     wxTreeItemData* GetItemData(const wxTreeItemId& p_cItem) const;
+
+	void DeleteChildren(const wxTreeItemId& p_cItem);
 };
 
 #endif // __SP_WDG_TREECTRL_H__

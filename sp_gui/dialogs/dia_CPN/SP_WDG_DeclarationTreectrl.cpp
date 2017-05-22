@@ -512,8 +512,3 @@ void SP_WDG_DeclarationTreectrl::OnToolTip(wxTreeEvent& p_cEvent)
 
 }
 
-void SP_WDG_DeclarationTreectrl::DeleteChildren(const wxTreeItemId &item) {
-	if(item.IsOk()) {
-		SP_WDG_Treectrl::DeleteChildren(item);
-	}
-}

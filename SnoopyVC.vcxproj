@@ -727,6 +727,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="sp_gui\dialogs\SP_DLG_DShowAllModelView.h" />
     <ClInclude Include="sp_gui\dialogs\SP_DLG_DuplicateNodes.h" />
     <ClInclude Include="sp_gui\dialogs\SP_DLG_MergeNodes.h" />
+    <ClInclude Include="sp_gui\dialogs\SP_DLG_NewObserverDefinition.h" />
     <ClInclude Include="sp_gui\dialogs\SP_DLG_ViewerWindow.h" />
     <ClInclude Include="sp_gui\dialogs\SP_DLG_ViewerWindowSteering.h" />
     <ClInclude Include="sp_gui\windows\SP_GUI_Canvas.h" />
@@ -1306,6 +1307,7 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile Include="sp_gui\dialogs\SP_DLG_DShowAllModelView.cpp" />
     <ClCompile Include="sp_gui\dialogs\SP_DLG_DuplicateNodes.cpp" />
     <ClCompile Include="sp_gui\dialogs\SP_DLG_MergeNodes.cpp" />
+    <ClCompile Include="sp_gui\dialogs\SP_DLG_NewObserverDefinition.cpp" />
     <ClCompile Include="sp_gui\dialogs\SP_DLG_ViewerWindow.cpp" />
     <ClCompile Include="sp_gui\dialogs\SP_DLG_ViewerWindowSteering.cpp" />
     <ClCompile Include="sp_gui\windows\SP_GUI_Canvas.cpp" />
