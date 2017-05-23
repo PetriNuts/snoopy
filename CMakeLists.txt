@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.5)
+
 project(snoopy)
 
 #custom find 'modules'
@@ -11,12 +12,15 @@ if( NOT CMAKE_BUILD_TYPE )
             FORCE )
 endif()
 
+add_definitions( -D__SOURCE_DIR__="${CMAKE_CURRENT_SOURCE_DIR}" )
+add_definitions( -D_USE_MATH_DEFINES )
+
 #check compiler for C++11 support
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+    if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
         set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -stdlib=libc++")
     endif()
@@ -33,7 +37,7 @@ if(NOT WIN32)
 endif(NOT WIN32)
 add_definitions( -D__SNOOPY__ )
 add_definitions( -D_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_ )
-if(APPLE)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     add_definitions( -mmacosx-version-min=10.9 )
 endif()
 add_definitions( -Wno-deprecated )
@@ -51,35 +55,25 @@ include_directories(${wxCode_INCLUDE_DIRS})
 list(APPEND LIBS ${wxCode_LIBRARIES})
 
 #boost
-# The following verifyies that BOOST_ROOT is set properly.
-if(NOT BOOST_ROOT AND NOT $ENV{BOOST_ROOT} STREQUAL "")
-    FILE( TO_CMAKE_PATH $ENV{BOOST_ROOT} BOOST_ROOT )
-    if( NOT EXISTS ${BOOST_ROOT} ) 
-        MESSAGE( STATUS  ${BOOST_ROOT} " does not exist. Checking if BOOST_ROOT was a quoted string.." )
-        STRING( REPLACE "\"" "" BOOST_ROOT ${BOOST_ROOT} ) 
-        if( EXISTS ${BOOST_ROOT} ) 
-            MESSAGE( STATUS "After removing the quotes " ${BOOST_ROOT} " was now found by CMake" )
-        endif( EXISTS ${BOOST_ROOT})
-    endif( NOT EXISTS ${BOOST_ROOT} )
-# Save the BOOST_ROOT in the cache
-    if( NOT EXISTS ${BOOST_ROOT} ) 
-        MESSAGE( WARNING ${BOOST_ROOT} " does not exist." )
-    else(NOT EXISTS ${BOOST_ROOT})
-        SET (BOOST_ROOT ${BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
-    endif( NOT EXISTS ${BOOST_ROOT} )
-endif(NOT BOOST_ROOT AND NOT $ENV{BOOST_ROOT} STREQUAL "")
+if( WIN32 )
+    if( NOT "$ENV{BOOST_ROOT}" STREQUAL "" )
+        set(ENV{BOOST_LIBRARYDIR} $ENV{BOOST_ROOT}/stage/lib)
+    else()
+        MESSAGE( WARNING "Please set the BOOST_ROOT environment variable." )
+    endif( NOT "$ENV{BOOST_ROOT}" STREQUAL "" )
+endif( WIN32 )
 
-if( WIN32 AND NOT BOOST_ROOT )
-    MESSAGE( WARNING "Please set the BOOST_ROOT environment variable." )
-endif( WIN32 AND NOT BOOST_ROOT )
-
+set(Boost_NO_BOOST_CMAKE ON)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME ON)
+#set(Boost_USE_STATIC_RUNTIME ON)
 
 find_package(Boost REQUIRED regex)
-include_directories(${Boost_INCLUDE_DIRS})
-list(APPEND LIBS ${Boost_LIBRARIES})
+if(Boost_FOUND)
+    add_definitions( -DUSE_BOOST )
+    include_directories(${Boost_INCLUDE_DIRS})
+    list(APPEND LIBS ${Boost_LIBRARIES})
+endif()
 
 #OGDF
 find_package(OGDF REQUIRED)
@@ -123,6 +117,7 @@ list(APPEND LIBS ${GECODE_LIBRARIES})
 #gmplib
 find_package(GMP)
 if(GMP_FOUND)
+    add_definitions( -DUSE_GMP )
     include_directories(GMP_INCLUDE_DIR)
     list(APPEND LIBS ${GMP_LIBRARIES})
     #SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-no_pie" )
@@ -153,24 +148,33 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN})
 #message("libs = ${LIBS}")
 
 # search source files
+file(GLOB H_FILES ${SRC}/*.h)
+set(HEADER_FILES ${H_FILES})
 file(GLOB CPP_FILES ${SRC}/*.cpp)
 set(SOURCE_FILES ${CPP_FILES})
 set(SRC_DIRS sp_core sp_ds sp_gr sp_gui export import)
 foreach(d ${SRC_DIRS})
+  file(GLOB_RECURSE HPP_FILES ${SRC}/${d}/*.hpp)
+  file(GLOB_RECURSE H_FILES ${SRC}/${d}/*.h)
+  list(APPEND HEADER_FILES ${HPP_FILES})
+  list(APPEND HEADER_FILES ${H_FILES})
   file(GLOB_RECURSE CPP_FILES ${SRC}/${d}/*.cpp)
   file(GLOB_RECURSE CC_FILES ${SRC}/${d}/*.cc)
   list(APPEND SOURCE_FILES ${CPP_FILES})
   list(APPEND SOURCE_FILES ${CC_FILES})
 endforeach()
 
-add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})
+source_group("Header Files" FILES ${HEADER_FILES})
+source_group("Source Files" FILES ${SOURCE_FILES})
+
+add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 target_link_libraries(${CMAKE_PROJECT_NAME} ${LIBS})
 
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy sp_build.cpp.in sp_build.cpp
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/)
 
-if(APPLE)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
         COMMAND ../mkAppBundleOSX.sh ${CMAKE_PROJECT_NAME} beta
         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/)

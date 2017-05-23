@@ -20,27 +20,27 @@
 #   GECODE_LIBRARY, where to find the GECODE library.
 
 find_path(GECODE_INCLUDE_DIR NAMES gecode/driver.hh
-    HINTS ENV GECODEDIR
-    PATH_SUFFIXES gecode
-    )
+        HINTS ENV GECODEDIR
+        PATH_SUFFIXES gecode
+        )
 
 find_path(GECODE_CONFIG_INCLUDE_DIR NAMES gecode/support/config.hpp
-    HINTS ENV GECODEDIR
-    PATH_SUFFIXES gecode Release Debug
-    )
+        HINTS ENV GECODEDIR
+        PATH_SUFFIXES gecode build Release Debug
+        )
 
 if(NOT GECODE_FIND_COMPONENTS)
-    # Assume they want default
-    set(GECODE_FIND_COMPONENTS driver int float kernel minimodel search set support)
+  # Assume they want default
+  set(GECODE_FIND_COMPONENTS driver int float kernel minimodel search set support)
 endif()
 
 foreach(COMPONENT ${GECODE_FIND_COMPONENTS})
   string( TOUPPER ${COMPONENT} UPPERCOMPONENT )
-  find_library(GECODE_${UPPERCOMPONENT}_LIBRARY 
-      HINTS ENV GECODEDIR
-      NAMES gecode${COMPONENT} libgecode${COMPONENT} Gecode${COMPONENT}
-      PATH_SUFFIXES lib Release Debug
-      )
+  find_library(GECODE_${UPPERCOMPONENT}_LIBRARY
+          HINTS ENV GECODEDIR
+          NAMES gecode${COMPONENT} libgecode${COMPONENT} Gecode${COMPONENT}
+          PATH_SUFFIXES lib build Release Debug build/Release build/Debug
+          )
 endforeach()
 
 # handle the QUIETLY and REQUIRED arguments and set GECODE_FOUND to TRUE if

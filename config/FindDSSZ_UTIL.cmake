@@ -20,12 +20,15 @@
 #   DSSZ_UTIL_LIBRARY, where to find the DSSZ_UTIL library.
 
 find_path(DSSZ_UTIL_INCLUDE_DIR NAMES dssz/functions/functions.h
-    PATH_SUFFIXES dssz
-    )
+        HINTS ENV DSSZ_UTIL
+        PATH_SUFFIXES include dssz
+        )
 
-find_library(DSSZ_UTIL_LIBRARY 
-    NAMES dssz_util libdssz_util
-    )
+find_library(DSSZ_UTIL_LIBRARY
+        HINTS ENV DSSZ_UTIL
+        NAMES dssz_util libdssz_util
+        PATH_SUFFIXES lib build Release Debug build/Release build/Debug lib/Release lib/Debug
+        )
 
 # handle the QUIETLY and REQUIRED arguments and set DSSZ_UTIL_FOUND to TRUE if
 # all listed variables are TRUE

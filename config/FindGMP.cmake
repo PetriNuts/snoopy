@@ -7,16 +7,23 @@
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
-	
+
 if (GMP_INCLUDE_DIR AND GMP_LIBRARIES)
   # Already in cache, be silent
   set(GMP_FIND_QUIETLY TRUE)
 endif (GMP_INCLUDE_DIR AND GMP_LIBRARIES)
 
-find_path(GMP_INCLUDE_DIR NAMES gmp.h )
-find_library(GMP_LIBRARIES NAMES gmp libgmp )
-find_library(GMPXX_LIBRARIES NAMES gmpxx libgmpxx )
-MESSAGE(STATUS "GMP libs: " ${GMP_LIBRARIES} " " ${GMPXX_LIBRARIES} )
+find_path(GMP_INCLUDE_DIR NAMES gmp.h
+        HINTS ENV GMPDIR
+        PATH_SUFFIXES build
+        )
+find_library(GMP_LIBRARIES NAMES gmp libgmp mpir libmpir
+        HINTS ENV GMPDIR
+        PATH_SUFFIXES lib/x64/Release lib/x64/Debug
+        )
+#find_library(GMPXX_LIBRARIES NAMES gmpxx libgmpxx )
+#MESSAGE(STATUS "GMP libs: " ${GMP_LIBRARIES} " " ${GMPXX_LIBRARIES} )
+MESSAGE(STATUS "GMP libs: " ${GMP_LIBRARIES} )
 
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(GMP DEFAULT_MSG GMP_INCLUDE_DIR GMP_LIBRARIES)
