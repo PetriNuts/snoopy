@@ -28,6 +28,7 @@
 #include "sp_core/SP_Map.h"
 #include "sp_core/SP_Vector.h"
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
+#include "sp_ds/extensions/SP_DS_Function.h"
 
 #include "spsim/simulator.h"
 
@@ -201,6 +202,11 @@ protected:
     SP_MapString2Double m_msParameterName2Value;
 
 	//simulation Matrices
+
+	// observer functions
+	std::map<unsigned int, SP_FunctionPtr> m_mObserverPlaceFunctions;
+	std::map<unsigned int, SP_FunctionPtr> m_mObserverTransitionFunctions;
+
 protected:
 	//for auxiliary variables
 	SP_Vector2DDouble m_aanAuxPLVarsResults;
@@ -268,6 +274,7 @@ DECLARE_EVENT_TABLE()
 
 	virtual void LoadSets();
     virtual void LoadParameters();
+	virtual void LoadObservers();
 	virtual bool InitializeSimulator()=0;
 
 	//load initial simultor configuration
@@ -344,6 +351,9 @@ protected:
 
 	//specify how we get a reference to the result matrices
 	virtual void UpdateSimulationMatrix(SP_DS_Metadata* p_pcView = nullptr)=0;
+
+	// update the observers, RowCount shows the current simulation progress
+	virtual void UpdateObservers(const wxString& p_sObsersverType, unsigned int p_nColCount, unsigned long p_nRowCount);
 
 	//load the net information first time the dialog is opened
 	virtual void LoadNetInformation()=0;

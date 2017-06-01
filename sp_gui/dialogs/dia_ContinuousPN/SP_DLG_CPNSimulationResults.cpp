@@ -608,6 +608,9 @@ bool SP_DLG_CPNSimulationResults::InitializeSimulator()
 
 		//Load Connections
 		LoadConnections();
+
+		// load observers
+		LoadObservers();
 	}
 
 	wxBusyInfo* l_pcInfo = new wxBusyInfo(wxT("Initializing the ODEs solver, please wait...."), this);
@@ -1238,16 +1241,22 @@ void SP_DLG_CPNSimulationResults::UpdateSimulationMatrix(SP_DS_Metadata* p_pcVie
 
 	wxString l_sElementType = l_pcAttribute->GetValueString();
 
+	unsigned int l_nColCount = 0;
+
 	if (l_sElementType.IsSameAs(wxT("Transition")))
 	{
 		//rate
 		m_anResultMatrix = m_pcMainSimulator->GetRateResultMatrix();
+		l_nColCount = m_pcMainSimulator->GetTransitionCount();
 	}
 	else
 	{
 		//marking
 		m_anResultMatrix = m_pcMainSimulator->GetResultMatrix();
+		l_nColCount = m_pcMainSimulator->GetPlaceCount();
 	}
+
+	UpdateObservers(l_sElementType, l_nColCount, m_pcMainSimulator->GetGeneratedResultPointsCount());
 
 	UpdateXAxisValues();
 }

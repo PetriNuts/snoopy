@@ -212,6 +212,8 @@ void SP_DLG_Simulation::OnInitDialog(wxInitDialogEvent& event)
     //load the marking, rate, and parameter sets
     LoadSets();
 
+	LoadObservers();
+
     //show default view
     //OpenViewInSeparateWindow(m_pcCurrentTablePlot);
 
@@ -1133,6 +1135,70 @@ void SP_DLG_Simulation::LoadParameters()
     m_pcMainSimulator->SetParameterNames(l_asParameterNames);
     m_pcMainSimulator->SetParameterValues(l_anParameterValue);
 }
+void SP_DLG_Simulation::LoadObservers()
+{
+	std::map<std::string, unsigned int> l_mPlaceToPosition;
+	std::map<std::string, unsigned int> l_mTransitionToPosition;
+
+	for (auto const& elem : m_mPlaceName2Position) {
+		l_mPlaceToPosition[elem.first] = elem.second;
+	}
+
+	for (auto const& elem : m_mTransitionName2Position) {
+		l_mTransitionToPosition[elem.first] = elem.second;
+	}
+
+	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+	if (l_pcMetadataclass)
+	{
+		SP_VectorString l_asParameterNames;
+
+		SP_ListMetadata::const_iterator l_itElem;
+		for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+		{
+			SP_DS_Metadata* l_pcMetadata = *l_itElem;
+			wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+			wxString l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
+			wxString l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
+
+			unsigned long l_nPos = 0;
+
+			// check the function
+			SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+			SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sBody));
+			if (!l_pcFunction)
+			{
+				SP_MESSAGEBOX(wxT("the body of observer ") + l_sName + wxT(" is not correct"), wxT("Check Observer"), wxOK | wxICON_ERROR);
+				continue;
+			}
+
+			SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
+
+			if (l_sType == wxT("Place"))
+			{
+				m_asPlaceNames.push_back(l_sName);
+				m_mPlaceName2Position[l_sName] = l_nPos = m_asPlaceNames.size() - 1;
+				m_mObserverPlaceFunctions[l_nPos] = l_pcExpanded;
+
+				l_mPlaceToPosition[l_sName] = l_nPos;
+
+				dsszmc::functions::convertOptions co;
+				l_pcExpanded->setVariableIds(l_mPlaceToPosition, co);
+			}
+			else {
+
+				m_asTransitionNames.push_back(l_sName);
+				m_mTransitionName2Position[l_sName] = l_nPos = m_asTransitionNames.size() - 1;
+				m_mObserverTransitionFunctions[l_nPos] = l_pcExpanded;
+
+				l_mTransitionToPosition[l_sName] = l_nPos;
+
+				dsszmc::functions::convertOptions co;
+				l_pcExpanded->setVariableIds(l_mTransitionToPosition, co);
+			}			
+		}
+	}
+}
 /*
 void SP_DLG_Simulation::SaveSelectedCurves()
 {
@@ -1546,6 +1612,32 @@ bool SP_DLG_Simulation::IsMarkingSetNameExist(const wxString& p_sName)
 
     return false;
 
+}
+
+void SP_DLG_Simulation::UpdateObservers(const wxString & p_sObsersverType, unsigned int p_nColCount, unsigned long p_nRowCount)
+{
+	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+	SP_FunctionPtr l_pcFunction;
+
+	if (p_sObsersverType.IsSameAs(wxT("Place"))) 
+	{
+		l_pcFunction = m_mObserverPlaceFunctions[p_nColCount];
+
+		for (unsigned int l_nRow = 0; l_nRow < p_nRowCount; l_nRow++)
+		{
+			double l_Val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, std::numeric_limits<double>::min() }(m_anResultMatrix[l_nRow]);
+			m_anResultMatrix[l_nRow].push_back(l_Val);
+		}
+	} else {
+
+		l_pcFunction = m_mObserverTransitionFunctions[p_nColCount];
+
+		for (unsigned int l_nRow = 0; l_nRow < p_nRowCount; l_nRow++)
+		{
+			double l_Val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, std::numeric_limits<double>::min() }(m_anResultMatrix[l_nRow]);
+			m_anResultMatrix[l_nRow].push_back(l_Val);
+		}
+	}
 }
 
 void SP_DLG_Simulation::OnModifyConstantSets(wxCommandEvent& p_cEvent)

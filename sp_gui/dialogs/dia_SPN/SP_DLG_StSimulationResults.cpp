@@ -1028,6 +1028,8 @@ void SP_DLG_StSimulationResults::UpdateSimulationMatrix(SP_DS_Metadata* p_pcView
 
 	}
 
+	UpdateObservers(l_sElementType, l_nColCount, m_pcMainSimulator->GetGeneratedResultPointsCount());
+
 	UpdateXAxisValues();
 }
 
@@ -1449,6 +1451,9 @@ bool SP_DLG_StSimulationResults::InitializeSimulator()
 
 	//Load Connections
 	LoadConnections();
+
+	// load observers
+	LoadObservers();
 
 	return m_pcMainSimulator->Initialise(true);
 }

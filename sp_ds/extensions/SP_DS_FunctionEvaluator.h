@@ -36,9 +36,24 @@ class SP_DS_FunctionEvaluator
 		try
 		{
 			SP_FunctionPtr f = m_FunctionRegistry->substituteFunctions(m_Function);
-			return EvalT{static_cast<FunctionT&>(*f)}();
+			return EvalT{ static_cast<FunctionT&>(*f) }();
 		}
-		catch(std::exception& e)
+		catch (std::exception& e)
+		{
+			SP_LOGERROR(wxString(e.what(), wxConvUTF8));
+			SP_LOGERROR(wxString(m_Function->toString()));
+		}
+		return m_Default;
+	}
+
+	T operator()(const ArgumentT& args)
+	{
+		try
+		{
+			SP_FunctionPtr f = m_FunctionRegistry->substituteFunctions(m_Function);
+			return EvalT{ static_cast<FunctionT&>(*f) }(args);
+		}
+		catch (std::exception& e)
 		{
 			SP_LOGERROR(wxString(e.what(), wxConvUTF8));
 			SP_LOGERROR(wxString(m_Function->toString()));

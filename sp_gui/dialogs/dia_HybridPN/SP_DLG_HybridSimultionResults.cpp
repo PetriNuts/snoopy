@@ -1097,6 +1097,8 @@ void SP_DLG_HybridSimulationResults::UpdateSimulationMatrix(SP_DS_Metadata* p_pc
 			}
 	}
 
+	UpdateObservers(l_sElementType, l_nColCount, m_pcMainSimulator->GetGeneratedResultPointsCount());
+
 	UpdateXAxisValues();
 }
 bool SP_DLG_HybridSimulationResults::InitializeSimulator()
@@ -1163,6 +1165,9 @@ bool SP_DLG_HybridSimulationResults::InitializeSimulator()
 
 		//Load Connections
 		LoadConnections();
+
+		// load observers
+		LoadObservers();
 	}
 
 	wxBusyInfo* l_pcInfo = new wxBusyInfo(wxT("Initializing, please wait...."), this);
