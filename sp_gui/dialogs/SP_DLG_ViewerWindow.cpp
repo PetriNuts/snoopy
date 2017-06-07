@@ -19,6 +19,7 @@ IMPLEMENT_CLASS(SP_DLG_ViewerWindow, wxFrame)
 
 enum
 {
+	SP_ID_BUTTON_CLOSE,
 	SP_ID_BUTTON_REFRESH,
 	SP_ID_BUTTON_DISCONNECT,
 	SP_ID_CHECKLISTBOX_PLACE_CHOICE,
@@ -107,14 +108,14 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 		m_pcConnectButton = new wxButton(this, SP_ID_BUTTON_DISCONNECT, wxT("Disconnect"));
 		m_pcConnectButton->SetToolTip(wxT("Turn automatic refresh on/off"));
 		l_pcRowSizer->Add(m_pcConnectButton, 0, wxALL, 1);
-		l_pcRowSizer->Add(new wxButton(this, wxID_CANCEL, wxT("Close")), 0, wxALL, 1);
+		l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_CLOSE, wxT("Close")), 0, wxALL, 1);
 
 		l_pcViewSizer->Add(l_pcRowSizer, 0, wxALL, 5);
 		m_pcMainSizer->Add(l_pcViewSizer, 0, wxALL, 1);
 		SetSizerAndFit(m_pcMainSizer);
 
 		//event handler
-		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnClose, this, wxID_CANCEL);
+		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnClose, this, SP_ID_BUTTON_CLOSE);
 		Bind(wxEVT_CLOSE_WINDOW, &SP_DLG_ViewerWindow::OnWindowClose, this);
 		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnShowHideNodeList, this, SP_ID_BUTTON_SHOW_HIDE_NODE_LIST);
 		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnDisconnect, this, SP_ID_BUTTON_DISCONNECT);
@@ -186,8 +187,7 @@ void SP_DLG_ViewerWindow::DoClose()
 
 void SP_DLG_ViewerWindow::OnClose(wxCommandEvent& event)
 {
-	DoClose();
-
+	Close();
 	event.Skip();
 }
 
