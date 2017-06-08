@@ -12,6 +12,7 @@
 #include <wx/filename.h>
 #include <wx/wfstream.h>
 #include <wx/stdstream.h>
+#include <dssz/andl/andl_writer.h>
 
 SP_ExportANDL::SP_ExportANDL()
 {
@@ -46,9 +47,8 @@ bool SP_ExportANDL::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 	SP_SimpleNetBuilder builder;
 	if(builder(m_graph))
 	{
-		wxFFileOutputStream fout(m_fileName);
-		wxStdOutputStream out(fout);
-		out << *builder.GetNet();
+		dsszmc::andl::writer writer{builder.GetNet()};
+		writer(m_fileName);
 	}
 
 	return !m_bError;
