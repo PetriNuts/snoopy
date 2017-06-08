@@ -1619,24 +1619,26 @@ void SP_DLG_Simulation::UpdateObservers(const wxString & p_sObsersverType, unsig
 	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
 	SP_FunctionPtr l_pcFunction;
 
-	if (p_sObsersverType.IsSameAs(wxT("Place"))) 
-	{
-		l_pcFunction = m_mObserverPlaceFunctions[p_nColCount];
+	if (p_sObsersverType.IsSameAs(wxT("Place"))) {
+        if(!m_mObserverPlaceFunctions.empty()) {
+            l_pcFunction = m_mObserverPlaceFunctions[p_nColCount];
 
-		for (unsigned int l_nRow = 0; l_nRow < p_nRowCount; l_nRow++)
-		{
-			double l_Val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, std::numeric_limits<double>::min() }(m_anResultMatrix[l_nRow]);
-			m_anResultMatrix[l_nRow].push_back(l_Val);
-		}
+            for (unsigned int l_nRow = 0; l_nRow < p_nRowCount; l_nRow++) {
+                double l_Val = SP_DS_FunctionEvaluatorDouble{l_pcFR, l_pcFunction, std::numeric_limits<double>::min()}(
+                        m_anResultMatrix[l_nRow]);
+                m_anResultMatrix[l_nRow].push_back(l_Val);
+            }
+        }
 	} else {
+        if(!m_mObserverTransitionFunctions.empty()) {
+            l_pcFunction = m_mObserverTransitionFunctions[p_nColCount];
 
-		l_pcFunction = m_mObserverTransitionFunctions[p_nColCount];
-
-		for (unsigned int l_nRow = 0; l_nRow < p_nRowCount; l_nRow++)
-		{
-			double l_Val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, std::numeric_limits<double>::min() }(m_anResultMatrix[l_nRow]);
-			m_anResultMatrix[l_nRow].push_back(l_Val);
-		}
+            for (unsigned int l_nRow = 0; l_nRow < p_nRowCount; l_nRow++) {
+                double l_Val = SP_DS_FunctionEvaluatorDouble{l_pcFR, l_pcFunction, std::numeric_limits<double>::min()}(
+                        m_anResultMatrix[l_nRow]);
+                m_anResultMatrix[l_nRow].push_back(l_Val);
+            }
+        }
 	}
 }
 
