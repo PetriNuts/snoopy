@@ -90,8 +90,8 @@ private:
 	double y;
 
 	//void CreateGraph();
-	void CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_Net);
-	void CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& weight,const wxString& type);
+	bool CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_Net);
+	bool CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& weight,const wxString& type);
 
 	//SP_DS_Graph* CreateDocument();
 	SP_DS_Graph* CreateDocument(const wxString& p_sFile, dsszmc::andl::NetType p_eType);
@@ -102,7 +102,7 @@ private:
 	bool CreateFunctions(const dsszmc::andl::ColorFunctions& p_Functions);
 	bool CreateObservers(const dsszmc::andl::Observers& p_Observers);
 	bool CreateTransitions(const dsszmc::andl::Transitions& p_Transitions);
-	void CreateArcs();
+	bool CreateArcs();
 	void doLayout();
 	void AdaptColorExpression(wxString& p_ColorExpression);
 

@@ -94,6 +94,7 @@
 #include "import/SP_ImportAPNN.h"
 #include "import/SP_ImportANDL.h"
 #include "import/SP_ImportCANDL.h"
+#include "import/SP_ImportPNML.h"
 #include "import/SP_ImportPED.h"
 #include "import/SP_ImportTINA.h"
 #include "import/SP_ImportSBML2cntPn.h"
@@ -893,11 +894,7 @@ bool Snoopy::OnInit()
 
 	m_pcIAManager = new SP_IA_Manager();
 	m_pcImportManager = new SP_ImportManager();
-	SP_ImportRoutine *l_pcImport = new SP_ImportFTree_DNF();
-	if (!m_pcImportManager->AddImportRoutine(l_pcImport))
-	{
-		wxDELETE(l_pcImport);
-	}
+	SP_ImportRoutine *l_pcImport;
 
 	l_pcImport = new SP_ImportANDL();
 	if (!m_pcImportManager->AddImportRoutine(l_pcImport))
@@ -906,6 +903,12 @@ bool Snoopy::OnInit()
 	}
 
 	l_pcImport = new SP_ImportCANDL();
+	if (!m_pcImportManager->AddImportRoutine(l_pcImport))
+	{
+		wxDELETE(l_pcImport);
+	}
+
+	l_pcImport = new SP_ImportPNML();
 	if (!m_pcImportManager->AddImportRoutine(l_pcImport))
 	{
 		wxDELETE(l_pcImport);
@@ -949,6 +952,11 @@ bool Snoopy::OnInit()
 		wxDELETE(l_pcImport);
 	}
 	l_pcImport = new SP_ImportCSV2SPN();
+	if (!m_pcImportManager->AddImportRoutine(l_pcImport))
+	{
+		wxDELETE(l_pcImport);
+	}
+	l_pcImport = new SP_ImportFTree_DNF();
 	if (!m_pcImportManager->AddImportRoutine(l_pcImport))
 	{
 		wxDELETE(l_pcImport);

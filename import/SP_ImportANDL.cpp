@@ -58,8 +58,9 @@ bool SP_ImportANDL::ReadFile(const wxString& p_sFile)
 			const dsszmc::andl::Net& l_Net = *(p.get());
 			wxString l_sMsg = wxT("parse successful\n");
 			SP_LOGMESSAGE(l_sMsg);
-			CreateGraph(p_sFile, l_Net);
-			doLayout();
+			l_Return = CreateGraph(p_sFile, l_Net);
+            if(l_Return)
+    			doLayout();
 		}
 	}
 	catch(const std::exception& e)
@@ -76,7 +77,7 @@ bool SP_ImportANDL::ReadFile(const wxString& p_sFile)
 
 void SP_ImportANDL::doLayout()
 {
-	SP_DLG_LayoutProperties* l_pcDlg = new SP_DLG_LayoutProperties(NULL, m_pcMyDoc);
+	SP_DLG_LayoutProperties *l_pcDlg = new SP_DLG_LayoutProperties(NULL, m_pcMyDoc);
 	l_pcDlg->ShowModal();
 	l_pcDlg->Destroy();
 }
@@ -91,7 +92,7 @@ void SP_ImportANDL::ClearAll()
 
 /////////////////////////////////////////////////Graph Creation////////////////////////////////////////////////////
 
-void SP_ImportANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_Net)
+bool SP_ImportANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_Net)
 {
 	x = 350.0;
 	y = 250.0;
@@ -99,6 +100,9 @@ void SP_ImportANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net
 
 	m_eNetType = p_Net.type_;
 	m_pcGraph = CreateDocument(p_sFile, p_Net.type_);
+
+	if(!m_pcGraph)
+		return false;
 
 	if(p_Net.functions_)
 		CreateFunc(*p_Net.functions_);
@@ -116,6 +120,8 @@ void SP_ImportANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net
 	if(p_Net.transitions_)
 		CreateTransitions(*p_Net.transitions_);
 	CreateArcs();
+
+    return true;
 }
 
 bool SP_ImportANDL::CreateFunc(const dsszmc::andl::Functions& p_Functions)
@@ -422,7 +428,7 @@ bool SP_ImportANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transit
 	return true;
 }
 
-void SP_ImportANDL::CreateArcs()
+bool SP_ImportANDL::CreateArcs()
 {
 	map<pair<std::string, std::string>, Weights>::const_iterator aIt;
 
@@ -458,6 +464,7 @@ void SP_ImportANDL::CreateArcs()
 			CreateEdge(w.trans_, w.place_, w.vtp_, SP_DS_EDGE);
 		}
 	}
+    return true;
 }
 
 SP_DS_Graph*
@@ -492,6 +499,11 @@ SP_ImportANDL::CreateDocument(const wxString& p_sFile, dsszmc::andl::NetType p_e
 	{
 		netName = SP_DS_TIMEPN_CLASS;
 	}
+	else
+	{
+		SP_LOGERROR(wxT("net class not supported!"));
+		return nullptr;
+	}
 
 	SP_GM_DocTemplate* l_pcTemplate = l_pcDM->GetTemplate(netName);
 	SP_DS_Netclass* newClass = l_pcTemplate->GetNetclass();
@@ -509,7 +521,7 @@ SP_ImportANDL::CreateDocument(const wxString& p_sFile, dsszmc::andl::NetType p_e
 	return l_pcGraph;
 }
 
-void SP_ImportANDL::CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& weight, const wxString& type)
+bool SP_ImportANDL::CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& weight, const wxString& type)
 {
 	CHECK_POINTER(source, SP_LOGDEBUG(wxString(wxT("source is NULL"))));
 	CHECK_POINTER(target, SP_LOGDEBUG(wxString(wxT("target is NULL"))));
@@ -526,6 +538,8 @@ void SP_ImportANDL::CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxS
 	l_pcEC->AddElement(l_edge);
 	l_edge->ShowOnCanvas(l_pcCanvas, FALSE);
 	CHECK_POINTER(l_edge->GetGraphics(), SP_LOGDEBUG(wxT("no graphics")));
+
+    return true;
 }
 
 

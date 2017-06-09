@@ -60,8 +60,9 @@ SP_ImportCANDL::ReadFile(const wxString& p_sFile)
 			const dsszmc::andl::Net& l_Net = *(p.get());
 			wxString l_sMsg = wxT("parse successful\n");
 			SP_LOGMESSAGE(l_sMsg);
-			CreateGraph(p_sFile, l_Net);
-			doLayout();
+			l_Return = CreateGraph(p_sFile, l_Net);
+			if (l_Return)
+                doLayout();
 		}
 	}
 	catch(const std::exception& e)
@@ -79,9 +80,9 @@ SP_ImportCANDL::ReadFile(const wxString& p_sFile)
 
 void SP_ImportCANDL::doLayout()
 {
-	SP_DLG_LayoutProperties* l_pcDlg = new SP_DLG_LayoutProperties(NULL, m_pcMyDoc);
-	l_pcDlg->ShowModal();
-	l_pcDlg->Destroy();
+    SP_DLG_LayoutProperties *l_pcDlg = new SP_DLG_LayoutProperties(NULL, m_pcMyDoc);
+    l_pcDlg->ShowModal();
+    l_pcDlg->Destroy();
 }
 
 void
@@ -102,7 +103,7 @@ SP_ImportCANDL::ClearAll()
 /////////////////////////////////////////////////Graph Creation////////////////////////////////////////////////////
 
 
-void
+bool
 SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_Net)
 {
 	x = 350.0;
@@ -111,6 +112,9 @@ SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_
 
 	m_eNetType = p_Net.type_;
 	m_pcGraph = CreateDocument(p_sFile, p_Net.type_);
+
+	if(!m_pcGraph)
+		return false;
 
 	if(p_Net.constants_ && p_Net.valuesets_)
 		CreateConst(*p_Net.constants_, *p_Net.valuesets_);
@@ -136,6 +140,8 @@ SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_
 		CreateTransitions(*p_Net.transitions_);
 
 	CreateArcs();
+
+    return true;
 }
 
 
@@ -682,7 +688,7 @@ SP_ImportCANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions
 	return true;
 }
 
-void
+bool
 SP_ImportCANDL::CreateArcs()
 {
 	map<pair<std::string, std::string>, Weights >::const_iterator aIt;
@@ -719,6 +725,7 @@ SP_ImportCANDL::CreateArcs()
 			CreateEdge(w.trans_ , w.place_,  w.vtp_, SP_DS_EDGE);
 		}
 	}
+    return true;
 }
 
 SP_DS_Graph*
@@ -749,6 +756,11 @@ SP_ImportCANDL::CreateDocument(const wxString& p_sFile, dsszmc::andl::NetType p_
 	{
 		netName = SP_DS_COLHPN_CLASS;
 	}
+	else
+	{
+		SP_LOGERROR(wxT("net class not supported!"));
+		return nullptr;
+	}
 
 	SP_GM_DocTemplate* l_pcTemplate = l_pcDM->GetTemplate(netName);
 	SP_DS_Netclass* newClass = l_pcTemplate->GetNetclass();
@@ -766,7 +778,7 @@ SP_ImportCANDL::CreateDocument(const wxString& p_sFile, dsszmc::andl::NetType p_
 	return l_pcGraph;
 }
 
-void
+bool
 SP_ImportCANDL::CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& weight, const wxString& type)
 {
 	CHECK_POINTER(source, SP_LOGDEBUG(wxString(wxT("source is NULL"))));
@@ -787,6 +799,7 @@ SP_ImportCANDL::CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxStrin
 	l_edge->ShowOnCanvas(l_pcCanvas, FALSE);
 	CHECK_POINTER(l_edge->GetGraphics(),SP_LOGDEBUG(wxT("no graphics")));
 
+    return true;
 }
 
 void
