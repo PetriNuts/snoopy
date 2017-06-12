@@ -353,7 +353,7 @@ protected:
 	virtual void UpdateSimulationMatrix(SP_DS_Metadata* p_pcView = nullptr)=0;
 
 	// update the observers, RowCount shows the current simulation progress
-	virtual void UpdateObservers(const wxString& p_sObsersverType, unsigned int p_nColCount, unsigned long p_nRowCount);
+	virtual void UpdateObservers(const wxString& p_sObsersverType, unsigned long p_nRowCount);
 
 	//load the net information first time the dialog is opened
 	virtual void LoadNetInformation()=0;

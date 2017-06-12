@@ -1097,7 +1097,7 @@ void SP_DLG_HybridSimulationResults::UpdateSimulationMatrix(SP_DS_Metadata* p_pc
 			}
 	}
 
-	UpdateObservers(l_sElementType, l_nColCount, m_pcMainSimulator->GetGeneratedResultPointsCount());
+	UpdateObservers(l_sElementType, m_pcMainSimulator->GetGeneratedResultPointsCount());
 
 	UpdateXAxisValues();
 }

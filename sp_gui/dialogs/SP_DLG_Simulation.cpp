@@ -1614,14 +1614,14 @@ bool SP_DLG_Simulation::IsMarkingSetNameExist(const wxString& p_sName)
 
 }
 
-void SP_DLG_Simulation::UpdateObservers(const wxString & p_sObsersverType, unsigned int p_nColCount, unsigned long p_nRowCount)
+void SP_DLG_Simulation::UpdateObservers(const wxString & p_sObsersverType, unsigned long p_nRowCount)
 {
 	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
 	SP_FunctionPtr l_pcFunction;
 
 	if (p_sObsersverType.IsSameAs(wxT("Place"))) {
-        if(!m_mObserverPlaceFunctions.empty()) {
-            l_pcFunction = m_mObserverPlaceFunctions[p_nColCount];
+        for(auto it : m_mObserverPlaceFunctions) {
+            l_pcFunction = it.second;
 
             for (unsigned int l_nRow = 0; l_nRow < p_nRowCount; l_nRow++) {
                 double l_Val = SP_DS_FunctionEvaluatorDouble{l_pcFR, l_pcFunction, std::numeric_limits<double>::min()}(
@@ -1630,8 +1630,8 @@ void SP_DLG_Simulation::UpdateObservers(const wxString & p_sObsersverType, unsig
             }
         }
 	} else {
-        if(!m_mObserverTransitionFunctions.empty()) {
-            l_pcFunction = m_mObserverTransitionFunctions[p_nColCount];
+        for(auto it : m_mObserverTransitionFunctions) {
+            l_pcFunction = it.second;
 
             for (unsigned int l_nRow = 0; l_nRow < p_nRowCount; l_nRow++) {
                 double l_Val = SP_DS_FunctionEvaluatorDouble{l_pcFR, l_pcFunction, std::numeric_limits<double>::min()}(
