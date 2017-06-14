@@ -598,8 +598,6 @@ void SP_DLG_Simulation::OnRemovingModalViews(wxCommandEvent& p_cEvent) {
 void SP_DLG_Simulation::OnRenameModalView(wxCommandEvent& p_cEvent) {
 
 	wxArrayInt currentSelections;
-	wxArrayString currentSelections1;
-	currentSelections.Clear();
 	m_pcListboxShowAllGraphViewName->GetSelections(currentSelections);
 
 	if(currentSelections.IsEmpty() || currentSelections.GetCount() > 1)
@@ -609,7 +607,7 @@ void SP_DLG_Simulation::OnRenameModalView(wxCommandEvent& p_cEvent) {
 	}
 
 	// get a pointer to the view
-	wxString l_sView = m_pcListboxShowAllGraphViewName->GetStringSelection();
+	wxString l_sView = m_pcListboxShowAllGraphViewName->GetString(currentSelections[0]);
 	SP_DS_Metadata* l_pcView = FindView(l_sView);
 	//ChangeCurrentView(l_pcView);
 
