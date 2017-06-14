@@ -195,7 +195,8 @@ Build-Guide for Snoopy to compile under Mac OS X
 	1. download [boost](http://www.boost.org/users/download/) and unpack it into "~/workspace"
 	1. open command line at $BOOST_ROOT and call  
     `./bootstrap.sh`  
-    `./b2 variant=release threading=multi architecture=x86 address-model=64 link=static cxxflags="-std=c++11 -stdlib=libc++" linkflags="-stdlib=libc++" toolset=clang`
+    `./b2 variant=release threading=multi architecture=x86 address-model=64 link=static cxxflags="-std=c++11 -stdlib=libc++" linkflags="-stdlib=libc++" toolset=clang`  
+    `sudo ./b2 variant=release threading=multi architecture=x86 address-model=64 link=static cxxflags="-std=c++11 -stdlib=libc++" linkflags="-stdlib=libc++" toolset=clang install`  
 
 1. Sundials
 	1. download [sundials](https://computation.llnl.gov/projects/sundials/sundials-software) and unpack it into "~/workspace"
@@ -307,7 +308,8 @@ Linux
 	1. download [boost](http://www.boost.org/users/download/) and unpack it into "~/workspace"
 	1. open command line at $BOOST_ROOT and call  
     `./bootstrap.sh`  
-    `./b2 variant=release threading=multi architecture=x86 address-model=64 link=static cxxflags="-std=c++11 -stdlib=libc++" linkflags="-stdlib=libc++" toolset=clang`
+    `./b2 variant=release threading=multi architecture=x86 address-model=64 link=static cxxflags="-std=c++11 -stdlib=libc++" linkflags="-stdlib=libc++" toolset=clang`  
+    `sudo ./b2 variant=release threading=multi architecture=x86 address-model=64 link=static cxxflags="-std=c++11 -stdlib=libc++" linkflags="-stdlib=libc++" toolset=clang install`  
 
 1. Sundials
 	1. download [sundials](https://computation.llnl.gov/projects/sundials/sundials-software) and unpack it into "~/workspace"
