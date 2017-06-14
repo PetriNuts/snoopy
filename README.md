@@ -145,7 +145,7 @@ Windows
 
 1. Snoopy
 	1. get Snoopy  
-	`git clone https://github.com/PetriNuts/Snoopy.git`
+	`git clone https://github.com/PetriNuts/snoopy.git`
 	1. open `($Snoopy)\SnoopyVC.sln` 
 	1. build *solution* for x64 as *Debug* and *Release*
 	1. To use dynamic link(DLL), you can either copy the DLLs to Snoopy folder or as a more general way add the path of the Dlls to your windows PATH in the environment variable e.g (PATH=D:\workspace\Steering\Snoopy Simulator\lib\lib_win\debug\DLL) so that you do not need to copy the DLLs each time they are changed. Do not forget to add both the debug and the release paths
@@ -259,7 +259,7 @@ Build-Guide for Snoopy to compile under Mac OS X
 
 1. Snoopy
 	1. get Snoopy  
-	`git clone https://github.com/PetriNuts/Snoopy.git`
+	`git clone https://github.com/PetriNuts/snoopy.git`
 	1. open the project in eclipse or clion 
 	1. build for *Debug* and *Release*
 
@@ -379,7 +379,7 @@ Linux
 
 1. Snoopy
 	1. get Snoopy  
-	`git clone https://github.com/PetriNuts/Snoopy.git`
+	`git clone https://github.com/PetriNuts/snoopy.git`
 	1. open the project in eclipse or clion 
 	1. build for *Debug* and *Release*
 
