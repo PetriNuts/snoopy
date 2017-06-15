@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "SP_ImportSBML.h"
-#include "dssz/auxi/math.h"
+#include "dssd/auxi/math.h"
 
 wxString
 SP_ImportSBML::formulaToString(const ASTNode* p_Math)

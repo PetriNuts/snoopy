@@ -9,14 +9,14 @@
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
 #include "sp_utilities.h"
 
-#include "dssz/auxi/auxi.h"
-#include "dssz/auxi/timer.h"
-#include "dssz/andl/andl_reader.h"
-#include "dssz/andl/andl_writer.h"
-#include "dssz/candl/candl_writer.h"
-#include "dssz/unfolding/net_unfolding.icc"
-#include "dssz/unfolding/gecode_representation.h"
-#include "dssz/unfolding/idd_representation.h"
+#include "dssd/auxi/auxi.h"
+#include "dssd/auxi/timer.h"
+#include "dssd/andl/andl_reader.h"
+#include "dssd/andl/andl_writer.h"
+#include "dssd/candl/candl_writer.h"
+#include "dssd/unfolding/net_unfolding.icc"
+#include "dssd/unfolding/gecode_representation.h"
+#include "dssd/unfolding/idd_representation.h"
 
 template<typename Repr>
 bool
@@ -30,15 +30,15 @@ SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph, bool evalToken
 	if(builder(m_pcGraph))
 	{
 		m_ColoredNet = builder.GetNet();
-		//dsszmc::candl::writer w(m_ColoredNet);
+		//dssd::candl::writer w(m_ColoredNet);
 		//std::stringstream tout;
 		//w(tout);
 		//SP_LOGMESSAGE(wxString(tout.str()));
 		try
 		{
-			dsszmc::functions::FunctionRegistry fReg;
-			dsszmc::unfolding::net_unfolder<Repr> unfolder(m_ColoredNet,fReg);
-			dsszmc::aux::Timer unfoldTime;
+			dssd::functions::FunctionRegistry fReg;
+			dssd::unfolding::net_unfolder<Repr> unfolder(m_ColoredNet,fReg);
+			dssd::aux::Timer unfoldTime;
 			unfolder(evalTokens, evalArcInscriptions);
 			m_UnfoldedNet = unfolder.result();
 			std::stringstream sout;
@@ -77,7 +77,7 @@ namespace
 		{
 			if(!n) continue;
 
-			if(dsszmc::aux::startsWith(p_UnfoldedName, n->name_))
+			if(dssd::aux::startsWith(p_UnfoldedName, n->name_))
 			{
 				if(pos < n->name_.length())
 				{
@@ -100,20 +100,20 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 
 	//places
 
-	dsszmc::andl::Place_ptr coloredPlace;
+	dssd::andl::Place_ptr coloredPlace;
 	wxString l_sColoredPlaceName;
 	SP_CPN_UnfoldedPlace* l_mUnfoldedPlace;
 	for(auto& p : *m_UnfoldedNet->places_)
 	{
 		if(!p) continue;
 
-		if(!coloredPlace || ! dsszmc::aux::startsWith(p->name_, coloredPlace->name_))
+		if(!coloredPlace || ! dssd::aux::startsWith(p->name_, coloredPlace->name_))
 		{
-			coloredPlace = FindColoredNode<dsszmc::andl::Place>(p->name_, *m_ColoredNet->places_);
+			coloredPlace = FindColoredNode<dssd::andl::Place>(p->name_, *m_ColoredNet->places_);
 		}
 		l_sColoredPlaceName = p->name_.substr(0, p->prefix_);
 		//p_pcResults->m_mssColPlaceName2ColorSetforOrdering[l_sColoredPlaceName] = l_sColorSetName;
-		if(p->type_ == dsszmc::andl::PlType::CONTINUOUS_T)
+		if(p->type_ == dssd::andl::PlType::CONTINUOUS_T)
 		{
 			l_mUnfoldedPlace = &(p_pcResults->GetUnfoldedContPlaces()[l_sColoredPlaceName]);
 		}
@@ -123,7 +123,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 		}
 		// prefix+1 because of '_' as delimiter between name and color
 		wxString l_sColor = p->name_.substr(p->prefix_+1);
-		if(p->type_ == dsszmc::andl::PlType::CONTINUOUS_T)
+		if(p->type_ == dssd::andl::PlType::CONTINUOUS_T)
 		{
 			SP_CPN_UnfoldedPlaceInfo& l_UnfoldedPlaceInfo = (*l_mUnfoldedPlace)[l_sColor];
 			l_UnfoldedPlaceInfo.m_bIsolated = false;
@@ -169,16 +169,16 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 
 		l_sColoredTransName = t->name_.substr(0, t->prefix_);
 		switch (t->type_) {
-		case dsszmc::andl::TrType::CONTINUOUS_T:
+		case dssd::andl::TrType::CONTINUOUS_T:
 			l_UnfoldedTrans = &(p_pcResults->GetUnfoldedContTransions()[l_sColoredTransName]);
 			break;
-		case dsszmc::andl::TrType::IMMEDIATE_T:
+		case dssd::andl::TrType::IMMEDIATE_T:
 			l_UnfoldedTrans = &(p_pcResults->GetUnfoldedImmTransions()[l_sColoredTransName]);
 			break;
-		case dsszmc::andl::TrType::DETERMINISTIC_T:
+		case dssd::andl::TrType::DETERMINISTIC_T:
 			l_UnfoldedTrans = &(p_pcResults->GetUnfoldedDetTransions()[l_sColoredTransName]);
 			break;
-		case dsszmc::andl::TrType::SCHEDULED_T:
+		case dssd::andl::TrType::SCHEDULED_T:
 			l_UnfoldedTrans = &(p_pcResults->GetUnfoldedSchedTransions()[l_sColoredTransName]);
 			break;
 		default:
@@ -189,19 +189,19 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 		wxString l_sBinding = t->name_.substr(t->prefix_+1);
 		SP_CPN_UnfoldedTransInfo* l_UnfoldedTransInfo;
 		switch (t->type_) {
-		case dsszmc::andl::TrType::CONTINUOUS_T:
+		case dssd::andl::TrType::CONTINUOUS_T:
 			l_UnfoldedTransInfo = &((*l_UnfoldedTrans)[l_sBinding]);
 			l_UnfoldedTransInfo->m_sType = SP_DS_CONTINUOUS_TRANS;
 			break;
-		case dsszmc::andl::TrType::IMMEDIATE_T:
+		case dssd::andl::TrType::IMMEDIATE_T:
 			l_UnfoldedTransInfo = &((*l_UnfoldedTrans)[l_sBinding]);
 			l_UnfoldedTransInfo->m_sType = SP_DS_IMMEDIATE_TRANS;
 			break;
-		case dsszmc::andl::TrType::DETERMINISTIC_T:
+		case dssd::andl::TrType::DETERMINISTIC_T:
 			l_UnfoldedTransInfo = &((*l_UnfoldedTrans)[l_sBinding]);
 			l_UnfoldedTransInfo->m_sType = SP_DS_DETERMINISTIC_TRANS;
 			break;
-		case dsszmc::andl::TrType::SCHEDULED_T:
+		case dssd::andl::TrType::SCHEDULED_T:
 			l_UnfoldedTransInfo = &((*l_UnfoldedTrans)[l_sBinding]);
 			l_UnfoldedTransInfo->m_sType = SP_DS_SCHEDULED_TRANS;
 			break;
@@ -221,7 +221,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 			if(!c) continue;
 			SP_CPN_UnfoldedArcInfo l_UnfoldedArcInfo;
 
-			coloredPlace = FindColoredNode<dsszmc::andl::Place>(c->place_, *m_ColoredNet->places_);
+			coloredPlace = FindColoredNode<dssd::andl::Place>(c->place_, *m_ColoredNet->places_);
 			l_sColoredPlaceName = coloredPlace->name_;
 			// length()+1 because of '_' as delimiter between name and color
 			wxString l_sColor = c->place_.substr(coloredPlace->name_.length()+1);
@@ -229,7 +229,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 			l_UnfoldedArcInfo.m_sColor = l_sColor;
 			wxString l_sInscription = c->value_;
 			l_UnfoldedArcInfo.m_sMultiplicity = l_sInscription;
-			if(coloredPlace->type_ == dsszmc::andl::PlType::CONTINUOUS_T)
+			if(coloredPlace->type_ == dssd::andl::PlType::CONTINUOUS_T)
 			{
 				l_UnfoldedArcInfo.m_sDiscContType = SP_DS_CONTINUOUS_PLACE;
 				l_sInscription.ToDouble(&l_UnfoldedArcInfo.m_dMultiplicity);
@@ -240,16 +240,16 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 				l_sInscription.ToLong(&l_UnfoldedArcInfo.m_nMultiplicity);
 			}
 			switch (c->type_) {
-				case dsszmc::andl::CondType::READ_T:
+				case dssd::andl::CondType::READ_T:
 					l_UnfoldedArcInfo.m_sArcType = SP_DS_READ_EDGE;
 					break;
-				case dsszmc::andl::CondType::INHIBITOR_T:
+				case dssd::andl::CondType::INHIBITOR_T:
 					l_UnfoldedArcInfo.m_sArcType = SP_DS_INHIBITOR_EDGE;
 					break;
-				case dsszmc::andl::CondType::EQUAL_T:
+				case dssd::andl::CondType::EQUAL_T:
 					l_UnfoldedArcInfo.m_sArcType = SP_DS_EQUAL_EDGE;
 					break;
-				case dsszmc::andl::CondType::MODIFIER_T:
+				case dssd::andl::CondType::MODIFIER_T:
 					l_UnfoldedArcInfo.m_sArcType = SP_DS_MODIFIER_EDGE;
 					break;
 				default:
@@ -265,7 +265,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 			if(!u) continue;
 			SP_CPN_UnfoldedArcInfo l_UnfoldedArcInfo;
 
-			coloredPlace = FindColoredNode<dsszmc::andl::Place>(u->place_, *m_ColoredNet->places_);
+			coloredPlace = FindColoredNode<dssd::andl::Place>(u->place_, *m_ColoredNet->places_);
 			l_sColoredPlaceName = coloredPlace->name_;
 			// length()+1 because of '_' as delimiter between name and color
 			wxString l_sColor = u->place_.substr(coloredPlace->name_.length()+1);
@@ -273,7 +273,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 			l_UnfoldedArcInfo.m_sColor = l_sColor;
 			wxString l_sInscription = u->value_;
 			l_UnfoldedArcInfo.m_sMultiplicity = l_sInscription;
-			if(coloredPlace->type_ == dsszmc::andl::PlType::CONTINUOUS_T)
+			if(coloredPlace->type_ == dssd::andl::PlType::CONTINUOUS_T)
 			{
 				l_UnfoldedArcInfo.m_sDiscContType = SP_DS_CONTINUOUS_PLACE;
 				l_sInscription.ToDouble(&l_UnfoldedArcInfo.m_dMultiplicity);
@@ -284,15 +284,15 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 				l_sInscription.ToLong(&l_UnfoldedArcInfo.m_nMultiplicity);
 			}
 			switch (u->type_) {
-				case dsszmc::andl::UpdateType::DECREASE_T:
+				case dssd::andl::UpdateType::DECREASE_T:
 					l_UnfoldedArcInfo.m_sArcType = SP_DS_EDGE;
 					l_UnfoldedTransInfo->m_vInputArcs.push_back(l_UnfoldedArcInfo);
 					break;
-				case dsszmc::andl::UpdateType::INCREASE_T:
+				case dssd::andl::UpdateType::INCREASE_T:
 					l_UnfoldedArcInfo.m_sArcType = SP_DS_EDGE;
 					l_UnfoldedTransInfo->m_vOutputArcs.push_back(l_UnfoldedArcInfo);
 					break;
-				case dsszmc::andl::UpdateType::ASSIGN_T:
+				case dssd::andl::UpdateType::ASSIGN_T:
 					if(!(l_sInscription == wxT("0") || l_sInscription == wxT("0.0") ))
 					{
 						l_UnfoldedArcInfo.m_sArcType = SP_DS_EDGE;
@@ -315,6 +315,6 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 }
 
 
-template class SP_AbstractNetUnfolder<dsszmc::unfolding::idd_guard_representation>;
-template class SP_AbstractNetUnfolder<dsszmc::unfolding::gecode_guard_representation>;
+template class SP_AbstractNetUnfolder<dssd::unfolding::idd_guard_representation>;
+template class SP_AbstractNetUnfolder<dssd::unfolding::gecode_guard_representation>;
 

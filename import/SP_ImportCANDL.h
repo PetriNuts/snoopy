@@ -21,7 +21,7 @@
 #include "sp_gui/management/SP_GM_Docmanager.h"
 #include "sp_gui/management/SP_GM_DocTemplate.h"
 
-#include "dssz/misc/net.h"
+#include "dssd/misc/net.h"
 
 class SP_DS_Graph;
 class SP_DS_Edge;
@@ -78,7 +78,7 @@ private:
 	////////////////////////Parsing//////////////////////
 	wxFFile m_fFile;
 
-	dsszmc::andl::NetType m_eNetType;
+	dssd::andl::NetType m_eNetType;
 
 	////////////////////////Graph Creation////////////////
 	SP_MDI_View* m_pcView;
@@ -90,18 +90,18 @@ private:
 	double y;
 
 	//void CreateGraph();
-	bool CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_Net);
+	bool CreateGraph(const wxString& p_sFile, const dssd::andl::Net& p_Net);
 	bool CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& weight,const wxString& type);
 
 	//SP_DS_Graph* CreateDocument();
-	SP_DS_Graph* CreateDocument(const wxString& p_sFile, dsszmc::andl::NetType p_eType);
-	bool CreatePlaces(const dsszmc::andl::Places& p_Places);
-	bool CreateConst(const dsszmc::andl::Constants& p_Constants, const dsszmc::andl::Valuesets& p_Valuesets);
-	bool CreateColorsets(const dsszmc::andl::Colorsets& p_Colorsets);
-	bool CreateVariables(const dsszmc::andl::Variables& p_Variables);
-	bool CreateFunctions(const dsszmc::andl::ColorFunctions& p_Functions);
-	bool CreateObservers(const dsszmc::andl::Observers& p_Observers);
-	bool CreateTransitions(const dsszmc::andl::Transitions& p_Transitions);
+	SP_DS_Graph* CreateDocument(const wxString& p_sFile, dssd::andl::NetType p_eType);
+	bool CreatePlaces(const dssd::andl::Places& p_Places);
+	bool CreateConst(const dssd::andl::Constants& p_Constants, const dssd::andl::Valuesets& p_Valuesets);
+	bool CreateColorsets(const dssd::andl::Colorsets& p_Colorsets);
+	bool CreateVariables(const dssd::andl::Variables& p_Variables);
+	bool CreateFunctions(const dssd::andl::ColorFunctions& p_Functions);
+	bool CreateObservers(const dssd::andl::Observers& p_Observers);
+	bool CreateTransitions(const dssd::andl::Transitions& p_Transitions);
 	bool CreateArcs();
 	void doLayout();
 	void AdaptColorExpression(wxString& p_ColorExpression);

@@ -8,11 +8,11 @@
 #ifndef SP_CORE_TOOLS_SP_SIMPLENETBUILDER_H_
 #define SP_CORE_TOOLS_SP_SIMPLENETBUILDER_H_
 
-#include "dssz/misc/net.h"
+#include "dssd/misc/net.h"
 
 class SP_DS_Graph;
 
-namespace dsszmc
+namespace dssd
 {
 namespace andl
 {
@@ -27,13 +27,13 @@ public:
 
 	virtual bool operator()(SP_DS_Graph* p_pcGraph) = 0;
 
-	dsszmc::andl::Net_ptr GetNet() { return m_Net; }
+	dssd::andl::Net_ptr GetNet() { return m_Net; }
 	SP_DS_Graph* GetGraph() { return m_pcGraph; }
 
 protected:
 
 	SP_DS_Graph* m_pcGraph;
-	dsszmc::andl::Net_ptr m_Net;
+	dssd::andl::Net_ptr m_Net;
 };
 
 class SP_SimpleNetBuilder final : public SP_AbstractNetBuilder
@@ -44,11 +44,11 @@ public:
 	bool operator()(SP_DS_Graph* p_pcGraph);
 
 private:
-	bool CreatePlaces(dsszmc::andl::simple_net_builder& b);
-	bool CreateTransitions(dsszmc::andl::simple_net_builder& b);
-	bool CreateConstants(dsszmc::andl::simple_net_builder& b);
-	bool CreateFunctions(dsszmc::andl::simple_net_builder& b);
-	bool CreateObservers(dsszmc::andl::simple_net_builder& b);
+	bool CreatePlaces(dssd::andl::simple_net_builder& b);
+	bool CreateTransitions(dssd::andl::simple_net_builder& b);
+	bool CreateConstants(dssd::andl::simple_net_builder& b);
+	bool CreateFunctions(dssd::andl::simple_net_builder& b);
+	bool CreateObservers(dssd::andl::simple_net_builder& b);
 
 };
 
@@ -60,14 +60,14 @@ public:
 	bool operator()(SP_DS_Graph* p_pcGraph);
 
 private:
-	  bool CreateVariables(dsszmc::andl::simple_net_builder& b);
-	  bool CreateColorsets(dsszmc::andl::simple_net_builder& b);
-	  bool CreateColorFunctions(dsszmc::andl::simple_net_builder& b);
-	  bool CreatePlaces(dsszmc::andl::simple_net_builder& b);
-	  bool CreateTransitions(dsszmc::andl::simple_net_builder& b);
-	  bool CreateConstants(dsszmc::andl::simple_net_builder& b);
-	  bool CreateFunctions(dsszmc::andl::simple_net_builder& b);
-	  bool CreateObservers(dsszmc::andl::simple_net_builder& b);
+	  bool CreateVariables(dssd::andl::simple_net_builder& b);
+	  bool CreateColorsets(dssd::andl::simple_net_builder& b);
+	  bool CreateColorFunctions(dssd::andl::simple_net_builder& b);
+	  bool CreatePlaces(dssd::andl::simple_net_builder& b);
+	  bool CreateTransitions(dssd::andl::simple_net_builder& b);
+	  bool CreateConstants(dssd::andl::simple_net_builder& b);
+	  bool CreateFunctions(dssd::andl::simple_net_builder& b);
+	  bool CreateObservers(dssd::andl::simple_net_builder& b);
 
 };
 

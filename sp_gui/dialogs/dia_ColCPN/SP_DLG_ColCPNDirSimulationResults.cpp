@@ -423,7 +423,7 @@ void SP_DLG_ColCPNDirSimulationResults::DirectExportToCSV()
 	for (unsigned long l_nRow = 0; l_nRow < m_pcMainSimulator->GetGeneratedResultPointsCount(); l_nRow++)
 	{
 		l_sOutput = wxT("");
-		l_sOutput << dsszmc::aux::toString(m_pcMainSimulator->GetOutputSampleSize() * l_nRow);
+		l_sOutput << dssd::aux::toString(m_pcMainSimulator->GetOutputSampleSize() * l_nRow);
 		l_sCurrentRow = wxT("");
 
 		for (unsigned int l_n = 0; l_n < l_pcCurveInfoList->GetRowCount(); l_n++)

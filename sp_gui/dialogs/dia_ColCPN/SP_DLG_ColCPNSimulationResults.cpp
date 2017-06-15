@@ -462,7 +462,7 @@ void SP_DLG_ColCPNSimulationResults::DirectExportToCSV()
 	for (unsigned long l_nRow = 0; l_nRow < m_pcMainSimulator->GetGeneratedResultPointsCount(); l_nRow++)
 	{
 		l_sOutput = wxT("");
-		l_sOutput << dsszmc::aux::toString(m_pcMainSimulator->GetOutputSampleSize() * l_nRow);
+		l_sOutput << dssd::aux::toString(m_pcMainSimulator->GetOutputSampleSize() * l_nRow);
 		l_sCurrentRow = wxT("");
 
 		for (unsigned int l_n = 0; l_n < l_pcCurveInfoList->GetRowCount(); l_n++)
@@ -626,7 +626,7 @@ void SP_DLG_ColCPNSimulationResults::AddNewMarkingSet(const wxString& p_sMarking
 			for (unsigned int l_nCol = m_pnsPlaceCountById[l_nPos].m_nLow; l_nCol <= m_pnsPlaceCountById[l_nPos].m_nUp; l_nCol++)
 			{
 				wxString l_sColor = m_msColorsOfPlace[l_nCol];
-				wxString l_sValue = dsszmc::aux::toString(l_nCurrentTableRow[l_nCol]);
+				wxString l_sValue = dssd::aux::toString(l_nCurrentTableRow[l_nCol]);
 				if (l_sValue != wxT("0"))
 				{
 					l_mvNewMarking[l_sValue].push_back(l_sColor);

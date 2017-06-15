@@ -1180,7 +1180,7 @@ void SP_DLG_Simulation::LoadObservers()
 
 				l_mPlaceToPosition[l_sName] = l_nPos;
 
-				dsszmc::functions::convertOptions co;
+				dssd::functions::convertOptions co;
 				l_pcExpanded->setVariableIds(l_mPlaceToPosition, co);
 			}
 			else {
@@ -1191,7 +1191,7 @@ void SP_DLG_Simulation::LoadObservers()
 
 				l_mTransitionToPosition[l_sName] = l_nPos;
 
-				dsszmc::functions::convertOptions co;
+				dssd::functions::convertOptions co;
 				l_pcExpanded->setVariableIds(l_mTransitionToPosition, co);
 			}			
 		}
@@ -1551,7 +1551,7 @@ void SP_DLG_Simulation::AddNewMarkingSet(const wxString& p_sMarkingSetName, cons
 
             l_pcColList->SetCell(l_nNewRow, 0, p_sMarkingSetName);
 
-            wxString l_sValue = dsszmc::aux::toString(*l_itCol);
+            wxString l_sValue = dssd::aux::toString(*l_itCol);
 
             l_pcColList->SetCell(l_nNewRow, 1, l_sValue);
 

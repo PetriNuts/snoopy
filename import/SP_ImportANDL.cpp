@@ -28,7 +28,7 @@
 #include "sp_utilities.h"
 
 
-#include "dssz/andl/andl_reader.h"
+#include "dssd/misc/net_reader.h"
 
 #include <wx/spinctrl.h>
 
@@ -48,17 +48,17 @@ bool SP_ImportANDL::ReadFile(const wxString& p_sFile)
 
 	m_fileName = p_sFile;
 
-	dsszmc::andl::reader p;
+	dssd::net::reader p;
 	bool l_Return = false;
 	try
 	{
 		l_Return = p(p_sFile.ToStdString());
 		if (l_Return)
 		{
-			const dsszmc::andl::Net& l_Net = *(p.get());
+			auto l_Net = p.get();
 			wxString l_sMsg = wxT("parse successful\n");
 			SP_LOGMESSAGE(l_sMsg);
-			l_Return = CreateGraph(p_sFile, l_Net);
+			l_Return = CreateGraph(p_sFile, *l_Net);
             if(l_Return)
     			doLayout();
 		}
@@ -92,7 +92,7 @@ void SP_ImportANDL::ClearAll()
 
 /////////////////////////////////////////////////Graph Creation////////////////////////////////////////////////////
 
-bool SP_ImportANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_Net)
+bool SP_ImportANDL::CreateGraph(const wxString& p_sFile, const dssd::andl::Net& p_Net)
 {
 	x = 350.0;
 	y = 250.0;
@@ -124,7 +124,7 @@ bool SP_ImportANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net
     return true;
 }
 
-bool SP_ImportANDL::CreateFunc(const dsszmc::andl::Functions& p_Functions)
+bool SP_ImportANDL::CreateFunc(const dssd::andl::Functions& p_Functions)
 {
 	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);
 	if (mc)
@@ -146,10 +146,10 @@ bool SP_ImportANDL::CreateFunc(const dsszmc::andl::Functions& p_Functions)
 	return true;
 }
 
-bool SP_ImportANDL::CreatePlaces(const dsszmc::andl::Places& p_Places)
+bool SP_ImportANDL::CreatePlaces(const dssd::andl::Places& p_Places)
 {
 	SP_DS_Nodeclass *nodeClass = NULL;
-	if (m_eNetType == dsszmc::andl::NetType::CPN_T)
+	if (m_eNetType == dssd::andl::NetType::CPN_T)
 	{
 		nodeClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
 	}
@@ -168,11 +168,11 @@ bool SP_ImportANDL::CreatePlaces(const dsszmc::andl::Places& p_Places)
 			continue;
 			//return false;
 		}
-		if (p->type_ == dsszmc::andl::PlType::DISCRETE_T)
+		if (p->type_ == dssd::andl::PlType::DISCRETE_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
 		}
-		else if (p->type_ == dsszmc::andl::PlType::CONTINUOUS_T)
+		else if (p->type_ == dssd::andl::PlType::CONTINUOUS_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
 		}
@@ -201,7 +201,7 @@ bool SP_ImportANDL::CreatePlaces(const dsszmc::andl::Places& p_Places)
 	return true;
 }
 
-bool SP_ImportANDL::CreateConst(const dsszmc::andl::Constants& p_Constants, const dsszmc::andl::Valuesets& p_Valuesets)
+bool SP_ImportANDL::CreateConst(const dssd::andl::Constants& p_Constants, const dssd::andl::Valuesets& p_Valuesets)
 {
 	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 	if (mc)
@@ -213,7 +213,7 @@ bool SP_ImportANDL::CreateConst(const dsszmc::andl::Constants& p_Constants, cons
 
 			wxString name = constant->name_;
 			wxString type = wxT("int");
-			if(constant->type_ == dsszmc::andl::ConstType::DOUBLE_T)
+			if(constant->type_ == dssd::andl::ConstType::DOUBLE_T)
 			{
 				type = wxT("double");
 			}
@@ -254,16 +254,16 @@ bool SP_ImportANDL::CreateConst(const dsszmc::andl::Constants& p_Constants, cons
 	return true;
 }
 
-bool SP_ImportANDL::CreateObservers(const dsszmc::andl::Observers & p_Observers)
+bool SP_ImportANDL::CreateObservers(const dssd::andl::Observers & p_Observers)
 {
 	//TODO
 	return true;
 }
 
-bool SP_ImportANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions)
+bool SP_ImportANDL::CreateTransitions(const dssd::andl::Transitions& p_Transitions)
 {
 	SP_DS_Nodeclass *nodeClass = NULL;
-	if (m_eNetType == dsszmc::andl::NetType::CPN_T)
+	if (m_eNetType == dssd::andl::NetType::CPN_T)
 	{
 		nodeClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS);
 	}
@@ -284,23 +284,23 @@ bool SP_ImportANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transit
 			//return false;
 		}
 
-		if (t->type_ == dsszmc::andl::TrType::STOCHASTIC_T)
+		if (t->type_ == dssd::andl::TrType::STOCHASTIC_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_STOCHASTIC_TRANS);
 		}
-		else if (t->type_ == dsszmc::andl::TrType::IMMEDIATE_T)
+		else if (t->type_ == dssd::andl::TrType::IMMEDIATE_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_IMMEDIATE_TRANS);
 		}
-		else if (t->type_ == dsszmc::andl::TrType::DETERMINISTIC_T)
+		else if (t->type_ == dssd::andl::TrType::DETERMINISTIC_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_DETERMINISTIC_TRANS);
 		}
-		else if (t->type_ == dsszmc::andl::TrType::SCHEDULED_T)
+		else if (t->type_ == dssd::andl::TrType::SCHEDULED_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS);
 		}
-		else if (t->type_ == dsszmc::andl::TrType::CONTINUOUS_T)
+		else if (t->type_ == dssd::andl::TrType::CONTINUOUS_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS);
 		}
@@ -319,11 +319,11 @@ bool SP_ImportANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transit
 			}
 		}
 
-		if (m_eNetType == dsszmc::andl::NetType::SPN_T
-			|| m_eNetType == dsszmc::andl::NetType::GSPN_T
-			|| m_eNetType == dsszmc::andl::NetType::XSPN_T
-			|| m_eNetType == dsszmc::andl::NetType::CPN_T
-			|| m_eNetType == dsszmc::andl::NetType::HPN_T)
+		if (m_eNetType == dssd::andl::NetType::SPN_T
+			|| m_eNetType == dssd::andl::NetType::GSPN_T
+			|| m_eNetType == dssd::andl::NetType::XSPN_T
+			|| m_eNetType == dssd::andl::NetType::CPN_T
+			|| m_eNetType == dssd::andl::NetType::HPN_T)
 		{
 			wxString function = wxT("1");
 			if (!t->function_.empty())
@@ -369,17 +369,17 @@ bool SP_ImportANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transit
 
 			switch (c->type_)
 			{
-				case dsszmc::andl::CondType::READ_T:
+				case dssd::andl::CondType::READ_T:
 					w.vr_ = c->value_;
 					break;
-				case dsszmc::andl::CondType::INHIBITOR_T:
+				case dssd::andl::CondType::INHIBITOR_T:
 					w.vi_ = c->value_;
 					break;
-				case dsszmc::andl::CondType::EQUAL_T:
+				case dssd::andl::CondType::EQUAL_T:
 					w.vr_ = c->value_;
 					w.vi_ = c->value_;
 					break;
-				case dsszmc::andl::CondType::MODIFIER_T:
+				case dssd::andl::CondType::MODIFIER_T:
 					w.modifier_ = true;
 					break;
 				default:
@@ -404,13 +404,13 @@ bool SP_ImportANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transit
 			}
 			w.trans_ = l_node;
 			switch (u->type_) {
-				case dsszmc::andl::UpdateType::DECREASE_T:
+				case dssd::andl::UpdateType::DECREASE_T:
 					w.vpt_ = u->value_;
 					break;
-				case dsszmc::andl::UpdateType::INCREASE_T:
+				case dssd::andl::UpdateType::INCREASE_T:
 					w.vtp_ = u->value_;
 					break;
-				case dsszmc::andl::UpdateType::ASSIGN_T:
+				case dssd::andl::UpdateType::ASSIGN_T:
 				{
 					w.reset_ = true;
 					wxString val = u->value_;
@@ -468,34 +468,34 @@ bool SP_ImportANDL::CreateArcs()
 }
 
 SP_DS_Graph*
-SP_ImportANDL::CreateDocument(const wxString& p_sFile, dsszmc::andl::NetType p_eType)
+SP_ImportANDL::CreateDocument(const wxString& p_sFile, dssd::andl::NetType p_eType)
 {
 	SP_DS_Graph* l_pcGraph = NULL;
 	SP_GM_Docmanager* l_pcDM = wxGetApp().GetDocmanager();
 	wxString netName;
-	if (m_eNetType == dsszmc::andl::NetType::PN_T)
+	if (m_eNetType == dssd::andl::NetType::PN_T)
 	{
 		netName = SP_DS_PN_CLASS;
 	}
-	else if (m_eNetType == dsszmc::andl::NetType::XPN_T)
+	else if (m_eNetType == dssd::andl::NetType::XPN_T)
 	{
 		netName = SP_DS_EXTPN_CLASS;
 	}
-	else if (m_eNetType == dsszmc::andl::NetType::SPN_T
-			|| m_eNetType == dsszmc::andl::NetType::GSPN_T
-			|| m_eNetType == dsszmc::andl::NetType::XSPN_T)
+	else if (m_eNetType == dssd::andl::NetType::SPN_T
+			|| m_eNetType == dssd::andl::NetType::GSPN_T
+			|| m_eNetType == dssd::andl::NetType::XSPN_T)
 	{
 		netName = SP_DS_SPN_CLASS;
 	}
-	else if (m_eNetType == dsszmc::andl::NetType::CPN_T)
+	else if (m_eNetType == dssd::andl::NetType::CPN_T)
 	{
 		netName = SP_DS_CONTINUOUSPED_CLASS;
 	}
-	else if (m_eNetType == dsszmc::andl::NetType::HPN_T)
+	else if (m_eNetType == dssd::andl::NetType::HPN_T)
 	{
 		netName = SP_DS_HYBRIDPN_CLASS;
 	}
-	else if (m_eNetType == dsszmc::andl::NetType::TPN_T)
+	else if (m_eNetType == dssd::andl::NetType::TPN_T)
 	{
 		netName = SP_DS_TIMEPN_CLASS;
 	}

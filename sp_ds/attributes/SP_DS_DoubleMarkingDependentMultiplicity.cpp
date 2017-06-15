@@ -6,7 +6,7 @@
 // $Date: 2012/07/31 12:37:00 $
 // Short Description: to handle expression and constants for cpn edges
 //////////////////////////////////////////////////////////////////////
-#include <dssz/auxi/auxi.h>
+#include <dssd/auxi/auxi.h>
 #include "sp_ds/attributes/SP_DS_DoubleMarkingDependentMultiplicity.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include "sp_ds/attributes/SP_DS_TextAttribute.h"
@@ -25,7 +25,7 @@ SP_DS_DoubleMarkingDependentMultiplicity::SP_DS_DoubleMarkingDependentMultiplici
 }
 
 SP_DS_DoubleMarkingDependentMultiplicity::SP_DS_DoubleMarkingDependentMultiplicity(const wxString& p_pchName, double p_nVal)
-:SP_DS_ExpressionAttribute(p_pchName, dsszmc::aux::toString(p_nVal), SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_MARKINGDEPENDETMULTIPLICITY), m_nValue(p_nVal)
+:SP_DS_ExpressionAttribute(p_pchName, dssd::aux::toString(p_nVal), SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_MARKINGDEPENDETMULTIPLICITY), m_nValue(p_nVal)
 {
 }
 

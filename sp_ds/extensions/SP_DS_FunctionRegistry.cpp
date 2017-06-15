@@ -11,13 +11,13 @@
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 
-#include "dssz/functions/functionRegistry.h"
-#include "dssz/functions/builder/simFunctionBuilder.h"
-#include "dssz/functions/parser/bison_parser.h"
+#include "dssd/functions/functionRegistry.h"
+#include "dssd/functions/builder/simFunctionBuilder.h"
+#include "dssd/functions/parser/bison_parser.h"
 
-using dsszmc::functions::FunctionRegistry;
-using dsszmc::functions::SIMFunctionBuilder;
-using dsszmc::functions::BisonFunctionParser;
+using dssd::functions::FunctionRegistry;
+using dssd::functions::SIMFunctionBuilder;
+using dssd::functions::BisonFunctionParser;
 
 SP_DS_FunctionRegistryEntry::SP_DS_FunctionRegistryEntry(FunctionRegistryEntry *p_pcHandle):
 	m_Handle(p_pcHandle)

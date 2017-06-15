@@ -19,9 +19,9 @@
 #include <wx/log.h>
 #include <wx/colour.h>
 
-#include "dssz/auxi/sh_ptr.h"
+#include "dssd/auxi/sh_ptr.h"
 
-#include "dssz/functions/comp.h"
+#include "dssd/functions/comp.h"
 
 #include "sp_core/SP_List.h"
 #include "sp_core/SP_Map.h"

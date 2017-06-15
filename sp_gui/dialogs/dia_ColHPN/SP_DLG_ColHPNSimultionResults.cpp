@@ -901,7 +901,7 @@ void SP_DLG_ColHPNSimultionResults::DirectExportToCSV()
 
 		double l_nTime=m_pcMainSimulator->GetOutputStartPoint()+m_pcMainSimulator->GetOutputSampleSize() * l_nRow;
 
-		l_sOutput << dsszmc::aux::toString(l_nTime);
+		l_sOutput << dssd::aux::toString(l_nTime);
 		l_sCurrentRow=wxT(""); 
 
 		for(unsigned int l_n = 0; l_n < l_pcCurveInfoList->GetRowCount(); l_n++)

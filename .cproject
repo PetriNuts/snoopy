@@ -22,14 +22,14 @@
 							<builder buildPath="${workspace_loc:/snoopy-test/Debug-Linux}" errorParsers="" id="cdt.managedbuild.target.gnu.builder.base.101356122" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.2069660490" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool command="`/usr/local/bin/wx-config --cxx --cxxflags`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.465333939" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
-								<option id="gnu.cpp.compiler.option.include.paths.460376008" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.cpp.compiler.option.include.paths.460376008" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.1"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/gtk2-unicode-3.1"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.1815971354" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1815971354" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__WXGTK__"/>
 									<listOptionValue builtIn="false" value="__WXDEBUG__"/>
 									<listOptionValue builtIn="false" value="UNICODE"/>
@@ -38,25 +38,25 @@
 									<listOptionValue builtIn="false" value="wxDEBUG_LEVEL=0"/>
 									<listOptionValue builtIn="false" value="WXUSINGDLL"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.optimization.level.608175399" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.debugging.level.71720563" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.default" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.other.other.913741906" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -mfpmath=sse -Wno-overloaded-virtual" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.debugging.gprof.1527865906" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.debugging.prof.1206722653" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof" value="false" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.dialect.std.1983483361" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.dialect.flags.2121950737" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" value="-std=c++11" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.other.pic.1792430060" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.compiler.option.optimization.level.608175399" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.71720563" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.default" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.other.other.913741906" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -msse2 -mfpmath=sse -Wno-overloaded-virtual" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.debugging.gprof.1527865906" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.compiler.option.debugging.prof.1206722653" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.1983483361" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.flags.2121950737" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" useByScannerDiscovery="true" value="-std=c++11" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.pic.1792430060" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.91492098" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.base.830836445" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
-								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1568683179" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.debugging.level.1628556945" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.dialect.std.1005135947" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1568683179" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1628556945" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.dialect.std.1005135947" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1229524469" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1566566143" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
 							<tool command="`/usr/local/bin/wx-config --cxx`" commandLinePattern="${COMMAND} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} ${FLAGS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.base.270241786" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
-								<option id="gnu.cpp.link.option.libs.751672870" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+								<option id="gnu.cpp.link.option.libs.751672870" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="wxcode_gtk2u_freechart-3.1"/>
 									<listOptionValue builtIn="false" value="wxcode_gtk2u_ogl-3.1"/>
 									<listOptionValue builtIn="false" value="sbml"/>
@@ -74,19 +74,19 @@
 									<listOptionValue builtIn="false" value="gecodeint"/>
 									<listOptionValue builtIn="false" value="gecodekernel"/>
 									<listOptionValue builtIn="false" value="gecodesupport"/>
-									<listOptionValue builtIn="false" value="dssz_util"/>
+									<listOptionValue builtIn="false" value="dssd_util"/>
 									<listOptionValue builtIn="false" value="boost_regex"/>
 									<listOptionValue builtIn="false" value="z"/>
 									<listOptionValue builtIn="false" value="IrrKlang"/>
 									<listOptionValue builtIn="false" value="gmp"/>
 								</option>
-								<option id="gnu.cpp.link.option.debugging.gprof.125811728" name="Generate gprof information (-pg)" superClass="gnu.cpp.link.option.debugging.gprof" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.link.option.debugging.prof.417043846" name="Generate prof information (-p)" superClass="gnu.cpp.link.option.debugging.prof" value="false" valueType="boolean"/>
-								<option id="gnu.cpp.link.option.paths.205855694" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+								<option id="gnu.cpp.link.option.debugging.gprof.125811728" name="Generate gprof information (-pg)" superClass="gnu.cpp.link.option.debugging.gprof" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.debugging.prof.417043846" name="Generate prof information (-p)" superClass="gnu.cpp.link.option.debugging.prof" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.paths.205855694" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_Linux}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Debug_Linux}&quot;"/>
 								</option>
-								<option id="gnu.cpp.link.option.flags.988044372" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html` -Wl,-rpath='$ORIGIN/../lib' -Wl,-rpath=&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_Linux}&quot; -Wl,-rpath=&quot;${workspace_loc:/Snoopy Simulator/Debug_Linux}&quot;" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.988044372" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="`/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html` -Wl,-rpath='$ORIGIN/../lib' -Wl,-rpath=&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_Linux}&quot; -Wl,-rpath=&quot;${workspace_loc:/Snoopy Simulator/Debug_Linux}&quot;" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1433657995" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -127,14 +127,14 @@
 							<builder buildPath="${workspace_loc:/snoopy-test/Release-Linux}" errorParsers="" id="cdt.managedbuild.target.gnu.builder.base.1526688018" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1168252656" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool command="`/usr/local/bin/wx-config --cxx --cxxflags`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.262657007" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
-								<option id="gnu.cpp.compiler.option.include.paths.1111466910" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.cpp.compiler.option.include.paths.1111466910" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.1"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/gtk2-unicode-3.1"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.486053023" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.486053023" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__WXGTK__"/>
 									<listOptionValue builtIn="false" value="UNICODE"/>
 									<listOptionValue builtIn="false" value="__SNOOPY__"/>
@@ -142,24 +142,24 @@
 									<listOptionValue builtIn="false" value="wxDEBUG_LEVEL=0"/>
 									<listOptionValue builtIn="false" value="WXUSINGDLL"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.optimization.level.774749044" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.debugging.level.108606571" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.other.other.1357021899" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -mfpmath=sse -Wno-overloaded-virtual" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.optimization.flags.971777381" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="-fno-strict-aliasing" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.dialect.std.1161423195" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.other.pic.1165924611" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.dialect.flags.1781610948" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" value="-std=c++11" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.optimization.level.774749044" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.108606571" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.other.other.1357021899" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -msse2 -mfpmath=sse -Wno-overloaded-virtual" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.optimization.flags.971777381" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" useByScannerDiscovery="false" value="-fno-strict-aliasing" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.1161423195" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.other.pic.1165924611" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.compiler.option.dialect.flags.1781610948" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" useByScannerDiscovery="true" value="-std=c++11" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.844156377" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.base.596789648" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
-								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.91028698" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.debugging.level.650156506" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.dialect.std.510458525" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.91028698" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.650156506" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.dialect.std.510458525" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1791148123" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.530545099" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
 							<tool command="`/usr/local/bin/wx-config --cxx`" commandLinePattern="${COMMAND} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} ${FLAGS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.base.557637824" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
-								<option id="gnu.cpp.link.option.libs.425272042" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+								<option id="gnu.cpp.link.option.libs.425272042" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="wxcode_gtk2u_freechart-3.1"/>
 									<listOptionValue builtIn="false" value="wxcode_gtk2u_ogl-3.1"/>
 									<listOptionValue builtIn="false" value="sbml"/>
@@ -178,17 +178,17 @@
 									<listOptionValue builtIn="false" value="gecodefloat"/>
 									<listOptionValue builtIn="false" value="gecodekernel"/>
 									<listOptionValue builtIn="false" value="gecodesupport"/>
-									<listOptionValue builtIn="false" value="dssz_util"/>
+									<listOptionValue builtIn="false" value="dssd_util"/>
 									<listOptionValue builtIn="false" value="boost_regex"/>
 									<listOptionValue builtIn="false" value="z"/>
 									<listOptionValue builtIn="false" value="IrrKlang"/>
 									<listOptionValue builtIn="false" value="gmp"/>
 								</option>
-								<option id="gnu.cpp.link.option.paths.456551678" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+								<option id="gnu.cpp.link.option.paths.456551678" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Release_Linux}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Release_Linux}&quot;"/>
 								</option>
-								<option id="gnu.cpp.link.option.flags.318845265" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html` -Wl,-rpath='$ORIGIN/../lib' -Wl,-rpath=&quot;${workspace_loc:/SPSA_SteeringAPI/Release_Linux}&quot; -Wl,-rpath=&quot;${workspace_loc:/Snoopy Simulator/Release_Linux}&quot;" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.318845265" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="`/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html` -Wl,-rpath='$ORIGIN/../lib' -Wl,-rpath=&quot;${workspace_loc:/SPSA_SteeringAPI/Release_Linux}&quot; -Wl,-rpath=&quot;${workspace_loc:/Snoopy Simulator/Release_Linux}&quot;" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1230062185" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -230,12 +230,12 @@
 							<builder buildPath="${workspace_loc:/snoopy}/Release-MacOSX-Univ" id="cdt.managedbuild.target.gnu.builder.macosx.exe.release.390475067" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="2" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.release"/>
 							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release.934194051" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release"/>
 							<tool command="`/usr/local/bin/wx-config --cxx --libs base,core,adv,aui,net,xml,html`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release.134466457" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release">
-								<option id="macosx.cpp.link.option.paths.1628673185" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" valueType="libPaths">
+								<option id="macosx.cpp.link.option.paths.1628673185" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Release_MacOSX_Univ}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Release_MacOSX_Univ}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib"/>
 								</option>
-								<option id="macosx.cpp.link.option.libs.850805987" name="Libraries (-l)" superClass="macosx.cpp.link.option.libs" valueType="libs">
+								<option id="macosx.cpp.link.option.libs.850805987" name="Libraries (-l)" superClass="macosx.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="wxcode_osx_cocoau_freechart-3.0"/>
 									<listOptionValue builtIn="false" value="wxcode_osx_cocoau_ogl-3.0"/>
 									<listOptionValue builtIn="false" value="sundials_nvecserial"/>
@@ -252,19 +252,19 @@
 									<listOptionValue builtIn="false" value="gecodefloat"/>
 									<listOptionValue builtIn="false" value="gecodekernel"/>
 									<listOptionValue builtIn="false" value="gecodesupport"/>
-									<listOptionValue builtIn="false" value="dssz_util"/>
+									<listOptionValue builtIn="false" value="dssd_util"/>
 									<listOptionValue builtIn="false" value="boost_regex"/>
 									<listOptionValue builtIn="false" value="irrklang"/>
 									<listOptionValue builtIn="false" value="gmp"/>
 								</option>
-								<option id="macosx.cpp.link.option.other.1708375448" name="Other options (-Xlinker [option])" superClass="macosx.cpp.link.option.other"/>
-								<option id="macosx.cpp.link.option.nostart.708040674" name="Do not use standard start files (-nostartfiles)" superClass="macosx.cpp.link.option.nostart"/>
-								<option id="macosx.cpp.link.option.nodeflibs.1396679020" name="Do not use default libraries (-nodefaultlibs)" superClass="macosx.cpp.link.option.nodeflibs"/>
-								<option id="macosx.cpp.link.option.nostdlibs.1251249431" name="No startup or default libs (-nostdlib)" superClass="macosx.cpp.link.option.nostdlibs"/>
-								<option id="macosx.cpp.link.option.strip.1460143434" name="Omit all symbol information (-s)" superClass="macosx.cpp.link.option.strip"/>
-								<option id="macosx.cpp.link.option.flags.591922094" name="Linker flags" superClass="macosx.cpp.link.option.flags" value="-headerpad_max_install_names -Wl,-no_pie" valueType="string"/>
-								<option id="macosx.cpp.link.option.userobjs.1465085335" name="Other objects" superClass="macosx.cpp.link.option.userobjs"/>
-								<option id="macosx.cpp.link.option.shared.2014906506" name="Shared (-dynamiclib)" superClass="macosx.cpp.link.option.shared"/>
+								<option id="macosx.cpp.link.option.other.1708375448" name="Other options (-Xlinker [option])" superClass="macosx.cpp.link.option.other" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.nostart.708040674" name="Do not use standard start files (-nostartfiles)" superClass="macosx.cpp.link.option.nostart" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.nodeflibs.1396679020" name="Do not use default libraries (-nodefaultlibs)" superClass="macosx.cpp.link.option.nodeflibs" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.nostdlibs.1251249431" name="No startup or default libs (-nostdlib)" superClass="macosx.cpp.link.option.nostdlibs" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.strip.1460143434" name="Omit all symbol information (-s)" superClass="macosx.cpp.link.option.strip" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.flags.591922094" name="Linker flags" superClass="macosx.cpp.link.option.flags" useByScannerDiscovery="false" value="-headerpad_max_install_names -Wl,-no_pie" valueType="string"/>
+								<option id="macosx.cpp.link.option.userobjs.1465085335" name="Other objects" superClass="macosx.cpp.link.option.userobjs" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.shared.2014906506" name="Shared (-dynamiclib)" superClass="macosx.cpp.link.option.shared" useByScannerDiscovery="false"/>
 								<inputType id="cdt.managedbuild.tool.macosx.cpp.linker.input.1499784053" superClass="cdt.managedbuild.tool.macosx.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -275,9 +275,9 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.macosx.base.1007758636" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.macosx.base"/>
 							<tool command="`/usr/local/bin/wx-config --cxx --cxxflags`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release.1975309588" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release">
-								<option id="gnu.cpp.compiler.macosx.exe.release.option.optimization.level.1369472936" name="Optimization Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.macosx.exe.release.option.debugging.level.742248935" name="Debug Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.203399292" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.macosx.exe.release.option.optimization.level.1369472936" name="Optimization Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.macosx.exe.release.option.debugging.level.742248935" name="Debug Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.203399292" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__SNOOPY__"/>
 									<listOptionValue builtIn="false" value="__WXMAC__"/>
 									<listOptionValue builtIn="false" value="__WXOSX__"/>
@@ -288,7 +288,7 @@
 									<listOptionValue builtIn="false" value="WXUSINGDLL"/>
 									<listOptionValue builtIn="false" value="_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.include.paths.1266662112" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.cpp.compiler.option.include.paths.1266662112" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
@@ -296,27 +296,27 @@
 									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.1"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/osx_cocoa-unicode-3.1"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.1462480041" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -Wno-overloaded-virtual" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.910583807" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.preprocess.968599418" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.undef.1727538037" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef"/>
-								<option id="gnu.cpp.compiler.option.optimization.flags.1982094786" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="-finline-functions -funroll-loops&#10;" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.debugging.other.914935592" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other"/>
-								<option id="gnu.cpp.compiler.option.debugging.prof.523055952" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof"/>
-								<option id="gnu.cpp.compiler.option.debugging.gprof.1861115813" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof"/>
-								<option id="gnu.cpp.compiler.option.warnings.syntax.143630592" name="Check syntax only (-fsyntax-only)" superClass="gnu.cpp.compiler.option.warnings.syntax"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.864852008" name="Pedantic (-pedantic)" superClass="gnu.cpp.compiler.option.warnings.pedantic"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.error.1357673118" name="Pedantic warnings as errors (-pedantic-errors)" superClass="gnu.cpp.compiler.option.warnings.pedantic.error"/>
-								<option id="gnu.cpp.compiler.option.warnings.nowarn.632915311" name="Inhibit all warnings (-w)" superClass="gnu.cpp.compiler.option.warnings.nowarn"/>
-								<option id="gnu.cpp.compiler.option.warnings.allwarn.1760984122" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn"/>
-								<option id="gnu.cpp.compiler.option.warnings.toerrors.848795478" name="Warnings as errors (-Werror)" superClass="gnu.cpp.compiler.option.warnings.toerrors"/>
-								<option id="gnu.cpp.compiler.option.other.verbose.1129055987" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose"/>
-								<option id="gnu.cpp.compiler.option.dialect.std.2135302035" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.other.other.1462480041" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -msse2 -Wno-overloaded-virtual" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.910583807" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.preprocess.968599418" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.undef.1727538037" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.optimization.flags.1982094786" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" useByScannerDiscovery="false" value="-finline-functions -funroll-loops&#10;" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.debugging.other.914935592" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.debugging.prof.523055952" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.debugging.gprof.1861115813" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.syntax.143630592" name="Check syntax only (-fsyntax-only)" superClass="gnu.cpp.compiler.option.warnings.syntax" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.pedantic.864852008" name="Pedantic (-pedantic)" superClass="gnu.cpp.compiler.option.warnings.pedantic" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.pedantic.error.1357673118" name="Pedantic warnings as errors (-pedantic-errors)" superClass="gnu.cpp.compiler.option.warnings.pedantic.error" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.nowarn.632915311" name="Inhibit all warnings (-w)" superClass="gnu.cpp.compiler.option.warnings.nowarn" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.allwarn.1760984122" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.toerrors.848795478" name="Warnings as errors (-Werror)" superClass="gnu.cpp.compiler.option.warnings.toerrors" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.other.verbose.1129055987" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.2135302035" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.688808750" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.release.197627735" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.release">
-								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.macosx.exe.release.option.optimization.level.950251581" name="Optimization Level" superClass="gnu.c.compiler.macosx.exe.release.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.macosx.exe.release.option.debugging.level.1382528546" name="Debug Level" superClass="gnu.c.compiler.macosx.exe.release.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.macosx.exe.release.option.optimization.level.950251581" name="Optimization Level" superClass="gnu.c.compiler.macosx.exe.release.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.macosx.exe.release.option.debugging.level.1382528546" name="Debug Level" superClass="gnu.c.compiler.macosx.exe.release.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1144642443" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 						</toolChain>
@@ -353,12 +353,12 @@
 							<builder buildPath="${workspace_loc:/snoopy}/Debug-MacOSX-Univ" id="cdt.managedbuild.target.gnu.builder.macosx.exe.release.1393604838" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.release"/>
 							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release.1020970111" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release"/>
 							<tool command="`/usr/local/bin/wx-config --cxx --libs base,core,adv,aui,net,xml,html --version=3.0`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release.1170145505" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release">
-								<option id="macosx.cpp.link.option.paths.1651646245" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" valueType="libPaths">
+								<option id="macosx.cpp.link.option.paths.1651646245" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Debug_MacOSX_Univ}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_MacOSX_Univ}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib"/>
 								</option>
-								<option id="macosx.cpp.link.option.libs.1187938433" name="Libraries (-l)" superClass="macosx.cpp.link.option.libs" valueType="libs">
+								<option id="macosx.cpp.link.option.libs.1187938433" name="Libraries (-l)" superClass="macosx.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="wxcode_osx_cocoau_freechart-3.0"/>
 									<listOptionValue builtIn="false" value="wxcode_osx_cocoau_ogl-3.0"/>
 									<listOptionValue builtIn="false" value="sundials_nvecserial"/>
@@ -375,19 +375,19 @@
 									<listOptionValue builtIn="false" value="gecodefloat"/>
 									<listOptionValue builtIn="false" value="gecodekernel"/>
 									<listOptionValue builtIn="false" value="gecodesupport"/>
-									<listOptionValue builtIn="false" value="dssz_util"/>
+									<listOptionValue builtIn="false" value="dssd_util"/>
 									<listOptionValue builtIn="false" value="boost_regex"/>
 									<listOptionValue builtIn="false" value="irrklang"/>
 									<listOptionValue builtIn="false" value="gmp"/>
 								</option>
-								<option id="macosx.cpp.link.option.other.1687869595" name="Other options (-Xlinker [option])" superClass="macosx.cpp.link.option.other"/>
-								<option id="macosx.cpp.link.option.nostart.496864062" name="Do not use standard start files (-nostartfiles)" superClass="macosx.cpp.link.option.nostart"/>
-								<option id="macosx.cpp.link.option.nodeflibs.388293267" name="Do not use default libraries (-nodefaultlibs)" superClass="macosx.cpp.link.option.nodeflibs"/>
-								<option id="macosx.cpp.link.option.nostdlibs.90104886" name="No startup or default libs (-nostdlib)" superClass="macosx.cpp.link.option.nostdlibs"/>
-								<option id="macosx.cpp.link.option.strip.595161991" name="Omit all symbol information (-s)" superClass="macosx.cpp.link.option.strip"/>
-								<option id="macosx.cpp.link.option.flags.380028399" name="Linker flags" superClass="macosx.cpp.link.option.flags" value="-headerpad_max_install_names -Wl,-no_pie" valueType="string"/>
-								<option id="macosx.cpp.link.option.userobjs.443332176" name="Other objects" superClass="macosx.cpp.link.option.userobjs"/>
-								<option id="macosx.cpp.link.option.shared.244126883" name="Shared (-dynamiclib)" superClass="macosx.cpp.link.option.shared"/>
+								<option id="macosx.cpp.link.option.other.1687869595" name="Other options (-Xlinker [option])" superClass="macosx.cpp.link.option.other" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.nostart.496864062" name="Do not use standard start files (-nostartfiles)" superClass="macosx.cpp.link.option.nostart" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.nodeflibs.388293267" name="Do not use default libraries (-nodefaultlibs)" superClass="macosx.cpp.link.option.nodeflibs" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.nostdlibs.90104886" name="No startup or default libs (-nostdlib)" superClass="macosx.cpp.link.option.nostdlibs" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.strip.595161991" name="Omit all symbol information (-s)" superClass="macosx.cpp.link.option.strip" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.flags.380028399" name="Linker flags" superClass="macosx.cpp.link.option.flags" useByScannerDiscovery="false" value="-headerpad_max_install_names -Wl,-no_pie" valueType="string"/>
+								<option id="macosx.cpp.link.option.userobjs.443332176" name="Other objects" superClass="macosx.cpp.link.option.userobjs" useByScannerDiscovery="false"/>
+								<option id="macosx.cpp.link.option.shared.244126883" name="Shared (-dynamiclib)" superClass="macosx.cpp.link.option.shared" useByScannerDiscovery="false"/>
 								<inputType id="cdt.managedbuild.tool.macosx.cpp.linker.input.498290043" superClass="cdt.managedbuild.tool.macosx.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -398,9 +398,9 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.macosx.base.1493135778" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.macosx.base"/>
 							<tool command="`/usr/local/bin/wx-config --cxx --cxxflags --version=3.0`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release.1111652478" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release">
-								<option id="gnu.cpp.compiler.macosx.exe.release.option.optimization.level.1346498026" name="Optimization Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.macosx.exe.release.option.debugging.level.1432475628" name="Debug Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.default" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.76427130" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.macosx.exe.release.option.optimization.level.1346498026" name="Optimization Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.macosx.exe.release.option.debugging.level.1432475628" name="Debug Level" superClass="gnu.cpp.compiler.macosx.exe.release.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.default" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.76427130" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__SNOOPY__"/>
 									<listOptionValue builtIn="false" value="__WXMAC__"/>
 									<listOptionValue builtIn="false" value="__WXOSX__"/>
@@ -411,7 +411,7 @@
 									<listOptionValue builtIn="false" value="WXUSINGDLL"/>
 									<listOptionValue builtIn="false" value="_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.include.paths.38136713" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.cpp.compiler.option.include.paths.38136713" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
@@ -420,26 +420,26 @@
 									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.0"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/osx_cocoa-unicode-3.0"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.1771315370" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -msse2 -Wno-overloaded-virtual" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.1972408010" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.preprocess.386651518" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.undef.1939620035" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef"/>
-								<option id="gnu.cpp.compiler.option.optimization.flags.345003065" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.debugging.other.2086472647" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other"/>
-								<option id="gnu.cpp.compiler.option.debugging.prof.1704771125" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof"/>
-								<option id="gnu.cpp.compiler.option.debugging.gprof.1441441865" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof"/>
-								<option id="gnu.cpp.compiler.option.warnings.syntax.1074513876" name="Check syntax only (-fsyntax-only)" superClass="gnu.cpp.compiler.option.warnings.syntax"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.1631393070" name="Pedantic (-pedantic)" superClass="gnu.cpp.compiler.option.warnings.pedantic"/>
-								<option id="gnu.cpp.compiler.option.warnings.pedantic.error.369831168" name="Pedantic warnings as errors (-pedantic-errors)" superClass="gnu.cpp.compiler.option.warnings.pedantic.error"/>
-								<option id="gnu.cpp.compiler.option.warnings.nowarn.112225943" name="Inhibit all warnings (-w)" superClass="gnu.cpp.compiler.option.warnings.nowarn"/>
-								<option id="gnu.cpp.compiler.option.warnings.allwarn.1842142377" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn"/>
-								<option id="gnu.cpp.compiler.option.warnings.toerrors.1256609973" name="Warnings as errors (-Werror)" superClass="gnu.cpp.compiler.option.warnings.toerrors"/>
-								<option id="gnu.cpp.compiler.option.other.verbose.1640026049" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose"/>
+								<option id="gnu.cpp.compiler.option.other.other.1771315370" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -msse2 -Wno-overloaded-virtual" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.1972408010" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.preprocess.386651518" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.undef.1939620035" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.optimization.flags.345003065" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" useByScannerDiscovery="false" value="" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.debugging.other.2086472647" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.debugging.prof.1704771125" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.debugging.gprof.1441441865" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.syntax.1074513876" name="Check syntax only (-fsyntax-only)" superClass="gnu.cpp.compiler.option.warnings.syntax" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.pedantic.1631393070" name="Pedantic (-pedantic)" superClass="gnu.cpp.compiler.option.warnings.pedantic" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.pedantic.error.369831168" name="Pedantic warnings as errors (-pedantic-errors)" superClass="gnu.cpp.compiler.option.warnings.pedantic.error" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.nowarn.112225943" name="Inhibit all warnings (-w)" superClass="gnu.cpp.compiler.option.warnings.nowarn" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.allwarn.1842142377" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.warnings.toerrors.1256609973" name="Warnings as errors (-Werror)" superClass="gnu.cpp.compiler.option.warnings.toerrors" useByScannerDiscovery="false"/>
+								<option id="gnu.cpp.compiler.option.other.verbose.1640026049" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose" useByScannerDiscovery="false"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1504885161" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.release.750694899" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.release">
-								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.macosx.exe.release.option.optimization.level.2049456523" name="Optimization Level" superClass="gnu.c.compiler.macosx.exe.release.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.macosx.exe.release.option.debugging.level.1453137100" name="Debug Level" superClass="gnu.c.compiler.macosx.exe.release.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.macosx.exe.release.option.optimization.level.2049456523" name="Optimization Level" superClass="gnu.c.compiler.macosx.exe.release.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.macosx.exe.release.option.debugging.level.1453137100" name="Debug Level" superClass="gnu.c.compiler.macosx.exe.release.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.972684299" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 						</toolChain>

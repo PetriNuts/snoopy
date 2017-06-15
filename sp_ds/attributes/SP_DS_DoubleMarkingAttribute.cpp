@@ -4,7 +4,7 @@
  *  Created on: 14.01.2013
  *      Author: dell-notebook
  */
-#include <dssz/auxi/auxi.h>
+#include <dssd/auxi/auxi.h>
 #include "sp_ds/attributes/SP_DS_DoubleMarkingAttribute.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_core/SP_Core.h"
@@ -20,7 +20,7 @@ SP_DS_DoubleMarkingAttribute::SP_DS_DoubleMarkingAttribute(const wxString& p_pch
 
 
 SP_DS_DoubleMarkingAttribute::SP_DS_DoubleMarkingAttribute(const wxString& p_pchName, double p_nVal)
-:SP_DS_ExpressionAttribute(p_pchName, dsszmc::aux::toString(p_nVal), SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_DOUBLEMARKING), m_nValue(p_nVal)
+:SP_DS_ExpressionAttribute(p_pchName, dssd::aux::toString(p_nVal), SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_DOUBLEMARKING), m_nValue(p_nVal)
 {
 }
 

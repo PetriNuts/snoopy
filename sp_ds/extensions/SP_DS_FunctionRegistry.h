@@ -12,7 +12,7 @@
 #include "sp_core/SP_Vector.h"
 #include "sp_ds/extensions/SP_DS_Function.h"
 
-namespace dsszmc
+namespace dssd
 {
 	namespace functions
 	{
@@ -26,7 +26,7 @@ namespace dsszmc
 class SP_DS_FunctionRegistryEntry
 {
 private:
-	typedef dsszmc::functions::FunctionRegistryEntry FunctionRegistryEntry;
+	typedef dssd::functions::FunctionRegistryEntry FunctionRegistryEntry;
 	FunctionRegistryEntry* m_Handle;
 
 public:
@@ -74,13 +74,13 @@ private:
 	SP_DS_Graph* m_pcGraph;
 	bool m_bIsValid;
 
-	typedef std::shared_ptr<dsszmc::functions::FunctionRegistry> FunctionRegistryPtr;
+	typedef std::shared_ptr<dssd::functions::FunctionRegistry> FunctionRegistryPtr;
 	FunctionRegistryPtr m_pcRegistry;
 
-	typedef std::shared_ptr<dsszmc::functions::AbstractFunctionBuilder> FunctionBuilderPtr;
+	typedef std::shared_ptr<dssd::functions::AbstractFunctionBuilder> FunctionBuilderPtr;
 	FunctionBuilderPtr m_pcBuilder;
 
-	typedef std::shared_ptr<dsszmc::functions::FunctionParser> FunctionParserPtr;
+	typedef std::shared_ptr<dssd::functions::FunctionParser> FunctionParserPtr;
 	FunctionParserPtr m_pcParser;
 };
 

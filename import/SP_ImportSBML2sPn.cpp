@@ -5,7 +5,7 @@
 // Short Description: creates a stochastic petrinet on a SBML file
 //////////////////////////////////////////////////////////////////////
 
-#include <dssz/auxi/auxi.h>
+#include <dssd/auxi/auxi.h>
 #include "import/SP_ImportSBML2sPn.h"
 
 #include "sp_ds/netclasses/SP_DS_EventSPN.h"
@@ -177,12 +177,12 @@ void SP_ImportSBML2sPn::getSpecies()
 			if (l_sbmlSpecies->isSetInitialAmount())
 			{
 				l_Init = l_sbmlSpecies->getInitialAmount();
-				l_comment << wxT("initialAmount=\"") << dsszmc::aux::toString(l_Init) << wxT("\"\n");
+				l_comment << wxT("initialAmount=\"") << dssd::aux::toString(l_Init) << wxT("\"\n");
 			}
 			else if(l_sbmlSpecies->isSetInitialConcentration())
 			{
 				l_Init = l_sbmlSpecies->getInitialConcentration();
-				l_comment << wxT("initialConcentration=\"") << dsszmc::aux::toString(l_Init) << wxT("\"\n");
+				l_comment << wxT("initialConcentration=\"") << dssd::aux::toString(l_Init) << wxT("\"\n");
 			}
             l_sMarking = wxString::Format(wxT("%.0f"), ceil(l_Init));
             l_pcNode->GetAttribute(wxT("Marking"))->SetValueString(l_sMarking);
@@ -446,7 +446,7 @@ void SP_ImportSBML2sPn::getReactions ()
 
 				double l_sbmlStoichiometry = l_sbmlReactant->getStoichiometry();
 				wxString l_stoichiometry = wxString::Format(wxT("%.0f"), ceil(l_sbmlStoichiometry));
-				wxString l_comment = wxT("stoichiometry=\"") + dsszmc::aux::toString(l_sbmlStoichiometry) + wxT("\"\n");
+				wxString l_comment = wxT("stoichiometry=\"") + dssd::aux::toString(l_sbmlStoichiometry) + wxT("\"\n");
                 SP_DS_Edge* l_pcEdge = drawEdge(l_pcNode,l_reactionNode,SP_DS_EDGE,l_stoichiometry);
                 l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 				if(m_NormalizeStoichiometries)
@@ -475,7 +475,7 @@ void SP_ImportSBML2sPn::getReactions ()
 
 				double l_sbmlStoichiometry = l_sbmlProduct->getStoichiometry();
 				wxString l_stoichiometry = wxString::Format(wxT("%.0f"), ceil(l_sbmlStoichiometry));
-				wxString l_comment = wxT("stoichiometry=\"") + dsszmc::aux::toString(l_sbmlStoichiometry) + wxT("\"\n");
+				wxString l_comment = wxT("stoichiometry=\"") + dssd::aux::toString(l_sbmlStoichiometry) + wxT("\"\n");
 				SP_DS_Edge* l_pcEdge = drawEdge(l_reactionNode,l_pcNode,SP_DS_EDGE,l_stoichiometry);
 				l_pcEdge->GetAttribute(wxT("Comment"))->SetValueString(l_comment);
 				if(m_NormalizeStoichiometries)
@@ -580,7 +580,7 @@ void SP_ImportSBML2sPn::getModelCompartments()
 		wxString l_parameterValue;
 		if (l_sbmlCompartment->isSetSize())
 		{
-			l_parameterValue = dsszmc::aux::toString(l_sbmlCompartment->getSize());
+			l_parameterValue = dssd::aux::toString(l_sbmlCompartment->getSize());
 		}
 		else
 		{
@@ -644,7 +644,7 @@ void SP_ImportSBML2sPn::getModelParameters()
 		wxString l_parameterValue;
 		if (l_sbmlParameter->isSetValue())
 		{
-			l_parameterValue = dsszmc::aux::toString(l_sbmlParameter->getValue());
+			l_parameterValue = dssd::aux::toString(l_sbmlParameter->getValue());
 		}
 		else
 		{
@@ -713,7 +713,7 @@ void SP_ImportSBML2sPn::getReactionParameters(Reaction*  l_sbmlReaction, ASTNode
 		wxString l_parameterValue;
 		if (l_sbmlParameter->isSetValue())
 		{
-			l_parameterValue = dsszmc::aux::toString(l_sbmlParameter->getValue());
+			l_parameterValue = dssd::aux::toString(l_sbmlParameter->getValue());
 		}
 		else
 		{

@@ -8,7 +8,7 @@
 #include "export/SP_ExportCANDL_new.h"
 #include "sp_core/tools/SP_SimpleNetBuilder.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
-#include "dssz/candl/candl_writer.h"
+#include "dssd/candl/candl_writer.h"
 #include <wx/filename.h>
 #include <wx/wfstream.h>
 #include <wx/stdstream.h>
@@ -45,7 +45,7 @@ bool SP_ExportCANDL_new::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 	SP_ColoredNetBuilder builder;
 	if(builder(m_graph))
 	{
-		dsszmc::candl::writer{ builder.GetNet() }(m_fileName.ToStdString());
+		dssd::candl::writer{ builder.GetNet() }(m_fileName.ToStdString());
 	}
 	return !m_bError;
 }

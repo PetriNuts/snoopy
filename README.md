@@ -14,7 +14,7 @@ Snoopy
  * [Snoopy](https://github.com/PetriNuts/snoopy)
  * [SPSA_SteeringAPI](https://github.com/PetriNuts/SPSA_SteeringAPI)
  * [Snoopy simulator](https://github.com/PetriNuts/SP_Simulator)
- * [dssz_util](https://github.com/PetriNuts/dssz_util)
+ * [dssd_util](https://github.com/PetriNuts/dssd_util)
  * [wxWidgets](http://www.wxwidgets.org/)
  * [ogl](https://github.com/PetriNuts/ogl)
  * [freechart](https://github.com/PetriNuts/freechart)
@@ -42,7 +42,7 @@ Windows
 1. needed environment variables  
 	`$SPSA_STEERINGAPI = path of SPSA_SteeringAPI`  
 	`$SP_SIMULATOR = path of SP_Simulator`  
-	`$DSSZ_UTIL = path of dssz_util library`  
+	`$DSSD_UTIL = path of dssd_util library`
 	`$WXWIN = path of wxWidgets`  
 	`$OGL = path of ogl`  
 	`$FREECHART = path of freechart`  
@@ -123,12 +123,12 @@ Windows
 	1. open `($GECODEDIR)\build\gecode.sln` 
 	1. build *ALL_BUILD* for x64  as *Release* und *Debug*
 
-1. dssz_util
-	1. get dssz_util  
-	`git clone https://github.com/PetriNuts/dssz_util.git`
+1. dssd_util
+	1. get dssd_util  
+	`git clone https://github.com/PetriNuts/dssd_util.git`
 	1. create a folder *build* 
 	1. use cmake to create visual studio project files
-	1. open `($DSSZ_UTIL)\build\dssz_util.sln` 
+	1. open `($DSSD_UTIL)\build\dssd_util.sln`
 	1. build *ALL_BUILD* for x64  as *Release* und *Debug*
 
 1. SPSA_SteeringAPI
@@ -237,9 +237,9 @@ Build-Guide for Snoopy to compile under Mac OS X
 	`cmake ..`  
 	`make && sudo make install`
 
-1. dssz_util
-	1. get dssz_util  
-	`git clone https://github.com/PetriNuts/dssz_util.git`
+1. dssd_util
+	1. get dssd_util  
+	`git clone https://github.com/PetriNuts/dssd_util.git`
 	1. create a folder *build* 
 	1. go into *build* and run  
 	`cmake ..`  
@@ -357,9 +357,9 @@ Linux
 	`cmake ..`  
 	`make && sudo make install`
 
-1. dssz_util
-	1. get dssz_util  
-	`git clone https://github.com/PetriNuts/dssz_util.git`
+1. dssd_util
+	1. get dssd_util  
+	`git clone https://github.com/PetriNuts/dssd_util.git`
 	1. create a folder *build* 
 	1. go into *build* and run  
 	`cmake ..`  

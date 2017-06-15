@@ -29,7 +29,7 @@
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 
 #include <wx/ffile.h>
-#include <dssz/auxi/auxi.h>
+#include <dssd/auxi/auxi.h>
 
 #define ZERO 1e-14
 #define REALMAX 1.7e308
@@ -67,31 +67,31 @@ bool SP_DS_StSimFAU::AddToSimulationProperties(SP_DLG_SimulationProperties* p_pc
 
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add(new wxStaticText( p_pcDlg, -1, wxT("Max Lambda:") ), 1, wxALL | wxEXPAND, 5);
-	m_pcMaxLambdaTextCtrl = new wxTextCtrl( p_pcDlg, -1, dsszmc::aux::toString(m_nMaxLambda), wxDefaultPosition, wxDefaultSize, 0 );
+	m_pcMaxLambdaTextCtrl = new wxTextCtrl( p_pcDlg, -1, dssd::aux::toString(m_nMaxLambda), wxDefaultPosition, wxDefaultSize, 0 );
 	l_pcRowSizer->Add(m_pcMaxLambdaTextCtrl, 0, wxALL, 5);
 	p_pcSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL, 5);
 
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add(new wxStaticText( p_pcDlg, -1, wxT("Delta:") ), 1, wxALL | wxEXPAND, 5);
-	m_pcDeltaTextCtrl = new wxTextCtrl( p_pcDlg, -1, dsszmc::aux::toString(m_nDelta), wxDefaultPosition, wxDefaultSize, 0 );
+	m_pcDeltaTextCtrl = new wxTextCtrl( p_pcDlg, -1, dssd::aux::toString(m_nDelta), wxDefaultPosition, wxDefaultSize, 0 );
 	l_pcRowSizer->Add(m_pcDeltaTextCtrl, 0, wxALL, 5);
 	p_pcSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL, 5);
 
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add(new wxStaticText( p_pcDlg, -1, wxT("DeltaB:") ), 1, wxALL | wxEXPAND, 5);
-	m_pcDeltaBTextCtrl = new wxTextCtrl( p_pcDlg, -1, dsszmc::aux::toString(m_nDeltaB), wxDefaultPosition, wxDefaultSize, 0 );
+	m_pcDeltaBTextCtrl = new wxTextCtrl( p_pcDlg, -1, dssd::aux::toString(m_nDeltaB), wxDefaultPosition, wxDefaultSize, 0 );
 	l_pcRowSizer->Add(m_pcDeltaBTextCtrl, 0, wxALL, 5);
 	p_pcSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL, 5);
 
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add(new wxStaticText( p_pcDlg, -1, wxT("Tolerance:") ), 1, wxALL | wxEXPAND, 5);
-	m_pcTolerenceTextCtrl = new wxTextCtrl( p_pcDlg, -1, dsszmc::aux::toString(m_nTolerance), wxDefaultPosition, wxDefaultSize, 0 );
+	m_pcTolerenceTextCtrl = new wxTextCtrl( p_pcDlg, -1, dssd::aux::toString(m_nTolerance), wxDefaultPosition, wxDefaultSize, 0 );
 	l_pcRowSizer->Add(m_pcTolerenceTextCtrl, 0, wxALL, 5);
 	p_pcSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL, 5);
 
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add(new wxStaticText( p_pcDlg, -1, wxT("Epsilon:") ), 1, wxALL | wxEXPAND, 5);
-	m_pcEpsilonTextCtrl = new wxTextCtrl( p_pcDlg, -1, dsszmc::aux::toString(m_nEpsilon), wxDefaultPosition, wxDefaultSize, 0 );
+	m_pcEpsilonTextCtrl = new wxTextCtrl( p_pcDlg, -1, dssd::aux::toString(m_nEpsilon), wxDefaultPosition, wxDefaultSize, 0 );
 	l_pcRowSizer->Add(m_pcEpsilonTextCtrl, 0, wxALL, 5);
 	p_pcSizer->Add(l_pcRowSizer, 1, wxEXPAND | wxALL, 5);
 

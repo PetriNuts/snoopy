@@ -107,7 +107,7 @@ double SP_WDG_SpinCtrlDouble::GetValue()
 }
 wxString SP_WDG_SpinCtrlDouble::GetStringValue()
 {
-	return dsszmc::aux::toString(m_dwValue);
+	return dssd::aux::toString(m_dwValue);
 }
 wxTextCtrl *SP_WDG_SpinCtrlDouble::GetText()
 {

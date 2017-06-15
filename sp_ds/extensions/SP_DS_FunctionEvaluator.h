@@ -8,8 +8,8 @@
 #ifndef SP_DS_FUNCTIONEVALUATOR_H_
 #define SP_DS_FUNCTIONEVALUATOR_H_
 
-#include "dssz/functions/eval/sim_evaluator.h"
-#include "dssz/functions/function_arguments.h"
+#include "dssd/functions/eval/sim_evaluator.h"
+#include "dssd/functions/function_arguments.h"
 #include "sp_core/SP_Core.h"
 #include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
 #include "sp_ds/SP_DS_Node.h"
@@ -23,8 +23,8 @@ class SP_DS_FunctionEvaluator
 {
 	using ValueT = T;
 	using ArgumentT = std::vector<T>;
-	using FunctionT = dsszmc::functions::SimulatorFunction;
-	using EvalT = dsszmc::functions::GenericEvaluator<ValueT, ArgumentT, FunctionT>;
+	using FunctionT = dssd::functions::SimulatorFunction;
+	using EvalT = dssd::functions::GenericEvaluator<ValueT, ArgumentT, FunctionT>;
 	public:
 	SP_DS_FunctionEvaluator(SP_DS_FunctionRegistry* p_FunctionRegistry, SP_FunctionPtr p_Function, ValueT p_Default = 0):
 		m_FunctionRegistry(p_FunctionRegistry), m_Function(p_Function), m_Default(p_Default)
@@ -72,7 +72,7 @@ class SP_DS_FunctionEvaluator
 				SP_FunctionPtr f = m_FunctionRegistry->substituteFunctions(m_Function);
 				ArgumentT tmp;
 
-				dsszmc::functions::Name2Id l_Places;
+				dssd::functions::Name2Id l_Places;
 				const SP_ListEdge* l_plEdges = p_pcTrans->GetTargetEdges();
 				SP_ListEdge::const_iterator it = l_plEdges->begin();
 				SP_ListEdge::const_iterator end = l_plEdges->end();
@@ -104,7 +104,7 @@ class SP_DS_FunctionEvaluator
 				}
 
 				//TODO: check this option
-				dsszmc::functions::convertOptions co;
+				dssd::functions::convertOptions co;
 				f->setVariableIds(l_Places, co);
 				//wxString l_sF(f->toString().c_str(), wxConvUTF8);
 				//SP_LOGMESSAGE( l_sF);

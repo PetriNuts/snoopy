@@ -18,8 +18,8 @@
 #include "sp_ds/attributes/SP_DS_TextAttribute.h"
 #include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 
-#include "dssz/andl/andl_builder.h"
-#include "dssz/auxi/auxi.h"
+#include "dssd/andl/andl_builder.h"
+#include "dssd/auxi/auxi.h"
 
 #include <wx/filename.h>
 #include <wx/tokenzr.h>
@@ -34,43 +34,43 @@ bool SP_SimpleNetBuilder::operator ()(SP_DS_Graph* p_pcGraph)
 	bool l_bFinish = true;
 	try
 	{
-		dsszmc::andl::simple_net_builder b;
+		dssd::andl::simple_net_builder b;
 		if(m_pcGraph->GetNetclass()->GetName() == SP_DS_PN_CLASS)
 		{
-			b.setType(dsszmc::andl::NetType::PN_T);
+			b.setType(dssd::andl::NetType::PN_T);
 		}
 		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_EXTPN_CLASS)
 		{
-			b.setType(dsszmc::andl::NetType::XPN_T);
+			b.setType(dssd::andl::NetType::XPN_T);
 		}
 		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_SPN_CLASS)
 		{
 			if(!m_pcGraph->GetNodeclass(SP_DS_DETERMINISTIC_TRANS)->GetElements()->empty()
 				|| !m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS)->GetElements()->empty())
 			{
-				b.setType(dsszmc::andl::NetType::XSPN_T);
+				b.setType(dssd::andl::NetType::XSPN_T);
 			}
 			else if(!m_pcGraph->GetNodeclass(SP_DS_IMMEDIATE_TRANS)->GetElements()->empty())
 			{
-				b.setType(dsszmc::andl::NetType::GSPN_T);
+				b.setType(dssd::andl::NetType::GSPN_T);
 			}
 			else
 			{
-				b.setType(dsszmc::andl::NetType::SPN_T);
+				b.setType(dssd::andl::NetType::SPN_T);
 
 			}
 		}
 		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_CONTINUOUSPED_CLASS)
 		{
-			b.setType(dsszmc::andl::NetType::CPN_T);
+			b.setType(dssd::andl::NetType::CPN_T);
 		}
 		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_HYBRIDPN_CLASS)
 		{
-			b.setType(dsszmc::andl::NetType::HPN_T);
+			b.setType(dssd::andl::NetType::HPN_T);
 		}
 		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_TIMEPN_CLASS)
 		{
-			b.setType(dsszmc::andl::NetType::TPN_T);
+			b.setType(dssd::andl::NetType::TPN_T);
 		}
 		else
 		{
@@ -109,7 +109,7 @@ bool SP_SimpleNetBuilder::operator ()(SP_DS_Graph* p_pcGraph)
 	return l_bFinish;
 }
 
-bool SP_SimpleNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
+bool SP_SimpleNetBuilder::CreatePlaces(dssd::andl::simple_net_builder& b)
 {
 	for(SP_DS_Nodeclass* NC : *(m_pcGraph->GetNodeclasses()))
 	{
@@ -117,17 +117,17 @@ bool SP_SimpleNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
 		if(l_sNCName.Find(wxT("Place")) != wxNOT_FOUND
 			&& l_sNCName.Find(wxT("Coarse")) == wxNOT_FOUND)
 		{
-			auto l_Type = dsszmc::andl::PlType::DEFAULT_T;
+			auto l_Type = dssd::andl::PlType::DEFAULT_T;
 			if(l_sNCName.Find(' ') != wxNOT_FOUND && !NC->GetElements()->empty())
 			{
 				wxString l_sType = l_sNCName.BeforeFirst(' ').Lower();
 				if(l_sType == wxT("discrete"))
 				{
-					l_Type = dsszmc::andl::PlType::DISCRETE_T;
+					l_Type = dssd::andl::PlType::DISCRETE_T;
 				}
 				else if(l_sType == wxT("continuous"))
 				{
-					l_Type = dsszmc::andl::PlType::CONTINUOUS_T;
+					l_Type = dssd::andl::PlType::CONTINUOUS_T;
 				}
 			}
 			for(SP_DS_Node* l_pcNode : *(NC->GetElements()))
@@ -144,7 +144,7 @@ bool SP_SimpleNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
 				{
 					l_sMarking = l_pcNode->GetAttribute(wxT("Marking"))->GetValueString();
 				}
-				auto p = std::make_shared<dsszmc::andl::Place>(l_Type, l_sName, l_sMarking);
+				auto p = std::make_shared<dssd::andl::Place>(l_Type, l_sName, l_sMarking);
 				l_pcAttr = l_pcNode->GetAttribute(wxT("Fixed"));
 				if(l_pcAttr)
 				{
@@ -158,7 +158,7 @@ bool SP_SimpleNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
 	return TRUE;
 }
 
-bool SP_SimpleNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b)
+bool SP_SimpleNetBuilder::CreateTransitions(dssd::andl::simple_net_builder& b)
 {
 	for(SP_DS_Nodeclass* NC : *(m_pcGraph->GetNodeclasses()))
 	{
@@ -166,43 +166,43 @@ bool SP_SimpleNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b)
 		if(l_sNCName.Find(wxT("Transition")) != wxNOT_FOUND
 			&& l_sNCName.Find(wxT("Coarse")) == wxNOT_FOUND)
 		{
-			auto l_Type = dsszmc::andl::TrType::DEFAULT_T;
+			auto l_Type = dssd::andl::TrType::DEFAULT_T;
 			if(l_sNCName.Find(' ') != wxNOT_FOUND && !NC->GetElements()->empty())
 			{
 				wxString l_sType = l_sNCName.BeforeFirst(' ').Lower();
 				if(l_sType == wxT("stochastic"))
 				{
-					l_Type = dsszmc::andl::TrType::STOCHASTIC_T;
+					l_Type = dssd::andl::TrType::STOCHASTIC_T;
 				}
 				else if(l_sType == wxT("immediate"))
 				{
-					l_Type = dsszmc::andl::TrType::IMMEDIATE_T;
+					l_Type = dssd::andl::TrType::IMMEDIATE_T;
 				}
 				else if(l_sType == wxT("deterministic"))
 				{
-					l_Type = dsszmc::andl::TrType::DETERMINISTIC_T;
+					l_Type = dssd::andl::TrType::DETERMINISTIC_T;
 				}
 				else if(l_sType == wxT("scheduled"))
 				{
-					l_Type = dsszmc::andl::TrType::SCHEDULED_T;
+					l_Type = dssd::andl::TrType::SCHEDULED_T;
 				}
 				else if(l_sType == wxT("continuous"))
 				{
-					l_Type = dsszmc::andl::TrType::CONTINUOUS_T;
+					l_Type = dssd::andl::TrType::CONTINUOUS_T;
 				}
 			}
 			for(SP_DS_Node* l_pcNode : *(NC->GetElements()))
 			{
 				std::string l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 
-				auto t = make_shared<dsszmc::andl::Transition>(l_Type, l_sName);
+				auto t = make_shared<dssd::andl::Transition>(l_Type, l_sName);
 
 				for(SP_DS_Edge* l_pcEdge : *(l_pcNode->GetSourceEdges()))
 				{
 					SP_DS_Node* l_pcTarget = dynamic_cast<SP_DS_Node*>(l_pcEdge->GetTarget());
 					std::string l_sTarget = dynamic_cast<SP_DS_NameAttribute*>(l_pcTarget->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 					std::string l_sMult = l_pcEdge->GetAttribute(wxT("Multiplicity"))->GetValueString();
-					auto u = make_shared<dsszmc::andl::Update>(l_sTarget, '+', l_sMult);
+					auto u = make_shared<dssd::andl::Update>(l_sTarget, '+', l_sMult);
 					t->updates_->push_back(u);
 				}
 
@@ -213,7 +213,7 @@ bool SP_SimpleNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b)
 					if(l_pcEdge->GetClassName() == SP_DS_EDGE)
 					{
 						std::string l_sMult = l_pcEdge->GetAttribute(wxT("Multiplicity"))->GetValueString();
-						auto u = make_shared<dsszmc::andl::Update>(l_sSource, '-', l_sMult);
+						auto u = make_shared<dssd::andl::Update>(l_sSource, '-', l_sMult);
 						t->updates_->push_back(u);
 					}
 					else if(l_pcEdge->GetClassName() == SP_DS_RESET_EDGE)
@@ -221,40 +221,40 @@ bool SP_SimpleNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b)
 						bool found = false;
 						for(auto u : *(t->updates_))
 						{
-							if(u->place_ == l_sSource && u->type_ == dsszmc::andl::UpdateType::INCREASE_T)
+							if(u->place_ == l_sSource && u->type_ == dssd::andl::UpdateType::INCREASE_T)
 							{
 								u->op_ = '=';
-								u->type_ = dsszmc::andl::UpdateType::ASSIGN_T;
+								u->type_ = dssd::andl::UpdateType::ASSIGN_T;
 								found = true;
 							}
 						}
 						if(!found)
 						{
-							auto u = make_shared<dsszmc::andl::Update>(l_sSource, '=', "0");
+							auto u = make_shared<dssd::andl::Update>(l_sSource, '=', "0");
 							t->updates_->push_back(u);
 						}
 					}
 					else if(l_pcEdge->GetClassName() == SP_DS_READ_EDGE)
 					{
 						std::string l_sMult = l_pcEdge->GetAttribute(wxT("Multiplicity"))->GetValueString();
-						auto c = make_shared<dsszmc::andl::Condition>(l_sSource, l_sMult, dsszmc::andl::CondType::READ_T);
+						auto c = make_shared<dssd::andl::Condition>(l_sSource, l_sMult, dssd::andl::CondType::READ_T);
 						t->conditions_->push_back(c);
 					}
 					else if(l_pcEdge->GetClassName() == SP_DS_INHIBITOR_EDGE)
 					{
 						std::string l_sMult = l_pcEdge->GetAttribute(wxT("Multiplicity"))->GetValueString();
-						auto c = make_shared<dsszmc::andl::Condition>(l_sSource, l_sMult, dsszmc::andl::CondType::INHIBITOR_T);
+						auto c = make_shared<dssd::andl::Condition>(l_sSource, l_sMult, dssd::andl::CondType::INHIBITOR_T);
 						t->conditions_->push_back(c);
 					}
 					else if(l_pcEdge->GetClassName() == SP_DS_EQUAL_EDGE)
 					{
 						std::string l_sMult = l_pcEdge->GetAttribute(wxT("Multiplicity"))->GetValueString();
-						auto c = make_shared<dsszmc::andl::Condition>(l_sSource, l_sMult, dsszmc::andl::CondType::EQUAL_T);
+						auto c = make_shared<dssd::andl::Condition>(l_sSource, l_sMult, dssd::andl::CondType::EQUAL_T);
 						t->conditions_->push_back(c);
 					}
 					else if(l_pcEdge->GetClassName() == SP_DS_MODIFIER_EDGE)
 					{
-						auto c = make_shared<dsszmc::andl::Condition>(l_sSource, "", dsszmc::andl::CondType::MODIFIER_T);
+						auto c = make_shared<dssd::andl::Condition>(l_sSource, "", dssd::andl::CondType::MODIFIER_T);
 						t->conditions_->push_back(c);
 					}
 
@@ -295,7 +295,7 @@ bool SP_SimpleNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b)
 	return TRUE;
 }
 
-bool SP_SimpleNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
+bool SP_SimpleNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b)
 {
 	// for the new constants
 	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
@@ -318,11 +318,11 @@ bool SP_SimpleNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
 		//create constants
 		for (SP_DS_Metadata* l_pcMetadata : *(mc->GetElements()))
 		{
-			auto type = dsszmc::andl::ConstType::INT_T;
+			auto type = dssd::andl::ConstType::INT_T;
 			wxString l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
 			if(l_sType == wxT("double"))
 			{
-				type = dsszmc::andl::ConstType::DOUBLE_T;
+				type = dssd::andl::ConstType::DOUBLE_T;
 			}
 			std::string l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 			std::string l_sGroup = l_pcMetadata->GetAttribute(wxT("Group"))->GetValueString();
@@ -335,7 +335,7 @@ bool SP_SimpleNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
 				std::string l_sValue = l_pcColList->GetCell(i, 1);
 				values.push_back(l_sValue);
 			}
-			auto c = make_shared<dsszmc::andl::Constant>(type, l_sName, l_sGroup, values);
+			auto c = make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);
 			b.addConstant(c);
 		}
 	}
@@ -343,7 +343,7 @@ bool SP_SimpleNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
 	return TRUE;
 }
 
-bool SP_SimpleNetBuilder::CreateFunctions(dsszmc::andl::simple_net_builder& b)
+bool SP_SimpleNetBuilder::CreateFunctions(dssd::andl::simple_net_builder& b)
 {
 	// for the functions
 	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);
@@ -354,14 +354,14 @@ bool SP_SimpleNetBuilder::CreateFunctions(dsszmc::andl::simple_net_builder& b)
 			std::string l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 			std::string l_sParam = l_pcMetadata->GetAttribute(wxT("Parameter"))->GetValueString();
 			std::string l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
-			auto f = make_shared<dsszmc::andl::Function>(l_sName, l_sParam, l_sBody);
+			auto f = make_shared<dssd::andl::Function>(l_sName, l_sParam, l_sBody);
 			b.addFunction(f);
 		}
 	}
 	return true;
 }
 
-bool SP_SimpleNetBuilder::CreateObservers(dsszmc::andl::simple_net_builder& b)
+bool SP_SimpleNetBuilder::CreateObservers(dssd::andl::simple_net_builder& b)
 {
 	//TODO
 	return true;
@@ -378,39 +378,39 @@ bool SP_ColoredNetBuilder::operator ()(SP_DS_Graph* p_pcGraph)
 
 	try
 	{
-		dsszmc::andl::simple_net_builder b;
+		dssd::andl::simple_net_builder b;
 		if(m_pcGraph->GetNetclass()->GetName() == SP_DS_COLPN_CLASS)
 		{
-			b.setType(dsszmc::andl::NetType::COL_PN_T);
+			b.setType(dssd::andl::NetType::COL_PN_T);
 		}
 		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_COLEPN_CLASS)
 		{
-			b.setType(dsszmc::andl::NetType::COL_XPN_T);
+			b.setType(dssd::andl::NetType::COL_XPN_T);
 		}
 		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_COLSPN_CLASS)
 		{
 			if(!m_pcGraph->GetNodeclass(SP_DS_DETERMINISTIC_TRANS)->GetElements()->empty()
 				|| !m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS)->GetElements()->empty())
 			{
-				b.setType(dsszmc::andl::NetType::COL_XSPN_T);
+				b.setType(dssd::andl::NetType::COL_XSPN_T);
 			}
 			else if(!m_pcGraph->GetNodeclass(SP_DS_IMMEDIATE_TRANS)->GetElements()->empty())
 			{
-				b.setType(dsszmc::andl::NetType::COL_GSPN_T);
+				b.setType(dssd::andl::NetType::COL_GSPN_T);
 			}
 			else
 			{
-				b.setType(dsszmc::andl::NetType::COL_SPN_T);
+				b.setType(dssd::andl::NetType::COL_SPN_T);
 
 			}
 		}
 		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_COLCPN_CLASS)
 		{
-			b.setType(dsszmc::andl::NetType::COL_CPN_T);
+			b.setType(dssd::andl::NetType::COL_CPN_T);
 		}
 		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_COLHPN_CLASS)
 		{
-			b.setType(dsszmc::andl::NetType::COL_HPN_T);
+			b.setType(dssd::andl::NetType::COL_HPN_T);
 		}
 		else
 		{
@@ -451,7 +451,7 @@ bool SP_ColoredNetBuilder::operator ()(SP_DS_Graph* p_pcGraph)
 	return l_bFinish;
 }
 
-bool SP_ColoredNetBuilder::CreateVariables(dsszmc::andl::simple_net_builder& b)
+bool SP_ColoredNetBuilder::CreateVariables(dssd::andl::simple_net_builder& b)
 {
 	if(!m_pcGraph)
 		return false;
@@ -473,14 +473,14 @@ bool SP_ColoredNetBuilder::CreateVariables(dsszmc::andl::simple_net_builder& b)
 	{
 		std::string name = l_pcColList->GetCell(i,0);
 		std::string colorset = l_pcColList->GetCell(i,1);
-		auto v = std::make_shared<dsszmc::andl::Variable>(name, colorset);
+		auto v = std::make_shared<dssd::andl::Variable>(name, colorset);
 		b.addVariable(v);
 	}
 
 	return true;
 }
 
-bool SP_ColoredNetBuilder::CreateColorsets(dsszmc::andl::simple_net_builder& b)
+bool SP_ColoredNetBuilder::CreateColorsets(dssd::andl::simple_net_builder& b)
 {
 	if(!m_pcGraph)
 		return false;
@@ -503,23 +503,23 @@ bool SP_ColoredNetBuilder::CreateColorsets(dsszmc::andl::simple_net_builder& b)
 		std::string name = l_pcColList->GetCell(i,0);
 		std::string type = l_pcColList->GetCell(i,1);
 		std::string value = "{" + l_pcColList->GetCell(i,2) + "}";
-		dsszmc::aux::replaceAll(value, "-", "..");
-		auto cs = std::make_shared<dsszmc::andl::Colorset>(name, value);
+		dssd::aux::replaceAll(value, "-", "..");
+		auto cs = std::make_shared<dssd::andl::Colorset>(name, value);
 		if(type == wxT("dot"))
 		{
-			cs->type_ = dsszmc::andl::ColorsetType::DOT_T;
+			cs->type_ = dssd::andl::ColorsetType::DOT_T;
 		}
 		else if(type == wxT("int"))
 		{
-			cs->type_ = dsszmc::andl::ColorsetType::INT_T;
+			cs->type_ = dssd::andl::ColorsetType::INT_T;
 		}
 		else if(type == wxT("enum"))
 		{
-			cs->type_ = dsszmc::andl::ColorsetType::ENUM_T;
+			cs->type_ = dssd::andl::ColorsetType::ENUM_T;
 		}
 		else if(type == wxT("string"))
 		{
-			cs->type_ = dsszmc::andl::ColorsetType::STRING_T;
+			cs->type_ = dssd::andl::ColorsetType::STRING_T;
 		}
 		b.addColorset(cs);
 	}
@@ -545,25 +545,25 @@ bool SP_ColoredNetBuilder::CreateColorsets(dsszmc::andl::simple_net_builder& b)
 		if(type == "product")
 		{
 			type = type.substr(0,4);
-			value = dsszmc::aux::toUpper(type) + "(" + value + ")";
+			value = dssd::aux::toUpper(type) + "(" + value + ")";
 		}
 		else if(type == "union")
 		{
-			dsszmc::aux::replaceAll(value, ",", "+");
+			dssd::aux::replaceAll(value, ",", "+");
 		}
 		else
 		{
 			value = type + "[" + value + "]";
 		}
-		dsszmc::aux::replaceAll(value, "<>", "!=");
-		auto cs = std::make_shared<dsszmc::andl::Colorset>(name, value);
+		dssd::aux::replaceAll(value, "<>", "!=");
+		auto cs = std::make_shared<dssd::andl::Colorset>(name, value);
 		b.addColorset(cs);
 	}
 
 	return true;
 }
 
-bool SP_ColoredNetBuilder::CreateColorFunctions(dsszmc::andl::simple_net_builder& b)
+bool SP_ColoredNetBuilder::CreateColorFunctions(dssd::andl::simple_net_builder& b)
 {
 	if(!m_pcGraph)
 		return false;
@@ -587,8 +587,8 @@ bool SP_ColoredNetBuilder::CreateColorFunctions(dsszmc::andl::simple_net_builder
 		std::string name = l_pcColList->GetCell(i,1);
 		std::string param = l_pcColList->GetCell(i,2);
 		std::vector<std::string> tmp;
-		dsszmc::aux::tokenize(param, tmp, ",");
-		dsszmc::andl::ColorFunction::Params params;
+		dssd::aux::tokenize(param, tmp, ",");
+		dssd::andl::ColorFunction::Params params;
 		for(auto& s : tmp)
 		{
 			// different member versions of find in the same order as above:
@@ -599,14 +599,14 @@ bool SP_ColoredNetBuilder::CreateColorFunctions(dsszmc::andl::simple_net_builder
 			}
 		}
 		std::string body = l_pcColList->GetCell(i,3);
-		dsszmc::aux::replaceAll(body, "<>", "!=");
-		auto f = std::make_shared<dsszmc::andl::ColorFunction>(name, type, params, body);
+		dssd::aux::replaceAll(body, "<>", "!=");
+		auto f = std::make_shared<dssd::andl::ColorFunction>(name, type, params, body);
 		b.addColorFunction(f);
 	}
 	return true;
 }
 
-bool SP_ColoredNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
+bool SP_ColoredNetBuilder::CreatePlaces(dssd::andl::simple_net_builder& b)
 {
 	for(SP_DS_Nodeclass* NC : *(m_pcGraph->GetNodeclasses()))
 	{
@@ -614,13 +614,13 @@ bool SP_ColoredNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
 		if(l_sNCName.Find(wxT("Place")) != wxNOT_FOUND
 			&& l_sNCName.Find(wxT("Coarse")) == wxNOT_FOUND)
 		{
-			auto l_Type = dsszmc::andl::PlType::DISCRETE_T;
+			auto l_Type = dssd::andl::PlType::DISCRETE_T;
 			if(l_sNCName.Find(' ') != wxNOT_FOUND && !NC->GetElements()->empty())
 			{
 				wxString l_sType = l_sNCName.BeforeFirst(' ').Lower();
 				if(l_sType == wxT("continuous"))
 				{
-					l_Type = dsszmc::andl::PlType::CONTINUOUS_T;
+					l_Type = dssd::andl::PlType::CONTINUOUS_T;
 				}
 			}
 			for(SP_DS_Node* l_pcNode : *(NC->GetElements()))
@@ -656,10 +656,10 @@ bool SP_ColoredNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
 				{
 					l_sMarking = l_pcNode->GetAttribute(wxT("Marking"))->GetValueString();
 				}
-				dsszmc::aux::replaceAll(l_sMarking, "all()", "all");
-				dsszmc::aux::replaceAll(l_sMarking, "auto()", "auto");
-				dsszmc::aux::replaceAll(l_sMarking, "<>", "!=");
-				auto p = std::make_shared<dsszmc::andl::Place>(l_Type, l_sName, l_sMarking, l_sColorset);
+				dssd::aux::replaceAll(l_sMarking, "all()", "all");
+				dssd::aux::replaceAll(l_sMarking, "auto()", "auto");
+				dssd::aux::replaceAll(l_sMarking, "<>", "!=");
+				auto p = std::make_shared<dssd::andl::Place>(l_Type, l_sName, l_sMarking, l_sColorset);
 				SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("Fixed"));
 				if(l_pcAttr)
 				{
@@ -673,7 +673,7 @@ bool SP_ColoredNetBuilder::CreatePlaces(dsszmc::andl::simple_net_builder& b)
 	return TRUE;
 }
 
-bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b)
+bool SP_ColoredNetBuilder::CreateTransitions(dssd::andl::simple_net_builder& b)
 {
 	for(SP_DS_Nodeclass* NC : *(m_pcGraph->GetNodeclasses()))
 	{
@@ -681,36 +681,36 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 		if(l_sNCName.Find(wxT("Transition")) != wxNOT_FOUND
 			&& l_sNCName.Find(wxT("Coarse")) == wxNOT_FOUND)
 		{
-			auto l_Type = dsszmc::andl::TrType::DEFAULT_T;
+			auto l_Type = dssd::andl::TrType::DEFAULT_T;
 			if(l_sNCName.Find(' ') != wxNOT_FOUND && !NC->GetElements()->empty())
 			{
 				wxString l_sType = l_sNCName.BeforeFirst(' ').Lower();
 				if(l_sType == wxT("stochastic"))
 				{
-					l_Type = dsszmc::andl::TrType::STOCHASTIC_T;
+					l_Type = dssd::andl::TrType::STOCHASTIC_T;
 				}
 				else if(l_sType == wxT("immediate"))
 				{
-					l_Type = dsszmc::andl::TrType::IMMEDIATE_T;
+					l_Type = dssd::andl::TrType::IMMEDIATE_T;
 				}
 				else if(l_sType == wxT("deterministic"))
 				{
-					l_Type = dsszmc::andl::TrType::DETERMINISTIC_T;
+					l_Type = dssd::andl::TrType::DETERMINISTIC_T;
 				}
 				else if(l_sType == wxT("scheduled"))
 				{
-					l_Type = dsszmc::andl::TrType::SCHEDULED_T;
+					l_Type = dssd::andl::TrType::SCHEDULED_T;
 				}
 				else if(l_sType == wxT("continuous"))
 				{
-					l_Type = dsszmc::andl::TrType::CONTINUOUS_T;
+					l_Type = dssd::andl::TrType::CONTINUOUS_T;
 				}
 			}
 			for(SP_DS_Node* l_pcNode : *(NC->GetElements()))
 			{
 				std::string l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 
-				auto t = make_shared<dsszmc::andl::Transition>(l_Type, l_sName);
+				auto t = make_shared<dssd::andl::Transition>(l_Type, l_sName);
 
 				//guard
 				SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(SP_DS_CPN_GUARDLIST);
@@ -721,9 +721,9 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 					l_sGuard.Trim(true).Trim(false);
 					if(!l_sGuard.IsEmpty() && l_sGuard.CmpNoCase(wxT("true")) != 0)
 						t->guard_ = "[" + l_sGuard + "]";
-					dsszmc::aux::replaceAll(t->guard_, "all()", "all");
-					dsszmc::aux::replaceAll(t->guard_, "auto()", "auto");
-					dsszmc::aux::replaceAll(t->guard_, "<>", "!=");
+					dssd::aux::replaceAll(t->guard_, "all()", "all");
+					dssd::aux::replaceAll(t->guard_, "auto()", "auto");
+					dssd::aux::replaceAll(t->guard_, "<>", "!=");
 				}
 
 				for(SP_DS_Edge* l_pcEdge : *(l_pcNode->GetSourceEdges()))
@@ -732,11 +732,11 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 					std::string l_sTarget = dynamic_cast<SP_DS_NameAttribute*>(l_pcTarget->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcEdge->GetAttribute(SP_DS_CPN_INSCRIPTION));
 					std::string l_sInscr = l_pcColList->GetActiveCellValue(1);
-					dsszmc::aux::replaceAll(l_sInscr, "all()", "all");
-					dsszmc::aux::replaceAll(l_sInscr, "auto()", "auto");
-					dsszmc::aux::replaceAll(l_sInscr, "<>", "!=");
+					dssd::aux::replaceAll(l_sInscr, "all()", "all");
+					dssd::aux::replaceAll(l_sInscr, "auto()", "auto");
+					dssd::aux::replaceAll(l_sInscr, "<>", "!=");
 
-					auto u = make_shared<dsszmc::andl::Update>(l_sTarget, '+', l_sInscr);
+					auto u = make_shared<dssd::andl::Update>(l_sTarget, '+', l_sInscr);
 					t->updates_->push_back(u);
 				}
 
@@ -746,38 +746,38 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 					std::string l_sSource = dynamic_cast<SP_DS_NameAttribute*>(l_pcSource->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcEdge->GetAttribute(SP_DS_CPN_INSCRIPTION));
 					std::string l_sInscr = l_pcColList->GetActiveCellValue(1);
-					dsszmc::aux::replaceAll(l_sInscr, "all()", "all");
-					dsszmc::aux::replaceAll(l_sInscr, "auto()", "auto");
-					dsszmc::aux::replaceAll(l_sInscr, "<>", "!=");
+					dssd::aux::replaceAll(l_sInscr, "all()", "all");
+					dssd::aux::replaceAll(l_sInscr, "auto()", "auto");
+					dssd::aux::replaceAll(l_sInscr, "<>", "!=");
 
 					if(l_pcEdge->GetClassName() == SP_DS_EDGE)
 					{
-						auto u = make_shared<dsszmc::andl::Update>(l_sSource, '-', l_sInscr);
+						auto u = make_shared<dssd::andl::Update>(l_sSource, '-', l_sInscr);
 						t->updates_->push_back(u);
 					}
 					else if(l_pcEdge->GetClassName() == SP_DS_RESET_EDGE)
 					{
-						auto u = make_shared<dsszmc::andl::Update>(l_sSource, '=', l_sInscr);
+						auto u = make_shared<dssd::andl::Update>(l_sSource, '=', l_sInscr);
 						t->updates_->push_back(u);
 					}
 					else if(l_pcEdge->GetClassName() == SP_DS_READ_EDGE)
 					{
-						auto c = make_shared<dsszmc::andl::Condition>(l_sSource, l_sInscr, dsszmc::andl::CondType::READ_T);
+						auto c = make_shared<dssd::andl::Condition>(l_sSource, l_sInscr, dssd::andl::CondType::READ_T);
 						t->conditions_->push_back(c);
 					}
 					else if(l_pcEdge->GetClassName() == SP_DS_INHIBITOR_EDGE)
 					{
-						auto c = make_shared<dsszmc::andl::Condition>(l_sSource, l_sInscr, dsszmc::andl::CondType::INHIBITOR_T);
+						auto c = make_shared<dssd::andl::Condition>(l_sSource, l_sInscr, dssd::andl::CondType::INHIBITOR_T);
 						t->conditions_->push_back(c);
 					}
 					else if(l_pcEdge->GetClassName() == SP_DS_EQUAL_EDGE)
 					{
-						auto c = make_shared<dsszmc::andl::Condition>(l_sSource, l_sInscr, dsszmc::andl::CondType::EQUAL_T);
+						auto c = make_shared<dssd::andl::Condition>(l_sSource, l_sInscr, dssd::andl::CondType::EQUAL_T);
 						t->conditions_->push_back(c);
 					}
 					else if(l_pcEdge->GetClassName() == SP_DS_MODIFIER_EDGE)
 					{
-						auto c = make_shared<dsszmc::andl::Condition>(l_sSource, l_sInscr, dsszmc::andl::CondType::MODIFIER_T);
+						auto c = make_shared<dssd::andl::Condition>(l_sSource, l_sInscr, dssd::andl::CondType::MODIFIER_T);
 						t->conditions_->push_back(c);
 					}
 				}
@@ -856,9 +856,9 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 					}
 				}
 				t->function_ = l_sFunction;
-				dsszmc::aux::replaceAll(t->function_, "all()", "all");
-				dsszmc::aux::replaceAll(t->function_, "auto()", "auto");
-				dsszmc::aux::replaceAll(t->function_, "<>", "!=");
+				dssd::aux::replaceAll(t->function_, "all()", "all");
+				dssd::aux::replaceAll(t->function_, "auto()", "auto");
+				dssd::aux::replaceAll(t->function_, "<>", "!=");
 
 				l_pcAttr = l_pcNode->GetAttribute(wxT("Reversible"));
 				if(l_pcAttr)
@@ -874,7 +874,7 @@ bool SP_ColoredNetBuilder::CreateTransitions(dsszmc::andl::simple_net_builder& b
 	return TRUE;
 }
 
-bool SP_ColoredNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
+bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b)
 {
 	if(!m_pcGraph)
 		return false;
@@ -897,17 +897,17 @@ bool SP_ColoredNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
 		std::string name = l_pcColList->GetCell(i,0);
 		wxString l_sType = l_pcColList->GetCell(i,1);
 		std::string value = l_pcColList->GetCell(i,2);
-		auto type = dsszmc::andl::ConstType::INT_T;
+		auto type = dssd::andl::ConstType::INT_T;
 		if(l_sType == wxT("double"))
 		{
-			type = dsszmc::andl::ConstType::DOUBLE_T;
+			type = dssd::andl::ConstType::DOUBLE_T;
 		}
 		else if(l_sType != "int")
 		{
 			continue;
 		}
 		std::vector<std::string> values = {value};
-		auto c = std::make_shared<dsszmc::andl::Constant>(type, name, "all", values);
+		auto c = std::make_shared<dssd::andl::Constant>(type, name, "all", values);
 		b.addConstant(c);
 	}
 
@@ -930,7 +930,7 @@ bool SP_ColoredNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
 		}
 		for(SP_DS_Node* l_pcNode : *l_pcNC->GetElements())
 		{
-			auto type = dsszmc::andl::ConstType::DOUBLE_T;
+			auto type = dssd::andl::ConstType::DOUBLE_T;
 			std::string name = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 			SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("ParameterList")));
 			std::vector<std::string> values;
@@ -940,7 +940,7 @@ bool SP_ColoredNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
 				std::string l_sValue = l_pcColList->GetCell(i, 1);
 				values.push_back(l_sValue);
 			}
-			auto c = make_shared<dsszmc::andl::Constant>(type, name, "param", values);
+			auto c = make_shared<dssd::andl::Constant>(type, name, "param", values);
 			b.addConstant(c);
 		}
 	}
@@ -948,7 +948,7 @@ bool SP_ColoredNetBuilder::CreateConstants(dsszmc::andl::simple_net_builder& b)
 	return TRUE;
 }
 
-bool SP_ColoredNetBuilder::CreateFunctions(dsszmc::andl::simple_net_builder& b)
+bool SP_ColoredNetBuilder::CreateFunctions(dssd::andl::simple_net_builder& b)
 {
 	// for the functions
 	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);
@@ -959,14 +959,14 @@ bool SP_ColoredNetBuilder::CreateFunctions(dsszmc::andl::simple_net_builder& b)
 			std::string l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 			std::string l_sParam = l_pcMetadata->GetAttribute(wxT("Parameter"))->GetValueString();
 			std::string l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
-			auto f = make_shared<dsszmc::andl::Function>(l_sName, l_sParam, l_sBody);
+			auto f = make_shared<dssd::andl::Function>(l_sName, l_sParam, l_sBody);
 			b.addFunction(f);
 		}
 	}
 	return true;
 }
 
-bool SP_ColoredNetBuilder::CreateObservers(dsszmc::andl::simple_net_builder& b)
+bool SP_ColoredNetBuilder::CreateObservers(dssd::andl::simple_net_builder& b)
 {
 	//TODO
 	return true;

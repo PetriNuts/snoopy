@@ -29,7 +29,7 @@
 #include "sp_utilities.h"
 
 
-#include "dssz/andl/andl_reader.h"
+#include "dssd/misc/net_reader.h"
 
 #include <wx/spinctrl.h>
 
@@ -50,17 +50,17 @@ SP_ImportCANDL::ReadFile(const wxString& p_sFile)
 {
 	m_fileName = p_sFile;
 
-	dsszmc::andl::reader p;
+	dssd::net::reader p;
 	bool l_Return = false;
 	try
 	{
 		l_Return = p(p_sFile.ToStdString());
 		if (l_Return)
 		{
-			const dsszmc::andl::Net& l_Net = *(p.get());
+			auto l_Net = p.get();
 			wxString l_sMsg = wxT("parse successful\n");
 			SP_LOGMESSAGE(l_sMsg);
-			l_Return = CreateGraph(p_sFile, l_Net);
+			l_Return = CreateGraph(p_sFile, *l_Net);
 			if (l_Return)
                 doLayout();
 		}
@@ -104,7 +104,7 @@ SP_ImportCANDL::ClearAll()
 
 
 bool
-SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_Net)
+SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dssd::andl::Net& p_Net)
 {
 	x = 350.0;
 	y = 250.0;
@@ -146,10 +146,10 @@ SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dsszmc::andl::Net& p_
 
 
 bool
-SP_ImportCANDL::CreatePlaces(const dsszmc::andl::Places& p_Places)
+SP_ImportCANDL::CreatePlaces(const dssd::andl::Places& p_Places)
 {
 	SP_DS_Nodeclass *nodeClass = NULL;
-	if(m_eNetType == dsszmc::andl::NetType::COL_CPN_T)
+	if(m_eNetType == dssd::andl::NetType::COL_CPN_T)
 	{
 		nodeClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
 	}
@@ -170,11 +170,11 @@ SP_ImportCANDL::CreatePlaces(const dsszmc::andl::Places& p_Places)
 			continue;
 			//return false;
 		}
-		if (p->type_ == dsszmc::andl::PlType::DISCRETE_T)
+		if (p->type_ == dssd::andl::PlType::DISCRETE_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
 		}
-		else if (p->type_ == dsszmc::andl::PlType::CONTINUOUS_T)
+		else if (p->type_ == dssd::andl::PlType::CONTINUOUS_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
 		}
@@ -235,7 +235,7 @@ SP_ImportCANDL::CreatePlaces(const dsszmc::andl::Places& p_Places)
 }
 
 bool
-SP_ImportCANDL::CreateConst(const dsszmc::andl::Constants& p_Constants, const dsszmc::andl::Valuesets& p_Valuesets)
+SP_ImportCANDL::CreateConst(const dssd::andl::Constants& p_Constants, const dssd::andl::Valuesets& p_Valuesets)
 {
 	for(auto& constant : p_Constants)
 	{
@@ -256,15 +256,15 @@ SP_ImportCANDL::CreateConst(const dsszmc::andl::Constants& p_Constants, const ds
 		wxString type = wxT("int");
 		//TODO
 /*
-		if(constant->type_ == dsszmc::andl::ConstType::STRING_T)
+		if(constant->type_ == dssd::andl::ConstType::STRING_T)
 		{
 			type = wxT("string");
 		}
 */
-		if(constant->type_ == dsszmc::andl::ConstType::DOUBLE_T
-			&& (m_eNetType == dsszmc::andl::NetType::COL_SPN_T
-					|| m_eNetType == dsszmc::andl::NetType::COL_CPN_T
-					|| m_eNetType == dsszmc::andl::NetType::COL_HPN_T))
+		if(constant->type_ == dssd::andl::ConstType::DOUBLE_T
+			&& (m_eNetType == dssd::andl::NetType::COL_SPN_T
+					|| m_eNetType == dssd::andl::NetType::COL_CPN_T
+					|| m_eNetType == dssd::andl::NetType::COL_HPN_T))
 		{
 			SP_DS_Nodeclass *nodeClass = m_pcGraph->GetNodeclass(wxT("Parameter"));
 			SP_GUI_Canvas* l_pcCanvas = m_pcView->GetCanvas();
@@ -314,7 +314,7 @@ SP_ImportCANDL::CreateConst(const dsszmc::andl::Constants& p_Constants, const ds
 	return true;
 }
 
-bool SP_ImportCANDL::CreateColorsets(const dsszmc::andl::Colorsets& p_Colorsets)
+bool SP_ImportCANDL::CreateColorsets(const dssd::andl::Colorsets& p_Colorsets)
 {
 	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_BASICCOLORSETCLASS);
 	if(!l_pcMetadataclass)
@@ -351,11 +351,11 @@ bool SP_ImportCANDL::CreateColorsets(const dsszmc::andl::Colorsets& p_Colorsets)
 		wxString name = cs->name_;
 		//TODO: add more
 		wxString type = wxT("int");
-		if(cs->type_ == dsszmc::andl::ColorsetType::ENUM_T)
+		if(cs->type_ == dssd::andl::ColorsetType::ENUM_T)
 		{
 			type = wxT("enum");
 		}
-		else if(cs->type_ == dsszmc::andl::ColorsetType::STRING_T)
+		else if(cs->type_ == dssd::andl::ColorsetType::STRING_T)
 		{
 			type = wxT("string");
 		}
@@ -396,7 +396,7 @@ bool SP_ImportCANDL::CreateColorsets(const dsszmc::andl::Colorsets& p_Colorsets)
 	return true;
 }
 
-bool SP_ImportCANDL::CreateVariables(const dsszmc::andl::Variables& p_Variables)
+bool SP_ImportCANDL::CreateVariables(const dssd::andl::Variables& p_Variables)
 {
 	for(auto& v : p_Variables)
 	{
@@ -431,7 +431,7 @@ bool SP_ImportCANDL::CreateVariables(const dsszmc::andl::Variables& p_Variables)
 	return true;
 }
 
-bool SP_ImportCANDL::CreateFunctions(const dsszmc::andl::ColorFunctions& p_Functions)
+bool SP_ImportCANDL::CreateFunctions(const dssd::andl::ColorFunctions& p_Functions)
 {
 	for(auto& f : p_Functions)
 	{
@@ -445,7 +445,7 @@ bool SP_ImportCANDL::CreateFunctions(const dsszmc::andl::ColorFunctions& p_Funct
 
 		wxString name = f->name_;
 		wxString type = f->ret_;
-		dsszmc::andl::ColorFunction::Params params = f->params_;
+		dssd::andl::ColorFunction::Params params = f->params_;
 		wxString param;
 		for(auto& p : params)
 		{
@@ -477,17 +477,17 @@ bool SP_ImportCANDL::CreateFunctions(const dsszmc::andl::ColorFunctions& p_Funct
 	return true;
 }
 
-bool SP_ImportCANDL::CreateObservers(const dsszmc::andl::Observers& p_Observers)
+bool SP_ImportCANDL::CreateObservers(const dssd::andl::Observers& p_Observers)
 {
 	//TODO
 	return true;
 }
 
 bool
-SP_ImportCANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions)
+SP_ImportCANDL::CreateTransitions(const dssd::andl::Transitions& p_Transitions)
 {
 	SP_DS_Nodeclass *nodeClass = NULL;
-	if (m_eNetType == dsszmc::andl::NetType::COL_CPN_T)
+	if (m_eNetType == dssd::andl::NetType::COL_CPN_T)
 	{
 		nodeClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS);
 	}
@@ -508,23 +508,23 @@ SP_ImportCANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions
 			//return false;
 		}
 
-		if (t->type_ == dsszmc::andl::TrType::STOCHASTIC_T)
+		if (t->type_ == dssd::andl::TrType::STOCHASTIC_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_STOCHASTIC_TRANS);
 		}
-		else if (t->type_ == dsszmc::andl::TrType::IMMEDIATE_T)
+		else if (t->type_ == dssd::andl::TrType::IMMEDIATE_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_IMMEDIATE_TRANS);
 		}
-		else if (t->type_ == dsszmc::andl::TrType::DETERMINISTIC_T)
+		else if (t->type_ == dssd::andl::TrType::DETERMINISTIC_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_DETERMINISTIC_TRANS);
 		}
-		else if (t->type_ == dsszmc::andl::TrType::SCHEDULED_T)
+		else if (t->type_ == dssd::andl::TrType::SCHEDULED_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS);
 		}
-		else if (t->type_ == dsszmc::andl::TrType::CONTINUOUS_T)
+		else if (t->type_ == dssd::andl::TrType::CONTINUOUS_T)
 		{
 			nodeClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS);
 		}
@@ -548,11 +548,11 @@ SP_ImportCANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions
 		SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_node->GetAttribute(SP_DS_CPN_GUARDLIST));
 		l_pcAttr->SetCell(0,1,guard);
 
-		if (m_eNetType == dsszmc::andl::NetType::COL_SPN_T
-			|| m_eNetType == dsszmc::andl::NetType::COL_GSPN_T
-			|| m_eNetType == dsszmc::andl::NetType::COL_XSPN_T
-			|| m_eNetType == dsszmc::andl::NetType::COL_CPN_T
-			|| m_eNetType == dsszmc::andl::NetType::COL_HPN_T)
+		if (m_eNetType == dssd::andl::NetType::COL_SPN_T
+			|| m_eNetType == dssd::andl::NetType::COL_GSPN_T
+			|| m_eNetType == dssd::andl::NetType::COL_XSPN_T
+			|| m_eNetType == dssd::andl::NetType::COL_CPN_T
+			|| m_eNetType == dssd::andl::NetType::COL_HPN_T)
 		{
 			wxString function = wxT("1");
 			if (!t->function_.empty())
@@ -634,17 +634,17 @@ SP_ImportCANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions
 
 			switch (c->type_)
 			{
-				case dsszmc::andl::CondType::READ_T:
+				case dssd::andl::CondType::READ_T:
 					w.vr_ = c->value_;
 					break;
-				case dsszmc::andl::CondType::INHIBITOR_T:
+				case dssd::andl::CondType::INHIBITOR_T:
 					w.vi_ = c->value_;
 					break;
-				case dsszmc::andl::CondType::EQUAL_T:
+				case dssd::andl::CondType::EQUAL_T:
 					w.vr_ = c->value_;
 					w.vi_ = c->value_;
 					break;
-				case dsszmc::andl::CondType::MODIFIER_T:
+				case dssd::andl::CondType::MODIFIER_T:
 					w.modifier_ = c->value_;
 					break;
 				default:
@@ -669,13 +669,13 @@ SP_ImportCANDL::CreateTransitions(const dsszmc::andl::Transitions& p_Transitions
 			}
 			w.trans_ = l_node;
 			switch (u->type_) {
-				case dsszmc::andl::UpdateType::DECREASE_T:
+				case dssd::andl::UpdateType::DECREASE_T:
 					w.vpt_ = u->value_;
 					break;
-				case dsszmc::andl::UpdateType::INCREASE_T:
+				case dssd::andl::UpdateType::INCREASE_T:
 					w.vtp_ = u->value_;
 					break;
-				case dsszmc::andl::UpdateType::ASSIGN_T:
+				case dssd::andl::UpdateType::ASSIGN_T:
 					w.reset_ = u->value_;
 					break;
 				default:
@@ -729,30 +729,30 @@ SP_ImportCANDL::CreateArcs()
 }
 
 SP_DS_Graph*
-SP_ImportCANDL::CreateDocument(const wxString& p_sFile, dsszmc::andl::NetType p_eType)
+SP_ImportCANDL::CreateDocument(const wxString& p_sFile, dssd::andl::NetType p_eType)
 {
 	SP_DS_Graph* l_pcGraph = NULL;
 	SP_GM_Docmanager* l_pcDM = wxGetApp().GetDocmanager();
     wxString netName;
-	if(m_eNetType == dsszmc::andl::NetType::COL_PN_T)
+	if(m_eNetType == dssd::andl::NetType::COL_PN_T)
 	{
 		netName = SP_DS_COLPN_CLASS;
 	}
-	else if(m_eNetType == dsszmc::andl::NetType::COL_XPN_T)
+	else if(m_eNetType == dssd::andl::NetType::COL_XPN_T)
 	{
 		netName = SP_DS_COLEPN_CLASS;
 	}
-	else if(m_eNetType == dsszmc::andl::NetType::COL_SPN_T
-			|| m_eNetType == dsszmc::andl::NetType::COL_GSPN_T
-			|| m_eNetType == dsszmc::andl::NetType::COL_XSPN_T)
+	else if(m_eNetType == dssd::andl::NetType::COL_SPN_T
+			|| m_eNetType == dssd::andl::NetType::COL_GSPN_T
+			|| m_eNetType == dssd::andl::NetType::COL_XSPN_T)
 	{
 		netName = SP_DS_COLSPN_CLASS;
 	}
-	else if(m_eNetType == dsszmc::andl::NetType::COL_CPN_T)
+	else if(m_eNetType == dssd::andl::NetType::COL_CPN_T)
 	{
 		netName = SP_DS_COLCPN_CLASS;
 	}
-	else if(m_eNetType == dsszmc::andl::NetType::COL_HPN_T)
+	else if(m_eNetType == dssd::andl::NetType::COL_HPN_T)
 	{
 		netName = SP_DS_COLHPN_CLASS;
 	}

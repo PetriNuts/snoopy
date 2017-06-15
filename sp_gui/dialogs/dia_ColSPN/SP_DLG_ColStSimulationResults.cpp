@@ -800,7 +800,7 @@ void SP_DLG_ColStSimulationResults::AddNewMarkingSet(const wxString& p_sMarkingS
 			for (unsigned int l_nCol = m_pnsPlaceCountById[l_nPos].m_nLow; l_nCol <= m_pnsPlaceCountById[l_nPos].m_nUp; l_nCol++)
 			{
 				wxString l_sColor = m_msColorsOfPlace[l_nCol];
-				wxString l_sValue = dsszmc::aux::toString(l_nCurrentTableRow[l_nCol]);
+				wxString l_sValue = dssd::aux::toString(l_nCurrentTableRow[l_nCol]);
 				if (l_sValue != wxT("0"))
 				{
 					l_mvNewMarking[l_sValue].push_back(l_sColor);

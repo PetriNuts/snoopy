@@ -23,7 +23,7 @@
 #include "sp_ds/extensions/ResultViewer/AttributeTypes/SP_DS_ViewerAttributeList.h"
 #include "sp_utilities.h"
 #include <algorithm>
-#include <dssz/auxi/auxi.h>
+#include <dssd/auxi/auxi.h>
 
 #include "sp_ds/SP_DS_Graph.h"
 
@@ -47,7 +47,7 @@ SP_DS_HistogramPlotViewer::SP_DS_HistogramPlotViewer(wxWindow* p_pcParent, wxSiz
 
 	//interval width
 	l_pcAttribute = new SP_DS_ViewerAttributeText(wxT("INTERVAL_WIDTH"), wxT("Bars"), wxT("Interval width"));
-	l_pcAttribute->SetValueString(dsszmc::aux::toString(m_nIntervalWidth));
+	l_pcAttribute->SetValueString(dssd::aux::toString(m_nIntervalWidth));
 	m_pcAttributeList->push_back(l_pcAttribute);
 
 	SP_DS_ViewerAttributeList* l_pcAttribute1 = new SP_DS_ViewerAttributeList(wxT("FREQUENCY"), wxT("Bars"), wxT("Frequency"));

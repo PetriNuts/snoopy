@@ -323,7 +323,7 @@ void SP_DS_ResultViewer::SaveOutput(const wxString& p_sFileName, const int& p_nF
 	 for (unsigned long l_nRow=0; l_nRow < m_pcXAxisValues.size(); l_nRow++)
 	 {
 	 l_sOutput=wxT("");
-	 l_sOutput << dsszmc::aux::toString(m_pcXAxisValues[l_nRow]);
+	 l_sOutput << dssd::aux::toString(m_pcXAxisValues[l_nRow]);
 
 	 for(unsigned long l_nItem=0;l_nItem<m_apcShownCurvesList.size();l_nItem++)
 	 {

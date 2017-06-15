@@ -6,7 +6,7 @@
 
 #include "import/SP_ImportPNML.h"
 
-#include "dssz/andl/andl_reader.h"
+#include "dssd/misc/net_reader.h"
 
 SP_ImportPNML::SP_ImportPNML()
 {
@@ -22,17 +22,17 @@ bool SP_ImportPNML::ReadFile(const wxString& p_sFile)
 
 	m_fileName = p_sFile;
 
-	dsszmc::andl::reader p;
+	dssd::net::reader p;
 	bool l_Return = false;
 	try
 	{
 		l_Return = p(p_sFile.ToStdString());
 		if (l_Return)
 		{
-			const dsszmc::andl::Net& l_Net = *(p.get());
+			auto l_Net = p.get();
 			wxString l_sMsg = wxT("parse successful\n");
 			SP_LOGMESSAGE(l_sMsg);
-			l_Return = CreateGraph(p_sFile, l_Net);
+			l_Return = CreateGraph(p_sFile, *l_Net);
 			if (l_Return)
                 doLayout();
 		}

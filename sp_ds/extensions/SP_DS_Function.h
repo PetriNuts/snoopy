@@ -8,12 +8,12 @@
 #ifndef SP_DS_FUNCTION_H_
 #define SP_DS_FUNCTION_H_
 
-#include "dssz/functions/functions.h"
-#include "dssz/functions/exceptions.h"
+#include "dssd/functions/functions.h"
+#include "dssd/functions/exceptions.h"
 #include "sp_utilities.h"
 
 
-typedef dsszmc::functions::Function SP_Function;
+typedef dssd::functions::Function SP_Function;
 typedef std::shared_ptr<SP_Function> SP_FunctionPtr;
 
 #endif /* SP_DS_FUNCTION_H_ */

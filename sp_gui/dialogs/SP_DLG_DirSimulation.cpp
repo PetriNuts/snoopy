@@ -974,7 +974,7 @@ void SP_DLG_DirSimulation::LoadParameters()
 					{
 						l_nValue = el();
 					}
-					catch (dsszmc::functions::Exception& e)
+					catch (dssd::functions::Exception& e)
 					{
 						SP_LOGERROR(wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
 					}
@@ -986,7 +986,7 @@ void SP_DLG_DirSimulation::LoadParameters()
 					{
 						l_nValue = el();
 					}
-					catch (dsszmc::functions::Exception& e)
+					catch (dssd::functions::Exception& e)
 					{
 						SP_LOGERROR(wxString(e.getExcName().c_str(), wxConvUTF8) + wxT(": ") + wxString(e.getMsg().c_str(), wxConvUTF8));
 					}
@@ -1357,7 +1357,7 @@ void SP_DLG_DirSimulation::AddNewMarkingSet(const wxString& p_sMarkingSetName, c
 
 			l_pcColList->SetCell(l_nNewRow, 0, p_sMarkingSetName);
 
-			wxString l_sValue = dsszmc::aux::toString(*l_itCol);
+			wxString l_sValue = dssd::aux::toString(*l_itCol);
 
 			l_pcColList->SetCell(l_nNewRow, 1, l_sValue);
 

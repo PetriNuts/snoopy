@@ -2148,7 +2148,7 @@ SP_ExportReport::WriteTitlePage()
 	wxFprintf(l_pstream, wxT("\\vspace{1.4mm}\n\t") );
 	wxFprintf(l_pstream, wxT("\\hrule\n\t") );
 	wxFprintf(l_pstream, wxT("\\vspace{8mm}\n\t") );
-	wxFprintf(l_pstream, wxT("\\small {\\url {http://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Snoopy} }\n") );
+	wxFprintf(l_pstream, wxT("\\small {\\url {http://www-dssz.informatik.tu-cottbus.de/dssd/Software/Snoopy} }\n") );
 
 	wxFprintf(l_pstream, wxT("\\end{center}\n\n") );
 	wxFprintf(l_pstream, wxT("\\end{titlepage}\n\n") );

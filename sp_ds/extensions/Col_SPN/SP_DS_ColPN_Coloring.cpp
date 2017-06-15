@@ -11,7 +11,7 @@
 #include <wx/regex.h>
 
 
-#include "dssz/extern/alphanum.hpp"
+#include "dssd/extern/alphanum.hpp"
 
 
 bool alphanum_comparerNc::operator() (const wxString& left, const wxString& right) const

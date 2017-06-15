@@ -11,7 +11,7 @@
 
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 
-#include "dssz/andl/andl_writer.h"
+#include "dssd/andl/andl_writer.h"
 
 #include <wx/filename.h>
 #include <wx/wfstream.h>
@@ -49,7 +49,7 @@ bool SP_ExportColPN2ANDL_new::Write(SP_MDI_Doc* p_doc, const wxString& p_fileNam
 	SP_IddNetUnfolder unfolder;
 	if(unfolder(m_graph))
 	{
-		dsszmc::andl::writer w(unfolder.GetUnfoldedNet());
+		dssd::andl::writer w(unfolder.GetUnfoldedNet());
 		w(m_fileName.ToStdString());
 	}
 	else

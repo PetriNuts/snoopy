@@ -105,9 +105,9 @@ include_directories(${IRRKLANG_INCLUDE_DIRS})
 list(APPEND LIBS ${IRRKLANG_LIBRARIES})
 
 #dssz_util
-find_package(DSSZ_UTIL REQUIRED)
-include_directories(${DSSZ_UTIL_INCLUDE_DIRS})
-list(APPEND LIBS ${DSSZ_UTIL_LIBRARIES})
+find_package(DSSD_UTIL REQUIRED)
+include_directories(${DSSD_UTIL_INCLUDE_DIRS})
+list(APPEND LIBS ${DSSD_UTIL_LIBRARIES})
 
 #gecode
 find_package(GECODE REQUIRED flatzinc driver search minimodel set int float kernel support)
