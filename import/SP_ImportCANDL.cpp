@@ -128,7 +128,7 @@ SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dssd::andl::Net& p_Ne
 	if(p_Net.color_functions_)
 		CreateFunctions(*p_Net.color_functions_);
 
-	m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
+	m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
 
 	if(p_Net.places_)
 		CreatePlaces(*p_Net.places_);
@@ -157,7 +157,6 @@ SP_ImportCANDL::CreatePlaces(const dssd::andl::Places& p_Places)
 	{
 		nodeClass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
 	}
-	wxString colorset = wxT("Dot");
 	SP_GUI_Canvas* l_pcCanvas = m_pcView->GetCanvas();
 	SP_DS_Attribute* l_pcAttr;
 	SP_DS_Node *l_node;
@@ -182,6 +181,9 @@ SP_ImportCANDL::CreatePlaces(const dssd::andl::Places& p_Places)
 		wxString marking = p->marking_;
 		AdaptColorExpression(marking);
 		wxString colorset = p->colorset_;
+        if(colorset == wxT("dot")) {
+            colorset = wxT("Dot");
+        }
 		l_node = nodeClass->NewElement(l_pcCanvas->GetNetnumber());
 		l_node->GetAttribute(wxT("Name"))->SetValueString(name);
 		l_node->GetAttribute(wxT("Name"))->SetShow(TRUE);
@@ -342,7 +344,7 @@ bool SP_ImportCANDL::CreateColorsets(const dssd::andl::Colorsets& p_Colorsets)
 	{
 		if(!cs) continue;
 
-		if(lookupColorsets.find(cs->name_) != lookupColorsets.end())
+		if(lookupColorsets.find(cs->name_) != lookupColorsets.end() || cs->name_ == "dot")
 		{
 			continue;
 			//return false;
@@ -372,6 +374,11 @@ bool SP_ImportCANDL::CreateColorsets(const dssd::andl::Colorsets& p_Colorsets)
 			colors.Replace(wxT(".."), wxT("-"));
 			colors.Replace(wxT("{"), wxT(""));
 			colors.Replace(wxT("}"), wxT(""));
+		}
+		//TODO: add acyclic attribute to colorset definition in snoopy
+		if(!cs->cyclic_)
+		{
+			SP_LOGWARNING(wxT("colorset ") + cs->name_ + wxT(" is acyclic!\n") + wxT("This is not supported in Snoopy!\n"));
 		}
 		AdaptColorExpression(colors);
 		if(l_bSimple)
@@ -410,6 +417,9 @@ bool SP_ImportCANDL::CreateVariables(const dssd::andl::Variables& p_Variables)
 
 		wxString name = v->name_;
 		wxString type = v->colorset_;
+        if(type == wxT("dot")) {
+            type = wxT("Dot");
+        }
 
 		SP_DS_Metadataclass* l_pcMetadataclass;
 		l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_VARIABLECLASS);

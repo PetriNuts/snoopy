@@ -250,6 +250,16 @@ SP_DS_Graph::AddMetadataclass(SP_DS_Metadataclass* p_pcClass)
 }
 
 SP_DS_Metadataclass*
+SP_DS_Graph::RemoveMetadataclass(SP_DS_Metadataclass* p_pcClass)
+{
+    CHECK_POINTER(p_pcClass, return NULL);
+
+    m_lMetadataclass.remove(p_pcClass);
+
+    return p_pcClass;
+}
+
+SP_DS_Metadataclass*
 SP_DS_Graph::RenameMetadataclass(const wxString& p_pchFrom, const wxString& p_pchTo,bool p_bRenameDisplyName)
 {
     SP_DS_Metadataclass* l_pcMC = GetMetadataclass(p_pchFrom);

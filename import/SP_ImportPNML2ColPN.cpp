@@ -4,19 +4,19 @@
 // $Date: 2017/06/09 $
 ////////////////////////////////////////////////////////////////////
 
-#include "import/SP_ImportPNML.h"
+#include "import/SP_ImportPNML2ColPN.h"
 
 #include "dssd/misc/net_reader.h"
 
-SP_ImportPNML::SP_ImportPNML()
+SP_ImportPNML2ColPN::SP_ImportPNML2ColPN()
 {
 }
 
-SP_ImportPNML::~SP_ImportPNML()
+SP_ImportPNML2ColPN::~SP_ImportPNML2ColPN()
 {
 }
 
-bool SP_ImportPNML::ReadFile(const wxString& p_sFile)
+bool SP_ImportPNML2ColPN::ReadFile(const wxString& p_sFile)
 {
 	ClearAll();
 

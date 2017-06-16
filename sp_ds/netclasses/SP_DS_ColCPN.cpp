@@ -557,6 +557,16 @@ SP_DS_ColCPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	/////////////////////////////////////////////////////////////////////////////
 
+	/*
+	 * remove observers from the net class
+	 * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	 */
+	l_pcMC = p_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+	p_pcGraph->RemoveMetadataclass(l_pcMC);
+	wxDELETE(l_pcMC);
+
+	/////////////////////////////////////////////////////////////////////////////
+
 
 
 	

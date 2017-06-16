@@ -140,7 +140,7 @@ bool SP_ExportContPed2ColCPT::Write(SP_MDI_Doc* p_doc, const wxString& p_fileNam
 	bool l_bSuccess =  SP_XmlWriter::Write(p_doc->GetGraph(), p_fileName);
 
 	m_pcGraph->RemoveNodeclass(l_pcParameterNC);
-
+	wxDELETE(l_pcParameterNC);
 	return l_bSuccess;
 }
 

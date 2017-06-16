@@ -95,6 +95,7 @@
 #include "import/SP_ImportANDL.h"
 #include "import/SP_ImportCANDL.h"
 #include "import/SP_ImportPNML.h"
+#include "import/SP_ImportPNML2ColPN.h"
 #include "import/SP_ImportPED.h"
 #include "import/SP_ImportTINA.h"
 #include "import/SP_ImportSBML2cntPn.h"
@@ -909,6 +910,12 @@ bool Snoopy::OnInit()
 	}
 
 	l_pcImport = new SP_ImportPNML();
+	if (!m_pcImportManager->AddImportRoutine(l_pcImport))
+	{
+		wxDELETE(l_pcImport);
+	}
+
+	l_pcImport = new SP_ImportPNML2ColPN();
 	if (!m_pcImportManager->AddImportRoutine(l_pcImport))
 	{
 		wxDELETE(l_pcImport);

@@ -137,14 +137,11 @@ bool SP_ExportHybridPN2ColHybridPN::Write(SP_MDI_Doc* p_doc, const wxString& p_f
 		}
 	}
 	
-	bool l_bSuccess =  SP_XmlWriter::Write(p_doc->GetGraph(), p_fileName);
+	bool l_bSuccess = SP_XmlWriter::Write(p_doc->GetGraph(), p_fileName);
 
 	m_pcGraph->RemoveNodeclass(l_pcParameterNC);
-
+	wxDELETE(l_pcParameterNC);
 	return l_bSuccess;
-
-
-	return SP_XmlWriter::Write(p_doc->GetGraph(), p_fileName);
 }
 
 bool SP_ExportHybridPN2ColHybridPN::WriteNetclass(SP_DS_Netclass* p_pcVal, wxXmlNode* p_pcRoot)

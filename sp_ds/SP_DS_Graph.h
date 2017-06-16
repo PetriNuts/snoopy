@@ -56,6 +56,7 @@ public:
     SP_DS_Graph* CloneDefinition();
 
     SP_DS_Metadataclass* AddMetadataclass(SP_DS_Metadataclass* p_pcClass);
+	SP_DS_Metadataclass* RemoveMetadataclass(SP_DS_Metadataclass* p_pcClass);
     SP_DS_Metadataclass* GetMetadataclass(const wxString& p_pchName);
     SP_DS_Metadataclass* GetMetadataclassByDisplayedName(const wxString& p_pchName);
     SP_DS_Metadataclass* RenameMetadataclass(const wxString& p_pchFrom, const wxString& p_pchTo,bool p_bRenameDisplyName=true);

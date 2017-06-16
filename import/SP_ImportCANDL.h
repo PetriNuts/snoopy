@@ -32,7 +32,7 @@ class SP_Graphic;
 class SP_ImportCANDL: public SP_ImportRoutine,
 	public SP_Error
 {
-public:
+protected:
 
 	struct Weights
 	{
@@ -57,8 +57,6 @@ public:
 			modifier_(wxEmptyString)
 		{}
 	};
-
-private:
 
 	map<std::string, SP_DS_Node*> lookupPlaces;
 	map<std::string, SP_DS_Node*> lookupParameters;
@@ -106,7 +104,7 @@ private:
 	void doLayout();
 	void AdaptColorExpression(wxString& p_ColorExpression);
 
- protected:
+ private:
 
 
 
