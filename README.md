@@ -28,6 +28,11 @@ Snoopy
  * [GMP](http://www.gmplib.org)
  * [MPIR](http://www.mpir.org) drop-in replacement for gmp
 
+Setting up the development environment
+===============================================================================
+
+*Expected duration: about one day*
+
 Windows
 -------------------------------------------------------------------------------
 
