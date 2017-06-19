@@ -489,7 +489,26 @@ bool SP_ImportCANDL::CreateFunctions(const dssd::andl::ColorFunctions& p_Functio
 
 bool SP_ImportCANDL::CreateObservers(const dssd::andl::Observers& p_Observers)
 {
-	//TODO
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+	if (mc)
+	{
+		for(auto& obs : p_Observers)
+		{
+			if(!obs) continue;
+
+			wxString name = obs->name_;
+			wxString type = wxT("Place");
+			if(obs->type_ == dssd::andl::ObserverType::TRANS_T) {
+				type = wxT("Transition");
+			}
+			wxString body = obs->function_;
+			SP_DS_Metadata* l_Obs = mc->NewElement(1);
+			l_Obs->GetAttribute(wxT("Name"))->SetValueString(name);
+			l_Obs->GetAttribute(wxT("Type"))->SetValueString(type);
+			l_Obs->GetAttribute(wxT("Body"))->SetValueString(body);
+		}
+	}
+
 	return true;
 }
 

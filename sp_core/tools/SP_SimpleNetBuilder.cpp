@@ -363,7 +363,23 @@ bool SP_SimpleNetBuilder::CreateFunctions(dssd::andl::simple_net_builder& b)
 
 bool SP_SimpleNetBuilder::CreateObservers(dssd::andl::simple_net_builder& b)
 {
-	//TODO
+    // for the observers
+    SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+    if(mc)
+    {
+        for (SP_DS_Metadata* l_pcMetadata : *(mc->GetElements()))
+        {
+            std::string l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+            std::string l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
+            dssd::andl::ObserverType l_eType = dssd::andl::ObserverType::PLACE_T;
+            if(l_sType == "Transition") {
+                l_eType = dssd::andl::ObserverType::TRANS_T;
+            }
+            std::string l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
+            auto o = make_shared<dssd::andl::Observer>(l_eType, l_sName, l_sBody);
+            b.addObserver(o);
+        }
+    }
 	return true;
 }
 
@@ -968,8 +984,24 @@ bool SP_ColoredNetBuilder::CreateFunctions(dssd::andl::simple_net_builder& b)
 
 bool SP_ColoredNetBuilder::CreateObservers(dssd::andl::simple_net_builder& b)
 {
-	//TODO
-	return true;
+    // for the observers
+    SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+    if(mc)
+    {
+        for (SP_DS_Metadata* l_pcMetadata : *(mc->GetElements()))
+        {
+            std::string l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+            std::string l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
+            dssd::andl::ObserverType l_eType = dssd::andl::ObserverType::PLACE_T;
+            if(l_sType == "Transition") {
+                l_eType = dssd::andl::ObserverType::TRANS_T;
+            }
+            std::string l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
+            auto o = make_shared<dssd::andl::Observer>(l_eType, l_sName, l_sBody);
+            b.addObserver(o);
+        }
+    }
+    return true;
 }
 
 //////////////////////////////////////////////////////////////////////
