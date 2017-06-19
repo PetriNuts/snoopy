@@ -18,7 +18,7 @@ DEF_VERBOSE="yes"
 DEBUG=
 DEF_DEBUG="no"
 #------------------------------------------------------------
-# variables must be set below  
+# variables must be set below
 #
 # output dir
 OUTDIR=
@@ -72,7 +72,7 @@ for i in "$@"; do
 	-d|--debug)
 	    if [ ! -z $DEBUG ] ; then say_help ; fi
 	    DEBUG="yes" ;;
-	-n|--no-debug) 
+	-n|--no-debug)
 	    if [ ! -z $DEBUG ] ; then say_help ; fi
 	    DEBUG="no" ;;
 	-v|--verbose)
@@ -101,20 +101,20 @@ else
 fi
 
 if [ "$PLATFORM" = "Linux" ] ; then
-    OUTDIR="$HOME"    
+    OUTDIR="$HOME"
     SUBDIRS="bin lib share"
     ARCHCMD="tar -czvf "
 
     WXLIBDIR="/usr/local/lib"
-    
+
     if [ "$DEBUG" = "yes" ] ; then
-      BUILDDIR="Debug-Linux${MACHINE_TYPE}"
+      #BUILDDIR="Debug-Linux${MACHINE_TYPE}"
       ARCHNAME="snoopy-beta-linux${MACHINE_TYPE}-$DATE-debug.tgz"
 	    LATESTLINK="snoopy-beta-linux${MACHINE_TYPE}-latest-debug.tgz"
 	    FILES[$FILES_SIZE]="${SNOOPYDIR}/${BUILDDIR}/snoopy==>bin"
             ((FILES_SIZE++))
     else
-      BUILDDIR="Release-Linux${MACHINE_TYPE}"
+      #BUILDDIR="Release-Linux${MACHINE_TYPE}"
 	    ARCHNAME="snoopy-beta-linux${MACHINE_TYPE}-$DATE.tgz"
 	    LATESTLINK="snoopy-beta-linux${MACHINE_TYPE}-latest.tgz"
 	    FILES[$FILES_SIZE]="$SNOOPYDIR/$BUILDDIR/snoopy==>bin"
@@ -187,7 +187,7 @@ done
 DIR_ABOVE_DISTR=${DISTRTMP%\/*}
 DISTR=${DISTRTMP/*\//}
 
-if [ "$VERBOSE" = "yes" ] ; then 
+if [ "$VERBOSE" = "yes" ] ; then
     echo "cd $DIR_ABOVE_DISTR"
     echo "$ARCHCMD" "$OUTDIR/$ARCHNAME" "$DISTR"
     echo chmod 664 "$OUTDIR/$ARCHNAME"
@@ -202,14 +202,14 @@ rm "$OUTDIR/$LATESTLINK"
 # on cygwin windows shortcut is created with ln -s
 # instead of a soft link, so just copy the file
 if [ "$PLATFORM" = "CYGWIN_NT-5.1" ] ; then
-    if [ "$VERBOSE" = "yes" ] ; then 
+    if [ "$VERBOSE" = "yes" ] ; then
 	echo "cp $ARCHNAME $OUTDIR/$LATESTLINK"
 	echo "chmod 664 $OUTDIR/$LATESTLINK"
     fi
     cp "$OUTDIR/$ARCHNAME" "$OUTDIR/$LATESTLINK"
     chmod 664 "$OUTDIR/$LATESTLINK"
-else 
-    if [ "$VERBOSE" = "yes" ] ; then 
+else
+    if [ "$VERBOSE" = "yes" ] ; then
 	echo ln -s "$ARCHNAME" "$OUTDIR/$LATESTLINK"
     fi
    ln -s "$ARCHNAME" "$OUTDIR/$LATESTLINK"
