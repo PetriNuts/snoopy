@@ -128,8 +128,6 @@ SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dssd::andl::Net& p_Ne
 	if(p_Net.color_functions_)
 		CreateFunctions(*p_Net.color_functions_);
 
-	m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
-
 	if(p_Net.places_)
 		CreatePlaces(*p_Net.places_);
 
@@ -141,7 +139,9 @@ SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dssd::andl::Net& p_Ne
 
 	CreateArcs();
 
-    return true;
+	m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
+
+	return true;
 }
 
 

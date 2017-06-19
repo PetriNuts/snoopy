@@ -111,7 +111,6 @@ bool SP_ImportANDL::CreateGraph(const wxString& p_sFile, const dssd::andl::Net& 
 
 	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
 	l_pcFR->LoadFromNet(m_pcGraph);
-    m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
 
     if(p_Net.places_)
 		CreatePlaces(*p_Net.places_);
@@ -120,6 +119,8 @@ bool SP_ImportANDL::CreateGraph(const wxString& p_sFile, const dssd::andl::Net& 
 	if(p_Net.transitions_)
 		CreateTransitions(*p_Net.transitions_);
 	CreateArcs();
+
+	m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
 
     return true;
 }
