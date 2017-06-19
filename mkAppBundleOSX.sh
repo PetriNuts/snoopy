@@ -21,7 +21,7 @@ cd ${BuildArtifactFileName}.app/Contents/Frameworks
 echo "### check ${BuildArtifactFileName} dependencies ###"
 
 while read -d $'\n' f ; do
-  if [[ "${f}" == "/usr/local/"*".dylib"* || "${f}" == "${HOME}"*".dylib"* ]]
+  if [[ "${f}" == "/usr/local/"*".dylib"* || "${f}" == "${HOME}"*".dylib"* || "${f}" == "/opt/"*".dylib"* ]]
   then
     fullfile="${f% (*}"
     fullfilename="${fullfile%.*}"
@@ -64,7 +64,7 @@ do
     if [[ -e "${val}" && ! -h "${val}" ]]
     then
       while read -d $'\n' f ; do
-        if [[ "$f" == "/usr/local/"*".dylib"* || "$f" == "${HOME}"*".dylib"* ]]
+        if [[ "$f" == "/usr/local/"*".dylib"* || "$f" == "${HOME}"*".dylib"* || "${f}" == "/opt/"*".dylib"* ]]
         then
           checkMore=true
           fullfile="${f% (*}"
