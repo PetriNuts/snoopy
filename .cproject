@@ -24,6 +24,8 @@
 							<tool command="`/usr/local/bin/wx-config --cxx --cxxflags`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.465333939" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
 								<option id="gnu.cpp.compiler.option.include.paths.460376008" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_SteeringAPI/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_Simulator/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.1"/>
@@ -85,6 +87,8 @@
 								<option id="gnu.cpp.link.option.paths.205855694" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_Linux}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Debug_Linux}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_SteeringAPI/Debug_Linux}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_Simulator/Debug_Linux}&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.flags.988044372" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="`/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html` -Wl,-rpath='$ORIGIN/../lib' -Wl,-rpath=&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_Linux}&quot; -Wl,-rpath=&quot;${workspace_loc:/Snoopy Simulator/Debug_Linux}&quot;" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1433657995" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
@@ -130,6 +134,8 @@
 								<option id="gnu.cpp.compiler.option.include.paths.1111466910" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_SteeringAPI/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_Simulator/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.1"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib/wx/include/gtk2-unicode-3.1"/>
@@ -187,6 +193,8 @@
 								<option id="gnu.cpp.link.option.paths.456551678" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Release_Linux}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Release_Linux}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_SteeringAPI/Release_Linux}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_Simulator/Release_Linux}&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.flags.318845265" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="`/usr/local/bin/wx-config --libs base,core,adv,aui,net,xml,html` -Wl,-rpath='$ORIGIN/../lib' -Wl,-rpath=&quot;${workspace_loc:/SPSA_SteeringAPI/Release_Linux}&quot; -Wl,-rpath=&quot;${workspace_loc:/Snoopy Simulator/Release_Linux}&quot;" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1230062185" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
@@ -231,6 +239,8 @@
 							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release.934194051" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release"/>
 							<tool command="`/usr/local/bin/wx-config --cxx --libs base,core,adv,aui,net,xml,html`" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release.134466457" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release">
 								<option id="macosx.cpp.link.option.paths.1628673185" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_Simulator/Release_MacOSX_Univ}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_SteeringAPI/Release_MacOSX_Univ}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Release_MacOSX_Univ}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Release_MacOSX_Univ}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib"/>
@@ -291,6 +301,8 @@
 								<option id="gnu.cpp.compiler.option.include.paths.1266662112" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_SteeringAPI/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_Simulator/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/include"/>
 									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.1"/>
@@ -356,6 +368,8 @@
 								<option id="macosx.cpp.link.option.paths.1651646245" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/Debug_MacOSX_Univ}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/Debug_MacOSX_Univ}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_Simulator/Debug_MacOSX_Univ}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_SteeringAPI/Debug_MacOSX_Univ}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib"/>
 								</option>
 								<option id="macosx.cpp.link.option.libs.1187938433" name="Libraries (-l)" superClass="macosx.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
@@ -415,6 +429,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SPSA_SteeringAPI/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Snoopy Simulator/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_SteeringAPI/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SP_Simulator/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/include"/>
 									<listOptionValue builtIn="false" value="/usr/local/include/wx-3.0"/>
