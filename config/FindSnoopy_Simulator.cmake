@@ -21,14 +21,16 @@
 
 find_path(Snoopy_Simulator_INCLUDE_DIR 
     NAMES spsim/spsim.h
-    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../Snoopy\ Simulator/include
-          $ENV{SP_SIMULATOR}/include
-    PATH_SUFFIXES spsim
+    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../Snoopy\ Simulator
+          ${CMAKE_CURRENT_SOURCE_DIR}/../SP_Simulator
+          $ENV{SP_SIMULATOR}
+    PATH_SUFFIXES include spsim
     )
 
 find_library(Snoopy_Simulator_LIBRARY_RELEASE 
     NAMES spsim_dr libspsim_dr spsim_sr libspsim_sr
-    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../Snoopy\ Simulator/ 
+    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../Snoopy\ Simulator
+          ${CMAKE_CURRENT_SOURCE_DIR}/../SP_Simulator
           $ENV{SP_SIMULATOR}
     PATH_SUFFIXES Release Release_MacOSX_Univ Release_Linux
     )
@@ -36,6 +38,7 @@ find_library(Snoopy_Simulator_LIBRARY_RELEASE
 find_library(Snoopy_Simulator_LIBRARY_DEBUG 
     NAMES spsim_dd libspsim_dd spsim_sd libspsim_sd
     HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../Snoopy\ Simulator
+          ${CMAKE_CURRENT_SOURCE_DIR}/../SP_Simulator
           $ENV{SP_SIMULATOR}
     PATH_SUFFIXES Debug Debug_MacOSX_Univ Debug_Linux
     )

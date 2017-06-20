@@ -20,23 +20,26 @@
 #   SPSA_SteeringAPI_LIBRARY, where to find the SPSA_SteeringAPI library.
 
 find_path(SPSA_SteeringAPI_INCLUDE_DIR NAMES spsa/spsa.h
-    PATH_SUFFIXES spsa
-    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/include
-    $ENV{SPSA_STEERINGAPI}/include
+    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI
+          ${CMAKE_CURRENT_SOURCE_DIR}/../SP_SteeringAPI
+          $ENV{SPSA_STEERINGAPI}
+    PATH_SUFFIXES include spsa
     )
 
 find_library(SPSA_SteeringAPI_LIBRARY_RELEASE 
     NAMES SPSA_SteeringAPI libSPSA_SteeringAPI
-    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Release
-          ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Release_MacOSX_Univ
-          ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Release_Linux
+    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI
+          ${CMAKE_CURRENT_SOURCE_DIR}/../SP_SteeringAPI
+          $ENV{SPSA_STEERINGAPI}
+    PATH_SUFFIXES Release Release_MacOSX_Univ Release_Linux
     )
 
 find_library(SPSA_SteeringAPI_LIBRARY_DEBUG 
     NAMES SPSA_SteeringAPI libSPSA_SteeringAPI
-    HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Debug
-          ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Debug_MacOSX_Univ
-          ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI/Debug_Linux
+        HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../SPSA_SteeringAPI
+        ${CMAKE_CURRENT_SOURCE_DIR}/../SP_SteeringAPI
+        $ENV{SPSA_STEERINGAPI}
+    PATH_SUFFIXES Debug Debug_MacOSX_Univ Debug_Linux
     )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
