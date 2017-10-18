@@ -20,6 +20,7 @@ class SP_CMD_MoveGraphic : public wxCommand  {
 private:
 	SP_GUI_Canvas *m_pcCanvas;
 	std::list<wxShape*> m_lShapes;
+	std::list<wxLineShape*> m_lLineShapes;
 	std::list<wxRealPoint*> m_lLinePoints;
 	double m_nX;
 	double m_nY;

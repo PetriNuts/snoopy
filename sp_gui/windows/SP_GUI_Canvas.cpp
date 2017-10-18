@@ -17,6 +17,7 @@
 
 #include "snoopy.h"
 #include "sp_core/SP_GPR_Canvas.h"
+#include "sp_gr/SP_GR_Edge.h"
 
 IMPLEMENT_CLASS(SP_GUI_Canvas, wxShapeCanvas)
 
@@ -951,18 +952,153 @@ SP_GUI_Canvas::MoveShapes(const std::list<wxShape*>& p_pcShapes, double p_nOffse
     for(auto l_pcShape : p_pcShapes)
     {
         if (l_pcShape->Selected() &&
-            !l_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
-        {
+            !l_pcShape->IsKindOf(CLASSINFO(wxLineShape))) {
+
 			double l_nX = l_pcShape->GetX() + p_nOffsetX;
 			double l_nY = l_pcShape->GetY() + p_nOffsetY;
 			// to get the line attachments right
 			l_pcShape->Move(l_cDC, l_nX, l_nY);
 			UpdateVirtualSize(WXROUND(l_nX), WXROUND(l_nY));
+
         }
     }
+
+
     return true;
 }
+/**
+ * Move LineShaep children
+ * (only for lines with not more then 2 control points)
+ * if the ends have moved first
+ */
+bool SP_GUI_Canvas::MoveLineShapesChildren(const std::list<wxLineShape*>& p_pcLineShapes, double p_nOffsetX, double p_nOffsetY) {
 
+    if (!GetDiagram())
+        return false;
+
+    wxWindowUpdateLocker noUpdates(this);
+    m_bBitmapCacheInvalid = true;
+
+    for(wxLineShape* l_pcLineShape : p_pcLineShapes) {
+		// Move connections with corresponding attributes
+    	MoveLineShapeChildren(l_pcLineShape, p_nOffsetX, p_nOffsetY);
+	}
+	return true;
+}
+/**
+ * Move LineShaep children
+ * If the line has more than 2 rudder points
+ * rotation is not calculated
+ */
+bool SP_GUI_Canvas::MoveLineShapeChildren(wxLineShape* p_pcLineShape, double p_nOffsetX, double p_nOffsetY) {
+		if(p_pcLineShape == NULL) {
+			return false;
+		}
+
+	    SP_GR_Edge *l_pGrEdge = NULL;
+	    SP_Graphic *l_pChildGraphic = NULL;
+	    wxShape *l_pChildeShape = NULL;
+
+		double l_dInitX1 = 0, l_dInitY1 = 0, l_dInitX2 = 0, l_dInitY2 = 0;
+		double l_dFinalX1 = 0, l_dFinalY1 = 0, l_dFinalX2 = 0, l_dFinalY2 = 0;
+		double l_dInitAngle = 0, l_dRotationAngle = 0;
+		double l_dRotationPointX = 0, l_dRotationPointY = 0;
+
+		double l_dChildPosX = 0, l_dChildPosY = 0;
+		double l_dNewChildPosX = 0, l_dNewChildPosY = 0;
+
+
+		l_pGrEdge = dynamic_cast<SP_GR_Edge*>(SP_Core::Instance()->ResolveExtern(p_pcLineShape));
+		// Shift
+		if(p_pcLineShape->GetTo()->Selected() && p_pcLineShape->GetFrom()->Selected()) {
+
+			for(SP_ListGraphic::iterator l_itGr = l_pGrEdge->GetGraphicChildren()->begin();
+						l_itGr != l_pGrEdge->GetGraphicChildren()->end();
+						l_itGr++) {
+
+				l_pChildGraphic = *l_itGr;
+				if(l_pChildGraphic == NULL) {
+					continue;
+				}
+				l_pChildeShape = l_pChildGraphic->GetPrimitive();
+				if(l_pChildeShape != NULL && l_pChildeShape->Selected()) {
+					continue;
+				}
+
+
+				l_dNewChildPosX = l_pChildGraphic->GetPosX() + p_nOffsetX;
+				l_dNewChildPosY = l_pChildGraphic->GetPosY() + p_nOffsetY;
+				l_pChildGraphic->SetPosX(l_dNewChildPosX);
+				l_pChildGraphic->SetPosY(l_dNewChildPosY);
+
+			}
+
+		} else {
+
+			if(p_pcLineShape->GetLineControlPoints()->size() > 2) {
+				return false;
+			}
+			// else calculate a rotation
+			p_pcLineShape->GetEnds(&l_dFinalX1, &l_dFinalY1, &l_dFinalX2, &l_dFinalY2);
+
+			if(p_pcLineShape->GetFrom()->Selected()) {
+				l_dInitX1 = l_dFinalX1 - p_nOffsetX;
+				l_dInitY1 = l_dFinalY1 - p_nOffsetY;
+				l_dInitX2 = l_dFinalX2;
+				l_dInitY2 = l_dFinalY2;
+				l_dRotationPointX = l_dInitX2;
+				l_dRotationPointY = l_dInitY2;
+
+			} else {
+				l_dInitX1 = l_dFinalX1;
+				l_dInitY1 = l_dFinalY1;
+				l_dInitX2 = l_dFinalX2 - p_nOffsetX;
+				l_dInitY2 = l_dFinalY2 - p_nOffsetY;
+				l_dRotationPointX = l_dInitX1;
+				l_dRotationPointY = l_dInitY1;
+
+			}
+
+			l_dInitAngle = std::atan2(l_dInitY2 - l_dInitY1, l_dInitX2 - l_dInitX1);
+			l_dRotationAngle = std::atan2(l_dFinalY2 - l_dFinalY1, l_dFinalX2 - l_dFinalX1);
+
+			l_dRotationAngle = l_dRotationAngle - l_dInitAngle;
+
+			for(SP_ListGraphic::iterator l_itGr = l_pGrEdge->GetGraphicChildren()->begin();
+							l_itGr != l_pGrEdge->GetGraphicChildren()->end();
+							l_itGr++) {
+
+				l_pChildGraphic = *l_itGr;
+				if(l_pChildGraphic == NULL) {
+					continue;
+				}
+				l_pChildeShape = l_pChildGraphic->GetPrimitive();
+				if(l_pChildeShape != NULL && l_pChildeShape->Selected()) {
+					continue;
+				}
+
+
+				l_dChildPosX = l_pChildGraphic->GetPosX();
+				l_dChildPosY = l_pChildGraphic->GetPosY();
+
+				l_dNewChildPosX = std::cos(l_dRotationAngle) * (l_dChildPosX - l_dRotationPointX)
+								- std::sin(l_dRotationAngle) * (l_dChildPosY - l_dRotationPointY)
+								+ l_dRotationPointX;
+				l_dNewChildPosY = std::sin(l_dRotationAngle) * (l_dChildPosX - l_dRotationPointX)
+								+ std::cos(l_dRotationAngle) * (l_dChildPosY - l_dRotationPointY)
+								+ l_dRotationPointY;
+
+				l_pChildGraphic->SetPosX(l_dNewChildPosX);
+				l_pChildGraphic->SetPosY(l_dNewChildPosY);
+
+			}
+		}
+
+	return true;
+}
+/**
+ *
+ */
 bool
 SP_GUI_Canvas::MoveLinePoints(double p_nOffsetX, double p_nOffsetY)
 {

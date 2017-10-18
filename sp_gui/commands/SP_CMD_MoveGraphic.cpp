@@ -23,6 +23,16 @@ SP_CMD_MoveGraphic::SP_CMD_MoveGraphic(SP_GUI_Canvas *p_pcCanvas, double p_nX, d
 		while (l_pcNode)
 		{
 			wxShape* l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
+			// Add connected arc with label
+			if(l_pcShape->IsKindOf(CLASSINFO(wxLineShape)) && (
+					(dynamic_cast<wxLineShape*>(l_pcShape)->GetTo()->Selected() ||
+					dynamic_cast<wxLineShape*>(l_pcShape)->GetFrom()->Selected()))
+					) {
+
+				wxLineShape* l_pcLineShape = dynamic_cast<wxLineShape*>(l_pcShape);
+				m_lLineShapes.push_back(l_pcLineShape);
+
+			}
 			if (l_pcShape->Selected() &&
 				!l_pcShape->IsKindOf(CLASSINFO(wxLineShape)))
 			{
@@ -87,6 +97,7 @@ SP_CMD_MoveGraphic::Move(double p_nX, double p_nY) {
 			point->y += p_nY;
 		}*/
 		m_pcCanvas->MoveShapes(m_lShapes, p_nX, p_nY);
+		m_pcCanvas->MoveLineShapesChildren(m_lLineShapes, p_nX, p_nY);
 	}
 	return true;
 }

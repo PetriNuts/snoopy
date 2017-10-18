@@ -59,6 +59,8 @@ protected:
 
     bool OnEndDragLeftMerge(SP_Graphic* p_pcShape);
 
+    bool MoveLineShapeChildren(wxLineShape* p_pcLineShapes, double p_nOffsetX, double p_nOffsetY);
+
 public:
     SP_GUI_Canvas(
         SP_MDI_View* p_pcView,
@@ -127,6 +129,7 @@ public:
 
     bool MoveShape(wxShape* p_pcShape, double p_nOffsetX, double p_nOffsetY);
     bool MoveShapes(const std::list<wxShape*>& p_pcShapes, double p_nOffsetX, double p_nOffsetY);
+    bool MoveLineShapesChildren(const std::list<wxLineShape*>& p_pcLineShapes, double p_nOffsetX, double p_nOffsetY);
     bool MoveLinePoints(double p_nOffsetX, double p_nOffsetY);
     bool MoveShapes(double p_nOffsetX, double p_nOffsetY);
 
