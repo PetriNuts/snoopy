@@ -259,7 +259,6 @@ bool SP_GUI_ConnectToServer::ConnectToServer()
 	}
 
 	// try to connect to the server
-//	while (l_nIsConnected != SUCCESS && m_pcConnectButtonCtrl->GetLabel() == wxT("Cancel"))
 	for(int iIdx = 0; iIdx < l_iConnecttionAttempts; iIdx++)
 	{
 		m_pcIndicatorGaugeCtrl->Pulse();
@@ -295,7 +294,7 @@ bool SP_GUI_ConnectToServer::ConnectToServer()
 
 		if (l_bShowTwoOptions == false && l_asModelNames.size() == 0)
 		{
-			SP_MESSAGEBOX(wxT("Connection failed. Pleas check co"));
+			SP_MESSAGEBOX(wxT("No models in the server, please open a model in Snoopy and try again"));
 
 			m_pcGUIClient->DisConnectFromServer();
 
