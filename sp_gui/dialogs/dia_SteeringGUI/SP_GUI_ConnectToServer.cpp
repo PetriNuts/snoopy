@@ -221,6 +221,7 @@ bool SP_GUI_ConnectToServer::ConnectToServer()
 	bool l_bShowTwoOptions = false;
 
 	int l_nIsConnected = FAILURE;
+	int l_iConnecttionAttempts = 5;
 
 	SP_VectorString l_asModelNames;
 	wxString l_sName;
@@ -258,14 +259,15 @@ bool SP_GUI_ConnectToServer::ConnectToServer()
 	}
 
 	// try to connect to the server
-	while (l_nIsConnected != SUCCESS && m_pcConnectButtonCtrl->GetLabel() == wxT("Cancel"))
+//	while (l_nIsConnected != SUCCESS && m_pcConnectButtonCtrl->GetLabel() == wxT("Cancel"))
+	for(int iIdx = 0; iIdx < l_iConnecttionAttempts; iIdx++)
 	{
 		m_pcIndicatorGaugeCtrl->Pulse();
 
 		l_nIsConnected = m_pcGUIClient->ConnectToServer(m_sIP, m_sPort, false);
-
-		if (l_nIsConnected == spsa::INVALIDVERSION)
-		{
+		if(l_nIsConnected == SUCCESS) {
+			break;
+		} else if (l_nIsConnected == spsa::INVALIDVERSION) {
 			wxString l_sMsg = wxT("The server and client communication have different versions.");
 
 			SP_MESSAGEBOX(l_sMsg, wxT("Error"));
@@ -273,6 +275,17 @@ bool SP_GUI_ConnectToServer::ConnectToServer()
 			return false;
 		}
 
+	}
+	if(l_nIsConnected != SUCCESS) {
+		wxString l_sMsg;
+		l_sMsg << "Connection failed to the server: "
+			   << m_sIP
+			   << " on port: "
+			   << m_sPort;
+
+		SP_MESSAGEBOX(l_sMsg, wxT("Error"));
+
+		return false;
 	}
 
 	if (l_nIsConnected == SUCCESS)
@@ -282,7 +295,7 @@ bool SP_GUI_ConnectToServer::ConnectToServer()
 
 		if (l_bShowTwoOptions == false && l_asModelNames.size() == 0)
 		{
-			SP_MESSAGEBOX(wxT("No models in the server, please open a model in Snoopy and try again"));
+			SP_MESSAGEBOX(wxT("Connection failed. Pleas check co"));
 
 			m_pcGUIClient->DisConnectFromServer();
 
