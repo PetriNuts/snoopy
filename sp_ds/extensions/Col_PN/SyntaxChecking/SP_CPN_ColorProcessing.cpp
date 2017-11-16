@@ -493,8 +493,11 @@ bool SP_CPN_ColorProcessing::ProcessingString(wxString p_sColorsetName, wxString
 
 
 	// Then will generate the needed strings
-	if(l_vvString.size() == 1)
-		ProcessingStringSub(p_sColorsetName,l_vvString[0], p_vResult);
+	if(l_vvString.size() == 1) {
+		if(!ProcessingStringSub(p_sColorsetName,l_vvString[0], p_vResult)) {
+			return false;
+		}
+	}
 	if(l_vvString.size() > 1)
 	{
 		//Add codes to generate strings from regular expressions
@@ -533,6 +536,9 @@ bool SP_CPN_ColorProcessing::ProcessingString(wxString p_sColorsetName, wxString
 
 bool SP_CPN_ColorProcessing::ProcessingStringSub(wxString p_sColorsetName, vector<wxString> &p_vInputString, vector<wxString> &p_vString)
 {
+	if(p_vInputString.size() == 0) {
+		return false;
+	}
 	p_vString.clear();
 
 	if(p_vInputString[0] == wxT(",") ||
