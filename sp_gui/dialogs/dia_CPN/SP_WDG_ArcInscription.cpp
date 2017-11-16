@@ -415,10 +415,10 @@ void SP_WDG_ArcInscription::OnCheck(wxCommandEvent& p_cEvent)
 
 	SP_DS_Attribute* l_pcAttr = (*m_tlAttributes.begin());	
 	wxString l_sColorSet;
-	SP_DS_Edge* l_pcEdge;
-	SP_DS_Node* l_pcNode;
-	SP_DS_Node* l_pcPlaceNode;
-	SP_DS_Node* l_pcTransitionNode;
+	SP_DS_Edge* l_pcEdge = NULL;
+	SP_DS_Node* l_pcNode = NULL;
+	SP_DS_Node* l_pcPlaceNode = NULL;
+	SP_DS_Node* l_pcTransitionNode = NULL;
 
 	if(!l_pcAttr)
 		return;

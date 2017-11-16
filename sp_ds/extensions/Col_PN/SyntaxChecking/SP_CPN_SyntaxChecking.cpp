@@ -153,9 +153,16 @@ bool SP_CPN_SyntaxChecking::CheckTransitionClass(wxString p_sTransNCName)
 
 
 
-
+/**
+ * TODO !!!
+ * p_pcTransNode is not used in this function
+ */
 bool SP_CPN_SyntaxChecking::CheckArcExpression(SP_DS_Node* p_pcPlaceNode,SP_DS_Edge* p_pcEdge,SP_DS_Node* p_pcTransNode)
 {
+	if(!p_pcPlaceNode || !p_pcEdge) {
+		return false;
+	}
+
 	SP_DS_Node* l_pcPlaceNode = p_pcPlaceNode;
 
 	SP_CPN_ColorSet l_cColorSet;
