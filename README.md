@@ -132,9 +132,9 @@ Windows
 	1. get dssd_util  
 	`git clone https://github.com/PetriNuts/dssd_util.git`
 	1. create a folder *build*
-	   cd build
+	`cd build`
 	1. use cmake to create visual studio project files
-	   cmake -DCMAKE_GENERATOR_PLATFORM=x64 ..
+	`cmake -DCMAKE_GENERATOR_PLATFORM=x64 ..`
 	1. open `($DSSD_UTIL)\build\dssd_util.sln`
 	1. build *ALL_BUILD* for x64  as *Release* und *Debug*
 
