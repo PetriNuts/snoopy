@@ -123,7 +123,7 @@ Windows
 
 1. Gecode
 	1. download [Gecode](http://www.gecode.org/download/gecode-4.4.0.tar.gz) and unpack it into "~/workspace"
-	1. create a folder *build* 
+	1. create a folder *build*
 	1. use cmake to create visual studio project files
 	1. open `($GECODEDIR)\build\gecode.sln` 
 	1. build *ALL_BUILD* for x64  as *Release* und *Debug*
@@ -131,8 +131,10 @@ Windows
 1. dssd_util
 	1. get dssd_util  
 	`git clone https://github.com/PetriNuts/dssd_util.git`
-	1. create a folder *build* 
+	1. create a folder *build*
+	   cd build
 	1. use cmake to create visual studio project files
+	   cmake -DCMAKE_GENERATOR_PLATFORM=x64 ..
 	1. open `($DSSD_UTIL)\build\dssd_util.sln`
 	1. build *ALL_BUILD* for x64  as *Release* und *Debug*
 
