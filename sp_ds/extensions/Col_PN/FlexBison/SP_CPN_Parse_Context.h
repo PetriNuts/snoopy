@@ -1544,7 +1544,7 @@ public:
 		m_ParseNode_Info.m_DataType = l_LeftNodeInfo.m_DataType;
 		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo.m_ColorSet;
 
-		if (!m_ParseNode_Info.m_bSeparaterExpression)
+		if (!m_ParseNode_Info.m_bSeparaterExpression && l_RightNodeInfo.m_IntegerValue)
 		{
 			if (l_LeftNodeInfo.m_DataType == CPN_INTEGER && l_RightNodeInfo.m_DataType == CPN_INTEGER)
 			{
