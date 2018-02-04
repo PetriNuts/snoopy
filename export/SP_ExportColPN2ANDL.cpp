@@ -109,7 +109,7 @@ bool SP_ExportColPN2ANDL::WritePlaces(std::shared_ptr<SP_DS_ColPN_Unfolding> p_U
 	{
 		if(!p_Unfolding->GetUnfoldedContPlaces().empty())
 		{
-			//m_file.Write(wxT("  continous:\n"));
+			//m_file.Write(wxT("  continuous:\n"));
 			WritePlaceClass(p_Unfolding, p_Unfolding->GetUnfoldedContPlaces());
 		}
 	}
@@ -122,7 +122,7 @@ bool SP_ExportColPN2ANDL::WritePlaces(std::shared_ptr<SP_DS_ColPN_Unfolding> p_U
 		}
 		if(!p_Unfolding->GetUnfoldedContPlaces().empty())
 		{
-			m_file.Write(wxT("  continous:\n"));
+			m_file.Write(wxT("  continuous:\n"));
 			WritePlaceClass(p_Unfolding, p_Unfolding->GetUnfoldedContPlaces());
 		}
 	}
@@ -213,7 +213,7 @@ bool SP_ExportColPN2ANDL::WriteTransitions(std::shared_ptr<SP_DS_ColPN_Unfolding
 	{
 		if(!p_Unfolding->GetUnfoldedContTransions().empty())
 		{
-			m_file.Write(wxT("  continous:\n"));
+			m_file.Write(wxT("  continuous:\n"));
 			WriteTransitionClass(p_Unfolding, p_Unfolding->GetUnfoldedContTransions());
 		}
 	}
@@ -226,7 +226,7 @@ bool SP_ExportColPN2ANDL::WriteTransitions(std::shared_ptr<SP_DS_ColPN_Unfolding
 		}
 		if(!p_Unfolding->GetUnfoldedContTransions().empty())
 		{
-			m_file.Write(wxT("  continous:\n"));
+			m_file.Write(wxT("  continuous:\n"));
 			WriteTransitionClass(p_Unfolding, p_Unfolding->GetUnfoldedContTransions());
 		}
 		if(!p_Unfolding->GetUnfoldedImmTransions().empty())
@@ -440,6 +440,7 @@ bool SP_ExportColPN2ANDL::WriteArcs(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unf
 bool SP_ExportColPN2ANDL::WriteParameters(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding)
 {
 	m_file.Write(wxT("constants:\n"));
+	m_file.Write(wxT("parameter:\n"));
 
 	wxString l_sParameterName;
 	SP_DS_Nodeclass* l_pcNodeclass;
