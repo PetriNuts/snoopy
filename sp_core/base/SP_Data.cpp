@@ -154,13 +154,13 @@ SP_Data::RemoveGraphic(SP_ListGraphic* p_plGraphic, bool p_bDelete)
         return SP_DELETE_ERROR;
 
     for (auto itG = p_plGraphic->begin();
-    		itG != p_plGraphic->end();
-    		itG = p_plGraphic->begin())
-	{
-    	SP_Graphic* l_pcGraphic = *itG;
-    	RemoveGraphic(l_pcGraphic, p_bDelete);
-    	p_plGraphic->erase(itG);
-	}
+      		itG != p_plGraphic->end();
+      		itG = p_plGraphic->begin())
+  	{
+      	SP_Graphic* l_pcGraphic = *itG;
+      	RemoveGraphic(l_pcGraphic, p_bDelete);
+      	itG = p_plGraphic->erase(itG);
+  	}
 	return GetGraphics()->empty() ? SP_NO_MORE_OBJECTS : SP_MORE_OBJECTS;
 }
 
@@ -170,16 +170,28 @@ SP_Data::RemoveGraphic(SP_Graphic* p_pcGraphic, bool p_bDelete)
     if (!p_pcGraphic)
         return TRUE;
 
-	// remove the graphic from the list
-    GetGraphics()->remove(p_pcGraphic);
+    bool bForDelet = FALSE;
+
     // remove from graphics parent childrens list
-	p_pcGraphic->GetGraphicParent()->RemoveGraphicChildren(p_pcGraphic);
+    bForDelet = p_pcGraphic->GetGraphicParent()->RemoveGraphicChildren(p_pcGraphic);
+	// remove the graphic from the list
+    if(bForDelet) {
+    	GetGraphics()->remove(p_pcGraphic);
+    	p_pcGraphic->SetDataParent(NULL);
+    }
   	//
-    p_pcGraphic->SetDataParent(NULL);
 	// delete the graphic
 	if (p_bDelete)
 	{
-		wxDELETE(p_pcGraphic);
+		if(bForDelet) {
+			p_pcGraphic->RemoveFromCanvas();
+//			wxDELETE(p_pcGraphic);
+//			p_pcGraphic = NULL;
+		} else if(p_pcGraphic == p_pcGraphic->GetGraphicParent()){
+			p_pcGraphic->RemoveFromCanvas();
+//			wxDELETE(p_pcGraphic);
+//			p_pcGraphic = NULL;
+		}
 	}
 
     return TRUE;
