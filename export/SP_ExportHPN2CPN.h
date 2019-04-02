@@ -12,6 +12,7 @@
 
 #include "sp_core/SP_XmlWriter.h"
 #include "export/SP_ExportRoutine.h"
+#include "export/SpConvertElement.h"//Added by G.A
 
 class SP_ExportHPN2CPN: public SP_XmlWriter, public SP_ExportRoutine
 {
@@ -22,6 +23,8 @@ private:
 	SP_DS_Graph* m_graph;
 	wxString m_fileName;
 	wxXmlNode* m_pcElem;
+	std::vector<wxString> m_names;//Added by G.A
+	SpConvertElement m_converter = SpConvertElement();//Added by G.A
 protected:
 
 	bool WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcRoot);

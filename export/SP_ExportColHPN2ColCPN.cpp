@@ -98,7 +98,26 @@ bool SP_ExportColHPN2ColCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		wxXmlNode* l_pcElem = m_pcPlaceNodeclass;		
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WritePlace( ( *l_Iter ), l_pcElem);
+			wxString l_sNodeClass= p_pcVal->GetName();
+			if (wxT("Place") == l_sNodeClass) {
+			
+				wxString m_newType = wxT("Continuous Place");//to be removed
+				SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);//to be removed
+				SP_DS_Node* ConvertedNode1 = m_converter.Clone((**l_Iter), *l_pcConvertToNodeClass);// ConvertNode((*l_Iter), l_pcConvertToNodeClass);// to be removed
+				SP_DS_Attribute* nameAttr = ConvertedNode1->GetAttribute(wxT("ID"));
+				wxString valString = nameAttr->GetValueString();
+				m_names.push_back(valString);
+				WritePlace(ConvertedNode1, l_pcElem);
+			}
+			else
+			{  
+				SP_DS_Attribute* IdAttr = (*l_Iter)->GetAttribute(wxT("ID"));
+
+				wxString valString = IdAttr->GetValueString();
+				for(int i=0;i<m_names.size();i++)
+					if (m_names[i] == valString) { return TRUE; }
+				WritePlace((*l_Iter), l_pcElem);
+			}
 		}
 	}	
 	else if (wxT("Transition") == l_sNodeclassName ||
@@ -121,7 +140,33 @@ bool SP_ExportColHPN2ColCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 	    wxXmlNode* l_pcElem = m_pcTransitionNodeclass;		
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WriteTransition( ( *l_Iter ), l_pcElem);
+			wxString l_sNodeClass = p_pcVal->GetName();
+			if (wxT("Transition")== l_sNodeClass) {
+				wxString m_newType = wxT("Continuous Transition");
+
+				SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);
+
+				SP_DS_Node* ConvertedNode = m_converter.Clone((**l_Iter), *l_pcConvertToNodeClass);
+
+				ConvertedNode->Update();
+
+				SP_DS_Attribute* nameAttr = ConvertedNode->GetAttribute(wxT("ID"));
+
+				wxString valString = nameAttr->GetValueString();
+
+				m_names.push_back(valString);
+				WriteTransition(ConvertedNode, l_pcElem);
+
+			}
+			else
+			{
+				SP_DS_Attribute* IdAttr = (*l_Iter)->GetAttribute(wxT("ID"));
+
+				wxString valString = IdAttr->GetValueString();
+				for (int i = 0; i<m_names.size(); i++)
+					if (m_names[i] == valString) { return TRUE; }
+			WriteTransition((*l_Iter), l_pcElem);
+		}
 		}
 	}
 	else if (wxT("Parameter") == l_sNodeclassName)

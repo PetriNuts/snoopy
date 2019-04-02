@@ -19,103 +19,103 @@
 #include "sp_ds/attributes/SP_DS_IdAttribute.h"
 
 bool SP_ExportColSPN2ColCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
-		wxXmlNode* p_pcRoot)
+	wxXmlNode* p_pcRoot)
 {
-	CHECK_POINTER( p_pcVal, return FALSE );
-	CHECK_POINTER( p_pcRoot, return FALSE );	
+	CHECK_POINTER(p_pcVal, return FALSE);
+	CHECK_POINTER(p_pcRoot, return FALSE);
 
 	SP_ListNode::const_iterator l_Iter;
 	const SP_ListNode* l_plElements = p_pcVal->GetElements();
 
-	CHECK_POINTER( l_plElements, return FALSE );
+	CHECK_POINTER(l_plElements, return FALSE);
 	wxString l_sNodeclassName = p_pcVal->GetName();
 
 	if (wxT("Place") == l_sNodeclassName)
 	{
 		l_sNodeclassName = SP_DS_CONTINUOUS_PLACE;
-		wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE,  wxT("nodeclass"));
-	    l_pcElem->AddAttribute( wxT("count"), wxString::Format( wxT("%d"),  l_plElements->size()));
-		l_pcElem->AddAttribute( wxT("name"),  l_sNodeclassName );
+		wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("nodeclass"));
+		l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), l_plElements->size()));
+		l_pcElem->AddAttribute(wxT("name"), l_sNodeclassName);
 		p_pcRoot->AddChild(l_pcElem);
 
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WritePlace( ( *l_Iter ), l_pcElem);
+			WritePlace((*l_Iter), l_pcElem);
 		}
 	}
 	else if (wxT("Transition") == l_sNodeclassName)
 	{
 		l_sNodeclassName = SP_DS_CONTINUOUS_TRANS;
-		wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE,  wxT("nodeclass"));		
+		wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("nodeclass"));
 		m_pcTransitionNodeclass = l_pcElem;
 
-		m_nTransitionNumber=m_nTran+m_nImmediateTran+m_nDeterministicTran+m_nScheduledTran;
+		m_nTransitionNumber = m_nTran + m_nImmediateTran + m_nDeterministicTran + m_nScheduledTran;
 
-	    l_pcElem->AddAttribute( wxT("count"), wxString::Format( wxT("%d"), m_nTransitionNumber));
-		l_pcElem->AddAttribute( wxT("name"),  l_sNodeclassName );
+		l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), m_nTransitionNumber));
+		l_pcElem->AddAttribute(wxT("name"), l_sNodeclassName);
 		p_pcRoot->AddChild(l_pcElem);
 
-		m_nTransitionNumber=0;
+		m_nTransitionNumber = 0;
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WriteTransition( ( *l_Iter ), l_pcElem);
+			WriteTransition((*l_Iter), l_pcElem);
 		}
 	}
-	else if((wxT("Immediate Transition") == l_sNodeclassName ) )
-	{		
-		wxXmlNode* l_pcElem = m_pcTransitionNodeclass;	
-
-		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
-		{
-			WriteTransition( ( *l_Iter ), l_pcElem);
-		}
-	}
-	else if((wxT("Deterministic Transition") == l_sNodeclassName ) )
+	else if ((wxT("Immediate Transition") == l_sNodeclassName))
 	{
 		wxXmlNode* l_pcElem = m_pcTransitionNodeclass;
 
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WriteTransition( ( *l_Iter ), l_pcElem);
+			WriteTransition((*l_Iter), l_pcElem);
 		}
 	}
-			  
-	else if((wxT("Scheduled Transition") == l_sNodeclassName ) )
-	{	
+	else if ((wxT("Deterministic Transition") == l_sNodeclassName))
+	{
 		wxXmlNode* l_pcElem = m_pcTransitionNodeclass;
-	
+
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WriteTransition( ( *l_Iter ), l_pcElem);
+			WriteTransition((*l_Iter), l_pcElem);
 		}
-	} 
+	}
+
+	else if ((wxT("Scheduled Transition") == l_sNodeclassName))
+	{
+		wxXmlNode* l_pcElem = m_pcTransitionNodeclass;
+
+		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
+		{
+			WriteTransition((*l_Iter), l_pcElem);
+		}
+	}
 	else if (wxT("Parameter") == l_sNodeclassName)
 	{
 		l_sNodeclassName = SP_DS_PARAM;
 
-		wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE,  wxT("nodeclass"));
-	    l_pcElem->AddAttribute( wxT("count"), wxString::Format( wxT("%d"),  l_plElements->size()));
-		l_pcElem->AddAttribute( wxT("name"),  l_sNodeclassName );
+		wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("nodeclass"));
+		l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), l_plElements->size()));
+		l_pcElem->AddAttribute(wxT("name"), l_sNodeclassName);
 		p_pcRoot->AddChild(l_pcElem);
 
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WriteParameter( ( *l_Iter ), l_pcElem);
+			WriteParameter((*l_Iter), l_pcElem);
 		}
 	}
-	else if((wxT("Coarse Parameter") == l_sNodeclassName ) ||
-			(wxT("Coarse Place") == l_sNodeclassName ) ||
-			(wxT("Coarse Transition") == l_sNodeclassName )	||
-			(wxT("Comment") == l_sNodeclassName ))
+	else if ((wxT("Coarse Parameter") == l_sNodeclassName) ||
+		(wxT("Coarse Place") == l_sNodeclassName) ||
+		(wxT("Coarse Transition") == l_sNodeclassName) ||
+		(wxT("Comment") == l_sNodeclassName))
 	{
-		wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE,  wxT("nodeclass"));
-	    l_pcElem->AddAttribute( wxT("count"), wxString::Format( wxT("%d"),  l_plElements->size()));
-		l_pcElem->AddAttribute( wxT("name"),  l_sNodeclassName );
+		wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("nodeclass"));
+		l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), l_plElements->size()));
+		l_pcElem->AddAttribute(wxT("name"), l_sNodeclassName);
 		p_pcRoot->AddChild(l_pcElem);
 
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WriteNode( ( *l_Iter ), l_pcElem);
+			WriteNode((*l_Iter), l_pcElem);
 		}
 	}
 
@@ -124,22 +124,22 @@ bool SP_ExportColSPN2ColCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 }
 
 bool SP_ExportColSPN2ColCPN::WritePlace(SP_DS_Node* p_pcVal,
-		wxXmlNode* p_pcRoot)
+	wxXmlNode* p_pcRoot)
 {
 
-	CHECK_POINTER( p_pcVal, return FALSE );
-	CHECK_POINTER( p_pcRoot, return FALSE );	
+	CHECK_POINTER(p_pcVal, return FALSE);
+	CHECK_POINTER(p_pcRoot, return FALSE);
 
 	SP_ListAttribute::const_iterator l_Iter;
 	const SP_ListAttribute* l_plAttributes = p_pcVal->GetAttributes();
-	CHECK_POINTER( l_plAttributes, return FALSE );
+	CHECK_POINTER(l_plAttributes, return FALSE);
 
-	wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE,  wxT("node"));
+	wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("node"));
 	p_pcRoot->AddChild(l_pcElem);
 
 	for (l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter)
 	{
-		WriteAttribute( ( *l_Iter ), l_pcElem);
+		WriteAttribute((*l_Iter), l_pcElem);
 	}
 
 	return WriteData(p_pcVal, l_pcElem);
@@ -147,53 +147,53 @@ bool SP_ExportColSPN2ColCPN::WritePlace(SP_DS_Node* p_pcVal,
 }
 
 bool SP_ExportColSPN2ColCPN::WriteTransition(SP_DS_Node* p_pcVal,
-		wxXmlNode* p_pcRoot)
+	wxXmlNode* p_pcRoot)
 {
-	CHECK_POINTER( p_pcVal, return FALSE );
-	CHECK_POINTER( p_pcRoot, return FALSE );	
+	CHECK_POINTER(p_pcVal, return FALSE);
+	CHECK_POINTER(p_pcRoot, return FALSE);
 
 	SP_ListAttribute::const_iterator l_Iter;
 	const SP_ListAttribute* l_plAttributes = p_pcVal->GetAttributes();
-	CHECK_POINTER( l_plAttributes, return FALSE );
+	CHECK_POINTER(l_plAttributes, return FALSE);
 
-	wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE,  wxT("node"));
+	wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("node"));
 	p_pcRoot->AddChild(l_pcElem);
 
 	for (l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter)
 	{
 
-	    if (( *l_Iter )->GetName() == wxT("DelayList"))
+		if ((*l_Iter)->GetName() == wxT("DelayList"))
 		{
 		}
-		else if (( *l_Iter )->GetName() == wxT("PeriodicList"))
+		else if ((*l_Iter)->GetName() == wxT("PeriodicList"))
 		{
 		}
 		else
 		{
-			WriteAttribute( ( *l_Iter ), l_pcElem);
+			WriteAttribute((*l_Iter), l_pcElem);
 		}
 	}
 	return WriteData(p_pcVal, l_pcElem);
 }
 
 bool SP_ExportColSPN2ColCPN::WriteParameter(SP_DS_Node* p_pcVal,
-		wxXmlNode* p_pcRoot)
+	wxXmlNode* p_pcRoot)
 {
 
-	CHECK_POINTER( p_pcVal, return FALSE );
-	CHECK_POINTER( p_pcRoot, return FALSE );
-	
+	CHECK_POINTER(p_pcVal, return FALSE);
+	CHECK_POINTER(p_pcRoot, return FALSE);
+
 
 	SP_ListAttribute::const_iterator l_Iter;
 	const SP_ListAttribute* l_plAttributes = p_pcVal->GetAttributes();
-	CHECK_POINTER( l_plAttributes, return FALSE );
+	CHECK_POINTER(l_plAttributes, return FALSE);
 
-	wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE,  wxT("node"));
+	wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("node"));
 	p_pcRoot->AddChild(l_pcElem);
 
 	for (l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter)
 	{
-		WriteAttribute( ( *l_Iter ), l_pcElem);
+		WriteAttribute((*l_Iter), l_pcElem);
 	}
 
 	return WriteData(p_pcVal, l_pcElem);
@@ -201,7 +201,7 @@ bool SP_ExportColSPN2ColCPN::WriteParameter(SP_DS_Node* p_pcVal,
 }
 
 bool SP_ExportColSPN2ColCPN::Write(SP_MDI_Doc* p_doc,
-		const wxString& p_fileName)
+	const wxString& p_fileName)
 {
 	CHECK_POINTER(p_doc, return false);
 	CHECK_POINTER(p_doc->GetGraph(), return false);
@@ -214,18 +214,18 @@ bool SP_ExportColSPN2ColCPN::Write(SP_MDI_Doc* p_doc,
 	m_nTran = m_graph->GetNodeclass(wxT("Transition"))->GetElements()->size();
 	m_nImmediateTran = m_graph->GetNodeclass(wxT("Immediate Transition"))->GetElements()->size();
 	m_nDeterministicTran = m_graph->GetNodeclass(wxT("Deterministic Transition"))->GetElements()->size();
-    m_nScheduledTran = m_graph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->size();		 
+	m_nScheduledTran = m_graph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->size();
 	/////
 	m_fileName = p_fileName;
 	return SP_XmlWriter::Write(m_graph, m_fileName);
 }
 
 bool SP_ExportColSPN2ColCPN::WriteNetclass(SP_DS_Netclass* p_pcVal,
-		wxXmlNode* p_pcRoot)
+	wxXmlNode* p_pcRoot)
 {
 	CHECK_POINTER(p_pcVal, return FALSE);
 	CHECK_POINTER(p_pcRoot, return FALSE);
-	
+
 
 	wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("netclass"));
 	l_pcElem->AddAttribute(wxT("name"), SP_DS_COLCPN_CLASS);
@@ -235,11 +235,11 @@ bool SP_ExportColSPN2ColCPN::WriteNetclass(SP_DS_Netclass* p_pcVal,
 }
 
 bool SP_ExportColSPN2ColCPN::WriteEdgeclass(SP_DS_Edgeclass* p_pcVal,
-		wxXmlNode* p_pcRoot)
+	wxXmlNode* p_pcRoot)
 {
 	CHECK_POINTER(p_pcVal, return FALSE);
 	CHECK_POINTER(p_pcRoot, return FALSE);
-	
+
 
 	SP_ListEdge::const_iterator l_Iter;
 	const SP_ListEdge* l_plElements = p_pcVal->GetElements();
@@ -249,26 +249,26 @@ bool SP_ExportColSPN2ColCPN::WriteEdgeclass(SP_DS_Edgeclass* p_pcVal,
 
 	if (wxT("Edge") == l_sEdgeclassName ||
 		wxT("Inhibitor Edge") == l_sEdgeclassName ||
-		wxT("Read Edge") == l_sEdgeclassName||
-		wxT("Equal Edge") == l_sEdgeclassName||
-		wxT("Reset Edge")== l_sEdgeclassName||
+		wxT("Read Edge") == l_sEdgeclassName ||
+		wxT("Equal Edge") == l_sEdgeclassName ||
+		wxT("Reset Edge") == l_sEdgeclassName ||
 		wxT("Modifier Edge") == l_sEdgeclassName)
 	{
 		wxXmlNode* l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("edgeclass"));
-		l_pcElem->AddAttribute(wxT("count"), wxString::Format( wxT("%d"), l_plElements->size()));
+		l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), l_plElements->size()));
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
 			WriteEdge((*l_Iter), l_pcElem);
 		}
 
-		if(wxT("Edge") == l_sEdgeclassName||
+		if (wxT("Edge") == l_sEdgeclassName ||
 			wxT("Equal Edge") == l_sEdgeclassName)
 		{
 			l_sEdgeclassName = SP_DS_EDGE;
 		}
 
-		if( wxT("Read Edge") == l_sEdgeclassName||
-			wxT("Reset Edge")== l_sEdgeclassName )
+		if (wxT("Read Edge") == l_sEdgeclassName ||
+			wxT("Reset Edge") == l_sEdgeclassName)
 		{
 			l_sEdgeclassName = SP_DS_READ_EDGE;
 		}
@@ -283,27 +283,27 @@ bool SP_ExportColSPN2ColCPN::WriteEdgeclass(SP_DS_Edgeclass* p_pcVal,
 bool
 SP_ExportColSPN2ColCPN::WriteEdge(SP_DS_Edge* p_pcVal, wxXmlNode* p_pcRoot)
 {
-    CHECK_POINTER(p_pcVal, return FALSE);
-    CHECK_POINTER(p_pcRoot, return FALSE);
-    
+	CHECK_POINTER(p_pcVal, return FALSE);
+	CHECK_POINTER(p_pcRoot, return FALSE);
 
-    SP_ListAttribute::const_iterator l_Iter;
-    const SP_ListAttribute* l_plAttributes = p_pcVal->GetAttributes();
-    CHECK_POINTER(l_plAttributes, return FALSE);
 
-    wxXmlNode*  l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("edge"));
-    if (p_pcVal->GetSource())
-        l_pcElem->AddAttribute(wxT("source"), wxString::Format( wxT("%ld"), p_pcVal->GetSource()->GetId()));
-    if (p_pcVal->GetTarget())
-        l_pcElem->AddAttribute(wxT("target"), wxString::Format( wxT("%ld"), p_pcVal->GetTarget()->GetId()));
-    p_pcRoot->AddChild(l_pcElem);
+	SP_ListAttribute::const_iterator l_Iter;
+	const SP_ListAttribute* l_plAttributes = p_pcVal->GetAttributes();
+	CHECK_POINTER(l_plAttributes, return FALSE);
 
-    for (l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter)
-    {		
-        WriteAttribute((*l_Iter), l_pcElem);    	
-    }
+	wxXmlNode*  l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("edge"));
+	if (p_pcVal->GetSource())
+		l_pcElem->AddAttribute(wxT("source"), wxString::Format(wxT("%ld"), p_pcVal->GetSource()->GetId()));
+	if (p_pcVal->GetTarget())
+		l_pcElem->AddAttribute(wxT("target"), wxString::Format(wxT("%ld"), p_pcVal->GetTarget()->GetId()));
+	p_pcRoot->AddChild(l_pcElem);
 
-    return WriteData(p_pcVal, l_pcElem);
+	for (l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter)
+	{
+		WriteAttribute((*l_Iter), l_pcElem);
+	}
+
+	return WriteData(p_pcVal, l_pcElem);
 }
 
 bool SP_ExportColSPN2ColCPN::AcceptsDoc(SP_MDI_Doc* p_doc)
@@ -317,53 +317,53 @@ bool SP_ExportColSPN2ColCPN::AcceptsDoc(SP_MDI_Doc* p_doc)
 
 bool
 SP_ExportColSPN2ColCPN::WriteEdgeGraphic(SP_GR_Edge* p_pcVal,
-				     wxXmlNode* p_pcRoot)
+	wxXmlNode* p_pcRoot)
 {
-  if (m_edgeClass != wxT("Edge")) 
-	  m_changeColour = true;
-  bool res = SP_XmlWriter::WriteEdgeGraphic(p_pcVal, p_pcRoot);
-  m_changeColour = false;
+	if (m_edgeClass != wxT("Edge"))
+		m_changeColour = true;
+	bool res = SP_XmlWriter::WriteEdgeGraphic(p_pcVal, p_pcRoot);
+	m_changeColour = false;
 
-  return res;
+	return res;
 }
 
 bool
 SP_ExportColSPN2ColCPN::WriteColourInformation(SP_Graphic* p_pcVal,
-					   wxXmlNode* p_pcNode)
+	wxXmlNode* p_pcNode)
 {
-  CHECK_POINTER(p_pcVal, return FALSE);
-  CHECK_POINTER(p_pcNode, return FALSE);
+	CHECK_POINTER(p_pcVal, return FALSE);
+	CHECK_POINTER(p_pcNode, return FALSE);
 
-  if (m_changeColour) 
-  { // write our own colors
+	if (m_changeColour)
+	{ // write our own colors
 
-   if( m_edgeClass == wxT("Edge") )
-	   return SP_XmlWriter::WriteColourInformation(p_pcVal, p_pcNode);
+		if (m_edgeClass == wxT("Edge"))
+			return SP_XmlWriter::WriteColourInformation(p_pcVal, p_pcNode);
 
-    if (m_edgeClass == wxT("Read Edge") )
-	       return SP_XmlWriter::WriteColourInformation(p_pcVal, p_pcNode);
+		if (m_edgeClass == wxT("Read Edge"))
+			return SP_XmlWriter::WriteColourInformation(p_pcVal, p_pcNode);
 
-	if(m_edgeClass == wxT("Inhibitor Edge") )
-	     return SP_XmlWriter::WriteColourInformation(p_pcVal, p_pcNode);
+		if (m_edgeClass == wxT("Inhibitor Edge"))
+			return SP_XmlWriter::WriteColourInformation(p_pcVal, p_pcNode);
 
-    wxString colour;
-	
-	if (m_edgeClass == wxT("Reset Edge")) 
+		wxString colour;
+
+		if (m_edgeClass == wxT("Reset Edge"))
+		{
+			colour = wxT("255,0,255");
+		}
+		if (m_edgeClass == wxT("Equal Edge"))
+		{
+			colour = wxT("255,220,0");
+		}
+		p_pcNode->AddAttribute(wxT("pen"), colour.c_str());
+		p_pcNode->AddAttribute(wxT("brush"), colour.c_str());
+	}
+	else
 	{
-      colour=wxT("255,0,255");
-    } 
-	if (m_edgeClass == wxT("Equal Edge")) 
-	{
-      colour=wxT("255,220,0");
-    }
-    p_pcNode->AddAttribute(wxT("pen"), colour.c_str());
-    p_pcNode->AddAttribute(wxT("brush"), colour.c_str());
-  } 
-   else 
-  {
-    return SP_XmlWriter::WriteColourInformation(p_pcVal, p_pcNode);
-  }
-  return true;
+		return SP_XmlWriter::WriteColourInformation(p_pcVal, p_pcNode);
+	}
+	return true;
 }
 
 

@@ -13,6 +13,9 @@
 
 #include "sp_revision.h"
 
+#include "sp_ds/attributes/SP_DS_MarkingAttribute.h"
+
+
 bool SP_ExportHPN2SPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 {
 	CHECK_POINTER(p_doc, return false);
@@ -68,7 +71,40 @@ bool SP_ExportHPN2SPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 		{
 			for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 			{
-				WritePlace((*l_Iter), m_pcElem);
+				//////Obtain Marking of the Node//////
+				wxString l_sAttributeName = wxT("Marking");
+				SP_DS_Attribute* l_pcOldAttribute = (*l_Iter)->GetAttribute(l_sAttributeName);
+				wxString valString = l_pcOldAttribute->GetValueString();
+				double marking;
+				valString.ToDouble(&marking);
+				/************************************/
+
+				wxString m_newType = wxT("Discrete Place");
+
+				SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);
+
+
+
+				SP_DS_Node* ConvertedNode = m_converter.Clone((**l_Iter), (*l_pcConvertToNodeClass));
+
+
+				SP_DS_Attribute* l_pcNewAttribute = ConvertedNode->GetAttribute(l_sAttributeName);
+
+				SP_DS_Attribute* att;
+
+				if (floor(marking) == ceil(marking))
+				{
+					att = new SP_DS_MarkingAttribute(wxT("Marking"), (int)marking);
+				}
+				else
+				{
+					int roundedVal = round(marking);
+					att = new SP_DS_MarkingAttribute(wxT("Marking"), roundedVal);
+				}
+
+				l_pcNewAttribute->CopyValueFrom(att);
+
+				WritePlace(ConvertedNode, m_pcElem);
 			}
 		}
 		else
@@ -90,7 +126,12 @@ bool SP_ExportHPN2SPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 			{
 				for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 				{
-					WriteTransition((*l_Iter), m_pcElem);
+					wxString m_newType = wxT("Stochastic Transition");
+					SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType); 
+																											  
+					SP_DS_Node* ConvertedNode = m_converter.Clone(**l_Iter, *l_pcConvertToNodeClass);
+					ConvertedNode->Update();
+					WriteTransition(ConvertedNode, m_pcElem);
 				}
 			}
 			else

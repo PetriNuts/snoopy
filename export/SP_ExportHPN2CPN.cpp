@@ -60,7 +60,14 @@ bool SP_ExportHPN2CPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WritePlace((*l_Iter), m_pcElem);
+			/*lines 64-69 Added by G.A and line 70 is modified also*/
+			wxString m_newType = wxT("Continuous Place");//to be removed
+			SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);//to be removed
+			SP_DS_Node* ConvertedNode1 = m_converter.Clone((**l_Iter), *l_pcConvertToNodeClass);// ConvertNode((*l_Iter), l_pcConvertToNodeClass);// to be removed
+ 			SP_DS_Attribute* nameAttr = ConvertedNode1->GetAttribute(wxT("ID"));
+			wxString valString = nameAttr->GetValueString();
+			m_names.push_back(valString);
+			WritePlace(ConvertedNode1, m_pcElem);
 		}
 	}
 	else
@@ -68,21 +75,48 @@ bool SP_ExportHPN2CPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 		{
 			for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 			{
+				SP_DS_Attribute* nameAttr = (*l_Iter)->GetAttribute(wxT("Name"));
+				wxString valString = nameAttr->GetValueString();
+				bool isConv = m_converter.IsConverted(valString);
+				for (int i = 0; i < m_names.size(); i++)
+				{
+					if (m_names[i] == valString)
+					{
+						return TRUE;
+					}
+				}
 				WritePlace((*l_Iter), m_pcElem);
+				 
 			}
 		}
 		else
 			if (l_sNodeclassName == SP_DS_STOCHASTIC_TRANS)
 			{
+				unsigned long l_mStochTransitionCount = m_graph->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements()->size();
+				l_mStochTransitionCount += m_graph->GetNodeclass(SP_DS_STOCHASTIC_TRANS)->GetElements()->size();
 				m_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("nodeclass"));
-				m_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), m_mTransitionCount));
+				m_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), l_mStochTransitionCount));
 				m_pcElem->AddAttribute(wxT("name"), SP_DS_CONTINUOUS_TRANS);
 				p_pcRoot->AddChild(m_pcElem);
 
 				for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 				{
-					WriteTransition((*l_Iter), m_pcElem);
-				}
+					wxString m_newType = wxT("Continuous Transition"); 
+
+					SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);
+
+					SP_DS_Node* ConvertedNode = m_converter.Clone((**l_Iter), *l_pcConvertToNodeClass);
+
+ 					ConvertedNode->Update();
+
+					SP_DS_Attribute* nameAttr = ConvertedNode->GetAttribute(wxT("ID"));
+
+					wxString valString = nameAttr->GetValueString();
+
+					m_names.push_back(valString);
+
+					WriteTransition(ConvertedNode, m_pcElem); 
+ 				}
 			}
 			else
 				if (l_sNodeclassName == SP_DS_IMMEDIATE_TRANS)
@@ -110,7 +144,25 @@ bool SP_ExportHPN2CPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 								WriteTransition((*l_Iter), m_pcElem);
 							}
 						}
+						else if (l_sNodeclassName == SP_DS_CONTINUOUS_TRANS)
+						{
 
+
+							for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
+							{
+
+								SP_DS_Attribute* IdAttr = (*l_Iter)->GetAttribute(wxT("ID"));
+
+								wxString valString = IdAttr->GetValueString();
+
+								for (int i = 0; i < m_names.size(); i++)
+								{
+									if (m_names[i] == valString) return TRUE;
+								}
+
+								WriteTransition((*l_Iter), m_pcElem); 
+							}
+						}
 						else
 						{
 

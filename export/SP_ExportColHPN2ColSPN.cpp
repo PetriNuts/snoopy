@@ -18,7 +18,7 @@
 #include "sp_gr/attributes/SP_GR_TextAttribute.h"
 #include "sp_ds/attributes/SP_DS_IdAttribute.h"
 
-
+#include "sp_ds/attributes/SP_DS_MarkingAttribute.h"
 bool SP_ExportColHPN2ColSPN::AcceptsDoc(SP_MDI_Doc* p_doc)
 {
 	CHECK_POINTER(p_doc, return false);
@@ -95,7 +95,55 @@ bool SP_ExportColHPN2ColSPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		wxXmlNode* l_pcElem = m_pcPlaceNodeclass;		
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WritePlace( ( *l_Iter ), l_pcElem);
+			wxString l_sNodeClass = p_pcVal->GetName();
+			if (l_sNodeClass== SP_DS_CONTINUOUS_PLACE)
+			{
+				//////Obtain Marking of the Node//////
+				wxString l_sAttributeName = wxT("Marking");
+				SP_DS_Attribute* l_pcOldAttribute = (*l_Iter)->GetAttribute(l_sAttributeName);
+				wxString valString = l_pcOldAttribute->GetValueString();
+				double marking;
+				valString.ToDouble(&marking);
+				/************************************/
+
+				wxString m_newType = wxT("Discrete Place");
+
+				SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);
+
+
+
+				SP_DS_Node* ConvertedNode = m_converter.Clone((**l_Iter), (*l_pcConvertToNodeClass));
+
+
+				SP_DS_Attribute* l_pcNewAttribute = ConvertedNode->GetAttribute(l_sAttributeName);
+
+				SP_DS_Attribute* att;
+
+				if (floor(marking) == ceil(marking))
+				{
+					att = new SP_DS_MarkingAttribute(wxT("Marking"), (int)marking);
+				}
+				else
+				{
+					int roundedVal = round(marking);
+					att = new SP_DS_MarkingAttribute(wxT("Marking"), roundedVal);
+				}
+
+				l_pcNewAttribute->CopyValueFrom(att);
+				SP_DS_Attribute* nameAttr = ConvertedNode->GetAttribute(wxT("ID"));
+				wxString valString1 = nameAttr->GetValueString();
+				m_names.push_back(valString1);
+
+				WritePlace(ConvertedNode, l_pcElem);
+			}
+			else {
+				SP_DS_Attribute* IdAttr = (*l_Iter)->GetAttribute(wxT("ID"));
+
+				wxString valString = IdAttr->GetValueString();
+				for (int i = 0; i<m_names.size(); i++)
+					if (m_names[i] == valString) { return TRUE; }
+				WritePlace((*l_Iter), l_pcElem);
+			}
 		}
 	}	
 	else if (wxT("Transition") == l_sNodeclassName ||	
@@ -115,7 +163,30 @@ bool SP_ExportColHPN2ColSPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 	    wxXmlNode* l_pcElem = m_pcTransitionNodeclass;		
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WriteTransition( ( *l_Iter ), l_pcElem);
+			wxString l_sNodeClass = p_pcVal->GetName();
+			if (l_sNodeClass== SP_DS_CONTINUOUS_TRANS)
+			{
+				wxString m_newType = wxT("Stochastic Transition");
+				SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);
+
+				SP_DS_Node* ConvertedNode = m_converter.Clone(**l_Iter, *l_pcConvertToNodeClass);
+				SP_DS_Attribute* nameAttr = ConvertedNode->GetAttribute(wxT("ID"));
+				wxString valString = nameAttr->GetValueString();
+				m_names.push_back(valString);
+				WriteTransition(ConvertedNode, l_pcElem);
+
+			}
+			else
+			{
+				SP_DS_Attribute* IdAttr = (*l_Iter)->GetAttribute(wxT("ID"));
+
+				wxString valString = IdAttr->GetValueString();
+				for (int i = 0; i<m_names.size(); i++)
+					if (m_names[i] == valString) { return TRUE; }
+				WriteTransition((*l_Iter), l_pcElem);
+
+			}
+			
 		}
 	}
 	else if (wxT("Immediate Transition") == l_sNodeclassName)

@@ -9,6 +9,7 @@
 
 #include "export/SP_ExportRoutine.h"
 #include "sp_core/SP_XmlWriter.h"
+#include "export/SpConvertElement.h"
 
 class SP_ExportStochPed2ContPed:  public SP_ExportRoutine, private SP_XmlWriter
 {
@@ -20,6 +21,8 @@ class SP_ExportStochPed2ContPed:  public SP_ExportRoutine, private SP_XmlWriter
 	 unsigned m_nDeterministicTran;
 	 unsigned m_nScheduledTran;
 	 wxXmlNode* m_pcTransitionNodeclass;
+	 SpConvertElement m_converter = SpConvertElement();
+	 std::vector<wxString> m_sIds;
 
  protected:
 

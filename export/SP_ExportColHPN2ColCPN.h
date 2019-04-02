@@ -9,6 +9,8 @@
 
 #include "export/SP_ExportRoutine.h"
 #include "sp_core/SP_XmlWriter.h"
+#include "export/SpConvertElement.h"//Added by G.A
+
 
 class SP_ExportColHPN2ColCPN:  public SP_ExportRoutine, private SP_XmlWriter
 {
@@ -22,6 +24,9 @@ class SP_ExportColHPN2ColCPN:  public SP_ExportRoutine, private SP_XmlWriter
 
 	 wxString m_edgeClass;
 	 bool m_changeColour;
+
+	 std::vector<wxString> m_names;//Added by G.A
+	 SpConvertElement m_converter = SpConvertElement();//Added by G.A
 
  protected:
 
