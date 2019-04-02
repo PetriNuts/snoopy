@@ -478,6 +478,10 @@ SP_Graphic::RemoveGraphicChildren(SP_Graphic* p_pcChild)
     }
     // and remember me as graphic parent for the param
     p_pcChild->SetGraphicParent(p_pcChild);
+    // removing children of p_pcChild from canvas
+    for(SP_Graphic* l_pcGraphicChild : *(p_pcChild->GetGraphicChildren())) {
+    			l_pcGraphicChild->RemoveFromCanvas();
+	}
 
     return TRUE;
 }

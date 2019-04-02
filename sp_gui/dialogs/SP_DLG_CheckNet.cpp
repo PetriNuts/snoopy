@@ -176,14 +176,14 @@ void SP_DLG_CheckNet::CheckDuplicateNodes()
 						wxString l_sMessage = l_sMetaclass + wxT(" with ID=")
 								+ meta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID)->GetValueString()
 								+ wxT(" has no name!");
-						SP_LOGWARNING( l_sMessage);
+						//SP_LOGWARNING( l_sMessage);
 					}
 					else
 					{
 						if(l_mpNodes[l_sName])
 						{
 							wxString l_sMessage = l_sMetaclass + wxT(" ") + l_sName + wxT(" is not unique!");
-							SP_LOGWARNING( l_sMessage);
+							//SP_LOGWARNING( l_sMessage);
 							l_bUniqueNodes = false;
 						}
 						l_mpNodes[l_sName] = meta;

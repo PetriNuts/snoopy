@@ -116,6 +116,7 @@
 #include "import/SP_ImportSBML2sPn.h"
 #include "import/SP_ImportCSV2SPN.h"
 #include "import/SP_ImportCSV2ColPN.h" //liu 2010
+#include "import/erode/SP_ImportERODE.h"
 
 #include "export/SP_ExportColPT2PT.h"
 #include "export/SP_ExportColExtPT2ExtPT.h" //2009 liu
@@ -181,6 +182,9 @@
 
 #include "export/SP_ExportHPN2CPN.h"
 #include "export/SP_ExportHPN2SPN.h"
+
+#include "export/SP_ExportERODE.h"
+
 
 #include <wx/cmdline.h>
 #include <wx/fs_zip.h>
@@ -886,6 +890,12 @@ bool Snoopy::OnInit()
 			wxDELETE(l_pcExport);
 	}
 
+	l_pcExport = new SP_ExportERODE();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+			wxDELETE(l_pcExport);
+	}
+
 #ifdef __WXDEBUG__
 	l_pcExport = new SP_ExportCPP();
 	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
@@ -1048,6 +1058,12 @@ bool Snoopy::OnInit()
 	{
 		wxDELETE(l_pcImport);
 	}
+	l_pcImport = new SP_ImportERODE();
+	if (!m_pcImportManager->AddImportRoutine(l_pcImport))
+	{
+		wxDELETE(l_pcImport);
+	}
+
 
 	//create preferences (must be done before initializing any net classes
 	m_pcCanvasPrefs = new SP_GPR_Canvas();

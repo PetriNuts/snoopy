@@ -30,15 +30,16 @@ SP_DLG_About::SP_DLG_About (wxWindow *p_pcParent, int p_nMilliseconds)
     l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_REVISION),0);
     l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Release: ")),0);
     l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_RELEASE),0);
-    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Build: ")),0);
+    l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Built: ")),0);
     l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, SP_APP_BUILD),0);
     l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY, _("Contributors: \n(in alphabetic order)  ")),0);
     l_pcAboutInfo->Add (new wxStaticText(this, wxID_ANY,
-	wxT("Shubham Agarwal, Denny Bayer, Matthias Dube, Markus Fieber, \n")
-	wxT("Monika Heiner, Mostafa Herajy, Erik Jongsma, Christian Krueger, \n")
-	wxT("Anja Kurth, Steffen Laarz, Sebastian Lehrack, Fei Liu, \n")
-	wxT("Thomas Meier, Ronny Richter, Christian Rohr, Daniel Scheibler, \n")
-	wxT("Martin Schwarick, Anjali Sharma, Alexey Tovchigrechko, Katja Winder")
+	wxT("Shubham Agarwal, George Assaf, Denny Bayer, Jacek Chodak, \n")
+	wxT("Matthias Dube, Markus Fieber, Monika Heiner, Mostafa Herajy, \n")
+	wxT("Erik Jongsma, Christian Krueger, Anja Kurth, Steffen Laarz, \n")
+	wxT("Sebastian Lehrack, Fei Liu, Thomas Meier, Ronny Richter, \n")
+	wxT("Christian Rohr, Daniel Scheibler, Martin Schwarick, Anjali Sharma, \n")
+	wxT("Alexey Tovchigrechko, Katja Winder")
     )
 	,0);
 

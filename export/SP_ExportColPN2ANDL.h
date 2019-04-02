@@ -31,7 +31,7 @@ private:
   virtual bool AcceptsDoc(SP_MDI_Doc*);
 	
   inline virtual wxString GetName()
-    { return wxT("Export to ANDL (Charlie & Marcie)");}
+    { return wxT("Export to ANDL (Charlie, Marcie & Spike)");}
   inline virtual wxString GetDescr()
     { return wxT("Export a Colored Petri Net in ANDL Format");}
   virtual wxString GetExtension()
