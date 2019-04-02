@@ -14,7 +14,11 @@
 #include "sp_ds/extensions/ResultViewer/SP_DS_TableViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_xyPlotViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_HistogramPlotViewer.h"
+#include "wx/scrolbar.h"
+#include "spsim/simulator.h"
 
+#include "sp_core/SP_Core.h"
+#include "sp_gui/mdi/SP_MDI_Doc.h"
 IMPLEMENT_CLASS(SP_DLG_ViewerWindow, wxFrame)
 
 enum
@@ -29,7 +33,10 @@ enum
 	SP_ID_BUTTON_EXPORT,
 	SP_ID_CHANGE_X_AXIS,
 	SP_ID_BUTTON_EDIT_NODE_LIST,
-	SP_ID_BUTTON_SHOW_HIDE_NODE_LIST
+	SP_ID_BUTTON_SHOW_HIDE_NODE_LIST,
+	SP_ID_SCROLL_BAR,
+	SP_ID_Time_Label,
+	SP_ID_Time_VALUE
 };
 
 BEGIN_EVENT_TABLE( SP_DLG_ViewerWindow, wxFrame )
@@ -61,6 +68,9 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 		m_pcPlaceChoiceCheckListBox = new wxCheckListBox(this, SP_ID_CHECKLISTBOX_PLACE_CHOICE, wxDefaultPosition, wxSize(200, 200));
 		l_pcPlaceChoiceSizer->Add(m_pcPlaceChoiceCheckListBox, 1, wxALL | wxEXPAND, 5);
 
+		//SP_DS_Graph* l_pcNetClass = SP_Core::Instance()->GetRootDocument()->GetGraph();// ->GetNetclass();
+		//wxString ss= spsim::Simulator::g
+
 		//select/deselect all
 		m_pcSelectClearAllChkBox = new wxCheckBox(this, SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS, wxT("Select/deselect all"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE);
 		m_pcSelectClearAllChkBox->Set3StateValue(wxCHK_UNDETERMINED);
@@ -91,7 +101,31 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 		l_pcRowSizer->Add(m_pcOutputExportType, 0, wxALL, 1);
 		l_pcRowSizer->Add(new wxButton(this, SP_ID_BUTTON_EXPORT, wxT("Export")), 0, wxALL, 1);
 
+		wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
+		
+
+		if (m_sNetClassName.Contains(wxT("Fuzzy")))//for testing purposes
+		{
+			m_pcScroll = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Change Time point")), wxHORIZONTAL);
+			  scrollBar = new wxScrollBar(this, SP_ID_SCROLL_BAR,wxDefaultPosition, wxSize(300, 20), wxSB_HORIZONTAL);
+			  timeLabel=new  wxStaticText(this, SP_ID_Time_Label,wxT("TimePoint:"), wxDefaultPosition, wxDefaultSize, 0);
+			  timePointValue=  new wxTextCtrl(this, SP_ID_Time_VALUE,  wxEmptyString, wxDefaultPosition, wxSize(40,20), wxTE_CENTER);
+			  timePointValue->Enable(true);
+			m_pcScroll->Add(scrollBar);
+			m_pcScroll->Add(timeLabel);
+			m_pcScroll->Add(timePointValue);
+		}
+		else {
+
+			m_pcScroll = nullptr;
+		}
 		l_pcViewSizer->Add(l_pcRowSizer, 0, wxALL, 5);
+
+		if (m_sNetClassName.Contains(wxT("Fuzzy")))//for testing purposes
+		{
+			l_pcViewSizer->Add(m_pcScroll, 0, wxALL, 5);//
+		}//
+
 		m_pcMainSizer->Add(l_pcViewSizer, 0, wxALL, 1);
 
 		l_pcViewSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -130,7 +164,16 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnExportClick, this, SP_ID_BUTTON_EXPORT);
 		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnChangeXAxis, this, SP_ID_CHANGE_X_AXIS);
 		Bind(wxEVT_ACTIVATE, &SP_DLG_ViewerWindow::OnWindowActivate, this);
-
+	 //Scroll bar events handlers 
+	Bind(wxEVT_SCROLL_LINEUP,&SP_DLG_ViewerWindow::OnScroll,this, SP_ID_SCROLL_BAR);
+	Bind(wxEVT_SCROLL_LINEDOWN,&SP_DLG_ViewerWindow::OnScroll,this, SP_ID_SCROLL_BAR);
+	Bind(wxEVT_SCROLL_PAGEUP,&SP_DLG_ViewerWindow::OnScroll, this, SP_ID_SCROLL_BAR);
+	Bind(wxEVT_SCROLL_PAGEDOWN,&SP_DLG_ViewerWindow::OnScroll,this, SP_ID_SCROLL_BAR);
+	Bind(wxEVT_SCROLL_CHANGED,&SP_DLG_ViewerWindow::OnScroll, this, SP_ID_SCROLL_BAR);
+	//when entering certain time point to the textCtrl
+	Bind(wxEVT_COMMAND_TEXT_ENTER, &SP_DLG_ViewerWindow::OnTextEner, this, SP_ID_Time_VALUE);
+	
+	
 }
 
 SP_DLG_ViewerWindow::~SP_DLG_ViewerWindow()
@@ -154,6 +197,7 @@ void SP_DLG_ViewerWindow::CreateResultViewer(const wxString& p_sViewerType)
 	if (l_sViewerType.IsSameAs(wxT("xyPlot")))
 	{
 		m_pcResultViewer = new SP_DS_xyPlotViewer(this, m_pcViewerSizer);
+		
 	}
 	else
 	if (l_sViewerType.IsSameAs(wxT("Histogram")))
@@ -169,6 +213,18 @@ void SP_DLG_ViewerWindow::CreateResultViewer(const wxString& p_sViewerType)
 	m_pcResultViewer->Create();
 
 	m_pcResultViewer->SetXAxisValues(&m_anXValues);
+	if (scrollBar != nullptr)
+	{
+		wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
+		if (m_sNetClassName.Contains("Fuzzy"))
+		{
+		
+		scrollBar->SetRange(m_anXValues.size());
+		m_pcResultViewer->SetYAxisValues(&m_anYValues);
+		}
+		 
+	}
+	 
 }
 
 void SP_DLG_ViewerWindow::OnWindowClose(wxCloseEvent& event)
@@ -190,7 +246,43 @@ void SP_DLG_ViewerWindow::OnClose(wxCommandEvent& event)
 	Close();
 	event.Skip();
 }
+void SP_DLG_ViewerWindow::OnTextEner(wxCommandEvent & event)
+{
+	wxString sTimeVal = timePointValue->GetValue();
+	double dTime;
+	if (sTimeVal.ToDouble(&dTime))
+	{
+		scrollBar->SetScrollPos(1, dTime);
+		 
+		//scrollBar->SetToolTip(cc);
+		//timePointValue->SetLabelText(cc);
+		m_pcResultViewer->UpdateMembershipViewer(dTime);
+	
+	}
+	else
+	{
 
+		/*error!*/
+
+		std::string msg = "You entered an invalid value!";
+		SP_LOGWARNING(msg);
+		wxMessageDialog* errr_dlg = new wxMessageDialog(this, msg, "Invalid Time Value!", wxOK| wxICON_WARNING);
+		errr_dlg->ShowModal();
+		timePointValue->SetValue(wxT("0"));
+	}
+
+}
+
+void SP_DLG_ViewerWindow::OnScroll(wxCommandEvent& event1)
+{
+	double x = scrollBar->GetThumbPosition();
+	wxString cc;
+	cc << x;
+	scrollBar->SetToolTip(cc);
+	timePointValue->SetLabelText(cc);
+	m_pcResultViewer->UpdateMembershipViewer(x);
+
+}
 
 void SP_DLG_ViewerWindow::OnShowHideNodeList(wxCommandEvent& event)
 {

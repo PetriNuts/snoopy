@@ -33,6 +33,17 @@ const wxString SP_DS_COARSE_PARAMETER = wxT("Coarse Parameter");
 // SP_DS_EventSPN
 const wxString SP_DS_SPN_CLASS = wxT("Stochastic Petri Net");
 
+//SP_DS_FuzzySPN
+const wxString SP_DS_FUZZYSPN_CLASS = wxT("Fuzzy Stochastic Petri Net");
+
+//SP_DS_FuzzyCPN
+
+const wxString SP_DS_FUZZYCPN_CLASS = wxT("Fuzzy Continuous Petri Net");
+
+//SP_DS_FuzzyHPN
+
+const wxString SP_DS_FUZZYHPN_CLASS = wxT("Fuzzy Hybrid Petri Net");
+
 // SP_DS_TimePT
 const wxString SP_DS_TIMEPN_CLASS = wxT("Time Petri Net");
 
@@ -84,6 +95,11 @@ const wxString SP_DS_REACHABILITY_CLASS = wxT("Reachability Graph");
 
 // SP_DS_FaultTree
 const wxString SP_DS_FAULTTREE_CLASS = wxT("Fault Tree");
+
+//SP_DS_FuzzyPN 
+//const wxString SP_DS_FUZZYPN_CLASS = wxT("Fuzzy Petri Net");//added by G.Assaf
+
+
 
 // SP_DS_ExtendedFaultTree
 const wxString SP_DS_EXTFAULTTREE_CLASS = wxT("Extended Fault Tree");

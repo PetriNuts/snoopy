@@ -37,7 +37,7 @@ enum class SP_ATTRIBUTE_TYPE
 	SP_ATTRIBUTE_DOUBLEMARKINGDEPENDETMULTIPLICITY,
 	SP_ATTRIBUTE_MARKING,
 	SP_ATTRIBUTE_DOUBLEMARKING
-};
+ };
 
 #include "sp_core/base/SP_Error.h"
 #include "sp_core/base/SP_Data.h"

@@ -152,7 +152,14 @@ Chart* SP_DS_HistogramPlotViewer::CreateChart()
 
 	return new Chart(l_pcPlot, m_sTitle);
 }
-
+Chart* SP_DS_HistogramPlotViewer::CreateFuzzyPlot()
+{
+	return NULL;
+}
+Chart* SP_DS_HistogramPlotViewer::CreateMembershipFunction(double timepoint)
+{
+	return NULL;
+}
 XYDynamicSerie* SP_DS_HistogramPlotViewer::PreProcessData(SP_VectorDouble& p_anColumnData)
 {
 	unsigned int l_nNumberCount = std::sqrt((double) p_anColumnData.size());

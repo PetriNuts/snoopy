@@ -354,6 +354,16 @@ extern const wxString SP_DS_COARSE_PARAMETER;
 
 // SP_DS_EventSPN
 extern const wxString SP_DS_SPN_CLASS;
+//SP_DS_FuzzySPN
+extern const wxString SP_DS_FUZZYSPN_CLASS;
+
+//SP_DS_FuzzyCPN
+
+extern const wxString SP_DS_FUZZYCPN_CLASS;
+
+//SP_DS_FuzzyHPN
+
+extern const wxString SP_DS_FUZZYHPN_CLASS;
 
 // SP_DS_TimePT
 extern const wxString SP_DS_TIMEPN_CLASS;
@@ -406,6 +416,9 @@ extern const wxString SP_DS_REACHABILITY_CLASS;
 
 // SP_DS_FaultTree
 extern const wxString SP_DS_FAULTTREE_CLASS;
+
+//SP_DS_FUZZYPN
+//extern const wxString SP_DS_FUZZYPN_CLASS;//added by G.Assaf
 
 // SP_DS_ExtendedFaultTree
 extern const wxString SP_DS_EXTFAULTTREE_CLASS;

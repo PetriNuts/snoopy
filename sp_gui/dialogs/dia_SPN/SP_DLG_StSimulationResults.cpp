@@ -8,16 +8,20 @@
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 #include <wx/dcps.h>
+#include "sp_ds/extensions/SP_DS_SimulatorThread.h"/////
 #include <wx/printdlg.h>
 #include <wx/filename.h>
 #include <wx/textfile.h>
 #include <wx/regex.h>
+#include "spsim/simulator.h"
 #include "export/SP_EPSDC.h"
+#include "sp_ds/extensions/ext_SPN/SP_DS_StSimTransition.h"
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StSimulationResults.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStMarkingOverview.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStFunctionOverview.h"
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StDirectExportProperties.h"
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StMarkingOverview.h"
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_FpnConstantDefinition.h"
 //bysl
 #include "sp_gui/dialogs/SP_DLG_NewConstantDefinition.h"
 #include "sp_ds/attributes/SP_DS_MarkingDependentMultiplicity.h"
@@ -436,10 +440,10 @@ void SP_DLG_StSimulationResults::OnModifyScheduleSets(wxCommandEvent& p_cEvent)
 
 }
 
-void SP_DLG_StSimulationResults::OnModifyParameterSets(wxCommandEvent& p_cEvent)
+void SP_DLG_StSimulationResults::OnModifyParameterSets(wxCommandEvent& p_cEvent)//constants
 {
 	SP_DLG_NewConstantDefinition* l_pcDlg = new SP_DLG_NewConstantDefinition(NULL);
-
+	//SP_DLG_FpnConstantDefinition*   l_pcDlg = new SP_DLG_FpnConstantDefinition(NULL);
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{
 		LoadSets();
@@ -1033,6 +1037,7 @@ void SP_DLG_StSimulationResults::UpdateSimulationMatrix(SP_DS_Metadata* p_pcView
 	UpdateXAxisValues();
 }
 
+
 bool SP_DLG_StSimulationResults::ComputeAuxiliaryVars()
 {
 
@@ -1439,6 +1444,7 @@ bool SP_DLG_StSimulationResults::InitializeSimulator()
 	wxBusyInfo l_Info(wxT("Initialising, please wait...."), this);
 
 	SetSimulationProgressGaugeRange(100);
+	
 
 	//Parameters
 	LoadParameters();
@@ -1454,6 +1460,10 @@ bool SP_DLG_StSimulationResults::InitializeSimulator()
 
 	// load observers
 	LoadObservers();
+	//m_pcMainSimulator->ChangeParameterValue(0, 0.06);
+
+	// spsim::VectorTransition* trs=m_pcMainSimulator->GetTransitionInfo();
+	 
 
 	return m_pcMainSimulator->Initialise(true);
 }
@@ -1697,6 +1707,8 @@ void SP_DLG_StSimulationResults::DoStartSimulation()
 	{
 		//Create a new worker thread
 		m_pcWorkerThread = new SP_DS_SimulatorThreadStochastic(this, m_pcMainSimulator);
+	//	SendGuiEvent(7, 2, NULL);
+	
 	}
 
 	//Check the thread

@@ -26,7 +26,7 @@ public:
 		 virtual ~SP_DS_TableViewer();
 
 		 virtual void Update();
-
+		 void  UpdateMembershipViewer(double TimePoint);
 		 virtual void Create();
 
 		 virtual void Destroy();

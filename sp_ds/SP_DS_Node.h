@@ -93,7 +93,7 @@ public:
 	    \return	the first attribute in list, known by the name, or NULL
     */
     virtual SP_DS_Attribute* GetAttribute(const wxString& p_pchName);
-    virtual const SP_ListAttribute* GetAttributes() { return &m_lAttributes; }
+    virtual const SP_ListAttribute* GetAttributes()  { return &m_lAttributes; }
 
     virtual SP_DS_Attribute* RemoveAttribute(SP_DS_Attribute* p_pcVal);
 

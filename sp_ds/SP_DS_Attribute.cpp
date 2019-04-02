@@ -364,8 +364,10 @@ SP_DS_Attribute::RemoveAttribute(SP_DS_Attribute* p_pcVal)
 
 bool SP_DS_Attribute::CopyValueFrom(SP_DS_Attribute* p_pcAttribute)
 {
-	if(! Equals(p_pcAttribute, false)) return false;
-
+	wxString valString = p_pcAttribute->GetValueString();
+	SetValueString(p_pcAttribute->GetValueString());
+	 if(!Equals(p_pcAttribute, false)) return false;
+	
 	SetValueString(p_pcAttribute->GetValueString());
 
 	return true;

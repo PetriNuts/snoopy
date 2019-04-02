@@ -42,7 +42,8 @@ enum
 	GROUP,
 	TYPE,
 	COMMENT,
-	VALUES
+	VALUES,
+	FNT
 };
 
 enum
@@ -442,6 +443,7 @@ bool SP_DLG_NewConstantDefinition::LoadData()
 		wxString l_sMetadataGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Group")))->GetValue();
 		wxString l_sMetadataType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcMetadata->GetAttribute(wxT("Type")))->GetValue();
 		wxString l_sMetadataComment = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Comment")))->GetValue();
+
 		wxString l_sMetadataShow = l_pcMetadata->GetShow() ? wxT("1") : wxT("0");
 		SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcMetadata->GetAttribute(wxT("ValueList")));
 
@@ -672,6 +674,7 @@ void SP_DLG_NewConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 	int row = p_gEvent.GetRow();
 
 	wxString colLabel = m_pcConstantSetGrid->GetColLabelValue(col);
+
 	wxString l_sCellValue = m_pcConstantSetGrid->GetCellValue(row, col);
 
 	if (colLabel == wxT("Constant"))
@@ -699,6 +702,9 @@ void SP_DLG_NewConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 
 	if (colLabel == wxT("Type"))
 	{
+		if(l_sCellValue== wxT("Fuzzy Number"))
+			SP_MESSAGEBOX("Bell", wxT("Error"), wxOK | wxICON_ERROR);
+
 		return;
 	}
 
@@ -849,6 +855,9 @@ void SP_DLG_NewConstantDefinition::LoadSetNames()
 	m_pcConstantSetGrid->SetColLabelValue(SHOW, wxT("Show"));
 	m_pcConstantSetGrid->SetColSize(SHOW, 50);
 
+	/*m_pcConstantSetGrid->SetColLabelValue(FNT, wxT("FNT"));// added by G.A
+	m_pcConstantSetGrid->SetColSize(FNT, 70);
+	*/
 	m_pcConstantSetGrid->SetColLabelValue(VALUES, wxT("Main"));
 	m_pcConstantSetGrid->SetColSize(VALUES, 70);
 
@@ -1002,9 +1011,9 @@ void SP_DLG_NewConstantDefinition::InitializeDataTypes()
 	SP_DS_Metadata* l_pcMetadata;
 
 	l_pcMetadata = m_pcConstants->GetPrototype();
-
+	
 	set<wxString> l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcMetadata->GetAttribute(wxT("Type")))->GetPossibleValues();
-
+	
 	set<wxString>::iterator it;
 
 	m_sAvailableDatatypes = wxT(" ");
@@ -1068,3 +1077,5 @@ void SP_DLG_NewConstantDefinition::LoadPlaceOfType(const wxString& p_sPlaceType)
 	}
 }
 
+ 
+ 

@@ -275,6 +275,9 @@ SP_GPR_Fonts::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage *
 					|| p_sNetClass.CmpNoCase(SP_DS_MUSICPN_CLASS) == 0
 					|| p_sNetClass.CmpNoCase(SP_DS_HYBRIDPN_CLASS) == 0
 					|| p_sNetClass.CmpNoCase(SP_DS_MTIDD_CLASS) == 0
+				|| p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0
+				|| p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0
+				|| p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0
 					|| p_sNetClass.CmpNoCase(SP_DS_FREESTYLE_CLASS) == 0)
 	) {
 		int i = 0;

@@ -18,7 +18,7 @@
 //F. Liu 2010.12.4
 #include "sp_ds/extensions/ext_SPN/SP_DS_ApFormula.h"
 #include "sp_ds/extensions/ext_SPN/SP_DS_ApParser.h"
-
+ 
 class SP_DS_ThreadEvent;
 class SP_DS_SimulatorThreadStochastic;
 
@@ -41,6 +41,9 @@ protected:
 	SP_VectorDouble m_aApResults;
 
 	SP_VectorLong m_anCurrentMarking;
+	
+
+
 
 	void CheckApFormulae(wxCommandEvent& p_cEvent);
 
@@ -77,11 +80,12 @@ protected:
 	virtual void LoadPlacesOfType(const wxString& p_sPlaceType, unsigned long& p_nPosition);
 
 	virtual spsim::Simulator* CreateSimulator(const int& p_nSimulatorType);
-
+	
 	virtual int GetCureentSelectedSimulator()
 	{
-		return m_pcSimulatorComboBox->GetSelection();
+		return m_pcSimulatorComboBox->GetCurrentSelection();
 	}
+	
 
 protected:
 	DECLARE_EVENT_TABLE()

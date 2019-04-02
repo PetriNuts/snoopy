@@ -1,6 +1,7 @@
 /*
  * SP_DS_xyPlotViewer.cpp
  * $Author: M.Herajy
+ * $Modified by G.A to support fuzzy plot
  * $Version: 0.0 $
  * $Revision: 0.0 $
  * $Date: 10.06.2011
@@ -11,8 +12,11 @@
 #include "sp_core/base/SP_Error.h"
 #include "sp_core/SP_Vector.h"
 #include <wx/xy/xyplot.h>
+
 #include <wx/xy/xylinerenderer.h>
+#include <wx/xy/xyarearenderer.h>
 #include <wx/xy/xydynamicdataset.h>
+#include <wx/areadraw.h>
 #include <wx/aui/aui.h>
 #include <wx/sizer.h>
 #include "sp_ds/extensions/ResultViewer/SP_DS_PlotViewer.h"
@@ -22,7 +26,6 @@
 #include "sp_ds/extensions/ResultViewer/AttributeTypes/SP_DS_ViewerAttributeText.h"
 #include "sp_ds/attributes/SP_DS_NumberAttribute.h"
 #include "sp_ds/attributes/SP_DS_DoubleAttribute.h"
-
 #include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 #include "sp_ds/SP_DS_Graph.h"
 
@@ -95,20 +98,20 @@ Chart* SP_DS_xyPlotViewer::CreateChart()
 
 		for (l_itXValue = m_pcXAxisValues->begin(); l_itXValue != m_pcXAxisValues->end(); l_itXValue++, l_nPos++)
 		{
-			l_pcSerie->AddXY((*l_itXValue), m_aPlotCurves[(*l_itCurve)]->GetValue(l_nPos));
+			l_pcSerie->AddXY((*l_itXValue),  m_aPlotCurves[(*l_itCurve)]->GetValue(l_nPos));
+		 
 		}
 
 		l_pcSerie->SetName(m_aPlotCurves[(*l_itCurve)]->GetName());
 
 		// and add serie to it
 		l_pcDataSet->AddSerie(l_pcSerie);
-
 	}
 
 	XYPlot *l_pcPlot = new XYPlot();
 
 	XYLineRenderer* l_pcLineRenderer = new XYLineRenderer(m_bShowSymbols, m_bShowLines, m_nDefaultLineWidth, m_nDefaultLineStyle);
-
+	 
 	//Add curve attributes
 	int l_nSerie = 0;
 	for (l_itCurve = m_apcShownCurvesList.begin(); l_itCurve != m_apcShownCurvesList.end(); l_itCurve++)
@@ -171,6 +174,263 @@ Chart* SP_DS_xyPlotViewer::CreateChart()
 
 	return new Chart(l_pcPlot, m_sTitle);
 }
+///////////
+Chart* SP_DS_xyPlotViewer::CreateMembershipFunction(double timepoint)
+{
+	std::list<unsigned int>::iterator l_itCurve;
+	std::map<double, int> levels2Points;
+	SP_VectorDouble::const_iterator l_itXValue;
+	 
+	unsigned long l_nPos = 0;
+
+	XYDynamicDataset* l_pcDataSet;
+
+	CHECK_POINTER(m_pcXAxisValues, return NULL);
+
+	l_pcDataSet = new XYDynamicDataset();
+
+	for (l_itCurve = m_apcShownCurvesList.begin(); l_itCurve != m_apcShownCurvesList.end(); l_itCurve++)
+	{
+		unsigned int index = (*l_itCurve);
+		 
+		SP_DS_Viewer_Fuzzy_Curve* m_fcurve = m_aPlotFuzzyCurves[index];
+		SP_Compressed_Fuzzy_Band p_pcCompressedBand = m_fcurve->GetResultMatrix();
+		const long dataColumn = m_aPlotFuzzyCurves[(*l_itCurve)]->GetDataColumn();
+	    std::vector<vector<double>> m_nMembershipMatrix = p_pcCompressedBand.GetMembershipAtTimePoint(timepoint, dataColumn);
+	    std::vector<double> m_alphaLevels = p_pcCompressedBand.GetAlphaLevels();
+
+		/**************ploting results*************/
+		XYDynamicSerie *l_pcMFSerie = new XYDynamicSerie();
+		for (int i = 0; i<m_nMembershipMatrix.size(); i++)
+		{
+			double d_yVal = m_alphaLevels[i];
+			double d_xVal = m_nMembershipMatrix[i][0];
+
+			l_pcMFSerie->AddXY(d_xVal, d_yVal);
+		}
+		for (int j = m_nMembershipMatrix.size() - 1; j >= 0; j--)
+		{
+			double d_yVal = m_alphaLevels[j];
+			double d_xVal = m_nMembershipMatrix[j][1];
+			l_pcMFSerie->AddXY(d_xVal, d_yVal);
+		}
+
+		l_pcMFSerie->SetName(m_aPlotFuzzyCurves[(*l_itCurve)]->GetName());
+
+		l_pcDataSet->AddSerie(l_pcMFSerie);
+	 
+	}
+
+	XYPlot *l_pcPlot = new XYPlot();
+	
+	XYLineRenderer* l_pcLineRenderer = new XYLineRenderer(m_bShowSymbols, m_bShowLines, m_nDefaultLineWidth, m_nDefaultLineStyle);
+
+	//Add curve attributes
+	int l_nSerie = 0;
+	for (l_itCurve = m_apcShownCurvesList.begin(); l_itCurve != m_apcShownCurvesList.end(); l_itCurve++)
+	{
+		//get curve information
+		unsigned int ind = (*l_itCurve);
+		SP_DS_Viewer_Fuzzy_Curve* curve = m_aPlotFuzzyCurves[ind];
+		wxColour l_nColor1 = curve->GetColor();
+		//	wxColour l_nColor(m_aPlotFuzzyCurves[(*l_itCurve)]->GetColor());
+
+		int l_nLineWidth = m_aPlotFuzzyCurves[(*l_itCurve)]->GetLineWidth();
+		l_nLineWidth = l_nLineWidth < 0 ? m_nDefaultLineWidth : l_nLineWidth;
+
+		int l_nLineStyle = m_aPlotFuzzyCurves[(*l_itCurve)]->GetLineStyle();
+		l_nLineStyle = l_nLineStyle < wxSOLID ? m_nDefaultLineStyle : l_nLineStyle;
+
+		//create a pen
+		wxPen l_pen(l_nColor1, l_nLineWidth, l_nLineStyle);
+
+		l_pcLineRenderer->SetSeriePen(l_nSerie, &l_pen);
+
+		l_nSerie++;
+	}
+
+	// set line renderer to dataset
+	l_pcDataSet->SetRenderer(l_pcLineRenderer);
+
+	//create x and y axes
+	NumberAxis *l_pcXAxis = NULL;
+	NumberAxis *l_pcYAxis = NULL;
+
+	l_pcXAxis = new NumberAxis(AXIS_BOTTOM);
+	l_pcXAxis->SetTitle(wxT("universe"));
+	l_pcXAxis->SetLabelCount(11);
+
+	l_pcYAxis = new NumberAxis(AXIS_LEFT);
+	l_pcYAxis->SetTitle(m_sYAxisTitle);
+	l_pcYAxis->SetLabelCount(11);
+
+	if (m_bFixedXAdjustment == true)
+	{
+		l_pcXAxis->SetFixedBounds(m_nMinXValue, m_nMaxXValue);
+	}
+
+	if (m_bFixedYAdjustment == true)
+	{
+		l_pcYAxis->SetFixedBounds(m_nMinYValue, m_nMaxYValue);
+	}
+
+	// add axes and dataset to plot
+	l_pcPlot->AddObjects(l_pcDataSet, l_pcYAxis, l_pcXAxis);
+
+	// set legend to plot
+	if (m_bShowLegend == true)
+	{
+		Legend* l_pcLegend = new Legend(m_nLegendVerticalPosition, m_nLegendHorizontalPosition);
+
+		l_pcPlot->SetLegend(l_pcLegend);
+
+	}
+
+	 
+
+	return new Chart(l_pcPlot, m_sTitle);
+/******************************/
+}
+
+Chart* SP_DS_xyPlotViewer::CreateFuzzyPlot()
+{
+	std::list<unsigned int>::iterator l_itCurve;
+
+	SP_VectorDouble::const_iterator l_itXValue;
+
+	unsigned long l_nPos = 0;
+
+	XYDynamicDataset* l_pcDataSet;
+
+	CHECK_POINTER(m_pcXAxisValues, return NULL);
+
+	l_pcDataSet = new XYDynamicDataset();
+
+	for (l_itCurve = m_apcShownCurvesList.begin(); l_itCurve != m_apcShownCurvesList.end(); l_itCurve++)
+	{
+		unsigned int index = (*l_itCurve);
+		SP_DS_Viewer_Fuzzy_Curve* m_fcurve = m_aPlotFuzzyCurves[index];
+		SP_Compressed_Fuzzy_Band p_pcCompressedBand= m_fcurve->GetResultMatrix();
+		std::vector<SP_Vector2DDouble> m_minMaxBands;
+		m_minMaxBands.clear();
+		std::vector<vector<double>> minCurve = p_pcCompressedBand.GetMinimumCurve();
+		std::vector<vector<double>> maxCurve = p_pcCompressedBand.GetMaximumCurve();
+		m_minMaxBands.push_back(maxCurve);
+		m_minMaxBands.push_back(minCurve);
+		
+	 
+		long m_lnumofMatricies = 2;// Fuzzyband.size();
+		
+		for (int i = 0; i < m_lnumofMatricies; i++)
+		{
+			XYDynamicSerie *l_pcSerie = new XYDynamicSerie();
+
+			l_nPos = 0;
+
+			for (l_itXValue = m_pcXAxisValues->begin(); l_itXValue != m_pcXAxisValues->end(); l_itXValue++, l_nPos++)
+			{
+			
+				const SP_Vector2DDouble m_nResMat = m_minMaxBands[i];
+				int dataColumn = m_aPlotFuzzyCurves[(*l_itCurve)]->GetDataColumn();
+				double val = m_aPlotFuzzyCurves[(*l_itCurve)]->GetValue(l_nPos, m_nResMat);
+				l_pcSerie->AddXY((*l_itXValue), val);
+				 
+		
+			}
+
+			if(i==0)
+			l_pcSerie->SetName(m_aPlotFuzzyCurves[(*l_itCurve)]->GetName());
+			
+			// and add serie to it
+			l_pcDataSet->AddSerie(l_pcSerie);
+			 
+		}
+		
+	}
+
+	XYPlot *l_pcPlot = new XYPlot();
+
+	XYLineRenderer* l_pcLineRenderer = new XYLineRenderer(m_bShowSymbols, m_bShowLines, m_nDefaultLineWidth, m_nDefaultLineStyle);
+	XYAreaRenderer* l_areaR = new XYAreaRenderer();
+	
+	//Add curve attributes
+	int l_nSerie = 0;
+	for (l_itCurve = m_apcShownCurvesList.begin(); l_itCurve != m_apcShownCurvesList.end(); l_itCurve++)
+	{
+
+		for (int subCurve = 0; subCurve < 2; subCurve++)// We need the both curves(min,max) to be in the same colour
+		{
+			//get curve information
+			wxColour l_nColor(m_aPlotFuzzyCurves[(*l_itCurve)]->GetColor());
+
+			int l_nLineWidth = m_aPlotFuzzyCurves[(*l_itCurve)]->GetLineWidth();
+			l_nLineWidth = l_nLineWidth < 0 ? m_nDefaultLineWidth : l_nLineWidth;
+
+			int l_nLineStyle = m_aPlotFuzzyCurves[(*l_itCurve)]->GetLineStyle();
+			l_nLineStyle = l_nLineStyle < wxSOLID ? m_nDefaultLineStyle : l_nLineStyle;
+
+			//create a pen
+			wxPen l_pen(l_nColor, l_nLineWidth, l_nLineStyle);
+
+			l_pcLineRenderer->SetSeriePen(l_nSerie, &l_pen);
+			l_areaR->SetSerieColour(l_nSerie, &l_nColor);//
+			
+			l_nSerie++;
+
+
+		}
+		 
+	}
+
+	
+	// set line renderer to dataset
+	l_pcDataSet->SetRenderer(l_pcLineRenderer);
+	 
+	 
+	//l_pcDataSet->SetRenderer(l_areaR);
+	 
+	
+	//create x and y axes
+	NumberAxis *l_pcXAxis = NULL;
+	NumberAxis *l_pcYAxis = NULL;
+
+	l_pcXAxis = new NumberAxis(AXIS_BOTTOM);
+	l_pcXAxis->SetTitle(m_sXAxisTitle);
+	l_pcXAxis->SetLabelCount(11);
+
+	l_pcYAxis = new NumberAxis(AXIS_LEFT);
+	l_pcYAxis->SetTitle(m_sYAxisTitle);
+	l_pcYAxis->SetLabelCount(11);
+
+	if (m_bFixedXAdjustment == true)
+	{
+		l_pcXAxis->SetFixedBounds(m_nMinXValue, m_nMaxXValue);
+	}
+
+	if (m_bFixedYAdjustment == true)
+	{
+		l_pcYAxis->SetFixedBounds(m_nMinYValue, m_nMaxYValue);
+	}
+
+	// add axes and dataset to plot
+	l_pcPlot->AddObjects(l_pcDataSet, l_pcYAxis, l_pcXAxis);
+	//l_pcPlot->SetDrawGrid(false,false);
+
+	// set legend to plot
+	if (m_bShowLegend == true)
+	{
+		Legend* l_pcLegend = new Legend(m_nLegendVerticalPosition, m_nLegendHorizontalPosition);
+
+		l_pcPlot->SetLegend(l_pcLegend);
+		
+	}
+
+	//connect the event handler to this class
+	//m_pcChartPanel->Connect(wxEVT_MOTION,wxMouseEventHandler(SP_DS_xyPlotViewer::OnMouseMotion));
+
+	return new Chart(l_pcPlot, m_sTitle);
+}
+
 
 void SP_DS_xyPlotViewer::OnMouseMotion(wxMouseEvent& event)
 {

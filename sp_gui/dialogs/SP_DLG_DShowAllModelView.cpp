@@ -195,6 +195,7 @@ SP_DLG_DShowAllModelView::SP_DLG_DShowAllModelView(SP_DLG_DirSimulation* p_pcWnd
 	Bind(wxEVT_BUTTON, &SP_DLG_DShowAllModelView::OnShowHideNodeList, this, SP_ID_BUTTON_SHOW_HIDE_NODE_LIST);
 
 	Bind(wxEVT_ACTIVATE, &SP_DLG_DShowAllModelView::OnWindowActivate, this);
+ 
 }
 
 SP_DLG_DShowAllModelView::~SP_DLG_DShowAllModelView()

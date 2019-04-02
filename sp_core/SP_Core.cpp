@@ -28,6 +28,9 @@
 #include "sp_ds/netclasses/SP_DS_ExtPT.h"
 #include "sp_ds/netclasses/SP_DS_TimePT.h"
 #include "sp_ds/netclasses/SP_DS_FaultTree.h"
+#include "sp_ds/netclasses/SP_DS_FuzzySPN.h" // added by G.A
+#include "sp_ds/netclasses/SP_DS_FuzzyCPN.h" // added by G.A
+#include "sp_ds/netclasses/SP_DS_FuzzyHybridPN.h"
 #include "sp_ds/netclasses/SP_DS_ExtendedFaultTree.h"
 #include "sp_ds/netclasses/SP_DS_ContinuousPed.h"
 #include "sp_ds/netclasses/SP_DS_MTBDD.h"
@@ -228,8 +231,39 @@ SP_Core::InitialiseNetclasses(SP_GM_Docmanager* p_pcDocmanager)
         AddNetclass(l_pcNet);
     else
         wxDELETE(l_pcNet);
+	////////////////////////////////////////////////////////////////
+//	l_pcNet = new SP_DS_FuzzyPN();//SP_DS_FuzzyPN
+//	if (l_pcNet->AddToGui(p_pcDocmanager))
+//		AddNetclass(l_pcNet);
+//	else
+//		wxDELETE(l_pcNet);
 
-    //////////////////////////////////////////////////////////////////
+    //////////////////////////// 
+
+	
+
+	//////////////////////////
+
+	l_pcNet = new SP_DS_FuzzyCPN();      //SP_DS_FuzzyCPN
+	if (l_pcNet->AddToGui(p_pcDocmanager))
+		AddNetclass(l_pcNet);
+	else
+		wxDELETE(l_pcNet);
+	///////////////////////
+	l_pcNet = new SP_DS_FuzzyHybridPN();  //SP_DS_FuzzyHPN
+	if (l_pcNet->AddToGui(p_pcDocmanager))
+		AddNetclass(l_pcNet);
+	else
+		wxDELETE(l_pcNet);
+	///////////////////////
+
+	l_pcNet = new SP_DS_FuzzySPN();      //SP_DS_FuzzySPN
+	if (l_pcNet->AddToGui(p_pcDocmanager))
+		AddNetclass(l_pcNet);
+	else
+		wxDELETE(l_pcNet);
+
+	////////////////////
     l_pcNet = new SP_DS_HybridPN();
         if (l_pcNet->AddToGui(p_pcDocmanager))
             AddNetclass(l_pcNet);
@@ -302,7 +336,7 @@ SP_Core::InitialiseNetclasses(SP_GM_Docmanager* p_pcDocmanager)
     else
         wxDELETE(l_pcNet);
 
-	//////////////////////////////////////////////////////////////////
+ 	
 
 
 	return TRUE;

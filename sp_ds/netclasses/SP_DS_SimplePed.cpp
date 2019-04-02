@@ -301,18 +301,25 @@ SP_DS_SimplePed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
 	l_pcGrAttr->SetShow(false);
 
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("ValueList"), SP_COLLIST_STRING, 2 ,wxT("Group")) );
+	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("ValueList"), SP_COLLIST_STRING, 6 ,wxT("Group")) );
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogColList(wxT("Values")));
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_ColListAttribute( l_pcAttr, wxT("=  [ % ];") ));
 	l_pcGrAttr->SetShow(false);
 	SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >( l_pcAttr );
 	l_pcColList->SetColLabel( 0, wxT("Value set") );
-	l_pcColList->SetColLabel( 1, wxT("Value") );
+	l_pcColList->SetColLabel( 1, wxT("Value"));
+	l_pcColList->SetColLabel(2, wxT("ConstA"));///additional coulumn G.A
+	l_pcColList->SetColLabel(3, wxT("ConstB"));///additional coulumn G.A
+	l_pcColList->SetColLabel(4, wxT("ConstC"));///additional coulumn G.A
+	l_pcColList->SetColLabel(5, wxT("ConstD"));///additional coulumn G.A
 	unsigned int l_nNewRow = l_pcColList->AppendEmptyRow();
 	l_pcColList->SetCell(l_nNewRow, 0, wxT("Main"));
 	l_pcColList->SetCell(l_nNewRow, 1, wxT(""));
-
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("Comment") ) );
+	l_pcColList->SetCell(l_nNewRow, 2, wxT(""));///
+	l_pcColList->SetCell(l_nNewRow, 3, wxT("")); 
+	l_pcColList->SetCell(l_nNewRow, 4, wxT("")); 
+	l_pcColList->SetCell(l_nNewRow, 5, wxT(""));
+ 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("Comment") ) );
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogMultiline(wxT("General")));
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr, wxT("//%")));
 	l_pcGrAttr->SetShow(false);

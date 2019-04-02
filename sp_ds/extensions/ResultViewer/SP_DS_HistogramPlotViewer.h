@@ -37,6 +37,8 @@ public:
 
 		//Create a plot
 		virtual Chart* CreateChart();
+		virtual Chart* CreateFuzzyPlot();// Added by G.A
+	    virtual Chart* CreateMembershipFunction(double timepoint);
 
 		virtual void SaveViewToSnoopyFormat(SP_DS_Metadata* p_pcView);
 		virtual void LoadViewFromSnoopyFormat(SP_DS_Metadata* p_pcView);

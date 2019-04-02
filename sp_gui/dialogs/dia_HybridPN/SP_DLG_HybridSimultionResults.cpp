@@ -707,7 +707,8 @@ void SP_DLG_HybridSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cE
 		Update();
 
 		//start the simulator
-		StartSimulation();
+	 StartSimulation();
+	
 	}
 	else
 	{

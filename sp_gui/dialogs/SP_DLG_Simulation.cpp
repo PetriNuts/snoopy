@@ -29,6 +29,7 @@
 #include "sp_core/SP_Core.h"
 #include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_PlotViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_TableViewer.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_xyPlotViewer.h"
@@ -42,8 +43,12 @@
 #include "sp_gui/dialogs/dia_ColHPN/SP_DLG_ColHPNSimultionResults.h"
 #include "sp_gui/dialogs/dia_ColCPN/SP_DLG_ColCPNSimulationResults.h"
 
-#include "sp_gui/dialogs/SP_DLG_BaseSimulation.h"
+#include "sp_gui/dialogs/dia_FPN/FuzzyBasics.h" //Added by G.A
+#include "sp_gui/dialogs/dia_FPN/TriangularFN.h" //Added by G.A
+#include <vector>
 
+#include "sp_gui/dialogs/SP_DLG_BaseSimulation.h"
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_FpnConstantDefinition.h"//Added by G.A
 #include <wx/busyinfo.h>
 #if !defined(__WXMSW__) && !defined(__WXPM__)
 #include "sp_gui/widgets/sp_plot/plot_enl.xpm"
@@ -686,6 +691,10 @@ void SP_DLG_Simulation::OnEditXAxis(wxWindow *p_pcExternalWindowDialog) {
     l_asTimeVector.push_back(wxT("Simulation Time"));
     l_asTimeVector.push_back(wxT("Run Time"));
     m_pcXAxisChoices[wxT("Time")] = &l_asTimeVector;
+	////////
+	//SP_VectorString l_asfuzzyVector;
+	//l_asfuzzyVector.push_back(wxT("Fuzzy Value"));
+	//m_pcXAxisChoices[wxT("Fuzzy Num")] = &l_asfuzzyVector;
 
     SP_DLG_SelectXAxisVariable* l_pcDialog = new SP_DLG_SelectXAxisVariable(p_pcExternalWindowDialog, m_pcXAxisChoices, l_sCategory, l_sSubCategory);
 
@@ -988,8 +997,18 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
 		if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_asPlaceNames.size()) //unfolded place
 		{
 			l_sName = m_asPlaceNames[l_nPosition];
+			wxString l_sCategory = GetViewAttributeValue(m_pcCurrentTablePlot, wxT("XAxisVariable"));
+			wxString netClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
 
+			if (netClass.Contains(wxT("Fuzzy")) ) {
+				//p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
+				p_pcViewer->AddFuzzyCurves(l_sName, l_nPosition, m_pcCompressedBand);
+			//	p_pcViewer->AddFuzzyCurves(l_sName, l_nPosition, m_nFuzzyResultBand, m_FuzzyBand,m_nAlphaLevels,m_nLevels,m_nSamples,m_fnCount);
+
+			}
+			else
 			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
+			 
 		}
 		else if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_asTransitionNames.size()) //unfolded place
 			{
@@ -1094,8 +1113,9 @@ void SP_DLG_Simulation::LoadParameters()
     {
         SP_DS_Metadata* l_pcConstant = *it;
         wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-
-        l_asParameterNames.push_back(l_sName);
+		wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();///Added by G.A
+		
+			l_asParameterNames.push_back(l_sName);
 
         SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
 
@@ -1123,10 +1143,12 @@ void SP_DLG_Simulation::LoadParameters()
 				l_pcFR->registerFunction(l_sName, to_string(l_nValue));
             }
             //****************************************************************************************
+			
+				l_anParameterValue.push_back(l_nValue);
 
-            l_anParameterValue.push_back(l_nValue);
+				m_msParameterName2Value[l_sName] = l_nValue;
 
-            m_msParameterName2Value[l_sName]=l_nValue;
+			 
         }
     }
 
@@ -1642,14 +1664,27 @@ void SP_DLG_Simulation::UpdateObservers(const wxString & p_sObsersverType, unsig
 
 void SP_DLG_Simulation::OnModifyConstantSets(wxCommandEvent& p_cEvent)
 {
-    SP_DLG_NewConstantDefinition* l_pcDlg = new SP_DLG_NewConstantDefinition(NULL);
+    //SP_DLG_NewConstantDefinition* l_pcDlg = new SP_DLG_NewConstantDefinition(NULL);
+	if (m_pcGraph->GetNetclass()->GetName().Contains("Fuzzy")) {
+		SP_DLG_FpnConstantDefinition* l_pcDlg = new SP_DLG_FpnConstantDefinition(NULL);
+		if (l_pcDlg->ShowModal() == wxID_OK)
+		{
+			LoadSets();
+		}
 
-    if (l_pcDlg->ShowModal() == wxID_OK)
-    {
-        LoadSets();
-    }
+		l_pcDlg->Destroy();
+	}
+	else {
 
-    l_pcDlg->Destroy();
+		SP_DLG_NewConstantDefinition* l_pcDlg = new SP_DLG_NewConstantDefinition(NULL);
+		if (l_pcDlg->ShowModal() == wxID_OK)
+		{
+			LoadSets();
+		}
+
+		l_pcDlg->Destroy();
+
+	}
 }
 
 
@@ -1970,20 +2005,26 @@ void SP_DLG_Simulation::OpenExportFile()
     wxString l_sName;
     wxString l_sOutput = wxT("Time");
     wxString l_sSpacer = GetSpacer(m_nExportSpacer);
-
+	wxString sNetClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
     SP_DS_ColListAttribute* l_pcPlaceIdList = dynamic_cast<SP_DS_ColListAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo")));
 
     for (unsigned long i = 0; i < l_pcPlaceIdList->GetRowCount(); i++)
     {
         wxString l_sCheckState = l_pcPlaceIdList->GetCell(i, 2);
-        if (l_sCheckState == wxT("1"))
-        {
-            l_sName = l_pcPlaceIdList->GetCell(i, 6);
-            l_sOutput << l_sSpacer << l_sName;
+		if (l_sCheckState == wxT("1"))
+		{
+			
+			if (!sNetClass.Contains(wxT("Fuzzy")))// Added by G.A
+			{
+			l_sName = l_pcPlaceIdList->GetCell(i, 6);
+			l_sOutput << l_sSpacer << l_sName;
+		    }
         }
     }
-
-    (*m_pcExport) << l_sOutput << endl;
+	if (!sNetClass.Contains(wxT("Fuzzy")))// Added by G.A
+	{
+		(*m_pcExport) << l_sOutput << endl;
+	}
 }
 
 void SP_DLG_Simulation::CloseExportFile()

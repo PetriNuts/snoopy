@@ -10,7 +10,7 @@
 #include "sp_ds/SP_DS_Graph.h"
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
-
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 #include "dssd/functions/functionRegistry.h"
 #include "dssd/functions/builder/simFunctionBuilder.h"
 #include "dssd/functions/parser/bison_parser.h"
@@ -104,7 +104,7 @@ SP_DS_FunctionRegistry::LoadFromNet(SP_DS_Graph* p_pcGraph)
 		{
 			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMeta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 			wxString l_sValue = dynamic_cast<SP_DS_ColListAttribute*>(l_pcMeta->GetAttribute(wxT("ValueList")))->GetActiveCellValue(1);
-
+			wxString l_sMetadataType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcMeta->GetAttribute(wxT("Type")))->GetValue();
 			registerFunction(l_sName, l_sValue);
 		}
 	}

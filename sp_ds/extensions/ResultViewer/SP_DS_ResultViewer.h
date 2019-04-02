@@ -15,6 +15,10 @@
 #include <sp_core/SP_Map.h>
 #include "sp_ds/extensions/ResultViewer/AttributeTypes/SP_DS_ViewerAttribute.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_ViewerCurve.h"
+#include "sp_ds/extensions/ResultViewer/SP_DS_ViewerFuzzyCurve.h"//Added By G.A
+#include "sp_ds/extensions/ResultViewer/SP_DS_Viewer_Fuzzy_Curve.h"//Added By G.A
+#include "sp_gui/dialogs/dia_FPN/SP_Compressed_Fuzzy_Band.h"//Added By G.A
+
 #include "spsa/spsa.h"
 
 /*
@@ -45,6 +49,8 @@ protected:
 	 */
 	const SP_VectorDouble* m_pcXAxisValues;
 
+	const SP_VectorDouble* m_pcYAxisValues;//for fuzzy membership function
+
 	/*
 	 * a list of shown curves
 	 */
@@ -55,6 +61,9 @@ protected:
 	 * all viewer curves
 	 */
 	SP_VectorCurve m_aPlotCurves;
+
+	SP_VectorFuzzyCurve m_aPlotFuzzyCurves;// Added by G.A
+
 
 	/*
 	 * Name of the viewer to be displayed
@@ -89,11 +98,19 @@ public:
 	{
 		m_pcXAxisValues = p_pcXAxisValues;
 	}
+	//set a ref to the alphalevels
+	virtual void SetYAxisValues(const SP_VectorDouble* p_pcYAxisValues)
+	{
+		m_pcYAxisValues = p_pcYAxisValues;
+	}
 
 	//Add curve to the list of curves
 	virtual void AddCurve(const wxString& p_sCurveName, const unsigned long& p_nDataColumn, const SP_Vector2DDouble* p_pcResultMatrix, const wxString& p_sColor = wxT(""), const int& p_nLineWidth = -1,
 			const int& p_nLineStyle = -1);
-
+	virtual void AddFuzzyCurve(const wxString& p_sCurveName, const unsigned long& p_nDataColumn, const std::vector<SP_Vector2DDouble> p_pcResultMatrix, const ResultFuzzyBand fBand, SP_VectorDouble alphaLevels, unsigned long levels, unsigned long points, unsigned int fn, const wxString& p_sColor = wxT(""), const int& p_nLineWidth = -1,
+		const int& p_nLineStyle = -1);//Added by G.A
+	virtual void AddFuzzyCurves(const wxString& p_sCurveName, const unsigned long& p_nDataColumn, SP_Compressed_Fuzzy_Band* p_pcCompressedResult, const wxString& p_sColor = wxT(""), const int& p_nLineWidth = -1,
+		const int& p_nLineStyle = -1);//Added by G.A
 	//removes a curve with a specified name from the curves vector
 
 	virtual void ClearCurves();
@@ -105,6 +122,8 @@ public:
 
 	//Update the current view. It has to be implemented in the derived class
 	virtual void Update()=0;
+
+	virtual void UpdateMembershipViewer(double TimePoint) = 0;
 
 	/*
 	 * Create a viewer

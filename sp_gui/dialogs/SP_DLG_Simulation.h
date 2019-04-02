@@ -35,6 +35,7 @@
 #include "sp_ds/extensions/ResultViewer/SP_DS_ResultViewer.h"
 #include "sp_gui/dialogs/SP_DLG_SelectXAxisVariable.h"
 #include "sp_gui/dialogs/SP_DLG_BaseSimulation.h"
+#include "sp_gui/dialogs/dia_FPN/SP_Compressed_Fuzzy_Band.h"
 #include <wx/collpane.h>
 
 typedef map<long, wxColour> SP_MapLong2Colour;
@@ -215,6 +216,9 @@ protected:
 	//uncolored elements
 	SP_Vector2DDouble m_anResultMatrix;
 
+	//for fuzzy result 
+	//ResultFuzzyBand m_FuzzyBand;//Added by G.A
+	SP_Compressed_Fuzzy_Band *m_pcCompressedBand;
 	//colored elements
 	SP_Vector2DDouble m_aanColPlaceResults;
 	SP_Vector2DDouble m_aanColTransResults;

@@ -635,7 +635,7 @@ SP_DS_Graph::AddToViewMenu(wxMenu* p_pcMenu)
        (l_sName == SP_DS_COLSPN_CLASS) ||
        (l_sName == SP_DS_COLCPN_CLASS) ||
 	    (l_sName == SP_DS_COLHPN_CLASS) ||
-       (l_sName == SP_DS_HYBRIDPN_CLASS))
+       (l_sName == SP_DS_HYBRIDPN_CLASS) || (l_sName == SP_DS_FUZZYCPN_CLASS) || (l_sName == SP_DS_FUZZYSPN_CLASS) || (l_sName==SP_DS_FUZZYHPN_CLASS))//Added by G.A
     {
     	//Simulation mode
 		p_pcMenu->AppendSeparator();
@@ -668,7 +668,7 @@ SP_DS_Graph::AddToViewMenu(wxMenu* p_pcMenu)
     if((l_sName == SP_DS_EXTPN_CLASS) ||
        (l_sName == SP_DS_SPN_CLASS) ||
        (l_sName == SP_DS_CONTINUOUSPED_CLASS) ||
-       (l_sName == SP_DS_HYBRIDPN_CLASS))
+       (l_sName == SP_DS_HYBRIDPN_CLASS) ||( l_sName == SP_DS_FUZZYSPN_CLASS)  || (l_sName == SP_DS_FUZZYCPN_CLASS)|| (l_sName==SP_DS_FUZZYHPN_CLASS))
     {
     	p_pcMenu->AppendSeparator();
 		wxMenuItem* l_pcMenuItem = new wxMenuItem(p_pcMenu,
@@ -688,7 +688,7 @@ SP_DS_Graph::AddToEditMenu(wxMenu* p_pcMenu)
     CHECK_POINTER(p_pcMenu, return FALSE);
  
     wxString l_sName = GetNetclass()->GetName();
-   if(l_sName == SP_DS_CONTINUOUSPED_CLASS || l_sName==SP_DS_SPN_CLASS ||l_sName==SP_DS_HYBRIDPN_CLASS || l_sName==SP_DS_EXTPN_CLASS ||
+   if(l_sName == SP_DS_CONTINUOUSPED_CLASS || l_sName==SP_DS_SPN_CLASS ||l_sName==SP_DS_HYBRIDPN_CLASS || l_sName==SP_DS_EXTPN_CLASS || l_sName==SP_DS_FUZZYHPN_CLASS|| l_sName==SP_DS_FUZZYCPN_CLASS||l_sName==SP_DS_FUZZYSPN_CLASS||
 	  l_sName == SP_DS_COLEPN_CLASS || l_sName == SP_DS_COLCPN_CLASS || l_sName==SP_DS_COLSPN_CLASS ||l_sName==SP_DS_COLHPN_CLASS)
      {
        p_pcMenu->AppendSeparator();
@@ -727,6 +727,9 @@ SP_DS_Graph::AddToExtrasMenu(wxMenu* p_pcMenu)
 
 	if(l_sName == SP_DS_PN_CLASS ||
 	   l_sName == SP_DS_SPN_CLASS ||
+		l_sName==SP_DS_FUZZYSPN_CLASS||
+		l_sName==SP_DS_FUZZYCPN_CLASS ||
+		l_sName==SP_DS_FUZZYHPN_CLASS ||
 	   l_sName == SP_DS_EXTPN_CLASS ||
 	   l_sName == SP_DS_TIMEPN_CLASS ||
 	   l_sName == SP_DS_CONTINUOUSPED_CLASS ||

@@ -521,7 +521,7 @@ bool SP_MDI_Doc::OnOpenDocument(const wxString& p_sFile)
     		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_EXTPN_CLASS
     		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_SPN_CLASS
     		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_HYBRIDPN_CLASS
-    		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_CONTINUOUSPED_CLASS)
+    		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_CONTINUOUSPED_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZYSPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZYCPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZYHPN_CLASS)
     	m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
 
 	SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(GetFirstView());

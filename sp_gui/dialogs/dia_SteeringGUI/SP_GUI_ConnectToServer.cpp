@@ -247,7 +247,7 @@ bool SP_GUI_ConnectToServer::ConnectToServer()
 
 		l_sName = m_pcGraph->GetNetclass()->GetName();
 
-		if ((l_sName == SP_DS_SPN_CLASS) || (l_sName == SP_DS_CONTINUOUSPED_CLASS) || (l_sName == SP_DS_COLSPN_CLASS) || (l_sName == SP_DS_COLCPN_CLASS) || (l_sName == SP_DS_HYBRIDPN_CLASS)
+		if ((l_sName == SP_DS_SPN_CLASS)|| (l_sName == SP_DS_FUZZYSPN_CLASS) || (l_sName == SP_DS_FUZZYCPN_CLASS)|| (l_sName == SP_DS_FUZZYHPN_CLASS) ||(l_sName == SP_DS_CONTINUOUSPED_CLASS) || (l_sName == SP_DS_COLSPN_CLASS) || (l_sName == SP_DS_COLCPN_CLASS) || (l_sName == SP_DS_HYBRIDPN_CLASS)
 				|| (l_sName == SP_DS_COLHPN_CLASS))
 		{
 			l_bShowTwoOptions = true;

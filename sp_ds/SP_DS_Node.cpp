@@ -734,9 +734,9 @@ SP_DS_Node* SP_DS_Node::AddSourceEdge(SP_DS_Edge* p_pcEdge)
 	for(; l_Iter != m_lSourceEdges.end(); ++l_Iter)
 	{
 		SP_DS_Edge* l_pcEdge = *l_Iter;
-		if(l_pcEdge->GetTarget() == p_pcEdge->GetTarget()
-			&& (l_pcEdge->GetTarget()->GetLogical()
-					|| p_pcEdge->GetTarget()->GetLogical())
+		if( l_pcEdge->GetTarget() == p_pcEdge->GetTarget()
+			&& ((l_pcEdge->GetTarget() != nullptr && l_pcEdge->GetTarget()->GetLogical())
+					|| (p_pcEdge->GetTarget() != nullptr && p_pcEdge->GetTarget()->GetLogical()))
 			&& l_pcEdge->GetEdgeclass() == p_pcEdge->GetEdgeclass()
 			&& l_pcEdge != p_pcEdge)
 		{

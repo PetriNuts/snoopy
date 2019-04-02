@@ -95,7 +95,7 @@ SP_DLG_FunctionDefinition::SP_DLG_FunctionDefinition( wxWindow* p_pcParent,
 
 	// new row
 	m_pcGrid = new wxGrid( this, SP_ID_GRID_MARKING,
-			wxDefaultPosition, wxSize( 700, 300 ), wxSUNKEN_BORDER );
+			wxDefaultPosition, wxSize( 600, 200 ), wxSUNKEN_BORDER );
 	m_pcGrid->CreateGrid( 0, 0);
 	m_pcGrid->EnableEditing( true);
 
@@ -309,7 +309,7 @@ void SP_DLG_FunctionDefinition::OnAddFunction( wxCommandEvent& p_cEvent )
 bool SP_DLG_FunctionDefinition::LoadData()
 {
 	SP_DS_Metadataclass* l_pcMetadataclass;
-	l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_FUNCTIONCLASS);
+	l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);// SP_DS_CPN_FUNCTIONCLASS
 
 	if(m_bIsColored)
 	{

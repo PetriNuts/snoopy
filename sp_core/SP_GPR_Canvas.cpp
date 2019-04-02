@@ -166,6 +166,9 @@ SP_GPR_Canvas::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage 
 	//you can add your new net class to this list,
 	//or you can create a new else-if-branch if you need a different appearance
 	if (p_sNetClass.CmpNoCase(SP_DS_PN_CLASS) == 0
+		||  p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0
+		|| p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0
+		 || p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_EXTPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_SPN_CLASS) == 0
@@ -254,6 +257,9 @@ SP_GPR_Canvas::OnDialogOk(const wxString& p_sNetClass) {
 			|| p_sNetClass.CmpNoCase(SP_DS_EXTPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_SPN_CLASS) == 0
+		|| p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0  //Added by G.A
+		|| p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0  //Added by G.A
+		|| p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0  //Added by G.A
 			|| p_sNetClass.CmpNoCase(SP_DS_COLSPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_COLEPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0
@@ -268,6 +274,7 @@ SP_GPR_Canvas::OnDialogOk(const wxString& p_sNetClass) {
 			|| p_sNetClass.CmpNoCase(SP_DS_TIMEPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_MTIDD_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_HYBRIDPN_CLASS) == 0
+	 
 			|| p_sNetClass.CmpNoCase(SP_DS_FREESTYLE_CLASS) == 0){
 		SetGridSpacing(p_sNetClass, m_scGridSpacing->GetValue());
 		SetGridVisible(p_sNetClass, m_cbGridVisible->IsChecked());

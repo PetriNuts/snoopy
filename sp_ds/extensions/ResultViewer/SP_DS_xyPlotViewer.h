@@ -28,6 +28,13 @@ public:
     //Create a plot
     virtual Chart *CreateChart();
 
+	//Create memberShipFunction Plot
+	
+	virtual Chart *CreateMembershipFunction(double timepoint);
+
+	//Create Fuzzy Plot
+	virtual Chart *CreateFuzzyPlot();
+
     virtual void UpdateAttributes();
 
     //set the attribute values to the current one

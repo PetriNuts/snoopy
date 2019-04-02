@@ -110,7 +110,14 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	pos.x += size.GetX() + 10;
 	SetPosition(pos);
 }
+void SP_DLG_ShowAllModelView::OnChangeThumbPage(wxCommandEvent& event)
+{
+	long x = scrollBar->GetThumbPosition();
+	wxString cc;
+	cc << x;
+	scrollBar->SetToolTip(cc);
 
+}
 wxString SP_DLG_ShowAllModelView::GetViewerType()
 {
 	  SP_DS_Attribute* l_pcAttribute = m_pcModelView->GetAttribute(wxT("ViewerType"));
@@ -378,6 +385,8 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 		m_pcPlaceChoiceCheckListBox->Insert(l_pcCurveInfoList->GetCell(l_nRow, 6), m_pcPlaceChoiceCheckListBox->GetCount());
 		//show selected curves
 		LoadCurveSetting(p_pcResultViewer, l_pcCurveInfoList, l_nRow);
+		wxString ddd = l_pcCurveInfoList->GetCell(l_nRow, 6);
+
 	}
 
 	m_pcParentWnd->CalculateXAxisValues(p_pcModelView, m_anXValues);

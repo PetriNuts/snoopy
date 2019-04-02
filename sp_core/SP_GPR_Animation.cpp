@@ -335,7 +335,7 @@ SP_GPR_Animation::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPa
 			l_pcSizer->Add(m_rbStepping, 0, wxALL, 10);
 
 
-	} else if (p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0) {
+	} else if (p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0 || p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0) {
 
 		wxBoxSizer *helpSizer, *helpSizer2;
 

@@ -5,15 +5,15 @@
  * $Revision: 0.0 $
  * $Date: 06.06.2011
  * Short Description:
- *///=================================================
-
+ *///=========================================
 #include "sp_utilities.h"
-
+#include "sp_core/SP_Core.h"
+#include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_core/base/SP_Error.h"
 #include <wx/aui/aui.h>
 #include "sp_ds/SP_DS_Graph.h"
 #include <wx/xy/xyplot.h>
-
+#include <wx/areadraw.h>
 #include "sp_ds/extensions/ResultViewer/SP_DS_PlotViewer.h"
 #include "sp_ds/extensions/ResultViewer/AttributeTypes/SP_DS_ViewerAttributeCheckBox.h"
 #include "sp_ds/extensions/ResultViewer/AttributeTypes/SP_DS_ViewerAttributeList.h"
@@ -24,7 +24,8 @@
 #include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 
 enum {
-    SP_ID_PLOT_WINDOW_ID = SP_ID_LAST_ID + 2000
+    SP_ID_PLOT_WINDOW_ID = SP_ID_LAST_ID + 2000,
+	SP_ID_SCROLL_BAR
 };
 
 SP_DS_PlotViewer::SP_DS_PlotViewer(wxWindow *p_pcParent, wxSizer *p_pcSizer)
@@ -160,7 +161,18 @@ SP_DS_PlotViewer::SP_DS_PlotViewer(wxWindow *p_pcParent, wxSizer *p_pcSizer)
 
     m_sSupportedSaveExtensions = wxT(
             "Bitmap(*.bmp)|*.bmp | GIF (*.gif)|*.gif|PNG files (*.png)|*.png| jpg(*.jpg)|*.jpeg|Postscript(*.ps)|*.ps");
+	wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
 
+
+	if (m_sNetClassName.Contains(wxT("Fuzzy")))//for testing purposes
+	{
+		//	m_pcScroll = new wxStaticBoxSizer(new wxStaticBox(p_pcParent, -1, wxT("Change Time Point")), wxHORIZONTAL);
+	  
+			//scrollBar = new wxScrollBar(p_pcParent, SP_ID_SCROLL_BAR, wxDefaultPosition, wxSize(400, 20), wxSB_HORIZONTAL);
+			//scrollBar->SetRange(m_nMaxXValue);
+			//m_pcScroll->Add(scrollBar);   
+	       // p_pcSizer->Add(m_pcScroll);
+	}
 }
 
 SP_DS_PlotViewer::~SP_DS_PlotViewer() {
@@ -169,8 +181,18 @@ SP_DS_PlotViewer::~SP_DS_PlotViewer() {
 
 void SP_DS_PlotViewer::Create() {
     if(m_pcChartPanel == nullptr) {
-        m_pcChartPanel = new wxChartPanel(m_pcParent, SP_ID_PLOT_WINDOW_ID, NULL, wxDefaultPosition, wxSize(600, 600));
+        m_pcChartPanel = new wxChartPanel(m_pcParent, SP_ID_PLOT_WINDOW_ID, NULL, wxDefaultPosition, wxSize(200, 200));//600*600
         m_pcSizer->Add(m_pcChartPanel, 1, wxEXPAND | wxALL, 5);
+		///////// for testing
+		wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
+
+		if (m_sNetClassName.Contains(wxT("Fuzzy")))//Added by G.A
+		{
+			 panel2=new wxChartPanel(m_pcParent, SP_ID_PLOT_WINDOW_ID+1, NULL, wxDefaultPosition, wxSize(100, 200));
+			m_pcSizer->Add(panel2, 1, wxEXPAND | wxALL, 5);
+		}
+
+		/////////
         m_pcSizer->Layout();
     }
 }
@@ -180,7 +202,13 @@ void SP_DS_PlotViewer::Destroy() {
 
     //m_pcChartPanel = NULL;
 }
+void SP_DS_PlotViewer::UpdateMembershipViewer(double timePoint)
+{
 
+	Chart *l_pcChart2 = CreateMembershipFunction(timePoint);
+	panel2->SetChart(l_pcChart2);
+
+}
 void SP_DS_PlotViewer::Update() {
 
     //check if we need to sort the curves
@@ -195,13 +223,36 @@ void SP_DS_PlotViewer::Update() {
             break;
 
     }
+	wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
 
-    Chart *l_pcChart = CreateChart();
+	if (!m_sNetClassName.Contains(wxT("Fuzzy")))//Added by G.A
+	{
+		Chart *l_pcChart = CreateChart();
 
-    CHECK_POINTER(l_pcChart, return);
-    //remove background
-    l_pcChart->SetBackground(new FillAreaDraw(*wxWHITE_PEN, *wxWHITE_BRUSH));
-    m_pcChartPanel->SetChart(l_pcChart);
+		CHECK_POINTER(l_pcChart, return);
+		//remove background
+		l_pcChart->SetBackground(new FillAreaDraw(*wxWHITE_PEN, *wxWHITE_BRUSH));
+		
+		m_pcChartPanel->SetChart(l_pcChart);
+	
+	}
+	else {
+		Chart *l_pcChart = CreateFuzzyPlot();
+//		Chart *l_pcChart = CreateChart();
+	 
+		CHECK_POINTER(l_pcChart, return);
+		//remove background
+		l_pcChart->SetBackground(new FillAreaDraw(*wxWHITE_PEN, *wxWHITE_BRUSH));
+		m_pcChartPanel->SetBackgroundStyle(wxBackgroundStyle::wxBG_STYLE_COLOUR);
+		wxColour l_nColor1(wxT("WHITE"));
+		m_pcChartPanel->SetBackgroundColour(l_nColor1);
+		m_pcChartPanel->SetChart(l_pcChart);
+		
+		Chart *l_pcChart2 = CreateMembershipFunction(0);
+	panel2->SetChart(l_pcChart2);
+	
+
+	}
 }
 
 void SP_DS_PlotViewer::UpdateAttributes() {

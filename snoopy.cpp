@@ -74,6 +74,19 @@
 #include "export/SP_ExportCPN2Matlab.h"
 #include "export/SP_ExportTPN2Matlab.h"
 #include "export/SP_ExportCUDA.h"
+#include "export/SP_ExportFspn2SPN.h"//Added by G.Assaf 2019
+#include "export/SP_ExportSPN2FSPN.h"
+#include "export/SP_ExportFCPN2CPN.h"
+#include "export/SP_ExportCPN2FCPN.h"
+#include "export/SP_ExportFHPN2HPN.h"
+#include "export/SP_ExportHPN2FHPN.h"
+#include "export/SP_ExportFSPN2FCPN.h"
+#include "export/SP_ExportFSPN2FHPN.h"
+#include "export/SP_ExportFCPN2FHPN.h"
+#include "export/SP_ExportFHPN2FSPN.h"
+#include "export/SP_ExportFHPN2FCPN.h"
+#include "export/SP_ExportFCPN2FSPN.h"
+
 
 #include "sp_gui/interaction/SP_IA_Manager.h"
 
@@ -151,7 +164,7 @@
 #include "export/SP_ExportColCPN2ColHPN.h"
 #include "export/SP_ExportColEPN2ColHPN.h"
 #include "export/SP_ExportColPN2ColHPN.h"
-
+#include "export/SP_ExportHPN2SPN.h"
 #include "export/SP_ExportColPN2SSC.h"
 
 #include "export/SP_ExportHybridPN2ColHybridPN.h"
@@ -855,7 +868,7 @@ bool Snoopy::OnInit()
 	{
 			wxDELETE(l_pcExport);
 	}
-
+	//SP_ExportHPN2SPN
 	l_pcExport = new SP_ExportHPN2SPN();
 	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
 	{
@@ -887,6 +900,73 @@ bool Snoopy::OnInit()
 	}
 
 	l_pcExport = new SP_ExportRomeo();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	
+	l_pcExport = new SP_ExportFspn2SPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	l_pcExport = new SP_ExportSPN2FSPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	
+	l_pcExport = new  SP_ExportFCPN2CPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	l_pcExport = new  SP_ExportCPN2FCPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	l_pcExport = new  SP_ExportFHPN2HPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	l_pcExport = new SP_ExportHPN2FHPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+ 	l_pcExport = new SP_ExportFSPN2FCPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	l_pcExport = new SP_ExportFSPN2FHPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	l_pcExport = new SP_ExportFCPN2FHPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	l_pcExport = new SP_ExportFHPN2FSPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	
+		l_pcExport = new SP_ExportFHPN2FCPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	l_pcExport = new SP_ExportFCPN2FSPN();
 	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
 	{
 		wxDELETE(l_pcExport);

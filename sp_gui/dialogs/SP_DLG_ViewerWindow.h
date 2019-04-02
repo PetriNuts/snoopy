@@ -30,6 +30,8 @@ private:
 
 		SP_VectorDouble m_anXValues;
 
+		SP_VectorDouble m_anYValues;//alpha levels membership funct
+
 		//viewer sizer
 		wxSizer* m_pcViewerSizer;
 
@@ -56,6 +58,11 @@ private:
 		wxSizer *m_pcContentSizer;
 
 		bool m_bIsColouredSimulation;
+protected:
+		wxSizer* m_pcScroll;
+		wxScrollBar* scrollBar;
+		wxStaticText* timeLabel;
+		wxTextCtrl* timePointValue;
 
 protected:
 		virtual void OnRefresh(wxCommandEvent& event)=0;
@@ -75,6 +82,8 @@ protected:
 		virtual void OnChangeXAxis(wxCommandEvent& event)=0;
 		virtual void OnEditNodeList(wxCommandEvent& event)=0;
 		virtual void OnShowHideNodeList(wxCommandEvent& event);
+		virtual void OnScroll(wxCommandEvent & event);
+		virtual void OnTextEner(wxCommandEvent & event);
 
 protected:
 		virtual void CreateResultViewer(const wxString& p_sViewerType);
@@ -82,6 +91,7 @@ public:
 		virtual void RefreshWindow()=0;
 		virtual void RefreshCurrentWindow(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle)=0;
 		virtual void RemoveExternalWindowsPointer()=0;
+		virtual wxScrollBar* GetScrollBar() { return scrollBar; }
 public:
 
 	  SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd);

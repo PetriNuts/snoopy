@@ -86,6 +86,9 @@ SP_DLG_CheckNet::SP_DLG_CheckNet( SP_MDI_View* p_pcView, wxWindow *p_parent, con
 		|| m_sNetClassName == SP_DS_COLHPN_CLASS 
 		|| m_sNetClassName == SP_DS_CONTINUOUSPED_CLASS
 		|| m_sNetClassName == SP_DS_HYBRIDPN_CLASS
+		|| m_sNetClassName==SP_DS_FUZZYCPN_CLASS
+		|| m_sNetClassName== SP_DS_FUZZYSPN_CLASS
+		||m_sNetClassName==SP_DS_FUZZYHPN_CLASS
 		|| m_sNetClassName == SP_DS_SPN_CLASS)
 	{
 		m_cbSyntax = new wxCheckBox(this, SP_ID_CHECKLISTBOX_SYNTAX, wxT("Check Syntax (Consistency)"));
@@ -270,7 +273,7 @@ bool SP_DLG_CheckNet::Check()
 
 	if( m_sNetClassName == SP_DS_SPN_CLASS
 		|| m_sNetClassName == SP_DS_HYBRIDPN_CLASS
-		|| m_sNetClassName == SP_DS_CONTINUOUSPED_CLASS)
+		|| m_sNetClassName == SP_DS_CONTINUOUSPED_CLASS || m_sNetClassName ==SP_DS_FUZZYCPN_CLASS|| m_sNetClassName==SP_DS_FUZZYSPN_CLASS || m_sNetClassName==SP_DS_FUZZYHPN_CLASS )
 	{
 		if(m_cbSyntax->IsChecked())
 		{
@@ -345,6 +348,7 @@ bool SP_DLG_CheckNet :: CheckSPN( )
 			l_Constants.push_back(l_Name);
 		}
 		l_cParser.SetParameterNames(&l_Constants);
+
 	}
 
 	l_pcNodeclass = m_graph->GetNodeclass(SP_DS_STOCHASTIC_TRANS);

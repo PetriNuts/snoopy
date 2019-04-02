@@ -10,7 +10,8 @@
 #include "sp_core/SP_Vector.h"
 #include "sp_ds/extensions/ResultViewer/SP_DS_ResultViewer.h"
 #include "sp_ds/SP_DS_Graph.h"
-
+#include "sp_core/SP_Core.h"
+#include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_ds/extensions/ResultViewer/AttributeTypes/SP_DS_ViewerAttributeText.h"
 #include <wx/wfstream.h>
 #include <wx/txtstrm.h>
@@ -129,6 +130,50 @@ void SP_DS_ResultViewer::AddCurve(const wxString& p_sCurveName, const unsigned l
 	//add this curve to the list
 	m_aPlotCurves.push_back(l_pcCurve);
 }
+///////////////////////
+void SP_DS_ResultViewer::AddFuzzyCurves(const wxString& p_sCurveName, const unsigned long& p_nDataColumn, SP_Compressed_Fuzzy_Band* p_pcCompressedResult, const wxString& p_sColor, const int& p_nLineWidth ,
+	const int& p_nLineStyle )
+{
+	SP_DS_Viewer_Fuzzy_Curve* l_pcCurve;
+	wxString l_sCurveColor = p_sColor;
+
+	if (l_sCurveColor == wxT(""))
+	{
+		l_sCurveColor = GetColourString(p_nDataColumn);
+	}
+
+	//create a curve
+	l_pcCurve = new SP_DS_Viewer_Fuzzy_Curve(p_sCurveName, p_nDataColumn, l_sCurveColor, p_nLineWidth, p_nLineStyle, p_pcCompressedResult);
+
+	//add the position of this curve as the current number of curves
+	m_mCurveName2Postion[p_sCurveName] = m_aPlotFuzzyCurves.size();
+
+	//add this curve to the list
+	m_aPlotFuzzyCurves.push_back(l_pcCurve);
+}
+
+///////////////////////
+void SP_DS_ResultViewer::AddFuzzyCurve(const wxString& p_sCurveName, const unsigned long& p_nDataColumn, const vector<SP_Vector2DDouble> p_pcResultMatrix,const ResultFuzzyBand fBand,SP_VectorDouble alphaLevels, unsigned long levels, unsigned long points, unsigned int fn, const wxString& p_sColor, const int& p_nLineWidth,
+	const int& p_nLineStyle)
+{
+	SP_DS_ViewerFuzzyCurve* l_pcCurve;
+	wxString l_sCurveColor = p_sColor;
+
+	if (l_sCurveColor == wxT(""))
+	{
+		l_sCurveColor = GetColourString(p_nDataColumn);
+	}
+	//create a curve
+	l_pcCurve = new SP_DS_ViewerFuzzyCurve(p_sCurveName, p_nDataColumn, p_pcResultMatrix,fBand, alphaLevels,l_sCurveColor, p_nLineWidth, p_nLineStyle,levels,points,fn);
+
+	//add the position of this curve as the current number of curves
+	//m_mCurveName2Postion[p_sCurveName] = m_aPlotFuzzyCurves.size();
+
+	//add this curve to the list
+	//m_aPlotFuzzyCurves.push_back(l_pcCurve);
+}
+//////////////////////
+
 
 void SP_DS_ResultViewer::ClearCurves()
 {
@@ -268,20 +313,47 @@ void SP_DS_ResultViewer::SetCurveColor(const wxString& l_nName, const wxString& 
 void SP_DS_ResultViewer::ShowCurve(const unsigned long& p_nIndex, const bool& p_bShow)
 {
 	SP_ListCurve::iterator l_itCurve;
+	
+	wxString netClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();///Added by G.A
+	bool isFuzzyNet = netClass.Contains(wxT("Fuzzy"))? true : false;//Added by G.A
+	//isFuzzyNet = false;//for testing max 
+	if(isFuzzyNet)//Added by G.A
+	{
+		if (p_nIndex >= m_aPlotFuzzyCurves.size())
+		{
+			return;
 
-	if (p_nIndex >= m_aPlotCurves.size())
-	{
-		return;
-	}
-	if (p_bShow == true)
-	{
-		m_apcShownCurvesList.push_back(p_nIndex);
-	}
-	else
-	{
-		m_apcShownCurvesList.remove(p_nIndex);
-	}
+		}
+		if (p_bShow == true)
+		{
 
+			m_apcShownCurvesList.push_back(p_nIndex);
+
+		}
+		else
+		{
+			m_apcShownCurvesList.remove(p_nIndex);
+		}
+
+	}
+	else {
+
+		if (p_nIndex >= m_aPlotCurves.size())
+		{
+			return;
+
+		}
+		if (p_bShow == true)
+		{
+
+			m_apcShownCurvesList.push_back(p_nIndex);
+
+		}
+		else
+		{
+			m_apcShownCurvesList.remove(p_nIndex);
+		}
+	}
 }
 
 void SP_DS_ResultViewer::ShowCurve(const wxString& p_sName, const bool& p_bShow)

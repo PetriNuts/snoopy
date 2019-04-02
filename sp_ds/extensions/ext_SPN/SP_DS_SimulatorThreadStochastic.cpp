@@ -32,6 +32,7 @@ void* SP_DS_SimulatorThreadStochastic::Entry()
 
 	//transform this simulator into hybrid simulator
 	l_pcSimulator = dynamic_cast<spsim::StochasticSimulator*> (m_pcSimulator);
+	//SendGuiEvent(SP_THREAD_EVENT_START_SIM, 0, NULL);
 
 	//start recording the runtime
 	m_cSimulationStopWatch.Start(0);
@@ -91,7 +92,7 @@ void* SP_DS_SimulatorThreadStochastic::Entry()
 	long l_nRunTime = GetSimulationRuntime();
 
 	SendGuiEvent(SP_THREAD_EVENT_END_SIMULATION, l_nRunTime, NULL);
-
+	
 	return NULL;
 }
 

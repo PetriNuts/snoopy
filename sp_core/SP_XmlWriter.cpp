@@ -34,6 +34,7 @@ SP_XmlWriter::~SP_XmlWriter()
 {
 }
 
+
 bool SP_XmlWriter::Write(SP_DS_Graph* p_pcGraph, const wxString& p_sFile)
 {
 	bool l_bReturn = false;
@@ -133,26 +134,30 @@ SP_XmlWriter::WriteClasses(SP_DS_Graph* p_pcVal, wxXmlNode* p_pcRoot)
     CHECK_POINTER(l_plMC, return FALSE);
 
     wxXmlNode* l_pcElemNC = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("nodeclasses"));
-    l_pcElemNC->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"), l_plNC->size()));
+    l_pcElemNC->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"), (unsigned  long int)(l_plNC->size())));//
     p_pcRoot->AddChild(l_pcElemNC);
 
     for (l_NIter = l_plNC->begin(); l_NIter != l_plNC->end(); ++l_NIter)
         WriteNodeclass((*l_NIter), l_pcElemNC);
 
     wxXmlNode* l_pcElemEC = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("edgeclasses"));
-    l_pcElemEC->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"), l_plEC->size()));
+    l_pcElemEC->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"),(unsigned long int ) l_plEC->size()));//
     p_pcRoot->AddChild(l_pcElemEC);
 
     for (l_EIter = l_plEC->begin(); l_EIter != l_plEC->end(); ++l_EIter)
         WriteEdgeclass((*l_EIter), l_pcElemEC);
 
     wxXmlNode* l_pcElemMC = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("metadataclasses"));
-    l_pcElemMC->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"), l_plMC->size()));
+    l_pcElemMC->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"), (unsigned long int) l_plMC->size()));//
     p_pcRoot->AddChild(l_pcElemMC);
+
+	SP_DS_Metadataclass* m_pcMetaDataConstants = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 
     for (l_MIter = l_plMC->begin(); l_MIter != l_plMC->end(); ++l_MIter)
         WriteMetadataclass((*l_MIter), l_pcElemMC);
-
+	//m_pcGraph->RemoveMetadataclass(m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT));
+ 
+	
     return TRUE;
 }
 
@@ -168,7 +173,7 @@ SP_XmlWriter::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcRoot)
     CHECK_POINTER(l_plElements, return FALSE);
 
     wxXmlNode*  l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("nodeclass"));
-    l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"), l_plElements->size()));
+    l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"),(unsigned long int ) l_plElements->size()));//have to remob=ve unsigned long int before commit on git
     l_pcElem->AddAttribute(wxT("name"), p_pcVal->GetName());
     p_pcRoot->AddChild(l_pcElem);
 
@@ -190,7 +195,7 @@ SP_XmlWriter::WriteEdgeclass(SP_DS_Edgeclass* p_pcVal, wxXmlNode* p_pcRoot)
     CHECK_POINTER(l_plElements, return FALSE);
 
     wxXmlNode*  l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("edgeclass"));
-    l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"), l_plElements->size()));
+    l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"),(unsigned long int ) l_plElements->size()));//
     l_pcElem->AddAttribute(wxT("name"), p_pcVal->GetName());
     p_pcRoot->AddChild(l_pcElem);
 
@@ -212,7 +217,7 @@ SP_XmlWriter::WriteMetadataclass(SP_DS_Metadataclass* p_pcVal, wxXmlNode* p_pcRo
     CHECK_POINTER(l_plElements, return FALSE);
 
     wxXmlNode*  l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("metadataclass"));
-    l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"), l_plElements->size()));
+    l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"),(unsigned long int) l_plElements->size()));///
     l_pcElem->AddAttribute(wxT("name"), p_pcVal->GetName());
     p_pcRoot->AddChild(l_pcElem);
 
@@ -403,7 +408,7 @@ SP_XmlWriter::WriteData(SP_Data* p_pcVal, wxXmlNode* p_pcRoot)
     }
 
     wxXmlNode*  l_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("graphics"));
-    l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"), (l_plGraphics?l_plGraphics->size():0)));
+    l_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%lu"),(unsigned long int ) (l_plGraphics?l_plGraphics->size():0)));/// change unsigned long int before final commit on  git 
     p_pcRoot->AddChild(l_pcElem);
 
     if (l_plGraphics)
@@ -630,7 +635,7 @@ SP_XmlWriter::WriteEdgeGraphic(SP_GR_Edge* p_pcVal, wxXmlNode* p_pcRoot)
 
     wxXmlNode* l_pcPointE;
     wxList* l_pcList = dynamic_cast<wxLineShape*>(p_pcVal->GetPrimitive())->GetLineControlPoints();
-    l_pcElem2->AddAttribute(wxT("count"), wxString::Format( wxT("%lu"), (l_pcList?l_pcList->GetCount():0)));
+    l_pcElem2->AddAttribute(wxT("count"), wxString::Format( wxT("%lu"), (unsigned long int)(l_pcList?l_pcList->GetCount():0)));
     if (l_pcList)
     {
         wxNode* l_pcNode = l_pcList->GetFirst();

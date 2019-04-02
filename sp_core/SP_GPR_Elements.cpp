@@ -579,7 +579,9 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 		p_sNetClass.CmpNoCase(SP_DS_MUSICPN_CLASS) == 0 ||
 		p_sNetClass.CmpNoCase(SP_DS_HYBRIDPN_CLASS) == 0||
 		p_sNetClass.CmpNoCase(SP_DS_MTIDD_CLASS) == 0 ||
-		p_sNetClass.CmpNoCase(SP_DS_FREESTYLE_CLASS) == 0 )
+		p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0 ||
+		p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0 ||
+		p_sNetClass.CmpNoCase(SP_DS_FREESTYLE_CLASS) == 0 || p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) ==0)
 	{
 
 		for (itN = ((*itNC).second).begin(); itN != ((*itNC).second).end(); ++itN)
@@ -601,6 +603,9 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 				p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_EXTPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_MUSICPN_CLASS) == 0 ||
+				p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0 ||
+				p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0 ||
+				p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_MODULOPN_CLASS) == 0) &&
 				l_rString.CmpNoCase(wxT("Transition")) == 0)
 			{
@@ -750,6 +755,9 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 		if (p_sNetClass.CmpNoCase(SP_DS_FREESTYLE_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_SPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_HYBRIDPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_COLSPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
@@ -828,6 +836,9 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			p_sNetClass.CmpNoCase(SP_DS_TIMEPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_MUSICPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_MTIDD_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_FREESTYLE_CLASS) == 0)
 		{
 			m_rbLogicBrush = new wxRadioBox(p_pcPage, -1, wxT("Logical Nodes (affecting all net classes)"), wxDefaultPosition, wxDefaultSize, 2, brushes, 1, wxRA_SPECIFY_ROWS);
@@ -937,6 +948,10 @@ bool SP_GPR_Elements::OnDialogOk(const wxString& p_sNetClass)
 		}
 		if (p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_SPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_HYBRIDPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_COLSPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||

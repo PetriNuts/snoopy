@@ -425,6 +425,8 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr = l_pcMC->GetPrototype()->GetAttribute(wxT("Type"));
 	SP_DS_TypeAttribute* l_pcType = dynamic_cast< SP_DS_TypeAttribute* >( l_pcAttr );
 	l_pcType->AddPossibleValue(wxT("double"));
+	//l_pcType->AddPossibleValue(wxT("TFN1"));
+	//l_pcType->AddPossibleValue(wxT("BFN1"));
 
 
  	//////////////////////////////////////////////////////////////////////////////

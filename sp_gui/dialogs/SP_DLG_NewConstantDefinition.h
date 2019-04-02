@@ -36,6 +36,10 @@ class SP_DLG_NewConstantDefinition : public wxDialog
 	wxArrayString  m_datatypes;
 	wxString *datatypes;
 
+
+	wxArrayString m_ftn;// Added by G.A
+	wxString *dataFn;//Added by G.A
+
 	wxString m_sAvailableDatatypes;
 
 	SP_DS_Graph* m_pcGraph;

@@ -11,8 +11,6 @@
 ////////#include "wx/choicdlg.h"
 #include "wx/msgdlg.h"
 #include "sp_utilities.h"
-
-
 #include "sp_gui/management/SP_GM_Docmanager.h"
 #include "sp_gui/windows/SP_GUI_Childframe.h"
 #include "sp_gui/dialogs/SP_DLG_GraphProperties.h"
@@ -35,7 +33,9 @@
 #include "sp_gui/dialogs/dia_ColCPN/SP_DLG_ColCPNSimulationResults.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStSimulationResults.h"
 #include "sp_gui/dialogs/dia_ColHPN/SP_DLG_ColHPNSimultionResults.h"
-
+#include"sp_gui/dialogs/dia_FPN/SP_DLG_FCPNSimulationResults.h"
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_FspnSimResult.h"
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_FHybridSimultionResults.h"
 
 //AMR
 #include "sp_gui/dialogs/dia_ColCPN/SP_DLG_ColCPNDirSimulationResults.h"
@@ -1840,6 +1840,18 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 		{
 			l_pcDlg = new SP_DLG_StSimulationResults( l_pcGraph, m_pcFrame );
 		}
+		//else if((l_sName == SP_DS_FUZZYPN_CLASS)) //Added by G.A
+		//{
+         //   l_pcDlg = new SP_DLG_StSimulationResults(l_pcGraph, m_pcFrame);
+			//l_pcDlg = new SP_DLG_FstSimulationResults(l_pcGraph, m_pcFrame);
+			// l_pcDlg = new SP_DLG_FspnSimResult(l_pcGraph, m_pcFrame);
+		//}
+		else if ((l_sName == SP_DS_FUZZYSPN_CLASS)) //Added by G.A
+		{
+			//l_pcDlg = new SP_DLG_StSimulationResults(l_pcGraph, m_pcFrame);
+			//l_pcDlg = new SP_DLG_FspnStSimulationResults(l_pcGraph, m_pcFrame);
+			l_pcDlg = new SP_DLG_FspnSimResult(l_pcGraph, m_pcFrame);
+		}
 		else if(l_sName == SP_DS_CONTINUOUSPED_CLASS)
 		{
 	/*
@@ -1855,22 +1867,21 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 	*/
 			l_pcDlg = new SP_DLG_CPNSimulationResults( l_pcGraph, m_pcFrame );
 		}
+		else if (l_sName == SP_DS_FUZZYCPN_CLASS)
+		{
+			l_pcDlg = new SP_DLG_FCPNSimulationResults(l_pcGraph, m_pcFrame);
+
+
+		}
 		else if(l_sName == SP_DS_HYBRIDPN_CLASS)
 		{
-	/*
-			SP_DS_CheckTransitions l_checkTrans(l_pcGraph);
-
-			wxBusyInfo l_Info(wxT("Please wait while checking the net.."));
-
-			if(!l_checkTrans.CheckRateFunction())
-			 {
-				 SP_MESSAGEBOX(wxT("Simulation can not initialize"),wxT("Hybrid Simulation"));
-				 return; //there is error in one of the transitions rate functions
-			 }
-
-	*/
+ 
 		    l_pcDlg = new SP_DLG_HybridSimulationResults( l_pcGraph, m_pcFrame );
 
+		}
+		else if (l_sName == SP_DS_FUZZYHPN_CLASS)
+		{
+			l_pcDlg = new SP_DLG_FHybridSimulationResults(l_pcGraph, m_pcFrame);
 		}
 
 		if(l_pcDlg != NULL)

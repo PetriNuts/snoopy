@@ -27,7 +27,14 @@ typedef vector< SP_VectorDouble > SP_Vector2DDouble;
 typedef vector< SP_VectorLong > SP_Vector2DLong;
 typedef vector< SP_VectorULong > SP_Vector2DULong;
 typedef vector< SP_VectorBool > SP_Vector2DBool;
+struct TraceElement {//Added by G.A
+	std::vector<double> sample;
+	double currentLevel;
+	int levelNum;
+	SP_Vector2DDouble fuzzyTrace;
 
+};
+typedef std::vector<TraceElement>  ResultFuzzyBand;
 /*
 template <class T> class SP_Vector: public vector<T>
 {

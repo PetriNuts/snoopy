@@ -9,6 +9,7 @@
 #include <wx/imaglist.h>
 #include <wx/image.h>
 
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 #include "sp_core/base/SP_Type.h"
 
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
@@ -16,9 +17,11 @@
 #include "sp_gui/dialogs/dia_CPN/SP_WDG_DeclarationTreectrl.h"
 #include "sp_gui/windows/SP_GUI_DevbarContainer.h"
 #include "sp_gui/windows/SP_GUI_Childframe.h"
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_FpnConstantDefinition.h"
 
 #include "sp_gui/dialogs/dia_CPN/SP_DLG_ColorSetSetting.h"
 #include "sp_gui/dialogs/dia_CPN/SP_DLG_ConstantDefinition.h"
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_FpnConstantDefinition.h"
 #include "sp_gui/dialogs/dia_CPN/SP_DLG_VariableDefinition.h"
 #include "sp_gui/dialogs/dia_CPN/SP_DLG_FunctionDefinition.h"
 
@@ -123,6 +126,11 @@ SP_WDG_DeclarationTreectrl::OnDoubleClick(wxTreeEvent& p_cEvent)
 			SP_DLG_ConstantDefinition l_cConstantDlg(NULL);
 			l_cConstantDlg.ShowModal();
 		}
+		else if (l_sNetClassName.Contains(wxT("Fuzzy")))
+		{
+			SP_DLG_FpnConstantDefinition l_cConstantDlg(NULL);
+			l_cConstantDlg.ShowModal();
+		}
 		else
 		{
 			SP_DLG_NewConstantDefinition l_cConstantDlg(NULL);
@@ -194,26 +202,29 @@ SP_WDG_DeclarationTreectrl::AppendFileItem(wxTreeItemId p_cId, const wxString& p
 //bysl
 void
 SP_WDG_DeclarationTreectrl::UpdateOtherTree()
-{ 
-	wxTreeItemId l_cRootId=GetRootItem();
-	wxTreeItemIdValue l_nCookie= NULL;
+{
+	wxTreeItemId l_cRootId = GetRootItem();
+	wxTreeItemIdValue l_nCookie = NULL;
 
 	m_ColorsMap.clear();
 
-	GetFirstChild(l_cRootId,l_nCookie);
-	wxTreeItemId l_cSecondChild=GetFirstChild(l_cRootId,l_nCookie);
+	GetFirstChild(l_cRootId, l_nCookie);
+	wxTreeItemId l_cSecondChild = GetFirstChild(l_cRootId, l_nCookie);
 	DeleteChildren(l_cSecondChild);
 
 	SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
-	if(!l_pcGraph)
+
+	//wxString cName = p_doc->GetNetclassName();
+	wxString netClass = SP_Core::Instance()->GetRootDocument()->GetNetclassName();
+	if (!l_pcGraph)
 		return;
 
-	SP_DS_Metadataclass* l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
-	if(l_pcMetadataclass)
+	SP_DS_Metadataclass* l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);//SP_DS_META_CONSTANT="Constant Class"
+	if (l_pcMetadataclass)
 	{
 		SP_ListMetadata::const_iterator l_itElem;
 		for (l_itElem = l_pcMetadataclass->GetElements()->begin();
-				l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+			l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
 		{
 			SP_DS_Metadata* l_pcMetadata = *l_itElem;
 			wxString l_sMetadataName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
@@ -221,14 +232,61 @@ SP_WDG_DeclarationTreectrl::UpdateOtherTree()
 			//wxString l_sMetadataValue = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Value")))->GetValue();
 			SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcMetadata->GetAttribute(wxT("ValueList")));
 			wxString l_sMetadataValue;
-			for(unsigned int i = 0; i < l_pcColList->GetRowCount(); ++i)
+			wxString l_sMetadataType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcMetadata->GetAttribute(wxT("Type")))->GetValue();
+
+			for (unsigned int i = 0; i < l_pcColList->GetRowCount(); ++i)
 			{
-				l_sMetadataValue << l_pcColList->GetCell(i,1) << wxT(";");
+				if (l_sMetadataType.Cmp(wxT("TFN")) == 0 && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS|| netClass == SP_DS_FUZZYHPN_CLASS))
+				{
+					
+
+					l_sMetadataValue << wxT("(") << l_pcColList->GetCell(i, 1) << wxT(");");
+				}
+				else if (l_sMetadataType.Cmp(wxT("BFN")) == 0 && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS ||netClass == SP_DS_FUZZYCPN_CLASS))
+				{
+					l_sMetadataValue << wxT("(") << l_pcColList->GetCell(i, 1) << wxT(");");
+
+				}
+				else if (l_sMetadataType.Cmp(wxT("TZN")) == 0 && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS))
+				{
+					l_sMetadataValue << wxT("(") << l_pcColList->GetCell(i, 1) << wxT(");");
+
+				}
+				else
+				{
+					l_sMetadataValue << l_pcColList->GetCell(i, 1) << wxT(";");
+					
+				}
 			}
-			m_ColorsMap[l_sMetadataName] = l_sMetadataGroup + wxT(" : ") + l_sMetadataValue;
-			AppendFileItem(l_cSecondChild,l_sMetadataName + wxT(" : ") + l_sMetadataValue,NULL);
+			////////////////
+			if ((l_sMetadataType.Cmp(wxT("TFN")) == 0 || l_sMetadataType.Cmp(wxT("BFN")) == 0 || l_sMetadataType.Cmp(wxT("TZN")) == 0) && (netClass == SP_DS_FUZZYSPN_CLASS|| netClass == SP_DS_FUZZYHPN_CLASS ||netClass == SP_DS_FUZZYCPN_CLASS))
+			{
+				m_ColorsMap[l_sMetadataName] = l_sMetadataGroup + wxT(" : ") + l_sMetadataValue;
+				AppendFileItem(l_cSecondChild, l_sMetadataName + l_sMetadataValue, NULL);
+				wxString msg = "new" + l_sMetadataType + " Fuzzy Number is defined  " + l_sMetadataName + ":" + l_sMetadataValue;
+				SP_LOGMESSAGE(msg);
+			}
+			/////////////////
+
+			else {
+				if ((netClass != SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass != SP_DS_FUZZYCPN_CLASS) && !l_sMetadataValue.Contains(","))
+				{
+
+					m_ColorsMap[l_sMetadataName] = l_sMetadataGroup + wxT(" : ") + l_sMetadataValue;
+					AppendFileItem(l_cSecondChild, l_sMetadataName + wxT(" : ") + l_sMetadataValue, NULL);
+				}
+				else if (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS)
+				{
+					m_ColorsMap[l_sMetadataName] = l_sMetadataGroup + wxT(" : ") + l_sMetadataValue;
+					AppendFileItem(l_cSecondChild, l_sMetadataName + wxT(" : ") + l_sMetadataValue, NULL);
+				}
+				else{}
+			}
 		}
-	}
+
+	
+}
+	
 
 	wxTreeItemId l_cThirdChild = GetNextChild(l_cRootId,l_nCookie);
 	DeleteChildren(l_cThirdChild);

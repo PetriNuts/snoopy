@@ -19,7 +19,8 @@ enum
 {
 	SP_THREAD_EVENT_END_SIMULATION,
 
-	SP_THREAD_EVENT_END_ONE_RUN
+	SP_THREAD_EVENT_END_ONE_RUN,
+	SP_THREAD_EVENT_START_SIM
 	//TODO: add here other event types which need to be dispatched
 };
 

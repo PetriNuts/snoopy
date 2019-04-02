@@ -21,10 +21,12 @@
  */
 class SP_DS_PlotViewer : public SP_DS_ResultViewer, public wxEvtHandler {
 protected :
-
+	wxStaticBoxSizer*	m_pcScroll;
+	wxScrollBar* scrollBar;
     //Chart panel where the chart will be created
 
     wxChartPanel *m_pcChartPanel;
+	wxChartPanel* panel2;
 
     //plot legend state
     bool m_bShowLegend;
@@ -67,6 +69,9 @@ public:
     //Update a viewer
     virtual void Update();
 
+	//Update the viewer with certain time point (Membership function) Added by G.A
+	virtual void UpdateMembershipViewer(double timePoint);
+
     //Create a viewer window
     virtual void Create();
 
@@ -75,7 +80,8 @@ public:
 
     //Create a chart
     virtual Chart *CreateChart() = 0;
-
+	virtual Chart *CreateFuzzyPlot() = 0;//Added by G.A
+	virtual Chart *CreateMembershipFunction(double timepoint) = 0;//Added by G.A
     virtual void UpdateAttributes();
 
     //set the attribute values to the current one
