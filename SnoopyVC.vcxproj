@@ -739,7 +739,6 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="sp_gui\dialogs\dia_ContinuousPN\SP_DLG_CPNColDirSimResults.h" />
     <ClInclude Include="sp_gui\dialogs\dia_ContinuousPN\SP_DLG_CSVExport.h" />
     <ClInclude Include="sp_gui\dialogs\dia_CPN\SP_DLG_CPNDeclaration.h" />
-    <ClInclude Include="sp_gui\dialogs\dia_FPN\CalcMinMaxCurve.h" />
     <ClInclude Include="sp_gui\dialogs\dia_FPN\FuzzyBasics.h" />
     <ClInclude Include="sp_gui\dialogs\dia_FPN\FuzzyReasoning.h" />
     <ClInclude Include="sp_gui\dialogs\dia_FPN\SP_Compressed_Fuzzy_Band.h" />
@@ -1351,7 +1350,6 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile Include="sp_gui\dialogs\dia_ContinuousPN\SP_DLG_CPNColDirSimResults.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_ContinuousPN\SP_DLG_CSVExport.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_CPN\SP_DLG_CPNDeclaration.cpp" />
-    <ClCompile Include="sp_gui\dialogs\dia_FPN\CalcMinMaxCurve.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_FPN\FuzzyReasoning.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_FPN\SP_Compressed_Fuzzy_Band.cpp" />
     <ClCompile Include="sp_gui\dialogs\dia_FPN\SP_DLG_FCPNSimulationResults.cpp" />
