@@ -25,14 +25,6 @@ public:
 	virtual void SetAlphaLevels(vector<double>& levels) { m_alphaLevels = levels; }
 	virtual vector<double> GetAlphaLevels() { return m_alphaLevels; }
 
-	SP_Compressed_Fuzzy_Band operator=(SP_Compressed_Fuzzy_Band b)
-	{
-		SP_Compressed_Fuzzy_Band copy = SP_Compressed_Fuzzy_Band();
-		copy.SetMinimumCurve(b.GetMinimumCurve());
-		copy.SetMaximumCurve(b.GetMaximumCurve());
-		copy.SetMembershipList(b.GetMembershipList());
-		copy.SetAlphaLevels(b.GetAlphaLevels());
-		return copy;
-	}
+	
 };
 #endif //_SP_COMPRESSED_FUZZY_BAND_H_

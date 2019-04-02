@@ -82,7 +82,7 @@ virtual wxString  GetKParameter(const wxString& func);
 
 virtual void   OnCloseWindow(wxCloseEvent& p_cEvent);
 
-virtual void SP_DLG_FspnSimResult::OnModifyConstantSets(wxCommandEvent& p_cEvent);
+virtual void OnModifyConstantSets(wxCommandEvent& p_cEvent);
 
  
 

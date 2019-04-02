@@ -69,7 +69,7 @@ public:
 
 	virtual unsigned long GetNumFuzzyNum();
 
-	void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataColumn);
+	void GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataColumn);
 
 	virtual std::vector<SP_Vector2DDouble> GetMinMaxFuzzyTraceMatrix(ResultFuzzyBand& fuzzyBand);
 

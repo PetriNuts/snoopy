@@ -497,7 +497,6 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClInclude Include="sp_core\FTree\SP_FTree_TermParser.h" />
     <ClInclude Include="sp_core\FTree\SP_FTree_TermScanner.h" />
     <ClInclude Include="sp_core\TParser\SP_Parser.h" />
-    <ClInclude Include="sp_ds\attributes\SP_DS_FuzzyNTAttribute.h" />
     <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_ColoredPNDirSimulation.h" />
     <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_ColPN_Coloring.h" />
     <ClInclude Include="sp_ds\extensions\Col_SPN\SP_DS_DColTraceAnalyzer.h" />
@@ -1121,7 +1120,6 @@ del $(TargetDir)SP_DLG_CheckForUpdate.*
     <ClCompile Include="sp_core\FTree\SP_FTree_TermScanner.cpp" />
     <ClCompile Include="sp_core\TParser\SP_Parser.cpp" />
     <ClCompile Include="sp_defines.cpp" />
-    <ClCompile Include="sp_ds\attributes\SP_DS_FuzzyNTAttribute.cpp" />
     <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_ColoredPNDirSimulation.cpp" />
     <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_ColPN_Coloring.cpp" />
     <ClCompile Include="sp_ds\extensions\Col_SPN\SP_DS_DcolTraceAnalyzer.cpp" />
