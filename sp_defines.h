@@ -417,8 +417,6 @@ extern const wxString SP_DS_REACHABILITY_CLASS;
 // SP_DS_FaultTree
 extern const wxString SP_DS_FAULTTREE_CLASS;
 
-//SP_DS_FUZZYPN
-//extern const wxString SP_DS_FUZZYPN_CLASS;//added by G.Assaf
 
 // SP_DS_ExtendedFaultTree
 extern const wxString SP_DS_EXTFAULTTREE_CLASS;
