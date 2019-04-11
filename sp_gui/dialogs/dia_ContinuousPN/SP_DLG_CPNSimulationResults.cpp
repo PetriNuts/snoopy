@@ -127,7 +127,7 @@ int l_nSimulatorIndex =
 
 	//simulation algorithm
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Simulator Semantics")), 1, wxALL | wxEXPAND, 5);
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("simulator semantics")), 1, wxALL | wxEXPAND, 5);
 	m_pcsemanticsComboBox = new wxChoice(m_pcPropertyWindowPropertySizer, SP_ID_CHOICE_SIMULATOR_SEMANTICS, wxDefaultPosition, wxSize(100, -1));
 
 	l_pcRowSizer->Add(m_pcsemanticsComboBox);
@@ -153,7 +153,7 @@ int l_nSimulatorIndex =
 
 	//ODE solver
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("ODE Solver")), 1, wxALL | wxEXPAND, 5);
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("ODE solver")), 1, wxALL | wxEXPAND, 5);
 	m_pcSolverComboBox = new wxChoice(m_pcPropertyWindowPropertySizer, SP_ID_CHOICE_SOLVER, wxDefaultPosition, wxSize(100, -1));
 	m_pcSolverComboBox->Clear();
 
