@@ -105,7 +105,10 @@ SP_DS_FunctionRegistry::LoadFromNet(SP_DS_Graph* p_pcGraph)
 			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMeta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 			wxString l_sValue = dynamic_cast<SP_DS_ColListAttribute*>(l_pcMeta->GetAttribute(wxT("ValueList")))->GetActiveCellValue(1);
 			wxString l_sMetadataType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcMeta->GetAttribute(wxT("Type")))->GetValue();
-			registerFunction(l_sName, l_sValue);
+			if (l_sMetadataType != wxT("TFN"))//Added by G.Assaf
+			{
+				registerFunction(l_sName, l_sValue);
+			}
 		}
 	}
 	m_bIsValid = true;
