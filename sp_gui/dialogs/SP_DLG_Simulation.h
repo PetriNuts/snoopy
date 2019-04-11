@@ -93,6 +93,7 @@ protected:
 
 	wxGauge* m_pcSimulationProgressGauge;
 	wxStaticText* m_pcSimulationProgressText;
+	 
 
 	bool m_bCompressExact;
 	wxString m_sNodeclass;
@@ -425,7 +426,9 @@ public:
 	}
 	virtual void SetSimulationProgressGauge(long p_nValue)
 	{
+		 
 		m_pcSimulationProgressGauge->SetValue(p_nValue);
+	 
 		m_pcSimulationProgressText->SetLabel(
 				wxString::Format(wxT("%i %%"),(p_nValue*100)/m_pcSimulationProgressGauge->GetRange()));
 		Update();

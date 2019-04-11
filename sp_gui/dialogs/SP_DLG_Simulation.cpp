@@ -259,7 +259,7 @@ void SP_DLG_Simulation::SetMinimalLayout()
 	m_pcPropertyWindowPropertySizer = m_pcCollpanePropertySizer->GetPane();
 
     l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Interval start:")),
+    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("interval start:")),
     					wxSizerFlags(1).Expand().Border(wxALL, 2));
 
     m_pcIntervalStartTextCtrl = new wxTextCtrl(m_pcPropertyWindowPropertySizer, -1,"0" , wxDefaultPosition, wxDefaultSize, 0);
@@ -267,7 +267,7 @@ void SP_DLG_Simulation::SetMinimalLayout()
     m_pcPropertySizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
     l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Interval end:")),
+    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("interval end:")),
     					wxSizerFlags(1).Expand().Border(wxALL, 2));
 
     //l_pcAttr = l_pcSimProp->GetAttribute(wxT("interval end"));
@@ -277,7 +277,7 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
 
     l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Interval Splitting:")),
+    l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("interval splitting:")),
     					wxSizerFlags(1).Expand().Border(wxALL, 2));
 
     m_pcResultPointCountTextCtrl = new wxTextCtrl(m_pcPropertyWindowPropertySizer, -1,"100", wxDefaultPosition, wxDefaultSize, 0);
@@ -293,10 +293,10 @@ void SP_DLG_Simulation::SetMinimalLayout()
 
     // rows of direct export sizer
     l_pcRowSizer = new wxBoxSizer(wxVERTICAL);
-    m_pcNoExportRadioButton = new wxRadioButton(m_pcPropertyWindowDirectExportSizer, -1, wxT("No export"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+    m_pcNoExportRadioButton = new wxRadioButton(m_pcPropertyWindowDirectExportSizer, -1, wxT("no export"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
     m_pcNoExportRadioButton->SetValue(true);
     l_pcRowSizer->Add(m_pcNoExportRadioButton, wxSizerFlags(0).Border(wxALL, 5));
-    m_pcDirectExportRadioButton = new wxRadioButton(m_pcPropertyWindowDirectExportSizer, -1, wxT("Direct export"), wxDefaultPosition, wxDefaultSize, 0);
+    m_pcDirectExportRadioButton = new wxRadioButton(m_pcPropertyWindowDirectExportSizer, -1, wxT("direct export"), wxDefaultPosition, wxDefaultSize, 0);
     l_pcRowSizer->Add(m_pcDirectExportRadioButton, wxSizerFlags(0).Border(wxALL, 5));
     m_pcDirectExportSizer->Add(l_pcRowSizer);
 
@@ -357,9 +357,9 @@ void SP_DLG_Simulation::SetMinimalLayout()
 void SP_DLG_Simulation::CreateStartSimulationButton()
 {
 	 wxSizer* l_pcRowSizer;
-
 	 // start simulation
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+	
 	m_pcStartButton = new wxButton(this, SP_ID_BUTTON_START_SIMULATION, wxT("Start Simulation"));
 	m_pcStartButton->SetBackgroundColour(*wxGREEN);
 	l_pcRowSizer->Add(m_pcStartButton, wxSizerFlags(0).Expand().Border(wxALL, 5));
@@ -368,7 +368,7 @@ void SP_DLG_Simulation::CreateStartSimulationButton()
 	m_pcSimulationProgressText = new wxStaticText(this, -1, wxT("    0 %"), wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE | wxALIGN_RIGHT);
 	l_pcRowSizer->Add(m_pcSimulationProgressText, wxSizerFlags(0).Expand().Border(wxALL, 5));
 	m_pcMainSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
-
+	
 	// simulation stop watch
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(this, -1, wxT("Simulation runtime:")), 0, wxALL, 5);
@@ -691,10 +691,7 @@ void SP_DLG_Simulation::OnEditXAxis(wxWindow *p_pcExternalWindowDialog) {
     l_asTimeVector.push_back(wxT("Simulation Time"));
     l_asTimeVector.push_back(wxT("Run Time"));
     m_pcXAxisChoices[wxT("Time")] = &l_asTimeVector;
-	////////
-	//SP_VectorString l_asfuzzyVector;
-	//l_asfuzzyVector.push_back(wxT("Fuzzy Value"));
-	//m_pcXAxisChoices[wxT("Fuzzy Num")] = &l_asfuzzyVector;
+	 
 
     SP_DLG_SelectXAxisVariable* l_pcDialog = new SP_DLG_SelectXAxisVariable(p_pcExternalWindowDialog, m_pcXAxisChoices, l_sCategory, l_sSubCategory);
 

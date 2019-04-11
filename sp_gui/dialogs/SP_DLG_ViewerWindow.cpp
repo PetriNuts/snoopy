@@ -250,11 +250,11 @@ void SP_DLG_ViewerWindow::OnTextEner(wxCommandEvent & event)
 {
 	wxString sTimeVal = timePointValue->GetValue();
 	double dTime;
-	if (sTimeVal.ToDouble(&dTime))
+	if (sTimeVal.ToDouble(&dTime)&& dTime>=0 && dTime<=scrollBar->GetRange()-1)
 	{
 		scrollBar->SetScrollPos(1, dTime);
-		 
-		//scrollBar->SetToolTip(cc);
+		scrollBar->SetThumbPosition(dTime);
+		scrollBar->SetToolTip(sTimeVal);
 		//timePointValue->SetLabelText(cc);
 		m_pcResultViewer->UpdateMembershipViewer(dTime);
 	

@@ -81,7 +81,11 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	m_pcOutputViewerType->SetStringSelection(m_pcModelView->GetAttribute(wxT("ViewerType"))->GetValueString());
 
 //	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("")), wxHORIZONTAL);
-
+	wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();//Added by G.A 
+	if (m_sNetClassName.Contains(wxT("Fuzzy")))
+	{
+		scrollBar->SetRange(m_anXValues.size());//required when loading a saved view
+	}
 	wxSize temp = m_pcMainSizer->GetSize();
 //	cout << temp.GetWidth() << " " << temp.GetHeight() << endl;
 
