@@ -37,12 +37,12 @@ protected:
 	SP_Compressed_Fuzzy_Band* m_compressedBand;          // object to store the needed results min/max with membership funs
 	SP_Vector2DDouble         m_nFinalMinResultFuzzyMatrix;  // Minimum values of places with time
 	SP_Vector2DDouble         m_nFinalMaxResultFuzzyMatrix;  // Maximum values of places with time
- 
+	bool                      m_bIsAbortCalculation;
 	unsigned long m_pCount;
 
 
 public:
- 
+   
 	virtual void CalculateAlphaLevels();
 
 	virtual void DoSamplePointsCombination(double calpha);
@@ -74,7 +74,7 @@ public:
 	virtual std::vector<SP_Vector2DDouble> GetMinMaxFuzzyTraceMatrix(ResultFuzzyBand& fuzzyBand);
 
 	virtual SP_Compressed_Fuzzy_Band* CompressResults( ResultFuzzyBand  fuzzyBand);
-
+	virtual void SetAbort(bool bAbort);
 };
 
 #endif // SP_FUZZY_REASONONG_

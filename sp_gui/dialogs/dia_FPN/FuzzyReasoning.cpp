@@ -9,6 +9,8 @@ FuzzyReasoning::FuzzyReasoning(unsigned long alphaLevels, unsigned long nDiscPoi
 	m_nAlphaLevels = alphaLevels;
 	m_nDiscPoints = nDiscPoints;
 	m_paramMatrix = paramMat;
+	m_bIsAbortCalculation = false;
+
 	//m_compMatrix = compMat;
 	m_compressedBand =new SP_Compressed_Fuzzy_Band( );
 	m_alphaStepSize =(double) 1 / m_nAlphaLevels;
@@ -32,7 +34,10 @@ FuzzyReasoning::FuzzyReasoning(unsigned long l, unsigned long s) {
 	m_nAlphaLevels = l;
 	m_nDiscPoints = s;
 }
-
+void   FuzzyReasoning::SetAbort(bool bAbort)
+{
+	m_bIsAbortCalculation = bAbort;
+}
 FuzzyReasoning::FuzzyReasoning() {
 
 }
@@ -67,9 +72,10 @@ unsigned long FuzzyReasoning::GetNumFuzzyNum()
 {
 	return m_nFuzzyNum;
 }
-
+/*Calculate vector of alpha levels from 0 to 1*/
 void FuzzyReasoning::CalculateAlphaLevels()
 {
+	
 	m_valphaLevels.clear();
 	double alpha = 0.0;
 	m_valphaLevels.push_back(alpha);
@@ -82,6 +88,7 @@ void FuzzyReasoning::CalculateAlphaLevels()
 	}
 	m_valphaLevels[nlevels ] = 1;
 }
+
 SP_Vector2DDouble FuzzyReasoning::GetAlphaCutForAllLevels()
 {
 	
@@ -107,6 +114,7 @@ SP_Vector2DDouble FuzzyReasoning::GetAlphaCutForAllLevels()
 	return m_alphaCutSetAllLevels;
 
 }
+/*Do ampling for the current(inputed) alpha level of all TFNs */
 void FuzzyReasoning::DoSamplePointsCombination(double calpha) 
 {
 	
@@ -125,16 +133,18 @@ void FuzzyReasoning::DoSamplePointsCombination(double calpha)
 		double left = m_paramMatrix[i][0];
 		double center = m_paramMatrix[i][1];
 		double right = m_paramMatrix[i][2];
-		if ((center - left) < pow(10, -10))
+		if ((center - left) < pow(10, -10))// crisp value
 			for (int j = 0; j < pow(m_nDiscPoints, m_nFuzzyNum); j++)
 				m_compMatrix[j][i] = left;
 		else
 		{
+			/* the parameter is fuzzy number*/
 			TriangularFN t(left, right, center);
+			/*calculate the alpha cut set (m_nDiscPoints sample-size) for the input alpha level*/
 			AlphaCutSet set = t.getAlphaCutSet(calpha, m_nDiscPoints);
 			int k = 0;
 			while (k < pow(m_nDiscPoints, m_nFuzzyNum))
-			{
+			{// do combinations
 				for (int m = 0; m < set.size(); m++)
 				{
 					long g = pow(m_nDiscPoints, count - 1);
@@ -154,9 +164,10 @@ void FuzzyReasoning::DoSamplePointsCombination(double calpha)
 	}
 }
 
-
+/*Calculate minimum and maximum traces over time*/
 void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataColumnNum)
 {
+	/*divide the time ito two slots, and run 2*spieces threads to speed up the calculations*/
 	long ltime = fuzzyBand[0].fuzzyTrace.size();
 	long lnumThreads = ltime / 2;
 	vector<std::thread> threadVector(dataColumnNum*2);
@@ -166,22 +177,29 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 	std::vector<double> finalMinVector;
 	std::vector<double> finalMaxVector;
 	long lDataCol = 0; long li = 0; 
+
 	m_nFinalMinResultFuzzyMatrix.resize(dataColumnNum, std::vector<double>(ltime));
 	m_nFinalMaxResultFuzzyMatrix.resize(dataColumnNum, std::vector<double>(ltime));
 	//m_nMinResultMatrix.resize(dataColumnNum, std::vector<double>(ltime));
 	while (lDataCol < dataColumnNum)
 	{
 		
-		
-		 
 		minthreads[li]=std::thread([&](SP_Vector2DDouble& m_nFinalMaxResultFuzzyMatrix, SP_Vector2DDouble& m_nFinalMinResultFuzzyMatrix,ResultFuzzyBand& fuzzyBand, long dataColumn, long start, long end) {
 		        long lastTime = fuzzyBand[0].fuzzyTrace.size();
 				for (long pos = start; pos < end; pos++)
 				{
+					if(m_bIsAbortCalculation)
+					{
+						break;
+					}
 					double minVal = fuzzyBand[0].fuzzyTrace[pos][dataColumn];
 					double maxVal = fuzzyBand[0].fuzzyTrace[pos][dataColumn];
 					for (unsigned long tracePos = 0; tracePos < fuzzyBand.size(); tracePos++)
 					{
+						if (m_bIsAbortCalculation)
+						{
+							break;
+						}
 						SP_Vector2DDouble elementTrace = fuzzyBand[tracePos].fuzzyTrace;
 						double dataValue = elementTrace[pos][dataColumn];
 						if (dataValue < minVal)
@@ -206,10 +224,18 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 			long lastTime = fuzzyBand[0].fuzzyTrace.size();
 			for (long pos = start; pos < end; pos++)
 			{
+				if (m_bIsAbortCalculation)
+				{
+					break;
+				}
 				double minVal = fuzzyBand[0].fuzzyTrace[pos][dataColumn];
 				double maxVal = fuzzyBand[0].fuzzyTrace[pos][dataColumn];
 				for (unsigned long tracePos = 0; tracePos < fuzzyBand.size(); tracePos++)
 				{
+					if (m_bIsAbortCalculation)
+					{
+						break;
+					}
 					SP_Vector2DDouble elementTrace = fuzzyBand[tracePos].fuzzyTrace;
 					double dataValue = elementTrace[pos][dataColumn];
 					if (dataValue < minVal)
@@ -320,9 +346,10 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 
  }
 
+ /*Calculate the Triangular membership function over time for specific data column and time point*/
  TimedTFN FuzzyReasoning::CalculateTfnAt( long timePoint,  long dataColumn,const ResultFuzzyBand& fuzzyband)
  {
-	 std::map<double, int> m_levels2PointsMap;
+	 std::map<double, int> m_levels2PointsMap;/*store each level with its corrosponding trace count */
 	 long lnumTraces = fuzzyband.size();
 	 SP_Vector2DDouble   m_nMinMaxResult;
 	 TimedTFN            timedMembershipFunc;
@@ -344,9 +371,10 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 	 /* store each sample result in its according level*/
 	 SP_Vector2DDouble m_nFormedMatrix;
 	 SP_Vector2DDouble m_oneTrace;
-	 SP_VectorDouble   m_nValuePerlevel;
+	 SP_VectorDouble   m_nValuePerlevel;/*used to store result values of one level*/
 	 vector<double> levels; levels.clear();
-	 int i_Level = 0; int j = 0;
+	 int i_Level = 0; /*refers to number of samples per level*/
+	 int j = 0;
 	 for (long i = 0; i < lnumTraces; i++)
 	 {
 		 if (m_levels2PointsMap[m_valphaLevels[j]] != 0)
@@ -363,8 +391,9 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 
 			 i_Level++;
 			 if (i_Level == m_levels2PointsMap[levels[j]])
-			 {
-				 i_Level = 0; j++;
+			 {/*complete one level, so store it in the final matrix*/
+				 i_Level = 0;
+				 j++;
 				 m_nFormedMatrix.push_back(m_nValuePerlevel);
 				 m_nValuePerlevel.clear();
 			 }
@@ -372,7 +401,7 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 		 }
 		 else { j++; }
 	 }
-	 /*sort and store the final results*/
+	 /*sort and store  the final results, min and max of each level*/
 	 if (m_nFormedMatrix.size() > 0)
 	 {
 		 for (int i = 0; i < m_nFormedMatrix.size(); i++)
@@ -399,6 +428,7 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 
 
  }
+ /*Calculate all TFNs for all data columns(places)  for all time points*/
 void FuzzyReasoning::CalcAllTFN( long dataColumn,  ResultFuzzyBand& band)
  {
 	 TimedTFN         m_timeTfn;
@@ -406,6 +436,10 @@ void FuzzyReasoning::CalcAllTFN( long dataColumn,  ResultFuzzyBand& band)
 
 	 for (long pos = 0; pos < l_lastTime; pos++)
 	 {
+		 if (m_bIsAbortCalculation)
+		 {
+			 break;
+		 }
 		 m_timeTfn = CalculateTfnAt(pos, dataColumn, band);
 		 m_membershipList.StoreTFNMembership(dataColumn, pos, m_timeTfn.m_nTFNMemberShip);
 		 
@@ -413,7 +447,7 @@ void FuzzyReasoning::CalcAllTFN( long dataColumn,  ResultFuzzyBand& band)
 	 
 	 
  }
-
+/*Calculate the min max fuzzy band with TFNs over time*/
 SP_Compressed_Fuzzy_Band* FuzzyReasoning::CompressResults(  ResultFuzzyBand  fuzzyBand)
  {
 	
@@ -431,13 +465,26 @@ SP_Compressed_Fuzzy_Band* FuzzyReasoning::CompressResults(  ResultFuzzyBand  fuz
 	  unsigned long l_lastTime = fuzzyBand[0].fuzzyTrace.size();
 	  for (long dataCol = 0; dataCol < lnumPlaces; dataCol++)
 	  {
-
+		 if (m_bIsAbortCalculation)
+		  {
+			  break;
+		  }
 		  CalcAllTFN(dataCol, fuzzyBand);
 	  }
 	  Membership_List tfnList = m_membershipList.GetMembershipList();
 	  vector<double> levls = GetAlphaSet();
-	  SP_Compressed_Fuzzy_Band* band =new SP_Compressed_Fuzzy_Band(tfnList, minTrace, maxTrace, levls);
-	
+	  SP_Compressed_Fuzzy_Band* band;
+	  if (!m_bIsAbortCalculation)
+	  {
+		   band = new SP_Compressed_Fuzzy_Band(tfnList, minTrace, maxTrace, levls);
+	  }
+	  else {
+		  minTrace.clear();
+		  maxTrace.clear();
+		  levls.clear();
+		  tfnList.clear();
+		   band = new SP_Compressed_Fuzzy_Band(tfnList, minTrace, maxTrace, levls);
+	  }
 
 	  return band;
  }
