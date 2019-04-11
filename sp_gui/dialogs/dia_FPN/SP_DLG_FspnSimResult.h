@@ -28,7 +28,7 @@ protected:
 	unsigned long               m_lpCount;
 	unsigned long               m_lnFuzzyNum;
 	long                        m_lSamplingStrategyselection;
-
+	long                        m_lTotalSimRuns;
 protected:
 	SP_Vector2DDouble            m_paramMatrix;
 	std::map<wxString, wxString> m_mTransParamNames;
@@ -38,13 +38,12 @@ protected:
 	ResultFuzzyBand              m_ResultFBand;
 	std::map<wxString, int>      m_mFuzzyParam2Position;
 	std::vector<wxString>        m_fuzzyParams;
-	long                         m_lTotalSimTim;
- 
-
+	bool                         m_bIsAbort;
+	
 protected:
 
 
-virtual void InitializeFuzzySetting();
+virtual bool InitializeFuzzySetting();
 
 virtual SP_VectorDouble  GetFNConstants(const wxString &val);
 
@@ -84,7 +83,13 @@ virtual void   OnCloseWindow(wxCloseEvent& p_cEvent);
 
 virtual void OnModifyConstantSets(wxCommandEvent& p_cEvent);
 
- 
+virtual void SetSimulationProgressText(long& p_nValue);
+
+virtual void  InitProgress();
+
+virtual void  SetSimulationProgressGaugeRange(long p_nRangeValue);
+
+void SetSimulationProgressGauge(long p_nValue);
 
 virtual wxString GetCurrentSelectedSet()
 {
