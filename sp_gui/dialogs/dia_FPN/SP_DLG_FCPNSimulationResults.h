@@ -29,8 +29,8 @@ protected:
 	wxChoice*   m_pcSamplingchoices;
 	unsigned long m_lpCount;
 	unsigned long m_lnFuzzyNum;
-	bool m_initialRun;
-	//SP_Compressed_Fuzzy_Band m_compressedFuzzyBand =  SP_Compressed_Fuzzy_Band();
+	bool         m_initialRun;
+	 
 protected:
 	SP_Vector2DDouble           m_paramMatrix;
 	std::map<wxString,wxString> m_mTransParamNames;
@@ -42,9 +42,9 @@ protected:
 	FuzzyReasoning           m_fr;
 	long                     m_lSamplingStrategyselection;
 	long                     m_lSimTim;
-	std::recursive_mutex   m_mutex;
-	//std::condition_variable m_finished;
-	//SP_SetString m_samplingStrategies;
+    bool                     m_bIsAbort;
+	long                     m_lTotalSimRuns;
+	 
 protected:
 	 
 
@@ -57,7 +57,7 @@ protected:
 
 	virtual void  ConvertTFNListToParamMatrix(std::vector<TriangularFN> vTriangasTFNParams);
 
-	virtual void InitializeFuzzySetting();
+	virtual bool InitializeFuzzySetting();
 
 	virtual std::vector<double> GetCurentSamples(int iIteration);
 
@@ -78,12 +78,14 @@ protected:
 	virtual void* DoFcpnSimulation();
 
 	virtual void* DoNormalFcpnSimulation();
-
- 
-
+	
 	virtual void DoStartSimulation();
 
-	 
+	virtual void SetSimulationProgressText(long& p_nValue);
+
+	virtual void  InitProgress();
+	virtual void  SetSimulationProgressGauge(long p_nValue);
+	virtual void SetSimulationProgressGaugeRange(long p_nRangeValue);
 public:
 
 	DECLARE_CLASS(SP_DLG_FCPNSimulationResults)
