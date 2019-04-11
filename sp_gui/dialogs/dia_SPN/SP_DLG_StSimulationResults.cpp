@@ -110,37 +110,37 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 	{
 		//function set
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Marking overview:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("marking overview:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("")), wxSizerFlags(1).Expand().Border(wxALL, 2));
-		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
 		m_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
-		l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Function set:") ), wxSizerFlags(1).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("function set:") ), wxSizerFlags(1).Expand().Border(wxALL, 2));
 		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, -1, wxDefaultPosition, wxSize(100, -1)));
 		l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], wxSizerFlags(1).Expand().Border(wxALL, 2));
-		l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify") ), wxSizerFlags(0).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("modify") ), wxSizerFlags(0).Expand().Border(wxALL, 2));
 		m_pcSetsSizer->Add( l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Weight set:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("weight set:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
 		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, -1, wxDefaultPosition, wxSize(100, -1)));
 		l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size()-1], wxSizerFlags(1).Expand().Border(wxALL, 2));
-		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_WEIGHT_SETS, wxT("Modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_WEIGHT_SETS, wxT("modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
 		m_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Delay set:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("delay set:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
 		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, -1, wxDefaultPosition, wxSize(100, -1)));
 		l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size()-1], wxSizerFlags(1).Expand().Border(wxALL, 2));
-		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
 		m_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Schedule set:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("schedule set:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
 		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, -1, wxDefaultPosition, wxSize(100, -1)));
 		l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size()-1], wxSizerFlags(1).Expand().Border(wxALL, 2));
-		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("Modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
 		m_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
 		UpdateChoices();
@@ -152,7 +152,7 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 			l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, l_sGroup + wxT(':') ), wxSizerFlags(1).Expand().Border(wxALL, 2));
 			m_apcComboBoxes.push_back(new wxChoice( m_pcPropertyWindowSetsSizer, -1 , wxDefaultPosition, wxSize(100,-1), 0, NULL, 0, wxDefaultValidator, l_sGroup ));
 			l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], wxSizerFlags(1).Expand().Border(wxALL, 2));
-			l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), wxSizerFlags(0).Expand().Border(wxALL, 2));
+			l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("modify") ), wxSizerFlags(0).Expand().Border(wxALL, 2));
 			m_pcSetsSizer->Add( l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 		}
 	}
@@ -160,7 +160,7 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 	// rows of PropertySizer
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Simulator:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
+	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("simulator:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
 	m_pcSimulatorComboBox = new wxChoice(m_pcPropertyWindowPropertySizer, SP_ID_CHOICE_SIMULATOR_CHOICE, wxDefaultPosition, wxSize(100, -1));
 	m_pcSimulatorComboBox->Append(wxT("Gillespie"));
 	m_pcSimulatorComboBox->Append(wxT("Tau-Leaping"));
