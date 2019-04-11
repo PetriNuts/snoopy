@@ -7,8 +7,8 @@
 using namespace std;
 
  
-typedef std::map<long, vector<vector<double>>> Time2Membership;
-typedef std::map<long, Time2Membership> Membership_List;
+typedef std::map<long, vector<vector<double>>> Time2Membership;// each membership function described by its time point and matrix of min max values
+typedef std::map<long, Time2Membership> Membership_List;// map the specific place to its all membership functions over time
 
 class SP_TfnMembershipList {
 	protected:

@@ -1,3 +1,7 @@
+/*
+*@Author=George Assaf
+*Data structure for storing Membership functions of places over time
+*/
 #include "SP_TfnMembershipList.h"
 
 SP_TfnMembershipList::SP_TfnMembershipList()
@@ -38,6 +42,7 @@ vector<vector<double>> SP_TfnMembershipList::GetMembershipAtTimePoint(const long
 	membership= m_tfnList[dataCol][timepoint];
 	return membership;
 }
+/*Store Timed membership function */
 bool SP_TfnMembershipList::StoreTFNMembership(const long dataColumn, const long timePoint, vector<vector<double>> membership)
 {
 	
