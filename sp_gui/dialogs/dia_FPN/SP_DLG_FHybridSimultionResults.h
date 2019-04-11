@@ -32,7 +32,7 @@ protected:
 	unsigned long m_lpCount;
 	unsigned long m_lnFuzzyNum;
 	bool          m_binitialRun;
-
+	bool          m_bIsAbort;
 protected:
 	SP_Vector2DDouble            m_paramMatrix;
 	std::map<wxString, wxString> m_mTransitionsParamNames;
@@ -42,6 +42,7 @@ protected:
 	ResultFuzzyBand              m_ResultFBand;
 	FuzzyReasoning               m_fr;
 	long                         m_samplingStrategyselection;
+	long                         m_lTotalSimRuns;
 protected:
  
 
@@ -51,7 +52,7 @@ protected:
 
 	virtual void  ConvertTFNListToParamMatrix(std::vector<TriangularFN> asTFNParams);
 
-	virtual void InitializeFuzzySetting();
+	virtual bool InitializeFuzzySetting();
 
 
 	virtual void LoadUsedParams();
@@ -78,7 +79,13 @@ protected:
 
 	virtual void* DoReducedFhpn();
 
- 
+	virtual void SetSimulationProgressText(long& p_nValue);
+
+	virtual void InitProgress();
+
+	virtual void SetSimulationProgressGauge(long p_nValue);
+
+	virtual void SetSimulationProgressGaugeRange(long p_nRangeValue);
 
 public:
 
