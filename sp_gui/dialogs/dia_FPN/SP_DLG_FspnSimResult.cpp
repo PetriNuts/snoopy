@@ -913,6 +913,7 @@ void* SP_DLG_FspnSimResult::DoFspnSimulation()
 			SetSimulationProgressText(lRemainingSimRunCoun);
 			SetSimulationProgressGauge(lRemainingSimRunCoun);
 			m_pcStartButton->SetLabel(wxT("Abort Processing"));
+			m_pcSimulationProgressGauge->SetValue(100);
 			m_pcStartButton->SetBackgroundColour(*wxRED);
 			wxBusyInfo info(wxT("Finalizing the processing, please wait."), this);
 			m_pcCompressedBand = m_fr.CompressResults(m_ResultFBand);// m_FuzzyBand);
