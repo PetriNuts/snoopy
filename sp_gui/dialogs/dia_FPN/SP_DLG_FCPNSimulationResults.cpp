@@ -388,7 +388,7 @@ void SP_DLG_FCPNSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cEve
 		  {
 			  //TDOD: rewrite this part
 			  m_pcMainSimulator->AbortSimulation();
-			  SetSimulationProgressGauge(100);
+			 // SetSimulationProgressGauge(100);
 			  m_pcStartButton->SetLabel(wxT("Start Simulation"));
 			  m_pcStartButton->SetBackgroundColour(*wxGREEN);
 
@@ -406,7 +406,7 @@ void SP_DLG_FCPNSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cEve
 		  else
 			  m_ExportType = SP_SIM_NO_EXPORT;
 
-		  SetSimulationProgressGauge(0);
+		//  SetSimulationProgressGauge(0);
 		  m_pcStartButton->SetLabel(wxT("Abort Simulation"));
 		  m_pcStartButton->SetBackgroundColour(*wxRED);
 		  Update();
@@ -425,6 +425,7 @@ void SP_DLG_FCPNSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cEve
 				  
 				  
 				  DoNormalFcpnSimulation();
+				  m_pcTimer->Stop();
 			  }
 
 			  //export final result
@@ -448,7 +449,7 @@ void SP_DLG_FCPNSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cEve
 			  }
 		  }
 		  
-	m_pcTimer->Stop();
+	
 	 
 	return;
 }
@@ -530,6 +531,7 @@ void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 			long lRemainingSimRunCoun = 0; long lRunCount = 0;
 			for (int ialpha = 0; ialpha < m_fr.GetAlphaSet().size() - 1; ialpha++)
 			{
+				m_clock = std::clock(); // get current time
 				if (m_bIsAbort)
 				{
 					break;
@@ -550,14 +552,15 @@ void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 					m_initialRun = true;
 					if (m_bIsInitialized == true)
 					{
-						SetSimulationProgressGauge(0);
-						lRunCount++;
-						lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
+						//SetSimulationProgressGauge(0);
+						
 						
 						 
 						DoStartSimulation();
+						lRunCount++;
+						lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 						SetSimulationProgressText(lRemainingSimRunCoun);
-						//m_pcTimer->Stop();
+						SetSimulationProgressGauge(lRemainingSimRunCoun);//
 
 						spsim::Matrix2DDouble vvDresultMat;
 
@@ -579,12 +582,13 @@ void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 			if (m_bIsInitialized == true && !m_bIsAbort)
 			{
 
-				SetSimulationProgressGauge(0);
+				//SetSimulationProgressGauge(0);//
 				
 				DoStartSimulation();
 				lRunCount++;
 				lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 				SetSimulationProgressText(lRemainingSimRunCoun);
+				SetSimulationProgressGauge(lRemainingSimRunCoun);//
 				spsim::Matrix2DDouble vvdresultMat;
 
 
@@ -605,8 +609,8 @@ void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 			}
 			bisFinished = true;
 
-			 
-			
+			double duration = (std::clock() - m_clock) / (double)CLOCKS_PER_SEC;
+			m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), duration));
 			if (!m_bIsAbort && bisFinished)
 			{
 				m_pcStartButton->SetLabel(wxT("Abort Processing"));
@@ -625,8 +629,9 @@ void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 			if (m_bIsAbort)
 			{
 				InitProgress();
-
-				SetSimulationProgressGauge(0);
+				m_pcSimulationProgressGauge->SetValue(0);
+				m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), 0.0));
+				//SetSimulationProgressGauge(0);
 			}
 			else {
 				SetSimulationProgressGauge(100);
@@ -747,6 +752,7 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 			long lRemainingSimRunCoun = 0; long lRunCount = 0;
 			for (int ialpha = 0; ialpha < m_fr.GetAlphaSet().size() - 1; ialpha++)
 			{
+				m_clock = std::clock();
 				if (m_bIsAbort)
 				{
 					break;
@@ -768,13 +774,14 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 						if (m_bIsInitialized == true)
 						{
 
-							SetSimulationProgressGauge(0);
+							//SetSimulationProgressGauge(0);//
 
 							DoStartSimulation();
 
 							lRunCount++;
 							lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 							SetSimulationProgressText(lRemainingSimRunCoun);
+							SetSimulationProgressGauge(lRemainingSimRunCoun);
 							m_pcTimer->Stop();
 
 							spsim::Matrix2DDouble vvdResultMat;
@@ -805,12 +812,13 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 					m_initialRun = true;
 					if (m_bIsInitialized == true && !m_bIsAbort)
 					{
-						SetSimulationProgressGauge(0);
+						//SetSimulationProgressGauge(0);//
 
 						DoStartSimulation();
 						lRunCount++;
 						lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 						SetSimulationProgressText(lRemainingSimRunCoun);
+						SetSimulationProgressGauge(lRemainingSimRunCoun);
 						m_pcTimer->Stop();
 
 						spsim::Matrix2DDouble vvdResultMat;
@@ -864,13 +872,14 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 					m_initialRun = true;
 					if (m_bIsInitialized1 == true && !m_bIsAbort)
 					{
-						SetSimulationProgressGauge(0);
+						//SetSimulationProgressGauge(0);//
 
 
 						DoStartSimulation();
 						lRunCount++;
 						lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 						SetSimulationProgressText(lRemainingSimRunCoun);
+						SetSimulationProgressGauge(lRemainingSimRunCoun);
 						m_pcTimer->Stop();
 
 						spsim::Matrix2DDouble vvdResultMat;
@@ -894,13 +903,14 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 			if (m_bIsInitialized == true && !m_bIsAbort)
 			{
 
-				SetSimulationProgressGauge(0);
+				//SetSimulationProgressGauge(0);
 
 
 				DoStartSimulation();
 				lRunCount++;
 				lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 				SetSimulationProgressText(lRemainingSimRunCoun);
+				SetSimulationProgressGauge(lRemainingSimRunCoun);
 				m_pcTimer->Stop();
 				spsim::Matrix2DDouble vvdResultMat;
 
@@ -919,6 +929,8 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 				m_vResultFBand.push_back(structTraceElement);
 
 			}
+			double duration = (std::clock() - m_clock) / (double)CLOCKS_PER_SEC;
+			m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), duration));
 			if (!m_bIsAbort)
 			{
 				m_pcStartButton->SetLabel(wxT("Abort Processing"));
@@ -937,10 +949,13 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 			if (m_bIsAbort)
 			{
 				InitProgress();
-				SetSimulationProgressGauge(0);
+				//SetSimulationProgressGauge(0);
+				m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), 0.0));
+				m_pcSimulationProgressGauge->SetValue(0);
 			}
 			else {
 				SetSimulationProgressGauge(100);
+				SetSimulationProgressGauge(lRemainingSimRunCoun);
 			}
 			m_bIsAbort = false;
 			m_initialRun = false;
@@ -1065,10 +1080,9 @@ bool SP_DLG_FCPNSimulationResults::InitializeSimulator(unsigned long ite, double
 		m_nRefreshRate = m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("Refreshrate"))->GetValuelong();
 	}
 
-	SetSimulationProgressGaugeRange(l_nLong0);
+	//SetSimulationProgressGaugeRange(l_nLong0);//
 
-	//lck.unlock();
-	//m_finished.notify_one();
+	 
 	return l_bIsInitialized;
 }
 
@@ -1123,11 +1137,11 @@ void SP_DLG_FCPNSimulationResults::DoStartSimulation()
 
 	m_nLastUpdateTime = 0;
 
-	m_cSimulationStopWatch.Start(0);
+	//m_cSimulationStopWatch.Start(0);
 
-	SetSimulationCurrentTime(m_pcMainSimulator->GetCurrentTime());
+	//SetSimulationCurrentTime(m_pcMainSimulator->GetCurrentTime());
 
-	SetSimulationStopWatch(0);
+	//SetSimulationStopWatch(0);
 
 	Update();
 
@@ -1141,24 +1155,25 @@ void SP_DLG_FCPNSimulationResults::DoStartSimulation()
 	}
 
 	//Stop the stopwatch
-	m_cSimulationStopWatch.Pause();
+	//m_cSimulationStopWatch.Pause();
 
-	SetSimulationProgressGauge(m_pcMainSimulator->GetOutputPointsCount());
+	//SetSimulationProgressGauge(m_pcMainSimulator->GetOutputPointsCount());//
 
 	//SetSimulationStopWatch(m_cSimulationStopWatch.Time());
 	/*update simulation time*/
-	m_lSimTim += m_pcMainSimulator->GetCurrentTime();
-	m_pcMainSimulator->AbortSimulation();
-	SetSimulationStopWatch(m_lSimTim);
+	//m_lSimTim += m_pcMainSimulator->GetCurrentTime();
+	//m_pcMainSimulator->AbortSimulation();
+	//SetSimulationStopWatch(m_lSimTim);
 
 	float l_nSimulationCurrentTime = m_pcMainSimulator->GetCurrentTime() > m_pcMainSimulator->GetOutputEndPoint() ? m_pcMainSimulator->GetOutputEndPoint() : m_pcMainSimulator->GetCurrentTime();
-
-	SetSimulationCurrentTime(l_nSimulationCurrentTime);
+	m_lSimTim += l_nSimulationCurrentTime;
+	//SetSimulationStopWatch(m_lSimTim);
+	//SetSimulationCurrentTime(l_nSimulationCurrentTime);
  
 	//Load colored or auxiliary variables
 	//LoadColAuxResults();//
 	//Load the final result
-	//LoadResults();//
+	//LoadResults();
 }
 
 void SP_DLG_FCPNSimulationResults::DirectExportToCSV()
@@ -1341,10 +1356,12 @@ std::vector<double> SP_DLG_FCPNSimulationResults::GetCurentSamples(int iteration
  }
  void SP_DLG_FCPNSimulationResults::SetSimulationProgressGauge(long p_nValue)
  {
-
-	 m_pcSimulationProgressGauge->SetValue(p_nValue);
+	 if (m_lTotalSimRuns != 0) {
+	 int iProgress = 100 - ((p_nValue * 100) / m_lTotalSimRuns);
+	 m_pcSimulationProgressGauge->SetValue(iProgress);
 
 	 Update();
+            }
  }
  void SP_DLG_FCPNSimulationResults::SetSimulationProgressGaugeRange(long p_nRangeValue)
  {

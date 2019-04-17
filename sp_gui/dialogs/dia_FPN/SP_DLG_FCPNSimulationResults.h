@@ -44,7 +44,7 @@ protected:
 	long                     m_lSimTim;
     bool                     m_bIsAbort;
 	long                     m_lTotalSimRuns;
-	 
+	std::clock_t             m_clock;
 protected:
 	 
 
@@ -91,7 +91,7 @@ public:
 	DECLARE_CLASS(SP_DLG_FCPNSimulationResults)
 	SP_DLG_FCPNSimulationResults(
 		SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent,
-		wxString p_sHelpText = wxT(""), wxString p_sTitle = wxT("Fuzzy Continuous Simulation results"),
+		wxString p_sHelpText = wxT(""), wxString p_sTitle = wxT("Fuzzy Continuous Simulation"),
 		long p_nStyle = wxDEFAULT_DIALOG_STYLE);
 
 	~SP_DLG_FCPNSimulationResults();
