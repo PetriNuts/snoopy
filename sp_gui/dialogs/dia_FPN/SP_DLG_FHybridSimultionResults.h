@@ -9,7 +9,7 @@
 //==============================================================================
 #ifndef SP_DLG_FUZZYHYBRIDSIMULTIONRESULTS_H_
 #define SP_DLG_FUZZYHYBRIDSIMULTIONRESULTS_H_
-
+#include<ctime>
 /*
 * This class implements the simulation dialog for Fuzzy Hybrid PN
 */
@@ -43,6 +43,7 @@ protected:
 	FuzzyReasoning               m_fr;
 	long                         m_samplingStrategyselection;
 	long                         m_lTotalSimRuns;
+	std::clock_t           m_clock;
 protected:
  
 
@@ -91,7 +92,7 @@ public:
 
 	virtual void OnStartAbortSimulation(wxCommandEvent& p_cEvent);
 	DECLARE_CLASS(SP_DLG_FHybridSimulationResults)
-		SP_DLG_FHybridSimulationResults(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), wxString p_sTitle = wxT("Hybrid Simulation Results"), long p_nStyle =
+		SP_DLG_FHybridSimulationResults(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""),const  wxString p_sTitle = wxT("Fuzzy Hybrid Simulation"), long p_nStyle =
 			wxDEFAULT_DIALOG_STYLE);
 	virtual ~SP_DLG_FHybridSimulationResults();
 
