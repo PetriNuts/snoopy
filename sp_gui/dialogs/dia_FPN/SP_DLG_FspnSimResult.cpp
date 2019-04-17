@@ -300,7 +300,9 @@ void SP_DLG_FspnSimResult::OnStartAbortSimulation(wxCommandEvent& p_cEvent)
 			DoFspnSimulation();
 		}
 		else {
+			m_cSimulationStopWatch.Start(0);
 			DoFSPwithNormalSampling();
+			m_cSimulationStopWatch.Pause();
 		}
 	}
 }
@@ -596,6 +598,7 @@ void* SP_DLG_FspnSimResult::DoFSPwithNormalSampling()
 
 				for (long lIteration = 0; lIteration < m_lNumCombinedPoints; lIteration++)
 				{
+					m_clock = std::clock(); // get current time
 					if(m_bIsAbort)
 					{
 						break;
@@ -613,7 +616,7 @@ void* SP_DLG_FspnSimResult::DoFSPwithNormalSampling()
 					lRunCount++;
 					lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 					SetSimulationProgressText(lRemainingSimRunCoun);
-
+					SetSimulationProgressGauge(lRemainingSimRunCoun);
 					/*store current sim trace with its level information eg., current sample,level*/
 					structTraceElement.sample = m_vdCurrentSample;
 					structTraceElement.currentLevel = m_fr.GetAlphaSet()[iAlpha];
@@ -634,6 +637,7 @@ void* SP_DLG_FspnSimResult::DoFSPwithNormalSampling()
 				lRunCount++;
 				lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 				SetSimulationProgressText(lRemainingSimRunCoun);
+				SetSimulationProgressGauge(lRemainingSimRunCoun);
 				/*add the trace of the heighest level to the band*/
 
 				structTraceElement.sample = m_vdCurrentSample;
@@ -642,8 +646,11 @@ void* SP_DLG_FspnSimResult::DoFSPwithNormalSampling()
 				structTraceElement.fuzzyTrace = vvdResultMat;
 				m_ResultFBand.push_back(structTraceElement);
 			}
+			double duration = (std::clock() - m_clock)/(double)CLOCKS_PER_SEC;
+			m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), duration));
 			//wxWindowDisabler disableAll;
 			if (!m_bIsAbort) {
+				m_pcSimulationProgressGauge->SetValue(100);
 				m_pcStartButton->SetLabel(wxT("Abort Processing"));
 				m_pcStartButton->SetBackgroundColour(*wxRED);
 				wxBusyInfo info(wxT("Finalizing the processing, please wait."), this);
@@ -652,7 +659,8 @@ void* SP_DLG_FspnSimResult::DoFSPwithNormalSampling()
 			if (m_bIsAbort)
 			{
 				InitProgress();
-				SetSimulationProgressGauge(0);
+				m_pcSimulationProgressGauge->SetValue(0);
+				m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), 0.0));
 			}
 			else {
 				SetSimulationProgressGauge(100);
@@ -766,6 +774,7 @@ void* SP_DLG_FspnSimResult::DoFspnSimulation()
 
 			for (long l_iteration = 0; l_iteration < m_lNumCombinedPoints; l_iteration++)
 			{
+				m_clock = std::clock(); // get current time
 				if (m_bIsAbort)
 				{
 					break;
@@ -781,6 +790,7 @@ void* SP_DLG_FspnSimResult::DoFspnSimulation()
 				lRunCount++;
 				lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 				SetSimulationProgressText(lRemainingSimRunCoun);
+				SetSimulationProgressGauge(lRemainingSimRunCoun);
 
 		        /*store the simulation trace with its level information e.g, current sample and corresponding level*/
 				structTraceElement.sample = m_vdCurrentSample;
@@ -807,6 +817,7 @@ void* SP_DLG_FspnSimResult::DoFspnSimulation()
 				lRunCount++;
 				lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 				SetSimulationProgressText(lRemainingSimRunCoun);
+				SetSimulationProgressGauge(lRemainingSimRunCoun);
 
 				traceElement1.sample = GetCurentSamples(0);
 				traceElement1.currentLevel = m_fr.GetAlphaSet()[iAlpha];
@@ -858,6 +869,7 @@ void* SP_DLG_FspnSimResult::DoFspnSimulation()
 				lRunCount++;
 				lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 				SetSimulationProgressText(lRemainingSimRunCoun);
+				SetSimulationProgressGauge(lRemainingSimRunCoun);
 
 				structTraceElementn.sample = GetCurentSamples(m_lNumCombinedPoints - 1);
 				structTraceElementn.currentLevel = currentAlpha1;
@@ -885,6 +897,7 @@ void* SP_DLG_FspnSimResult::DoFspnSimulation()
 			lRunCount++;
 			lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
 			SetSimulationProgressText(lRemainingSimRunCoun);
+			SetSimulationProgressGauge(lRemainingSimRunCoun);
 
 			structTtraceElement1.sample = m_vdCurrentSample;
 			structTtraceElement1.currentLevel = m_fr.GetAlphaSet()[1];
@@ -892,10 +905,13 @@ void* SP_DLG_FspnSimResult::DoFspnSimulation()
 			structTtraceElement1.fuzzyTrace = resultMat;
 			m_ResultFBand.push_back(structTtraceElement1);
 		}
+		double duration = (std::clock() - m_clock / (double)CLOCKS_PER_SEC);
+		m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), duration));
 		if (!m_bIsAbort)
 		{
 			lRemainingSimRunCoun = 0;
 			SetSimulationProgressText(lRemainingSimRunCoun);
+			SetSimulationProgressGauge(lRemainingSimRunCoun);
 			m_pcStartButton->SetLabel(wxT("Abort Processing"));
 			m_pcStartButton->SetBackgroundColour(*wxRED);
 			wxBusyInfo info(wxT("Finalizing the processing, please wait."), this);
@@ -907,7 +923,7 @@ void* SP_DLG_FspnSimResult::DoFspnSimulation()
 		m_lnFuzzyNum = 0;
 		m_initialRun = false;
 		m_pcTimer->Stop();
-		SetSimulationProgressGauge(GetSimulatorProgress());
+		//SetSimulationProgressGauge(GetSimulatorProgress());
 		SetSimulationStopWatch(1);
 		if (!m_bIsAbort)
 		{
@@ -918,14 +934,15 @@ void* SP_DLG_FspnSimResult::DoFspnSimulation()
 		if (m_bIsAbort)
 		{
 			InitProgress();
-			SetSimulationProgressGauge(0);
+			m_pcSimulationProgressGauge->SetValue(0);
+			m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), 0));
 			m_pcStartButton->SetLabel(wxT("Start Simulation"));
 			m_pcStartButton->SetBackgroundColour(*wxGREEN);
 		}
 		else {
 			lRemainingSimRunCoun = 0;
 			SetSimulationProgressText(lRemainingSimRunCoun);
-			SetSimulationProgressGauge(100);
+			SetSimulationProgressGauge(lRemainingSimRunCoun);
 			m_pcStartButton->SetLabel(wxT("Start Simulation"));
 			m_pcStartButton->SetBackgroundColour(*wxGREEN);
 		}
@@ -1264,7 +1281,7 @@ spsim::Matrix2DDouble SP_DLG_FspnSimResult::DOneSpnSimulation(unsigned long iter
 	{
 
 
-		SetSimulationProgressGauge(0);
+		//SetSimulationProgressGauge(0);
 		m_pcStartButton->SetLabel(wxT("Abort Simulation"));
 		m_pcStartButton->SetBackgroundColour(*wxRED);
 
@@ -1371,10 +1388,14 @@ spsim::Matrix2DDouble SP_DLG_FspnSimResult::DOneSpnSimulation(unsigned long iter
 		 
 
 		//m_pcStartButton->SetBackgroundColour(*wxGREEN);
-		m_pcTimer->Stop();
-		double d = GetSimulatorProgress();
+	//	m_pcTimer->Stop();
+		//double d = GetSimulatorProgress();
 
-		SetSimulationProgressGauge(GetSimulatorProgress());
+		//SetSimulationProgressGauge(GetSimulatorProgress());
+		//float l_nSimulationCurrentTime = l_pcSimulator->GetCurrentTime() > l_pcSimulator->GetOutputEndPoint() ? l_pcSimulator->GetOutputEndPoint() : l_pcSimulator->GetCurrentTime();
+	//	m_lSimTim += l_nSimulationCurrentTime;
+		float l_nSimulationCurrentTime = l_pcSimulator->GetCurrentTime();
+		SetSimulationStopWatch(l_nSimulationCurrentTime);
 
 		Update();
 
@@ -1404,10 +1425,12 @@ void SP_DLG_FspnSimResult::InitProgress()
  void SP_DLG_FspnSimResult::SetSimulationProgressGauge(long p_nValue)
 {
 
-	m_pcSimulationProgressGauge->SetValue(p_nValue);
+	 if (m_lTotalSimRuns != 0) {
+		 int iProgress = 100 - ((p_nValue * 100) / m_lTotalSimRuns);
+		 m_pcSimulationProgressGauge->SetValue(iProgress);
 
- 
-	Update();
+		 Update();
+	 }
 }
 void SP_DLG_FspnSimResult:: SetSimulationProgressGaugeRange(long p_nRangeValue)
 {

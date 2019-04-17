@@ -39,7 +39,7 @@ protected:
 	std::map<wxString, int>      m_mFuzzyParam2Position;
 	std::vector<wxString>        m_fuzzyParams;
 	bool                         m_bIsAbort;
-	
+	std::clock_t             m_clock;
 protected:
 
 
@@ -103,7 +103,7 @@ virtual wxString GetCurrentSelectedSet()
 
 public:
 	DECLARE_CLASS(SP_DLG_FspnSimResult)
-	SP_DLG_FspnSimResult(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), const wxString& p_sTitle = wxT("Simulation results"), long p_nStyle =
+	SP_DLG_FspnSimResult(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), const wxString& p_sTitle = wxT("Fuzzy Stochastic Simulation"), long p_nStyle =
 		wxDEFAULT_DIALOG_STYLE);
 
 	virtual ~SP_DLG_FspnSimResult();
