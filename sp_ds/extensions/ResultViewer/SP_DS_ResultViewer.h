@@ -109,7 +109,7 @@ public:
 			const int& p_nLineStyle = -1);
 	virtual void AddFuzzyCurve(const wxString& p_sCurveName, const unsigned long& p_nDataColumn, const std::vector<SP_Vector2DDouble> p_pcResultMatrix, const ResultFuzzyBand fBand, SP_VectorDouble alphaLevels, unsigned long levels, unsigned long points, unsigned int fn, const wxString& p_sColor = wxT(""), const int& p_nLineWidth = -1,
 		const int& p_nLineStyle = -1);//Added by G.A
-	virtual void AddFuzzyCurves(const wxString& p_sCurveName, const unsigned long& p_nDataColumn, SP_Compressed_Fuzzy_Band* p_pcCompressedResult, const wxString& p_sColor = wxT(""), const int& p_nLineWidth = -1,
+	virtual void AddFuzzyCurves(const wxString& p_sCurveName, const unsigned long& p_nDataColumn,   SP_Compressed_Fuzzy_Band* p_pcCompressedResult, const wxString& p_sColor = wxT(""), const int& p_nLineWidth = -1,
 		const int& p_nLineStyle = -1);//Added by G.A
 	//removes a curve with a specified name from the curves vector
 

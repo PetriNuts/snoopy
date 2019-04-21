@@ -999,7 +999,7 @@ bool SP_DLG_Simulation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Met
 
 			if (netClass.Contains(wxT("Fuzzy")) ) {
 				//p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
-				p_pcViewer->AddFuzzyCurves(l_sName, l_nPosition, m_pcCompressedBand);
+				p_pcViewer->AddFuzzyCurves(l_sName, l_nPosition, &(*m_pcCompressedBand));
 			//	p_pcViewer->AddFuzzyCurves(l_sName, l_nPosition, m_nFuzzyResultBand, m_FuzzyBand,m_nAlphaLevels,m_nLevels,m_nSamples,m_fnCount);
 
 			}

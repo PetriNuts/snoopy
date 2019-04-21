@@ -229,6 +229,7 @@ protected:
 
 	bool m_bComAuxVarSingleRun;
 public:
+	void SetCompressedBand(SP_Compressed_Fuzzy_Band*     fband) { m_pcCompressedBand = fband; }
 	SP_VectorString* GetAuxPLVariables()
 	{
 		return &m_vAuxPLVars;

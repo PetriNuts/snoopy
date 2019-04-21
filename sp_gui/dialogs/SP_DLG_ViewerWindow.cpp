@@ -104,7 +104,7 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 		wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
 		
 
-		if (m_sNetClassName.Contains(wxT("Fuzzy")))//for testing purposes
+		if (m_sNetClassName.Contains(wxT("Fuzzy")))
 		{
 			m_pcScroll = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Change Time point")), wxHORIZONTAL);
 			  scrollBar = new wxScrollBar(this, SP_ID_SCROLL_BAR,wxDefaultPosition, wxSize(300, 20), wxSB_HORIZONTAL);
@@ -121,10 +121,10 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 		}
 		l_pcViewSizer->Add(l_pcRowSizer, 0, wxALL, 5);
 
-		if (m_sNetClassName.Contains(wxT("Fuzzy")))//for testing purposes
+		if (m_sNetClassName.Contains(wxT("Fuzzy")))
 		{
-			l_pcViewSizer->Add(m_pcScroll, 0, wxALL, 5);//
-		}//
+			l_pcViewSizer->Add(m_pcScroll, 0, wxALL, 5);
+		}
 
 		m_pcMainSizer->Add(l_pcViewSizer, 0, wxALL, 1);
 
