@@ -1736,7 +1736,8 @@ void SP_DLG_StSimulationResults::DoStartSimulation()
 	CHECK_POINTER(m_pcTimer, return);
 
 	//start the timer
-	m_pcTimer->Start(5000);
+		m_pcTimer->Start(5000);
+	 
 }
 
 void SP_DLG_StSimulationResults::DoSingleExport(const unsigned long& p_nCurrentRunNumber)
