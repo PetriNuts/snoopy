@@ -60,9 +60,9 @@ private:
 		bool m_bIsColouredSimulation;
 protected:
 		wxSizer* m_pcScroll;
-		wxScrollBar* scrollBar;
-		wxStaticText* timeLabel;
-		wxTextCtrl* timePointValue;
+		wxScrollBar* m_pscrollBar;
+		wxStaticText* m_ptimeLabel;
+		wxTextCtrl* m_ptimePointValue;
 
 protected:
 		virtual void OnRefresh(wxCommandEvent& event)=0;
@@ -82,7 +82,7 @@ protected:
 		virtual void OnChangeXAxis(wxCommandEvent& event)=0;
 		virtual void OnEditNodeList(wxCommandEvent& event)=0;
 		virtual void OnShowHideNodeList(wxCommandEvent& event);
-		virtual void OnScroll(wxCommandEvent & event);
+		virtual void OnScrol(wxScrollEvent & event);//wxCommandEvent&  
 		virtual void OnTextEner(wxCommandEvent & event);
 
 protected:
@@ -91,7 +91,7 @@ public:
 		virtual void RefreshWindow()=0;
 		virtual void RefreshCurrentWindow(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle)=0;
 		virtual void RemoveExternalWindowsPointer()=0;
-		virtual wxScrollBar* GetScrollBar() { return scrollBar; }
+		virtual wxScrollBar* GetScrollBar() { return m_pscrollBar; }
 public:
 
 	  SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd);

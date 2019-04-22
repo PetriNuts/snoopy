@@ -84,7 +84,9 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();//Added by G.A 
 	if (m_sNetClassName.Contains(wxT("Fuzzy")))
 	{
-		scrollBar->SetRange(m_anXValues.size());//required when loading a saved view
+		m_pscrollBar->SetRange(m_anXValues.size());//required when loading a saved view
+		m_pscrollBar->Refresh();
+		this->RefreshWindow();
 	}
 	wxSize temp = m_pcMainSizer->GetSize();
 //	cout << temp.GetWidth() << " " << temp.GetHeight() << endl;
@@ -114,12 +116,13 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	pos.x += size.GetX() + 10;
 	SetPosition(pos);
 }
-void SP_DLG_ShowAllModelView::OnChangeThumbPage(wxCommandEvent& event)
+void SP_DLG_ShowAllModelView::OnChangeThumbPage( wxScrollEvent&  event)//wxCommandEvent&
 {
-	long x = scrollBar->GetThumbPosition();
-	wxString cc;
-	cc << x;
-	scrollBar->SetToolTip(cc);
+	long dtimePoint = m_pscrollBar->GetThumbPosition();
+	wxString sTimePoint;
+	sTimePoint << dtimePoint;
+	m_pscrollBar->SetToolTip(sTimePoint);
+	m_pscrollBar->Refresh();
 
 }
 wxString SP_DLG_ShowAllModelView::GetViewerType()

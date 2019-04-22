@@ -68,8 +68,6 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 		m_pcPlaceChoiceCheckListBox = new wxCheckListBox(this, SP_ID_CHECKLISTBOX_PLACE_CHOICE, wxDefaultPosition, wxSize(200, 200));
 		l_pcPlaceChoiceSizer->Add(m_pcPlaceChoiceCheckListBox, 1, wxALL | wxEXPAND, 5);
 
-		//SP_DS_Graph* l_pcNetClass = SP_Core::Instance()->GetRootDocument()->GetGraph();// ->GetNetclass();
-		//wxString ss= spsim::Simulator::g
 
 		//select/deselect all
 		m_pcSelectClearAllChkBox = new wxCheckBox(this, SP_ID_BUTTON_SELECT_CLEAR_ALL_ITEMS, wxT("Select/deselect all"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE);
@@ -103,17 +101,17 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 
 		wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
 		
-
+		/*scroll bar for fuzzy staff*/
 		if (m_sNetClassName.Contains(wxT("Fuzzy")))
 		{
 			m_pcScroll = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Change Time point")), wxHORIZONTAL);
-			  scrollBar = new wxScrollBar(this, SP_ID_SCROLL_BAR,wxDefaultPosition, wxSize(300, 20), wxSB_HORIZONTAL);
-			  timeLabel=new  wxStaticText(this, SP_ID_Time_Label,wxT("TimePoint:"), wxDefaultPosition, wxDefaultSize, 0);
-			  timePointValue=  new wxTextCtrl(this, SP_ID_Time_VALUE,  wxEmptyString, wxDefaultPosition, wxSize(40,20), wxTE_CENTER);
-			  timePointValue->Enable(true);
-			m_pcScroll->Add(scrollBar);
-			m_pcScroll->Add(timeLabel);
-			m_pcScroll->Add(timePointValue);
+			  m_pscrollBar = new wxScrollBar(this, SP_ID_SCROLL_BAR,wxDefaultPosition, wxSize(300, 20), wxSB_HORIZONTAL);
+			  m_ptimeLabel=new  wxStaticText(this, SP_ID_Time_Label,wxT("TimePoint:"), wxDefaultPosition, wxDefaultSize, 0);
+			  m_ptimePointValue=  new wxTextCtrl(this, SP_ID_Time_VALUE,  wxEmptyString, wxDefaultPosition, wxSize(40,20),wxTE_PROCESS_ENTER | wxTE_CENTER);
+			  m_ptimePointValue->Enable(true);
+			m_pcScroll->Add(m_pscrollBar);
+			m_pcScroll->Add(m_ptimeLabel);
+			m_pcScroll->Add(m_ptimePointValue);
 		}
 		else {
 
@@ -165,13 +163,13 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnChangeXAxis, this, SP_ID_CHANGE_X_AXIS);
 		Bind(wxEVT_ACTIVATE, &SP_DLG_ViewerWindow::OnWindowActivate, this);
 	 //Scroll bar events handlers 
-	Bind(wxEVT_SCROLL_LINEUP,&SP_DLG_ViewerWindow::OnScroll,this, SP_ID_SCROLL_BAR);
-	Bind(wxEVT_SCROLL_LINEDOWN,&SP_DLG_ViewerWindow::OnScroll,this, SP_ID_SCROLL_BAR);
-	Bind(wxEVT_SCROLL_PAGEUP,&SP_DLG_ViewerWindow::OnScroll, this, SP_ID_SCROLL_BAR);
-	Bind(wxEVT_SCROLL_PAGEDOWN,&SP_DLG_ViewerWindow::OnScroll,this, SP_ID_SCROLL_BAR);
-	Bind(wxEVT_SCROLL_CHANGED,&SP_DLG_ViewerWindow::OnScroll, this, SP_ID_SCROLL_BAR);
+	Bind(wxEVT_SCROLL_LINEUP,&SP_DLG_ViewerWindow::OnScrol,this, SP_ID_SCROLL_BAR);
+	Bind(wxEVT_SCROLL_LINEDOWN,&SP_DLG_ViewerWindow::OnScrol,this, SP_ID_SCROLL_BAR);
+	Bind(wxEVT_SCROLL_PAGEUP,&SP_DLG_ViewerWindow::OnScrol, this, SP_ID_SCROLL_BAR);
+	Bind(wxEVT_SCROLL_PAGEDOWN,&SP_DLG_ViewerWindow::OnScrol,this, SP_ID_SCROLL_BAR);
+	Bind(wxEVT_SCROLL_CHANGED,&SP_DLG_ViewerWindow::OnScrol, this, SP_ID_SCROLL_BAR);
 	//when entering certain time point to the textCtrl
-	Bind(wxEVT_COMMAND_TEXT_ENTER, &SP_DLG_ViewerWindow::OnTextEner, this, SP_ID_Time_VALUE);
+	Bind(wxEVT_TEXT_ENTER, &SP_DLG_ViewerWindow::OnTextEner, this, SP_ID_Time_VALUE);//wxEVT_COMMAND_TEXT_ENTER
 	
 	
 }
@@ -210,20 +208,21 @@ void SP_DLG_ViewerWindow::CreateResultViewer(const wxString& p_sViewerType)
 
 	}
 
-	m_pcResultViewer->Create();
+	
 
 	m_pcResultViewer->SetXAxisValues(&m_anXValues);
-	if (scrollBar != nullptr)
+	if (m_pscrollBar != nullptr)
 	{
 		wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
 		if (m_sNetClassName.Contains("Fuzzy"))
 		{
 		
-		scrollBar->SetRange(m_anXValues.size());
+		m_pscrollBar->SetRange(m_anXValues.size());
 		m_pcResultViewer->SetYAxisValues(&m_anYValues);
 		}
 		 
 	}
+	m_pcResultViewer->Create();
 	 
 }
 
@@ -248,13 +247,13 @@ void SP_DLG_ViewerWindow::OnClose(wxCommandEvent& event)
 }
 void SP_DLG_ViewerWindow::OnTextEner(wxCommandEvent & event)
 {
-	wxString sTimeVal = timePointValue->GetValue();
+	wxString sTimeVal = m_ptimePointValue->GetValue();
 	double dTime;
-	if (sTimeVal.ToDouble(&dTime)&& dTime>=0 && dTime<=scrollBar->GetRange()-1)
+	if (sTimeVal.ToDouble(&dTime)&& dTime>=0 && dTime<=m_pscrollBar->GetRange()-1)
 	{
-		scrollBar->SetScrollPos(1, dTime);
-		scrollBar->SetThumbPosition(dTime);
-		scrollBar->SetToolTip(sTimeVal);
+		m_pscrollBar->SetScrollPos(1, dTime);
+		m_pscrollBar->SetThumbPosition(dTime);
+		m_pscrollBar->SetToolTip(sTimeVal);
 		//timePointValue->SetLabelText(cc);
 		m_pcResultViewer->UpdateMembershipViewer(dTime);
 	
@@ -268,19 +267,21 @@ void SP_DLG_ViewerWindow::OnTextEner(wxCommandEvent & event)
 		SP_LOGWARNING(msg);
 		wxMessageDialog* errr_dlg = new wxMessageDialog(this, msg, "Invalid Time Value!", wxOK| wxICON_WARNING);
 		errr_dlg->ShowModal();
-		timePointValue->SetValue(wxT("0"));
+		m_ptimePointValue->SetValue(wxT("0"));
 	}
 
 }
 
-void SP_DLG_ViewerWindow::OnScroll(wxCommandEvent& event1)
+void SP_DLG_ViewerWindow::OnScrol(wxScrollEvent& event1)//wxCommandEvent&  
 {
-	double x = scrollBar->GetThumbPosition();
-	wxString cc;
-	cc << x;
-	scrollBar->SetToolTip(cc);
-	timePointValue->SetLabelText(cc);
-	m_pcResultViewer->UpdateMembershipViewer(x);
+	double dtimePoint = m_pscrollBar->GetThumbPosition();
+	wxString stimePoint;
+	stimePoint << dtimePoint;
+	m_pscrollBar->SetToolTip(stimePoint);
+	m_pscrollBar->Refresh();
+	m_ptimePointValue->SetLabelText(stimePoint);
+	m_pcResultViewer->UpdateMembershipViewer(dtimePoint);
+
 
 }
 

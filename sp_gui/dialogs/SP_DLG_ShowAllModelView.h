@@ -38,7 +38,7 @@ protected:
 	virtual void OnExportClick(wxCommandEvent& event);
 	virtual void OnChangeXAxis(wxCommandEvent& event);
 	virtual void OnEditNodeList(wxCommandEvent& event);
-	virtual void OnChangeThumbPage(wxCommandEvent& event);
+	virtual void OnChangeThumbPage(wxScrollEvent& event);// wxCommandEvent&
 
 protected:
 	wxString GetViewAttributeValue(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName);
