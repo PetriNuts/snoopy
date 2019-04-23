@@ -55,7 +55,7 @@ SP_DLG_StSimulationResults(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyl
 	 m_initialRun1=false;
 	 
 	 m_TransParamNames[wxT("RR")] = wxT("dd"); 
-	  /*
+	  
 	  m_mFuzzyParam2Position[wxT("t")] = 10;
 	m_vdCurrentSample = v;
 	m_paramMatrix1 = paramMap;
@@ -63,7 +63,7 @@ SP_DLG_StSimulationResults(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyl
     m_isReducedSampling = false;
    m_lCurrentProgress = 0;
  
- */
+  
 }
 SP_DS_FspnThread::~SP_DS_FspnThread()
 {}
