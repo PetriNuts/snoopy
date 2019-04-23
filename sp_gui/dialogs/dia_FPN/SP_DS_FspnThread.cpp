@@ -43,7 +43,27 @@
 SP_DS_FspnThread::SP_DS_FspnThread(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText, const wxString& p_sTitle, long p_nStyle) :wxThread(wxTHREAD_JOINABLE),
 SP_DLG_StSimulationResults(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle)
 {
+	
+	
+	spsim::Simulator* m_pcMainSimulatorth = nullptr;
+	std::vector<double> v = { 1, 2, 3, 4 };
+		std::vector<std::vector<double>> paramMap(0, std::vector<double>(0));
+	m_fuzzyReasoning = FuzzyReasoning(0, 0, paramMap, 0, 0);
+	m_bIsAbort1 = false;
 
+	m_fuzzyBand=(0, std::vector<TraceElement>(0));
+	 m_initialRun1=false;
+	 
+	 m_TransParamNames[wxT("RR")] = wxT("dd"); 
+	  /*
+	  m_mFuzzyParam2Position[wxT("t")] = 10;
+	m_vdCurrentSample = v;
+	m_paramMatrix1 = paramMap;
+     m_lTotalSimRuns = 0;
+    m_isReducedSampling = false;
+   m_lCurrentProgress = 0;
+ 
+ */
 }
 SP_DS_FspnThread::~SP_DS_FspnThread()
 {}
@@ -192,10 +212,12 @@ void * SP_DS_FspnThread::Entry()
 			m_pcMainSimulator->Initialise(false);
 			m_pcMainSimulator->AbortSimulation();
 		}
-		else { return 0; }
-
-
-
+		else 
+		{
+			SendGuiEvent(10, 0, NULL);
+			return 0;
+		}
+ 
 	}
 	else
 	{
@@ -396,7 +418,10 @@ void * SP_DS_FspnThread::Entry()
 
 
 		}
-		else { return NULL; }
+		else { 
+			SendGuiEvent(10, 0, NULL);
+			return NULL; 
+		}
 	}
 
 
