@@ -914,6 +914,7 @@ bool Snoopy::OnInit()
 	{
 		wxDELETE(l_pcExport);
 	}
+#endif
 	
 	l_pcExport = new SP_ExportFspn2SPN();
 	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
@@ -981,7 +982,6 @@ bool Snoopy::OnInit()
 	{
 		wxDELETE(l_pcExport);
 	}
-#endif
 
 	m_pcIAManager = new SP_IA_Manager();
 	m_pcImportManager = new SP_ImportManager();
