@@ -17,7 +17,7 @@
 #include "sp_gui/dialogs/dia_HybridPN/SP_DLG_HybridSimultionResults.h"
 #include "FuzzyReasoning.h"
 //class SP_DS_ThreadEvent;
-///class SP_DS_SimulatorThreadHybrid;
+ 
 typedef std::vector<TriangularFN> TFN_List;
 
 class SP_DLG_FHybridSimulationResults : public SP_DLG_HybridSimulationResults

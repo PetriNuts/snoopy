@@ -628,7 +628,7 @@ void* SP_DLG_FHybridSimulationResults::DoFHpnSimulation()
 	 
 		thSimWorkerThread = std::thread([&]() {
 			long lRemainingSimRunCoun = 0; long lRunCount = 0;
-			for (int iAlpha = 0; iAlpha < m_fr.GetAlphaSet().size() - 1; iAlpha++)
+			for (int iAlpha = 0; iAlpha < m_fr.GetAlphaSet().size() ; iAlpha++)
 			{
 				m_clock = std::clock(); // get current time
 				if (m_bIsAbort)
@@ -744,7 +744,7 @@ void* SP_DLG_FHybridSimulationResults::DoReducedFhpn()
 	 
 		thSimWorkerThread = std::thread([&]() {
 			long lRemainingSimRunCoun = 0; long lRunCount = 0;
-			for (int ialpha = 0; ialpha < m_fr.GetAlphaSet().size() - 1; ialpha++)
+			for (int ialpha = 0; ialpha < m_fr.GetAlphaSet().size() ; ialpha++)
 			{ 
 				m_clock = std::clock(); // get current time
 				if (m_bIsAbort)

@@ -19,8 +19,9 @@
 #include"sp_gui/dialogs/dia_ContinuousPN/SP_DLG_CPNSimulationResults.h"
 #include "sp_gui/dialogs/dia_FPN/SP_Compressed_Fuzzy_Band.h"
 #include "FuzzyReasoning.h"
-#include<mutex>
+
 typedef std::vector<TriangularFN> TFN_List;
+class SP_DS_ThreadEvent;
 class SP_DLG_FCPNSimulationResults : public SP_DLG_CPNSimulationResults
 {
 protected:
@@ -30,10 +31,10 @@ protected:
 	unsigned long m_lpCount;
 	unsigned long m_lnFuzzyNum;
 	bool         m_initialRun;
-	 
+
 protected:
 	SP_Vector2DDouble           m_paramMatrix;
-	std::map<wxString,wxString> m_mTransParamNames;
+	std::map<wxString, wxString> m_mTransParamNames;
 	std::map<wxString, int>  m_mFuzzyParam2Position;
 	std::vector<wxString>    m_fuzzyParams;
 	std::vector<int>         m_fuzzyParamPositions;
@@ -42,14 +43,14 @@ protected:
 	FuzzyReasoning           m_fr;
 	long                     m_lSamplingStrategyselection;
 	long                     m_lSimTim;
-    bool                     m_bIsAbort;
+	bool                     m_bIsAbort;
 	long                     m_lTotalSimRuns;
 	std::clock_t             m_clock;
 protected:
-	 
+
 
 	//call the special csv export dialog
-  virtual void OnExportToCSV();
+	virtual void OnExportToCSV();
 
 protected:
 
@@ -78,7 +79,7 @@ protected:
 	virtual void* DoFcpnSimulation();
 
 	virtual void* DoNormalFcpnSimulation();
-	
+
 	virtual void DoStartSimulation();
 
 	virtual void SetSimulationProgressText(long& p_nValue);
@@ -86,6 +87,8 @@ protected:
 	virtual void  InitProgress();
 	virtual void  SetSimulationProgressGauge(long p_nValue);
 	virtual void SetSimulationProgressGaugeRange(long p_nRangeValue);
+
+	virtual void     OnSimulatorThreadEvent(SP_DS_ThreadEvent& event);
 public:
 
 	DECLARE_CLASS(SP_DLG_FCPNSimulationResults)
@@ -100,8 +103,8 @@ public:
 	virtual void OnStartAbortSimulation(wxCommandEvent& p_cEvent);
 
 	virtual void DirectExportToCSV();
- 
-	 
+
+
 };
 
 #endif /* SP_DLG_FCPNSIMULATIONRESULTS_H_ */

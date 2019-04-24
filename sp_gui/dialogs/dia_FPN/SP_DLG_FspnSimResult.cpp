@@ -52,17 +52,17 @@ enum {
 };
 
 SP_DLG_FspnSimResult::SP_DLG_FspnSimResult(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText, const wxString& p_sTitle, long p_nStyle)
-	:  SP_DLG_StSimulationResults(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle)
+	: SP_DLG_StSimulationResults(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle)
 
 {
-	 
+
 	wxSizer* l_pcRowSizer = NULL;
 	wxSizer* l_pcRowSizer1 = NULL;
 	wxSizer* l_pcRowSizer2 = NULL;
 	wxSizer* l_pcRowSizer3 = NULL;
 	m_lSamplingStrategyselection = 0;
 	m_bIsAbort = false;
-	 
+
 	m_pcSamplingchoices = new wxChoice(m_pcPropertyWindowPropertySizer, SAMPLING_CHOICES_FSPN_ID2, wxDefaultPosition, wxSize(100, -1));
 	m_pcSamplingchoices->Append(wxT("Basic Sampling"));
 	m_pcSamplingchoices->Append(wxT("Reduced Sampling"));
@@ -98,7 +98,6 @@ SP_DLG_FspnSimResult::SP_DLG_FspnSimResult(SP_DS_Graph* p_pcGraph, wxWindow* p_p
 	m_lpCount = l_pcNodeclass->GetElements()->size();
 	m_lTotalSimRuns = 0;// init total sim run for showing progress of total simulation
 	m_pcCompressedBand = new SP_Compressed_Fuzzy_Band();
-	//SP_DS_FspnThread* m_tt = new SP_DS_FspnThread(p_pcGraph, p_pcParent,wxT(""), p_sTitle,0);
 	InitializeParamMatrix();
 	SetSizerAndFit(m_pcMainSizer);
 
@@ -115,56 +114,6 @@ void SP_DLG_FspnSimResult::OnCloseWindow(wxCloseEvent& p_cEvent)
 	p_cEvent.Skip();
 
 }
-
-void   SP_DLG_FspnSimResult::OnSimulatorThreadEvent(SP_DS_ThreadEvent& event)
-{
-	long lprogress = 0;
-	switch (event.GetEventTask())
-	{
-	case SP_THREAD_EVENT_END_ONE_RUN://SP_THREAD_EVENT_END_SIMULATION:
-	{
-	lprogress = event.GetLongValue();
-	SetSimulationProgressGauge((long)lprogress);
-	long progress = (long)lprogress;
-	void* ltime = event.GetUserData();
-	SetSimulationStopWatch((long)ltime);
-	SetSimulationProgressText(progress);
-	if (progress == 100)
-	{
-		 
-		m_pcStartButton->SetLabel(wxT("Abort Processing"));
-	}
-	LoadResults();
-	break;
-	}
-
-		
-	case SP_THREAD_EVENT_END_SIMULATION: {
-		void*	m_pcCompressedBand = event.GetUserData();
-		SetCompressedBand((SP_Compressed_Fuzzy_Band*)m_pcCompressedBand);
-		m_pcStartButton->SetLabel(wxT("Start Simulation"));
-		m_pcStartButton->SetBackgroundColour(*wxGREEN);
-		break;
-	}
-	case 10: {
-		 
-		RefreshExternalWindows();
-		m_pcStartButton->SetLabel(wxT("Start Simulation"));
-		m_pcStartButton->SetBackgroundColour(*wxGREEN);
-		SetSimulationProgressGauge(0);
-		m_bIsAbort = false;
-
-		break;
-	 
-	}
-
-	default:
-		break;
-	}
-	 
-}
-
- 
 
 std::vector<TriangularFN> SP_DLG_FspnSimResult::LoadParams()
 {
@@ -240,7 +189,6 @@ std::vector<TriangularFN> SP_DLG_FspnSimResult::LoadParams()
 
 bool SP_DLG_FspnSimResult::InitializeFuzzySetting()
 {
-	m_lnFuzzyNum = 0;
 	long m_lAlphaLevels;
 	long m_lnDiscPoints;
 	if ((m_alphaLevels1->GetValue().ToLong(&m_lAlphaLevels)) && (m_pSamplePints->GetValue().ToLong(&m_lnDiscPoints)))
@@ -329,9 +277,7 @@ void SP_DLG_FspnSimResult::ConvertTFNListToParamMatrix(std::vector<TriangularFN>
 
 void SP_DLG_FspnSimResult::OnStartAbortSimulation(wxCommandEvent& p_cEvent)
 {
-	//SP_DS_FspnThread* m_tt;
-	wxString state = m_pcStartButton->GetLabel();
-	if (state==wxT("Abort Simulation") || state == wxT("Abort Processing"))
+	if (m_initialRun)
 	{
 		wxString s_warningMsg = "You are going to halt the simulation, please confirm!";
 		wxMessageDialog* pwarningSimStopDialog = new wxMessageDialog(this, s_warningMsg, "Warning", wxOK | wxCANCEL | wxICON_WARNING);
@@ -339,74 +285,26 @@ void SP_DLG_FspnSimResult::OnStartAbortSimulation(wxCommandEvent& p_cEvent)
 		{
 			m_bIsAbort = true;
 			m_fr.SetAbort(true);
-			if (m_FspnSimulationThread != nullptr)
-			{
-				m_FspnSimulationThread->SetAbortSim(true);
-				 
-			}
 		}
 		else {
-			//the user cancel aborting 
 			return;
 
 		}
 	}
-	else if (!m_bIsAbort)
+	if (!m_bIsAbort)
 	{
 		int selctedStrategy = m_pcSamplingchoices->GetSelection();
 		if (selctedStrategy == 1)
 
 		{
-		
-			m_FspnSimulationThread = new  SP_DS_FspnThread(m_pcGraph, this, wxT(""), this->GetTitle(), 0);
-
-			spsim::StochasticSimulator*	l_pcSimulator = dynamic_cast<spsim::StochasticSimulator*> (m_pcMainSimulator);
-			m_FspnSimulationThread->SetParentWin(this);
-			m_FspnSimulationThread->SetCurrentGraph(m_pcGraph);
-			m_FspnSimulationThread->SetMainSimulator(l_pcSimulator);
-			bool bisInitialised = InitializeFuzzySetting();
-			m_FspnSimulationThread->SetReducedSampling(true);
-			m_FspnSimulationThread->SetAbortSim(false);
-			m_FspnSimulationThread->SetReasoning(m_fr);
-			m_FspnSimulationThread->SetTransitionNames(m_mTransParamNames);
-			m_FspnSimulationThread->SetParam2Pos(m_mFuzzyParam2Position);
-			m_FspnSimulationThread->SetCurrentSample(m_vdCurrentSample);
-			m_FspnSimulationThread->SetParamMatrix(m_paramMatrix);
-			m_pcStartButton->SetLabel(wxT("Abort Simulation"));
-			m_pcStartButton->SetBackgroundColour(*wxRED);
-		 
-			m_FspnSimulationThread->Run();
-			m_FspnSimulationThread->SetPriority(WXTHREAD_MAX_PRIORITY);
-
-
+			DoFspnSimulation();
 		}
 		else {
-			 
-		 
-			m_FspnSimulationThread = new  SP_DS_FspnThread(m_pcGraph, this, wxT(""), this->GetTitle(), 0);
-			 
-			 spsim::StochasticSimulator*	l_pcSimulator = dynamic_cast<spsim::StochasticSimulator*> (m_pcMainSimulator);
-			
-			
-			 m_FspnSimulationThread->SetParentWin(this);
-			 m_FspnSimulationThread->SetCurrentGraph(m_pcGraph);
-			 m_FspnSimulationThread->SetMainSimulator(l_pcSimulator);
-			bool bisInitialised = InitializeFuzzySetting();
-			m_FspnSimulationThread->SetReducedSampling(false);
-			m_FspnSimulationThread->SetAbortSim(false);
-			m_FspnSimulationThread->SetReasoning(m_fr);
-			m_FspnSimulationThread->SetTransitionNames(m_mTransParamNames);
-			m_FspnSimulationThread->SetParam2Pos(m_mFuzzyParam2Position);
-			m_FspnSimulationThread->SetCurrentSample(m_vdCurrentSample);
-			m_FspnSimulationThread->SetParamMatrix(m_paramMatrix);
-			m_pcStartButton->SetLabel(wxT("Abort Simulation"));
-			m_pcStartButton->SetBackgroundColour(*wxRED);
-			m_FspnSimulationThread->Run();
-			m_FspnSimulationThread->SetPriority(WXTHREAD_MAX_PRIORITY);
-			 
+			m_cSimulationStopWatch.Start(0);
+			DoFSPwithNormalSampling();
+			m_cSimulationStopWatch.Pause();
 		}
 	}
-	 
 }
 
 
@@ -420,6 +318,654 @@ void SP_DLG_FspnSimResult::OnSimulatorSelect(wxCommandEvent& p_cEvent)
 }
 
 
+bool SP_DLG_FspnSimResult::InitializeSimulator(unsigned long lIteration, double dAlpha)
+{
+	//before simulation
+	if (m_initialRun == false) {
+		if (m_pcMainSimulator->IsSimulationRunning())
+		{
+			m_pcMainSimulator->AbortSimulation();
+			return false;
+		}
+
+		LoadSimulatorData();
+
+		if (m_pcDirectExportRadioButton->GetValue())
+		{
+			m_ExportType = SP_SIM_DIRECT_EXPORT;
+
+			OpenExportFile();
+		}
+		else
+			if (m_pcDirectSingleExportRadioButton->GetValue())
+			{
+				m_ExportType = SP_SIM_DIRECT_SINGLE_EXPORT;
+
+				OpenExportFile();
+			}
+			else
+				if (m_pcDirectSingleExactExportRadioButton->GetValue())
+				{
+					m_ExportType = SP_SIM_DIRECT_SINGLE_EXACT_EXPORT;
+
+					OpenExportFile();
+				}
+				else
+				{
+					m_ExportType = SP_SIM_NO_EXPORT;
+				}
+
+		dynamic_cast<spsim::StochasticSimulator*>(m_pcMainSimulator)->SetExportType((spsim::ExportType) (m_ExportType));
+
+		if (m_bComAuxVarSingleRun == true)
+		{
+			dynamic_cast<spsim::StochasticSimulator*>(m_pcMainSimulator)->SetExportType(spsim::DIRECT_SINGLE_EXPORT);
+		}
+
+		Update();
+
+	}
+	//////////////////////////////////////////////////////////////////////////
+	double l_nOutputEndPoint = 0;
+	double l_nOutputStartPoint;
+	long l_nLong0;
+
+	if (m_pcIntervalEndTextCtrl->GetValue().ToDouble(&l_nOutputEndPoint) && l_nOutputEndPoint > 0)
+	{
+		m_pcMainSimulator->SetOutputEndPoint(l_nOutputEndPoint);
+
+		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("Simulation Properties"))->GetElements()->begin());
+		SP_DS_Attribute* l_pcAttr = l_pcSimProp->GetAttribute(wxT("interval end"));
+		l_pcAttr->SetValueString(m_pcIntervalEndTextCtrl->GetValue());
+	}
+	else
+	{
+		SP_MESSAGEBOX(wxT("The interval end value must be non-negative real number > 0. The inputed value is invalid."), wxT("Error"), wxOK | wxICON_ERROR);
+		return false;
+	}
+
+	if (m_pcIntervalStartTextCtrl->GetValue().ToDouble(&l_nOutputStartPoint) && l_nOutputStartPoint >= 0 && l_nOutputStartPoint < l_nOutputEndPoint)
+	{
+		m_pcMainSimulator->SetOutputStartPoint(l_nOutputStartPoint);
+
+		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("Simulation Properties"))->GetElements()->begin());
+		SP_DS_Attribute* l_pcAttr = l_pcSimProp->GetAttribute(wxT("interval start"));
+		l_pcAttr->SetValueString(m_pcIntervalStartTextCtrl->GetValue());
+	}
+	else
+	{
+		SP_MESSAGEBOX(wxT("The interval start value must be smaller than the interval end value. The inputed values are invalid."), wxT("Error"), wxOK | wxICON_ERROR);
+		return false;
+	}
+
+	if (m_pcResultPointCountTextCtrl->GetValue().ToLong(&l_nLong0) && l_nLong0 > 0)
+	{
+		m_nResultPointCount = l_nLong0 + 1;
+
+		m_pcMainSimulator->SetOutputSampleSize((l_nOutputEndPoint - l_nOutputStartPoint) / (m_nResultPointCount - 1));
+
+		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("Simulation Properties"))->GetElements()->begin());
+		SP_DS_Attribute* l_pcAttr = l_pcSimProp->GetAttribute(wxT("output step"));
+		l_pcAttr->SetValueString(m_pcResultPointCountTextCtrl->GetValue());
+	}
+	else
+	{
+		SP_MESSAGEBOX(wxT("The output interval count value must be positive real number. The inputed value is invalid."), wxT("Error"), wxOK | wxICON_ERROR);
+		return false;
+	}
+
+	if (m_initialRun == false)
+		wxBusyInfo l_Info(wxT("Initialising, please wait...."), this);
+
+	SetSimulationProgressGaugeRange(100);
+
+
+	//Parameters
+	LoadParameters(lIteration, dAlpha);
+
+	//Places
+	LoadPlaces();
+
+	//Transitions
+	LoadTransitions();
+
+	//Load Connections
+	LoadConnections();
+
+	// load observers
+	LoadObservers();
+	//m_pcMainSimulator->ChangeParameterValue(0, 0.06);
+
+
+	return m_pcMainSimulator->Initialise(true);
+}
+
+
+void SP_DLG_FspnSimResult::LoadParameters(unsigned long lIteration, double dAlpha)
+{
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+	SP_ListMetadata::const_iterator it;
+
+	SP_VectorString l_asParameterNames;
+	SP_VectorDouble l_anParameterValue;
+
+	m_msParameterName2Value.clear();
+
+	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+	{
+		SP_DS_Metadata* l_pcConstant = *it;
+		wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+		wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();///Added by G.A
+		if (m_mTransParamNames.find(l_sName) != m_mTransParamNames.end())																					   //if(l_sName.Cmp("TFN")!=0 || l_sName.Cmp("BFN") != 0|| l_sName.Cmp("TZN") != 0)																						///
+		{
+
+			l_asParameterNames.push_back(l_sName);
+		}
+		std::vector<double> c = m_fr.GetCombinationMatrix()[lIteration];
+		double l_nValue = c[0];
+		wxString ss;
+		ss << l_nValue;
+
+
+	}
+	/*when alpha is exactly equals 1 then we need only one combination*/
+	if (dAlpha == 1)
+	{
+		std::vector<double>  params = GetCombinationVectorForTopLevel();
+		for (int iIt = 0; iIt < l_asParameterNames.size(); iIt++)
+		{
+
+			l_anParameterValue.push_back(params[iIt]);
+
+			m_msParameterName2Value[l_asParameterNames[iIt]] = params[iIt];
+
+			wxString sParam;
+			sParam << params[iIt];
+			m_pcGraph->GetFunctionRegistry()->registerFunction(l_asParameterNames[iIt], sParam);
+
+
+		}
+
+		m_pcMainSimulator->SetParameterNames(l_asParameterNames);
+		m_pcMainSimulator->SetParameterValues(l_anParameterValue);
+
+		return;
+	}
+
+	std::vector<double> vdCurrentParams = m_fr.GetCombinationMatrix()[lIteration];
+	m_vdCurrentSample.clear();
+	for (int iCount = 0; iCount < l_asParameterNames.size(); iCount++)
+	{
+		if (m_mFuzzyParam2Position.find(l_asParameterNames[iCount]) != m_mFuzzyParam2Position.end())//if (l_asParameterNames[y] == m_fuzzyParams[y])
+		{
+			int pos = m_mFuzzyParam2Position[l_asParameterNames[iCount]];
+			l_anParameterValue.push_back(vdCurrentParams[pos]);
+			m_msParameterName2Value[l_asParameterNames[iCount]] = vdCurrentParams[pos];
+			wxString sparam;
+			sparam << vdCurrentParams[pos];
+			m_pcGraph->GetFunctionRegistry()->registerFunction(l_asParameterNames[iCount], sparam);
+			m_vdCurrentSample.push_back(vdCurrentParams[pos]);
+			continue;
+		}
+
+		l_anParameterValue.push_back(vdCurrentParams[iCount]);
+
+		m_msParameterName2Value[l_asParameterNames[iCount]] = vdCurrentParams[iCount];
+
+		wxString sParam;
+		sParam << vdCurrentParams[iCount];
+		m_pcGraph->GetFunctionRegistry()->registerFunction(l_asParameterNames[iCount], sParam);
+
+
+	}
+
+	m_pcMainSimulator->SetParameterNames(l_asParameterNames);
+	m_pcMainSimulator->SetParameterValues(l_anParameterValue);
+
+}
+void* SP_DLG_FspnSimResult::DoFSPwithNormalSampling()
+{
+	/*reset the fuzzy setting and the result band*/
+	bool bisInitialised = InitializeFuzzySetting();
+	if (!bisInitialised)
+	{
+		return 0;
+	}
+	m_ResultFBand.clear();
+
+	/*inform the user to the  simulation running times*/
+	long l_numofLevels = m_fr.GetNumFuzzyLevels();
+	long l_numofSamples = m_fr.GetNumSamplePoints();
+	long l_numFN = m_fr.GetNumFuzzyNum();
+	long l_nRunningTimes = pow(l_numofSamples, l_numFN) * (l_numofLevels)+1;// pow(numofSamples, lnumFN)* numofLevels + 1;
+
+	m_lTotalSimRuns = l_nRunningTimes;
+	/*in case of no fuzzy numbers*/
+	if (l_numFN == 0)
+	{
+		const std::string s_msgWarnMsg = "You are trying to run standard SPN ! ";
+
+		SP_LOGWARNING(s_msgWarnMsg);
+
+		spsim::Matrix2DDouble n_mResultMat = DoNormalFSPN();
+
+		TraceElement structTraceElement;
+		structTraceElement.sample = m_vdCurrentSample;
+		structTraceElement.currentLevel = 0;
+		structTraceElement.levelNum = 0;
+		structTraceElement.fuzzyTrace = n_mResultMat;
+		m_ResultFBand.push_back(structTraceElement);
+		m_pcCompressedBand = m_fr.CompressResults(m_ResultFBand);
+		m_ResultFBand.clear();
+		LoadResults();
+		return 0;
+
+	}
+
+	spsim::StochasticSimulator* l_pcSimulator;
+	long lRunCount = 1;
+
+	l_pcSimulator = dynamic_cast<spsim::StochasticSimulator*> (m_pcMainSimulator);
+	const std::string s_msgWarnMesag = "The total number of simulation runs is: ";
+	spsim::Property* l_pcPropRunCounts = l_pcSimulator->GetSimulatorOptions()->GetOption(wxT("RunCount"));
+	if (l_pcPropRunCounts != NULL)
+	{
+		lRunCount = l_pcPropRunCounts->GetValuelong();
+	}
+	std::string s_msg = s_msgWarnMesag + std::to_string(l_nRunningTimes) + " x " + std::to_string(lRunCount);
+	SP_LOGWARNING(s_msg);
+
+	wxMessageDialog* pc_msgDialog = new wxMessageDialog(this, s_msg, "High number of simulation Runs", wxOK | wxCANCEL | wxICON_WARNING);
+	std::thread thSimThreadWorker;
+	if (pc_msgDialog->ShowModal() == wxID_OK)
+	{/*D Fspn simulation*/
+
+	 /*calculate alpha levels, default levels=11 ,0->10 */
+		m_fr.CalculateAlphaLevels();
+		thSimThreadWorker = std::thread([&]() {
+			long lRemainingSimRunCoun = 0; long lRunCount = 0;
+			for (int iAlpha = 0; iAlpha < m_fr.GetAlphaSet().size() ; iAlpha++)
+			{
+				if (m_bIsAbort)
+				{
+					break;
+				}
+				/*do sample point combination for current alpha level*/
+				m_fr.DoSamplePointsCombination(m_fr.GetAlphaSet()[iAlpha]);
+
+				/*calculate number of simulation at current alpha levels*/
+				long m_lNumCombinedPoints = pow(m_fr.GetNumSamplePoints(), m_fr.GetNumFuzzyNum());
+
+				for (long lIteration = 0; lIteration < m_lNumCombinedPoints; lIteration++)
+				{
+					m_clock = std::clock(); // get current time
+					if (m_bIsAbort)
+					{
+						break;
+					}
+					/*to store current simulation trace*/
+					TraceElement structTraceElement;
+
+					spsim::Matrix2DDouble resultMat;
+					double alphaValue = m_fr.GetAlphaSet()[iAlpha];
+
+					/*do simulation on current sample combination*/
+					resultMat = DOneSpnSimulation(lIteration, alphaValue);
+
+					/*show the total progress*/
+					lRunCount++;
+					lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
+					SetSimulationProgressText(lRemainingSimRunCoun);
+					SetSimulationProgressGauge(lRemainingSimRunCoun);
+					/*store current sim trace with its level information eg., current sample,level*/
+					structTraceElement.sample = m_vdCurrentSample;
+					structTraceElement.currentLevel = m_fr.GetAlphaSet()[iAlpha];
+					structTraceElement.levelNum = iAlpha;
+					structTraceElement.fuzzyTrace = resultMat;
+					m_ResultFBand.push_back(structTraceElement);
+
+				}
+			}
+			/*do simulation on the heighest level alpha=1*/
+			TraceElement structTraceElement;
+			spsim::Matrix2DDouble vvdResultMat;
+			if (!m_bIsAbort)
+			{
+				vvdResultMat = DOneSpnSimulation(0, 1); /*Do one Simulation for the top sample*/
+
+														/*show the total progress*/
+				lRunCount++;
+				lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
+				SetSimulationProgressText(lRemainingSimRunCoun);
+				SetSimulationProgressGauge(lRemainingSimRunCoun);
+				/*add the trace of the heighest level to the band*/
+
+				structTraceElement.sample = m_vdCurrentSample;
+				structTraceElement.currentLevel = 1;
+				structTraceElement.levelNum = m_fr.GetNumFuzzyLevels();
+				structTraceElement.fuzzyTrace = vvdResultMat;
+				m_ResultFBand.push_back(structTraceElement);
+			}
+			double duration = (std::clock() - m_clock) / (double)CLOCKS_PER_SEC;
+			m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), duration));
+			//wxWindowDisabler disableAll;
+			if (!m_bIsAbort) {
+				m_pcSimulationProgressGauge->SetValue(100);
+				m_pcStartButton->SetLabel(wxT("Abort Processing"));
+				m_pcStartButton->SetBackgroundColour(*wxRED);
+				wxBusyInfo info(wxT("Finalizing the processing, please wait."), this);
+				m_pcCompressedBand = m_fr.CompressResults(m_ResultFBand);// m_FuzzyBand);
+			}
+			if (m_bIsAbort)
+			{
+				InitProgress();
+				m_pcSimulationProgressGauge->SetValue(0);
+				m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), 0.0));
+			}
+
+
+			m_pcStartButton->SetBackgroundColour(*wxGREEN);
+			m_pcStartButton->SetLabel(wxT("Start Simulation"));
+			m_lnFuzzyNum = 0;
+			m_initialRun = false;
+			m_bIsAbort = false;
+			m_pcMainSimulator->Initialise(false);
+			m_pcMainSimulator->AbortSimulation();
+
+
+		});
+		thSimThreadWorker.detach();
+
+		if (thSimThreadWorker.joinable())
+		{
+			thSimThreadWorker.join();
+		}
+	}
+	else {
+		m_pcStartButton->SetBackgroundColour(*wxGREEN);
+		m_pcStartButton->SetLabel(wxT("Start Simulation"));
+		return 0;
+
+	}
+
+	return 0;
+}
+
+void* SP_DLG_FspnSimResult::DoFspnSimulation()
+{
+	/*Initialise fuzzy settings*/
+	bool bisInitialised = InitializeFuzzySetting();
+	if (!bisInitialised)
+	{
+		return 0;
+	}
+	m_ResultFBand.clear();
+
+	/*inform the user to the  simulation running times*/
+	long l_numofLevels = m_fr.GetNumFuzzyLevels();
+	long l_numofSamples = m_fr.GetNumSamplePoints();
+	long l_numFN = m_fr.GetNumFuzzyNum();
+	long l_nRunningtimes = pow(l_numofSamples, l_numFN) + (l_numofLevels) * 2 + 1;// pow(numofSamples, lnumFN)* numofLevels + 1;
+
+	m_lTotalSimRuns = l_nRunningtimes;
+	if (l_numFN == 0)
+	{
+
+		const std::string sWarnMsg = "You are trying to run Normal SPN ! ";
+
+		SP_LOGWARNING(sWarnMsg);
+
+
+		spsim::Matrix2DDouble n_mResultMat = DoNormalFSPN();
+
+		TraceElement structTraceElement;
+		structTraceElement.sample = m_vdCurrentSample;
+		structTraceElement.currentLevel = 0;
+		structTraceElement.levelNum = 0;
+		structTraceElement.fuzzyTrace = n_mResultMat;
+		m_ResultFBand.push_back(structTraceElement);
+		m_pcCompressedBand = m_fr.CompressResults(m_ResultFBand);
+		m_ResultFBand.clear();
+
+		LoadResults();
+		return 0;
+
+	}
+
+	spsim::StochasticSimulator* l_pcSimulator;
+	long lRunCount = 1;
+
+	l_pcSimulator = dynamic_cast<spsim::StochasticSimulator*> (m_pcMainSimulator);
+
+	spsim::Property* l_pcPropRunCounts = l_pcSimulator->GetSimulatorOptions()->GetOption(wxT("RunCount"));
+	if (l_pcPropRunCounts != NULL)
+	{
+		lRunCount = l_pcPropRunCounts->GetValuelong();
+	}
+	const std::string sWarnMesag = "The total number of simulation runs is : ";
+	std::string s_WarningMsg = sWarnMesag + std::to_string(l_nRunningtimes) + " x " + std::to_string(lRunCount);
+	SP_LOGWARNING(s_WarningMsg);
+	wxMessageDialog* p_pcDialog = new wxMessageDialog(this, s_WarningMsg, "High number of simulation runs", wxOK | wxCANCEL | wxICON_WARNING);
+	std::thread thSimThreadWorker;
+	/*warning the user about number of simulation runs*/
+	if (p_pcDialog->ShowModal() == wxID_OK)
+	{
+
+		/*caculate alpha levels, default 11, 0->10*/
+		m_fr.CalculateAlphaLevels();
+		thSimThreadWorker = std::thread([&]() {
+			long lRemainingSimRunCoun = 0; long lRunCount = 0;
+			for (int iAlpha = 0; iAlpha < m_fr.GetAlphaSet().size() ; iAlpha++)
+			{
+				if (m_bIsAbort)
+				{
+					break;
+				}
+				/* do simulation just for the first level*/
+				if (iAlpha == 0)
+				{
+					/*do sample point combinations for very first level*/
+					m_fr.DoSamplePointsCombination(m_fr.GetAlphaSet()[iAlpha]);
+
+					/*calculate number of samples at the first level*/
+					long m_lNumCombinedPoints = pow(m_fr.GetNumSamplePoints(), m_fr.GetNumFuzzyNum());
+
+					for (long l_iteration = 0; l_iteration < m_lNumCombinedPoints; l_iteration++)
+					{
+						m_clock = std::clock(); // get current time
+						if (m_bIsAbort)
+						{
+							break;
+						}
+						/*to store the simulation trace*/
+						TraceElement structTraceElement;
+						spsim::Matrix2DDouble vvdResultMat;
+						double alphaValue = m_fr.GetAlphaSet()[iAlpha];
+						/*do simulation for current sample */
+						vvdResultMat = DOneSpnSimulation(l_iteration, alphaValue);
+
+						/*show the total progress*/
+						lRunCount++;
+						lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
+						SetSimulationProgressText(lRemainingSimRunCoun);
+						SetSimulationProgressGauge(lRemainingSimRunCoun);
+
+						/*store the simulation trace with its level information e.g, current sample and corresponding level*/
+						structTraceElement.sample = m_vdCurrentSample;
+						structTraceElement.currentLevel = m_fr.GetAlphaSet()[iAlpha];
+						structTraceElement.levelNum = iAlpha;
+						structTraceElement.fuzzyTrace = vvdResultMat;
+						/*add the trace to fuzzy band*/
+						m_ResultFBand.push_back(structTraceElement);
+
+					}
+				}
+				else {
+					//alpha>0
+					m_fr.DoSamplePointsCombination(m_fr.GetAlphaSet()[iAlpha]);
+					long m_lNumCombinedPoints = pow(m_fr.GetNumSamplePoints(), m_fr.GetNumFuzzyNum());
+					TraceElement traceElement1;
+					spsim::Matrix2DDouble vvdResultMat;
+					double currentAlpha = m_fr.GetAlphaSet()[iAlpha];
+
+					/*do one run simulation for the first point of the current level*/
+					vvdResultMat = DOneSpnSimulation(0, currentAlpha);
+
+					/*show the total progress*/
+					lRunCount++;
+					lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
+					SetSimulationProgressText(lRemainingSimRunCoun);
+					SetSimulationProgressGauge(lRemainingSimRunCoun);
+
+					traceElement1.sample = GetCurentSamples(0);
+					traceElement1.currentLevel = m_fr.GetAlphaSet()[iAlpha];
+					traceElement1.levelNum = iAlpha;
+					traceElement1.fuzzyTrace = vvdResultMat;
+					m_ResultFBand.push_back(traceElement1);
+
+					vector<double> low = GetCurentSamples(0);
+					vector<double> up = GetCurentSamples(m_lNumCombinedPoints - 1);
+
+					/*make use of the previous traces when the curent sample is in between low and up*/
+					for (long literation = 1; literation < m_lNumCombinedPoints - 1; literation++)
+					{
+						int count = 0;
+						if (m_bIsAbort)
+						{
+							break;
+						}
+
+						for (int j = 0; j < m_fr.GetNumFuzzyNum(); j++)
+						{
+							if (m_bIsAbort) { break; }
+							if (m_ResultFBand[literation].sample[j] > low[j] && m_ResultFBand[literation].sample[j] < up[j])
+							{
+								count++;
+								if (count == m_fr.GetNumFuzzyNum() && m_fr.GetAlphaSet()[iAlpha] != 1)
+								{
+
+									TraceElement structTraceElement2 = m_ResultFBand[literation];
+									structTraceElement2.currentLevel = m_fr.GetAlphaSet()[iAlpha];;
+									structTraceElement2.levelNum = iAlpha;
+									m_ResultFBand.push_back(structTraceElement2);
+								}
+
+							}
+
+						}
+					}
+
+					/*do simulation on the last sample at the current level*/
+					TraceElement structTraceElementn;
+					spsim::Matrix2DDouble vvdResultMat1;
+					double currentAlpha1 = m_fr.GetAlphaSet()[iAlpha];
+					if (m_bIsAbort) { break; }
+					/*do one run on the last point of the current level*/
+					vvdResultMat1 = DOneSpnSimulation(m_lNumCombinedPoints - 1, currentAlpha1);
+
+					/*show the total progress*/
+					lRunCount++;
+					lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
+					SetSimulationProgressText(lRemainingSimRunCoun);
+					SetSimulationProgressGauge(lRemainingSimRunCoun);
+
+					structTraceElementn.sample = GetCurentSamples(m_lNumCombinedPoints - 1);
+					structTraceElementn.currentLevel = currentAlpha1;
+					structTraceElementn.levelNum = iAlpha;
+					structTraceElementn.fuzzyTrace = vvdResultMat1;
+					m_ResultFBand.push_back(structTraceElementn);
+
+
+				}
+
+				// When fininshing the combination points of each level except the top level, calculate min and max values with their corresponding alpha level
+
+			}
+
+			/*for alpha=1*
+			*initialize the simulator with zero iteration and alpha =1*/
+			TraceElement structTtraceElement1;
+			spsim::Matrix2DDouble resultMat;
+			double currentAlpha = m_fr.GetAlphaSet()[1];
+			if (!m_bIsAbort) {
+
+				resultMat = DOneSpnSimulation(0, 1);
+
+				/*show the total progress*/
+				lRunCount++;
+				lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
+				SetSimulationProgressText(lRemainingSimRunCoun);
+				SetSimulationProgressGauge(lRemainingSimRunCoun);
+
+				structTtraceElement1.sample = m_vdCurrentSample;
+				structTtraceElement1.currentLevel = m_fr.GetAlphaSet()[1];
+				structTtraceElement1.levelNum = 1;
+				structTtraceElement1.fuzzyTrace = resultMat;
+				m_ResultFBand.push_back(structTtraceElement1);
+			}
+			double duration = (std::clock() - m_clock / (double)CLOCKS_PER_SEC);
+			m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), duration));
+			if (!m_bIsAbort)
+			{
+				lRemainingSimRunCoun = 0;
+				SetSimulationProgressText(lRemainingSimRunCoun);
+				SetSimulationProgressGauge(lRemainingSimRunCoun);
+				m_pcStartButton->SetLabel(wxT("Abort Processing"));
+				m_pcSimulationProgressGauge->SetValue(100);
+				m_pcStartButton->SetBackgroundColour(*wxRED);
+				wxBusyInfo info(wxT("Finalizing the processing, please wait."), this);
+				m_pcCompressedBand = m_fr.CompressResults(m_ResultFBand);// m_FuzzyBand);
+
+				m_ResultFBand.clear();
+
+			}
+			m_lnFuzzyNum = 0;
+			m_initialRun = false;
+			m_pcTimer->Stop();
+			//SetSimulationProgressGauge(GetSimulatorProgress());
+			SetSimulationStopWatch(1);
+			if (!m_bIsAbort)
+			{
+				LoadResults();
+			}
+			m_pcMainSimulator->Initialise(false);
+			m_pcMainSimulator->AbortSimulation();
+			if (m_bIsAbort)
+			{
+				InitProgress();
+				m_pcSimulationProgressGauge->SetValue(0);
+				m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), 0));
+				m_pcStartButton->SetLabel(wxT("Start Simulation"));
+				m_pcStartButton->SetBackgroundColour(*wxGREEN);
+			}
+			else {
+				lRemainingSimRunCoun = 0;
+				SetSimulationProgressText(lRemainingSimRunCoun);
+				SetSimulationProgressGauge(lRemainingSimRunCoun);
+				m_pcStartButton->SetLabel(wxT("Start Simulation"));
+				m_pcStartButton->SetBackgroundColour(*wxGREEN);
+			}
+			m_bIsAbort = false;
+			m_initialRun = false;
+			m_pcMainSimulator->AbortSimulation();
+			//Update();
+		});
+		thSimThreadWorker.detach();
+
+		if (thSimThreadWorker.joinable())
+		{
+			thSimThreadWorker.join();
+		}
+	}
+	else {
+		m_pcStartButton->SetBackgroundColour(*wxGREEN);
+		m_pcStartButton->SetLabel(wxT("Start Simulation"));
+		return 0;
+	}
+	m_bIsAbort = false;
+	m_initialRun = false;
+	m_pcMainSimulator->AbortSimulation();
+}
 
 
 void SP_DLG_FspnSimResult::OnModifyConstantSets(wxCommandEvent& p_cEvent)
@@ -447,7 +993,7 @@ void SP_DLG_FspnSimResult::OnModifyConstantSets(wxCommandEvent& p_cEvent)
 	}
 }
 
-std::vector<double> SP_DLG_FspnSimResult:: GetCombinationVectorForTopLevel()
+std::vector<double> SP_DLG_FspnSimResult::GetCombinationVectorForTopLevel()
 {
 	std::vector<double> param_top(m_paramMatrix.size(), 0);
 	for (int i = 0; i < m_paramMatrix.size(); i++)
@@ -457,16 +1003,17 @@ std::vector<double> SP_DLG_FspnSimResult:: GetCombinationVectorForTopLevel()
 
 
 }
+
 spsim::Matrix2DDouble SP_DLG_FspnSimResult::DoNormalFSPN()
 {
 	//m_nFuzzyResultBand.clear();
 	m_fr.CalculateAlphaLevels();
 	m_fr.DoSamplePointsCombination(m_fr.GetAlphaSet()[0]);
 
-	//bool m_bIsInitialized = InitializeSimulator(0, m_fr.GetAlphaSet()[0]);
+	bool m_bIsInitialized = InitializeSimulator(0, m_fr.GetAlphaSet()[0]);
 	spsim::Matrix2DDouble vvdresultMat;
 	m_initialRun = true;
-	if ( true)
+	if (m_bIsInitialized == true)
 	{
 
 		SetSimulationProgressGauge(0);
@@ -638,7 +1185,44 @@ void SP_DLG_FspnSimResult::DirectExportToCSV()
 
 
 }
+std::vector<double>  SP_DLG_FspnSimResult::GetCurentSamples(int iteration)
+{
 
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+	SP_ListMetadata::const_iterator it;
+
+	SP_VectorString l_asParameterNames;
+	//	SP_VectorDouble l_anParameterValue;
+
+	//	m_msParameterName2Value.clear();
+
+	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+	{
+		SP_DS_Metadata* l_pcConstant = *it;
+		wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+		wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();///Added by G.A
+		if (m_mTransParamNames.find(l_sName) != m_mTransParamNames.end())																										   //if(l_sName.Cmp("TFN")!=0 || l_sName.Cmp("BFN") != 0|| l_sName.Cmp("TZN") != 0)																						///
+		{
+			l_asParameterNames.push_back(l_sName);
+		}
+
+	}
+
+	std::vector<double>  vdCurrentConstant;
+	vdCurrentConstant.clear();
+	vdCurrentConstant = m_fr.GetCombinationMatrix()[iteration];
+	m_vdCurrentSample.clear();
+	for (int y = 0; y < l_asParameterNames.size(); y++)
+	{
+		if (m_mFuzzyParam2Position.find(l_asParameterNames[y]) != m_mFuzzyParam2Position.end())//if (l_asParameterNames[y] == m_fuzzyParams[y])
+		{
+			int ipos = m_mFuzzyParam2Position[l_asParameterNames[y]];
+			m_vdCurrentSample.push_back(vdCurrentConstant[ipos]);
+			continue;
+		}
+	}
+	return m_vdCurrentSample;
+}
 void SP_DLG_FspnSimResult::LoadUsedParams()
 {
 
@@ -687,21 +1271,168 @@ wxString SP_DLG_FspnSimResult::GetKParameter(const wxString& sfunc)
 	m_sKparam = sfunc.substr(stpos1 + 1, stpos2);
 	return m_sKparam;
 }
-
-
-void SP_DLG_FspnSimResult::SetSimulationProgressText(long p_nValue)
+spsim::Matrix2DDouble SP_DLG_FspnSimResult::DOneSpnSimulation(unsigned long iteration, double alpha)
 {
-	 
-		m_pcSimulationProgressText->SetLabel(wxString::Format(wxT("%i %%"), p_nValue));
-		//m_pcTotalSimulationProgressGauge->SetValue(100 - ((p_nValue * 100) / m_lTotalSimRuns));
-		m_pcSimulationProgressText->Refresh();
+	bool m_bIsInitialized = InitializeSimulator(iteration, m_fr.GetAlphaSet()[alpha]);
+	m_initialRun = true;
+	spsim::Matrix2DDouble vvdResultMat;
+	if (m_bIsInitialized == true)
+	{
+
+
+		//SetSimulationProgressGauge(0);
+		m_pcStartButton->SetLabel(wxT("Abort Simulation"));
+		m_pcStartButton->SetBackgroundColour(*wxRED);
+
+		spsim::StochasticSimulator* l_pcSimulator;
+
+		//CHECK_POINTER(m_pcMainSimulator, return NULL);
+
+		//transform this simulator into hybrid simulator
+		l_pcSimulator = dynamic_cast<spsim::StochasticSimulator*> (m_pcMainSimulator);
+		l_pcSimulator->Initialise(true);
+		l_pcSimulator->SetSimulationRunningState(true);
+
+		long l_nRunCount;
+		long l_nThreadCount;
+		spsim::Property* l_pcPropRunCounts = l_pcSimulator->GetSimulatorOptions()->GetOption(wxT("RunCount"));
+		spsim::Property* l_pcPropThreadCount = l_pcSimulator->GetSimulatorOptions()->GetOption(wxT("ThreadCount"));
+		if (l_pcPropThreadCount != NULL)
+		{
+			l_nThreadCount = l_pcPropThreadCount->GetValuelong();
+		}
+		if (l_pcPropRunCounts != NULL)
+		{
+			l_nRunCount = l_pcPropRunCounts->GetValuelong();
+		}
+		if (l_nRunCount >= 1 && l_nThreadCount == 1)
+		{
+			for (long lrun = 0; lrun < l_nRunCount; lrun++)
+			{
+				if (m_bIsAbort)
+				{
+					break;
+				}
+				// run single simulation
+				l_pcSimulator->SimulateSingleRun();
+			}
+		}
+		else
+		{
+
+			if (l_pcSimulator->GetSimulatorAlgorithm() != wxT("FAU"))
+			{
+				//Multithreading
+				l_pcSimulator->RunSimulation();
+				l_pcSimulator->AbortSimulation();
+			}
+			else
+			{//Fau
+				l_pcSimulator->SimulateSingleRun();
+				l_pcSimulator->AbortSimulation();
+			}
+		}
+
+		/*Averaging the results according to choice of multithreading*/
+		if (l_nRunCount > 1 && l_nThreadCount == 1)
+		{
+			//Get the result  Matrix and average it to run counts
+
+			vvdResultMat = l_pcSimulator->GetResultMatrix();
+			long	l_nColCount = l_pcSimulator->GetPlaceCount();
+			for (unsigned int l_nRow = 0; l_nRow < vvdResultMat.size(); l_nRow++)
+			{
+				if (m_bIsAbort) { break; }
+				for (unsigned int l_nCol = 0; l_nCol < l_nColCount; l_nCol++)
+				{
+					if (m_bIsAbort) break;
+					vvdResultMat[l_nRow][l_nCol] /= l_nRunCount;
+				}
+			}
+		}
+		else if (l_nRunCount == 1 && l_nThreadCount == 1) {
+			vvdResultMat = l_pcSimulator->GetResultMatrix();
+		}
+		else
+		{
+			wxString salg = l_pcSimulator->GetSimulatorAlgorithm();
+			if (l_pcSimulator->GetSimulatorAlgorithm() != wxT("FAU"))
+			{
+				//Multithreading
+				if (!l_pcSimulator->IsSimulationRunning())
+				{
+					vvdResultMat = l_pcSimulator->GetResultMatrix();
+					long	l_nColCount = l_pcSimulator->GetPlaceCount();
+					for (unsigned int l_nRow = 0; l_nRow < vvdResultMat.size(); l_nRow++)
+					{
+						if (m_bIsAbort)
+						{
+							break;
+						}
+						for (unsigned int l_nCol = 0; l_nCol < l_nColCount; l_nCol++)
+						{
+							if (m_bIsAbort) { break; }
+							vvdResultMat[l_nRow][l_nCol] /= l_nRunCount;
+						}
+					}
+				}
+			}
+			else
+			{
+				//FAU
+
+				//Do no averging
+			}
+
+		}
+
+
+
+		//m_pcStartButton->SetBackgroundColour(*wxGREEN);
+		//	m_pcTimer->Stop();
+		//double d = GetSimulatorProgress();
+
+		//SetSimulationProgressGauge(GetSimulatorProgress());
+		//float l_nSimulationCurrentTime = l_pcSimulator->GetCurrentTime() > l_pcSimulator->GetOutputEndPoint() ? l_pcSimulator->GetOutputEndPoint() : l_pcSimulator->GetCurrentTime();
+		//	m_lSimTim += l_nSimulationCurrentTime;
+		float l_nSimulationCurrentTime = l_pcSimulator->GetCurrentTime();
+		SetSimulationStopWatch(l_nSimulationCurrentTime);
+
 		Update();
-		RefreshExternalWindows();
-	 
+
+
+	}
+
+	return vvdResultMat;
+}
+
+void SP_DLG_FspnSimResult::SetSimulationProgressText(long& p_nValue)
+{
+	if (m_lTotalSimRuns != 0)
+	{
+		m_pcSimulationProgressText->SetLabel(wxString::Format(wxT("%i %%"), 100 - ((p_nValue * 100) / m_lTotalSimRuns)));
+		//m_pcTotalSimulationProgressGauge->SetValue(100 - ((p_nValue * 100) / m_lTotalSimRuns));
+
+	}
 
 
 }
+void SP_DLG_FspnSimResult::InitProgress()
+{
 
+	m_pcSimulationProgressText->SetLabel(wxString::Format(wxT("%i %%"), 0));
+
+}
+void SP_DLG_FspnSimResult::SetSimulationProgressGauge(long p_nValue)
+{
+
+	if (m_lTotalSimRuns != 0) {
+		int iProgress = 100 - ((p_nValue * 100) / m_lTotalSimRuns);
+		m_pcSimulationProgressGauge->SetValue(iProgress);
+
+		Update();
+	}
+}
 void SP_DLG_FspnSimResult::SetSimulationProgressGaugeRange(long p_nRangeValue)
 {
 	m_pcSimulationProgressGauge->SetRange(p_nRangeValue);

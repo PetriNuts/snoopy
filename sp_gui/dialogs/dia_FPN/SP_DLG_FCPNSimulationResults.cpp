@@ -35,7 +35,7 @@
 #include "sp_ds/extensions/continuous/SP_DS_PlaceODE.h"
 #include "sp_ds/attributes/SP_DS_BoolAttribute.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
- 
+
 #include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 //by sl
 #include "sp_ds/attributes/SP_DS_DoubleMarkingAttribute.h"
@@ -44,6 +44,8 @@
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StDirectExportProperties.h"
 #include "sp_gui/dialogs/dia_ContinuousPN/SP_DLG_CSVExport.h"
 #include "sp_gui/dialogs/dia_FPN/SP_DLG_FCPNSimulationResults.h"
+
+#include "sp_ds/extensions/SP_DS_ThreadEvent.h"
 //New simulator header file
 #include "spsim/spsim.h"
 #if !defined(__WXMSW__) && !defined(__WXPM__)
@@ -65,17 +67,17 @@ SP_DLG_FCPNSimulationResults::SP_DLG_FCPNSimulationResults(SP_DS_Graph* p_pcGrap
 {
 
 	m_pcCompressedBand = new SP_Compressed_Fuzzy_Band();
-	 
+
 	wxSizer* l_pcRowSizer = NULL;
 	wxSizer* l_pcRowSizer1 = NULL;
 	wxSizer* l_pcRowSizer2 = NULL;
 	wxSizer* l_pcRowSizer3 = NULL;
-	 
+
 	m_bIsAbort = false;
 	m_lSamplingStrategyselection = 0;
 	m_lTotalSimRuns = 0;
-	m_pcSamplingchoices =new wxChoice(m_pcPropertyWindowPropertySizer, SAMPLING_CHOICES_ID2, wxDefaultPosition, wxSize(100, -1));
- 
+	m_pcSamplingchoices = new wxChoice(m_pcPropertyWindowPropertySizer, SAMPLING_CHOICES_ID2, wxDefaultPosition, wxSize(100, -1));
+
 	m_pcSamplingchoices->Append(wxT("Basic Sampling"));
 	m_pcSamplingchoices->Append(wxT("Reduced Sampling"));
 	m_pcSamplingchoices->SetSelection(m_lSamplingStrategyselection);
@@ -113,7 +115,7 @@ SP_DLG_FCPNSimulationResults::SP_DLG_FCPNSimulationResults(SP_DS_Graph* p_pcGrap
 	m_initialRun = false;
 	m_lnFuzzyNum = 0;
 	m_lSimTim = 0;
-	
+
 	SetSizerAndFit(m_pcMainSizer);
 
 	Layout();
@@ -127,7 +129,7 @@ void SP_DLG_FCPNSimulationResults::InitializeParamMatrix()
 	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 	num_lparam = l_pcMetadataclass->GetElements()->size();
 	m_paramMatrix.resize(num_lparam, std::vector<double>(3, 0));
- 
+
 }
 
 void SP_DLG_FCPNSimulationResults::ConvertTFNListToParamMatrix(std::vector<TriangularFN> asTFNParams)
@@ -156,17 +158,17 @@ void SP_DLG_FCPNSimulationResults::ConvertTFNListToParamMatrix(std::vector<Trian
 
 bool SP_DLG_FCPNSimulationResults::InitializeFuzzySetting()
 {
-	 long m_lAlphaLevels;
-	 long m_lnDiscPoints;
+	long m_lAlphaLevels;
+	long m_lnDiscPoints;
 	if ((m_lalphaLevels->GetValue().ToLong(&m_lAlphaLevels)) && (m_lSamplePoints->GetValue().ToLong(&m_lnDiscPoints)))
-	{ 
+	{
 		if (m_lAlphaLevels > 0 && m_lnDiscPoints > 0)
 		{
-	
-		LoadUsedParams();
-		ConvertTFNListToParamMatrix(LoadParams());
-		m_fr = FuzzyReasoning(m_lAlphaLevels, m_lnDiscPoints, m_paramMatrix, m_lnFuzzyNum, m_lpCount);
-		return true;
+
+			LoadUsedParams();
+			ConvertTFNListToParamMatrix(LoadParams());
+			m_fr = FuzzyReasoning(m_lAlphaLevels, m_lnDiscPoints, m_paramMatrix, m_lnFuzzyNum, m_lpCount);
+			return true;
 		}
 		else {
 			SP_MESSAGEBOX(wxT("The intered values of Alpha levels or Sample points must be larger than 0"));
@@ -197,7 +199,7 @@ std::vector<TriangularFN> SP_DLG_FCPNSimulationResults::LoadParams()
 			SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcMetadata->GetAttribute(wxT("ValueList")));
 			wxString l_sMetadataValue;
 			wxString l_sMetadataType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcMetadata->GetAttribute(wxT("Type")))->GetValue();
-			
+
 			if (m_mTransParamNames.find(l_sMetadataName) != m_mTransParamNames.end())
 			{
 				int x = m_apcComboBoxes[1]->GetCurrentSelection();
@@ -290,7 +292,7 @@ void SP_DLG_FCPNSimulationResults::LoadParameters(unsigned long lIteration, doub
 		{
 			l_asParameterNames.push_back(l_sName);
 		}
-	 
+
 
 	}
 	/*when alpha is exactly equals 1 then we need only one combination*/
@@ -317,21 +319,21 @@ void SP_DLG_FCPNSimulationResults::LoadParameters(unsigned long lIteration, doub
 		return;
 	}
 
-	 
+
 
 	std::vector<double> c;
 	c.clear();
-	c= m_fr.GetCombinationMatrix()[lIteration];
+	c = m_fr.GetCombinationMatrix()[lIteration];
 	m_vCurrentSample.clear();
 	for (int y = 0; y < l_asParameterNames.size(); y++)
 	{
-		if(m_mFuzzyParam2Position.find(l_asParameterNames[y]) != m_mFuzzyParam2Position.end())//if (l_asParameterNames[y] == m_fuzzyParams[y])
+		if (m_mFuzzyParam2Position.find(l_asParameterNames[y]) != m_mFuzzyParam2Position.end())//if (l_asParameterNames[y] == m_fuzzyParams[y])
 		{
 			int pos = m_mFuzzyParam2Position[l_asParameterNames[y]];
 			l_anParameterValue.push_back(c[pos]);
-				 
+
 			m_msParameterName2Value[l_asParameterNames[y]] = c[pos];
-			
+
 			wxString ss1;
 			ss1 << c[pos];
 			m_pcGraph->GetFunctionRegistry()->registerFunction(l_asParameterNames[y], ss1);
@@ -369,91 +371,91 @@ std::vector<double> SP_DLG_FCPNSimulationResults::GetCombinationVectorForTopLeve
 
 void SP_DLG_FCPNSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cEvent)
 {
-	if (m_initialRun) 
+	if (m_initialRun)
 	{
 		wxString s_warningMsg = "You are going to halt the simulation, please confirm!";
 		wxMessageDialog* pwarningSimStopDialog = new wxMessageDialog(this, s_warningMsg, "Warning", wxOK | wxCANCEL | wxICON_WARNING);
 		if (pwarningSimStopDialog->ShowModal() == wxID_OK)
 		{
-			m_bIsAbort = true; 
+			m_bIsAbort = true;
 			m_fr.SetAbort(true);
 		}
 		else {
 			return;
-		 
+
 		}
 	}
 
-		  if (m_pcMainSimulator->IsSimulationRunning() && m_bIsAbort)
-		  {
-			  //TDOD: rewrite this part
-			  m_pcMainSimulator->AbortSimulation();
-			 // SetSimulationProgressGauge(100);
-			  m_pcStartButton->SetLabel(wxT("Start Simulation"));
-			  m_pcStartButton->SetBackgroundColour(*wxGREEN);
+	if (m_pcMainSimulator->IsSimulationRunning() && m_bIsAbort)
+	{
+		//TDOD: rewrite this part
+		m_pcMainSimulator->AbortSimulation();
+		// SetSimulationProgressGauge(100);
+		m_pcStartButton->SetLabel(wxT("Start Simulation"));
+		m_pcStartButton->SetBackgroundColour(*wxGREEN);
 
-			  //Stop the stopwatch
-			  m_cSimulationStopWatch.Pause();
+		//Stop the stopwatch
+		m_cSimulationStopWatch.Pause();
 
-			  Update();
+		Update();
 
-			  return;
-		  }
+		return;
+	}
 
-		  //Export Type
-		  if (m_pcDirectExportRadioButton->GetValue())
-			  m_ExportType = SP_SIM_DIRECT_EXPORT;
-		  else
-			  m_ExportType = SP_SIM_NO_EXPORT;
+	//Export Type
+	if (m_pcDirectExportRadioButton->GetValue())
+		m_ExportType = SP_SIM_DIRECT_EXPORT;
+	else
+		m_ExportType = SP_SIM_NO_EXPORT;
 
-		//  SetSimulationProgressGauge(0);
-		  m_pcStartButton->SetLabel(wxT("Abort Simulation"));
-		  m_pcStartButton->SetBackgroundColour(*wxRED);
-		  Update();
+	//  SetSimulationProgressGauge(0);
+	m_pcStartButton->SetLabel(wxT("Abort Simulation"));
+	m_pcStartButton->SetBackgroundColour(*wxRED);
+	Update();
 
-		  if (m_initialRun==false)
-		  {
+	if (m_initialRun == false)
+	{
 
 
-			  long selectedSimulation= m_pcSamplingchoices->GetSelection();
-			  if(selectedSimulation==1)
-			  {
-				  DoFcpnSimulation();
-			  }
-			  else
-			  {
-				  
-				  
-				  DoNormalFcpnSimulation();
-				  m_pcTimer->Stop();
-			  }
+		long selectedSimulation = m_pcSamplingchoices->GetSelection();
+		if (selectedSimulation == 1)
+		{
+			DoFcpnSimulation();
+		}
+		else
+		{
 
-			  //export final result
-			  if (m_ExportType == SP_SIM_DIRECT_EXPORT)
-			  {
-				  //open export file
-				  OpenExportFile();
 
-				  //do the export
-				  DirectExportToCSV();
+			DoNormalFcpnSimulation();
+			m_pcTimer->Stop();
+		}
 
-				  //close the export
-				  CloseExportFile();
-			  }
-		  }
-		  else
-		  {
-			  if (m_bIsAbort)
-			  {
-				  SP_LOGERROR(wxT("The simulation can not be initialized"));
-			  }
-		  }
-		  
-	
-	 
+		//export final result
+		if (m_ExportType == SP_SIM_DIRECT_EXPORT)
+		{
+			//open export file
+			OpenExportFile();
+
+			//do the export
+			DirectExportToCSV();
+
+			//close the export
+			CloseExportFile();
+		}
+	}
+	else
+	{
+		if (m_bIsAbort)
+		{
+			SP_LOGERROR(wxT("The simulation can not be initialized"));
+		}
+	}
+
+
+
 	return;
 }
- 
+
 
 void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 {
@@ -519,7 +521,7 @@ void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 
 	}
 	std::thread     m_thSimThread; bool bisFinished = false;
-	
+
 	/* fuzzy simulation- warning the user to the number of simulations*/
 	if (p_warningDialog->ShowModal() == wxID_OK)
 	{
@@ -529,7 +531,7 @@ void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 		m_fr.CalculateAlphaLevels();
 		m_thSimThread = std::thread([&]() {
 			long lRemainingSimRunCoun = 0; long lRunCount = 0;
-			for (int ialpha = 0; ialpha < m_fr.GetAlphaSet().size() - 1; ialpha++)
+			for (int ialpha = 0; ialpha < m_fr.GetAlphaSet().size() ; ialpha++)
 			{
 				m_clock = std::clock(); // get current time
 				if (m_bIsAbort)
@@ -553,9 +555,9 @@ void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 					if (m_bIsInitialized == true)
 					{
 						//SetSimulationProgressGauge(0);
-						
-						
-						 
+
+
+
 						DoStartSimulation();
 						lRunCount++;
 						lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
@@ -583,7 +585,7 @@ void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 			{
 
 				//SetSimulationProgressGauge(0);//
-				
+
 				DoStartSimulation();
 				lRunCount++;
 				lRemainingSimRunCoun = m_lTotalSimRuns - lRunCount;
@@ -633,22 +635,21 @@ void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 				m_pcSimulationStopWatch->SetLabel(wxString::Format(wxT("%.3f s"), 0.0));
 				//SetSimulationProgressGauge(0);
 			}
-			else {
-				SetSimulationProgressGauge(100);
-			}
+
 			m_bIsAbort = false;
 			m_initialRun = false;
 			m_pcMainSimulator->AbortSimulation();
-			
+
 			m_pcStartButton->SetLabel(wxT("Start Simulation"));
 			m_pcStartButton->SetBackgroundColour(*wxGREEN);
 		});
-	 
-		m_thSimThread.detach();
+
+		//m_thSimThread.detach();
 
 		if (m_thSimThread.joinable())
 		{
-			m_thSimThread.join();
+			//	m_thSimThread.join();
+			m_thSimThread.detach();
 		}
 	}
 
@@ -671,8 +672,8 @@ void* SP_DLG_FCPNSimulationResults::DoNormalFcpnSimulation()
 void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 {//with Reduced Sampling strategy
 
-	/*initializing the fuzzy setting e.g, alpha levels and combination matrix*/
-	
+ /*initializing the fuzzy setting e.g, alpha levels and combination matrix*/
+
 	bool bisInitialized = InitializeFuzzySetting();
 
 	if (!bisInitialized)
@@ -687,25 +688,25 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 	long l_numofLevels = m_fr.GetNumFuzzyLevels();
 	long l_numofSamples = m_fr.GetNumSamplePoints();
 	long l_numFN = m_fr.GetNumFuzzyNum();
-	
+
 	/*calculate how many times the simulation should be run*/
-	long l_nRunningtimes = pow(l_numofSamples, l_numFN) + (l_numofLevels-1) * 2 + 1;//pow(numofSamples, numFN)* numofLevels+1;
+	long l_nRunningtimes = pow(l_numofSamples, l_numFN) + (l_numofLevels - 1) * 2 + 1;//pow(numofSamples, numFN)* numofLevels+1;
 	m_lTotalSimRuns = l_nRunningtimes;
 	const std::string sWarnMesag = "The total simulation number is: ";
-		
+
 	std::string s_warningMsg = sWarnMesag + std::to_string(l_nRunningtimes);
 
 	SP_LOGWARNING(s_warningMsg);// add the message to log window 
 
 	wxMessageDialog* p_messageDialog = new wxMessageDialog(this, s_warningMsg, "High number of Simulation Runs", wxOK | wxCANCEL | wxICON_WARNING);
-	
+
 	if (l_numFN == 0)
-	{  
+	{
 		/*Normal Simulation without fuzzy numbers*/
 		m_fr.CalculateAlphaLevels();
-		
+
 		m_fr.DoSamplePointsCombination(m_fr.GetAlphaSet()[0]);
-		
+
 		bool m_bIsInitialized = InitializeSimulator(0, 0);
 		m_initialRun = true;
 		if (m_bIsInitialized == true)
@@ -721,7 +722,7 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 			structTraceElement.levelNum = 1;
 			structTraceElement.fuzzyTrace = vvdResultMat;
 			m_vResultFBand.push_back(structTraceElement);
-			
+
 			m_lnFuzzyNum = 0;
 			m_initialRun = false;
 			m_pcTimer->Stop();
@@ -738,7 +739,7 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 	}
 
 	std::thread thSimThread;
-	
+
 	/*Notify the user about the number of simulations*/
 	if (p_messageDialog->ShowModal() == wxID_OK)
 	{
@@ -750,7 +751,7 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 
 		thSimThread = std::thread([&]() {
 			long lRemainingSimRunCoun = 0; long lRunCount = 0;
-			for (int ialpha = 0; ialpha < m_fr.GetAlphaSet().size() - 1; ialpha++)
+			for (int ialpha = 0; ialpha < m_fr.GetAlphaSet().size() ; ialpha++)
 			{
 				m_clock = std::clock();
 				if (m_bIsAbort)
@@ -979,18 +980,18 @@ void* SP_DLG_FCPNSimulationResults::DoFcpnSimulation()
 		return 0;
 
 	}
- 
+
 	m_lnFuzzyNum = 0;
 	m_lSimTim = 0;
 	m_initialRun = false;
 	m_bIsAbort = false;
- 
+
 	return 0;
-	}
- 
+}
+
 bool SP_DLG_FCPNSimulationResults::InitializeSimulator(unsigned long ite, double a)
 {
-	 
+
 	double l_nOutputEndPoint = 0;
 	double l_nOutputStartPoint;
 	long l_nLong0;
@@ -1045,7 +1046,7 @@ bool SP_DLG_FCPNSimulationResults::InitializeSimulator(unsigned long ite, double
 			wxBusyInfo l_Info(wxT("Loading data, please wait...."), this);
 		}
 		//Parameters
-		LoadParameters(ite,a);
+		LoadParameters(ite, a);
 
 		//Places
 		LoadPlaces();
@@ -1062,12 +1063,12 @@ bool SP_DLG_FCPNSimulationResults::InitializeSimulator(unsigned long ite, double
 	wxBusyInfo* l_pcInfo;
 	if (m_initialRun == false)
 	{
-		 l_pcInfo = new wxBusyInfo(wxT("Initializing the ODEs solver, please wait...."), this);
-		 wxDELETE(l_pcInfo);
+		l_pcInfo = new wxBusyInfo(wxT("Initializing the ODEs solver, please wait...."), this);
+		wxDELETE(l_pcInfo);
 	}
 	bool l_bIsInitialized = m_pcMainSimulator->Initialise(true);
 
-	
+
 
 	//Get some properties from the user
 	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("InBetweenVisualization")) != NULL)
@@ -1082,7 +1083,7 @@ bool SP_DLG_FCPNSimulationResults::InitializeSimulator(unsigned long ite, double
 
 	//SetSimulationProgressGaugeRange(l_nLong0);//
 
-	 
+
 	return l_bIsInitialized;
 }
 
@@ -1098,7 +1099,7 @@ void SP_DLG_FCPNSimulationResults::LoadUsedParams()
 	m_pcMainSimulator->SetTransitionCount(l_pcNodeclass->GetElements()->size());
 
 	unsigned long l_nPosition = 0;
-	 
+
 	//Go through all the transition nodes
 	for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); l_itElem++)
 	{
@@ -1109,10 +1110,10 @@ void SP_DLG_FCPNSimulationResults::LoadUsedParams()
 
 		const wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue(1);
 
-		wxString m_sParamName=GetKParameter(l_sTransitionFunction);
+		wxString m_sParamName = GetKParameter(l_sTransitionFunction);
 		m_mTransParamNames[m_sParamName] = l_sName;
 
-		 
+
 	}
 
 }
@@ -1127,12 +1128,12 @@ wxString SP_DLG_FCPNSimulationResults::GetKParameter(const wxString& func)
 	sdelimiter = ")";
 	stpos2 = func.find(sdelimiter);
 	stpos2 = stpos2 - stpos1 - 1;
-	sKparam = func.substr(stpos1+1, stpos2);
+	sKparam = func.substr(stpos1 + 1, stpos2);
 	return sKparam;
 }
 void SP_DLG_FCPNSimulationResults::DoStartSimulation()
 {
-	 
+
 	double l_nCurrentTime = 0;
 
 	m_nLastUpdateTime = 0;
@@ -1169,7 +1170,7 @@ void SP_DLG_FCPNSimulationResults::DoStartSimulation()
 	m_lSimTim += l_nSimulationCurrentTime;
 	//SetSimulationStopWatch(m_lSimTim);
 	//SetSimulationCurrentTime(l_nSimulationCurrentTime);
- 
+
 	//Load colored or auxiliary variables
 	//LoadColAuxResults();//
 	//Load the final result
@@ -1202,7 +1203,7 @@ void SP_DLG_FCPNSimulationResults::DirectExportToCSV()
 	{
 
 		wxString l_sPos = l_pcCurveInfoList->GetCell(l_n, 0);
- 
+
 		long l_nPos;
 		if (!l_sPos.ToLong(&l_nPos))
 			return;
@@ -1218,23 +1219,23 @@ void SP_DLG_FCPNSimulationResults::DirectExportToCSV()
 
 	}
 	////////////////////////////
-	 
-		for (int iIt = 0; iIt < mPlaces2PosMap.size(); iIt++)
-		{
-			wxString l_sName = vsplaces[iIt];
-			 
-				 
-					wxString sCol, sCol1;
-					sCol << l_sSpacer << l_sName << "_Min";
-					*m_pcExport << sCol;
-					sCol1 << l_sSpacer << l_sName << "_Max";
-					*m_pcExport << sCol1;
-		}
-		*m_pcExport << wxT("\n");
-		std::vector<SP_Vector2DDouble> m_nFuzzyResultBand;
-		m_nFuzzyResultBand.clear();
-		m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMinimumCurve());
-		m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMaximumCurve());
+
+	for (int iIt = 0; iIt < mPlaces2PosMap.size(); iIt++)
+	{
+		wxString l_sName = vsplaces[iIt];
+
+
+		wxString sCol, sCol1;
+		sCol << l_sSpacer << l_sName << "_Min";
+		*m_pcExport << sCol;
+		sCol1 << l_sSpacer << l_sName << "_Max";
+		*m_pcExport << sCol1;
+	}
+	*m_pcExport << wxT("\n");
+	std::vector<SP_Vector2DDouble> m_nFuzzyResultBand;
+	m_nFuzzyResultBand.clear();
+	m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMinimumCurve());
+	m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMaximumCurve());
 	for (unsigned long l_nRow = 0; l_nRow < m_pcMainSimulator->GetGeneratedResultPointsCount(); l_nRow++)
 	{
 		l_sOutput = wxT("");
@@ -1257,27 +1258,27 @@ void SP_DLG_FCPNSimulationResults::DirectExportToCSV()
 				if (m_bReplaceValue == true && l_dResult <= m_nReplacedVaue)
 				{
 					l_dResult = 0;
-					
+
 				}
 				l_sCurrentRow << l_sSpacer;
 				l_sCurrentRow << wxString::Format(wxT("%.16g"), l_dResult);
 			}
-			
+
 		}
 		l_sOutput << l_sCurrentRow;
 		*m_pcExport << l_sOutput;// << wxT("\n");
 		*m_pcExport << wxT("\n");
 	}
 
-	 
+
 }
 
 void SP_DLG_FCPNSimulationResults::
 OnExportToCSV()
 {
-	 wxString l_sFilename = m_sExportFilename;
-	 bool     l_bCompressExact = false;
-	
+	wxString l_sFilename = m_sExportFilename;
+	bool     l_bCompressExact = false;
+
 	SP_DLG_CSVExport* l_pcDlg = new SP_DLG_CSVExport(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this,
 		&l_sFilename, &m_nExportSpacer,
 		&l_bCompressExact, m_bReplaceValue,
@@ -1319,7 +1320,7 @@ std::vector<double> SP_DLG_FCPNSimulationResults::GetCurentSamples(int iteration
 		{
 			l_asParameterNames.push_back(l_sName);
 		}
-	
+
 	}
 
 	std::vector<double> vdCurrentCombination;
@@ -1337,34 +1338,82 @@ std::vector<double> SP_DLG_FCPNSimulationResults::GetCurentSamples(int iteration
 	}
 	return m_vCurrentSample;
 }
- void SP_DLG_FCPNSimulationResults::SetSimulationProgressText(long& p_nValue)
+void SP_DLG_FCPNSimulationResults::SetSimulationProgressText(long& p_nValue)
 {
 	if (m_lTotalSimRuns != 0)
 	{
 		m_pcSimulationProgressText->SetLabel(wxString::Format(wxT("%i %%"), 100 - ((p_nValue * 100) / m_lTotalSimRuns)));
-		 
-		 
+
+
 	}
-	
-	
+
+
 }
- void SP_DLG_FCPNSimulationResults::InitProgress()
- {
+void SP_DLG_FCPNSimulationResults::InitProgress()
+{
 
 
-	 m_pcSimulationProgressText->SetLabel(wxString::Format(wxT("%i %%"), 0));
- }
- void SP_DLG_FCPNSimulationResults::SetSimulationProgressGauge(long p_nValue)
- {
-	 if (m_lTotalSimRuns != 0) {
-	 int iProgress = 100 - ((p_nValue * 100) / m_lTotalSimRuns);
-	 m_pcSimulationProgressGauge->SetValue(iProgress);
+	m_pcSimulationProgressText->SetLabel(wxString::Format(wxT("%i %%"), 0));
+}
+void SP_DLG_FCPNSimulationResults::SetSimulationProgressGauge(long p_nValue)
+{
+	if (m_lTotalSimRuns != 0) {
+		int iProgress = 100 - ((p_nValue * 100) / m_lTotalSimRuns);
+		m_pcSimulationProgressGauge->SetValue(iProgress);
+		Update();
 
-	 Update();
-            }
- }
- void SP_DLG_FCPNSimulationResults::SetSimulationProgressGaugeRange(long p_nRangeValue)
- {
-	 m_pcSimulationProgressGauge->SetRange(p_nRangeValue);
-	
- }
+	}
+}
+void SP_DLG_FCPNSimulationResults::SetSimulationProgressGaugeRange(long p_nRangeValue)
+{
+	m_pcSimulationProgressGauge->SetRange(p_nRangeValue);
+
+}
+
+void    SP_DLG_FCPNSimulationResults::OnSimulatorThreadEvent(SP_DS_ThreadEvent& event)
+{
+	long lprogress = 0;
+	switch (event.GetEventTask())
+	{
+	case SP_THREAD_EVENT_END_ONE_RUN://SP_THREAD_EVENT_END_SIMULATION:
+	{
+		lprogress = event.GetLongValue();
+		SetSimulationProgressGauge((long)lprogress);
+		long progress = (long)lprogress;
+		void* ltime = event.GetUserData();
+		SetSimulationStopWatch((long)ltime);
+		SetSimulationProgressText(progress);
+		if (progress == 100)
+		{
+
+			m_pcStartButton->SetLabel(wxT("Abort Processing"));
+		}
+		LoadResults();
+		break;
+	}
+
+
+	case SP_THREAD_EVENT_END_SIMULATION: {
+		void*	m_pcCompressedBand = event.GetUserData();
+		SetCompressedBand((SP_Compressed_Fuzzy_Band*)m_pcCompressedBand);
+		m_pcStartButton->SetLabel(wxT("Start Simulation"));
+		m_pcStartButton->SetBackgroundColour(*wxGREEN);
+		break;
+	}
+	case 10: {
+
+		RefreshExternalWindows();
+		m_pcStartButton->SetLabel(wxT("Start Simulation"));
+		m_pcStartButton->SetBackgroundColour(*wxGREEN);
+		SetSimulationProgressGauge(0);
+		m_bIsAbort = false;
+
+		break;
+
+	}
+
+	default:
+		break;
+	}
+
+}

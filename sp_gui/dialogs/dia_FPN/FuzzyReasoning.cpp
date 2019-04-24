@@ -79,14 +79,15 @@ void FuzzyReasoning::CalculateAlphaLevels()
 	m_valphaLevels.clear();
 	double alpha = 0.0;
 	m_valphaLevels.push_back(alpha);
-	int nlevels = 0;
+	int nlevels = 1;
+	
 	while (alpha <= 1 && nlevels != m_nAlphaLevels)
 	{
 		alpha += m_alphaStepSize;
 		m_valphaLevels.push_back(alpha);
 		nlevels = nlevels + 1;
 	}
-	m_valphaLevels[nlevels ] = 1;
+	m_valphaLevels[nlevels-1 ] = 1;
 }
 
 SP_Vector2DDouble FuzzyReasoning::GetAlphaCutForAllLevels()
@@ -355,7 +356,7 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 	 TimedTFN            timedMembershipFunc;
 
 	 /*calculating the number of traces per level*/
-	 for (int i = 0; i <= m_nAlphaLevels; i++)
+	 for (int i = 0; i < m_nAlphaLevels; i++)
 	 {
 		 int point_count = 0;
 		 for (int t = 0; t < lnumTraces; t++)
