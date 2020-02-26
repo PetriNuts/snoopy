@@ -60,7 +60,7 @@ private:
 protected:
     wxTreeItemId FindItemRec(const wxTreeItemId& p_Id,
 			     const wxString& p_label);
-
+ 
 public:
     enum
     {
@@ -132,13 +132,15 @@ public:
     void OnSelChanging(wxTreeEvent& p_cEvent);
     void OnTreeKeyDown(wxTreeEvent& p_cEvent);
     void OnDoubleClick(wxTreeEvent& p_cEvent);
-    void OnRMouseClick(wxMouseEvent& p_cEvent);
+    void OnRMouseClick(wxTreeEvent& p_cEvent);
 
     void DoToggleIcon(const wxTreeItemId& p_cId);
 
     wxTreeItemData* GetItemData(const wxTreeItemId& p_cItem) const;
 
 	void DeleteChildren(const wxTreeItemId& p_cItem);
+	
+	
 };
 
 #endif // __SP_WDG_TREECTRL_H__

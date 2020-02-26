@@ -83,6 +83,8 @@ EVT_CHOICE( SP_ID_CHOICE_SOLVER, SP_DLG_CPNSimulationResults::OnSolverChanged )
 EVT_CHOICE( SP_ID_CHOICE_SIMULATOR_SEMANTICS, SP_DLG_CPNSimulationResults::OnSemanticsChanged )
 EVT_BUTTON( SP_ID_BUTTON_SIMULATION_PROPERTIES, SP_DLG_CPNSimulationResults :: OnSimulationProperties )
 EVT_BUTTON( SP_ID_BUTTON_SAVE_ODE, SP_DLG_CPNSimulationResults :: SaveODE )
+ 
+
 END_EVENT_TABLE()
 //
 
@@ -494,7 +496,7 @@ void SP_DLG_CPNSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cEven
 		SetSimulationProgressGauge(100);
 		m_pcStartButton->SetLabel(wxT("Start Simulation"));
 		m_pcStartButton->SetBackgroundColour(*wxGREEN);
-
+		
 		//Stop the stopwatch
 		 m_cSimulationStopWatch.Pause();
 
@@ -595,7 +597,7 @@ bool SP_DLG_CPNSimulationResults::InitializeSimulator()
 		return false;
 	}
 
-	if (!m_bIsSimulatorInitialized)
+	if (!m_bIsSimulatorInitialized || m_bIsSimulatorInitialized)//re-inintialise anyway cases by george constants harmonizing
 	{
 		wxBusyInfo l_Info(wxT("Loading data, please wait...."), this);
 		//Parameters
@@ -1287,3 +1289,5 @@ OnExportToCSV()
 
 	    l_pcDlg->Destroy();
 }
+
+

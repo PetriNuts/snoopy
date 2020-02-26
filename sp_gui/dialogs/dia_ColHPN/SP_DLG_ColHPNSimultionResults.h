@@ -21,7 +21,10 @@
 
 class SP_DLG_ColHPNSimultionResults : public SP_DS_ColoredPNSimulation, public SP_DLG_HybridSimulationResults
 {
-
+ private://by george
+	 SP_SetString m_choicesForColPNs;//by george
+	 int m_iModifyCount;//by george, this data member prevents load doublicate two identical CollistAttributes
+	 int m_nGroupCounts;//by george, this member counts the extra comboboxes (extra constants groups)
  protected:
 	    DECLARE_EVENT_TABLE();
 		virtual void OnModifyMarkingSets( wxCommandEvent& p_cEvent );
@@ -71,6 +74,9 @@ class SP_DLG_ColHPNSimultionResults : public SP_DS_ColoredPNSimulation, public S
 
 		spsim::ConnectionType GetConnectionType(const wxString& p_sConnectionType);
 	    
+		virtual void UpdateChoices();//by george for constant harmonizing
+		virtual void LoadConstantsSetsForColPN();//by george for constants harmo
+		void OnModifyConstants(wxCommandEvent& p_cEvent);//by george
 
  public:
 

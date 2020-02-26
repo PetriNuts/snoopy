@@ -103,6 +103,7 @@ EVT_MENU(SP_EDIT_UNHIDEALL_ID, SP_MDI_View::OnUnHide)
 // special, generated from inside the tree control that holds the graph elements
 EVT_MENU(SP_MENU_ITEM_TREE_SELECT_ALL, SP_MDI_View::OnSelectAllClass)
 EVT_MENU(SP_MENU_ITEM_TREE_EDIT_PROPERTIES, SP_MDI_View::OnEditPropertiesClass)
+ 
 // in case, a graph has global options in the view menu of the frame
 EVT_MENU(SP_MENU_ITEM_EDIT_SHOW, SP_MDI_View::OnEditGlobalOptions)
 // in case the graph has SP_DS_IdAttributes with the possibility to be 'squeezed'

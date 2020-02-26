@@ -151,7 +151,11 @@ public:
     SP_WDG_CoarseTreectrl* CreateCoarseTree();
 
 	SP_WDG_DeclarationTreectrl* CreateDeclarationTree(); //by liu
-
+	SP_WDG_DeclarationTreectrl* GetDeclarationTree()//Added by G.Assaf
+	{
+		return m_pcDeclarationTreectrl;
+	}
+	 
     bool ResetCoarseTree();
 
     void SetHasAnimators(bool p_bVal) { m_bHasAnimators = p_bVal; }

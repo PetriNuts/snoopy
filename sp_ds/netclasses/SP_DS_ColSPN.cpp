@@ -86,7 +86,7 @@
 
 #include "sp_ds/animators/ani_ColSPN/SP_DS_ColStCoarseTransAnimator.h"
 #include "sp_ds/animators/ani_ColSPN/SP_DS_ColStAnimation.h"
-
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"//by george, for constants harmonizing 
 
 SP_DS_ColSPN::SP_DS_ColSPN()
 :SP_DS_EventSPN( SP_DS_COLSPN_CLASS )
@@ -654,7 +654,57 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 
 	/////////////////////////////////////////////////////////////////////////////
+	/***********george constants harmonizing************/
+	l_pcMC = p_pcGraph->AddMetadataclass(new SP_DS_Metadataclass(p_pcGraph, SP_DS_CPN_CONSTANT_HARMONIZING));
 
+	l_pcMC->SetDisplayName(wxT("Harmonized Constant"));
+
+	l_pcMC->SetShowInElementTree(false);
+	//l_pcMC->SetShowInDeclarationTreeColorSet(true);
+
+	 
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TextAttribute(wxT("Group")));
+	//l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
+	//l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr, wxT("%:")));
+	//l_pcGrAttr->SetShow(false);
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TypeAttribute(wxT("Type"), wxT("int")));
+	l_pcAttr = l_pcMC->GetPrototype()->GetAttribute(wxT("Type"));
+	SP_DS_TypeAttribute* l_pcType = dynamic_cast< SP_DS_TypeAttribute* >(l_pcAttr);
+	l_pcType->AddPossibleValue(wxT("double"));
+	
+	//l_pcAttr = l_pcMC->GetPrototype()->GetAttribute(wxT("Type"));
+
+	//l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
+	//l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
+	//l_pcGrAttr->SetShow(false);
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NameAttribute(wxT("Name")));
+	//l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
+	//l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
+	//l_pcGrAttr->SetShow(false);
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_ColListAttribute(wxT("ValueList"), SP_COLLIST_STRING, 2, wxT("Group")));
+	//l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogColList(wxT("Values")));
+	//l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_ColListAttribute(l_pcAttr, wxT("=  [ % ];")));
+	//l_pcGrAttr->SetShow(false);
+	SP_DS_ColListAttribute* l_pcColList1 = dynamic_cast< SP_DS_ColListAttribute* >(l_pcAttr);
+	l_pcColList1->SetColLabel(0, wxT("Value set"));
+	l_pcColList1->SetColLabel(1, wxT("Value"));
+	 
+	unsigned int l_nNewRow1 = l_pcColList1->AppendEmptyRow();
+	l_pcColList1->SetCell(l_nNewRow1, 0, wxT("Main"));
+	l_pcColList1->SetCell(l_nNewRow1, 1, wxT(""));
+ 
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TextAttribute(wxT("Comment")));
+	//l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogMultiline(wxT("General")));
+	//l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr, wxT("//%")));
+	//l_pcGrAttr->SetShow(false);
+
+	/**********************/
 
 	//l_pcMC = p_pcGraph->AddMetadataclass( new SP_DS_Metadataclass( p_pcGraph, SP_DS_CPN_CONSTANTCLASS ) );
     //l_pcMC->SetDisplayName(wxT("Constants"));
@@ -668,13 +718,13 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcMC->GetPrototype()->RemoveAllGraphics(true);
 
 	l_pcAttr = l_pcMC->GetPrototype()->GetAttribute(wxT("ValueList"));
-	if(l_pcAttr->Remove()) wxDELETE(l_pcAttr);
+	//if(l_pcAttr->Remove()) wxDELETE(l_pcAttr); temp commented by george
 
 	l_pcAttr = l_pcMC->GetPrototype()->GetAttribute(wxT("Group"));
-	if(l_pcAttr->Remove()) wxDELETE(l_pcAttr);
+	//if(l_pcAttr->Remove()) wxDELETE(l_pcAttr);temp commented by george
 
 	l_pcAttr = l_pcMC->GetPrototype()->GetAttribute(wxT("Type"));
-	if(l_pcAttr->Remove()) wxDELETE(l_pcAttr);
+//	if(l_pcAttr->Remove()) wxDELETE(l_pcAttr);temp commented by george
 
 
 
@@ -689,7 +739,7 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_IdAttribute( wxT("ID") ) );
 	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_TextAttribute( wxT("Comment"), wxT("") ) );
 	
-	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("ConstantList"), SP_COLLIST_UNSIGNED_INTEGER, 4 ) );
+	l_pcAttr = l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("ConstantList"), SP_COLLIST_UNSIGNED_INTEGER, 4+1 ) );//+1 added for group attribute (constants harmonizing) G.Assaf
 
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -924,6 +974,11 @@ SP_DS_ColSPN::MetadataRequirement( SP_DS_Metadata* p_pcMetadata )
     if(!SP_DS_EventSPN::MetadataRequirement( p_pcMetadata ))
     {
     	return false;
+    }
+	wxString l_sName1 = p_pcMetadata->GetClassName();//george for constnt harmonizing
+	if (l_sName1 == wxT("Constant Class"))//george for constnt harmonizing
+	{
+		return true;
     }
 
     wxString l_sName = p_pcMetadata->GetClassName();

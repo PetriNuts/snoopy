@@ -48,6 +48,15 @@
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColPlacesSelection.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColTraceAnalyzer.h"
 
+//by george for constants harmonizing
+#include "sp_ds/attributes/SP_DS_TextAttribute.h"
+#include "sp_ds/attributes/SP_DS_NameAttribute.h"
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
+#include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
+#include "sp_gui/dialogs/dia_CPN/SP_DLG_ConstantDefinition.h"//constants harmonizing by george
+
+
 IMPLEMENT_CLASS(SP_DLG_ColHPNSimultionResults, SP_DLG_HybridSimulationResults )
 
 enum
@@ -71,7 +80,10 @@ enum
    SP_ID_BUTTON_CONTINUOUS_SOLVER_PROPERTIES,
    SP_ID_BUTTON_MODIFY_DELAY_SETS,
    SP_ID_BUTTON_MODIFY_IMMDIATE_SETS,
-   SP_ID_BUTTON_MODIFY_SCHEDULED_SETS
+   SP_ID_BUTTON_MODIFY_SCHEDULED_SETS,
+   SP_ID_BUTTON_MODIFY_COL_CONSTANT_SETS,// by george
+
+   SP_ID_BUTTON_CHANGE_COL_CONSTANT_SETS
 
 };
 BEGIN_EVENT_TABLE( SP_DLG_ColHPNSimultionResults, SP_DLG_HybridSimulationResults )
@@ -100,6 +112,7 @@ EVT_BUTTON( SP_ID_BUTTON_CONTINUOUS_SOLVER_PROPERTIES, SP_DLG_ColHPNSimultionRes
 EVT_BUTTON( SP_ID_BUTTON_SAVE_ODE, SP_DLG_ColHPNSimultionResults :: SaveODE )
 
 EVT_SIMTHREAD(SP_SIMULATION_THREAD_EVENT,SP_DLG_HybridSimulationResults::OnSimulatorThreadEvent)
+EVT_BUTTON(SP_ID_BUTTON_MODIFY_COL_CONSTANT_SETS, SP_DLG_ColHPNSimultionResults::OnModifyConstants)// by george
 
 END_EVENT_TABLE()
 
@@ -165,15 +178,32 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	l_pcRowSizer->Add( m_pcScheduledSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULED_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
-
+	//commented by george for constants harmonizing
 	//Parameter Set
-	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
-	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Parameter set:") ), 1, wxALL | wxEXPAND, 5 );
-	m_pcParameterSetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_PARAMETER_SETS, wxDefaultPosition, wxSize(100,-1));
-	l_pcRowSizer->Add( m_pcParameterSetComboBox, 1, wxALL, 5 );
-	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify") ), 0, wxALL, 5 );
-	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
+	//l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
+	//l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Parameter set:") ), 1, wxALL | wxEXPAND, 5 );
+	//m_pcParameterSetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_PARAMETER_SETS, wxDefaultPosition, wxSize(100,-1));
+	//l_pcRowSizer->Add( m_pcParameterSetComboBox, 1, wxALL, 5 );
+	//l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify") ), 0, wxALL, 5 );
+	//m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
 
+	//by george for constants harmonizing
+	UpdateChoices();
+	m_nGroupCounts = 0;
+	SP_SetString::iterator l_itChoice;
+	for (l_itChoice = m_choicesForColPNs.begin(); l_itChoice != m_choicesForColPNs.end(); ++l_itChoice)
+	{
+		wxString l_sGroup = *l_itChoice;
+		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, l_sGroup + wxT(':')), wxSizerFlags(1).Expand().Border(wxALL, 2));
+		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_CHANGE_COL_CONSTANT_SETS, wxDefaultPosition, wxSize(100, -1), 0, NULL, 0, wxDefaultValidator, l_sGroup));
+		l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], wxSizerFlags(1).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_COL_CONSTANT_SETS, wxT("modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
+		m_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
+		m_nGroupCounts++;
+	}
+
+	m_iModifyCount = 0;
 	 //At the end call this function for alignment
 	 SetSizerAndFit( m_pcMainSizer);
 
@@ -182,7 +212,20 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 
 SP_DLG_ColHPNSimultionResults::~SP_DLG_ColHPNSimultionResults()
 {
-	    
+	//george, reset default groups
+	for (size_t i = 0; i < m_apcColListAttr.size(); i++)
+	{
+		if (m_apcColListAttr[i])
+		{
+			if (i < m_apcComboBoxes.size())
+			{
+				m_apcComboBoxes[i]->SetSelection(0);
+				m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i]->GetSelection());
+			}
+
+		}
+	}
+
 }
 
 bool SP_DLG_ColHPNSimultionResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewer,SP_DS_Metadata*  p_pcView, wxArrayString& p_asPlaces)
@@ -724,7 +767,7 @@ void SP_DLG_ColHPNSimultionResults::OnModifyParameterSets(wxCommandEvent& p_cEve
 void SP_DLG_ColHPNSimultionResults::LoadSets()
 {
 	m_pcMarkingSetComboBox->Clear();
-	m_pcParameterSetComboBox->Clear();
+	//m_pcParameterSetComboBox->Clear();//commented by george
 	m_pcFunctionSetComboBox->Clear();
 	m_pcStochasticRateSetComboBox->Clear();
 	m_pcImmediateSetComboBox->Clear();
@@ -769,10 +812,10 @@ void SP_DLG_ColHPNSimultionResults::LoadSets()
 		 l_pcColListAttr=dynamic_cast<SP_DS_ColListAttribute *>(l_pcAttr);
 		 for(unsigned int i=0;i<l_pcColListAttr->GetRowCount();i++)
 		 {
-			m_pcParameterSetComboBox->Append(l_pcColListAttr->GetCell(i,0));
+			//m_pcParameterSetComboBox->Append(l_pcColListAttr->GetCell(i,0));//commented by george
 		 }
 		 //Select the first Parameter
-		 m_pcParameterSetComboBox->SetSelection(l_pcColListAttr->GetActiveList());
+		// m_pcParameterSetComboBox->SetSelection(l_pcColListAttr->GetActiveList());//commented by george
     }
 
 	//load continusou function set
@@ -875,7 +918,7 @@ void SP_DLG_ColHPNSimultionResults::LoadSets()
 			m_pcScheduledSetComboBox->SetSelection(l_pcColListAttr->GetActiveColumn());
 	}
 
-
+	LoadConstantsSetsForColPN();//by george
 }
 
 void SP_DLG_ColHPNSimultionResults::DirectExportToCSV()
@@ -1247,6 +1290,94 @@ void SP_DLG_ColHPNSimultionResults::LoadParameters()
 	SP_VectorString l_asParameterNames;
 	SP_VectorDouble l_anParameterValue;
 
+
+	//------- update user selection especially for constants // be george
+
+	for (size_t i = 0; i < m_apcColListAttr.size(); i++)
+	{
+		if (m_apcColListAttr[i])
+		{
+			if (i<m_apcComboBoxes.size())
+				m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i]->GetSelection());
+			else
+			{
+				m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i - m_nGroupCounts]->GetSelection());
+			}
+		}
+	}
+
+
+	//-----------------------------------------
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	SP_ListMetadata::const_iterator it;
+
+	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+	{
+		SP_DS_Metadata* l_pcConstant = *it;
+		wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+		wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();///Added by G.A
+
+		SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+
+		SP_DS_FunctionRegistryEntry l_FE = l_pcFR->lookUpFunction(l_sName);
+		if (l_FE.IsOk())
+		{
+			SP_FunctionPtr l_Function = l_FE.getFunction();
+
+			double l_nValue = 0.0;
+
+
+			if (l_Function->isValue())
+			{
+				if (l_sType == wxT("int"))
+				{
+					l_nValue = (int)l_Function->getValue();
+					l_asParameterNames.push_back(l_sName);
+					//double l_nValue;
+					//l_sConstantvalue.ToDouble(&l_nValue);
+					l_anParameterValue.push_back(l_nValue);
+				}
+				else if (l_sType == wxT("double"))
+				{
+					l_nValue = l_Function->getValue();
+					l_asParameterNames.push_back(l_sName);
+					//double l_nValue;
+					//l_sConstantvalue.ToDouble(&l_nValue);
+					l_anParameterValue.push_back(l_nValue);
+				}
+				wxString l_sConstVal;
+				l_sConstVal << l_nValue;
+				//	SP_CPN_Collist_Declarations l_scDeclaration;
+				//l_scDeclaration.m_sName = l_sName;
+				//l_scDeclaration.m_sType = l_sType;
+				//l_scDeclaration.m_sConstantvalue = l_sConstVal;
+
+				//l_vDeclarations.push_back(l_scDeclaration);
+			}
+			else
+			{
+				//evaluate string
+				wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
+				if (l_sType == wxT("int"))
+				{
+					l_nValue = SP_DS_FunctionEvaluatorLong{ l_pcFR, l_Function }();
+					wxString l_sConstVal;
+					l_sConstVal << l_nValue;
+
+
+				}
+				else if (l_sType == wxT("double"))
+				{
+					l_nValue = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
+				}
+				l_pcFR->registerFunction(l_sName, to_string(l_nValue));
+			}
+		}
+	}
+	/*********************************/
+
+
 	auto l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
 	auto l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
 	l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
@@ -1257,10 +1388,10 @@ void SP_DLG_ColHPNSimultionResults::LoadParameters()
 		wxString l_sConstantvalue = l_pcColList->GetCell(i,2);
 		if(l_sType == wxT("int"))
 		{
-			l_asParameterNames.push_back(l_sName);
+			//l_asParameterNames.push_back(l_sName);
 			double l_nValue;
-			l_sConstantvalue.ToDouble(&l_nValue);
-			l_anParameterValue.push_back(l_nValue);
+			//l_sConstantvalue.ToDouble(&l_nValue);//commented by george for constants harmonizing
+			//l_anParameterValue.push_back(l_nValue);//commented by george for constants harmonizing
 		}
 	}
 
@@ -1268,11 +1399,11 @@ void SP_DLG_ColHPNSimultionResults::LoadParameters()
 	 for(l_itElem=l_pcNodeclass->GetElements()->begin();l_itElem!=l_pcNodeclass->GetElements()->end();l_itElem++)
 	 {
 		//Set the transition name
-		l_asParameterNames.push_back(dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue());
+	//	l_asParameterNames.push_back(dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue());//commented by george for constants harmonizing
 
 		//Get the transition rate function
 		 l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itElem)->GetAttribute(wxT("ParameterList")) );
-		 l_anParameterValue.push_back(l_pcColList->GetActiveCellValueDouble(1));
+	//	 l_anParameterValue.push_back(l_pcColList->GetActiveCellValueDouble(1));//commented by george for constants harmonizing
 	 }
 
 	m_pcMainSimulator->SetParameterNames(l_asParameterNames);
@@ -1487,3 +1618,96 @@ void SP_DLG_ColHPNSimultionResults::InitializeEmptyView(SP_DS_Metadata* p_pcView
 		}
 }
 
+
+void SP_DLG_ColHPNSimultionResults::UpdateChoices()//by george for constant harmonizing
+{
+	m_choicesForColPNs.clear();
+	//l_pcGraph->GetMetadataclass();
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	if (mc)
+	{
+		SP_ListMetadata::const_iterator it;
+		SP_DS_Metadata* l_pcMetadata = NULL;
+
+		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+		{
+			l_pcMetadata = *it;
+			SP_DS_Attribute* l_pcAttr = l_pcMetadata->GetAttribute(wxT("Group"));
+			if (l_pcAttr)
+			{
+				wxString l_sGroup = l_pcAttr->GetValueString();
+				m_choicesForColPNs.insert(l_sGroup);
+			}
+		}
+	}
+}
+
+void SP_DLG_ColHPNSimultionResults::LoadConstantsSetsForColPN()
+{
+	int ss = m_apcColListAttr.size();
+
+	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+
+	SP_ListMetadata::const_iterator l_itElem;
+
+	SP_SetString::iterator l_itChoice;
+	for (l_itChoice = m_choicesForColPNs.begin(); l_itChoice != m_choicesForColPNs.end(); ++l_itChoice)
+	{
+		wxString l_sChoice = *l_itChoice;
+		SP_ListMetadata::const_iterator l_itElem;
+		for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+		{
+			SP_DS_Metadata* l_pcConstant = *l_itElem;
+			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
+			if (l_sChoice == l_sGroup && m_iModifyCount == 0)
+			{
+				m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
+				break;
+			}
+		}
+	}
+
+
+	//int start = m_apcColListAttr.size() - ss;
+	for (size_t j = ss; j < m_apcColListAttr.size(); j++)
+	{
+		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
+		//int l_Index = j - m_nGroupCounts;
+		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
+		l_pcCombobox->Clear();
+		if (l_pcAttr)
+		{
+			for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
+			{
+				wxString l_sSetName = l_pcAttr->GetCell(i, 0);
+				l_pcCombobox->Append(l_sSetName);
+			}
+			l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
+		}
+	}
+}
+
+void SP_DLG_ColHPNSimultionResults::OnModifyConstants(wxCommandEvent& p_cEvent)
+{
+
+	SP_DLG_ConstantDefinition* l_pcConstantsDialog = new SP_DLG_ConstantDefinition(NULL);
+	if (l_pcConstantsDialog->ShowModal() == wxID_OK)
+	{
+		UpdateChoices();
+		if (m_choicesForColPNs.size() != m_nGroupCounts)
+		{//special case, when a user add a new group during simulation
+			m_iModifyCount = 0;
+			m_apcColListAttr.clear();
+
+			m_nGroupCounts = m_choicesForColPNs.size();//update groups size 
+			LoadSets();
+		}
+		else {
+			m_iModifyCount++;
+
+			LoadSets();
+		}
+
+	}
+
+}

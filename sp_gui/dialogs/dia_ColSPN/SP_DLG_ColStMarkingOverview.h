@@ -36,7 +36,7 @@ class SP_DLG_ColStMarkingOverview : public wxDialog
     void LoadData();
     void LoadSetNames();
 
-    void SaveData();
+  
 
     bool ExistMarkingSetName( const wxString& p_sName );
     void RefreshFrame();
@@ -51,7 +51,7 @@ class SP_DLG_ColStMarkingOverview : public wxDialog
 
     void OnDlgOk( wxCommandEvent& p_cEvent );
     void OnDlgCancel( wxCommandEvent& p_cEvent );
-
+	void SaveData();
     void OnAddSet( wxCommandEvent& p_cEvent );
     void OnDeleteSet( wxCommandEvent& p_cEvent );
     void OnRenameSet( wxCommandEvent& p_cEvent );
@@ -60,6 +60,10 @@ class SP_DLG_ColStMarkingOverview : public wxDialog
 
     void OnCellValueChanged( wxGridEvent& ev );
     void OnGridCellSelected( wxGridEvent& ev );
+	wxGrid* GetMarkingGrid()
+	{
+		return m_pcMarkingGrid;
+	}
 
   DECLARE_CLASS( SP_DLG_ColStMarkingOverview )
   DECLARE_EVENT_TABLE()

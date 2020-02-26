@@ -172,8 +172,9 @@ void SP_WDG_Treectrl::OnDoubleClick(wxTreeEvent& p_cEvent)
 	}
 }
 
-void SP_WDG_Treectrl::OnRMouseClick(wxMouseEvent& p_cEvent)
+void SP_WDG_Treectrl::OnRMouseClick(wxTreeEvent& p_cEvent)
 {
+	SP_MESSAGEBOX(wxT("....."));
 }
 
 wxTreeItemId SP_WDG_Treectrl::FindItemRec(const wxTreeItemId& p_Id,
@@ -213,6 +214,7 @@ TREE_EVENT_HANDLER(OnGetInfo)
 TREE_EVENT_HANDLER(OnSetInfo)
 TREE_EVENT_HANDLER(OnSelChanging)
 TREE_EVENT_HANDLER(OnTreeKeyDown)
+ 
 
 #undef TREE_EVENT_HANDLER
 

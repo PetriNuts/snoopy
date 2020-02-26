@@ -19,7 +19,7 @@
 #include "sp_core/SP_GPR_Canvas.h"
 #include "sp_core/tools/SP_StopWatch.h"
 #include "sp_utilities.h"
-
+#include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include "sp_core/SP_Signer.h"
 #include <wx/file.h>
 #include <wx/regex.h>
@@ -32,6 +32,12 @@
 #include "sp_gui/windows/SP_GUI_DevbarContainer.h"
 
 #include "sp_ds/extensions/SP_DS_Transformer.h"
+
+
+//by george for constants harmonizing
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
+#include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+#include "sp_ds/attributes/SP_DS_TextAttribute.h"
 
 namespace {
 // panel with custom controls for file dialog
@@ -88,6 +94,7 @@ SP_MDI_Doc::SP_MDI_Doc() :
 
 SP_MDI_Doc::~SP_MDI_Doc()
 {
+	if(m_pcGraph)//by george
 	wxDELETE(m_pcGraph);
 }
 
@@ -462,7 +469,263 @@ bool SP_MDI_Doc::OnSaveDocument(const wxString& p_sFile)
 
 	return TRUE;
 }
+void SP_MDI_Doc::HarmonizeConstantsForColPN()
+{
+	std::vector<wxString> l_vParamNames;
+	size_t l_nConstantsCount = 0;
+	//SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+	SP_DS_Metadataclass* l_pcMetadataclass;
+	l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
 
+	SP_DS_Metadata* l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+	SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
+
+	//initially assign all old constants to the default constants group ALL
+	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+	{
+		wxString l_sGroup = l_pcColList->GetCell(i, 4);
+		if (l_sGroup.IsEmpty())
+			l_pcColList->SetCell(i, 4, "all");
+		else {
+			l_pcColList->SetCell(i, 4, l_sGroup);
+		}
+		l_vParamNames.push_back(l_pcColList->GetCell(i, 0));
+	}
+
+ 
+	///////////////////////////////////////
+	//get number of rows of each old param (number of value sets)
+
+	std::vector<wxString> l_vSetsName;
+	if (m_pcGraph->GetNetclass()->GetName() == SP_DS_COLSPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_COLHPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_COLCPN_CLASS)
+	{
+		SP_DS_ColListAttribute * l_pcColListOldParam1;
+		SP_DS_Nodeclass* l_pcNodeclass1;
+		l_pcNodeclass1 = m_pcGraph->GetNodeclass(SP_DS_PARAM);
+		SP_ListNode::const_iterator l_itElem1;
+		int l_nValueSetsCount = 0;
+		
+		for (l_itElem1 = l_pcNodeclass1->GetElements()->begin(); l_itElem1 != l_pcNodeclass1->GetElements()->end(); ++l_itElem1)
+		{
+
+		 
+			l_pcColListOldParam1 = dynamic_cast<SP_DS_ColListAttribute*>((*l_itElem1)->GetAttribute(wxT("ParameterList")));
+			//for (unsigned int i = 0; i <  i++)
+			l_nValueSetsCount = l_pcColListOldParam1->GetRowCount();
+			for (unsigned int i = 1; i < l_pcColListOldParam1->GetRowCount(); i++)
+			{
+				l_vSetsName.push_back(l_pcColListOldParam1->GetCell(i, 0));
+			}
+			break;
+		}
+	}//if
+		////////////////////////////////////////
+		//next step: copy the old constant list to the new DS
+		SP_DS_Metadata* l_pcConstant;
+		SP_DS_Metadataclass* m_pcConstants;
+
+		m_pcConstants = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		SP_ListMetadata::const_iterator l_itElem;
+		if (m_pcConstants->GetElements()->size() == 0)
+		{
+			while (m_pcConstants->GetElements()->size() < l_pcColList->GetRowCount())
+			{
+				m_pcConstants->NewElement(1);
+			}
+
+		
+			l_itElem = m_pcConstants->GetElements()->begin();
+
+			for (unsigned int l_nRow = 0; l_nRow < l_pcColList->GetRowCount(); l_nRow++)
+			{
+				l_nConstantsCount++;
+				l_pcConstant = *l_itElem;
+
+				wxString l_sName = l_pcColList->GetCell(l_nRow, 0);
+				wxString l_sGroup = l_pcColList->GetCell(l_nRow, 4);
+				wxString l_sType = l_pcColList->GetCell(l_nRow, 1);
+				wxString l_sComment = l_pcColList->GetCell(l_nRow, 3);
+				wxString l_sMainVal = l_pcColList->GetCell(l_nRow, 2);
+				l_pcConstant->GetAttribute(wxT("Name"))->SetValueString(l_sName);
+				l_pcConstant->GetAttribute(wxT("Group"))->SetValueString(l_sGroup);
+				l_pcConstant->GetAttribute(wxT("Comment"))->SetValueString(l_sComment);
+
+				bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(l_sType);
+
+				//asssume only the main value, because there are no sets in old constant def
+				SP_DS_ColListAttribute * l_pcColList1 = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+				///int l_nRowCol = l_pcColList1->AppendEmptyRow();
+				l_pcColList1->SetCell(0, 0, wxT("Main"));
+				l_pcColList1->SetCell(0, 1, l_sMainVal);
+
+				//////////////////
+				//SP_DS_ColListAttribute * l_pcColListV = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+			//	l_pcColList->Clear();
+				for (unsigned i = 0; i < l_vSetsName.size(); i++)
+				{
+					int l_nRowCol = l_pcColList1->AppendEmptyRow();
+					l_pcColList1->SetCell(l_nRowCol, 0, l_vSetsName[i]);
+					l_pcColList1->SetCell(l_nRowCol, 1, l_sMainVal);
+				}
+
+				////////////////
+
+				m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, l_sMainVal);
+
+				l_pcColList1->UpdateActiveListColumnPtr();
+
+				l_pcConstant->SetShow(true);
+				l_pcConstant->Update();
+
+				++l_itElem;
+
+			}
+		}
+		m_pcGraph->Update();
+
+		/**************move on the list of old parameters**********************/
+
+
+		//add param nodes to old constant list
+		if (m_pcGraph->GetNetclass()->GetName() == SP_DS_COLSPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_COLHPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_COLCPN_CLASS)
+		{
+			SP_DS_Metadata* l_pcConstant2;
+
+
+
+			//get the old param nodes
+			SP_DS_ColListAttribute * l_pcColListOldParam;
+			SP_DS_Nodeclass* l_pcNodeclass;
+			l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_PARAM);
+			SP_ListNode::const_iterator l_itElem;
+
+
+			size_t xxx=l_pcColList->GetRowCount() + l_pcNodeclass->GetElements()->size();
+			if (m_pcConstants->GetElements()->size() >= l_pcColList->GetRowCount()+ l_pcNodeclass->GetElements()->size())
+			{//prevent doublicate the constants
+				m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
+				return;
+			}
+
+
+			wxString l_sParameterName;
+			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+			{
+
+				l_pcConstant2 = m_pcConstants->NewElement(1);
+				l_sParameterName = dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+				l_pcConstant2->GetAttribute(wxT("Name"))->SetValueString(l_sParameterName);
+				l_pcConstant2->GetAttribute(wxT("Group"))->SetValueString(wxT("parameter"));
+				l_pcConstant2->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
+				//comment attribute
+				wxString l_scomment;
+				SP_DS_Attribute* l_pcAttrComment = dynamic_cast<SP_DS_Attribute*>((*l_itElem)->GetAttribute(wxT("Comment")));
+				l_scomment << l_pcAttrComment->GetValueString();
+
+				l_pcConstant2->GetAttribute(wxT("Comment"))->SetValueString(l_scomment);
+
+				SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant2->GetAttribute(wxT("ValueList")));
+				l_pcColList->Clear();
+				wxString l_sMainVal;
+				wxString Name;
+				////////////////////////////
+				auto it = std::find(l_vParamNames.begin(), l_vParamNames.end(), l_sParameterName);
+				if (it == l_vParamNames.end())
+				{
+					l_pcColListOldParam = dynamic_cast<SP_DS_ColListAttribute*>((*l_itElem)->GetAttribute(wxT("ParameterList")));
+					for (unsigned int i = 0; i < l_pcColListOldParam->GetRowCount(); i++)
+					{
+
+						wxString l_sParName;
+						wxString l_sParVal;
+						wxString l_sParGroup;
+						wxString l_sParType;
+						
+
+						l_sParGroup << l_pcColListOldParam->GetCell(i, 0).c_str();//set name
+						l_sParVal = l_pcColListOldParam->GetCell(i, 1).c_str();//value of the set
+						l_sParName << l_sParameterName;
+
+						if (i == 0)
+						{
+							l_sMainVal << l_sParVal;
+							Name << l_sParameterName;
+						}
+
+						//	for (int j = 4; j < m_pcColorSetGrid->GetNumberCols(); j++)
+							//{
+						int l_nRowCol = l_pcColList->AppendEmptyRow();
+						l_pcColList->SetCell(i, 0, l_sParGroup);
+						l_pcColList->SetCell(i, 1, l_sParVal);
+						//}
+
+
+						//adjust type attribute
+						if (l_sParType.IsEmpty())
+						{
+							l_sParType = wxT("double");
+
+						}
+						else {
+							l_sParType = l_pcColListOldParam->GetCell(i, 2).c_str();
+
+						}
+
+						//comment attribute
+						wxString l_scomment;
+						SP_DS_Attribute* l_pcAttrComment = dynamic_cast<SP_DS_Attribute*>((*l_itElem)->GetAttribute(wxT("Comment")));
+						l_scomment << l_pcAttrComment->GetValueString();
+
+
+						//int l_nRow = l_pcColList->AppendEmptyRow();
+						//l_pcColList->SetCell(l_nRow, 0, l_sParName);//name		
+						//l_pcColList->SetCell(l_nRow, 1, l_sParType);//type
+						//l_pcColList->SetCell(l_nRow, 2, l_sParVal);//value
+						//l_pcColList->SetCell(l_nRow, 3, l_scomment);//comment
+						if (l_sParGroup.IsEmpty())
+						{
+							//l_pcColList->SetCell(l_nRow, 4, wxT("parameter"));//default group for param nodes
+						}
+						else {
+							if (l_sParGroup == wxT("Main"))
+							{
+								l_sParGroup = wxT("parameter");
+							}
+							//	l_pcColList->SetCell(l_nRow, 4, l_sParGroup);//group
+						}
+						Modify(true);
+					}
+
+				}//end if
+
+				 
+
+				m_pcGraph->GetFunctionRegistry()->registerFunction(Name, l_sMainVal );
+				
+				wxString mainv = l_pcColList->GetCell(0, 1);
+				l_pcColList->UpdateActiveListColumnPtr();
+
+				 
+				l_pcConstant2->Update();
+
+
+			}//end for
+		}//end outer if
+
+	
+
+
+
+
+
+
+
+
+
+
+	/********************************/
+	m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
+}
 bool SP_MDI_Doc::OnOpenDocument(const wxString& p_sFile)
 {
 	SP_StopWatch sw(wxT("Start loading file ") + p_sFile, wxT("Finished loading in"));
@@ -515,6 +778,121 @@ bool SP_MDI_Doc::OnOpenDocument(const wxString& p_sFile)
     	|| m_pcGraph->GetNetclass()->GetName()==SP_DS_COLCPN_CLASS)
 	{
 		m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();//liu
+		HarmonizeConstantsForColPN();//george
+		/************Conevr Parameters Nodes into Constants (harmonizing)**********/
+	//	std::vector<wxString> l_vParamNames;
+	//	SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+	//	SP_DS_Metadataclass* l_pcMetadataclass;
+	//	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
+
+	//	SP_DS_Metadata* l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+	//	SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
+
+	  
+	//	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+	//	{
+	//		wxString l_sGroup = l_pcColList->GetCell(i, 4);
+	//		if(l_sGroup.IsEmpty())
+	//		l_pcColList->SetCell(i, 4, "all");
+	//		else {
+	//			l_pcColList->SetCell(i, 4, l_sGroup);
+	//		}
+	//		l_vParamNames.push_back(l_pcColList->GetCell(i,0));
+	//	}
+
+		/**********************************************/
+
+		/*
+		if (m_pcGraph->GetNetclass()->GetName() == SP_DS_COLSPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_COLHPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_COLCPN_CLASS)
+		{
+
+			SP_DS_Metadataclass* l_pcMetadataclass;
+			l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
+
+			SP_DS_Metadata* l_pcNewMetadata1 = *(l_pcMetadataclass->GetElements()->begin());
+			SP_DS_ColListAttribute * l_pcColList1 = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata1->GetAttribute(wxT("ConstantList")));
+
+			SP_DS_Metadata* l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+			SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
+			SP_DS_ColListAttribute * l_pcColListOldParam;
+			SP_DS_Nodeclass* l_pcNodeclass;
+			l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_PARAM);
+			SP_ListNode::const_iterator l_itElem;
+
+			wxString l_sParameterName;
+
+			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+			{
+
+				l_sParameterName = dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+
+
+				auto it = std::find(l_vParamNames.begin(), l_vParamNames.end(), l_sParameterName);
+				if (it == l_vParamNames.end())
+				{
+					l_pcColListOldParam = dynamic_cast<SP_DS_ColListAttribute*>((*l_itElem)->GetAttribute(wxT("ParameterList")));
+
+					for (unsigned int i = 0; i < l_pcColListOldParam->GetRowCount(); i++)
+					{
+
+						wxString l_sParName;
+						wxString l_sParVal;
+						wxString l_sParGroup;
+						wxString l_sParType;
+
+						l_sParType = l_pcColListOldParam->GetCell(i, 2).c_str();
+						l_sParVal = l_pcColListOldParam->GetCell(i, 1).c_str();
+						l_sParName << l_sParameterName;
+						l_sParGroup << l_pcColListOldParam->GetCell(i, 0).c_str();
+
+
+
+
+
+						if (l_sParType.IsEmpty())
+						{
+
+
+
+							l_sParType = wxT("double");
+
+						}
+						else {
+							l_sParType = l_pcColListOldParam->GetCell(i, 2).c_str();
+
+						}
+
+
+
+						wxString l_scomment;
+						SP_DS_Attribute* l_pcAttrComment = dynamic_cast<SP_DS_Attribute*>((*l_itElem)->GetAttribute(wxT("Comment")));
+						l_scomment << l_pcAttrComment->GetValueString();
+
+
+						int l_nRow = l_pcColList->AppendEmptyRow();
+
+						l_pcColList->SetCell(l_nRow, 0, l_sParName);//name		
+						l_pcColList->SetCell(l_nRow, 1, l_sParType);//type
+						l_pcColList->SetCell(l_nRow, 2, l_sParVal);//value
+						l_pcColList->SetCell(l_nRow, 3, l_scomment);//comment
+						if (l_sParGroup.IsEmpty())
+						{
+							l_pcColList->SetCell(l_nRow, 4, wxT("all"));//group
+						}
+						else {
+							l_pcColList->SetCell(l_nRow, 4, l_sParGroup);//group
+						}
+						Modify(true);
+ 					}
+
+				}//end if
+
+			}//end for
+		}//end outer if
+		m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
+		*/
+		/**********************************************************/
+
 	}
     //by sl
     if(m_pcGraph->GetNetclass()->GetName()==SP_DS_PN_CLASS

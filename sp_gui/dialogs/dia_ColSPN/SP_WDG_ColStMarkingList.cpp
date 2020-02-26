@@ -258,7 +258,7 @@ bool SP_WDG_ColStMarkingList::SaveData()
 {
 	m_pcMarkingGrid->SaveEditControlValue();
 
-	SP_DS_Attribute* l_pcAttr = (*m_tlAttributes.begin());	
+ 	SP_DS_Attribute* l_pcAttr = (*m_tlAttributes.begin());	
 	wxString l_sColorSetName;
 	SP_DS_Node* l_pcNode;
 

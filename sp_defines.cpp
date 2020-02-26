@@ -49,6 +49,7 @@ const wxString SP_DS_TIMEPN_CLASS = wxT("Time Petri Net");
 
 // SP_DS_Metadataclass constants
 const wxString SP_DS_META_CONSTANT = wxT("Constant Class");
+const wxString SP_DS_CPN_CONSTANT_HARMONIZING= wxT("Constant Class1");
 const wxString SP_DS_META_FUNCTION = wxT("Function Class");
 const wxString SP_DS_META_OBSERVER = wxT("Oberserver Class");
 

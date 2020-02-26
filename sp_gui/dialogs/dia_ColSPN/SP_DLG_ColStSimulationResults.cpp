@@ -5,6 +5,7 @@
 // $Revision: 1.30 $
 // $Date: 2007/08/14 11:20:00 $
 // @Change M.Herajy 10.6.2010
+// @Modified George Assaf 25.01.2020 constants harmonizing
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 #include <wx/dcps.h>
@@ -34,7 +35,17 @@
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColPlacesSelection.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColTraceAnalyzer.h"
 #include "sp_ds/extensions/ext_SPN/SP_DS_SimulatorThreadStochastic.h"
+#include "sp_gui/dialogs/dia_CPN/SP_DLG_ConstantDefinition.h"//constants harmonizing by george
 #include "spsim/spsim.h"
+
+
+//by george for constants harmonizing
+#include "sp_ds/attributes/SP_DS_TextAttribute.h"
+#include "sp_ds/attributes/SP_DS_NameAttribute.h"
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
+#include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
+
 #if !defined(__WXMSW__) && !defined(__WXPM__)
 #include "sp_gui/widgets/sp_plot/plot_enl.xpm"
 #include "sp_gui/widgets/sp_plot/plot_shr.xpm"
@@ -61,7 +72,11 @@ enum
 	SP_ID_BUTTON_ENTER_ILFORMULAE,
 	SP_ID_BUTTON_CHECK_ILFORMULAE,
 
-	SP_ID_BUTTON_CHECK_ILFORMULAE_MENU
+	SP_ID_BUTTON_CHECK_ILFORMULAE_MENU,
+
+	SP_ID_BUTTON_MODIFY_COL_CONSTANT_SETS,// by george
+	
+	SP_ID_BUTTON_CHANGE_COL_CONSTANT_SETS
 
 };
 BEGIN_EVENT_TABLE( SP_DLG_ColStSimulationResults, SP_DLG_StSimulationResults )
@@ -82,6 +97,8 @@ EVT_MENU( SP_ID_BUTTON_ENTER_ILFORMULAE, SP_DLG_ColStSimulationResults :: OnEnte
 EVT_MENU( SP_ID_BUTTON_CHECK_ILFORMULAE, SP_DLG_ColStSimulationResults :: CheckApFormulae )
 EVT_BUTTON( SP_ID_BUTTON_CHECK_ILFORMULAE_MENU, SP_DLG_ColStSimulationResults :: OnCheckFormulaMenu )
 EVT_SIMTHREAD(SP_SIMULATION_THREAD_EVENT,SP_DLG_StSimulationResults::OnSimulatorThreadEvent)
+
+EVT_BUTTON(SP_ID_BUTTON_MODIFY_COL_CONSTANT_SETS, SP_DLG_ColStSimulationResults::OnModifyConstants)// by george
 END_EVENT_TABLE()
 
 SP_DLG_ColStSimulationResults::SP_DLG_ColStSimulationResults(SP_DS_Graph* p_pcGraph, SP_DS_ColPN_Unfolding* p_pcUnfoldedNet, wxWindow* p_pcParent, wxString p_sHelpText, const wxString& p_sTitle,
@@ -132,13 +149,31 @@ SP_DLG_ColStSimulationResults::SP_DLG_ColStSimulationResults(SP_DS_Graph* p_pcGr
 	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("Modify")), 0, wxALL, 5);
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Parameter set:")), 1, wxALL | wxEXPAND, 5);
-	m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, -1, wxDefaultPosition, wxSize(100, -1)));
-	l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 1, wxALL, 5);
-	l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify")), 0, wxALL, 5);
-	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+	//commented by George, no further need, these are parameter nodes 
+	//l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+	//l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Parameter set:")), 1, wxALL | wxEXPAND, 5);
+	//m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, -1, wxDefaultPosition, wxSize(100, -1)));
+	//l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 1, wxALL, 5);
+	//l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify")), 0, wxALL, 5);
+	//m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
+	//by george for constants harmonizing 146-157
+	UpdateChoices();
+	m_nGroupCounts = 0;
+	SP_SetString::iterator l_itChoice;
+	for (l_itChoice = m_choicesForColPNs.begin(); l_itChoice != m_choicesForColPNs.end(); ++l_itChoice)
+	{
+		wxString l_sGroup = *l_itChoice;
+		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, l_sGroup + wxT(':')), wxSizerFlags(1).Expand().Border(wxALL, 2));
+		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_CHANGE_COL_CONSTANT_SETS, wxDefaultPosition, wxSize(100, -1), 0, NULL, 0, wxDefaultValidator, l_sGroup));
+		l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], wxSizerFlags(1).Expand().Border(wxALL, 2));
+		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_COL_CONSTANT_SETS, wxT("modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
+		m_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
+		m_nGroupCounts++;
+	}
+
+	m_iModifyCount = 0;
 	SetSizerAndFit(m_pcMainSizer);
 }
 
@@ -283,8 +318,12 @@ void SP_DLG_ColStSimulationResults::LoadSimulatorData()
 	{
 		if (m_apcColListAttr[i])
 		{
+			if(m_apcComboBoxes.size()>i)//
 			m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i]->GetSelection());
-
+			else//
+			{
+				m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i- m_nGroupCounts]->GetSelection());
+			}
 			if (i <= 4)
 			{
 				m_apcColListAttr[i]->SetActiveColumn(m_apcComboBoxes[i]->GetSelection());
@@ -390,11 +429,20 @@ void SP_DLG_ColStSimulationResults::LoadSets()
 		}
 
 	}
-
+	
 	for (size_t j = 5; j < m_apcColListAttr.size(); j++)
 	{
 		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
-		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
+		wxChoice* l_pcCombobox;
+		if(j< m_apcComboBoxes.size())
+		{
+			  l_pcCombobox = m_apcComboBoxes[j];
+		}
+		else 
+		{
+			  l_pcCombobox = m_apcComboBoxes[j- m_nGroupCounts];
+		}
+		
 		l_pcCombobox->Clear();
 		if (l_pcAttr)
 		{
@@ -406,6 +454,9 @@ void SP_DLG_ColStSimulationResults::LoadSets()
 			l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
 		}
 	}
+
+	LoadConstantsSetsForColPN();//by george
+
 }
 
 void SP_DLG_ColStSimulationResults::OnModifyMarkingSets(wxCommandEvent& p_cEvent)
@@ -509,12 +560,19 @@ void SP_DLG_ColStSimulationResults::OnModifyScheduleSets(wxCommandEvent& p_cEven
 
 void SP_DLG_ColStSimulationResults::OnModifyParameterSets(wxCommandEvent& p_cEvent)
 {
-	SP_DLG_StParameterOverview* l_pcDlg = new SP_DLG_StParameterOverview(this);
+	//SP_DLG_StParameterOverview* l_pcDlg = new SP_DLG_StParameterOverview(this);
+	SP_DLG_ConstantDefinition * l_pcConstantDialog = new SP_DLG_ConstantDefinition(this);
 
-	if (l_pcDlg->ShowModal() == wxID_OK)
+	if (l_pcConstantDialog->ShowModal() == wxID_OK)
 	{
 		LoadSets();
 	}
+
+
+	//if (l_pcDlg->ShowModal() == wxID_OK)
+//	{
+//		LoadSets();
+//	}
 }
 
 void SP_DLG_ColStSimulationResults::DirectSingleExportToCSV(long p_nSimulationRunNumber)
@@ -632,6 +690,19 @@ void SP_DLG_ColStSimulationResults::DirectSingleExactExportToCSV(long p_nSimulat
 
 SP_DLG_ColStSimulationResults::~SP_DLG_ColStSimulationResults()
 {
+	//george, reset default groups
+	for (size_t i = 0; i < m_apcColListAttr.size(); i++)
+	{
+		if (m_apcColListAttr[i])
+		{
+			if (i < m_apcComboBoxes.size())
+			{
+				m_apcComboBoxes[i]->SetSelection(0);
+				m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i]->GetSelection());
+			}
+
+		}
+	}
 
 }
 
@@ -1367,8 +1438,102 @@ spsim::ConnectionType SP_DLG_ColStSimulationResults::GetConnectionType(const wxS
 
 void SP_DLG_ColStSimulationResults::LoadParameters()
 {
-	SP_VectorString l_asParameterNames;
-	SP_VectorDouble l_anParameterValue;
+
+	//------- update user selection especially for constants // be george
+	 
+		for (size_t i = 0; i < m_apcColListAttr.size(); i++)
+		{
+			if (m_apcColListAttr[i])
+			{
+				if(i<m_apcComboBoxes.size())
+				m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i]->GetSelection());
+				else
+				{
+					m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i- m_nGroupCounts]->GetSelection());
+				}
+			}
+		}
+	 
+		SP_VectorString l_asParameterNames;
+		SP_VectorDouble l_anParameterValue;
+	//-----------------------------------------
+		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		SP_ListMetadata::const_iterator it;
+
+		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+		{
+			SP_DS_Metadata* l_pcConstant = *it;
+			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+			wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();///Added by G.A
+
+			SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+
+			SP_DS_FunctionRegistryEntry l_FE = l_pcFR->lookUpFunction(l_sName);
+			if (l_FE.IsOk())
+			{
+				SP_FunctionPtr l_Function = l_FE.getFunction();
+				
+					double l_nValue = 0.0;
+				 
+				
+				if (l_Function->isValue())
+				{
+					if (l_sType == wxT("int"))
+					{
+						l_nValue = (int)l_Function->getValue();
+						l_asParameterNames.push_back(l_sName);
+						//double l_nValue;
+						//l_sConstantvalue.ToDouble(&l_nValue);
+						l_anParameterValue.push_back(l_nValue);
+					}
+					else if (l_sType == wxT("double"))
+					{
+						l_nValue = l_Function->getValue();
+						l_asParameterNames.push_back(l_sName);
+						//double l_nValue;
+						//l_sConstantvalue.ToDouble(&l_nValue);
+						l_anParameterValue.push_back(l_nValue);
+					}
+					wxString l_sConstVal;
+					l_sConstVal << l_nValue;
+				//	SP_CPN_Collist_Declarations l_scDeclaration;
+					//l_scDeclaration.m_sName = l_sName;
+					//l_scDeclaration.m_sType = l_sType;
+					//l_scDeclaration.m_sConstantvalue = l_sConstVal;
+
+					//l_vDeclarations.push_back(l_scDeclaration);
+				}
+				else
+				{
+					//evaluate string
+					wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
+					if (l_sType == wxT("int"))
+					{
+						l_nValue = SP_DS_FunctionEvaluatorLong{ l_pcFR, l_Function }();
+						wxString l_sConstVal;
+						l_sConstVal << l_nValue;
+				 
+
+					}
+					else if (l_sType == wxT("double"))
+					{
+						l_nValue = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
+					}
+					l_pcFR->registerFunction(l_sName, to_string(l_nValue));
+				}
+			}
+		}
+
+
+
+
+
+
+
+
+//--------------------------------------------
+	
 
 	SP_DS_ColListAttribute* l_pcColList;
 
@@ -1382,10 +1547,10 @@ void SP_DLG_ColStSimulationResults::LoadParameters()
 		wxString l_sConstantvalue = l_pcColList->GetCell(i,2);
 		if(l_sType == wxT("int"))
 		{
-			l_asParameterNames.push_back(l_sName);
+			//l_asParameterNames.push_back(l_sName);
 			double l_nValue;
 			l_sConstantvalue.ToDouble(&l_nValue);
-			l_anParameterValue.push_back(l_nValue);
+		//	l_anParameterValue.push_back(l_nValue);
 		}
 	}
 
@@ -1397,14 +1562,108 @@ void SP_DLG_ColStSimulationResults::LoadParameters()
 	for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); l_itElem++)
 	{
 		//Set the transition name
-		l_asParameterNames.push_back(dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue());
+		//l_asParameterNames.push_back(dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue());
 
 		//Get the transition rate function
 		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>((*l_itElem)->GetAttribute(wxT("ParameterList")));
-		l_anParameterValue.push_back(l_pcColList->GetActiveCellValueDouble(1));
+	//	l_anParameterValue.push_back(l_pcColList->GetActiveCellValueDouble(1));
 	}
 
 	m_pcMainSimulator->SetParameterNames(l_asParameterNames);
 	m_pcMainSimulator->SetParameterValues(l_anParameterValue);
 }
 
+
+void SP_DLG_ColStSimulationResults::UpdateChoices()//by george for constant harmonizing
+{
+	m_choicesForColPNs.clear();
+	//l_pcGraph->GetMetadataclass();
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	if (mc)
+	{
+		SP_ListMetadata::const_iterator it;
+		SP_DS_Metadata* l_pcMetadata = NULL;
+
+		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+		{
+			l_pcMetadata = *it;
+			SP_DS_Attribute* l_pcAttr = l_pcMetadata->GetAttribute(wxT("Group"));
+			if (l_pcAttr)
+			{
+				wxString l_sGroup = l_pcAttr->GetValueString();
+				m_choicesForColPNs.insert(l_sGroup);
+			}
+		}
+	}
+}
+
+
+void SP_DLG_ColStSimulationResults::LoadConstantsSetsForColPN()
+{
+	int ss = m_apcColListAttr.size();
+
+		SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+
+		SP_ListMetadata::const_iterator l_itElem;
+
+		SP_SetString::iterator l_itChoice;
+		for (l_itChoice = m_choicesForColPNs.begin(); l_itChoice != m_choicesForColPNs.end(); ++l_itChoice)
+		{
+			wxString l_sChoice = *l_itChoice;
+			SP_ListMetadata::const_iterator l_itElem;
+			for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+			{
+				SP_DS_Metadata* l_pcConstant = *l_itElem;
+				wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
+				if (l_sChoice == l_sGroup && m_iModifyCount==0)
+				{
+					m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
+					break;
+				}
+			}
+		}
+
+	 
+		//int start = m_apcColListAttr.size() - ss;
+		for (size_t j = ss; j < m_apcColListAttr.size(); j++)
+		{
+			SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
+			int l_Index = j - m_nGroupCounts;
+			wxChoice* l_pcCombobox = m_apcComboBoxes[l_Index];
+			l_pcCombobox->Clear();
+			if (l_pcAttr)
+			{
+				for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
+				{
+					wxString l_sSetName = l_pcAttr->GetCell(i, 0);
+					l_pcCombobox->Append(l_sSetName);
+				}
+				l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
+			}
+		}
+	}
+
+void SP_DLG_ColStSimulationResults::OnModifyConstants(wxCommandEvent& p_cEvent)
+{
+	
+	SP_DLG_ConstantDefinition* l_pcConstantsDialog = new SP_DLG_ConstantDefinition(NULL);
+	if (l_pcConstantsDialog->ShowModal() == wxID_OK)
+	{ 
+		UpdateChoices();
+		if (m_choicesForColPNs.size() != m_nGroupCounts)
+		{//special case, when a user add a new group during simulation
+			m_iModifyCount = 0;
+			m_apcColListAttr.clear();
+		 
+			m_nGroupCounts = m_choicesForColPNs.size();//update groups size 
+			LoadSets();
+		}
+		else {
+			m_iModifyCount++;
+
+			LoadSets();
+		}
+		
+	}
+	
+}

@@ -17,6 +17,9 @@
  */
 #include "sp_gui/dialogs/SP_DLG_Simulation.h"
 
+#include "sp_ds/extensions/SP_DS_SimulatorThread.h"
+
+//class SP_DS_ThreadEvent;
 class SP_DLG_CPNSimulationResults : public SP_DLG_Simulation
 {
  protected:
@@ -71,7 +74,7 @@ class SP_DLG_CPNSimulationResults : public SP_DLG_Simulation
 	    virtual void OnExportToCSV();
 
 protected:
-
+	//virtual void     OnSimulatorThreadEvent(SP_DS_ThreadEvent& evt);
 	    //on ODE solver changed
 	    virtual void OnSolverChanged(wxCommandEvent& p_cEven);
 
@@ -143,6 +146,7 @@ protected:
 	virtual void DirectExportToCSV();
 	
 	virtual void CalculateXAxisValues(SP_DS_Metadata* p_pcView,SP_VectorDouble& p_anXAxisValues);
+	 
 };
 
 #endif /* SP_DLG_CPNSIMULATIONRESULTS_H_ */

@@ -108,7 +108,12 @@ enum
 	SP_MENU_ITEM_MERGE,
 	SP_MENU_ITEM_COARSE,
 	SP_MENU_ITEM_FLATTEN,
-
+	SP_MENU_RITEM1_TREE,//Added by G.Assaf
+	SP_MENU_RITEM2_TREE, //Added by G.Assaf
+	SP_MENU_RITEM3_TREE,
+	SP_MENU_RITEM4_TREE,
+	SP_MENU_RITEM5_TREE,
+	SP_RIGHT_CLICK_ITEM,
     // hierarchy navigation
     SP_MENU_ITEM_GO_UP,
     SP_MENU_ITEM_GO_FIRST_CHILD,
@@ -197,6 +202,8 @@ enum
     SP_ID_GRAPHTREE_CTRL_ID,
     SP_ID_COARSETREE_CTRL_ID,
 	SP_ID_COLORSETTREE_CTRL_ID,
+	SP_ID_TREE_CTRL_RIGHT_CLICK_MENU1,//Added by G.Assaf
+	SP_ID_TREE_CTRL_RIGHT_CLICK_MENU2,//Added by G.Assaf
 
     // animation buttons
 	SP_ID_BUTTON_ANIM_PLAYBWD,
@@ -388,6 +395,7 @@ extern const wxString SP_DS_CPN_FUNCTIONCLASS;
 extern const wxString SP_DS_CPN_RATEFUNCTIONLIST;
 extern const wxString SP_DS_CPN_AUXILIARVARIABLESCLASS;
 
+extern const wxString SP_DS_CPN_CONSTANT_HARMONIZING;//george for constants harmonizing
 //Continuous - Stochastic Petri Net
 extern const wxString SP_DS_HYBRIDPN_CLASS;
 //Extension

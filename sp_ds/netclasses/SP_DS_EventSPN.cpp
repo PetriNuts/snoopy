@@ -547,6 +547,43 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	SP_ANIM_STEP_T stepping = SP_ANIM_STEP_SINGLE;
 
 	p_pcGraph->SetAnimation( new SP_DS_StAnimation(refresh, duration, stepping));
+	///////////////////
+	/***********george constants harmonizing************/
+	//for export to colCPN 
+	l_pcMC = p_pcGraph->AddMetadataclass(new SP_DS_Metadataclass(p_pcGraph, SP_DS_CPN_CONSTANT_HARMONIZING));
+
+	l_pcMC->SetDisplayName(wxT("Harmonized Constant"));
+
+	l_pcMC->SetShowInElementTree(false);
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TextAttribute(wxT("Group")));
+
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TypeAttribute(wxT("Type"), wxT("int")));
+	//l_pcAttr = l_pcMC->GetPrototype()->GetAttribute(wxT("Type"));
+	l_pcType = dynamic_cast< SP_DS_TypeAttribute* >(l_pcAttr);
+	l_pcType->AddPossibleValue(wxT("double"));
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NameAttribute(wxT("Name")));
+
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_ColListAttribute(wxT("ValueList"), SP_COLLIST_STRING, 2, wxT("Group")));
+
+	SP_DS_ColListAttribute* l_pcColList1 = dynamic_cast< SP_DS_ColListAttribute* >(l_pcAttr);
+	l_pcColList1->SetColLabel(0, wxT("Value set"));
+	l_pcColList1->SetColLabel(1, wxT("Value"));
+
+	unsigned int l_nNewRow1 = l_pcColList1->AppendEmptyRow();
+	l_pcColList1->SetCell(l_nNewRow1, 0, wxT("Main"));
+	l_pcColList1->SetCell(l_nNewRow1, 1, wxT(""));
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TextAttribute(wxT("Comment")));
+
+
+	/**********************/
+
 
 	return p_pcGraph;
 

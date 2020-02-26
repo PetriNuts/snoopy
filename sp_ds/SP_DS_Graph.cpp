@@ -460,12 +460,12 @@ bool SP_DS_Graph::AddToDeclarationTreectrl(SP_WDG_DeclarationTreectrl* p_pcCtrl)
 
     SP_ListMetadataclass::const_iterator l_itMC;
 
-	 if( ((this->GetNetclass()->GetName()==SP_DS_COLSPN_CLASS)
-		 || (this->GetNetclass()->GetName()==SP_DS_COLCPN_CLASS)
-		 || (this->GetNetclass()->GetName()==SP_DS_COLPN_CLASS)
-		 || (this->GetNetclass()->GetName()==SP_DS_COLHPN_CLASS)
-		 || (this->GetNetclass()->GetName()==SP_DS_COLEPN_CLASS) ))
-	 {
+	if (((this->GetNetclass()->GetName() == SP_DS_COLSPN_CLASS)
+		|| (this->GetNetclass()->GetName() == SP_DS_COLCPN_CLASS)
+		|| (this->GetNetclass()->GetName() == SP_DS_COLPN_CLASS)
+		|| (this->GetNetclass()->GetName() == SP_DS_COLHPN_CLASS)
+		|| (this->GetNetclass()->GetName() == SP_DS_COLEPN_CLASS)))
+	{
 		l_cIdParent = p_pcCtrl->AppendFolderItem(l_cRootId, wxT("Color Sets"));
 		// with a folder icon
 		l_bReturn &= p_pcCtrl->SetFolderIcons(l_cIdParent);
@@ -474,13 +474,19 @@ bool SP_DS_Graph::AddToDeclarationTreectrl(SP_WDG_DeclarationTreectrl* p_pcCtrl)
 
 		for (l_itMC = m_lMetadataclass.begin(); l_itMC != m_lMetadataclass.end(); ++l_itMC)
 		{
-		  if( (*l_itMC)->GetShowInDeclarationTreeColorSet() )
-		  {
-			// adding the entry, by calling the function of the tree control
-			  p_pcCtrl->AppendFolderItem(l_cIdParent, (*l_itMC)->GetDisplayName());
-		  }
+
+			if ((*l_itMC)->GetShowInDeclarationTreeColorSet())
+			{
+				// adding the entry, by calling the function of the tree control
+				p_pcCtrl->AppendFolderItem(l_cIdParent, (*l_itMC)->GetDisplayName());
+			}
 		}
+
+		
+		
+
 		p_pcCtrl->Expand(l_cIdParent);
+
 	 }
 	for (l_itMC = m_lMetadataclass.begin(); l_itMC != m_lMetadataclass.end(); ++l_itMC)
     {
@@ -490,6 +496,8 @@ bool SP_DS_Graph::AddToDeclarationTreectrl(SP_WDG_DeclarationTreectrl* p_pcCtrl)
         p_pcCtrl->AppendFolderItem(l_cRootId, (*l_itMC)->GetDisplayName());
       }
     }
+
+ 
 
     p_pcCtrl->Expand(l_cRootId);
 
@@ -988,9 +996,12 @@ SP_DS_Graph::CreateDeclarationTree()
             wxDefaultSize,
             wxTR_DEFAULT_STYLE);
         m_pcDeclarationTreectrl->SetGraph(this);
+		
     }
+	
     return m_pcDeclarationTreectrl;
 }
+ 
 bool
 SP_DS_Graph::ResetCoarseTree()
 {

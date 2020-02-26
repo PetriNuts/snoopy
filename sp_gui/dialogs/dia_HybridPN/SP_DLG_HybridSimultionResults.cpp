@@ -1152,7 +1152,7 @@ bool SP_DLG_HybridSimulationResults::InitializeSimulator()
 		return false;
 	}
 
-	if (!m_bIsSimulatorInitialized)
+	if (!m_bIsSimulatorInitialized || m_bIsSimulatorInitialized)//george; re-initialize any way for reloading parameters in COL HPN after chainging the value set of COLHPN
 	{
 		wxBusyInfo l_Info(wxT("Loading data, please wait...."), this);
 		//Parameters

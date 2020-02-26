@@ -139,6 +139,7 @@ SP_AbstractNetUnfolder<Repr>::FillInResults(SP_DS_ColPN_Unfolding* p_pcResults)
 				SP_LOGERROR(l_sMsg);
 			}
 			l_UnfoldedPlaceInfo.m_adNetMarkings.push_back(l_nMarking);
+ 
 		}
 		else
 		{

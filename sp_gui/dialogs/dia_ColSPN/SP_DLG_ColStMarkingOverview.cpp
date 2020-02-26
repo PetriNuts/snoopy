@@ -130,7 +130,7 @@ SP_DLG_ColStMarkingOverview::SP_DLG_ColStMarkingOverview(wxWindow* p_pcParent,
 
 void SP_DLG_ColStMarkingOverview::OnDlgOk(wxCommandEvent& p_cEvent)
 {
-
+	wxClassInfo* x=p_cEvent.GetClassInfo();
 	if (Validate() && TransferDataFromWindow() )
 	{
 		if (IsModal() )

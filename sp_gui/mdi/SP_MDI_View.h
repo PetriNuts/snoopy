@@ -88,6 +88,8 @@ public:
     virtual void OnSelectAllClass(wxCommandEvent& p_cEvent);
     virtual void OnEditPropertiesClass(wxCommandEvent& p_cEvent);
 
+	
+
     wxShape *FindFirstSelectedShape(wxClassInfo *p_pcToFind = NULL);
 
     inline unsigned int GetNetnumber() { return m_nNetnumber; }

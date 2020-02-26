@@ -25,7 +25,9 @@ class  SP_DLG_ColStSimulationResults : public SP_DS_ColoredPNSimulation, public 
 	      wxString m_sOutputType;
 
 		  SP_Vector2DDouble m_aanTempAverageAuxPLVarsResults;
-
+		  SP_SetString m_choicesForColPNs;//by george
+		  int m_iModifyCount;//by george, this data member prevents load doublicate two identical CollistAttributes
+		  int m_nGroupCounts;//by george, this member counts the extra comboboxes (extra constants groups)
 private:
 	
 	   virtual void AddNewMarkingSet(const wxString& p_sMarkingSetName,const int& p_nRow);
@@ -40,7 +42,7 @@ protected:
        virtual void LoadConnections();
        virtual void LoadParameters();
        virtual void LoadPlaces();
-
+	   void UpdateChoices();//by george
        spsim::ConnectionType GetConnectionType(const wxString& p_sConnectionType);
 
        spsim::TransitionType GetTransitionType(const wxString& p_sTransitionType);
@@ -51,6 +53,10 @@ protected :
       virtual bool LoadViewerData(SP_DS_ResultViewer* p_pcViewer,SP_DS_Metadata*  p_pcView, wxArrayString& p_asPlaces);
       
       virtual void LoadSets();
+
+	  virtual void LoadConstantsSetsForColPN();//by george for constants harmo
+	  void OnModifyConstants(wxCommandEvent& p_cEvent);//by george
+
 
 	  virtual void LoadSimulatorData();
 

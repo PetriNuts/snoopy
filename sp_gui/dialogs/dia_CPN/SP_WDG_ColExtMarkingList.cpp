@@ -371,7 +371,7 @@ bool SP_WDG_ColExtMarkingList::SaveData()
 	for(itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
 	{
 		l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
-	}
+ 	}
 	//end 
 
 

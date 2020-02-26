@@ -983,6 +983,10 @@ bool Snoopy::OnInit()
 		wxDELETE(l_pcExport);
 	}
 
+
+
+
+
 	m_pcIAManager = new SP_IA_Manager();
 	m_pcImportManager = new SP_ImportManager();
 	SP_ImportRoutine *l_pcImport;

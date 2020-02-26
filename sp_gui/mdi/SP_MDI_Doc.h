@@ -72,6 +72,8 @@ public:
     virtual bool OnOpenDocument(const wxString& p_sFile);
     virtual bool SaveAs();
 
+	virtual void HarmonizeConstantsForColPN();//by George
+
     virtual SP_DS_Graph* InitGraph(SP_DS_Netclass* p_pcNetclass);
     virtual SP_DS_Graph* SetGraph(SP_DS_Graph* p_pcVal) { return m_pcGraph; }
     inline SP_DS_Graph* GetGraph() { return m_pcGraph; }
