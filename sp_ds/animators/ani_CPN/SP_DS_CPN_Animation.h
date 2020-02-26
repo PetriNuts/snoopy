@@ -18,6 +18,15 @@
 #include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ValueAssign.h"
 #include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ColorSetClass.h"
 
+//by george for constants harmonizing
+#include "sp_ds/attributes/SP_DS_TextAttribute.h"
+#include "sp_ds/attributes/SP_DS_NameAttribute.h"
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
+#include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
+#include "sp_gui/dialogs/dia_CPN/SP_DLG_ConstantDefinition.h"
+
+
 class SP_DS_CPN_Animation: public SP_DS_Animation
 {
 private:
@@ -41,7 +50,20 @@ private:
 	//speical to colored petir nets
 	SP_CPN_ValueAssign m_cValueAssign;	
 	SP_CPN_ColorSetClass m_cColorSetClass;
+	bool m_IsDestructor;//by george
+	SP_SetString  m_choices;//by george
+	vector<wxChoice*> m_apcComboBoxes1;// by george
+	vector<SP_DS_ColListAttribute*> m_apcColListAttrForConstants;// by george
+	wxStaticText* m_pcOutputLabelStaticText;//by george
+	int m_nIsClose;
 
+private:
+	void UpdateChoices();//by george
+	void LoadSets();//by george
+	void OnModifyConstants(wxCommandEvent& p_cEvent);//by george
+	void OnColConstantSetsChanged(wxCommandEvent& p_cEvent);//george
+	void UpdateColMarking();//by george
+	void LoadDefaultConstantsGroups();//by george
 protected:
 	bool PreStep();
 	bool Step();
@@ -75,6 +97,7 @@ public:
 	void OnReset();
 	void OnSet(wxCommandEvent& p_cEvent);
 	void OnUpdateUI(wxUpdateUIEvent& p_cEvent);
+	//void OnClose(wxCloseEvent& event);//george
 
 	void SetSingleStep(SP_DS_Animator* p_pcVal) { m_pcSingleStep = p_pcVal; }
 	SP_DS_Animator* GetSingleStep() const { return m_pcSingleStep; }

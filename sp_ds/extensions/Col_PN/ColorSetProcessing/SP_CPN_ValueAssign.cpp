@@ -11,7 +11,11 @@
 #include <algorithm>
 #include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_CPN_SyntaxChecking.h"
 
-
+#include "sp_ds/attributes/SP_DS_TextAttribute.h"
+#include "sp_ds/attributes/SP_DS_NameAttribute.h"
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
+#include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 SP_CPN_ValueAssign::SP_CPN_ValueAssign()
 {
 	m_ColorSetVector.clear();
@@ -711,9 +715,13 @@ bool SP_CPN_ValueAssign::InitializeConstant()
 			SP_MESSAGEBOX(wxT("Please select data type"), wxT("Constant definition checking"), wxOK | wxICON_ERROR);
 			return false;
 		}
-		
+		else if (l_ConstantType == wxT("double"))
+		{
+			continue;
+		}
 		else
 		{
+			
 			bool l_bFound = false;
 			for(unsigned j = 0; j < m_ColorSetVector.size(); j++)
 			{
@@ -852,6 +860,11 @@ bool SP_CPN_ValueAssign::InitializeBasicTypeConstant()
 		{
 			l_ConstantStruct.m_DataType = CPN_PRODUCT;
 			l_ConstantStruct.m_StringValue = l_sConstantValue;
+		}
+		else if (l_ConstantType == wxT("double"))
+		{//add by George Assaf (constant harmonizing)
+			//constant as a parameter
+			 
 		}
 		else 
 		{
@@ -1250,16 +1263,73 @@ bool SP_CPN_ValueAssign::CollectAllDeclarations()
 	l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
 	if(!l_pcColList)
 		return false;	
-	
-	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
-	{
-		SP_CPN_Collist_Declarations l_scDeclaration;
-		l_scDeclaration.m_sName = wxString(l_pcColList->GetCell(i,0).c_str());
-		l_scDeclaration.m_sType = wxString(l_pcColList->GetCell(i,1).c_str());		
-		l_scDeclaration.m_sConstantvalue = wxString(l_pcColList->GetCell(i,2).c_str());		
+	/**************************/
+	SP_DS_Metadataclass* mc = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	SP_ListMetadata::const_iterator it;
 
-		l_vDeclarations.push_back(l_scDeclaration);
+	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+	{
+		SP_DS_Metadata* l_pcConstant = *it;
+		wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+		wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();///Added by G.A
+
+		SP_DS_FunctionRegistry* l_pcFR = l_pcGraph->GetFunctionRegistry();
+
+
+		SP_DS_FunctionRegistryEntry l_FE = l_pcFR->lookUpFunction(l_sName);
+		if (l_FE.IsOk())
+		{
+			SP_FunctionPtr l_Function = l_FE.getFunction();
+			long l_nValue = 0;
+			if (l_Function->isValue())
+			{
+				l_nValue = l_Function->getValue();
+				 
+				wxString l_sConstVal;
+				l_sConstVal << l_nValue;
+				SP_CPN_Collist_Declarations l_scDeclaration;
+	  		    l_scDeclaration.m_sName = l_sName;
+	      	    l_scDeclaration.m_sType = l_sType;
+				l_scDeclaration.m_sConstantvalue = l_sConstVal;
+	  		    l_vDeclarations.push_back(l_scDeclaration);
+	      }
+			else
+			{
+				//evaluate string
+				wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
+				if (l_sType == wxT("int"))
+				{
+					l_nValue = SP_DS_FunctionEvaluatorLong{ l_pcFR, l_Function }();
+					wxString l_sConstVal; 
+					l_sConstVal<< l_nValue;
+					SP_CPN_Collist_Declarations l_scDeclaration;
+					 l_scDeclaration.m_sName = l_sName;
+					 l_scDeclaration.m_sType = l_sType;
+					 l_scDeclaration.m_sConstantvalue = l_sConstVal;
+
+					 	l_vDeclarations.push_back(l_scDeclaration);
+
+				}
+				else if (l_sType == wxT("double"))
+				{
+					l_nValue = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
+				}
+				l_pcFR->registerFunction(l_sName, to_string(l_nValue));
+			}
+		}
 	}
+
+
+	/**************************/
+	//for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+	//{
+	//	SP_CPN_Collist_Declarations l_scDeclaration;
+		//l_scDeclaration.m_sName = wxString(l_pcColList->GetCell(i,0).c_str());
+		//l_scDeclaration.m_sType = wxString(l_pcColList->GetCell(i,1).c_str());		
+		//l_scDeclaration.m_sConstantvalue = wxString(l_pcColList->GetCell(i,2).c_str());		
+
+		//l_vDeclarations.push_back(l_scDeclaration);
+	//}
 	m_svDeclarations[wxT("ConstantList")] = l_vDeclarations;
 
 

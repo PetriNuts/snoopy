@@ -4,6 +4,8 @@
 // $Version: 0.0 $
 // $Revision: 1.00 $
 // $Date: 2009/09/28 10:20:00 $
+// @ Updated: George Assaf
+// @ Date:02/02/2020
 // Short Description: colored PN animation class
 //////////////////////////////////////////////////////////////////////
 #ifndef __SP_DS_ColStAnimation_H__
@@ -22,7 +24,7 @@
 
 
 #include"spsim/spsim.h"
-
+ 
 class SP_DS_ColStAnimation: public SP_DS_Animation
 {
 private:
@@ -33,7 +35,9 @@ private:
 	int m_nBindingChoice;
 	wxCheckBox *m_cbKeep;
 	SP_DS_Animator* m_pcSingleStep;
-
+	bool m_IsDestructor;//by george
+	int m_nIsClose;
+	 
 	list<list<SP_DS_ColStTransAnimator*> > m_llHistoryTransAnimators;
 
 	SP_DLG_Animation *m_pcDialog;
@@ -52,9 +56,13 @@ private:
 
 	vector<SP_DS_ColListAttribute*> m_apcColListAttr;
 	vector<wxChoice*> m_apcComboBoxes;
+	
 
     wxStaticText* m_pcOutputLabelStaticText;
-
+	SP_SetString  m_choices;//by george
+	vector<wxChoice*> m_apcComboBoxes1;// by george
+	vector<SP_DS_ColListAttribute*> m_apcColListAttrForConstants;// by george
+	
 
 	map<long, SP_CPN_CountInterval> m_pnsTransitionCountById ;
 	map<long, SP_CPN_CountInterval> m_nsPlaceCountById;
@@ -96,9 +104,13 @@ private:
 	void OnDelaySetChanged( wxCommandEvent& p_cEvent );
 	void OnWeightSetChanged( wxCommandEvent& p_cEvent );
 	void OnScheduleSetChanged( wxCommandEvent& p_cEvent );
-
+	void OnColConstantSetsChanged(wxCommandEvent& p_cEvent);//george
+	void OnModifyConstants(wxCommandEvent& p_cEvent);//by george
+	void UpdateColMarking();//george
+	void UpdateChoices();//george
+	void LoadDefaultConstantsGroups();//by george
 	void LoadSets();
-	int ChooseTransition();
+	int  ChooseTransition();
 	bool ChooseColTransitions();
 	bool ReduceColTransitions();
 	void ChooseArcMulitplicity(SP_DS_Node* p_pcNode,wxString p_sTransitionName);

@@ -4,6 +4,8 @@
 // $Version: 0.0 $
 // $Revision: 1.00 $
 // $Date: 2009/09/28 10:20:00 $
+// @ Updated: George Assaf
+// @ Date:02/02/2020
 // Short Description: colored PN animation class
 //////////////////////////////////////////////////////////////////////
 #include <wx/statline.h>
@@ -31,13 +33,20 @@ enum
 	SP_ID_PEDSET,
 	SP_ID_PEDKEEP,
 	SP_ID_SHOWBINDDIALOGUE,
-	SP_ID_RANDOMCOLOR
+	SP_ID_RANDOMCOLOR,
+	SP_ID_CHOICE_SETS, //by george
+	SP_ID_BUTTON_MODIFY_CONSTANT_SETS, //by george
+	SP_ID_STATIC_TEXT_OUTPUT_LABEL,//by george
+	SP_ID_DESTROY_ANIM
 };
 
 BEGIN_EVENT_TABLE(SP_DS_CPN_Animation, SP_DS_Animation)
 EVT_BUTTON(SP_ID_PEDSET, SP_DS_CPN_Animation::OnSet)
 EVT_UPDATE_UI(SP_ID_PEDSET, SP_DS_CPN_Animation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_PEDKEEP, SP_DS_CPN_Animation::OnUpdateUI)
+EVT_CHOICE(SP_ID_CHOICE_SETS, SP_DS_CPN_Animation::OnColConstantSetsChanged)// by george
+EVT_BUTTON(SP_ID_BUTTON_MODIFY_CONSTANT_SETS, SP_DS_CPN_Animation::OnModifyConstants) //by george
+//EVT_CLOSE(SP_DS_CPN_Animation::OnClose)
 END_EVENT_TABLE()
 
 SP_DS_CPN_Animation::SP_DS_CPN_Animation(unsigned int p_nRefresh, unsigned int p_nDuration, SP_ANIM_STEP_T p_eStepping):
@@ -49,11 +58,112 @@ SP_DS_CPN_Animation::SP_DS_CPN_Animation(unsigned int p_nRefresh, unsigned int p
 	m_bChooseRandomColor(true),
 	m_pcDialog(NULL)
 	{	 
+	m_IsDestructor = false;//by george
+	m_nIsClose = 0;
+ 
 
 	}
 
+ 
 SP_DS_CPN_Animation::~SP_DS_CPN_Animation()
 {
+
+	/***********************by george*******************/
+	if (m_nIsClose == SP_ID_DESTROY_ANIM)
+	{
+		m_IsDestructor = true;
+		LoadDefaultConstantsGroups();//reset default constants groups
+
+	    //reset initial marking of places,
+		//because the current marking will be in an unfolding style!!
+		list<SP_DS_CPN_PlaceAnimator*>::iterator l_Iter;
+		for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
+			(*l_Iter)->ResetMarking();
+ 
+		 
+		SP_DS_ColListAttribute* l_pcColList;
+		SP_ListNode::const_iterator l_itElem;
+		vector<SP_DS_Node*> l_vPlaceNodes;
+		SP_DS_Nodeclass* l_pcNodeclass;
+
+
+		//go through all places located on the Ped and update its initial marking
+		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+		if (l_pcNodeclass)
+		{
+			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+			{
+				l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+			}
+		}
+		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+		if (l_pcNodeclass)
+		{
+			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+			{
+				l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+			}
+		}
+
+
+
+		int l_nGridRowNumber = 0;
+		for (unsigned int l_nPos = 0; l_nPos < l_vPlaceNodes.size(); l_nPos++)
+		{
+			//obtain the initial marking
+			l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
+			int l_nBegin = l_nGridRowNumber;
+			wxString l_sMainMarking;
+			l_vPlaceNodes[l_nPos]->Update(TRUE);
+
+			//re-check: update constants values
+			SP_CPN_SyntaxChecking l_cSyntaxChecking;
+			if (!l_cSyntaxChecking.Initialize())
+				return;
+
+			//re-computation of the initial marking after updating the constants values
+			l_sMainMarking = wxT("");
+			map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
+			if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false))
+				return;
+			map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
+			wxString l_sNodeClass = l_vPlaceNodes[l_nPos]->GetNodeclass()->GetName();
+
+			if (l_sNodeClass == SP_DS_CONTINUOUS_PLACE)
+			{
+				double l_dMarking = 0;
+				for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+				{
+					l_dMarking = l_dMarking + itMap->second[0].m_DoubleMultiplicity;
+				}
+				l_sMainMarking << l_dMarking;
+			}
+			else
+			{
+				long l_nMarking = 0;
+				for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+				{
+					l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
+				}
+				l_sMainMarking << l_nMarking;
+			}
+
+
+			SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast<SP_DS_Attribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(wxT("Marking")));
+			if (l_pcMarkingAttr)
+				l_pcMarkingAttr->SetValueString(l_sMainMarking);
+
+			l_vPlaceNodes[l_nPos]->Update(TRUE);
+		}
+
+		//set modify flag and refresh the Canvas 
+		SP_Core::Instance()->GetRootDocument()->Modify(true);
+		Refresh();
+		m_nIsClose = 0;
+	}
+
+	/******************************************/
+ 
 	if (m_cbKeep) {
 		if (m_cbKeep->IsChecked()) {
 			KeepMarking();
@@ -76,7 +186,8 @@ SP_DS_CPN_Animation::Clone()
 
 bool
 SP_DS_CPN_Animation::Initialise(SP_DS_Graph* p_pcGraph)
-{	
+{
+	m_nIsClose = SP_ID_DESTROY_ANIM;//
 	bool l_bReturn = SP_DS_Animation::Initialise(p_pcGraph);
 	SP_ListAnimator::iterator l_Iter;
 	m_lAllPlaceAnimators.clear();
@@ -502,15 +613,62 @@ SP_DS_CPN_Animation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSizer
 	//allow backstepping
 	m_pcDialog->EnableBackStepping(true);
 
+
+	/*****************george*********************/
+	wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxSizer* l_pcSetsSizer = new wxBoxSizer(wxVERTICAL);
+	wxSizer* l_pcOutputLabelSizer = new wxBoxSizer(wxVERTICAL);
+
+	m_pcOutputLabelStaticText = new wxStaticText(p_pcCtrl, SP_ID_STATIC_TEXT_OUTPUT_LABEL, wxT("Start ..."), wxDefaultPosition, wxDefaultSize);
+
+	
+	UpdateChoices();
+	SP_SetString::iterator l_itChoice;
+	for (l_itChoice = m_choices.begin(); l_itChoice != m_choices.end(); ++l_itChoice)
+	{
+		wxString l_sGroup = *l_itChoice;
+		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, l_sGroup + wxT(':')), 1, wxALL | wxEXPAND, 5);
+		m_apcComboBoxes1.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_SETS, wxDefaultPosition, wxSize(100, -1), 0, NULL, 0, wxDefaultValidator, l_sGroup));
+		l_pcRowSizer->Add(m_apcComboBoxes1[m_apcComboBoxes1.size() - 1], 0, wxALL, 5);
+		l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify")), 0, wxALL, 5);
+		l_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+	}
+	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+	p_pcSizer->Add(m_pcOutputLabelStaticText, 1, wxALL, 5);
+	p_pcSizer->Add(l_pcOutputLabelSizer, 0, wxALL, 5);
+	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+	p_pcSizer->Add(l_pcSetsSizer, 0, wxALL, 5);
+	 
+	LoadSets();
+	/**************************************/
+	
 	return TRUE;
 }
 
 void
 SP_DS_CPN_Animation::OnReset()
 {
+	
+	/////////////george/////////////////////
+	for (size_t i = 0; i < m_apcColListAttrForConstants.size(); i++)
+	{
+		if (m_apcColListAttrForConstants[i])
+		{
+			int vsel = m_apcComboBoxes1[i]->GetSelection();
+
+			m_apcColListAttrForConstants[i]->SetActiveList(vsel);
+
+		}
+	}
+
+	UpdateColMarking();
+
+
+	/////////////////////////////////////////
 	list<SP_DS_CPN_PlaceAnimator*>::iterator l_Iter;
 	for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
-		(*l_Iter)->ResetMarking();
+		//(*l_Iter)->ResetMarking();/commented for reseting the initial marking to the coressponding selected value set
 
 	m_llHistoryTransAnimators.clear();
 
@@ -536,6 +694,243 @@ SP_DS_CPN_Animation::KeepMarking()
 void
 SP_DS_CPN_Animation::OnUpdateUI(wxUpdateUIEvent& p_cEvent)
 {
-	if (p_cEvent.GetId() == SP_ID_PEDSET) p_cEvent.Enable(!m_bRunning && !m_cbKeep->IsChecked());
-	else p_cEvent.Enable(!m_bRunning);
+	if (p_cEvent.GetId() == SP_ID_PEDSET)
+	{
+		p_cEvent.Enable(!m_bRunning && !m_cbKeep->IsChecked());
+	}
+	else
+	{
+		p_cEvent.Enable(!m_bRunning);
+	}
+}
+
+
+
+void  SP_DS_CPN_Animation::UpdateChoices()//george
+{
+	m_choices.clear();
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	if (mc)
+	{
+		SP_ListMetadata::const_iterator it;
+		SP_DS_Metadata* l_pcMetadata = NULL;
+
+		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+		{
+			l_pcMetadata = *it;
+			SP_DS_Attribute* l_pcAttr = l_pcMetadata->GetAttribute(wxT("Group"));
+			if (l_pcAttr)
+			{
+				wxString l_sGroup = l_pcAttr->GetValueString();
+				m_choices.insert(l_sGroup);
+			}
+		}
+	}
+}
+
+
+
+void SP_DS_CPN_Animation::LoadSets()
+{
+	m_apcColListAttrForConstants.clear();
+	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+
+	SP_ListMetadata::const_iterator l_itElem;
+
+	SP_SetString::iterator l_itChoice;
+	for (l_itChoice = m_choices.begin(); l_itChoice != m_choices.end(); ++l_itChoice)
+	{
+	   
+
+		wxString l_sChoice = *l_itChoice;
+		SP_ListMetadata::const_iterator l_itElem;
+		for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+		{
+			SP_DS_Metadata* l_pcConstant = *l_itElem;
+			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
+			if (l_sChoice == l_sGroup)
+			{
+				m_apcColListAttrForConstants.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
+				//m_bUserInteract = true;
+				break;
+			}
+		}
+	}
+
+
+	for (size_t j = 0; j < m_apcColListAttrForConstants.size(); j++)
+	{
+		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttrForConstants[j];
+		wxChoice* l_pcCombobox = m_apcComboBoxes1[j];
+		l_pcCombobox->Clear();
+		if (l_pcAttr)
+		{
+			for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
+			{
+				wxString l_sSetName = l_pcAttr->GetCell(i, 0);
+				l_pcCombobox->Append(l_sSetName);
+			}
+			l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
+		}
+	}
+
+	/**********************************/
+
+	m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
+	//m_bRestartAnimationFlag = true;
+}
+
+void SP_DS_CPN_Animation::OnModifyConstants(wxCommandEvent& p_cEvent)
+{
+	SP_DLG_ConstantDefinition * l_pcConstantDialog = new SP_DLG_ConstantDefinition(NULL);
+
+	if (l_pcConstantDialog->ShowModal() == wxID_OK)
+	{
+		LoadSets();
+	}
+
+}
+
+void SP_DS_CPN_Animation::OnColConstantSetsChanged(wxCommandEvent& p_cEvent)
+{
+	for (size_t i = 0; i < m_apcColListAttrForConstants.size(); i++)
+	{
+		if (m_apcColListAttrForConstants[i])
+		{
+			int vsel = m_apcComboBoxes1[i]->GetSelection();
+
+			m_apcColListAttrForConstants[i]->SetActiveList(vsel);
+
+		}
+	}
+
+	UpdateColMarking();
+	 
+}
+
+void SP_DS_CPN_Animation::UpdateColMarking()
+{
+
+	list<SP_DS_CPN_PlaceAnimator*>::iterator l_Iter;
+
+	for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
+		(*l_Iter)->ResetMarking();
+
+	SP_Core::Instance()->GetRootDocument()->Modify(TRUE);
+
+	//////////////////////////////////////////////////
+	//update marking here
+
+	SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+	if (!l_pcGraph)
+		return;
+	SP_DS_ColListAttribute* l_pcColList;
+
+	SP_ListNode::const_iterator l_itElem;
+	vector<SP_DS_Node*> l_vPlaceNodes;
+	SP_DS_Nodeclass* l_pcNodeclass;
+	l_pcNodeclass = l_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		{
+			l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+		}
+	}
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		{
+			l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+		}
+	}
+
+
+
+	int l_nGridRowNumber = 0;
+
+
+	for (unsigned int l_nPos = 0; l_nPos < l_vPlaceNodes.size(); l_nPos++)
+	{
+
+		l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
+
+		//update it the first time
+		l_vPlaceNodes[l_nPos]->Update(TRUE);
+
+
+		SP_CPN_SyntaxChecking l_cSyntaxChecking;
+		if (!l_cSyntaxChecking.Initialize())
+			return;
+
+
+		////////////////////////////////////////////////////////
+		wxString l_sMainMarking = wxT("");
+		map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
+		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false))
+			return;
+		map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
+
+		wxString l_sNodeClass = l_vPlaceNodes[l_nPos]->GetNodeclass()->GetName();
+
+		if (l_sNodeClass == SP_DS_CONTINUOUS_PLACE)
+		{
+			double l_dMarking = 0;
+			for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+			{
+				l_dMarking = l_dMarking + itMap->second[0].m_DoubleMultiplicity;
+			}
+			l_sMainMarking << l_dMarking;
+		}
+		else
+		{
+			long l_nMarking = 0;
+			for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+			{
+				l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
+			}
+			l_sMainMarking << l_nMarking;
+		}
+		////////////////////////////////////////////////////////////////
+
+		SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast< SP_DS_Attribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(wxT("Marking")));
+		if (l_pcMarkingAttr)
+			l_pcMarkingAttr->SetValueString(l_sMainMarking);
+
+		l_vPlaceNodes[l_nPos]->Update(TRUE);
+	}
+
+
+	SP_Core::Instance()->GetRootDocument()->Modify(true);
+
+	////////////////////////////////////////////////////////
+	if (!m_IsDestructor)
+		LoadSets();
+	 
+
+
+
+	for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
+	{
+		(*l_Iter)->UpdateDefaultMarking();
+	}
+	SP_Core::Instance()->GetRootDocument()->Refresh();
+	Refresh();
+}
+
+
+void SP_DS_CPN_Animation::LoadDefaultConstantsGroups()
+{
+	for (size_t i = 0; i < m_apcColListAttrForConstants.size(); i++)
+	{
+		if (m_apcColListAttrForConstants[i])
+		{
+			int vsel = 0;
+
+			m_apcColListAttrForConstants[i]->SetActiveList(vsel);
+
+		}
+	}
+//	UpdateColMarking();
 }

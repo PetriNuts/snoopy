@@ -65,7 +65,8 @@ public:
     bool PreStep(unsigned int p_nSteps, SP_DIRECTION_T p_nDir);
     bool Step(unsigned int p_nStep);
     bool PostStep();
-
+	map<wxString, vector<wxString> > GetDefaultMarking() { return m_mDefaultMarking; }//by george
+	void SetDefaultMarking(map<wxString, vector<wxString> >& p_mDefaultMarkingMap) { m_mDefaultMarking = p_mDefaultMarkingMap; }
     virtual SP_DS_Animator* Clone(SP_Data* p_pcParent, SP_DS_Animation* p_pcAnim);
 
     // special to places
@@ -103,6 +104,7 @@ public:
 	void ResetEdge(SP_DS_Edge* p_pcEdge);
 	bool UpdateMarking();
 	void UpdateDefaultMarking();
+	void SetMarkingForColAnim(SP_VectorString& p_vMarking );//by george
 	//void ResetMultiSet();
 
 };

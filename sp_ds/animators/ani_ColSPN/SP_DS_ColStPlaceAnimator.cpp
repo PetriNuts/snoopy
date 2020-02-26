@@ -863,3 +863,30 @@ bool SP_DS_ColStPlaceAnimator::UpdateMarking()
 
     return TRUE;
 }
+
+void SP_DS_ColStPlaceAnimator::SetMarkingForColAnim(SP_VectorString& p_vMarking)
+{
+	if (!m_pcAttribute && m_pcNode && m_pcColList)
+		return  ;
+
+	m_pcAttribute->SetValue(m_nDefaultValue);
+
+	m_pcColList->Clear();
+
+	map<wxString, vector<wxString> >::iterator itMap;
+	for (itMap = m_mDefaultMarking.begin(); itMap != m_mDefaultMarking.end(); itMap++)
+	{
+		unsigned l_nRow = m_pcColList->AppendEmptyRow();
+
+		m_pcColList->SetCell(l_nRow, 0, itMap->first);
+
+		for (unsigned i = 0; i < itMap->second.size(); i++)
+		{
+			m_pcColList->SetCell(l_nRow, i + 1, itMap->second[i]);
+		}
+	}
+
+	m_pcNode->Update(TRUE);
+
+	return;
+}
