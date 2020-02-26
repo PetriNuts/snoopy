@@ -9,6 +9,63 @@
 #include "sp_gui/dialogs/SP_DLG_ShapeProperties.h"
 #include "sp_core/SP_Core.h"
 
+
+#include "snoopy.h"
+#include "sp_core/SP_Core.h"
+#include "sp_core/SP_GPR_Canvas.h"
+#include "sp_core/SP_GPR_Animation.h"
+#include "sp_core/SP_GPR_Elements.h"
+#include "sp_core/SP_GPR_Fonts.h"
+#include "sp_gui/dialogs/SP_DLG_GlobalPreferences.h"
+#include "sp_gui/windows/SP_GUI_Mainframe.h"
+#include "sp_gui/windows/SP_GUI_Childframe.h"
+#include "sp_gui/mdi/SP_MDI_Doc.h"
+#include "sp_gui/mdi/SP_MDI_View.h"
+#include <wx/fileconf.h>
+#include "sp_utilities.h"
+#include "sp_gui/interaction/SP_IA_Manager.h"
+
+
+
+#include "sp_gui/windows/SP_GUI_DevbarContainer.h"
+
+#include "sp_ds/extensions/SP_DS_Transformer.h"
+
+#include "sp_gui/management/SP_GM_DocTemplate.h"
+#include "sp_gui/windows/SP_GUI_Childframe.h"
+#include "sp_gui/dialogs/SP_DLG_SearchId.h"
+#include "sp_gui/dialogs/SP_DLG_ReduceFTree.h"
+#include "sp_gui/dialogs/SP_DLG_ChooseInvariant.h"
+#include "sp_gui/windows/SP_GUI_Mainframe.h"
+#include "sp_gui/windows/SP_GUI_LogWindow.h"
+#include "sp_gui/mdi/SP_MDI_CoarseDoc.h"
+#include "sp_core/SP_Core.h"
+#include "sp_core/SP_GPR_Canvas.h"
+#include "sp_core/tools/SP_StopWatch.h"
+#include "sp_utilities.h"
+
+#include "sp_gui/management/SP_GM_DocTemplate.h"
+#include "sp_gui/windows/SP_GUI_Childframe.h"
+#include "sp_gui/dialogs/SP_DLG_SearchId.h"
+#include "sp_gui/dialogs/SP_DLG_ReduceFTree.h"
+#include "sp_gui/dialogs/SP_DLG_ChooseInvariant.h"
+#include "sp_gui/windows/SP_GUI_Mainframe.h"
+#include "sp_gui/windows/SP_GUI_LogWindow.h"
+#include "sp_gui/mdi/SP_MDI_CoarseDoc.h"
+#include "sp_core/SP_Core.h"
+#include "sp_core/SP_GPR_Canvas.h"
+#include "sp_core/tools/SP_StopWatch.h"
+#include "sp_utilities.h"
+
+#include "sp_core/SP_Signer.h"
+#include <wx/file.h>
+#include <wx/regex.h>
+#include <wx/busyinfo.h>
+#include "sp_gui/interaction/SP_IA_Manager.h"
+#include "sp_gui/mdi/SP_MDI_Doc.h"
+#include "sp_gui/windows/SP_GUI_DevbarContainer.h"
+#include "sp_ds/extensions/SP_DS_Transformer.h"
+
 IMPLEMENT_CLASS(SP_DLG_ShapeProperties, wxDialog)
 
 BEGIN_EVENT_TABLE(SP_DLG_ShapeProperties, wxDialog)
@@ -211,10 +268,48 @@ SP_DLG_ShapeProperties::OnDlgOk(wxCommandEvent& p_cEvent)
     if (l_bReturn)
     {
     	CleanUpWidgets();
+		//SP_GUI_Childframe *l_pcFrame = wxGetApp().GetMainframe()->GetActiveChildframe();
+		//if (l_pcFrame)
+		//{
+		//	SP_GUI_Canvas* canvas = dynamic_cast<SP_MDI_View*>(l_pcFrame->GetView())->GetCanvas();
+		//	wxClientDC dc(canvas);
 
-        SP_Core::Instance()->ClearDialogGraphicList();
-
-        p_cEvent.Skip();
+		//	canvas->DoPrepareDC(dc);
+		//	SP_Core::Instance()->GetRootDocument()->GetGraph()->ShowOnCanvas(canvas, true);
+		//}
+		 //  SP_Core::Instance()->GetRootDocument();
+		/*
+		if (SP_Core::Instance()->GetRootDocument()->GetDiagram() && SP_Core::Instance()->GetRootDocument()->GetDiagram()->GetShapeList())
+		{
+			SP_ListGraphic l_lGraphics;
+			SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(SP_Core::Instance()->GetRootDocument()->GetFirstView());
+			wxNode *l_pcNode = SP_Core::Instance()->GetRootDocument()->GetDiagram()->GetShapeList()->GetFirst();
+			while (l_pcNode)
+			{
+				wxShape *l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
+				if (l_pcShape && l_pcShape->GetParent() == NULL
+					&& !l_pcShape->IsKindOf(CLASSINFO(wxControlPoint))
+					&& !l_pcShape->IsKindOf(CLASSINFO(wxLabelShape)))
+				{
+					SP_Graphic* l_pcGraphic = SP_Core::Instance()->ResolveExtern(l_pcShape);
+					if (l_pcGraphic && l_pcGraphic->GetParent())
+					{
+						l_lGraphics.push_back(l_pcGraphic);
+					}
+				}
+				l_pcNode = l_pcNode->GetNext();
+			}
+			l_pcView->DoUnHide(l_lGraphics);
+		}
+		*/
+		//bug fix: show multiplicities on arcs G.Assaf
+		SP_Core::Instance()->GetRootDocument()->GetGraph()->SqueezeIdAttributes();
+		SP_Core::Instance()->GetRootDocument()->GetGraph()->CheckIntegrity();
+		SP_Core::Instance()->GetRootDocument()->Modify(false);
+		SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->Modify(false);
+		SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->Refresh();
+ 
+       p_cEvent.Skip();
     }
 }
 
