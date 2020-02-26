@@ -7,7 +7,7 @@
 * @Description
 * Simulation result dialog forFuzzy Continuous PN
 */
-//======================================================================================
+//=====================================================================================
 
 #ifndef SP_DLG_FCPNSIMULATIONRESULTS_H_
 #define SP_DLG_FCPNSIMULATIONRESULTS_H_
@@ -19,9 +19,12 @@
 #include"sp_gui/dialogs/dia_ContinuousPN/SP_DLG_CPNSimulationResults.h"
 #include "sp_gui/dialogs/dia_FPN/SP_Compressed_Fuzzy_Band.h"
 #include "FuzzyReasoning.h"
-
+#include "SP_DS_FcpnSimulThread.h"
+#include "SP_DS_FuzzyResult_Thread.h"
+#include<wx/busyinfo.h>
+//#include"sp_ds/extensions/SP_DS_ThreadEvent.h"
 typedef std::vector<TriangularFN> TFN_List;
-class SP_DS_ThreadEvent;
+//class SP_DS_ThreadEvent;
 class SP_DLG_FCPNSimulationResults : public SP_DLG_CPNSimulationResults
 {
 protected:
@@ -31,6 +34,8 @@ protected:
 	unsigned long m_lpCount;
 	unsigned long m_lnFuzzyNum;
 	bool         m_initialRun;
+	wxBusyInfo* m_info;
+	long m_lruncounter;
 
 protected:
 	SP_Vector2DDouble           m_paramMatrix;
@@ -40,12 +45,16 @@ protected:
 	std::vector<int>         m_fuzzyParamPositions;
 	std::vector<double>      m_vCurrentSample;
 	ResultFuzzyBand          m_vResultFBand;
-	FuzzyReasoning           m_fr;
+	FuzzyReasoning *          m_fr;
 	long                     m_lSamplingStrategyselection;
 	long                     m_lSimTim;
 	bool                     m_bIsAbort;
 	long                     m_lTotalSimRuns;
-	std::clock_t             m_clock;
+	wxStopWatch              m_stopWatch;
+	//std::map<wxString, wxString>  m_mSimOptions;
+	bool render_loop_on;
+	std::vector<SP_DS_FcpnSimulThread*> m_fcpnThreadVector;
+
 protected:
 
 
@@ -68,29 +77,34 @@ protected:
 
 	virtual void LoadParameters(unsigned long, double dAlpha);
 
+	virtual void  LoadTransitions();
+
+
 	virtual bool InitializeSimulator(unsigned long ulite, double dalpha);
 
 	std::vector<double> GetCombinationVectorForTopLevel();
 
 	virtual void LoadUsedParams();
 
+	virtual void* RunBasicSamplingFcpnThreadSim();
+
+	virtual void* RunReducedSamplingFCPNThreadSim();
+
 	virtual wxString GetKParameter(const wxString& strfunc);
-
-	virtual void* DoFcpnSimulation();
-
-	virtual void* DoNormalFcpnSimulation();
-
-	virtual void DoStartSimulation();
 
 	virtual void SetSimulationProgressText(long& p_nValue);
 
-	virtual void  InitProgress();
 	virtual void  SetSimulationProgressGauge(long p_nValue);
+
 	virtual void SetSimulationProgressGaugeRange(long p_nRangeValue);
 
 	virtual void     OnSimulatorThreadEvent(SP_DS_ThreadEvent& event);
+
+
+	void onIdle(wxIdleEvent& evt);
 public:
 
+	void activateRenderLoop(bool on);
 	DECLARE_CLASS(SP_DLG_FCPNSimulationResults)
 	SP_DLG_FCPNSimulationResults(
 		SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent,
@@ -101,10 +115,11 @@ public:
 	//virtual void SetSimulationCurrentTime(const double & p_nTime) { m_pcCurrentSimulationTimeTxtCtrl->SetLabel(wxString::Format(wxT("%.3f units"), (float)p_nTime)); }
 
 	virtual void OnStartAbortSimulation(wxCommandEvent& p_cEvent);
+	//virtual void OnStartAbortSimulation1();
 
 	virtual void DirectExportToCSV();
 
-
+	wxDECLARE_EVENT_TABLE();
 };
 
 #endif /* SP_DLG_FCPNSIMULATIONRESULTS_H_ */

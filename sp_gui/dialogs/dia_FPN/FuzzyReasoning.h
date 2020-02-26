@@ -71,10 +71,13 @@ public:
 
 	void GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataColumn);
 
+	void GetMinMaxTraceThreadV2(ResultFuzzyBand fuzzyBand, long dataColumn);
+
 	virtual std::vector<SP_Vector2DDouble> GetMinMaxFuzzyTraceMatrix(ResultFuzzyBand& fuzzyBand);
 
 	virtual SP_Compressed_Fuzzy_Band* CompressResults( ResultFuzzyBand  fuzzyBand);
-	virtual void SetAbort(bool bAbort);
+	virtual void SetAbort(bool bAbort=true);
+	virtual bool GetWorkingStatus() { return m_bIsAbortCalculation; }
 };
 
 #endif // SP_FUZZY_REASONONG_

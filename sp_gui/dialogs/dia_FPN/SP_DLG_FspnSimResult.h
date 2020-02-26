@@ -3,6 +3,7 @@
 #include "FuzzyReasoning.h"
 #include <wx/string.h>
 #include <wx/thread.h>
+#include "wx/busyinfo.h"
 #include "sp_ds/extensions/SP_DS_SimulatorThread.h"
 #include "sp_gui/dialogs/SP_DLG_Simulation.h"
 
@@ -11,6 +12,7 @@
 #include "FuzzyBasics.h"
 #include "FuzzyReasoning.h"
 #include "TriangularFN.h"
+#include "SP_DS_FspnSimulThread.h"
 
 typedef std::vector<TriangularFN>  TFN_List;
 class SP_DS_ThreadEvent;
@@ -29,17 +31,21 @@ protected:
 	unsigned long               m_lnFuzzyNum;
 	long                        m_lSamplingStrategyselection;
 	long                        m_lTotalSimRuns;
+	wxBusyInfo*                 m_info;
+	long                        m_lruncounter;
 protected:
 	SP_Vector2DDouble            m_paramMatrix;
 	std::map<wxString, wxString> m_mTransParamNames;
-	FuzzyReasoning               m_fr;
+	FuzzyReasoning *              m_fr;
 	std::vector<int>             m_fuzzyParamPositions;
 	std::vector<double>          m_vdCurrentSample;
 	ResultFuzzyBand              m_ResultFBand;
 	std::map<wxString, int>      m_mFuzzyParam2Position;
 	std::vector<wxString>        m_fuzzyParams;
 	bool                         m_bIsAbort;
-	std::clock_t             m_clock;
+	//std::clock_t             m_clock;
+	wxStopWatch m_stopWatch;
+	std::vector<SP_DS_FspnSimulThread*> m_fspnThreadVector;
 protected:
 
 
@@ -67,29 +73,35 @@ protected:
 
 	virtual void InitializeParamMatrix();
 
-	virtual void* DoFspnSimulation();
+	//	virtual void* DoFspnSimulation();
 
-	virtual spsim::Matrix2DDouble DoNormalFSPN();
+	//	virtual spsim::Matrix2DDouble DoNormalFSPN();
 
-	virtual void* DoFSPwithNormalSampling();
+	//virtual void* DoFSPwithNormalSampling();
+	virtual void* DoBasicSamplingFspnSimulThread();
 
-	virtual spsim::Matrix2DDouble DOneSpnSimulation(unsigned long iteration, double alpha);
+	virtual void * DoReducedSamplingFspnSimulThread();
+
+	//virtual spsim::Matrix2DDouble DOneSpnSimulation(unsigned long iteration, double alpha);
 
 	virtual void OnStartAbortSimulation(wxCommandEvent& p_cEvent);
-
+	//virtual void OnStartAbortSimulation1(wxCommandEvent& p_cEvent);
 	virtual wxString  GetKParameter(const wxString& func);
 
-	virtual void   OnCloseWindow(wxCloseEvent& p_cEvent);
 
 	virtual void OnModifyConstantSets(wxCommandEvent& p_cEvent);
 
 	virtual void SetSimulationProgressText(long& p_nValue);
 
-	virtual void  InitProgress();
+	//virtual void  InitProgress();
 
 	virtual void  SetSimulationProgressGaugeRange(long p_nRangeValue);
 
 	void SetSimulationProgressGauge(long p_nValue);
+
+	void LoadTransitions();
+
+	virtual void     OnSimulatorThreadEvent(SP_DS_ThreadEvent& event);
 
 	virtual wxString GetCurrentSelectedSet()
 	{

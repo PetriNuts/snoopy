@@ -3,6 +3,7 @@
 #include "FuzzyReasoning.h"
 #include <wx/wx.h>
 #include <wx/busyinfo.h>
+#include "SP_DS_Fuzzy_MinMaxThread.h"
 
 FuzzyReasoning::FuzzyReasoning(unsigned long alphaLevels, unsigned long nDiscPoints, std::vector<vector<double>> paramMat, unsigned long FN,unsigned long pcount)
 {
@@ -79,15 +80,15 @@ void FuzzyReasoning::CalculateAlphaLevels()
 	m_valphaLevels.clear();
 	double alpha = 0.0;
 	m_valphaLevels.push_back(alpha);
-	int nlevels = 1;
+	int nlevels = 0;
 	
-	while (alpha <= 1 && nlevels != m_nAlphaLevels)
+	while (alpha < 1 && nlevels != m_nAlphaLevels)
 	{
 		alpha += m_alphaStepSize;
 		m_valphaLevels.push_back(alpha);
 		nlevels = nlevels + 1;
 	}
-	m_valphaLevels[nlevels-1 ] = 1;
+	m_valphaLevels[nlevels ] = 1;
 }
 
 SP_Vector2DDouble FuzzyReasoning::GetAlphaCutForAllLevels()
@@ -165,10 +166,39 @@ void FuzzyReasoning::DoSamplePointsCombination(double calpha)
 	}
 }
 
+void FuzzyReasoning::GetMinMaxTraceThreadV2(ResultFuzzyBand fuzzyBand, long dataColumnNum)
+{
+	long ltime = fuzzyBand[0].fuzzyTrace.size();
+	m_nFinalMinResultFuzzyMatrix.resize(dataColumnNum, std::vector<double>(ltime));
+	m_nFinalMaxResultFuzzyMatrix.resize(dataColumnNum, std::vector<double>(ltime));
+	vector<SP_DS_Fuzzy_MinMaxThread*> threadVector;
+	long lcounter = 0;
+	for (int i = 0; i < dataColumnNum; i++)
+	{
+		if (m_bIsAbortCalculation)
+		{
+			break;
+		}
+		threadVector.push_back(new SP_DS_Fuzzy_MinMaxThread(m_nFinalMaxResultFuzzyMatrix, m_nFinalMinResultFuzzyMatrix, i, fuzzyBand, 0, ltime));
+		if(threadVector[lcounter]->Create() != wxTHREAD_NO_ERROR)
+		{
+			
+		}
+		threadVector[lcounter]->SetPriority(WXTHREAD_MAX_PRIORITY);
+		threadVector[lcounter]->Run();
+		threadVector[lcounter]->Wait();
+		wxYieldIfNeeded();
+		wxDELETE(threadVector[lcounter]);
+		lcounter++;
+	}
+	 
+
+}
+
 /*Calculate minimum and maximum traces over time*/
 void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataColumnNum)
 {
-	/*divide the time ito two slots, and run 2*spieces threads to speed up the calculations*/
+	/*divide the time into two slots, and run 2*spieces threads to speed up the calculations*/
 	long ltime = fuzzyBand[0].fuzzyTrace.size();
 	long lnumThreads = ltime / 2;
 	vector<std::thread> threadVector(dataColumnNum*2);
@@ -181,7 +211,7 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 
 	m_nFinalMinResultFuzzyMatrix.resize(dataColumnNum, std::vector<double>(ltime));
 	m_nFinalMaxResultFuzzyMatrix.resize(dataColumnNum, std::vector<double>(ltime));
-	//m_nMinResultMatrix.resize(dataColumnNum, std::vector<double>(ltime));
+	 
 	while (lDataCol < dataColumnNum)
 	{
 		
@@ -218,7 +248,7 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 
 		li = li + 1;
 
- /////////////////////////////////////////////////////////////
+ 
 
 		minthreads[li] = std::thread([&](SP_Vector2DDouble& m_nFinalMaxResultFuzzyMatrix,SP_Vector2DDouble& m_nFinalMinResultFuzzyMatrix, ResultFuzzyBand& fuzzyBand, long dataColumn, long start, long end) {
 
@@ -266,42 +296,7 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 		}
 
 	}
-	//wxBusyInfo info1(ss, NULL);
-	/*
-	for (std::vector<std::thread>::iterator it = threadVector.begin(); it != threadVector.end(); ++it)
-	{
-		if ((*it).joinable() )
-		{
-			(*it).join();
-		}
-
-	}
-	// end
-
-
-	long count = 0; int j = 0;
-	for (curvesIt = calcVec.begin(); curvesIt != calcVec.end(); curvesIt++)
-	{
-		 
-		if (count == 0)
-		{
-			m_nFinalMinResultFuzzyMatrix.push_back((*curvesIt).m_minVector);
-			m_nFinalMaxResultFuzzyMatrix.push_back((*curvesIt).m_maxVector);
-			count++;
-		}
-		else {
-			for (long lcount = 0; lcount < (*curvesIt).m_minVector.size(); lcount++)
-
-			{
-				m_nFinalMinResultFuzzyMatrix[m_nFinalMinResultFuzzyMatrix.size() - 1].push_back((*curvesIt).m_minVector[lcount]);
-				m_nFinalMaxResultFuzzyMatrix[m_nFinalMaxResultFuzzyMatrix.size() - 1].push_back((*curvesIt).m_maxVector[lcount]);
-			}
-			count = 0;
-		}
-
-		 
-	}
-	 */
+	 
 
 }
 
@@ -319,8 +314,8 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 	 l_placeCount = mytrace[0].size();
 	 l_lastTimePoint = fuzzyBand[0].fuzzyTrace.size();
 	
-	 GetMinMaxTraceThread(fuzzyBand, l_placeCount);
-
+	 //GetMinMaxTraceThread(fuzzyBand, l_placeCount);
+	 GetMinMaxTraceThreadV2(fuzzyBand, l_placeCount);
 
 	 long ss = m_nFinalMinResultFuzzyMatrix.size();
 	 //transform the matrix so that each row represents time point with the corrosponding values of places
@@ -356,7 +351,7 @@ void FuzzyReasoning::GetMinMaxTraceThread(ResultFuzzyBand fuzzyBand, long dataCo
 	 TimedTFN            timedMembershipFunc;
 
 	 /*calculating the number of traces per level*/
-	 for (int i = 0; i < m_nAlphaLevels; i++)
+ 	 for (int i = 0; i < m_valphaLevels.size(); i++)//m_nAlphaLevels
 	 {
 		 int point_count = 0;
 		 for (int t = 0; t < lnumTraces; t++)

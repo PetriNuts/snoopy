@@ -1,5 +1,5 @@
 /*
-* SP_DLG_HybridSimulationResults.h
+* SP_DLG_FHybridSimulationResults.h
 * $Author: G.Assaf
 * $Version: 0.0 $
 * $Revision: 0.0 $
@@ -16,10 +16,13 @@
 #include "sp_gui/dialogs/SP_DLG_Simulation.h"
 #include "sp_gui/dialogs/dia_HybridPN/SP_DLG_HybridSimultionResults.h"
 #include "FuzzyReasoning.h"
+#include"SP_DS_FhpnSimulThread.h"
+#include "SP_DS_FuzzyResult_Thread.h"
+#include "wx/busyinfo.h"
 //class SP_DS_ThreadEvent;
- 
-typedef std::vector<TriangularFN> TFN_List;
 
+typedef std::vector<TriangularFN> TFN_List;
+class SP_DS_ThreadEvent;
 class SP_DLG_FHybridSimulationResults : public SP_DLG_HybridSimulationResults
 {
 
@@ -40,12 +43,15 @@ protected:
 	std::vector<double>         m_vdCurrentSample;
 	std::map<wxString, wxString> m_mTransParamNames;
 	ResultFuzzyBand              m_ResultFBand;
-	FuzzyReasoning               m_fr;
+	FuzzyReasoning *              m_fr;
 	long                         m_samplingStrategyselection;
 	long                         m_lTotalSimRuns;
-	std::clock_t           m_clock;
+	long                         m_lruncounter;
+	wxBusyInfo*                  m_info;
+	wxStopWatch                  m_simStopWatch;
+	std::vector<SP_DS_FhpnSimulThread*> m_fhpnThreadVector;
 protected:
- 
+
 
 protected:
 
@@ -55,8 +61,10 @@ protected:
 
 	virtual bool InitializeFuzzySetting();
 
+	virtual void     OnSimulatorThreadEvent(SP_DS_ThreadEvent& event);
 
-	virtual void LoadUsedParams();
+	virtual void        LoadUsedParams();
+	virtual void LoadTransitions();
 
 	virtual std::vector<TriangularFN> LoadParams();
 
@@ -72,17 +80,14 @@ protected:
 
 	virtual std::vector<double> GetCurentSamples(int iteration);
 
-	virtual void* DoFHpnSimulation();
 
-	virtual void* DoOneHPNSimulation(long iter, double alpha);
+	virtual void* DoBasicSamplingFhpnSimulThread();
 
-	virtual void* RunNormalHPN();
+	virtual void* DoReducedSamplingFhpnSimulThread();
 
-	virtual void* DoReducedFhpn();
 
 	virtual void SetSimulationProgressText(long& p_nValue);
 
-	virtual void InitProgress();
 
 	virtual void SetSimulationProgressGauge(long p_nValue);
 
@@ -92,13 +97,13 @@ public:
 
 	virtual void OnStartAbortSimulation(wxCommandEvent& p_cEvent);
 	DECLARE_CLASS(SP_DLG_FHybridSimulationResults)
-		SP_DLG_FHybridSimulationResults(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""),const  wxString p_sTitle = wxT("Fuzzy Hybrid Simulation"), long p_nStyle =
-			wxDEFAULT_DIALOG_STYLE);
+	SP_DLG_FHybridSimulationResults(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), const  wxString p_sTitle = wxT("Fuzzy Hybrid Simulation"), long p_nStyle =
+		wxDEFAULT_DIALOG_STYLE);
 	virtual ~SP_DLG_FHybridSimulationResults();
 
 	virtual void DirectExportToCSV();
+	wxDECLARE_EVENT_TABLE();
 
-	 
 };
 
 #endif /* SP_DLG_FUZZYHYBRIDSIMULTIONRESULTS_H_*/
