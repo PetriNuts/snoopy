@@ -174,7 +174,7 @@ protected:
 	virtual void OpenViewInSeparateWindow(spsa::ModelView* p_pcModelView);
 
 	virtual spsa::ModelView* FindSteeringView(const wxString& p_sViewName);
-
+	
 protected:
 
 	virtual void CalculateXAxisValues(SP_DS_Metadata* p_pcView, SP_VectorDouble& p_anXAxisValues){}

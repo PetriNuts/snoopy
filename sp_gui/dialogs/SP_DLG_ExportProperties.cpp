@@ -133,6 +133,49 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 	 * comboboxes for constants
 	 */
 	SP_DS_Graph* l_pcGraph = m_pcDoc->GetGraph();
+	/*george new consatnts for col pn*/
+	SP_DS_Metadataclass* mc1 = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	if (mc1 && !mc1->GetElements()->empty() && l_pcGraph->GetName().Contains(wxT("Colored")))
+	{
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		// load groups
+		////////////////////////////////////////////////////////////////////////
+		SP_ListMetadata::const_iterator it;
+		SP_DS_Metadata* l_pcMetadata;
+
+		wxArrayString m_choices;
+		for (it = mc1->GetElements()->begin(); it != mc1->GetElements()->end(); ++it)
+		{
+			l_pcMetadata = *it;
+			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Group")))->GetValue();
+			SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*> (l_pcMetadata->GetAttribute(wxT("ValueList")));
+			if (SP_Find(m_choices, l_sGroup) == m_choices.end())
+			{
+				m_choices.Add(l_sGroup);
+				l_pcSetsSizer->Add(new wxStaticText(l_pcNotebookPage, wxID_ANY, m_choices.Last() + wxT(':')), wxGBPosition{ row,0 });
+				auto l_pcComboBox = new wxChoice(l_pcNotebookPage, wxID_ANY);
+
+				for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
+				{
+					wxString l_sSetName = l_pcAttr->GetCell(i, 0);
+					l_pcComboBox->Append(l_sSetName);
+				}
+
+				l_pcComboBox->SetSelection(l_pcAttr->GetActiveList());
+				m_mColListComboBoxes[l_pcAttr] = l_pcComboBox;
+				l_pcSetsSizer->Add(l_pcComboBox, wxGBPosition{ row,1 }, wxDefaultSpan, wxEXPAND);
+				++row;
+			}
+		}
+	}
+	//l_pcSetsSizer->AddGrowableCol(1);
+	//l_pcNotebookPage->AddControl(l_pcSetsSizer, 1, wxALL | wxEXPAND, 5);
+
+
+	/*****************************************/
+
+
+
 	SP_DS_Metadataclass* mc = l_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 	if (mc && !mc->GetElements()->empty() && !l_pcGraph->GetName().Contains(wxT("Colored")) )
 	{

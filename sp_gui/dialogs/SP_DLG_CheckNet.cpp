@@ -125,13 +125,15 @@ void SP_DLG_CheckNet::CheckDuplicateNodes()
 
 	bool l_bUniqueNodes = true;
 	map<wxString, SP_Data*> l_mpNodes;
-
+	 
 	for (SP_DS_Nodeclass* nc : *(m_graph->GetNodeclasses()))
 	{
+		 
 		if (nc->GetShowInElementTree())
 		{
 			if (nc->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID) && nc->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))
 			{
+				  
 				for(SP_DS_Node* node : *(nc->GetElements()))
 				{
 					wxString l_sNodeclass = nc->GetDisplayName();
@@ -170,6 +172,8 @@ void SP_DLG_CheckNet::CheckDuplicateNodes()
 				{
 					wxString l_sMetaclass = mc->GetDisplayName();
 					wxString l_sName = meta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)->GetValueString();
+					
+					
 					if(l_sName.IsEmpty())
 					{
 

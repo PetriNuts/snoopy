@@ -1,8 +1,8 @@
 /*
  * SP_DLG_NewConstantDefinition.cpp
  *
- *  Created on: 07.09.2012
- *      Author: Steffen Laarz
+ *  created by George Assaf 
+ *  15/01/2020    
  */
 
 #include <wx/valgen.h>
@@ -503,7 +503,7 @@ bool SP_DLG_NewConstantDefinition::SaveData()
 		m_pcConstants->RemoveElement(l_pcConst);
 		wxDELETE(l_pcConst);
 	}
-
+	 
 	while (m_pcConstants->GetElements()->size() < m_pcConstantSetGrid->GetNumberRows())
 	{
 		m_pcConstants->NewElement(1);

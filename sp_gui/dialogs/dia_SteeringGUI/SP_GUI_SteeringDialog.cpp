@@ -2135,7 +2135,7 @@ void SP_GUI_SteeringDialog :: OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent)
 		}
 
 }
-
+ 
 spsa::ModelView* SP_GUI_SteeringDialog::FindSteeringView(const wxString& p_sViewName)
 {
 			for(auto l_pcView:(*m_pcModelViews))
