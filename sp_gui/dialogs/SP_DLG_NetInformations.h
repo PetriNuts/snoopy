@@ -27,6 +27,7 @@ public:
 
 	void OnDlgClose(wxCommandEvent& p_cEvent);
 
+	long ComputeTokenNUM();//Added by George 
 };
 
 #endif // __SP_DLG_NETINFORMATIONS_H__

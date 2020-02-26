@@ -66,7 +66,12 @@ SP_DLG_NetInformations::SP_DLG_NetInformations(SP_DS_Graph *p_graph, wxWindow *p
 		wxString l_sName = l_pcEC->GetDisplayName();
 		elemSizer->Add(new wxStaticText(this, -1, l_sName), wxGBPosition(l_nRow, --l_nCol), wxGBSpan(), wxLEFT | wxRIGHT | wxTOP, l_nBorder);
 		elemSizer->Add(new wxStaticText(this, -1, wxString::Format(wxT("%u"), l_nSize)), wxGBPosition(l_nRow, ++l_nCol), wxGBSpan(), wxLEFT | wxRIGHT | wxTOP, l_nBorder);
+	
 	}
+	long l_lTokenNum=ComputeTokenNUM();//added by G.A
+	l_nRow++;
+	elemSizer->Add(new wxStaticText(this, -1, wxT("Token Count")), wxGBPosition(l_nRow, --l_nCol), wxGBSpan(), wxLEFT | wxRIGHT | wxTOP, l_nBorder);
+	elemSizer->Add(new wxStaticText(this, -1, wxString::Format(wxT("%u"), l_lTokenNum)), wxGBPosition(l_nRow, ++l_nCol), wxGBSpan(), wxLEFT | wxRIGHT | wxTOP, l_nBorder);
 
 	topSizer->Prepend(elemSizer, 1, wxEXPAND | wxALL, 5);
 
@@ -93,4 +98,68 @@ void SP_DLG_NetInformations::OnDlgClose(wxCommandEvent& p_cEvent)
 		SetReturnCode(wxID_CANCEL);
 		this->Show(FALSE);
 	}
+}
+
+
+long SP_DLG_NetInformations::ComputeTokenNUM()
+{
+
+	long l_num = 0;
+	
+	SP_ListNodeclass::const_iterator ncIt;
+
+	for (ncIt = m_graph->GetNodeclasses()->begin(); ncIt != m_graph->GetNodeclasses()->end(); ++ncIt)
+	{
+		if ((*ncIt)->GetShowInElementTree())
+		{
+			if ((*ncIt)->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID))
+			{
+				 
+				wxString l_sClassName = (*ncIt)->GetDisplayName();
+				 
+				const SP_ListNode* l_pcElements = (*ncIt)->GetElements();
+				for (auto l = l_pcElements->begin(); l != l_pcElements->end(); ++l)
+				{
+					wxString l_sNodeclass =(*l)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)->GetValueString();
+					
+					const SP_ListAttribute* l_pcAttr=(*l)->GetAttributes();
+					for (auto it_attr = l_pcAttr->begin(); it_attr != l_pcAttr->end(); ++it_attr)
+					{
+						SP_DS_Attribute* l_att = (*it_attr);
+						const wxString l_sAttName=l_att->GetName();
+						if (l_sClassName != wxT("Continuous Place")&& l_sAttName==wxT("Marking"))
+						{//discrete places
+						   long l_lval;
+						   wxString l_smarking=l_att->GetValueString();
+						   bool l_b= l_smarking.ToLong(&l_lval);
+						   if (l_b)
+						   {
+							   l_num += l_lval;
+						   }
+						}
+						else {
+
+							if (l_sAttName == wxT("Marking"))
+							{//for continious marking val
+								double l_dDoubleMarking;
+								wxString l_smarking = l_att->GetValueString();
+								bool l_b = l_smarking.ToDouble(&l_dDoubleMarking);
+								if (l_b)
+								{
+									double l_d = std::ceil(l_dDoubleMarking);
+									long l_lval = l_d;
+									l_num += l_lval;
+								}
+							}
+						}
+					}
+					
+					
+				}
+				
+			}
+		}
+	}
+	 
+	return l_num;
 }
