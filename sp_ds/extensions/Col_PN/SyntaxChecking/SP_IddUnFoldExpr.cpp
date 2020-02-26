@@ -196,7 +196,7 @@ bool SP_IddUnFoldExpr::EvalExpr( wxString& markingExp,wxString& p_scolorset)
 {
 	dssd::andl::Net_ptr m_ColoredNet;
 	dssd::andl::Net_ptr m_UnfoldedNet;
-	SP_ColoredNetBuilder builder;
+	SP_ColoredNetBuilder builder(true);
 	dssd::andl::simple_net_builder builder1;
 	bool l_bRes = true;
 	if (builder(m_pcGraph))

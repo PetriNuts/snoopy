@@ -55,6 +55,7 @@ private:
 class SP_ColoredNetBuilder final : public SP_AbstractNetBuilder
 {
 public:
+	SP_ColoredNetBuilder(bool p_bIsExport = false) { m_bIsExport = p_bIsExport; }
 	virtual ~SP_ColoredNetBuilder() = default;
 
 	bool operator()(SP_DS_Graph* p_pcGraph);
@@ -69,6 +70,8 @@ private:
 	  bool CreateFunctions(dssd::andl::simple_net_builder& b);
 	  bool CreateObservers(dssd::andl::simple_net_builder& b);
 	  void PrePareMarkingString(wxString& p_sMarkingExpression,wxString& p_sOutput);
+private:
+	bool m_bIsExport;
 
 };
 

@@ -393,7 +393,7 @@ bool SP_SimpleNetBuilder::CreateObservers(dssd::andl::simple_net_builder& b)
 
 //////////////////////////////////////////////////////////////////////
 
-bool SP_ColoredNetBuilder::operator ()(SP_DS_Graph* p_pcGraph)
+bool SP_ColoredNetBuilder::operator ()(SP_DS_Graph* p_pcGraph )
 {
 	if(!p_pcGraph) return false;
 
@@ -953,109 +953,177 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b)
 {
 	if(!m_pcGraph)
 		return false;
- 
+  
+	bool l_bForUpdateMarking = m_bIsExport;
 	/*************** by george*************/
-	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
-	SP_ListMetadata::const_iterator it;
-	int i = 0;
-	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+	if (!l_bForUpdateMarking)
 	{
+		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		SP_ListMetadata::const_iterator it;
+		int i = 0;
+		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+		{
 
-		SP_DS_Metadata* l_pcConstant = *it;
-		wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-		wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue(); 
-		wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
-		SP_DS_ColListAttribute * l_pcSourceColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
-		if (i == 0) {
-			
+			SP_DS_Metadata* l_pcConstant = *it;
+			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+			wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();
+			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
+			SP_DS_ColListAttribute * l_pcSourceColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+			if (i == 0) {
+
+				for (unsigned i = 0; i < l_pcSourceColList->GetRowCount(); ++i)
+				{
+					wxString valueSet = SP_NormalizeString(l_pcSourceColList->GetCell(i, 0));
+					b.registerValueSet(valueSet.ToStdString());
+				}
+			}
+			i++;
+
+			std::vector<string> l_sVsets;
 			for (unsigned i = 0; i < l_pcSourceColList->GetRowCount(); ++i)
 			{
-				wxString valueSet = SP_NormalizeString(l_pcSourceColList->GetCell(i, 0));
-				b.registerValueSet(valueSet.ToStdString());
+				l_sVsets.push_back(l_pcSourceColList->GetCell(i, 1));
+
 			}
-		}
-		i++;
 
-		std::vector<string> l_sVsets;
-		for (unsigned i = 0; i < l_pcSourceColList->GetRowCount(); ++i)
-		{
-			l_sVsets.push_back(l_pcSourceColList->GetCell(i,1));
-
-		}
-
-		SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+			SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
 
 
-		SP_DS_FunctionRegistryEntry l_FE = l_pcFR->lookUpFunction(l_sName);
-		if (l_FE.IsOk())
-		{
-			SP_FunctionPtr l_Function = l_FE.getFunction();
-			wxString l_sConstVal;
-			
-			if (l_Function->isValue())
+			SP_DS_FunctionRegistryEntry l_FE = l_pcFR->lookUpFunction(l_sName);
+			if (l_FE.IsOk())
 			{
-				if (l_sType == wxT("double"))
+				SP_FunctionPtr l_Function = l_FE.getFunction();
+				wxString l_sConstVal;
+
+				if (l_Function->isValue())
 				{
-					double l_nValue = 0.0;
-					l_nValue = l_Function->getValue();
+					if (l_sType == wxT("double"))
+					{
+						double l_nValue = 0.0;
+						l_nValue = l_Function->getValue();
 
 
-					l_sConstVal << l_nValue;
-				}
-				else {
-					long   l_nValue = 0.0;
-					l_nValue = l_Function->getValue();
+						l_sConstVal << l_nValue;
+					}
+					else {
+						long   l_nValue = 0.0;
+						l_nValue = l_Function->getValue();
 
 
-					l_sConstVal << l_nValue;
-				}
+						l_sConstVal << l_nValue;
+					}
 
-				
-				//l_pcFR->registerFunction(l_sName, to_string(l_nValue));
-			}
-			else
-			{
-				//evaluate string
-				wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
-				if (l_sType == wxT("int"))
-				{
-					long l_nValue = SP_DS_FunctionEvaluatorLong{ l_pcFR, l_Function }();
-					
-					l_sConstVal << l_nValue;
-				 
+
 					//l_pcFR->registerFunction(l_sName, to_string(l_nValue));
 				}
-				else if (l_sType == wxT("double"))
+				else
 				{
-					double l_dval;
-					l_dval = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
-					l_sConstVal << l_dval;
-					//l_pcFR->registerFunction(l_sName, to_string(l_dval));
-				}
-				
-			}
+					//evaluate string
+					wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
+					if (l_sType == wxT("int"))
+					{
+						long l_nValue = SP_DS_FunctionEvaluatorLong{ l_pcFR, l_Function }();
 
-			if (l_sType == wxT("int"))
-			{
-				auto type = dssd::andl::ConstType::INT_T;
-				std::vector<std::string> values = l_sVsets;// { l_sConstVal };
-				auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);//l_sGroup was "all"
-				b.addConstant(c);
-			}
-			if (l_sType == wxT("double"))
-			{
-				auto type = dssd::andl::ConstType::DOUBLE_T;
-				std::vector<std::string> values = l_sVsets;// { l_sConstVal };
-				auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);//l_sGroup was "param"
-				b.addConstant(c);
-			}
-			if (l_sType != wxT("double") && l_sType != wxT("int"))
-			{
-				continue;
+						l_sConstVal << l_nValue;
+
+						//l_pcFR->registerFunction(l_sName, to_string(l_nValue));
+					}
+					else if (l_sType == wxT("double"))
+					{
+						double l_dval;
+						l_dval = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
+						l_sConstVal << l_dval;
+						//l_pcFR->registerFunction(l_sName, to_string(l_dval));
+					}
+
+				}
+
+				if (l_sType == wxT("int"))
+				{
+					auto type = dssd::andl::ConstType::INT_T;
+					std::vector<std::string> values = l_sVsets;// { l_sConstVal };
+					auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);//l_sGroup was "all"
+					b.addConstant(c);
+				}
+				if (l_sType == wxT("double"))
+				{
+					auto type = dssd::andl::ConstType::DOUBLE_T;
+					std::vector<std::string> values = l_sVsets;// { l_sConstVal };
+					auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);//l_sGroup was "param"
+					b.addConstant(c);
+				}
+				if (l_sType != wxT("double") && l_sType != wxT("int"))
+				{
+					continue;
+				}
 			}
 		}
 	}
+	else
+	{//for updating marking
 
+		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		SP_ListMetadata::const_iterator it;
+
+		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+		{
+			SP_DS_Metadata* l_pcConstant = *it;
+			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+			wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();///Added by G.A
+
+			SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+			wxString l_sConstVal;
+			SP_DS_FunctionRegistryEntry l_FE = l_pcFR->lookUpFunction(l_sName);
+			if (l_FE.IsOk())
+			{
+				SP_FunctionPtr l_Function = l_FE.getFunction();
+				long l_nValue = 0;
+				if (l_Function->isValue())
+				{
+					l_nValue = l_Function->getValue();
+
+				
+					l_sConstVal << l_nValue;
+ 
+				}
+				else
+				{
+					//evaluate string
+					wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
+					if (l_sType == wxT("int"))
+					{
+						l_nValue = SP_DS_FunctionEvaluatorLong{ l_pcFR, l_Function }();
+						//wxString l_sConstVal;
+						l_sConstVal << l_nValue;
+ 
+
+					}
+					else if (l_sType == wxT("double"))
+					{
+						l_nValue = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
+						l_sConstVal << l_nValue;
+					}
+					//l_pcFR->registerFunction(l_sName, to_string(l_nValue));
+				}
+
+				auto type = dssd::andl::ConstType::INT_T;
+				if (l_sType == wxT("double"))
+				{
+					type = dssd::andl::ConstType::DOUBLE_T;
+				}
+				else if (l_sType != "int")
+				{
+					continue;
+				}
+				std::string l_sVal = l_sConstVal.ToStdString();
+				std::vector<std::string> values = { l_sVal };
+				auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, "all", values);
+				b.addConstant(c);
+			}
+		}
+
+	}
 	/***************************************/
 
 	/**
