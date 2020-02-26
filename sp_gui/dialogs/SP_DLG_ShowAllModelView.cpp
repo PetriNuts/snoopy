@@ -84,8 +84,9 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();//Added by G.A 
 	if (m_sNetClassName.Contains(wxT("Fuzzy")))
 	{
-		m_pscrollBar->SetRange(m_anXValues.size());//required when loading a saved view
-		m_pscrollBar->Refresh();
+		m_slider->SetRange(0, m_anXValues.size());
+		//m_pscrollBar->SetRange(m_anXValues.size());//required when loading a saved view
+		//m_pscrollBar->Refresh();
 		this->RefreshWindow();
 	}
 	wxSize temp = m_pcMainSizer->GetSize();

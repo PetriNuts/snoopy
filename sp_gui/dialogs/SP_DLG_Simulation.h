@@ -65,7 +65,6 @@ protected:
 
 	//New Simulator
 	spsim::Simulator* m_pcMainSimulator;
-
 	//Number of result points
 	unsigned long m_nResultPointCount;
 	bool m_bSimThreadCreated;

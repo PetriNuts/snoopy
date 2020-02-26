@@ -61,6 +61,7 @@ private:
 protected:
 		wxSizer* m_pcScroll;
 		wxScrollBar* m_pscrollBar;
+		wxSlider *m_slider;
 		wxStaticText* m_ptimeLabel;
 		wxTextCtrl* m_ptimePointValue;
 
@@ -83,6 +84,7 @@ protected:
 		virtual void OnEditNodeList(wxCommandEvent& event)=0;
 		virtual void OnShowHideNodeList(wxCommandEvent& event);
 		virtual void OnScrol(wxScrollEvent & event);//wxCommandEvent&  
+		  
 		virtual void OnTextEner(wxCommandEvent & event);
 
 protected:

@@ -40,6 +40,7 @@ enum
 };
 
 BEGIN_EVENT_TABLE( SP_DLG_ViewerWindow, wxFrame )
+EVT_COMMAND_SCROLL_THUMBRELEASE(SP_ID_SCROLL_BAR,SP_DLG_ViewerWindow::OnScrol)
 END_EVENT_TABLE()
 
 SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
@@ -105,13 +106,21 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 		if (m_sNetClassName.Contains(wxT("Fuzzy")))
 		{
 			m_pcScroll = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Change Time point")), wxHORIZONTAL);
-			  m_pscrollBar = new wxScrollBar(this, SP_ID_SCROLL_BAR,wxDefaultPosition, wxSize(300, 20), wxSB_HORIZONTAL);
-			  m_ptimeLabel=new  wxStaticText(this, SP_ID_Time_Label,wxT("TimePoint:"), wxDefaultPosition, wxDefaultSize, 0);
+			//  m_pscrollBar = new wxScrollBar(this, SP_ID_SCROLL_BAR,wxDefaultPosition, wxSize(300, 20), wxSB_HORIZONTAL);
+			m_slider = new wxSlider(this, SP_ID_SCROLL_BAR, 75, 0, 750, wxPoint(-1, -1),
+				wxSize(150, -1), wxSL_LABELS);
+			m_ptimeLabel=new  wxStaticText(this, SP_ID_Time_Label,wxT("TimePoint:"), wxDefaultPosition, wxDefaultSize, 0);
 			  m_ptimePointValue=  new wxTextCtrl(this, SP_ID_Time_VALUE,  wxEmptyString, wxDefaultPosition, wxSize(40,20),wxTE_PROCESS_ENTER | wxTE_CENTER);
 			  m_ptimePointValue->Enable(true);
-			m_pcScroll->Add(m_pscrollBar);
+			//m_pcScroll->Add(m_pscrollBar);
+			m_pcScroll->Add(m_slider);
 			m_pcScroll->Add(m_ptimeLabel);
 			m_pcScroll->Add(m_ptimePointValue);
+			/**************/
+			m_slider->SetFocus();
+
+			this->Connect(SP_ID_SCROLL_BAR, wxEVT_COMMAND_SLIDER_UPDATED,
+				wxScrollEventHandler(SP_DLG_ViewerWindow::OnScrol));
 		}
 		else {
 
@@ -163,11 +172,11 @@ SP_DLG_ViewerWindow::SP_DLG_ViewerWindow(SP_DLG_Simulation* p_pcParentWnd):
 		Bind(wxEVT_BUTTON, &SP_DLG_ViewerWindow::OnChangeXAxis, this, SP_ID_CHANGE_X_AXIS);
 		Bind(wxEVT_ACTIVATE, &SP_DLG_ViewerWindow::OnWindowActivate, this);
 	 //Scroll bar events handlers 
-	Bind(wxEVT_SCROLL_LINEUP,&SP_DLG_ViewerWindow::OnScrol,this, SP_ID_SCROLL_BAR);
-	Bind(wxEVT_SCROLL_LINEDOWN,&SP_DLG_ViewerWindow::OnScrol,this, SP_ID_SCROLL_BAR);
-	Bind(wxEVT_SCROLL_PAGEUP,&SP_DLG_ViewerWindow::OnScrol, this, SP_ID_SCROLL_BAR);
-	Bind(wxEVT_SCROLL_PAGEDOWN,&SP_DLG_ViewerWindow::OnScrol,this, SP_ID_SCROLL_BAR);
-	Bind(wxEVT_SCROLL_CHANGED,&SP_DLG_ViewerWindow::OnScrol, this, SP_ID_SCROLL_BAR);
+	//Bind(wxEVT_SCROLL_LINEUP,&SP_DLG_ViewerWindow::OnScrol,this, SP_ID_SCROLL_BAR);
+	//Bind(wxEVT_SCROLL_LINEDOWN,&SP_DLG_ViewerWindow::OnScrol,this, SP_ID_SCROLL_BAR);
+	//Bind(wxEVT_SCROLL_PAGEUP,&SP_DLG_ViewerWindow::OnScrol, this, SP_ID_SCROLL_BAR);
+	//Bind(wxEVT_SCROLL_PAGEDOWN,&SP_DLG_ViewerWindow::OnScrol,this, SP_ID_SCROLL_BAR);
+	//Bind(wxEVT_SCROLL_CHANGED,&SP_DLG_ViewerWindow::OnScrol, this, SP_ID_SCROLL_BAR);
 	//when entering certain time point to the textCtrl
 	Bind(wxEVT_TEXT_ENTER, &SP_DLG_ViewerWindow::OnTextEner, this, SP_ID_Time_VALUE);//wxEVT_COMMAND_TEXT_ENTER
 	
@@ -217,7 +226,8 @@ void SP_DLG_ViewerWindow::CreateResultViewer(const wxString& p_sViewerType)
 		if (m_sNetClassName.Contains("Fuzzy"))
 		{
 		
-		m_pscrollBar->SetRange(m_anXValues.size());
+			m_slider->SetRange(0, m_anXValues.size());
+		//m_pscrollBar->SetRange(m_anXValues.size());
 		m_pcResultViewer->SetYAxisValues(&m_anYValues);
 		}
 		 
@@ -249,12 +259,14 @@ void SP_DLG_ViewerWindow::OnTextEner(wxCommandEvent & event)
 {
 	wxString sTimeVal = m_ptimePointValue->GetValue();
 	double dTime;
-	if (sTimeVal.ToDouble(&dTime)&& dTime>=0 && dTime<=m_pscrollBar->GetRange()-1)
+	if (sTimeVal.ToDouble(&dTime)&& dTime>=0 && m_slider->GetMax()-1 )
 	{
-		m_pscrollBar->SetScrollPos(1, dTime);
-		m_pscrollBar->SetThumbPosition(dTime);
-		m_pscrollBar->SetToolTip(sTimeVal);
-		//timePointValue->SetLabelText(cc);
+		//dTime<=m_slider->GetRange()-1
+		//m_slider->SetScrollPos(1, dTime);
+		m_slider->SetValue(dTime);
+	//	m_pscrollBar->SetScrollPos(1, dTime);
+	//	m_pscrollBar->SetThumbPosition(dTime);
+	//	m_pscrollBar->SetToolTip(sTimeVal);
 		m_pcResultViewer->UpdateMembershipViewer(dTime);
 	
 	}
@@ -271,16 +283,19 @@ void SP_DLG_ViewerWindow::OnTextEner(wxCommandEvent & event)
 	}
 
 }
-
-void SP_DLG_ViewerWindow::OnScrol(wxScrollEvent& event1)//wxCommandEvent&  
+ 
+void SP_DLG_ViewerWindow::OnScrol(wxScrollEvent& WXUNUSED(event))//wxScrollEvent&  
 {
-	double dtimePoint = m_pscrollBar->GetThumbPosition();
+	double dtimePoint1 = m_slider->GetValue();
+	//double dtimePoint = m_pscrollBar->GetThumbPosition();
 	wxString stimePoint;
-	stimePoint << dtimePoint;
-	m_pscrollBar->SetToolTip(stimePoint);
-	m_pscrollBar->Refresh();
+	stimePoint << dtimePoint1;
+	//stimePoint << dtimePoint;
+	//m_pscrollBar->SetToolTip(stimePoint);
+	//m_pscrollBar->Refresh();
 	m_ptimePointValue->SetLabelText(stimePoint);
-	m_pcResultViewer->UpdateMembershipViewer(dtimePoint);
+	//m_pcResultViewer->UpdateMembershipViewer(dtimePoint);
+	m_pcResultViewer->UpdateMembershipViewer(dtimePoint1);
 
 
 }
