@@ -39,6 +39,7 @@ bool SP_ExportColHPN2HybridPN::AcceptsDoc(SP_MDI_Doc* p_doc)
 
 bool SP_ExportColHPN2HybridPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 {
+	 
 	CHECK_POINTER(p_doc, return false);
 	CHECK_POINTER(p_doc->GetGraph(), return false);
 	CHECK_BOOL((!p_fileName.IsEmpty()), return false);
@@ -59,11 +60,11 @@ bool SP_ExportColHPN2HybridPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileNa
 	m_lNewEdges = l_UnfoldingforExport.GetNewEdges();	
 
 	//parameter to constant
-	if(!p_doc->GetGraph()->GetNodeclass(wxT("Parameter")))
-		 return false;
+	//if(!p_doc->GetGraph()->GetNodeclass(wxT("Parameter")))
+	//	 return false;
 
-	const SP_ListNode* l_pcParams = p_doc->GetGraph()->GetNodeclass(wxT("Parameter"))->GetElements();
-	CHECK_POINTER(l_pcParams,return false);
+	//const SP_ListNode* l_pcParams = p_doc->GetGraph()->GetNodeclass(wxT("Parameter"))->GetElements();
+	//CHECK_POINTER(l_pcParams,return false);
 
 	SP_GM_Docmanager* l_pcDM = wxGetApp().GetDocmanager();
 	SP_GM_DocTemplate* l_pcTemplate = l_pcDM->GetTemplate(SP_DS_HYBRIDPN_CLASS);
@@ -72,7 +73,7 @@ bool SP_ExportColHPN2HybridPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileNa
 
 	SP_DS_Metadataclass* l_pcMC = m_pcExportGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 	l_pcMC->RemoveAll();
-
+	/**
 	SP_ListNode::const_iterator l_itParam;
 	for(l_itParam=l_pcParams->begin();l_itParam!= l_pcParams->end(); l_itParam++)
 	{
@@ -95,14 +96,15 @@ bool SP_ExportColHPN2HybridPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileNa
 		}
 
 	}
+	*/
 	//end of convertion
 
-	bool l_bSuccess = SP_XmlWriter::Write(p_doc->GetGraph(), p_fileName);
+	 bool l_bSuccess = SP_XmlWriter::Write(p_doc->GetGraph(), p_fileName);
 
 	l_UnfoldingforExport.Reset(); // Reset the net 
 
 	wxDELETE(m_pcExportGraph);
-
+	 
 	return l_bSuccess;
 
 }
@@ -268,6 +270,7 @@ bool SP_ExportColHPN2HybridPN::WriteMetadataclass( SP_DS_Metadataclass* p_pcVal,
 	CHECK_POINTER( p_pcRoot, return FALSE );
 
 	wxString l_sName = p_pcVal->GetName();
+	/**
 	if(l_sName == SP_DS_META_CONSTANT)
 	{
 		SP_DS_Metadataclass* l_pcMC = m_pcExportGraph->GetMetadataclass(SP_DS_META_CONSTANT);
@@ -292,12 +295,49 @@ bool SP_ExportColHPN2HybridPN::WriteMetadataclass( SP_DS_Metadataclass* p_pcVal,
 		}
 	    SP_XmlWriter::WriteMetadataclass(l_pcMC, p_pcRoot);
 	}
+	*/
+	if (l_sName == wxT("Constant Class1"))//by george
+	{
+		SP_DS_Metadataclass* l_pcMC = m_pcExportGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+		SP_DS_Metadataclass* l_pcCOnstants = p_pcVal;
+		SP_ListMetadata::const_iterator l_itElem;
+		l_itElem = l_pcCOnstants->GetElements()->begin();
+		for (size_t l_nCon = 0; l_nCon < l_pcCOnstants->GetElements()->size(); l_nCon++)
+		{
+			SP_DS_Metadata* l_pcConstant = l_pcMC->NewElement(1);
+			///l_pcConstant = *l_itElem;
+			SP_DS_Metadata* l_pcConst;
+			l_pcConst = *l_itElem;
+			l_pcConstant->GetAttribute(wxT("Group"))->SetValueString(l_pcConst->GetAttribute(wxT("Group"))->GetValueString());
+			l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(l_pcConst->GetAttribute(wxT("Type"))->GetValueString());
+			l_pcConstant->GetAttribute(wxT("Name"))->SetValueString(l_pcConst->GetAttribute(wxT("Name"))->GetValueString());
+			l_pcConstant->GetAttribute(wxT("Comment"))->SetValueString(l_pcConst->GetAttribute(wxT("Comment"))->GetValueString());
+			l_pcConstant->GetAttribute(wxT("Name"))->SetValueString(l_pcConst->GetAttribute(wxT("Name"))->GetValueString());
+			SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+			SP_DS_ColListAttribute * l_pcSourceColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConst->GetAttribute(wxT("ValueList")));
+
+
+			l_pcColList->Clear();
+			//l_pcColList->SetCell(0, 0, wxT("Main"));
+			//l_pcColList->SetCell(0, 1, l_pcSourceColList->GetCell(0, 1));
+
+			for (size_t l_nRow = 0; l_nRow < l_pcSourceColList->GetRowCount(); l_nRow++)
+			{
+				int l_nRowCol = l_pcColList->AppendEmptyRow();
+				l_pcColList->SetCell(l_nRowCol, 0, l_pcSourceColList->GetCell(l_nRowCol, 0));
+				l_pcColList->SetCell(l_nRowCol, 1, l_pcSourceColList->GetCell(l_nRowCol, 1));
+			}
+			++l_itElem;
+		}
+		SP_XmlWriter::WriteMetadataclass(l_pcMC, p_pcRoot);
+	}
 	else if(l_sName == SP_DS_META_FUNCTION)
 	{
 		//TODO
 	}
 	else if(m_pcExportGraph->GetMetadataclass(l_sName))
 	{
+		if(l_sName!=wxT("Constant Class"))//this line by george
 		SP_XmlWriter::WriteMetadataclass(p_pcVal, p_pcRoot);
 	}
 	return true;

@@ -61,7 +61,42 @@ bool SP_ExportPed2ColPT::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 	l_pcAttr->SetCell(0,2,wxT("dot"));
 	//end of color sets
 
+	/////////////////george///////////////
+	l_pcMC = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+	SP_DS_Metadataclass* l_pcNewConstants= m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	SP_DS_Metadata* l_pcConstant;
+	SP_ListMetadata::const_iterator l_itElem;
+	for (l_itElem = l_pcMC->GetElements()->begin(); l_itElem != l_pcMC->GetElements()->end(); l_itElem++)
+	{
+		SP_DS_Metadata* l_pcNewConstant = l_pcNewConstants->NewElement(1);
+		l_pcConstant = *l_itElem;
+		wxString l_sName = l_pcConstant->GetAttribute(wxT("Name"))->GetValueString();
+		wxString l_sGroup = l_pcConstant->GetAttribute(wxT("Group"))->GetValueString();
+		wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
+		wxString l_sComment = l_pcConstant->GetAttribute(wxT("Comment"))->GetValueString();
+
+		l_pcNewConstant->GetAttribute(wxT("Group"))->SetValueString(l_sGroup);
+		l_pcNewConstant->GetAttribute(wxT("Type"))->SetValueString(l_sType);
+		l_pcNewConstant->GetAttribute(wxT("Name"))->SetValueString(l_sName);
+		l_pcNewConstant->GetAttribute(wxT("Comment"))->SetValueString(l_sComment);
+	//	l_pcConstant->GetAttribute(wxT("Name"))->SetValueString(l_sName);
+
+		SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNewConstant->GetAttribute(wxT("ValueList")));
+
+		SP_DS_ColListAttribute * l_pcSourceColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+		l_pcColList->Clear();
+		
+		for (unsigned int i = 0; i <  l_pcSourceColList->GetRowCount(); i++)
+		{
+			int l_nRowCol = l_pcColList->AppendEmptyRow();
+			l_pcColList->SetCell(l_nRowCol, 0, l_pcSourceColList->GetCell(l_nRowCol, 0));
+			l_pcColList->SetCell(l_nRowCol, 1, l_pcSourceColList->GetCell(l_nRowCol, 1));
+		}
+		//++l_itElem;
+	}
+
 	/////////////////////////////////
+	/**
 	l_pcMC = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 	SP_DS_Metadata* l_pcConstant;
 	SP_ListMetadata::const_iterator l_itElem;
@@ -104,6 +139,8 @@ bool SP_ExportPed2ColPT::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 		l_pcAttr->SetCell(i,1,l_vValues[2]);
 		l_pcAttr->SetCell(i,2,l_vValues[4]);
 	}
+
+	*/
 	//end of constants
 
 

@@ -20,6 +20,7 @@
 #include "sp_ds/attributes/SP_DS_DoubleMarkingDependentMultiplicity.h"
 
 #include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 
 #include <wx/filename.h>
 
@@ -960,6 +961,70 @@ bool SP_ExportPT::WriteDeclarations()
 
 	m_file.Write(wxT("\n"));
 
+	//by george ( constants harmonizing)
+	SP_DS_Metadataclass* mc = m_graph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	SP_ListMetadata::const_iterator it;
+
+	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+	{
+		SP_DS_Metadata* l_pcConstant = *it;
+		wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+		wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();///Added by G.A
+
+		SP_DS_FunctionRegistry* l_pcFR = m_graph->GetFunctionRegistry();
+		wxString l_sConstVal;
+
+		SP_DS_FunctionRegistryEntry l_FE = l_pcFR->lookUpFunction(l_sName);
+		if (l_FE.IsOk())
+		{
+			SP_FunctionPtr l_Function = l_FE.getFunction();
+
+			double l_nValue = 0.0;
+
+
+			if (l_Function->isValue())
+			{
+				if (l_sType == wxT("int"))
+				{
+					l_nValue = (int)l_Function->getValue();
+					 
+				}
+				else if (l_sType == wxT("double"))
+				{
+					l_nValue = l_Function->getValue();
+					 
+				}
+				
+				l_sConstVal << l_nValue;
+				 
+			}
+			else
+			{
+				//evaluate string
+				wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
+				if (l_sType == wxT("int"))
+				{
+					l_nValue = SP_DS_FunctionEvaluatorLong{ l_pcFR, l_Function }();
+					wxString l_sConstVal;
+					l_sConstVal << l_nValue;
+
+
+				}
+				else if (l_sType == wxT("double"))
+				{
+					l_nValue = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
+					l_sConstVal << l_nValue;
+				}
+				 
+			}
+		}
+		wxString l_sConstant = wxT("Constant ") + l_sName + wxT(" = ") +l_sType + wxT(" with ") + l_sConstVal + wxT(";\n");
+		m_file.Write(l_sConstant);
+	}
+	/*********************************/
+
+	/**
+	
 	l_pcMetadataclass = m_graph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
 	if(!l_pcMetadataclass)
 		return false;
@@ -978,6 +1043,7 @@ bool SP_ExportPT::WriteDeclarations()
 		m_file.Write(l_sColorset);
 	}
 
+	*/
 
 	m_file.Write(wxT("\n"));
 

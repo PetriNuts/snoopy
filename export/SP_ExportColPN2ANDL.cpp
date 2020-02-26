@@ -439,7 +439,128 @@ bool SP_ExportColPN2ANDL::WriteArcs(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unf
 
 bool SP_ExportColPN2ANDL::WriteParameters(std::shared_ptr<SP_DS_ColPN_Unfolding> p_Unfolding)
 {
-	m_file.Write(wxT("constants:\n"));
+ 
+
+
+	SP_DS_Metadataclass* l_pcCOnstants = m_graph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	SP_ListMetadata::const_iterator l_itElem;
+	l_itElem = l_pcCOnstants->GetElements()->begin();
+	std::set<string> l_vVsets;
+	for (size_t l_nCon = 0; l_nCon < l_pcCOnstants->GetElements()->size(); l_nCon++)
+	{
+	 
+		SP_DS_Metadata* l_pcConst;
+		l_pcConst = *l_itElem;
+		wxString l_sGroup = l_pcConst->GetAttribute(wxT("Group"))->GetValueString();
+		wxString l_sType  = l_pcConst->GetAttribute(wxT("Type"))->GetValueString();
+		wxString l_sName=  l_pcConst->GetAttribute(wxT("Name"))->GetValueString();
+		 
+		SP_DS_ColListAttribute * l_pcSourceColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConst->GetAttribute(wxT("ValueList")));
+		 
+
+		for (size_t l_nRow = 0; l_nRow < l_pcSourceColList->GetRowCount(); l_nRow++)
+		{
+			 
+			wxString l_vset= l_pcSourceColList->GetCell(l_nRow, 0);
+			l_vset.Replace(wxT(" "),wxT("_"));
+			l_vset.Replace(wxT("-"), wxT("_"));
+			if (!l_vset.IsEmpty())
+			{
+				l_vVsets.insert(l_vset);
+			}
+			
+		}
+		++l_itElem;
+	}
+	
+	if (l_vVsets.size() > 0)
+	{
+		m_file.Write(wxT("constants:\n"));
+		m_file.Write(wxT("valuesets["));
+		std::set<std::string>::iterator it = l_vVsets.begin();
+		wxString l_sets;
+		 //write valuesets
+		
+		int i = 0;
+		while (it != l_vVsets.end())
+		{
+			 
+			l_sets << (*it);
+
+			if (i != l_vVsets.size() - 1)
+			{
+				l_sets << wxT(":");
+			}
+			else {
+				l_sets << wxT("]\n");
+			}
+			
+			 
+			it++;
+			i++;
+		}
+		
+		m_file.Write(l_sets.ToStdString());
+		/////////////////////////////////////
+		l_itElem = l_pcCOnstants->GetElements()->begin();
+		std::set<string> l_vVsets;
+		for (size_t l_nCon = 0; l_nCon < l_pcCOnstants->GetElements()->size(); l_nCon++)
+		{
+			vector<wxString> l_vVals;
+			SP_DS_Metadata* l_pcConst;
+			l_pcConst = *l_itElem;
+			wxString l_sGroup = l_pcConst->GetAttribute(wxT("Group"))->GetValueString();
+			wxString l_sType = l_pcConst->GetAttribute(wxT("Type"))->GetValueString();
+			wxString l_sName = l_pcConst->GetAttribute(wxT("Name"))->GetValueString();
+
+			SP_DS_ColListAttribute * l_pcSourceColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConst->GetAttribute(wxT("ValueList")));
+
+
+			for (size_t l_nRow = 0; l_nRow < l_pcSourceColList->GetRowCount(); l_nRow++)
+			{
+
+				wxString val = l_pcSourceColList->GetCell(l_nRow, 1);
+				l_vVals.push_back(val);
+			}
+			if (l_vVals.size() == 1)
+			{
+				l_vVals[0].Replace("[", "");
+				l_vVals[0].Replace("]", "");
+			}
+			wxString l_sWriteGroup;
+			l_sWriteGroup << l_sGroup << wxT(":\n");
+			m_file.Write(l_sWriteGroup.ToStdString());
+			wxString l_sConstWrite;
+			l_sConstWrite << l_sType<<wxT(" ") <<l_sName <<wxT(" =");
+			wxString l_sVs;
+			l_sVs << wxT("[");
+			for (int j = 0; j < l_vVals.size(); j++)
+			{
+				l_sVs << l_vVals[j];
+				if (j != l_vVals.size() - 1)
+				{
+					l_sVs << wxT(":");
+				}
+				else {
+					l_sVs << wxT("];");
+				}
+			}
+			  
+			if (l_vVals.size() == 1)
+			{
+				l_sVs.Replace(wxT("["),wxT(""));
+				l_sVs.Replace(wxT("]"), wxT(""));
+			}
+			l_sConstWrite << l_sVs<<wxT("\n");
+			m_file.Write(l_sConstWrite.ToStdString());
+			++l_itElem;
+		}
+	}//end outer if
+	m_file.Write(wxT("\n"));
+	////////////////////////////////////////
+
+
+/*
 	m_file.Write(wxT("parameter:\n"));
 
 	wxString l_sParameterName;
@@ -463,5 +584,6 @@ bool SP_ExportColPN2ANDL::WriteParameters(std::shared_ptr<SP_DS_ColPN_Unfolding>
 	}
 
 	m_file.Write(wxT("\n"));
+	*/
 	return TRUE;
 }

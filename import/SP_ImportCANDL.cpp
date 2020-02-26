@@ -35,6 +35,10 @@
 
 #include <algorithm>
 
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
+#include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+#include "sp_ds/attributes/SP_DS_TextAttribute.h"
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 SP_ImportCANDL::SP_ImportCANDL()
 {
 
@@ -209,8 +213,32 @@ SP_ImportCANDL::CreatePlaces(const dssd::andl::Places& p_Places)
 			if(l_Markings[i].Contains(wxT("`")))
 			{
 				token = l_Markings[i].BeforeFirst('`');
+				token.Replace(wxT("("), wxT(""));//by george
+				token.Replace(wxT(")"), wxT(""));//by george
+				token.Replace(wxT("++"), wxT(""));//by george
 				color = l_Markings[i].AfterFirst('`');
+			  
+				if (!color.Contains("all")&& !m_fileName.Contains(wxT(".candl")))
+				{
+					// by george
+					color.Replace(wxT("("), wxT(""));
+					color.Replace(wxT(")"), wxT(""));
+					color.Replace(wxT("++"), wxT(""));
+					wxString l_sColor;
+					if (!color.Contains(wxT("dot")))
+					{
+						l_sColor << wxT("(") << color << wxT(")");
+						color = l_sColor;
+					}
+				}
+				
+			//	if (color.Contains("(") && !color.Contains(",")&& !m_fileName.Contains(wxT(".candl")))// case where a simple color is surounded by (), but it is not compund colour
+				//{
+					//color.Replace(wxT("("), wxT(""));
+					//color.Replace(wxT(")"), wxT(""));
+				//}
 			}
+			
 			else
 			{
 				token = wxT("1");
@@ -239,6 +267,110 @@ SP_ImportCANDL::CreatePlaces(const dssd::andl::Places& p_Places)
 bool
 SP_ImportCANDL::CreateConst(const dssd::andl::Constants& p_Constants, const dssd::andl::Valuesets& p_Valuesets)
 {
+	int l_nCount = 0;
+SP_DS_Metadataclass*	l_pcConstants = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+for (auto& constant : p_Constants)
+{
+	l_pcConstants->NewElement(1);
+}
+SP_ListMetadata::const_iterator l_itElem;
+l_itElem = l_pcConstants->GetElements()->begin();
+for (auto& constant : p_Constants)
+	{
+		if (!constant) continue;
+
+		if (lookupParameters.find(constant->name_) != lookupParameters.end())
+		{
+			continue;
+	 
+		}
+		if (lookupConstants.find(constant->name_) != lookupConstants.end())
+		{
+			continue;
+	 
+		}
+
+		wxString name = constant->name_;
+		auto type = constant->type_;
+		wxString group = constant->group_;
+	 
+		//TODO
+		/*
+		if(constant->type_ == dssd::andl::ConstType::STRING_T)
+		{
+		type = wxT("string");
+		}
+		*/
+		if (constant->type_ == dssd::andl::ConstType::DOUBLE_T || constant->type_ == dssd::andl::ConstType::INT_T
+			&& (m_eNetType == dssd::andl::NetType::COL_SPN_T
+				|| m_eNetType == dssd::andl::NetType::COL_CPN_T
+				|| m_eNetType == dssd::andl::NetType::COL_HPN_T
+				 || m_eNetType == dssd::andl::NetType::COL_XPN_T
+				|| m_eNetType == dssd::andl::NetType::COL_PN_T))
+		{
+			//l_pcConstants->NewElement(1);
+			//l_nCount++;
+		 
+			 
+			
+			SP_DS_Metadata* l_pcConstant;
+			l_pcConstant = *l_itElem;
+			l_pcConstant->GetAttribute(wxT("Name"))->SetValueString(name);
+			l_pcConstant->GetAttribute(wxT("Group"))->SetValueString(group);
+			l_pcConstant->GetAttribute(wxT("Comment"))->SetValueString(wxT(""));
+
+			if (constant->type_ == dssd::andl::ConstType::DOUBLE_T)
+			{
+				bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
+			}
+			else {
+				bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(wxT("int"));
+			}
+			
+			
+			wxString value = wxT("0");
+			wxString l_sMain;
+			if (!constant->values_.empty())
+			{
+				value = constant->values_.front();
+				l_sMain << value;
+			}
+			SP_DS_ColListAttribute * l_pcColList1 = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+			l_pcColList1->Clear();
+			//l_pcColList1->SetCell(0, 0, wxT("Main"));
+			//l_pcColList1->SetCell(0, 1, value);
+			
+			
+			for (unsigned int i = 0; i < constant->values_.size(); i++)
+			{
+				value = constant->values_[i];
+				int l_nRowCol = l_pcColList1->AppendEmptyRow();
+				//wxString l_sVset;
+				///l_sVset << "Value-Set" << wxT("-")<<i-1;
+				l_pcColList1->SetCell(l_nRowCol, 0, p_Valuesets[i]);
+				l_pcColList1->SetCell(l_nRowCol, 1, value);
+			}
+
+			m_pcGraph->GetFunctionRegistry()->registerFunction(name, l_sMain);
+
+			l_pcColList1->UpdateActiveListColumnPtr();
+
+		 
+			l_pcConstant->Update();
+			lookupConstants[constant->name_] = *l_itElem;
+			 ++l_itElem;
+			//l_nCount++;
+		}
+		 
+
+
+	}
+
+
+
+
+
+	/**
 	for(auto& constant : p_Constants)
 	{
 		if(!constant) continue;
@@ -256,13 +388,14 @@ SP_ImportCANDL::CreateConst(const dssd::andl::Constants& p_Constants, const dssd
 
 		wxString name = constant->name_;
 		wxString type = wxT("int");
+	 
 		//TODO
-/*
-		if(constant->type_ == dssd::andl::ConstType::STRING_T)
-		{
-			type = wxT("string");
-		}
-*/
+
+		//if(constant->type_ == dssd::andl::ConstType::STRING_T)
+		//{
+		//	type = wxT("string");
+		//}
+
 		if(constant->type_ == dssd::andl::ConstType::DOUBLE_T
 			&& (m_eNetType == dssd::andl::NetType::COL_SPN_T
 					|| m_eNetType == dssd::andl::NetType::COL_CPN_T
@@ -313,6 +446,7 @@ SP_ImportCANDL::CreateConst(const dssd::andl::Constants& p_Constants, const dssd
 		}
 
 	}
+	*/
 	return true;
 }
 
@@ -575,6 +709,8 @@ SP_ImportCANDL::CreateTransitions(const dssd::andl::Transitions& p_Transitions)
 		wxString guard = t->guard_;
 		AdaptColorExpression(guard);
 		SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_node->GetAttribute(SP_DS_CPN_GUARDLIST));
+		guard = guard.AfterFirst('[');//by george
+		guard = guard.BeforeLast(']');//by george
 		l_pcAttr->SetCell(0,1,guard);
 
 		if (m_eNetType == dssd::andl::NetType::COL_SPN_T
@@ -837,6 +973,19 @@ SP_ImportCANDL::AdaptColorExpression(wxString& p_ColorExpression)
 	p_ColorExpression.Replace("all", "all()");
 	p_ColorExpression.Replace("auto", "auto()");
 	p_ColorExpression.Replace("!=", "<>");
+	if (p_ColorExpression.Contains(wxT("all")) && p_ColorExpression[0] == '(')
+	{//by george
+		wxString l_sToken,l_sColor;
+		l_sToken = p_ColorExpression.BeforeFirst('`');
+
+		l_sColor = p_ColorExpression.AfterFirst('`');
+
+		wxString l_sCNew = l_sColor.AfterFirst('(');
+		l_sCNew = l_sCNew.BeforeLast(')');
+		p_ColorExpression = wxT("");
+		p_ColorExpression << l_sToken << wxT('`') << l_sCNew;
+
+	}
 }
 
 
