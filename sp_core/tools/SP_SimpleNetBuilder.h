@@ -9,7 +9,7 @@
 #define SP_CORE_TOOLS_SP_SIMPLENETBUILDER_H_
 
 #include "dssd/misc/net.h"
-
+#include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_CPN_SyntaxChecking.h"
 class SP_DS_Graph;
 
 namespace dssd
@@ -68,6 +68,7 @@ private:
 	  bool CreateConstants(dssd::andl::simple_net_builder& b);
 	  bool CreateFunctions(dssd::andl::simple_net_builder& b);
 	  bool CreateObservers(dssd::andl::simple_net_builder& b);
+	  void PrePareMarkingString(wxString& p_sMarkingExpression,wxString& p_sOutput);
 
 };
 

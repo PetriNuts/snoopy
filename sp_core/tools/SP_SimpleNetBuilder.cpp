@@ -24,8 +24,15 @@
 #include <wx/filename.h>
 #include <wx/tokenzr.h>
 
+//george
+#include "sp_ds/attributes/SP_DS_TextAttribute.h"
+#include "sp_ds/attributes/SP_DS_NameAttribute.h"
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
+#include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
+#include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_CPN_SyntaxChecking.h"
 //////////////////////////////////////////////////////////////////////
-
+#include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_CPN_ColorProcessing.h"//george
 bool SP_SimpleNetBuilder::operator ()(SP_DS_Graph* p_pcGraph)
 {
 	if(!p_pcGraph) return false;
@@ -139,6 +146,7 @@ bool SP_SimpleNetBuilder::CreatePlaces(dssd::andl::simple_net_builder& b)
 				{
 					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcAttr);
 					l_sMarking = l_pcColList->GetActiveCellValue(1);
+					
 				}
 				else
 				{
@@ -518,7 +526,46 @@ bool SP_ColoredNetBuilder::CreateColorsets(dssd::andl::simple_net_builder& b)
 	{
 		std::string name = l_pcColList->GetCell(i,0);
 		std::string type = l_pcColList->GetCell(i,1);
-		std::string value = "{" + l_pcColList->GetCell(i,2) + "}";
+		std::string value = "{" + l_pcColList->GetCell(i, 2) + "}";
+		if(type=="enum"&& value.find('-')!=std::string::npos)//george
+		{
+			SP_LOGMESSAGE("The type " + type + " with colour range is not supported by CANDL format");
+			wxString l_ColValues = l_pcColList->GetCell(i, 2);
+			SP_CPN_ColorProcessing l_cpn_process;
+			std::vector<wxString> l_vColors;
+
+			l_cpn_process.ProcessingString(name, l_ColValues, l_vColors);
+			wxString l_sColors;
+			for (auto i : l_vColors)
+			{
+				l_sColors << "," << i;
+			}
+			l_sColors = l_sColors.AfterFirst(',');
+			value = "{" + l_sColors.ToStdString() + "}";
+		}
+
+		if (type == "string" )//george
+		{
+			wxString l_ColValues = l_pcColList->GetCell(i, 2);
+			SP_CPN_ColorProcessing l_cpn_process;
+			std::vector<wxString> l_vColors;
+
+			l_cpn_process.ProcessingString(name, l_ColValues, l_vColors);
+			wxString l_sColors;
+			wxString l_sQutCol;
+			for (auto i : l_vColors)
+			{
+				l_sQutCol << wxT("\"") << i << wxT("\"");
+				l_sColors <<","<< l_sQutCol ;
+				l_sQutCol.Empty();
+			}
+			l_sColors = l_sColors.AfterFirst(',');
+			value = "{" + l_sColors.ToStdString() + "}";
+		}
+		if (type == "union" || type=="index")//george
+		{
+			SP_LOGMESSAGE("The type "+ type+" is not supported by CANDL format");
+		}
 		dssd::aux::replaceAll(value, "-", "..");
 		auto cs = std::make_shared<dssd::andl::Colorset>(name, value);
 		if(type == wxT("dot"))
@@ -566,6 +613,7 @@ bool SP_ColoredNetBuilder::CreateColorsets(dssd::andl::simple_net_builder& b)
 		else if(type == "union")
 		{
 			dssd::aux::replaceAll(value, ",", "+");
+			SP_LOGMESSAGE("The type " + type + " is not supported by CANDL format");
 		}
 		else
 		{
@@ -666,11 +714,22 @@ bool SP_ColoredNetBuilder::CreatePlaces(dssd::andl::simple_net_builder& b)
 						l_sMarking += "" + l_sToken
 								+ "`" + l_sColors
 								+ "";
+						wxString l_sOld = l_sMarking;//george
+						wxString l_sNew;//george
+						 
+						PrePareMarkingString(l_sOld, l_sNew);//george
+						l_sMarking = l_sNew.ToStdString();//george
+					    
+					 
 					}
 				}
 				else
 				{
 					l_sMarking = l_pcNode->GetAttribute(wxT("Marking"))->GetValueString();
+					wxString l_sOld = l_sMarking;//george
+					wxString l_sNew;//
+					PrePareMarkingString(l_sOld, l_sNew);//
+					l_sMarking=l_sNew.ToStdString();//
 				}
 				dssd::aux::replaceAll(l_sMarking, "all()", "all");
 				dssd::aux::replaceAll(l_sMarking, "auto()", "auto");
@@ -894,7 +953,112 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b)
 {
 	if(!m_pcGraph)
 		return false;
+ 
+	/*************** by george*************/
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	SP_ListMetadata::const_iterator it;
+	int i = 0;
+	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+	{
 
+		SP_DS_Metadata* l_pcConstant = *it;
+		wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+		wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue(); 
+		wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
+		SP_DS_ColListAttribute * l_pcSourceColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+		if (i == 0) {
+			
+			for (unsigned i = 0; i < l_pcSourceColList->GetRowCount(); ++i)
+			{
+				wxString valueSet = SP_NormalizeString(l_pcSourceColList->GetCell(i, 0));
+				b.registerValueSet(valueSet.ToStdString());
+			}
+		}
+		i++;
+
+		std::vector<string> l_sVsets;
+		for (unsigned i = 0; i < l_pcSourceColList->GetRowCount(); ++i)
+		{
+			l_sVsets.push_back(l_pcSourceColList->GetCell(i,1));
+
+		}
+
+		SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+
+		SP_DS_FunctionRegistryEntry l_FE = l_pcFR->lookUpFunction(l_sName);
+		if (l_FE.IsOk())
+		{
+			SP_FunctionPtr l_Function = l_FE.getFunction();
+			wxString l_sConstVal;
+			
+			if (l_Function->isValue())
+			{
+				if (l_sType == wxT("double"))
+				{
+					double l_nValue = 0.0;
+					l_nValue = l_Function->getValue();
+
+
+					l_sConstVal << l_nValue;
+				}
+				else {
+					long   l_nValue = 0.0;
+					l_nValue = l_Function->getValue();
+
+
+					l_sConstVal << l_nValue;
+				}
+
+				
+				//l_pcFR->registerFunction(l_sName, to_string(l_nValue));
+			}
+			else
+			{
+				//evaluate string
+				wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
+				if (l_sType == wxT("int"))
+				{
+					long l_nValue = SP_DS_FunctionEvaluatorLong{ l_pcFR, l_Function }();
+					
+					l_sConstVal << l_nValue;
+				 
+					//l_pcFR->registerFunction(l_sName, to_string(l_nValue));
+				}
+				else if (l_sType == wxT("double"))
+				{
+					double l_dval;
+					l_dval = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
+					l_sConstVal << l_dval;
+					//l_pcFR->registerFunction(l_sName, to_string(l_dval));
+				}
+				
+			}
+
+			if (l_sType == wxT("int"))
+			{
+				auto type = dssd::andl::ConstType::INT_T;
+				std::vector<std::string> values = l_sVsets;// { l_sConstVal };
+				auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);//l_sGroup was "all"
+				b.addConstant(c);
+			}
+			if (l_sType == wxT("double"))
+			{
+				auto type = dssd::andl::ConstType::DOUBLE_T;
+				std::vector<std::string> values = l_sVsets;// { l_sConstVal };
+				auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);//l_sGroup was "param"
+				b.addConstant(c);
+			}
+			if (l_sType != wxT("double") && l_sType != wxT("int"))
+			{
+				continue;
+			}
+		}
+	}
+
+	/***************************************/
+
+	/**
 	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
 	if(!l_pcMetadataclass)
 		return false;
@@ -960,7 +1124,7 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b)
 			b.addConstant(c);
 		}
 	}
-
+	*/
 	return TRUE;
 }
 
@@ -1005,3 +1169,135 @@ bool SP_ColoredNetBuilder::CreateObservers(dssd::andl::simple_net_builder& b)
 }
 
 //////////////////////////////////////////////////////////////////////
+
+void SP_ColoredNetBuilder::PrePareMarkingString(wxString& p_sMarkingExpression, wxString& l_sResultExp)
+{
+	l_sResultExp = p_sMarkingExpression;
+	wxString l_sProcessed;
+	std::vector<wxString> l_vList;
+	if(l_sResultExp.Contains("++"))
+	{
+		char_separator<char> sep("++");
+		tokenizer<char_separator<char>> tokens(l_sResultExp.ToStdString(), sep);
+
+		for (const auto& t : tokens)
+		{
+			wxString xx;
+			xx =wxString( t);
+			l_vList.push_back(t);
+		}
+	}
+	else 
+	{
+		l_vList.push_back(l_sResultExp);
+	}
+	for (int i = 0; i < l_vList.size(); i++)
+	{
+		l_sResultExp = l_vList[i];
+		//deal with all
+		if (l_sResultExp.Contains(wxT("all()")) || l_sResultExp.Contains(wxT("All")) ||
+			l_sResultExp.Contains(wxT("ALL")))
+		{
+			l_sResultExp.Replace(wxT("all()"), wxT("all"));
+			l_sResultExp.Replace(wxT("All()"), wxT("all"));
+			l_sResultExp.Replace(wxT("ALL()"), wxT("all"));
+
+		}
+		std::map<wxString, wxString> l_mVar2Type;
+		bool                         l_bIsColurFunction = false;
+		///////////////////////////////////
+		SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_VARIABLECLASS);
+		if (!l_pcMetadataclass)
+			return;
+		SP_DS_Metadata* l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+		if (!l_pcNewMetadata)
+			return;
+		SP_DS_ColListAttribute*  l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("VariableList")));
+		if (!l_pcColList)
+			return;
+		for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+		{
+			SP_CPN_Collist_Declarations l_scDeclaration;
+			wxString l_sName = wxString(l_pcColList->GetCell(i, 0).c_str());
+			wxString  l_sType = wxString(l_pcColList->GetCell(i, 1).c_str());
+			l_mVar2Type[l_sName] = l_sType;
+
+		}
+		//////////////////////
+		l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_FUNCTIONCLASS);
+		if (!l_pcMetadataclass)
+			return;
+		l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+		if (!l_pcNewMetadata)
+			return;
+		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("FunctionList")));
+		if (!l_pcColList)
+			return;
+
+		for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+		{
+			wxString l_sFunName = wxString(l_pcColList->GetCell(i, 1).c_str());
+			if (l_sResultExp.Contains(l_sFunName))
+			{
+				l_bIsColurFunction = true;
+				break;
+			}
+		}
+
+
+		/////////////////////////////////////
+
+		SP_CPN_SyntaxChecking l_sCheck;
+
+		std::string l_sPred = l_sResultExp.ToStdString();
+		if (l_sResultExp.Contains(","))
+		{
+			l_sProcessed = l_sResultExp;
+			continue;
+		}
+		//deal with predicates
+		if (l_sResultExp.Contains(wxT("&")) || l_sResultExp.Contains(wxT("|")) || l_sResultExp.Contains(wxT(">")) ||
+			l_sResultExp.Contains(wxT(">=")) || l_sResultExp.Contains(wxT("<")) || l_sResultExp.Contains(wxT(">=")) ||
+			l_sResultExp.Contains(wxT("=")) || l_sResultExp.Contains(wxT("!")) || l_bIsColurFunction
+			)
+		{
+			std::set<std::string> l_setVar;
+			std::string tupel = "";
+			char_separator<char> sep("&|=)(-*+`%!<>,/ ");
+			tokenizer<char_separator<char>> tokens(l_sPred, sep);
+
+			for (const auto& t : tokens)
+			{
+
+				auto it = l_mVar2Type.find(t);
+				if (it != l_mVar2Type.end())
+				{
+					tupel += t + ",";
+				}
+			}
+
+			if (tupel[tupel.length() - 1] == ',')
+			{
+				tupel[tupel.length() - 1] = ' ';
+				tupel = "(" + tupel + ")";
+			}
+
+			std::size_t pos = l_sPred.find("`");
+			std::string num_tokens = l_sPred.substr(0, pos);
+			std::string color = l_sPred.substr(pos + 1, l_sPred.length());
+
+			std::string preparedMArkingExp = "[" + color + "]" + num_tokens + "`" + tupel;
+			l_sPred = preparedMArkingExp;
+			l_sResultExp = l_sPred;
+		}
+
+		if (l_vList.size() > 1)
+		{
+			l_sProcessed << wxT("++")<< l_sResultExp ;
+		}
+	}
+	if (l_vList.size() > 1)
+	{
+		l_sResultExp = l_sProcessed;
+	}
+}
