@@ -30,7 +30,7 @@ private:
     map<unsigned long, SP_Graphic*> m_mId2Graphic;
     bool FillInMap(SP_Data* p_pcData);
     bool FillInMap(SP_Graphic* p_pcGraphic);
-
+	bool m_bContainsOldParamNodes;//by george, flag to notifiy about old param nodes will be converted into constants in the new versions
     SP_Data* GetDataById(wxXmlNode* p_pcRoot, const wxString& p_pchAttr);
     SP_Graphic* GetGraphicById(wxXmlNode* p_pcRoot, const wxString& p_pchAttr);
 

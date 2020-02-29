@@ -269,6 +269,7 @@ GetAttributeGraphicState(wxXmlNode* p_pcNode, const wxString& p_pchAttr)
 SP_XmlReader::SP_XmlReader()
 {
         Init();
+		m_bContainsOldParamNodes = false;
 }
 
 void
@@ -315,6 +316,13 @@ SP_XmlReader::Read(SP_DS_Graph* p_pcGraph, wxInputStream& p_InputStream)
     wxStopWatch l_StopWatch;
     wxXmlDocument l_pcDocument;
 
+	//by george
+	if (p_pcGraph->GetNetclass()->GetName() == SP_DS_COLHPN_CLASS
+		|| p_pcGraph->GetNetclass()->GetName() == SP_DS_COLCPN_CLASS
+		|| p_pcGraph->GetNetclass()->GetName() == SP_DS_COLSPN_CLASS)
+	{
+		m_bContainsOldParamNodes = true;
+	}
     if(l_pcDocument.Load(p_InputStream, wxString(wxT("UTF-8")), wxXMLDOC_NONE))
     {
     	// remove all initial elements
@@ -394,6 +402,10 @@ SP_XmlReader::CheckRoot(wxXmlNode* p_pcRoot)
     {
     	wxString l_sMsg = wxT("You are trying to load a file that is older than your Snoopy!\n");
     	l_sMsg << wxT("This may result in some conversions.\n");
+		if (m_bContainsOldParamNodes)//by george
+		{
+			l_sMsg << wxT("Please note that parameter nodes will be converted into constants!\n\n");
+		}
     	l_sMsg << wxT("Please check the loaded file and save it.\n\n");
     	l_sMsg << wxT("Tool: Snoopy ") << SP_APP_VERSION << wxT(" Version: ") << SP_APP_REVISION << wxT("\n");
     	l_sMsg << wxT("File: Snoopy ") << l_nFileVersion << wxT(" Version: ") << l_nFileRevision << wxT("\n");
