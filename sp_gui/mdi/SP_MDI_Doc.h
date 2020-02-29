@@ -82,6 +82,7 @@ public:
 	SP_DLG_ReduceFTree* GetReduceFTDialog();
 	  SP_DLG_ChooseInvariant* GetChooseInvariantDialog();
     void ResetChooseInvariantColours();
+	void RemoveGraphicFromCanvas(SP_Graphic *p_pcGraphic);//george
 
     inline wxString GetNetclassName() { return m_sNetclassName; }
 		unsigned int GetNetnumber();

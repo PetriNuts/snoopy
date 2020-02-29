@@ -1483,26 +1483,18 @@ void SP_DLG_ColStSimulationResults::LoadParameters()
 					{
 						l_nValue = (int)l_Function->getValue();
 						l_asParameterNames.push_back(l_sName);
-						//double l_nValue;
-						//l_sConstantvalue.ToDouble(&l_nValue);
+						 
 						l_anParameterValue.push_back(l_nValue);
 					}
 					else if (l_sType == wxT("double"))
 					{
 						l_nValue = l_Function->getValue();
 						l_asParameterNames.push_back(l_sName);
-						//double l_nValue;
-						//l_sConstantvalue.ToDouble(&l_nValue);
 						l_anParameterValue.push_back(l_nValue);
 					}
 					wxString l_sConstVal;
 					l_sConstVal << l_nValue;
-				//	SP_CPN_Collist_Declarations l_scDeclaration;
-					//l_scDeclaration.m_sName = l_sName;
-					//l_scDeclaration.m_sType = l_sType;
-					//l_scDeclaration.m_sConstantvalue = l_sConstVal;
-
-					//l_vDeclarations.push_back(l_scDeclaration);
+			 
 				}
 				else
 				{
@@ -1547,27 +1539,14 @@ void SP_DLG_ColStSimulationResults::LoadParameters()
 		wxString l_sConstantvalue = l_pcColList->GetCell(i,2);
 		if(l_sType == wxT("int"))
 		{
-			//l_asParameterNames.push_back(l_sName);
+			 
 			double l_nValue;
 			l_sConstantvalue.ToDouble(&l_nValue);
-		//	l_anParameterValue.push_back(l_nValue);
+	 
 		}
 	}
 
-	SP_DS_Nodeclass* l_pcNodeclass;
-	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_PARAM);
-	SP_ListNode::const_iterator l_itElem;
-
-	//Go through all the transition nodes
-	for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); l_itElem++)
-	{
-		//Set the transition name
-		//l_asParameterNames.push_back(dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue());
-
-		//Get the transition rate function
-		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>((*l_itElem)->GetAttribute(wxT("ParameterList")));
-	//	l_anParameterValue.push_back(l_pcColList->GetActiveCellValueDouble(1));
-	}
+ 
 
 	m_pcMainSimulator->SetParameterNames(l_asParameterNames);
 	m_pcMainSimulator->SetParameterValues(l_anParameterValue);

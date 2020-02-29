@@ -350,7 +350,7 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
  
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->AddNodeclass( new SP_DS_Nodeclass( p_pcGraph, wxT("Parameter") ) );
-	l_pcNC->SetShortcut( wxT("K") );
+	//l_pcNC->SetShortcut( wxT("K") ); by georg, to disable the shortcut of parameter nodes
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute( wxT("Name") ) );
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText( wxT("General") ) );
 	l_pcGrAttr = l_pcAttr->AddGraphic( new SP_GR_TextAttribute( l_pcAttr ) );
@@ -392,7 +392,7 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
    	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 	l_pcNC->SetGraphic( l_pcGr );
 	l_pcNC->RegisterGraphicWidget( new SP_WDG_DialogGraphic( wxT("Graphic") ) );
-
+	l_pcNC->SetShowInElementTree(false);//by george, do not display the parameter nodes in the elements tree of colspn net class
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->AddNodeclass(new SP_DS_Nodeclass(p_pcGraph, wxT("Coarse Parameter") ));
 	l_pcNC->SetShortcut(wxT("Shift+A"));

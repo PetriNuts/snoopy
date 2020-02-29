@@ -1071,8 +1071,8 @@ void SP_DLG_ColCPNSimulationResults::CalculateXAxisValues(SP_DS_Metadata* p_pcVi
 
 void SP_DLG_ColCPNSimulationResults::LoadParameters()
 {
-	SP_DS_Nodeclass* l_pcNodeclass;
-	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_PARAM);
+	//SP_DS_Nodeclass* l_pcNodeclass;
+	//l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_PARAM);
 	SP_ListNode::const_iterator l_itElem;
 	SP_DS_ColListAttribute* l_pcColList;
 	SP_VectorString l_asParameterNames;
@@ -1180,16 +1180,7 @@ void SP_DLG_ColCPNSimulationResults::LoadParameters()
 		}
 	}
 
-	//Go through all the transition nodes
-	for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); l_itElem++)
-	{
-		//Set the transition name
-		//l_asParameterNames.push_back(dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue());//commented by george
-
-		//Get the transition rate function
-		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>((*l_itElem)->GetAttribute(wxT("ParameterList")));
-		//l_anParameterValue.push_back(l_pcColList->GetActiveCellValueDouble(1));//commented by george
-	}
+ 
 
 	m_pcMainSimulator->SetParameterNames(l_asParameterNames);
 	m_pcMainSimulator->SetParameterValues(l_anParameterValue);

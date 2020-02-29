@@ -22,6 +22,11 @@
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include "sp_ds/extensions/ext_SPN/SP_DS_StSimGillespie.h"
 
+//by george for constants harmonizing
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
+#include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+#include "sp_ds/attributes/SP_DS_TextAttribute.h"
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 SP_DS_StParser :: SP_DS_StParser(SP_DS_Graph* p_pcGraph) :
 m_pcGraph(p_pcGraph),
 m_nPlaceCount( 0 ),
@@ -2523,9 +2528,10 @@ void
 SP_DS_StParser :: LoadParameter()
 {
 	m_mnParameter->clear();
-
+	
 	if(m_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")))
 	{
+		/**
 		SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass( SP_DS_PARAM );
 		SP_ListNode::const_iterator l_itElem;
 
@@ -2539,6 +2545,67 @@ SP_DS_StParser :: LoadParameter()
 
 			( *m_mnParameter )[ l_sParameterName ] = l_nDouble;
 		}
+		**/
+		///
+		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		SP_ListMetadata::const_iterator it;
+
+		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+		{
+			SP_DS_Metadata* l_pcConstant = *it;
+			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+			wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();///Added by G.A
+
+			SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+
+			SP_DS_FunctionRegistryEntry l_FE = l_pcFR->lookUpFunction(l_sName);
+			if (l_FE.IsOk())
+			{
+				SP_FunctionPtr l_Function = l_FE.getFunction();
+
+				double l_nValue = 0.0;
+
+
+				if (l_Function->isValue())
+				{
+					if (l_sType == wxT("int"))
+					{
+						l_nValue = (int)l_Function->getValue();
+						 
+					}
+					else if (l_sType == wxT("double"))
+					{
+						l_nValue = l_Function->getValue();
+						 
+					}
+					//wxString l_sConstVal;
+					//l_sConstVal << l_nValue;
+					 
+				}
+				else
+				{
+					//evaluate string
+					wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
+					if (l_sType == wxT("int"))
+					{
+						l_nValue = SP_DS_FunctionEvaluatorLong{ l_pcFR, l_Function }();
+						//wxString l_sConstVal;
+						//l_sConstVal << l_nValue;
+
+
+					}
+					else if (l_sType == wxT("double"))
+					{
+						l_nValue = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
+					}
+					//l_pcFR->registerFunction(l_sName, to_string(l_nValue));
+					
+				}
+				(*m_mnParameter)[l_sName] = (double)l_nValue;
+			}
+		}
+		////
 	}
 	else
 	{
