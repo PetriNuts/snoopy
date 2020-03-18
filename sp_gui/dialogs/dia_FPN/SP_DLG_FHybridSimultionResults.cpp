@@ -151,6 +151,10 @@ std::vector<TriangularFN> SP_DLG_FHybridSimulationResults::LoadParams()
 			if (m_mTransParamNames.find(l_sMetadataName) != m_mTransParamNames.end())
 			{
 				int iSelection = m_apcComboBoxes[0]->GetCurrentSelection();
+				if (iSelection == -1)
+				{
+					iSelection = 0;
+				}
 				for (unsigned int i = iSelection; i < l_pcColList->GetRowCount(); ++i)
 				{
 					if (l_sMetadataType.Cmp(wxT("TFN")) == 0)
@@ -370,13 +374,12 @@ void SP_DLG_FHybridSimulationResults::LoadUsedParams()
 wxString SP_DLG_FHybridSimulationResults::GetKParameter(const wxString& sfunc)
 {
 	wxString m_sKparam;
-	wxString sdelimiter = "(";
-	size_t stpos1, stpos2 = 0;
-	stpos1 = sfunc.find(sdelimiter);
-	sdelimiter = ")";
-	stpos2 = sfunc.find(sdelimiter);
-	stpos2 = stpos2 - stpos1 - 1;
-	m_sKparam = sfunc.substr(stpos1 + 1, stpos2);
+	wxString l_msfun = sfunc;
+	l_msfun.Replace("MassAction", "");
+	l_msfun.Replace("pow", "");
+	l_msfun.Replace("(", "");
+	l_msfun.Replace(")", "");
+	m_sKparam = l_msfun;
 	return m_sKparam;
 }
 
