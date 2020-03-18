@@ -184,6 +184,15 @@
 #include "export/SP_ExportHPN2SPN.h"
 
 #include "export/SP_ExportERODE.h"
+#include "export/SP_ExportColSPN2ColFSPN.h"
+#include "export/SP_ExportColCPN2ColFCPN.h"
+#include "export/SP_ExportColHPN2ColFHPN.h"
+#include "export/SP_ExportColFHPN2ColHPN.h"
+#include "export/SP_ExportColFCPN2ColCPN.h"
+#include "export/SP_ExportColFSPN2ColSPN.h"
+#include "export/SP_ExportColFCPN2FCPN.h"
+#include "export/SP_ExportColFSPN2FSPN.h"
+#include "export/SP_ExportColFHPN2FHPN.h"
 
 
 #include <wx/cmdline.h>
@@ -637,6 +646,71 @@ bool Snoopy::OnInit()
 	}	
 
 	l_pcExport = new SP_ExportColSPN2ColCPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	//colSPN==>colFSPN
+	l_pcExport = new SP_ExportColSPN2ColFSPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	
+	//colCPN==>colFCPN
+	l_pcExport = new SP_ExportColCPN2ColFCPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	
+		//colHPN==>colFHPN
+		l_pcExport = new SP_ExportColHPN2ColFHPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	//colFHPN==>colHPN
+	l_pcExport = new SP_ExportColFHPN2ColHPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	
+	//colFCPN==>colCPN
+	l_pcExport = new SP_ExportColFCPN2ColCPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	//colFSPN==>colSPN
+	l_pcExport = new SP_ExportColFSPN2ColSPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	
+	//colFCPN==>FCPN
+	l_pcExport = new SP_ExportColFCPN2FCPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	
+
+	//colFSPN==>FSPN
+	l_pcExport = new SP_ExportColFSPN2FSPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	//colFHPN==>FHPN
+	l_pcExport = new SP_ExportColFHPN2FHPN();
 	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
 	{
 		wxDELETE(l_pcExport);

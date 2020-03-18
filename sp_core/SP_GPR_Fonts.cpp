@@ -265,7 +265,10 @@ SP_GPR_Fonts::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage *
 					|| p_sNetClass.CmpNoCase(SP_DS_COLEPN_CLASS) == 0
 					|| p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0
 					|| p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0
-					|| p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0
+					|| p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 
+				    ||p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 //by george
+				    ||p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 //by george
+				    ||p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 //by george
 					|| p_sNetClass.CmpNoCase(SP_DS_MODULOPN_CLASS) == 0
 					|| p_sNetClass.CmpNoCase(SP_DS_REACHABILITY_CLASS) == 0
 					|| p_sNetClass.CmpNoCase(SP_DS_FAULTTREE_CLASS) == 0
@@ -275,9 +278,9 @@ SP_GPR_Fonts::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage *
 					|| p_sNetClass.CmpNoCase(SP_DS_MUSICPN_CLASS) == 0
 					|| p_sNetClass.CmpNoCase(SP_DS_HYBRIDPN_CLASS) == 0
 					|| p_sNetClass.CmpNoCase(SP_DS_MTIDD_CLASS) == 0
-				|| p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0
-				|| p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0
-				|| p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0
+			     	|| p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0
+			     	|| p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0
+			     	|| p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0
 					|| p_sNetClass.CmpNoCase(SP_DS_FREESTYLE_CLASS) == 0)
 	) {
 		int i = 0;

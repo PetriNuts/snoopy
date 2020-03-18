@@ -30,7 +30,7 @@
 #include "sp_ds/netclasses/SP_DS_FaultTree.h"
 #include "sp_ds/netclasses/SP_DS_FuzzySPN.h" // added by G.A
 #include "sp_ds/netclasses/SP_DS_FuzzyCPN.h" // added by G.A
-#include "sp_ds/netclasses/SP_DS_FuzzyHybridPN.h"
+#include "sp_ds/netclasses/SP_DS_FuzzyHybridPN.h"// added by G.A
 #include "sp_ds/netclasses/SP_DS_ExtendedFaultTree.h"
 #include "sp_ds/netclasses/SP_DS_ContinuousPed.h"
 #include "sp_ds/netclasses/SP_DS_MTBDD.h"
@@ -47,12 +47,15 @@
 #include "sp_ds/netclasses/SP_DS_ColSPN.h"
 #include "sp_ds/netclasses/SP_DS_ColCPN.h"
 #include "sp_ds/netclasses/SP_DS_ColHPN.h"
+#include "sp_ds/netclasses/SP_DS_Fuzzy_ColCPN.h"// added by G.A
+#include "sp_ds/netclasses/SP_DS_Fuzzy_ColSPN.h"// added by G.A
+#include "sp_ds/netclasses/SP_DS_Fuzzy_ColHPN.h"// added by G.A
 
 // standard widget class
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogText.h"
 #include "sp_gui/dialogs/SP_DLG_Animation.h"
 #include "sp_core/base/SP_Graphic.h"
-
+ 
 unsigned int
 GetPasteNetnumber(SP_MapUInt2UInt* p_pmNet2Net, unsigned int p_nNumber, SP_DS_Graph* p_pcGraph)
 {
@@ -195,6 +198,26 @@ SP_Core::InitialiseNetclasses(SP_GM_Docmanager* p_pcDocmanager)
         AddNetclass(l_pcNet);
     else
         wxDELETE(l_pcNet);
+
+	//////////////////////////////////////////////////////////////////
+	l_pcNet = new SP_DS_Fuzzy_ColCPN();//by george
+	if (l_pcNet->AddToGui(p_pcDocmanager))
+		AddNetclass(l_pcNet);
+	else
+		wxDELETE(l_pcNet);
+	//////////////////////////////////////////////////////////////////
+
+	l_pcNet = new SP_DS_Fuzzy_ColSPN();//by george
+	if (l_pcNet->AddToGui(p_pcDocmanager))
+		AddNetclass(l_pcNet);
+	else
+		wxDELETE(l_pcNet);
+	/////////////////////////////////////////////////////////////////
+	l_pcNet = new SP_DS_Fuzzy_ColHPN();//by george
+	if (l_pcNet->AddToGui(p_pcDocmanager))
+		AddNetclass(l_pcNet);
+	else
+		wxDELETE(l_pcNet);
 
     //////////////////////////////////////////////////////////////////
    l_pcNet = new SP_DS_ContinuousPed();

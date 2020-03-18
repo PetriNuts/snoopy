@@ -570,6 +570,9 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 		p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0 ||
 		p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0 ||
 		p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
+		p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0 ||//by george
+		p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS) == 0 ||//by george
+		p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 ||//by george
 		p_sNetClass.CmpNoCase(SP_DS_MODULOPN_CLASS) == 0 ||
 		p_sNetClass.CmpNoCase(SP_DS_REACHABILITY_CLASS) == 0 ||
 		p_sNetClass.CmpNoCase(SP_DS_FAULTTREE_CLASS) == 0 ||
@@ -601,6 +604,9 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 				p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0 ||//by george
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS) == 0 ||//by george
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 ||//by george
 				p_sNetClass.CmpNoCase(SP_DS_EXTPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_MUSICPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0 ||
@@ -629,6 +635,9 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 				p_sNetClass.CmpNoCase(SP_DS_COLEPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0 ||//by george
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS) == 0 ||//by george
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 ||//by george
 				p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0 ) &&
 				l_rString.Find(wxT("Place")) != wxNOT_FOUND ) 
 			{
@@ -639,6 +648,9 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 				p_sNetClass.CmpNoCase(SP_DS_COLEPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0 ||//by george
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS) == 0 ||//by george
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 ||//by george
 				p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0 ) &&
 				l_rString.Find(wxT("Transition")) != wxNOT_FOUND )				
 			{
@@ -661,6 +673,9 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 				p_sNetClass.CmpNoCase(SP_DS_COLEPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0 ||//by george
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS) == 0 ||//by george
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 ||//by george
 				p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0 ) &&
 				l_rString.Find(wxT("Place")) != wxNOT_FOUND) 
 			{
@@ -682,7 +697,13 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 				p_sNetClass.CmpNoCase(SP_DS_COLEPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
-				p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0 ) &&
+				p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0 ||
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS) == 0 ||//by george
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0 ||//by george
+				p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 //by george
+				)
+				
+				&&
 				l_rString.Find(wxT("Transition")) != wxNOT_FOUND)				
 			{
 				wxColour l_GuardColor = wxColour( GetGuardColor(p_sNetClass, *itN) );	
@@ -761,7 +782,10 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			p_sNetClass.CmpNoCase(SP_DS_HYBRIDPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_COLSPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
-			p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0
+			p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0 ||//by george
+			p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS) == 0 ||//by george
+			p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 //by george
 			)
 		{
 			l_pcSizer->Add(new wxStaticText(p_pcPage, -1, _T("Line Design for Edges:")), 0, wxALL , 5);
@@ -827,6 +851,10 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0 || //by george
+			p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS)==0 || //by george
+			p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 || //by george
+
 			p_sNetClass.CmpNoCase(SP_DS_EXTPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_MODULOPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_FAULTTREE_CLASS) == 0 ||
@@ -867,6 +895,9 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 				p_sNetClass.CmpNoCase(SP_DS_COLEPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
+			    p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0 || //by george
+			    p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS) == 0|| //by george
+		     	p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 || //by george
 				p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0 ) ) 
 		{
 			wxColour l_ColorSetColor = wxColour( GetExpressionColor(p_sNetClass) );	
@@ -953,6 +984,9 @@ bool SP_GPR_Elements::OnDialogOk(const wxString& p_sNetClass)
 			p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_HYBRIDPN_CLASS) == 0 ||
+			p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS) == 0 ||//by george
+			p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0 ||//by george
+			p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0 ||//by george
 			p_sNetClass.CmpNoCase(SP_DS_COLSPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0 ||
 			p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0

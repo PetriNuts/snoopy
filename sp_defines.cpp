@@ -44,6 +44,9 @@ const wxString SP_DS_FUZZYCPN_CLASS = wxT("Fuzzy Continuous Petri Net");
 
 const wxString SP_DS_FUZZYHPN_CLASS = wxT("Fuzzy Hybrid Petri Net");
 
+
+
+
 // SP_DS_TimePT
 const wxString SP_DS_TIMEPN_CLASS = wxT("Time Petri Net");
 
@@ -84,6 +87,19 @@ const wxString SP_DS_COLCPN_CLASS = wxT("Colored Continuous Petri Net");
 
 //SP_DS_ColHPN
 const wxString SP_DS_COLHPN_CLASS = wxT("Colored Hybrid Petri Net");
+
+/*fuzzy coloured PNs*/
+
+//SP_DS_Fuzzy_ColSPN
+const wxString SP_DS_FUZZY_ColSPN_CLASS = wxT("Colored Fuzzy Stochastic Petri Net");
+
+//SP_DS_Fuzzy_ColCPN
+
+const wxString SP_DS_FUZZY_ColCPN_CLASS = wxT("Colored Fuzzy Continuous Petri Net");
+
+//SP_DS_Fuzzy_ColHPN
+
+const wxString SP_DS_FUZZY_ColHPN_CLASS = wxT("Colored Fuzzy Hybrid Petri Net");
 
 //SP_DS_ModuloNets
 const wxString SP_DS_MODULOPN_CLASS = wxT("Modulo Petri Net");

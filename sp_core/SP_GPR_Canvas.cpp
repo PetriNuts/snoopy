@@ -169,6 +169,9 @@ SP_GPR_Canvas::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_NotebookPage 
 		||  p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0
 		|| p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0
 		 || p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0
+	    	|| p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0//by george
+	     	|| p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS) == 0//by george
+	     	|| p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0//by george
 			|| p_sNetClass.CmpNoCase(SP_DS_EXTPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_SPN_CLASS) == 0
@@ -257,14 +260,17 @@ SP_GPR_Canvas::OnDialogOk(const wxString& p_sNetClass) {
 			|| p_sNetClass.CmpNoCase(SP_DS_EXTPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_SPN_CLASS) == 0
-		|| p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0  //Added by G.A
-		|| p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0  //Added by G.A
-		|| p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0  //Added by G.A
+		    || p_sNetClass.CmpNoCase(SP_DS_FUZZYSPN_CLASS) == 0  //Added by G.A
+		    || p_sNetClass.CmpNoCase(SP_DS_FUZZYCPN_CLASS) == 0  //Added by G.A
+		    || p_sNetClass.CmpNoCase(SP_DS_FUZZYHPN_CLASS) == 0  //Added by G.A
 			|| p_sNetClass.CmpNoCase(SP_DS_COLSPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_COLEPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_COLCPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_COLHPN_CLASS) == 0
+		    || p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColSPN_CLASS) == 0//by george
+		    || p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColCPN_CLASS) == 0//by george
+		    || p_sNetClass.CmpNoCase(SP_DS_FUZZY_ColHPN_CLASS) == 0//by george
 			|| p_sNetClass.CmpNoCase(SP_DS_MODULOPN_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_REACHABILITY_CLASS) == 0
 			|| p_sNetClass.CmpNoCase(SP_DS_FAULTTREE_CLASS) == 0
