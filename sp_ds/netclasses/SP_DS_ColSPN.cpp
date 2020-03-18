@@ -153,7 +153,7 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("Markings")));
 
 	// special EventSPN components
-	l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( SP_DS_CPN_MARKINGLIST, SP_COLLIST_UNSIGNED_INTEGER, 2 ) );
+	l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( SP_DS_CPN_MARKINGLIST, SP_COLLIST_UNSIGNED_INTEGER, 3 ) );
 	l_pcAttr->SetDisplayName(wxT("Marking set"));
 	//Colors and marking list
 	l_pcAttr->RegisterDialogWidget( new SP_WDG_ColStMarkingList( wxT("Markings") ) );
@@ -161,11 +161,12 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	l_pcColList->SetColLabel( 0, wxT("Main: Color(s)") );
 	l_pcColList->SetColLabel( 1, wxT("Main: Marking") );
+	l_pcColList->SetColLabel( 2, wxT("Product Color"));//by george
 	l_pcColList->Clear();	
 	l_nNewRow = l_pcColList->AppendEmptyRow();
 	l_pcColList->SetCell(l_nNewRow, 0, wxT("all()"));
 	l_pcColList->SetCell(l_nNewRow, 1, wxT("0"));
-
+	l_pcColList->SetCell(l_nNewRow, 2, wxT("()"));//by george
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_ColListAttribute( l_pcAttr, wxT("%") ));
 	l_pcGrAttr->SetTextColor( wxGetApp().GetElementPrefs()->GetMarkingColor(GetName(), l_pcNC->GetDisplayName()));	
 	l_pcGrAttr->SetOffsetX(45);
@@ -349,6 +350,7 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	//////////////////////////////////////////////////////////////////////////////
  
 	//////////////////////////////////////////////////////////////////////////////
+	//we cannot remove param nodes, because we still need them for loading old constants
 	l_pcNC = p_pcGraph->AddNodeclass( new SP_DS_Nodeclass( p_pcGraph, wxT("Parameter") ) );
 	//l_pcNC->SetShortcut( wxT("K") ); by georg, to disable the shortcut of parameter nodes
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute( wxT("Name") ) );
@@ -395,7 +397,7 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcNC->SetShowInElementTree(false);//by george, do not display the parameter nodes in the elements tree of colspn net class
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->AddNodeclass(new SP_DS_Nodeclass(p_pcGraph, wxT("Coarse Parameter") ));
-	l_pcNC->SetShortcut(wxT("Shift+A"));
+	//l_pcNC->SetShortcut(wxT("Shift+A"));//disable short cut 
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
@@ -421,7 +423,7 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
    	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), wxT("Parameter")));
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
-
+	l_pcNC->SetShowInElementTree(false);//by george, do not display the coarse parameter nodes in the elements tree of colspn net class
 
 
 	//Edges

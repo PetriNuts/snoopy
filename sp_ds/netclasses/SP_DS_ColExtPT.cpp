@@ -127,18 +127,19 @@ SP_DS_ColExtPT::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 
 	//Colors and marking list
-	l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( SP_DS_CPN_MARKINGLIST, SP_COLLIST_UNSIGNED_INTEGER, 2 ) );
+	l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( SP_DS_CPN_MARKINGLIST, SP_COLLIST_UNSIGNED_INTEGER, 3 ) );//by george
 	l_pcAttr->RegisterDialogWidget( new SP_WDG_ColExtMarkingList( wxT("Markings") ) );
 
 	l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >( l_pcAttr );
 
 	l_pcColList->SetColLabel( 0, wxT("Color/Predicate/Function") );
 	l_pcColList->SetColLabel( 1, wxT("Marking") );
+	l_pcColList->SetColLabel(2, wxT("Product Color"));//by george
 	l_pcColList->Clear();
 	l_nNewRow = l_pcColList->AppendEmptyRow();
 	l_pcColList->SetCell(l_nNewRow, 0, wxT("all()"));
 	l_pcColList->SetCell(l_nNewRow, 1, wxT("0"));
-
+	l_pcColList->SetCell(l_nNewRow, 2, wxT("()"));//by george
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_ColListAttribute( l_pcAttr, wxT("%") ));
 	l_pcGrAttr->SetTextColor( wxGetApp().GetElementPrefs()->GetMarkingColor(GetName(), l_pcNC->GetName()));	
 	l_pcGrAttr->SetOffsetX(45);

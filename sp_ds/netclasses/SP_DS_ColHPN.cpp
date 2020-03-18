@@ -150,7 +150,7 @@ SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("Markings")));
 
 	// special EventSPN components
-	l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( SP_DS_CPN_MARKINGLIST, SP_COLLIST_UNSIGNED_INTEGER, 2 ) );
+	l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( SP_DS_CPN_MARKINGLIST, SP_COLLIST_UNSIGNED_INTEGER, 3 ) );
 	l_pcAttr->SetDisplayName(wxT("Marking set"));
 	//Colors and marking list
 	l_pcAttr->RegisterDialogWidget( new SP_WDG_ColStMarkingList( wxT("Markings") ) );
@@ -158,10 +158,12 @@ SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	l_pcColList->SetColLabel( 0, wxT("Main: Color(s)") );
 	l_pcColList->SetColLabel( 1, wxT("Main: Marking") );
+	l_pcColList->SetColLabel( 2, wxT("Product Color"));//by george
 	l_pcColList->Clear();	
 	l_nNewRow = l_pcColList->AppendEmptyRow();
 	l_pcColList->SetCell(l_nNewRow, 0, wxT("all()"));
 	l_pcColList->SetCell(l_nNewRow, 1, wxT("0"));
+	l_pcColList->SetCell(l_nNewRow, 2, wxT("()"));//by george
 
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_ColListAttribute( l_pcAttr, wxT("%") ));
 	l_pcGrAttr->SetTextColor( wxGetApp().GetElementPrefs()->GetMarkingColor(GetName(), l_pcNC->GetDisplayName()));
@@ -191,17 +193,20 @@ SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	l_pcAttr = l_pcNC->GetPrototype()->GetAttribute( wxT("Marking") );
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("Markings")));
+	
 
-	l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( SP_DS_CPN_MARKINGLIST, SP_COLLIST_DOUBLE, 2 ) );
+	l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( SP_DS_CPN_MARKINGLIST, SP_COLLIST_DOUBLE, 3 ) );
 	l_pcAttr->SetDisplayName(wxT("Marking set"));
 	l_pcAttr->RegisterDialogWidget( new SP_WDG_ColStMarkingList( wxT("Markings") ) );
 	l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >( l_pcAttr );
 	l_pcColList->SetColLabel( 0, wxT("Main: Color(s)") );
 	l_pcColList->SetColLabel( 1, wxT("Main: Marking") );
+	l_pcColList->SetColLabel( 2, wxT("Product Color"));//by george
 	l_pcColList->Clear();	
 	l_nNewRow = l_pcColList->AppendEmptyRow();
 	l_pcColList->SetCell(l_nNewRow, 0, wxT("all()"));
 	l_pcColList->SetCell(l_nNewRow, 1, wxT("0"));
+	l_pcColList->SetCell(l_nNewRow, 2, wxT("0"));//by george
 
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_ColListAttribute( l_pcAttr, wxT("%") ));
 	l_pcGrAttr->SetTextColor( wxGetApp().GetElementPrefs()->GetMarkingColor(GetName(), l_pcNC->GetDisplayName()));
@@ -421,6 +426,7 @@ SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	
 	//////////////////////////////////////////////////////////////////////////////
+	//for constants harmonizing, we cannot delete param node, because wee need them to load the constants value after that we can remove them
 	l_pcNC = p_pcGraph->AddNodeclass( new SP_DS_Nodeclass( p_pcGraph, wxT("Parameter") ) );
 	//l_pcNC->SetShortcut( wxT("K") );disable the shortcut for the parameter nodes
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute( wxT("Name") ) );
@@ -466,8 +472,9 @@ SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcNC->RegisterGraphicWidget( new SP_WDG_DialogGraphic( wxT("Graphic") ) );
 	l_pcNC->SetShowInElementTree(false);//by george, do not display the parameter nodes in the elements tree of colhpn net class
 	//////////////////////////////////////////////////////////////////////////////
+	//for constants harmonizing, we cannot delete coars param node, because wee need them to load the constants value after that we can remove them
 	l_pcNC = p_pcGraph->AddNodeclass(new SP_DS_Nodeclass(p_pcGraph, wxT("Coarse Parameter") ));
-	l_pcNC->SetShortcut(wxT("Shift+K"));
+	//l_pcNC->SetShortcut(wxT("Shift+K"));//disable the shortcut for the parameter nodes
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
@@ -487,13 +494,13 @@ SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcCoarse = new SP_DS_Coarse(wxT("Subnet"), wxT("Parameter"), p_pcGraph, FALSE);
 	l_pcCoarse->SetLabelAttribute(wxT("Name"));
 	l_pcNC->SetCoarse(l_pcCoarse);
-
+	
    	l_pcGr = new SP_GR_ExtendedEllipse(l_pcNC->GetPrototype(),pawidth, paheight,TRUE,SP_EXTENDED_TYPE_TWO,3,wxColour(128, 128, 128));
 	l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
    	l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), wxT("Parameter")));
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
-
+	l_pcNC->SetShowInElementTree(false);//by george, do not display the parameter nodes in the elements tree of colhpn net class
 	
 	//////////////////////////////////////////////////////////////////////////////
 	//Edges
