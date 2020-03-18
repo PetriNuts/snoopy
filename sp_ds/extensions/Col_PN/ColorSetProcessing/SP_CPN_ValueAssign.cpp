@@ -715,7 +715,7 @@ bool SP_CPN_ValueAssign::InitializeConstant()
 			SP_MESSAGEBOX(wxT("Please select data type"), wxT("Constant definition checking"), wxOK | wxICON_ERROR);
 			return false;
 		}
-		else if (l_ConstantType == wxT("double"))
+		else if (l_ConstantType == wxT("double") || l_ConstantType == wxT("TFN"))
 		{
 			continue;
 		}
@@ -861,7 +861,7 @@ bool SP_CPN_ValueAssign::InitializeBasicTypeConstant()
 			l_ConstantStruct.m_DataType = CPN_PRODUCT;
 			l_ConstantStruct.m_StringValue = l_sConstantValue;
 		}
-		else if (l_ConstantType == wxT("double"))
+		else if (l_ConstantType == wxT("double") || l_ConstantType == wxT("TFN"))
 		{//add by George Assaf (constant harmonizing)
 			//constant as a parameter
 			 
@@ -1254,17 +1254,28 @@ bool SP_CPN_ValueAssign::CollectAllDeclarations()
 
 
 	l_vDeclarations.clear();
-	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
-	if(!l_pcMetadataclass)
-		return false;
-	l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
-	if(!l_pcNewMetadata)
-		return false;
-	l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
-	if(!l_pcColList)
-		return false;	
+	if (!l_pcGraph->GetNetclass()->GetName().Contains(wxT("Fuzzy"))) {
+		l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
+		if (!l_pcMetadataclass)
+			return false;
+		l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+		if (!l_pcNewMetadata)
+			return false;
+		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
+		if (!l_pcColList)
+			return false;
+	}
 	/**************************/
-	SP_DS_Metadataclass* mc = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	wxString l_sMetaClass;
+	if (l_pcGraph->GetNetclass()->GetName().Contains(wxT("Fuzzy")))
+	{
+		l_sMetaClass = SP_DS_META_CONSTANT;
+	}
+	else 
+	{
+		l_sMetaClass = SP_DS_CPN_CONSTANT_HARMONIZING;
+	}
+	SP_DS_Metadataclass* mc = l_pcGraph->GetMetadataclass(l_sMetaClass);
 	SP_ListMetadata::const_iterator it;
 
 	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
@@ -1315,6 +1326,20 @@ bool SP_CPN_ValueAssign::CollectAllDeclarations()
 					l_nValue = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
 				}
 				l_pcFR->registerFunction(l_sName, to_string(l_nValue));
+			}
+		}
+		else
+		{//fuzzy nets which have been exported from plain col pns
+			SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+			wxString l_sMainVAl = l_pcColList->GetCell(0, 1);
+			l_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, l_sMainVAl);
+			if (l_sType == wxT("int"))
+			{
+				SP_CPN_Collist_Declarations l_scDeclaration;
+				l_scDeclaration.m_sName = l_sName;
+				l_scDeclaration.m_sType = l_sType;
+				l_scDeclaration.m_sConstantvalue = l_sMainVAl;
+				l_vDeclarations.push_back(l_scDeclaration);
 			}
 		}
 	}

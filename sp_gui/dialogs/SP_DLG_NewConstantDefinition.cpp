@@ -245,6 +245,8 @@ void SP_DLG_NewConstantDefinition::OnDlgOk(wxCommandEvent& p_cEvent)
 				EndModal(wxID_OK);
 			}
 		}
+			 
+		
 		else
 		{
 			SetReturnCode(wxID_OK);

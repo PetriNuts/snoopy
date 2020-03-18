@@ -49,39 +49,10 @@
 #include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 #include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_IddUnFoldExpr.h"
 
-
-//using dssd::colexpr::colexpr_descriptor_evaluator;
-
-//using colExprVec = dssd::colexpr::col_expr_vec;
-//using colDescriptor = dssd::colexpr::element_descriptor;
-//using colEnv = dssd::colexpr::environment;
-//using colExpr = dssd::colexpr::col_expr;
- 
-
-//using colExprBuilder = dssd::colexpr::builder;
-//using colExprParser = dssd::colexpr::parser;//
-
-//using colParser = dssd::colexpr::col_expr_parser;
-
-//using dssd::andl::Place_ptr;
-//using dssd::andl::Transition_ptr;
-//using dssd::andl::Update_ptr;
-//using dssd::andl::Condition_ptr;
-//using dssd::andl::Net_ptr;
-//using dssd::andl::Constant_ptr;
-//using dssd::colexpr::evalColExpr;
-
-
-//using colExpr = dssd::colexpr::col_expr;
-
  
 SP_CPN_SyntaxChecking::SP_CPN_SyntaxChecking()
 {
 	m_mvCSExpr2PColors.clear();
-	//dssd::colexpr::builder*
-	// l_pcBuilder = new dssd::colexpr::builder();//dssd syntax
- //l_pcdssdParser = new dssd::colexpr::parser(l_pcBuilder);//dssd syntax
- 
 }
 
 SP_CPN_SyntaxChecking::~SP_CPN_SyntaxChecking()
@@ -193,7 +164,9 @@ bool SP_CPN_SyntaxChecking::CheckTransitionClass(wxString p_sTransNCName)
 				return false;
 
 			//check rate function
-			if (m_sNetClassName == SP_DS_COLSPN_CLASS || m_sNetClassName == SP_DS_COLCPN_CLASS || m_sNetClassName == SP_DS_COLHPN_CLASS)
+			if (m_sNetClassName == SP_DS_COLSPN_CLASS || m_sNetClassName == SP_DS_COLCPN_CLASS || m_sNetClassName == SP_DS_COLHPN_CLASS||
+				m_sNetClassName == SP_DS_FUZZY_ColSPN_CLASS || m_sNetClassName == SP_DS_FUZZY_ColCPN_CLASS || m_sNetClassName == SP_DS_FUZZY_ColHPN_CLASS //added by george
+				)
 			{
 				if (!CheckTransRateFunction(l_pcTransNode))
 					return false;
@@ -416,8 +389,8 @@ bool SP_CPN_SyntaxChecking::CheckExpression(wxString p_sExpression, wxString p_s
 	vector<SP_CPN_ColorSet*>* l_pcColorSet = m_cColorSetClass.GetColorSetVector();
 	for (auto l_pcColorSet : *l_pcColorSet)
 	{
-		if (l_pcColorSet->GetDataType() == CPN_UNION /* || l_pcColorSet->GetDataType() == CPN_BOOLEAN*/
-		/*	|| l_pcColorSet->GetDataType() == CPN_STRING*/ || l_pcColorSet->GetDataType() == CPN_INDEX)
+		if (l_pcColorSet->GetDataType() == CPN_UNION || p_sExpression.Contains("val")
+			/*	|| l_pcColorSet->GetDataType() == CPN_STRING*/ || l_pcColorSet->GetDataType() == CPN_INDEX)
 		{
 			l_bISSupportedByDssd = false;
 			break;
@@ -430,6 +403,7 @@ bool SP_CPN_SyntaxChecking::CheckExpression(wxString p_sExpression, wxString p_s
 		SP_IddUnFoldExpr   expEval(m_pcGraph, m_sPlaceExp, m_sPlaceName);
 		wxString l_sCSName = p_sColorSetName;
 		p_sExpression.Replace(wxT("all()"), wxT("all"));
+	 
 		bool l_bCheck = expEval.CheckCoLourExpression(p_sExpression.ToStdString(), l_sCSName.ToStdString(), m_sErrorPosition);// expEval.CheckCoLourExpression(p_sExpression.ToStdString(), l_sCSName.ToStdString(), m_sErrorPosition);
 		return l_bCheck;
 	}
@@ -786,7 +760,15 @@ wxString SP_CPN_SyntaxChecking::GetEdgeName(SP_DS_Edge* p_pcEdge)
 
 bool SP_CPN_SyntaxChecking::CheckFormula(SP_DS_Node* p_pcTransNode, wxString p_sRateFunExpr, SP_DS_StParser* p_pcParser, bool p_bSingle)
 {
-
+	if (!p_sRateFunExpr.Contains("val"))
+	{
+		SP_IddUnFoldExpr   expEval(m_pcGraph, m_sPlaceExp, m_sPlaceName);//
+		if (!expEval.CheckTransRateFunction(p_pcTransNode, p_sRateFunExpr))//
+			return false;
+		else
+			return true;
+	}
+	 
 	//sum function
 	wxString l_sRatefunction = p_sRateFunExpr;
 	SP_DS_ColPN_Unfolding l_cUnfolding;
@@ -963,6 +945,7 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 		for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 		{
 			wxString l_sColorExpr = l_pcColList->GetCell(i, j);
+			wxString l_sTupeExpression= l_pcColList->GetCell(i, j + 2);
 			wxString l_sTokenNum = l_pcColList->GetCell(i, j + 1);
 			wxString l_sAllExp= l_sColorExpr;
 			wxString l_sColourExpBeforSubstitueConstants = l_sColorExpr;
@@ -991,8 +974,17 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 			wxString l_sCSName = l_cColorSet.GetName();
 			wxString l_sPRocessedExp;
 
+			////////////////////////
+			//wxString test="((1,2),A)";
+			bool l_bTupelCheck;
+			l_bTupelCheck=CheckBracketStructure(l_sTupeExpression, l_sCSName);
+			if (!l_bTupelCheck)
+			{
+				SP_LOGERROR_("please check bracket structure of the tupel" + l_sTupeExpression);
+			}
+			///////////////////////
 			//prepare the expression for checking and computing the marking 
-			PrepareExpressionString(l_sExpression, l_sPRocessedExp);
+			PrepareExpressionString(l_sExpression, l_sTupeExpression,l_sPRocessedExp);
 
 			if (p_bMarkingCheck)
 			{//only for marking checking
@@ -1084,8 +1076,14 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 				p_mColorToMarkingMap[itMap->first].push_back(itMap->second);
 			}
 		}
-
-		j++;
+		if (l_pcColList->GetColCount() == 3)
+		{
+			j = j + 2;
+		}
+		else
+		{
+			j = j + 1;
+		}
 	}
 
 	return true;
@@ -1815,6 +1813,12 @@ bool SP_CPN_SyntaxChecking::CheckTransRateFunction(SP_DS_Node* p_pcTransNode)
 			if (l_sNodeClassName == SP_DS_STOCHASTIC_TRANS || l_sNodeClassName == SP_DS_CONTINUOUS_TRANS)
 			{
 				wxString l_sRatefunction = l_pcColList->GetCell(i, j);
+				if (!l_sRatefunction.Contains("val"))
+				{
+					SP_IddUnFoldExpr   expEval(m_pcGraph, m_sPlaceExp, m_sPlaceName);//
+					if(!expEval.CheckTransRateFunction(p_pcTransNode, l_sRatefunction))//
+					  return false;
+				}
 				SP_DS_StParser l_cParser;
 				if (!CheckFormula(p_pcTransNode, l_sRatefunction, &l_cParser))
 					return false;
@@ -1910,7 +1914,7 @@ bool SP_CPN_SyntaxChecking::CheckIDSRateFunction(wxString p_sRate, SP_DS_Node* p
 	wxString l_sErrorPosition = wxT(" Error position: ") + p_sRate + wxT(" | ") + l_sTransName;
 
 	SP_DS_StParser l_cParser;
-
+	
 	if (!(l_cParser.CheckFormulaFunction(p_sRate, p_pcTransNode, true)))
 	{
 		wxString l_sVariables = wxT("The formula \"");
@@ -2066,8 +2070,8 @@ bool SP_CPN_SyntaxChecking::ComputeMarkingUsingDssdUtil(wxString& p_sPlaceExp,wx
 
 	
 	wxString msLOG;
-	msLOG<<"lookup table:" << "\n";
-	SP_LOGMESSAGE(msLOG);
+	//msLOG<<"lookup table:" << "\n";
+	//SP_LOGMESSAGE(msLOG);
 	vector<wxString> l_vAllColors;
 	ComputeResultMarkingColours(l_UnfoldInf,p_cColorSet,l_sTokenNum, p_sPlaceName, l_vAllColors);
 	l_vColorVector=l_vAllColors;
@@ -2080,10 +2084,10 @@ bool SP_CPN_SyntaxChecking::ComputeMarkingUsingDssdUtil(wxString& p_sPlaceExp,wx
 	{
 		wxString l_sMsg;
 		l_b1 = true;
-		auto pl = it->second.unfoldedPlace_._Get();
+		auto pl = it->second.unfoldedPlace_;// ._Get();
 
 		l_sMsg << it->first << wxT("=") << pl->marking_ << "\n";
-		SP_LOGMESSAGE(l_sMsg);
+		//SP_LOGMESSAGE(l_sMsg);
 
 		wxString l_sMarking;
 		l_sMarking << pl->marking_;
@@ -2131,7 +2135,7 @@ void SP_CPN_SyntaxChecking::ComputeResultMarkingColours(dssd::unfolding::placeLo
 		for (auto it = p_placeLookupTable.begin(); it != p_placeLookupTable.end(); ++it)
 		{
 
-			auto pl = it->second.unfoldedPlace_._Get();
+			auto pl = it->second.unfoldedPlace_;
 
 			wxString l_sFullFlatName = it->first;
 			wxString l_sTokens = pl->marking_;
@@ -2165,7 +2169,7 @@ void SP_CPN_SyntaxChecking::ComputeResultMarkingColours(dssd::unfolding::placeLo
 
 }
  
-void SP_CPN_SyntaxChecking::PrepareExpressionString(wxString& l_sRawExp, wxString& l_sResultExp)
+void SP_CPN_SyntaxChecking::PrepareExpressionString(wxString& l_sRawExp,wxString& p_sPoduct, wxString& l_sResultExp)
 {
 	 
 	l_sResultExp = l_sRawExp;
@@ -2183,37 +2187,161 @@ void SP_CPN_SyntaxChecking::PrepareExpressionString(wxString& l_sRawExp, wxStrin
 	std::string l_sPred = l_sResultExp;
 	//deal with predicates
 	if (l_sResultExp.Contains(wxT("&")) || l_sResultExp.Contains(wxT("|")) || l_sResultExp.Contains(wxT(">")) ||
-		l_sResultExp.Contains(wxT(">=")) || l_sResultExp.Contains(wxT("<")) || l_sResultExp.Contains(wxT(">="))||
-		l_sResultExp.Contains(wxT("=")) || l_sResultExp.Contains(wxT("!"))  || IsDefFunction(l_sResultExp)
+		l_sResultExp.Contains(wxT(">=")) || l_sResultExp.Contains(wxT("<")) || l_sResultExp.Contains(wxT(">=")) ||
+		l_sResultExp.Contains(wxT("=")) || l_sResultExp.Contains(wxT("!")) || IsDefFunction(l_sResultExp)
 		)
 	{
-		std::set<std::string> l_setVar;
-		std::string tupel = "";
-		char_separator<char> sep("&|=)(-*+`%!<>,/ ");
-		tokenizer<char_separator<char>> tokens(l_sPred, sep);
+		/*
+		 std::set<std::string> l_setVar;
+		 std::string tupel = "";
+		 char_separator<char> sep("&|=)(-*+`%!<>,/ ");
+		 tokenizer<char_separator<char>> tokens(l_sPred, sep);
+		 std::set<string> l_setTokens;
+		 for (const auto& t : tokens)
+		 {
+			 std::map<wxString, SP_CPN_Variable_Constant>::const_iterator it = m_cColorSetClass.GetVariableMap()->find(t);
+			 if (it!= m_cColorSetClass.GetVariableMap()->end())
+			 {
+				 auto res = l_setTokens.find(t);
+				 if (res == l_setTokens.end())
+				 {
+					 l_setTokens.insert(t);
+					 tupel += t + ",";
+				 }
+			
+			 }
+		 }
 
-		for (const auto& t : tokens)
+		 if (tupel[tupel.length() - 1] == ',')
+		 {
+			 tupel[tupel.length() - 1] = ' ';
+			 tupel = "(" + tupel + ")";
+		 }
+		 */
+		 std::size_t pos = l_sPred.find("`");
+		 std::string num_tokens = l_sPred.substr(0, pos);
+		 std::string color = l_sPred.substr(pos + 1, l_sPred.length());
+
+		 std::string preparedMArkingExp = "[" + color + "]" + num_tokens + "`" + p_sPoduct;
+		 l_sPred = preparedMArkingExp;
+		 l_sResultExp = l_sPred;
+		  
+	 }
+	
+	 
+}
+bool SP_CPN_SyntaxChecking::CheckBracketStructure(wxString p_sExpression, wxString p_cs)
+{
+	SP_CPN_ColorSet* l_pcColorSet = m_cColorSetClass.LookupColorSet(p_cs);
+	 
+	if (!l_pcColorSet)
+		return false;
+
+	if (l_pcColorSet->GetDataType() != CPN_PRODUCT)
+	{
+		auto it = m_cColorSetClass.GetVariableMap()->find(p_sExpression);// != m_cColorSetClass.GetVariableMap()->end())
+		if(m_cColorSetClass.GetVariableMap()->find(p_sExpression) != m_cColorSetClass.GetVariableMap()->end())
 		{
-			std::map<wxString, SP_CPN_Variable_Constant>::const_iterator it = m_cColorSetClass.GetVariableMap()->find(t);
-			if (it!= m_cColorSetClass.GetVariableMap()->end())
+			wxString l_name=it->first;
+			std::string l_scompCs = it->second.m_ColorSet.ToStdString();
+			std::string l_strCs= p_cs.ToStdString();
+			if (l_scompCs==l_strCs)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	if (l_pcColorSet->GetDataType() == CPN_PRODUCT)
+	{
+
+		wxString l_sTempExp = p_sExpression.AfterFirst(wxChar('('));
+		         l_sTempExp = l_sTempExp.BeforeLast(wxChar(')'));
+	size_t size=	l_pcColorSet->GetComponentMap().size();
+	std::map<wxString, SP_CPN_ColorSet*> l_csMap = l_pcColorSet->GetComponentMap();
+	std::vector<wxString> l_vElements;
+	for (std::map<wxString, SP_CPN_ColorSet*>::iterator it = l_csMap.begin(); it != l_csMap.end(); ++it)
+	  {
+		
+		wxString l_sNextCs = it->first;
+		SP_CPN_ColorSet* l_cs = it->second;
+		if (l_cs->GetDataType() == CPN_PRODUCT)
+		{
+			std::vector<wxString> l_vCompCs;
+			auto l_mComp = l_cs->GetComponentMap();
+			for (auto it1 = l_mComp.begin(); it1 != l_mComp.end(); it1++)
 			{
-				tupel += t + ",";
+				l_vCompCs.push_back(it1->first);
+			}
+			if (l_vCompCs.size() > 0)
+			{
+				size = l_vCompCs.size();
+			}
+			wxString l_sAfterFirstParenthes = l_sTempExp.AfterFirst(wxChar('('));
+			wxString l_sBeforeLastParenthes = l_sAfterFirstParenthes.BeforeFirst(wxChar(')'));
+			if (l_sBeforeLastParenthes.Contains(","))
+			{
+				wxString l_tupel = "(" + l_sBeforeLastParenthes + ")";
+				l_sTempExp.Replace(l_tupel, wxT(""));
+			}
+			
+
+			//if (l_sTempExp.Contains("()"))
+				//l_sTempExp.Replace("()", "");
+
+			if (l_sTempExp[0] == wxChar(','))
+				l_sTempExp = l_sTempExp.AfterFirst(wxChar(','));
+
+			std::vector<unsigned char> vec;
+			wxStringTokenizer tkz(l_sBeforeLastParenthes, wxT(", "));
+			int i = 0;
+			if (tkz.CountTokens() == size)
+			{
+				while (tkz.HasMoreTokens())
+				{
+					wxString token = tkz.GetNextToken();
+					wxString compSet=l_vCompCs[i];
+					CheckBracketStructure(token, compSet);
+					i++;
+					   
+				}
+			}
+			else
+			{
+				return false;
 			}
 		}
-
-		if (tupel[tupel.length() - 1] == ',')
-		{
-			tupel[tupel.length() - 1] = ' ';
-			tupel = "(" + tupel + ")";
+		else
+		{//simple cs
+			wxString l_sElement;
+			if (l_sTempExp.Contains(","))
+			{
+				  l_sElement = l_sTempExp.BeforeFirst(wxChar(','));
+				l_sTempExp = l_sTempExp.AfterFirst(wxChar(','));
+			}
+			else
+			{
+			  l_sElement = l_sTempExp;// .BeforeFirst(wxChar(','));
+			  if (l_sElement.Contains(","))
+			  {
+				  l_sTempExp = l_sElement.AfterFirst(wxChar(','));
+			  }
+			}
+			 
+		bool l_bres= CheckBracketStructure(l_sElement, l_sNextCs);
+		 if (l_sTempExp.IsEmpty()|| l_sElement== l_sTempExp)
+		 {
+			return l_bres;
+		 }
 		}
+	  }
+		
 
-		std::size_t pos = l_sPred.find("`");
-		std::string num_tokens = l_sPred.substr(0, pos);
-		std::string color = l_sPred.substr(pos + 1, l_sPred.length());
-
-		std::string preparedMArkingExp = "[" + color + "]" + num_tokens + "`" + tupel;
-		l_sPred = preparedMArkingExp;
-		l_sResultExp = l_sPred;
 	}
-
+	//return true;
 }
+
+ 

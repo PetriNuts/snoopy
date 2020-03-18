@@ -114,9 +114,9 @@ private:
 
 	wxString SubstituteConstants(wxString p_sColorExpr);    //used
 	 
-	void PrepareExpressionString(wxString& l_sRawExp,wxString& l_sResultExp);//george
+	void PrepareExpressionString(wxString& l_sRawExp,wxString& p_sPredicate,wxString& l_sResultExp);//george
 
-	 
+	bool CheckBracketStructure(wxString p_sExpression, wxString p_csName);
 
 	wxString m_sPlaceName;//george 
 	wxString m_sPlaceExp;

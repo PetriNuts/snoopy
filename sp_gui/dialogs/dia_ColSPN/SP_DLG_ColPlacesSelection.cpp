@@ -22,8 +22,10 @@
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStSimulationResults.h"
 #include "sp_gui/dialogs/dia_ColHPN/SP_DLG_ColHPNSimultionResults.h"
 #include "sp_gui/dialogs/dia_ColCPN/SP_DLG_ColCPNSimulationResults.h"
-
-
+//by george
+#include "sp_gui/dialogs/dia_colFCPN/SP_DLG_ColFCPNSimulationResults.h"
+#include "sp_gui/dialogs/dia_colFSPN/SP_DLG_ColFSPNSimulationResults.h"
+#include "sp_gui/dialogs/dia_ColFHPN/SP_DLG_ColFHPNSimulationResults.h"
 IMPLEMENT_CLASS( SP_DLG_ColPlacesSelection, SP_DLG_PlacesSelection )
 
 enum
@@ -83,20 +85,35 @@ void SP_DLG_ColPlacesSelection::Initialize()
 	m_sNetClass = m_pcGraph->GetNetclass()->GetName();	
 
 	vector<wxString>* l_vAuxVar;
-	if(m_sNetClass == SP_DS_COLSPN_CLASS )
+	if(m_sNetClass == SP_DS_COLSPN_CLASS)
 	{
 		m_pcUnfoldedNet = dynamic_cast<SP_DLG_ColStSimulationResults*>(m_pcColSimulationResults)->GetUnfoldedNet(); 
 		l_vAuxVar =  dynamic_cast<SP_DLG_ColStSimulationResults*>(m_pcColSimulationResults)->GetAuxPLVariables();
 	}
-	else if (m_sNetClass == SP_DS_COLCPN_CLASS )
+	else if (m_sNetClass == SP_DS_FUZZY_ColSPN_CLASS/*by george*/)
+	{
+		m_pcUnfoldedNet = dynamic_cast<SP_DLG_ColFSPNSimulationResults*>(m_pcColSimulationResults)->GetUnfoldedNet();
+		l_vAuxVar = dynamic_cast<SP_DLG_ColFSPNSimulationResults*>(m_pcColSimulationResults)->GetAuxPLVariables();
+	}
+	else if (m_sNetClass == SP_DS_COLCPN_CLASS)
 	{
 		m_pcUnfoldedNet = dynamic_cast<SP_DLG_ColCPNSimulationResults*>(m_pcColSimulationResults)->GetUnfoldedNet(); 
 		l_vAuxVar =  dynamic_cast<SP_DLG_ColCPNSimulationResults*>(m_pcColSimulationResults)->GetAuxPLVariables();
 	}
-	else if (m_sNetClass == SP_DS_COLHPN_CLASS )
+	else if ( m_sNetClass == SP_DS_FUZZY_ColCPN_CLASS/*by george*/)
+	{
+		m_pcUnfoldedNet = dynamic_cast<SP_DLG_ColFCPNSimulationResults*>(m_pcColSimulationResults)->GetUnfoldedNet();
+		l_vAuxVar = dynamic_cast<SP_DLG_ColFCPNSimulationResults*>(m_pcColSimulationResults)->GetAuxPLVariables();
+	}
+	else if (m_sNetClass == SP_DS_COLHPN_CLASS)
 	{
 		m_pcUnfoldedNet = dynamic_cast<SP_DLG_ColHPNSimultionResults*>(m_pcColSimulationResults)->GetUnfoldedNet(); 
 		l_vAuxVar =  dynamic_cast<SP_DLG_ColHPNSimultionResults*>(m_pcColSimulationResults)->GetAuxPLVariables();
+	}
+	else if (  m_sNetClass == SP_DS_FUZZY_ColHPN_CLASS/*by george*/)
+	{
+		m_pcUnfoldedNet = dynamic_cast<SP_DLG_ColFHPNSimulationResults*>(m_pcColSimulationResults)->GetUnfoldedNet();
+		l_vAuxVar = dynamic_cast<SP_DLG_ColFHPNSimulationResults*>(m_pcColSimulationResults)->GetAuxPLVariables();
 	}
 	else
 	{
@@ -203,15 +220,30 @@ void SP_DLG_ColPlacesSelection::OnEditAuxVariable(wxCommandEvent& p_cEvent )
 			l_vAuxVar =  dynamic_cast<SP_DLG_ColStSimulationResults*>(m_pcColSimulationResults)->GetAuxPLVariables();			
 			
 		}
+		else if (m_sNetClass == SP_DS_FUZZY_ColSPN_CLASS/*by george*/)
+		{
+			dynamic_cast<SP_DLG_ColFSPNSimulationResults*>(m_pcColSimulationResults)->ComputeAuxiliaryVars();
+			l_vAuxVar = dynamic_cast<SP_DLG_ColFSPNSimulationResults*>(m_pcColSimulationResults)->GetAuxPLVariables();
+		}
 		else if (m_sNetClass == SP_DS_COLCPN_CLASS )
 		{
 			dynamic_cast<SP_DLG_ColCPNSimulationResults*>(m_pcColSimulationResults)->ComputeAuxiliaryVars(); 	
 			l_vAuxVar =  dynamic_cast<SP_DLG_ColCPNSimulationResults*>(m_pcColSimulationResults)->GetAuxPLVariables();
 		}
-		else if (m_sNetClass == SP_DS_COLHPN_CLASS )
+		else if ( m_sNetClass == SP_DS_FUZZY_ColCPN_CLASS/*by george*/)
+		{
+			dynamic_cast<SP_DLG_ColFCPNSimulationResults*>(m_pcColSimulationResults)->ComputeAuxiliaryVars();
+			l_vAuxVar = dynamic_cast<SP_DLG_ColFCPNSimulationResults*>(m_pcColSimulationResults)->GetAuxPLVariables();
+		}
+		else if (m_sNetClass == SP_DS_COLHPN_CLASS)
 		{
 			dynamic_cast<SP_DLG_ColHPNSimultionResults*>(m_pcColSimulationResults)->ComputeAuxiliaryVars(); 
 			l_vAuxVar =  dynamic_cast<SP_DLG_ColHPNSimultionResults*>(m_pcColSimulationResults)->GetAuxPLVariables();
+		}
+		else if (m_sNetClass == SP_DS_FUZZY_ColHPN_CLASS/*by george*/)
+		{
+			dynamic_cast<SP_DLG_ColFHPNSimulationResults*>(m_pcColSimulationResults)->ComputeAuxiliaryVars();
+			l_vAuxVar = dynamic_cast<SP_DLG_ColFHPNSimulationResults*>(m_pcColSimulationResults)->GetAuxPLVariables();
 		}
 		else
 		{
