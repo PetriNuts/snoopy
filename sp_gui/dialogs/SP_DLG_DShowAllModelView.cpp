@@ -405,7 +405,10 @@ void SP_DLG_DShowAllModelView::OnEditNodeList(wxCommandEvent& event)
 
 	if (l_TempClassName == SP_DS_COLSPN_CLASS
 		|| l_TempClassName == SP_DS_COLCPN_CLASS
-		|| l_TempClassName == SP_DS_COLHPN_CLASS)
+		|| l_TempClassName == SP_DS_COLHPN_CLASS 
+		|| l_TempClassName == SP_DS_FUZZY_ColCPN_CLASS//by george
+		|| l_TempClassName == SP_DS_FUZZY_ColSPN_CLASS//by george
+		|| l_TempClassName == SP_DS_FUZZY_ColHPN_CLASS)//by george
 	{
 		//m_pcParentWnd->SaveCurrentView();
 

@@ -164,15 +164,6 @@ SP_DS_PlotViewer::SP_DS_PlotViewer(wxWindow *p_pcParent, wxSizer *p_pcSizer)
 	wxString m_sNetClassName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
 
 
-	if (m_sNetClassName.Contains(wxT("Fuzzy")))//for testing purposes
-	{
-		//	m_pcScroll = new wxStaticBoxSizer(new wxStaticBox(p_pcParent, -1, wxT("Change Time Point")), wxHORIZONTAL);
-	  
-			//scrollBar = new wxScrollBar(p_pcParent, SP_ID_SCROLL_BAR, wxDefaultPosition, wxSize(400, 20), wxSB_HORIZONTAL);
-			//scrollBar->SetRange(m_nMaxXValue);
-			//m_pcScroll->Add(scrollBar);   
-	       // p_pcSizer->Add(m_pcScroll);
-	}
 }
 
 SP_DS_PlotViewer::~SP_DS_PlotViewer() {

@@ -287,14 +287,9 @@ void SP_DLG_ViewerWindow::OnTextEner(wxCommandEvent & event)
 void SP_DLG_ViewerWindow::OnScrol(wxScrollEvent& WXUNUSED(event))//wxScrollEvent&  
 {
 	double dtimePoint1 = m_slider->GetValue();
-	//double dtimePoint = m_pscrollBar->GetThumbPosition();
 	wxString stimePoint;
 	stimePoint << dtimePoint1;
-	//stimePoint << dtimePoint;
-	//m_pscrollBar->SetToolTip(stimePoint);
-	//m_pscrollBar->Refresh();
 	m_ptimePointValue->SetLabelText(stimePoint);
-	//m_pcResultViewer->UpdateMembershipViewer(dtimePoint);
 	m_pcResultViewer->UpdateMembershipViewer(dtimePoint1);
 
 
