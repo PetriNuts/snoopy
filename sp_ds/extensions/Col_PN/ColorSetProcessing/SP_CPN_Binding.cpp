@@ -59,7 +59,7 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 	{
 		if(Parsing())
 		{
-			if(m_pcGraph->GetNetclass()->GetName() != SP_DS_COLSPN_CLASS)
+			if(m_pcGraph->GetNetclass()->GetName() != SP_DS_COLSPN_CLASS && m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColSPN_CLASS/*added by george */)
 			{
 				map<SP_DS_Edge*, map<wxString, int> > l_mmEdge2Mult2Color;
 				GetBinding(l_mmEdge2Mult2Color);
@@ -153,7 +153,7 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 					m_mExistingBindings[l_sArc2Color2Num] = true;
 					l_EnabledChoiceList.push_back(m_ParseInputVector);   //Store all enabled binding choices
 					
-					if(m_pcGraph->GetNetclass()->GetName() != SP_DS_COLSPN_CLASS)
+					if(m_pcGraph->GetNetclass()->GetName() != SP_DS_COLSPN_CLASS &&m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColSPN_CLASS /*added by george*/ )
 					{
 						map<SP_DS_Edge*, map<wxString, int> > l_mmEdge2Mult2Color;
 						GetBinding(l_mmEdge2Mult2Color);
@@ -183,7 +183,7 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 			l_pcCPN_TransAnimator->ResetSingleClick(false);  //reset singlick flage to false
 		}
 		else
-		if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS )
+		if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS /*added by george*/)
 		{
 			SP_DS_ColStTransAnimator* l_pcCPN_TransAnimator = dynamic_cast<SP_DS_ColStTransAnimator*>(p_pcTransAnimator);
 			l_pcCPN_TransAnimator->ResetSingleClick(false);  //reset singlick flage to false
@@ -278,7 +278,7 @@ SP_CPN_Binding::BuildParserTree(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 			l_ParseInputItem.m_sColorSetName = l_pcCPN_PlaceAnimator->GetPlaceMultiSet()->GetColorSetName();
 		}
 
-		if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS )
+		if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS  || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS/*Added by george*/)
 		{
 			SP_DS_ColStPlaceAnimator* l_pcColStPN_PlaceAnimator = dynamic_cast<SP_DS_ColStPlaceAnimator*>(itExprVector->m_pcPlAnimator);
 			if( ! l_pcColStPN_PlaceAnimator )
@@ -514,7 +514,7 @@ bool SP_CPN_Binding::Parsing()
 						return false;
 				}
 				else
-				if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS )	
+				if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS  || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS)
 				{
 					if(!(dynamic_cast<SP_DS_ColStPlaceAnimator*>(itList->m_pcPlAnimator)->GetPlaceMultiSet()->IsMarking(l_mSubset)))
 						return false;
@@ -535,7 +535,7 @@ bool SP_CPN_Binding::Parsing()
 					if(!(dynamic_cast<SP_DS_CPN_PlaceAnimator*>(itList->m_pcPlAnimator)->GetPlaceMultiSet()->EqualArcTest(l_mSubset)))
 						return false;
 				}
-				if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS )	
+				if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS)
 				{
 					if(!(dynamic_cast<SP_DS_ColStPlaceAnimator*>(itList->m_pcPlAnimator)->GetPlaceMultiSet()->EqualArcTest(l_mSubset)))
 						return false;
@@ -550,7 +550,7 @@ bool SP_CPN_Binding::Parsing()
 					if(!(dynamic_cast<SP_DS_CPN_PlaceAnimator*>(itList->m_pcPlAnimator)->GetPlaceMultiSet()->InhibitorArcTest(l_mSubset)))
 						return false;
 				}
-				if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS )	
+				if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS)
 				{
 					if(!(dynamic_cast<SP_DS_ColStPlaceAnimator*>(itList->m_pcPlAnimator)->GetPlaceMultiSet()->InhibitorArcTest(l_mSubset)))
 						return false;
@@ -718,7 +718,7 @@ bool SP_CPN_Binding::BindingInference(SP_MapString2UInt &p_IndexMap, vector<vect
 			{
 				l_MultiSetMap = dynamic_cast<SP_DS_CPN_PlaceAnimator*>(itList->m_pcPlAnimator)->GetPlaceMultiSet()->GetMultiSetMap();
 			}
-			if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS )	
+			if( m_pcGraph->GetNetclass()->GetName() ==  SP_DS_COLSPN_CLASS  || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS)
 			{
 				l_MultiSetMap = dynamic_cast<SP_DS_ColStPlaceAnimator*>(itList->m_pcPlAnimator)->GetPlaceMultiSet()->GetMultiSetMap();
 			}

@@ -71,8 +71,12 @@ public:
 	bool CheckCoLourExpression(std::string p_sExp, std::string &p_sColorSet,wxString& p_sErrorPos);//Check the colour expression for Arcs 
 
 	bool CheckGuardEXpression(std::string& p_sExp, std::string& p_sErrorPos);//Check Colour expression for guards
+
+	bool CheckTransRateFunction(SP_DS_Node*, wxString& p_sRateFun);
 	
 	placeLookUpTable GetPlaceLookupTable() { return m_lkt; }
+
+
 
 	private:
 		colExpr parseExpr(const std::string& expr_string);

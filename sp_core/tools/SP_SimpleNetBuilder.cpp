@@ -411,7 +411,7 @@ bool SP_ColoredNetBuilder::operator ()(SP_DS_Graph* p_pcGraph )
 		{
 			b.setType(dssd::andl::NetType::COL_XPN_T);
 		}
-		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_COLSPN_CLASS)
+		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_COLSPN_CLASS|| m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS/*george*/)
 		{
 			if(!m_pcGraph->GetNodeclass(SP_DS_DETERMINISTIC_TRANS)->GetElements()->empty()
 				|| !m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS)->GetElements()->empty())
@@ -428,11 +428,11 @@ bool SP_ColoredNetBuilder::operator ()(SP_DS_Graph* p_pcGraph )
 
 			}
 		}
-		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_COLCPN_CLASS)
+		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_COLCPN_CLASS || m_pcGraph->GetNetclass()->GetName()==SP_DS_FUZZY_ColCPN_CLASS/*george*/)
 		{
 			b.setType(dssd::andl::NetType::COL_CPN_T);
 		}
-		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_COLHPN_CLASS)
+		else if(m_pcGraph->GetNetclass()->GetName() == SP_DS_COLHPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColHPN_CLASS/*george*/)
 		{
 			b.setType(dssd::andl::NetType::COL_HPN_T);
 		}
@@ -527,6 +527,8 @@ bool SP_ColoredNetBuilder::CreateColorsets(dssd::andl::simple_net_builder& b)
 		std::string name = l_pcColList->GetCell(i,0);
 		std::string type = l_pcColList->GetCell(i,1);
 		std::string value = "{" + l_pcColList->GetCell(i, 2) + "}";
+		value.erase(std::remove_if(value.begin(), value.end(), ::isspace), value.end());//by george to remove white spaces
+
 		if(type=="enum"&& value.find('-')!=std::string::npos)//george
 		{
 			SP_LOGMESSAGE("The type " + type + " with colour range is not supported by CANDL format");
@@ -697,28 +699,39 @@ bool SP_ColoredNetBuilder::CreatePlaces(dssd::andl::simple_net_builder& b)
 					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
 					for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 					{
-						wxString l_sColors = l_pcColList->GetCell(i,l_pcColList->GetActiveColumn());
-						if(l_sColors.IsEmpty())
+						wxString l_sColors = l_pcColList->GetCell(i, l_pcColList->GetActiveColumn());
+						if (l_sColors.IsEmpty())
 						{
 							l_sColors = "all";
 						}
-						wxString l_sToken = l_pcColList->GetCell(i,l_pcColList->GetActiveColumn()+1);
-						if(l_sToken.IsEmpty())
+						wxString l_sToken = l_pcColList->GetCell(i, l_pcColList->GetActiveColumn() + 1);
+						if (l_sToken.IsEmpty())
 						{
 							l_sToken = "0";
 						}
-						if(i>0)
+						if (i > 0)
 						{
 							l_sMarking += "++";
 						}
-						l_sMarking += "" + l_sToken
-								+ "`" + l_sColors
+						wxString l_sTupel = l_pcColList->GetCell(i, l_pcColList->GetActiveColumn() + 2);
+						if (l_sTupel.Contains(","))//if tupel column exists
+						{
+							l_sMarking += "[" + l_sColors +"]"+ l_sToken
+								+ "`" + l_sTupel
 								+ "";
-						wxString l_sOld = l_sMarking;//george
-						wxString l_sNew;//george
+						}
+						else
+						{
 						 
-						PrePareMarkingString(l_sOld, l_sNew);//george
-						l_sMarking = l_sNew.ToStdString();//george
+						l_sMarking += "" + l_sToken
+							+ "`" + l_sColors
+							+ "";
+					     }
+						//wxString l_sOld = l_sMarking;//george
+						//wxString l_sNew;//george
+						 
+						//PrePareMarkingString(l_sOld, l_sNew);//george
+						//l_sMarking = l_sNew.ToStdString();//george
 					    
 					 
 					}
@@ -958,7 +971,16 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b)
 	/*************** by george*************/
 	if (!l_bForUpdateMarking)
 	{
-		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		wxString l_sMetaClass;
+		if (m_pcGraph->GetNetclass()->GetName().Contains(wxT("Fuzzy")))
+		{
+			l_sMetaClass = SP_DS_META_CONSTANT;
+		}
+		else
+		{
+			l_sMetaClass = SP_DS_CPN_CONSTANT_HARMONIZING;
+		}
+		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(l_sMetaClass);
 		SP_ListMetadata::const_iterator it;
 		int i = 0;
 		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
@@ -1061,8 +1083,16 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b)
 	}
 	else
 	{//for updating marking
-
-		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		wxString l_sMetaClass;
+		if (m_pcGraph->GetNetclass()->GetName().Contains(wxT("Fuzzy")))
+		{
+			l_sMetaClass = SP_DS_META_CONSTANT;
+		}
+		else
+		{
+			l_sMetaClass = SP_DS_CPN_CONSTANT_HARMONIZING;
+		}
+		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(l_sMetaClass);
 		SP_ListMetadata::const_iterator it;
 
 		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)

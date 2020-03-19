@@ -1,8 +1,8 @@
 /*
 * SP_DLG_NewConstantDefinition.h
 *
-*  Created on: 07.09.2012
-*      Author: Steffen Laarz
+*  Created on: 07.02.2019
+*      Author: G. Assaf
 */
 
 #ifndef SP_DLG_FPNCONSTANTDEFINITION_H_
@@ -16,7 +16,7 @@
 #include "sp_utilities.h"
 #include"TriangularFN.h"
 #include<vector>
-
+#include "sp_gui\dialogs\dia_FPN\SP_DLG_FuzzyNumber_Drawing.h"
 class SP_DS_Metadataclass;
 //class TriangularFN;
 class SP_DLG_FpnConstantDefinition : public wxDialog
@@ -54,6 +54,12 @@ private:
 
 	SP_SetString m_Places;
 
+	SP_DLG_FuzzyNumber_Drawing* m_pcDraw;
+
+	wxString l_sTFNFromDrawingPanel;
+	int m_nRow;
+	int m_nCol;
+
 private:
 
 	bool SaveData();
@@ -76,7 +82,7 @@ private:
 	bool  ParseFN(const wxString& type,const wxString &val);
 	SP_VectorDouble  GetFNConstants( const wxString &val);
 
-
+	void OnChildDestroy(wxCloseEvent& event);
 protected:
 	bool FindString(wxArrayString& p_asStrArray, wxString& p_sValue);
 
@@ -105,7 +111,7 @@ public:
 	void OnGridCellValueChanged(wxGridEvent& p_gEvent);
 	void OnGridCellSelected(wxGridEvent& ev);
 	void OnEditorShown(wxGridEvent& ev);
-
+	void OnGridCellDClicked(wxGridEvent& ev);
 
 	DECLARE_CLASS(SP_DLG_FpnConstantDefinition)
 	DECLARE_EVENT_TABLE()

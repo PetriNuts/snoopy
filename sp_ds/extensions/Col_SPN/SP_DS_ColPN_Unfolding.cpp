@@ -1209,7 +1209,7 @@ void SP_DS_ColPN_Unfolding::SetContOutputArcDeltaVector(long p_nTransArrayPos, v
 
 vector<double>* SP_DS_ColPN_Unfolding::GetCurCPNMarking()
 {
-	if( !(m_sNetClass == SP_DS_COLCPN_CLASS)  )
+	if( !(m_sNetClass == SP_DS_COLCPN_CLASS) && !(m_sNetClass == SP_DS_FUZZY_ColCPN_CLASS))//by george
 		return NULL;
 
 	m_adInitialNetMarking.resize(m_anColCPNNetMarkings.size());
@@ -1260,7 +1260,9 @@ vector<double>*	SP_DS_ColPN_Unfolding::GetCurHybPNMarking()
 vector<long>* SP_DS_ColPN_Unfolding::GetCurColStMarking()
 {
 	if( m_sNetClass == SP_DS_COLCPN_CLASS
-		|| m_sNetClass == SP_DS_COLHPN_CLASS )
+		|| m_sNetClass == SP_DS_COLHPN_CLASS
+		|| m_sNetClass == SP_DS_FUZZY_ColHPN_CLASS //added by george
+		|| m_sNetClass == SP_DS_FUZZY_ColCPN_CLASS)//added by george
 		return NULL;
 
 	m_anInitialNetMarking.resize(m_anNetMarkings.size());
@@ -1283,7 +1285,11 @@ SP_VectorString* SP_DS_ColPN_Unfolding::GetCurRateFunction()
 
 	if( !(m_sNetClass == SP_DS_COLSPN_CLASS||
 		m_sNetClass == SP_DS_COLCPN_CLASS||
-		m_sNetClass == SP_DS_COLHPN_CLASS) )
+		m_sNetClass == SP_DS_COLHPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZY_ColCPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZY_ColSPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZY_ColHPN_CLASS 
+		) )
 		return NULL;
 
 	unsigned int l_nContTrCurrentColumn;
@@ -1348,10 +1354,10 @@ SP_VectorString* SP_DS_ColPN_Unfolding::GetCurRateFunction()
 	//initilize
 	m_msTransitionFunctions.assign(m_anNetFunctions.size(), wxT("0"));
 
-	for(unsigned int i = 0; i < m_anNetFunctions.size(); i++ )
+	for( int i = 0; i < m_anNetFunctions.size(); i++ )
 	{
 		unsigned int l_nCurrentColumn;
-		if( m_vsTransNodeType[i] == SP_DS_CONTINUOUS_TRANS )
+		if( m_vsTransNodeType[i].IsSameAs(SP_DS_CONTINUOUS_TRANS) )
 			l_nCurrentColumn = l_nContTrCurrentColumn;
 		if( m_vsTransNodeType[i] == wxT("Transition") )
 			l_nCurrentColumn = l_nStochTrCurrentColumn;
@@ -1362,7 +1368,7 @@ SP_VectorString* SP_DS_ColPN_Unfolding::GetCurRateFunction()
 		if( m_vsTransNodeType[i] == wxT("Scheduled Transition") )
 			l_nCurrentColumn = l_nSchedTrCurrentColumn;
 
-		m_msTransitionFunctions[i] = m_anNetFunctions[i][l_nCurrentColumn];
+		m_msTransitionFunctions[i] =m_anNetFunctions[i][l_nCurrentColumn];
 	}
 	
     return &m_msTransitionFunctions;
@@ -1859,7 +1865,11 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::InitializeParsedExprs()
 	
 	if( m_sNetClass == SP_DS_COLSPN_CLASS||
 		m_sNetClass == SP_DS_COLCPN_CLASS||
-		m_sNetClass == SP_DS_COLHPN_CLASS)
+		m_sNetClass == SP_DS_COLHPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZY_ColSPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZY_ColCPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZY_ColHPN_CLASS
+		)
 	{
 		if(!CollectRateFunction())
 		{
@@ -2792,7 +2802,11 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::ProcessTransition()
 	//If there is no predicate that is true, then we assign 0 to it.
 	if( m_sNetClass == SP_DS_COLSPN_CLASS||
 		m_sNetClass == SP_DS_COLCPN_CLASS||
-		m_sNetClass == SP_DS_COLHPN_CLASS)
+		m_sNetClass == SP_DS_COLHPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZY_ColCPN_CLASS ||//added by george
+		m_sNetClass == SP_DS_FUZZY_ColSPN_CLASS ||//added by george
+		m_sNetClass == SP_DS_FUZZY_ColHPN_CLASS) //added by george
+
 	{
 		if( !l_bFoundRateFunc )
 		{

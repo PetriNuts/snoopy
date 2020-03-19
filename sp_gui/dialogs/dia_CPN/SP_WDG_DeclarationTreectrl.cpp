@@ -9403,8 +9403,17 @@ SP_WDG_DeclarationTreectrl::OnDoubleClick(wxTreeEvent& p_cEvent)
 
 		if (l_sNetClassName.Contains(wxT("Colored")))
 		{
-			SP_DLG_ConstantDefinition l_cConstantDlg(NULL);
-			l_cConstantDlg.ShowModal();
+			if (l_sNetClassName.Contains(wxT("Fuzzy")))
+			{
+				SP_DLG_FpnConstantDefinition l_cConstantDlg(NULL);
+				l_cConstantDlg.ShowModal();
+			}
+			else
+			{
+				SP_DLG_ConstantDefinition l_cConstantDlg(NULL);
+				l_cConstantDlg.ShowModal();
+			}
+		
 		}
 		else if (l_sNetClassName.Contains(wxT("Fuzzy")))
 		{
@@ -9523,12 +9532,12 @@ SP_WDG_DeclarationTreectrl::UpdateOtherTree()
 
 					l_sMetadataValue << wxT("(") << l_pcColList->GetCell(i, 1) << wxT(");");
 				}
-				else if (l_sMetadataType.Cmp(wxT("BFN")) == 0 && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS))
+				else if (l_sMetadataType.Cmp(wxT("BFN")) == 0 && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS || netClass==SP_DS_FUZZY_ColCPN_CLASS|| netClass == SP_DS_FUZZY_ColSPN_CLASS|| netClass == SP_DS_FUZZY_ColHPN_CLASS))
 				{
 					l_sMetadataValue << wxT("(") << l_pcColList->GetCell(i, 1) << wxT(");");
 
 				}
-				else if (l_sMetadataType.Cmp(wxT("TZN")) == 0 && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS))
+				else if (l_sMetadataType.Cmp(wxT("TZN")) == 0 && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS || netClass == SP_DS_FUZZY_ColCPN_CLASS || netClass == SP_DS_FUZZY_ColSPN_CLASS || netClass == SP_DS_FUZZY_ColHPN_CLASS))
 				{
 					l_sMetadataValue << wxT("(") << l_pcColList->GetCell(i, 1) << wxT(");");
 
@@ -9540,7 +9549,7 @@ SP_WDG_DeclarationTreectrl::UpdateOtherTree()
 				}
 			}
 			////////////////
-			if ((l_sMetadataType.Cmp(wxT("TFN")) == 0 || l_sMetadataType.Cmp(wxT("BFN")) == 0 || l_sMetadataType.Cmp(wxT("TZN")) == 0) && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS))
+			if ((l_sMetadataType.Cmp(wxT("TFN")) == 0 || l_sMetadataType.Cmp(wxT("BFN")) == 0 || l_sMetadataType.Cmp(wxT("TZN")) == 0) && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS || netClass == SP_DS_FUZZY_ColCPN_CLASS || netClass == SP_DS_FUZZY_ColSPN_CLASS || netClass == SP_DS_FUZZY_ColHPN_CLASS))
 			{
 				m_ColorsMap[l_sMetadataName] = l_sMetadataGroup + wxT(" : ") + l_sMetadataValue;
 				AppendFileItem(l_cSecondChild, l_sMetadataName + l_sMetadataValue, NULL);
@@ -9550,13 +9559,13 @@ SP_WDG_DeclarationTreectrl::UpdateOtherTree()
 			/////////////////
 
 			else {
-				if ((netClass != SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass != SP_DS_FUZZYCPN_CLASS) && !l_sMetadataValue.Contains(","))
+				if ((netClass != SP_DS_FUZZYSPN_CLASS || netClass != SP_DS_FUZZYHPN_CLASS || netClass != SP_DS_FUZZYCPN_CLASS || netClass != SP_DS_FUZZY_ColCPN_CLASS || netClass != SP_DS_FUZZY_ColSPN_CLASS || netClass != SP_DS_FUZZY_ColHPN_CLASS) && !l_sMetadataValue.Contains(","))
 				{
 
 					m_ColorsMap[l_sMetadataName] = l_sMetadataGroup + wxT(" : ") + l_sMetadataValue;
 					AppendFileItem(l_cSecondChild, l_sMetadataName + wxT(" : ") + l_sMetadataValue, NULL);
 				}
-				else if (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS)
+				else if (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS || netClass == SP_DS_FUZZY_ColCPN_CLASS || netClass == SP_DS_FUZZY_ColSPN_CLASS || netClass == SP_DS_FUZZY_ColHPN_CLASS)
 				{
 					m_ColorsMap[l_sMetadataName] = l_sMetadataGroup + wxT(" : ") + l_sMetadataValue;
 					AppendFileItem(l_cSecondChild, l_sMetadataName + wxT(" : ") + l_sMetadataValue, NULL);
@@ -9716,20 +9725,18 @@ SP_WDG_DeclarationTreectrl::UpdateColorSetTree()
 	wxTreeItemId l_cSecondChild = GetNextChild(l_cRootId, l_nCookie);
 	DeleteChildren(l_cSecondChild);
 	/*********constants******/
-	//l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
-	//if (!l_pcMetadataclass)
-	//	return;
-
-	//if (l_pcMetadataclass->GetElements()->empty())
-	//	return;
-
-	//l_pcNewMetadata = l_pcMetadataclass->GetElements()->front();
-
-	//l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
-	//if (!l_pcColList)
-	//	return;
-	SP_DS_Metadataclass* m_pcConstants = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	wxString l_sMetaClass;
+	if (l_pcGraph->GetNetclass()->GetName().Contains(wxT("Fuzzy")))
+	{
+		l_sMetaClass = SP_DS_META_CONSTANT;
+	}
+	else
+	{
+		l_sMetaClass = SP_DS_CPN_CONSTANT_HARMONIZING;
+	}
+	SP_DS_Metadataclass* m_pcConstants = l_pcGraph->GetMetadataclass(l_sMetaClass);
 	if (m_pcConstants) {
+		wxString netClass = l_pcGraph->GetNetclass()->GetName();
 		for (SP_DS_Metadata* l_pcMetadata : *(m_pcConstants->GetElements()))
 		{
 			wxString l_sMetadataName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
@@ -9744,7 +9751,39 @@ SP_WDG_DeclarationTreectrl::UpdateColorSetTree()
 			{
 				wxString l_sSetName = l_pcColList->GetCell(i, 0).c_str();
 				wxString l_sValue = l_pcColList->GetCell(i, 1).c_str();
-				//wxString l_sValue = l_pcColList->GetCell(i, 2).c_str();
+				wxString l_sMetadataValue;
+				if (l_sMetadataType==wxT("TFN"))//
+				{
+					if (l_sMetadataType.Cmp(wxT("TFN")) == 0 && (netClass == SP_DS_FUZZY_ColCPN_CLASS || netClass == SP_DS_FUZZY_ColSPN_CLASS || netClass == SP_DS_FUZZY_ColHPN_CLASS))
+					{
+
+
+						l_sMetadataValue << wxT("(") << l_pcColList->GetCell(i, 1) << wxT(");");
+					}
+					else if (l_sMetadataType.Cmp(wxT("BFN")) == 0 && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS || netClass == SP_DS_FUZZY_ColCPN_CLASS || netClass == SP_DS_FUZZY_ColSPN_CLASS || netClass == SP_DS_FUZZY_ColHPN_CLASS))
+					{
+						l_sMetadataValue << wxT("(") << l_pcColList->GetCell(i, 1) << wxT(");");
+
+					}
+					else if (l_sMetadataType.Cmp(wxT("TZN")) == 0 && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS || netClass == SP_DS_FUZZY_ColCPN_CLASS || netClass == SP_DS_FUZZY_ColSPN_CLASS || netClass == SP_DS_FUZZY_ColHPN_CLASS))
+					{
+						l_sMetadataValue << wxT("(") << l_pcColList->GetCell(i, 1) << wxT(");");
+
+					}
+					else
+					{
+						l_sMetadataValue << l_pcColList->GetCell(i, 1) << wxT(";");
+
+					}
+				}//
+				if ((l_sMetadataType.Cmp(wxT("TFN")) == 0 || l_sMetadataType.Cmp(wxT("BFN")) == 0 || l_sMetadataType.Cmp(wxT("TZN")) == 0) && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS || netClass == SP_DS_FUZZY_ColCPN_CLASS || netClass == SP_DS_FUZZY_ColSPN_CLASS || netClass == SP_DS_FUZZY_ColHPN_CLASS))
+				{
+					m_ColorsMap[l_sMetadataName] = l_sMetadataGroup + wxT(" : ") + l_sMetadataValue;
+					AppendFileItem(l_cSecondChild, l_sMetadataName + l_sMetadataValue, NULL);
+					wxString msg = "new" + l_sMetadataType + " Fuzzy Number is defined  " + l_sMetadataName + ":" + l_sMetadataValue;
+					SP_LOGMESSAGE(msg);
+					break;
+				}
 				if (l_sMetadataType == wxT("int") && i == 0)
 				{
 					m_ColorsMap[l_sMetadataName] = l_sMetadataType + wxT(":") + l_sValue;
@@ -9814,7 +9853,7 @@ SP_WDG_DeclarationTreectrl::UpdateColorSetTree()
 	wxString l_sNetClassName = l_pcGraph->GetNetclass()->GetName();
 	wxString l_sPlaceNodeClassName;
 
-	if (l_sNetClassName == SP_DS_COLCPN_CLASS)
+	if (l_sNetClassName == SP_DS_COLCPN_CLASS|| l_sNetClassName==SP_DS_FUZZY_ColCPN_CLASS)//by george
 		l_sPlaceNodeClassName = SP_DS_CONTINUOUS_PLACE;
 	else
 		l_sPlaceNodeClassName = SP_DS_DISCRETE_PLACE;

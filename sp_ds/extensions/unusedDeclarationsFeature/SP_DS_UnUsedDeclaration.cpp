@@ -25,6 +25,7 @@ SP_DS_UnUsedDeclaration::SP_DS_UnUsedDeclaration(SP_DS_Graph* p_pcGraph, SP_Vect
 /*find un-used constants for (coloured) Petri net classes in declaration tree*/
 std::set<wxString>  SP_DS_UnUsedDeclaration::FindUnusedConstants()
 {
+
 	std::set<wxString> l_setRes;
 	std::set<wxString> l_setAllUsedConstants;
 	bool l_bIsColoured = false;
@@ -278,7 +279,10 @@ set<wxString> SP_DS_UnUsedDeclaration::GetDeclarationsInPredicates()
 
 	if ((l_sNetClass == SP_DS_COLSPN_CLASS) ||
 		(l_sNetClass == SP_DS_COLCPN_CLASS) ||
-		(l_sNetClass == SP_DS_COLHPN_CLASS))
+		(l_sNetClass == SP_DS_COLHPN_CLASS) ||
+		(l_sNetClass == SP_DS_FUZZY_ColCPN_CLASS)||
+		(l_sNetClass == SP_DS_FUZZY_ColSPN_CLASS)||
+		(l_sNetClass == SP_DS_FUZZY_ColHPN_CLASS))
 	{
 
 		SP_VectorString l_vTransNC = { SP_DS_CONTINUOUS_TRANS ,SP_DS_STOCHASTIC_TRANS ,wxT("Immediate Transition") ,wxT("Deterministic Transition") ,wxT("Scheduled Transition") };
@@ -598,7 +602,18 @@ map<wxString, wxString> SP_DS_UnUsedDeclaration::ObtainAllDefinedConstants2Valus
 		//}
 
 		///////////////////////
-		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+
+		wxString l_sTempClassName = m_pcGraph->GetNetclass()->GetName();
+		wxString l_sClass;
+		if (l_sTempClassName.Contains("Fuzzy"))
+		{
+			l_sClass = SP_DS_META_CONSTANT;
+		}
+		else
+		{
+			l_sClass = SP_DS_CPN_CONSTANT_HARMONIZING;
+		}
+		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(l_sClass);
 		SP_ListMetadata::const_iterator it;
 
 		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
@@ -651,10 +666,21 @@ set<wxString> SP_DS_UnUsedDeclaration::ObtainAllDefinedConstants() {
 
 	set<wxString> l_setConst;
 	wxString l_netType = m_pcGraph->GetNetclass()->GetDisplayName();
-
+	l_netType = m_pcGraph->GetNetclass()->GetName();
 	if (l_netType.Contains(wxT("Colored")))
-	{
-			SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	{       
+
+		wxString l_sTempClassName = m_pcGraph->GetNetclass()->GetName();
+		wxString l_sClass;
+		   if (l_sTempClassName.Contains("Fuzzy"))
+		    {
+			l_sClass = SP_DS_META_CONSTANT;
+		    }
+		   else
+		    {
+			l_sClass = SP_DS_CPN_CONSTANT_HARMONIZING;
+		    }
+			SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(l_sClass);
 			SP_ListMetadata::const_iterator it;
 
 			for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
@@ -2519,7 +2545,19 @@ void SP_DS_UnUsedDeclaration::DeleteUnusedConstant(wxString p_sName)
 		l_bIsColored = true;
 	}
 	if (l_bIsColored) {
-		SP_DS_Metadataclass* l_pcConstants= m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+
+		wxString l_sTempClassName = m_pcGraph->GetNetclass()->GetName();
+		wxString l_sClass;
+		if (l_sTempClassName.Contains("Fuzzy"))
+		{
+			l_sClass = SP_DS_META_CONSTANT;
+		}
+		else
+		{
+			l_sClass = SP_DS_CPN_CONSTANT_HARMONIZING;
+		}
+
+		SP_DS_Metadataclass* l_pcConstants= m_pcGraph->GetMetadataclass(l_sClass);
 	
 		for (SP_DS_Metadata* l_pcMeta : *(l_pcConstants)->GetElements())
 		{
@@ -2890,6 +2928,7 @@ set<wxString> SP_DS_UnUsedDeclaration::ObtainUsedConstantsInGraph()
 
 	bool l_bIsColoured = false;
 	wxString l_netType = m_pcGraph->GetNetclass()->GetDisplayName();
+	l_netType = m_pcGraph->GetNetclass()->GetName();
 	if (l_netType.Contains(wxT("Colored")))
 	{
 		l_bIsColoured = true;
@@ -2910,7 +2949,6 @@ set<wxString> SP_DS_UnUsedDeclaration::ObtainUsedConstantsInGraph()
 
 		return l_setUsedConst;
 	}
-
 
 	std::set<string> l_setConstInExp = ReadColPNVariables();
 	std::set<wxString> l_setmarking;
@@ -2992,6 +3030,14 @@ set<wxString> SP_DS_UnUsedDeclaration::ObtainUsedConstantsInGraph()
 
 	}
 
+	//////////////used constants in rate functions of transitions//////////////
+	std::set<wxString> l_setRateFuns;
+	std::set<wxString> l_setAllDeclarationsInRateFuns;
+	bool l_bAllRatefuns = GetRateFunctionsOfTransitions(l_setRateFuns);
+	bool l_bRes = TokenizeRateFunctions(l_setRateFuns, l_setAllDeclarationsInRateFuns);
+
+	l_setUsedConst.insert(l_setAllDeclarationsInRateFuns.begin(), l_setAllDeclarationsInRateFuns.end());
+	/////////////////////////////
 	l_setUsedConst.insert(l_setConstantCSRelated.begin(), l_setConstantCSRelated.end());
 	return l_setUsedConst;
 }
@@ -4793,4 +4839,62 @@ map<wxString, wxString> SP_DS_UnUsedDeclaration::ObtainAllCs2Type()
 
 	}
 	return l_mCs2Type;
+}
+
+bool SP_DS_UnUsedDeclaration::GetRateFunctionsOfTransitions(std::set<wxString>& p_setRateFun)
+{
+	wxString m_sNetClass = m_pcGraph->GetNetclass()->GetName();
+
+
+	if (!(m_sNetClass == SP_DS_COLSPN_CLASS ||
+		m_sNetClass == SP_DS_COLCPN_CLASS ||
+		m_sNetClass == SP_DS_COLHPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZY_ColCPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZY_ColSPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZY_ColHPN_CLASS ||
+		m_sNetClass == SP_DS_SPN_CLASS ||
+		m_sNetClass == SP_DS_CONTINUOUSPED_CLASS ||
+		m_sNetClass == SP_DS_HYBRIDPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZYCPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZYSPN_CLASS ||
+		m_sNetClass == SP_DS_FUZZYHPN_CLASS
+		))
+		return false;
+	 
+	SP_ListNode::const_iterator l_itElem;
+	SP_VectorString l_vTransNC = { SP_DS_CONTINUOUS_TRANS ,SP_DS_STOCHASTIC_TRANS ,wxT("Immediate Transition") ,wxT("Deterministic Transition") ,wxT("Scheduled Transition") };
+		
+	for (auto it_vTrns = l_vTransNC.begin(); it_vTrns != l_vTransNC.end(); ++it_vTrns)
+		{
+			SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(*it_vTrns);
+
+			if (l_pcNodeclass)
+			{
+				for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+				{
+					SP_DS_Node* l_pcTransNode = (*l_itElem);
+
+					wxString l_sTransName = dynamic_cast<SP_DS_NameAttribute*>(l_pcTransNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+
+
+					SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcTransNode->GetAttribute(wxT("FunctionList")));
+
+					for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+					{
+						wxString l_sRateFun = wxString(l_pcColList->GetCell(i, 1).c_str());
+						p_setRateFun.insert(l_sRateFun);
+					}
+				}
+			}
+		}
+}
+
+bool SP_DS_UnUsedDeclaration::TokenizeRateFunctions(std::set<wxString>& p_setRateFun, std::set<wxString>& p_setResultDeclarations)
+{
+	for (auto it_fun : p_setRateFun)
+	{
+		std::set<string> l_setTemp = ToknizeArcExp(it_fun);
+		p_setResultDeclarations.insert(l_setTemp.begin(), l_setTemp.end());
+	}
+	return true;
 }

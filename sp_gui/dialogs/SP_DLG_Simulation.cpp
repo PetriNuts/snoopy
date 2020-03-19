@@ -1058,6 +1058,8 @@ void SP_DLG_Simulation::LoadData(bool p_bCreateNewTree)
 
 void SP_DLG_Simulation::LoadSets()
 {
+
+	 
     SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 
     SP_ListMetadata::const_iterator l_itElem;

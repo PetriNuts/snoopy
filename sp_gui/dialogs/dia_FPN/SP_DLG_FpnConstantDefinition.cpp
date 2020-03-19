@@ -1,8 +1,8 @@
 /*
 * SP_DLG_NewConstantDefinition.cpp
 *
-*  Created on: 07.09.2012
-*      Author: Steffen Laarz
+*  Created on: 07.02.2019
+*      Author: G. Assaf
 */
 
 #include <wx/valgen.h>
@@ -59,7 +59,7 @@ enum
 	SP_ID_BUTTON_RENAMESET
 };
 BEGIN_EVENT_TABLE(SP_DLG_FpnConstantDefinition, wxDialog)
-
+EVT_CLOSE(SP_DLG_FpnConstantDefinition::OnChildDestroy)
 EVT_BUTTON(wxID_OK, SP_DLG_FpnConstantDefinition::OnDlgOk)
 EVT_BUTTON(wxID_CANCEL, SP_DLG_FpnConstantDefinition::OnDlgCancel)
 EVT_BUTTON(SP_ID_BUTTON_ADD, SP_DLG_FpnConstantDefinition::OnAddSet)
@@ -76,7 +76,7 @@ EVT_GRID_CELL_CHANGED(SP_DLG_FpnConstantDefinition::OnGridCellValueChanged)
 #else
 EVT_GRID_CELL_CHANGE(SP_DLG_FpnConstantDefinition::OnGridCellValueChanged)
 #endif
-
+EVT_GRID_CELL_LEFT_DCLICK(SP_DLG_FpnConstantDefinition::OnGridCellDClicked)
 EVT_GRID_SELECT_CELL(SP_DLG_FpnConstantDefinition::OnGridCellSelected)
 EVT_GRID_EDITOR_SHOWN(SP_DLG_FpnConstantDefinition::OnEditorShown)
 
@@ -86,7 +86,7 @@ SP_DLG_FpnConstantDefinition::SP_DLG_FpnConstantDefinition(wxWindow* p_pcParent,
 	wxDialog(p_pcParent, -1, p_sTitle, wxPoint(120, 120), wxSize(1500, 400), p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX),
 	m_nMainSet(VALUES)
 
-{///Constructor
+{ 
 	m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
 	m_pcConstants = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 	m_pcParent = p_pcParent;
@@ -153,6 +153,12 @@ SP_DLG_FpnConstantDefinition::SP_DLG_FpnConstantDefinition(wxWindow* p_pcParent,
 
 	m_pcSizer->Fit(this);
 	m_pcSizer->SetSizeHints(this);
+	wxString l_sNetClass=m_pcGraph->GetNetclass()->GetName();
+	if (l_sNetClass.Contains(wxT("Colored")))//do not display SHOW Column
+	{
+		m_pcConstantSetGrid->HideCol(0);
+	}
+	
 
 	Layout();
 
@@ -256,13 +262,30 @@ void SP_DLG_FpnConstantDefinition::OnDlgOk(wxCommandEvent& p_cEvent)
 				//by sl
 
 				/*
-				* todo update for other netclasses to show in declaration tree
+				* todo update for other netclasses to display in declaration tree
 				*/
+				wxString l_sName = m_pcGraph->GetNetclass()->GetName();
+				if (l_sName == SP_DS_FUZZY_ColCPN_CLASS|| l_sName == SP_DS_FUZZY_ColSPN_CLASS|| l_sName == SP_DS_FUZZY_ColHPN_CLASS)//by george
+				{
+					m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
 
-				m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
+					SP_CPN_SyntaxChecking l_cSyntaxChecking;
+					if (l_cSyntaxChecking.Initialize())
+					{
+						l_cSyntaxChecking.UpdateNetMarking();
+					}
+					SP_Core::Instance()->GetRootDocument()->Modify(TRUE);
+					EndModal(wxID_OK);
+				}
+				else {
 
-				SP_Core::Instance()->GetRootDocument()->Modify(TRUE);
-				EndModal(wxID_OK);
+
+					m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
+
+					SP_Core::Instance()->GetRootDocument()->Modify(TRUE);
+					EndModal(wxID_OK);
+				}
+			 
 			}
 		}
 		else
@@ -343,16 +366,18 @@ void SP_DLG_FpnConstantDefinition::OnAddSet(wxCommandEvent& p_cEvent)// on add a
 
 	int l_nEditRowPos = m_pcConstantSetGrid->GetNumberRows() - 1;
 
-	auto l_pcBoolEditor = new wxGridCellBoolEditor();
-	l_pcBoolEditor->UseStringValues(wxT("1"), wxT("0"));
-	m_pcConstantSetGrid->SetCellEditor(l_nEditRowPos, SHOW, l_pcBoolEditor);
-	m_pcConstantSetGrid->SetCellRenderer(l_nEditRowPos, SHOW, new wxGridCellBoolRenderer());
-	m_pcConstantSetGrid->SetCellSize(l_nEditRowPos, SHOW, 1, 1);
-	m_pcConstantSetGrid->SetCellAlignment(l_nEditRowPos, SHOW, wxALIGN_CENTER, wxALIGN_TOP);
-	m_pcConstantSetGrid->SetCellValue(l_nEditRowPos, SHOW, wxT("0"));
-	m_pcConstantSetGrid->SetCellOverflow(l_nEditRowPos, SHOW, false);
-	m_pcConstantSetGrid->SetCellBackgroundColour(l_nEditRowPos, SHOW, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-
+	if (!m_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")))//do not add SHOW Column
+	{
+		auto l_pcBoolEditor = new wxGridCellBoolEditor();
+		l_pcBoolEditor->UseStringValues(wxT("1"), wxT("0"));
+		m_pcConstantSetGrid->SetCellEditor(l_nEditRowPos, SHOW, l_pcBoolEditor);
+		m_pcConstantSetGrid->SetCellRenderer(l_nEditRowPos, SHOW, new wxGridCellBoolRenderer());
+		m_pcConstantSetGrid->SetCellSize(l_nEditRowPos, SHOW, 1, 1);
+		m_pcConstantSetGrid->SetCellAlignment(l_nEditRowPos, SHOW, wxALIGN_CENTER, wxALIGN_TOP);
+		m_pcConstantSetGrid->SetCellValue(l_nEditRowPos, SHOW, wxT("0"));
+		m_pcConstantSetGrid->SetCellOverflow(l_nEditRowPos, SHOW, false);
+		m_pcConstantSetGrid->SetCellBackgroundColour(l_nEditRowPos, SHOW, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+	}
 	m_pcConstantSetGrid->SetCellBackgroundColour(l_nEditRowPos, NAME, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
 
 	//m_pcConstantSetGrid->SetCellEditor(l_nEditRowPos, GROUP,new wxGridCellChoiceEditor(m_choices.GetCount(), choices));
@@ -488,14 +513,17 @@ bool SP_DLG_FpnConstantDefinition::LoadData()
 		SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcMetadata->GetAttribute(wxT("ValueList")));
 
 		m_pcConstantSetGrid->AppendRows(1);
-		//show the constant
-		auto l_pcBoolEditor = new wxGridCellBoolEditor();
-		l_pcBoolEditor->UseStringValues(wxT("1"), wxT("0"));
-		m_pcConstantSetGrid->SetCellEditor(l_nPos, SHOW, l_pcBoolEditor);
-		m_pcConstantSetGrid->SetCellRenderer(l_nPos, SHOW, new wxGridCellBoolRenderer());
-		m_pcConstantSetGrid->SetCellValue(l_nPos, SHOW, l_sMetadataShow);
-		m_pcConstantSetGrid->SetCellAlignment(l_nPos, SHOW, wxALIGN_CENTER, wxALIGN_TOP);
-		m_pcConstantSetGrid->SetCellBackgroundColour(l_nPos, SHOW, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+		wxString l_sNetClass = m_pcGraph->GetNetclass()->GetName();
+		if (!m_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")))//do not add SHOW Column
+		{//show the constant
+			auto l_pcBoolEditor = new wxGridCellBoolEditor();
+			l_pcBoolEditor->UseStringValues(wxT("1"), wxT("0"));
+			m_pcConstantSetGrid->SetCellEditor(l_nPos, SHOW, l_pcBoolEditor);
+			m_pcConstantSetGrid->SetCellRenderer(l_nPos, SHOW, new wxGridCellBoolRenderer());
+			m_pcConstantSetGrid->SetCellValue(l_nPos, SHOW, l_sMetadataShow);
+			m_pcConstantSetGrid->SetCellAlignment(l_nPos, SHOW, wxALIGN_CENTER, wxALIGN_TOP);
+			m_pcConstantSetGrid->SetCellBackgroundColour(l_nPos, SHOW, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+		}
 		//name of the constant
 		m_pcConstantSetGrid->SetCellValue(l_nPos, NAME, l_sMetadataName);
 		m_pcConstantSetGrid->SetCellAlignment(l_nPos, NAME, wxALIGN_CENTER, wxALIGN_TOP);
@@ -622,17 +650,10 @@ bool SP_DLG_FpnConstantDefinition::SaveData()
 		}
 		if (l_sType.Cmp(wxT("TFN"))==0 ||l_sType.Cmp(wxT("BFN")) == 0)
 		{
-			//m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, m_pcConstantSetGrid->GetCellValue(l_nRow, CONSTA));
-			//m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, m_pcConstantSetGrid->GetCellValue(l_nRow, CONSTB));
-			//m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, m_pcConstantSetGrid->GetCellValue(l_nRow, CONSTC));
 
 		}
 		else if (l_sType.Cmp(wxT("TZN")) == 0 )
 		{ 
-		//	m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, m_pcConstantSetGrid->GetCellValue(l_nRow, CONSTA));
-		//	m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, m_pcConstantSetGrid->GetCellValue(l_nRow, CONSTB));
-		//	m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, m_pcConstantSetGrid->GetCellValue(l_nRow, CONSTC));
-		//	m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, m_pcConstantSetGrid->GetCellValue(l_nRow, CONSTD));
 		}
 		else {
 			m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, m_pcConstantSetGrid->GetCellValue(l_nRow, m_nMainSet));
@@ -914,7 +935,20 @@ bool SP_DLG_FpnConstantDefinition::CheckFN(const wxString& type, wxString &const
 
 
 }
+void SP_DLG_FpnConstantDefinition::OnGridCellDClicked(wxGridEvent& ev)
+{
+	m_nRow = ev.GetRow();
+	m_nCol = ev.GetCol();
 
+	wxString colType = m_pcConstantSetGrid->GetCellValue(m_nRow,3);
+	if (colType == wxT("TFN"))
+	{
+		wxString l_sT = "TFN";
+		m_pcDraw =new SP_DLG_FuzzyNumber_Drawing(this, l_sT, 20, 30, 100, 200);
+		m_pcDraw->Show();
+	}
+
+}
 void SP_DLG_FpnConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 {
 	int col = p_gEvent.GetCol();
@@ -970,7 +1004,12 @@ void SP_DLG_FpnConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 		//	m_pcConstantSetGrid->SetCellBackgroundColour(row, 8, *wxLIGHT_GREY);
 
 			///////////
+			wxString l_sT = "TFN";
+		  //  m_pcDraw =new SP_DLG_FuzzyNumber_Drawing(this, l_sT, 20, 30, 100, 200);
+			//m_nRow = row;
+			//m_nCol += 2;
 
+			//m_pcDraw->Show();
 			return;
 		}
 
@@ -1151,7 +1190,13 @@ void SP_DLG_FpnConstantDefinition::LoadSetNames()
 		l_pcColListTemp = l_pcColList;
 	}
 
-	m_pcConstantSetGrid->AppendCols(6);
+	 
+		 
+	 
+	 
+		m_pcConstantSetGrid->AppendCols(6);
+	 
+	
 
 	m_pcConstantSetGrid->SetColLabelValue(NAME, wxT("Constant"));
 	m_pcConstantSetGrid->SetColSize(NAME, 100);
@@ -1164,9 +1209,12 @@ void SP_DLG_FpnConstantDefinition::LoadSetNames()
 
 	m_pcConstantSetGrid->SetColLabelValue(COMMENT, wxT("Comment"));
 	m_pcConstantSetGrid->SetColSize(COMMENT, 120);
+	if (!m_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")))//do not add SHOW Column
+	{
+		m_pcConstantSetGrid->SetColLabelValue(SHOW, wxT("Show"));
+		m_pcConstantSetGrid->SetColSize(SHOW, 50);
+	}
 
-	m_pcConstantSetGrid->SetColLabelValue(SHOW, wxT("Show"));
-	m_pcConstantSetGrid->SetColSize(SHOW, 50);
  
 	m_pcConstantSetGrid->SetColLabelValue(VALUES, wxT("Main"));
 	m_pcConstantSetGrid->SetColSize(VALUES, 70);
@@ -1402,3 +1450,25 @@ void SP_DLG_FpnConstantDefinition::LoadPlaceOfType(const wxString& p_sPlaceType)
 }
 
 
+void SP_DLG_FpnConstantDefinition::OnChildDestroy(wxCloseEvent& event)
+{
+
+	int id = event.GetId();
+
+	if (event.GetId() == this->GetId())
+	{
+		this->Destroy();
+		return;
+	}
+	if (m_pcDraw)
+	{
+		wxString l_sValA = wxString::Format(wxT("%f"), m_pcDraw->GetAVal());
+		wxString l_sValB = wxString::Format(wxT("%f"), m_pcDraw->GetBVal());
+		wxString l_sValC = wxString::Format(wxT("%f"), m_pcDraw->GetCVal());
+		l_sTFNFromDrawingPanel << l_sValA << wxT(",") << l_sValB << wxT(",")<< l_sValC;
+		m_pcConstantSetGrid->SetCellValue(m_nRow, m_nCol, l_sTFNFromDrawingPanel);
+		l_sTFNFromDrawingPanel.Empty();
+		m_pcDraw->Destroy();
+		//wxDELETE(m_pcDraw);
+	}
+}

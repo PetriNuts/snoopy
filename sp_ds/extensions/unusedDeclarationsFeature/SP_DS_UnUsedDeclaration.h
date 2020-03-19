@@ -232,6 +232,10 @@ private:
 
 	/*returns set of all declarations used in all predicates in the colored net*/
 	set<wxString> GetDeclarationsInPredicates();
+
+	bool GetRateFunctionsOfTransitions(std::set<wxString>& p_setRateFun);
+
+	bool TokenizeRateFunctions(std::set<wxString>& p_setRateFun, std::set<wxString>& p_setResultDeclarations);
 public:
 	/*constructor*/
 	SP_DS_UnUsedDeclaration(SP_DS_Graph* p_pcGraph, SP_VectorString p_vUserDec);

@@ -6,7 +6,7 @@
 // of guards, arcs and places, and compute initial marking of places.
 //////////////////////////////////////////////////////////////////////
 #include "SP_IddUnFoldExpr.h"
-
+#include "sp_ds/attributes/SP_DS_NameAttribute.h"
 
 SP_IddUnFoldExpr::SP_IddUnFoldExpr(SP_DS_Graph* p_pcGraph, wxString p_sColExpr,wxString p_sPna)
 {
@@ -77,15 +77,15 @@ bool SP_IddUnFoldExpr::LoadNetDefentions(dssd::andl::Net_ptr net_, dssd::andl::s
 			//we expect just a list of identifier
 			int i = 0;
 			std::vector < std::string > idents;
-			dssd::aux::tokenize(cs->definition_, idents, "{,}");
+			dssd::aux::tokenize(cs->definition_, idents, "{,} ");
 			for (auto const & ident : idents)
 			{
 				if (colDefinitions_.fReg().lookUpFunction(ident))
 				{
-					std::stringstream ss;
+					wxString ss;
 					ss << "cannot create enum type <" << name << ">! element <"
 						<< ident << "> is already defined!";
-					throw dssd::exc::Exc(_FLINE_, ss.str());
+					SP_LOGERROR(ss);
 				}
 				 
 				enums.insert(std::make_pair(i, ident));
@@ -94,7 +94,8 @@ bool SP_IddUnFoldExpr::LoadNetDefentions(dssd::andl::Net_ptr net_, dssd::andl::s
 				i++;
 			}
 		}
-
+		std::string ss = "";
+		ss = cs->definition_;
 		colExprParser_->parse(cs->definition_);
 		colExpr expr(colExprBuilder_->node());
 
@@ -102,7 +103,7 @@ bool SP_IddUnFoldExpr::LoadNetDefentions(dssd::andl::Net_ptr net_, dssd::andl::s
 	 
 		auto res = evalColExpr<colexpr_descriptor_evaluator>(expr, colDefinitions_);
 		//wxString mss;
-	 
+		ss = res.toString();
 		if (res.ed_.isIntSet())
 		{
 
@@ -250,10 +251,6 @@ colExpr SP_IddUnFoldExpr::parseExpr(const std::string& expr_string)
 
 void SP_IddUnFoldExpr::substituteColorFunctions(colExpr &expr)
 {
-	//wxString lsBefore;
-
-	//lsBefore << "expression before function substitution: " << expr.toString();
-	//SP_LOGMESSAGE(lsBefore);
 	dssd::colexpr::col_expr_function_instantiator fi(colDefinitions_);
 	dssd::misc::modifier_complete_tree<dssd::colexpr::col_expr_function_instantiator> modifier(fi);
 	modifier(expr);
@@ -265,18 +262,14 @@ void SP_IddUnFoldExpr::substituteColorFunctions(colExpr &expr)
 
 void SP_IddUnFoldExpr::flatExpression(colExpr &expr, std::string colorset)
 {
-	//wxString ss;
-	//ss << "expression before flattening: " << expr.toString();
-	//SP_LOGMESSAGE(ss);
 	std::vector<std::string> varNames;
 	dssd::colexpr::DefaultExpressionCreator expr_creator(colDefinitions_, varNames, "", colorset);
 	dssd::colexpr::col_expr_variable_substituter es(expr_creator);
  
 	dssd::misc::modifier_complete_tree<dssd::colexpr::col_expr_variable_substituter> modifier(es);
 	modifier(expr);//if i uncommented this, the memory is not acciable(pointers), e.g, [ISNeighbour(x,y,a,b)]1`(x,y,a,b), the problem here is with the tupel is two elements not 4!, 
-	//wxString after;
-	//after<< "expression after flattening: " << expr.toString();
-	//SP_LOGMESSAGE(after);
+	 wxString after;
+	 after<< "expression after flattening: " << expr.toString();
 }
 int  SP_IddUnFoldExpr::UnfoldPlace1(std::string markingExp,dssd::andl::Place_ptr p, dssd::andl::simple_net_builder& netBuilder_)
 {
@@ -287,36 +280,7 @@ int  SP_IddUnFoldExpr::UnfoldPlace1(std::string markingExp,dssd::andl::Place_ptr
 	std::string name = p->name_;
 	std::string colorset = p->colorset_;
 	std::string marking = markingExp;// p->marking_;//"[(x=MID&y=MID)]100`all";
-	//marking = "[(x=50&y=50&c=A)]1`((x,y),c)";
-	 /**
-	wxString l_sPred = marking;
-	if (l_sPred.Contains(wxT("&"))|| l_sPred.Contains(wxT("|"))|| l_sPred.Contains(wxT(">")) ||
-		l_sPred.Contains(wxT(">=")) || l_sPred.Contains(wxT("<")) || l_sPred.Contains(wxT(">=")) )
-	{
-		std::set<std::string> l_setVar;
-		std::string tupel="";
-		char_separator<char> sep("&|=)(-*+%,/ ");
-		tokenizer<char_separator<char>> tokens(marking, sep);
-		for (const auto& t : tokens) {
-			if (colDefinitions_.isVariable(t))
-			{
-				tupel += t + ",";
-			}
-		}
-		if (tupel[tupel.length() - 1] == ',')
-		{
-			tupel[tupel.length() - 1] = ' ';
-			tupel = "(" + tupel + ")";
-		}
-		std::size_t pos = marking.find("`");
-		std::string num_tokens = marking.substr(0, pos);
-		std::string color = marking.substr(pos + 1, marking.length());
-
-		std::string preparedMArkingExp = "[" + color + "]" + num_tokens+"`" + tupel;
-		marking = preparedMArkingExp;
-	}
 	
-	 */
 	//the marking; we need an evaluator, which extracts the subcolorset whose related place carries a specified number of tokens
 	wxString msg;
 	msg << "place " << name << " with colorset " << colorset << " marking " << marking;
@@ -421,7 +385,7 @@ int  SP_IddUnFoldExpr::UnfoldPlace1(std::string markingExp,dssd::andl::Place_ptr
 		ms5<< "throw exception, non disjoint guards";
 		SP_LOGERROR(ms5);
 	}
-
+	/**comented for phase variation
 	//create  the remaining places !guard_1 && !guard_2 ... and !guard_n
 	//SP_LOGERROR ( "create  the remaining places with 0 tokens");
 	if (!varNames_.empty())
@@ -455,7 +419,7 @@ int  SP_IddUnFoldExpr::UnfoldPlace1(std::string markingExp,dssd::andl::Place_ptr
 		colDefinitions_.removeAuxilaryVariables();
 	}
 
- 
+ */
 	m_lkt = l_lkt;
 
 	 
@@ -525,13 +489,15 @@ unsigned  SP_IddUnFoldExpr::createPlaces(solution_space &sol,
 		}
 		else
 		{
-			//place already unfolded
+			//break;	//place already unfolded
 		}
 
 	}
 	return places;
 
 }
+
+
 bool SP_IddUnFoldExpr::CheckGuardEXpression(std::string& p_sExp,std::string& p_sErrorPos)
 {
 	
@@ -620,7 +586,7 @@ bool SP_IddUnFoldExpr::CheckCoLourExpression(std::string p_sExp,std::string& p_s
 
 		try
 		{
-			//colDefinitions_ = RegisterNetDefinitions(m_ColoredNet, builder1);
+			
 			bool lb=LoadNetDefentions(m_ColoredNet, builder1);
 
 		}
@@ -643,7 +609,42 @@ bool SP_IddUnFoldExpr::CheckCoLourExpression(std::string p_sExp,std::string& p_s
 		desc<< p_sColorSet << " --> " << colorsetElementDescriptor.toString();
 		colExpr expr = parseExpr(p_sExp);
 		substituteColorFunctions(expr);
+
+		if (p_sExp.find("all") != std::string::npos)
+		{
+			flatExpression(expr, p_sColorSet);
+		}
 		flatExpression(expr, p_sColorSet);
+		//////////////////////////////////
+		colExpr markingExpr = parseExpr(p_sExp);
+
+
+		/*
+		* BUGFIX: all
+		*/
+		auto tmpVarNames = collectVarNames(markingExpr, colDefinitions_);
+		auto res = colDefinitions_.lookUpColorset(p_sColorSet);
+		std::map<std::string, std::string> mapVarsNames;
+		if (res.guard_.size() > 0) {
+			colExpr expr = parseExpr(res.guard_);
+			auto tmpVarNames1 = collectVarNames(expr, colDefinitions_);
+			tmpVarNames.insert(tmpVarNames1.begin(), tmpVarNames1.end());
+			for (std::string strName : tmpVarNames) {
+				std::string strColor = colDefinitions_.getVarColorsetName(strName);
+				mapVarsNames[strColor] = strName;
+				logger(aux::logDEBUG1) << "color: " << strColor << ":" << strName;
+			}
+		}
+		logger(aux::logDEBUG1) << "marking Exp: " << markingExpr;
+		// if(mapVarsNames.size() > 0) {
+		dssd::colexpr::DefaultExpressionCreator expr_creator(colDefinitions_, mapVarsNames, "", p_sColorSet);
+		// dssd::colexpr::DefaultExpressionCreator expr_creator(colDefinitions_, dssd::aux::toVector(tmpVarNames), "", colorset);
+		dssd::colexpr::col_expr_variable_substituter es(expr_creator);
+		dssd::misc::modifier_complete_tree<dssd::colexpr::col_expr_variable_substituter> modifierExp(es);
+		modifierExp(markingExpr);
+
+
+		///////////////////////////////////
 		variables = collectVarNames(expr, colDefinitions_, variables);
 		exprVec arcExpressions;
 		checkColExpr<colexpr_expression_collector>(expr, colDefinitions_, arcExpressions);
@@ -656,7 +657,7 @@ bool SP_IddUnFoldExpr::CheckCoLourExpression(std::string p_sExp,std::string& p_s
 				{
 					newGuard = newGuard + " & " + exp.guard_.toString();
 				}
-				//logger(aux::logDEBUG) << "new Guard: " << newGuard << "\n";
+				 
 				exp.guard_ = parseExpr(newGuard);
 			}
 			 
@@ -675,5 +676,261 @@ bool SP_IddUnFoldExpr::CheckCoLourExpression(std::string p_sExp,std::string& p_s
 		}
 	}		 
 	
+	return l_bRes;
+}
+
+
+bool SP_IddUnFoldExpr::CheckTransRateFunction(SP_DS_Node* p_pcTr, wxString& p_sRateFun)
+{
+
+	//first step: is to check the syntax
+	dssd::colexpr::builder*   l_pcBuilder = new dssd::colexpr::builder();//dssd syntax
+	dssd::colexpr::parser* l_pcdssdParser = new dssd::colexpr::parser(l_pcBuilder);//dssd syntax
+	bool l_bRes = true;
+  
+	//second step:register the net definitions
+	dssd::andl::Net_ptr m_ColoredNet;
+	dssd::andl::Net_ptr m_UnfoldedNet;
+	SP_ColoredNetBuilder builder;
+	dssd::andl::simple_net_builder builder1;
+
+	if (builder(m_pcGraph))
+	{
+		m_ColoredNet = builder.GetNet();
+
+		try
+		{
+
+			bool lb = LoadNetDefentions(m_ColoredNet, builder1);
+
+		}
+		catch (const std::exception &exc)
+		{
+			wxString l_sMsg = exc.what();
+			SP_LOGERROR(l_sMsg);
+			//SP_LOGERROR(p_sErrorPos);
+			l_bRes = false;
+
+		}
+	}
+
+	wxString l_sTransName = dynamic_cast<SP_DS_NameAttribute*>(p_pcTr->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+	dssd::andl::Transition_ptr  t_u;
+	for (auto t : *m_ColoredNet->transitions_)
+	{
+		if (!t) continue;
+		
+		if (t->name_ == l_sTransName)
+		{
+			t_u = t;
+			break;
+		}
+		 
+	}
+	std::string func = p_sRateFun.ToStdString();
+	func.erase(std::remove_if(func.begin(), func.end(),
+		std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), func.end());
+
+	std::stringstream f;
+
+	colParser parser;
+	unsigned guards_found = 0;
+	unsigned guards_fulfilled = 0;
+	std::vector < std::string > functions;
+	{
+		std::size_t last_pos = 0;
+		std::size_t pos = func.find("++");
+		while (pos != std::string::npos)
+		{
+			functions.push_back(func.substr(last_pos, pos - last_pos));
+			last_pos = pos + 2;
+			pos = func.find("++", pos + 1);
+		}
+		functions.push_back(func.substr(last_pos));
+	}
+
+	for (auto const& f_i : functions)
+	{
+		std::stringstream expr_stream;
+		bool mode = false;
+		unsigned int pos_found = 0;
+		bool ignore = false;
+		std::string ident;
+		for (unsigned pos = 0; pos < f_i.length(); ++pos)
+		{
+			auto c = f_i[pos];
+			if (c == '[')
+			{
+				pos_found = pos;
+				if (!mode)
+				{
+					mode = true;
+				}
+				else
+				{
+					l_bRes = false;
+					//throw dssd::exc::Exc(_FLINE_, "syntax error in rate function");
+					SP_LOGERROR("syntax error in rate function");
+					return l_bRes;
+				}
+			}
+			else if (c == ']')
+			{
+				if (mode)
+				{
+					mode = false;
+					colExpr colorExpr;
+					//must be a guard
+					if (pos_found == 0)
+					{
+						std::string tmp = "[";
+						tmp += expr_stream.str();
+						tmp += "]";
+						colorExpr = parser(tmp);
+						substituteColorFunctions(colorExpr);
+						flatExpression(colorExpr, "");
+						auto r = evalColExpr<colexpr_descriptor_evaluator>(colorExpr, colDefinitions_);
+
+						if (!r.isGuard())
+						{
+							l_bRes = false;
+							//throw dssd::exc::Exc(_FLINE_, "expecting guard in rate function definition\n");
+							SP_LOGERROR("expecting guard in rate function definition\n");
+							return l_bRes;
+						}
+
+						guards_found++;
+						logger(aux::logDEBUG) << "guard found:" << colorExpr;
+						auto b = evalColExpr<colexpr_guard_evaluator>(colorExpr, colDefinitions_);
+						if (b.resValue_)
+						{
+							guards_fulfilled++;
+						}
+						else
+						{
+							ignore = true;
+						}
+
+					}
+					else if (!ignore)
+					{
+						//SP_LOGMESSAGE(expr_stream.str());
+
+						colorExpr = parser(expr_stream.str());
+						substituteColorFunctions(colorExpr);
+						flatExpression(colorExpr, "");
+						auto res = evalColExpr<colexpr_node_evaluator>(colorExpr, colDefinitions_);
+						if (!ident.empty())
+						{
+							f << ident << res.node_.linearise();
+							ident.clear();
+						}
+						else
+						{
+							f << res.node_.toString();
+						}
+					}
+
+				}
+				expr_stream.str("");
+			}
+			else
+			{
+				if (mode)
+				{
+					expr_stream << c;
+				}
+				else if (!ignore)
+				{
+					if (aux::isextalnum(c) &&
+						(!ident.empty() || !std::isdigit(c)))
+					{
+						ident += c;
+						if ((pos + 1 == f_i.length()) ||
+							(!aux::isextalnum(f_i[pos + 1]) && f_i[pos + 1] != '['))
+						{
+							//check if ident is pre-place, if so build sum
+
+							unsigned count = 0;
+							std::set<std::string> used;
+							std::string sum;
+							if (t_u->conditions_ && !t_u->conditions_->empty()) {
+								for (auto& c : *(t_u->conditions_)) {
+									if (!c) continue;
+									const std::string& place = c->place_;
+									//auto it = unfoldedPlaces.find(place);
+									/**
+									if (ident == place.substr(0, it->second.unfoldedPlace_->prefix_))
+									{
+										if (used.find(place) == used.end())
+										{
+											used.insert(place);
+											if (count > 0)
+											{
+												sum += '+';
+											}
+											sum += place;
+											++count;
+										}
+									}
+									*/
+								}
+							}
+							if (t_u->updates_ && !t_u->updates_->empty()) {
+								for (auto& u : *(t_u->updates_)) {
+									if (!u || u->type_ == andl::UpdateType::INCREASE_T) continue;
+									const std::string& place = u->place_;
+									//auto it = unfoldedPlaces.find(place);
+									/**
+									if (ident == place.substr(0, it->second.unfoldedPlace_->prefix_))
+									{
+										if (used.find(place) == used.end())
+										{
+											used.insert(place);
+											if (count > 0)
+											{
+												sum += '+';
+											}
+											sum += place;
+											++count;
+										}
+									}
+									*/
+								}
+							}
+							if (count == 0)
+							{
+								f << ident;
+							}
+							else if (count == 1)
+							{
+								f << sum;
+							}
+							else
+							{
+								f << '(' << sum << ')';
+							}
+							ident.clear();
+						}
+					}
+					else
+					{
+						f << c;
+					}
+				}
+			}
+		}
+	}
+	if (guards_fulfilled > 1 || (guards_found < functions.size() - 1)
+		|| (guards_fulfilled == 1 && guards_found < functions.size() - 1))
+	{
+		l_bRes = false;
+		SP_LOGERROR(t_u->name_ + " rate function expression does not define a unique rate function\n");
+		return l_bRes;
+		//throw dssd::exc::Exc(_FLINE_, t_u->name_ + " rate function expression does not define a unique rate function\n");
+		
+		
+	}
+	t_u->function_ = f.str();
 	return l_bRes;
 }

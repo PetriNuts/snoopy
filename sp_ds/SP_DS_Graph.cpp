@@ -464,6 +464,9 @@ bool SP_DS_Graph::AddToDeclarationTreectrl(SP_WDG_DeclarationTreectrl* p_pcCtrl)
 		|| (this->GetNetclass()->GetName() == SP_DS_COLCPN_CLASS)
 		|| (this->GetNetclass()->GetName() == SP_DS_COLPN_CLASS)
 		|| (this->GetNetclass()->GetName() == SP_DS_COLHPN_CLASS)
+		|| (this->GetNetclass()->GetName() == SP_DS_FUZZY_ColCPN_CLASS)//by george
+		|| (this->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS)//by george
+		|| (this->GetNetclass()->GetName() == SP_DS_FUZZY_ColHPN_CLASS)//by george
 		|| (this->GetNetclass()->GetName() == SP_DS_COLEPN_CLASS)))
 	{
 		l_cIdParent = p_pcCtrl->AppendFolderItem(l_cRootId, wxT("Color Sets"));
@@ -643,6 +646,9 @@ SP_DS_Graph::AddToViewMenu(wxMenu* p_pcMenu)
        (l_sName == SP_DS_COLSPN_CLASS) ||
        (l_sName == SP_DS_COLCPN_CLASS) ||
 	    (l_sName == SP_DS_COLHPN_CLASS) ||
+		(l_sName==SP_DS_FUZZY_ColHPN_CLASS)||//by george
+		(l_sName == SP_DS_FUZZY_ColCPN_CLASS) ||//by george
+		(l_sName == SP_DS_FUZZY_ColSPN_CLASS) ||//by george
        (l_sName == SP_DS_HYBRIDPN_CLASS) || (l_sName == SP_DS_FUZZYCPN_CLASS) || (l_sName == SP_DS_FUZZYSPN_CLASS) || (l_sName==SP_DS_FUZZYHPN_CLASS))//Added by G.A
     {
     	//Simulation mode

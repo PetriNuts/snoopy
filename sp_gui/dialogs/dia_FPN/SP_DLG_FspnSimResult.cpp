@@ -132,6 +132,10 @@ std::vector<TriangularFN> SP_DLG_FspnSimResult::LoadParams()
 			if (m_mTransParamNames.find(l_sMetadataName) != m_mTransParamNames.end())
 			{
 				int iSelection = m_apcComboBoxes[4]->GetCurrentSelection();
+				if (iSelection == -1)//for color fuzzy spn
+				{
+					iSelection = 0;
+				}
 				for (unsigned int iIter = iSelection; iIter < l_pcColList->GetRowCount(); ++iIter)
 				{
 					if (l_sMetadataType.Cmp(wxT("TFN")) == 0)
@@ -151,6 +155,7 @@ std::vector<TriangularFN> SP_DLG_FspnSimResult::LoadParams()
 							m_mFuzzyParam2Position[l_sMetadataName] = iPos;
 							m_fuzzyParams.push_back(l_sMetadataName);
 							m_fuzzyParamPositions.push_back(iPos);
+							break;//for fcolsp
 						}
 					}
 					else if (l_sMetadataType.Cmp(wxT("double")) == 0 || l_sMetadataType.Cmp(wxT("int")) == 0)
@@ -1108,9 +1113,9 @@ void SP_DLG_FspnSimResult::LoadUsedParams()
 		/***/
 		//this step is important to let the simulator's parser evalute the 
 		//rate expression when the last contains at least one kinetic parameter as a fuzzy number
-		string l_str = m_sParamName.ToStdString();
+		string l_str =  m_sParamName.ToStdString();
 		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-		boost::char_separator<char> sep("(+-/%*) ");
+		boost::char_separator<char> sep("(+-/%*), ");
 		tokenizer tokens(l_str, sep);
 
 		for (tokenizer::iterator beg = tokens.begin(); beg != tokens.end(); ++beg) {
@@ -1131,13 +1136,13 @@ void SP_DLG_FspnSimResult::LoadUsedParams()
 wxString SP_DLG_FspnSimResult::GetKParameter(const wxString& sfunc)
 {
 	wxString m_sKparam;
-	wxString sdelimiter = "(";
-	size_t stpos1, stpos2 = 0;
-	stpos1 = sfunc.find(sdelimiter);
-	sdelimiter = ")";
-	stpos2 = sfunc.find(sdelimiter);
-	stpos2 = stpos2 - stpos1 - 1;
-	m_sKparam = sfunc.substr(stpos1 + 1, stpos2);
+	wxString l_msfun = sfunc;
+	l_msfun.Replace("MassAction", "");
+	l_msfun.Replace("pow", "");
+	l_msfun.Replace("(", "");
+	l_msfun.Replace(")", "");
+	m_sKparam = l_msfun;
+	 
 	return m_sKparam;
 }
 

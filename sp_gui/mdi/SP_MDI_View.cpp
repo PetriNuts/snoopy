@@ -33,10 +33,12 @@
 #include "sp_gui/dialogs/dia_ColCPN/SP_DLG_ColCPNSimulationResults.h"
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStSimulationResults.h"
 #include "sp_gui/dialogs/dia_ColHPN/SP_DLG_ColHPNSimultionResults.h"
-#include"sp_gui/dialogs/dia_FPN/SP_DLG_FCPNSimulationResults.h"
-#include "sp_gui/dialogs/dia_FPN/SP_DLG_FspnSimResult.h"
-#include "sp_gui/dialogs/dia_FPN/SP_DLG_FHybridSimultionResults.h"
-
+#include"sp_gui/dialogs/dia_FPN/SP_DLG_FCPNSimulationResults.h"//by george
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_FspnSimResult.h"//by george
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_FHybridSimultionResults.h"//by george
+#include "sp_gui/dialogs/dia_colFCPN/SP_DLG_ColFCPNSimulationResults.h"//by george
+#include "sp_gui/dialogs/dia_colFSPN/SP_DLG_ColFSPNSimulationResults.h"//by george
+#include "sp_gui/dialogs/dia_colFHPN/SP_DLG_ColFHPNSimulationResults.h"//by george
 //AMR
 #include "sp_gui/dialogs/dia_ColCPN/SP_DLG_ColCPNDirSimulationResults.h"
 //#include "sp_gui/dialogs/dia_ColHPN/SP_DLG_ColHPNDirSimulationResults.h"
@@ -1812,6 +1814,9 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 
 		if((l_sName == SP_DS_COLCPN_CLASS) ||
 			(l_sName == SP_DS_COLHPN_CLASS) ||
+			(l_sName == SP_DS_FUZZY_ColCPN_CLASS)||//by george
+			(l_sName == SP_DS_FUZZY_ColSPN_CLASS) ||//by george
+			(l_sName == SP_DS_FUZZY_ColHPN_CLASS) ||//by george
 		   (l_sName == SP_DS_COLSPN_CLASS))
 		{
 			//create the unfolding object
@@ -1835,6 +1840,19 @@ void SP_MDI_View::OnStartSimulation(wxCommandEvent& p_cEvent)
 			else if(l_sName == SP_DS_COLHPN_CLASS)
 			{
 				l_pcDlg = new SP_DLG_ColHPNSimultionResults( l_pcGraph,l_pcUnfoldedNet, m_pcFrame );
+			}
+			else if (l_sName == SP_DS_FUZZY_ColCPN_CLASS)
+			{
+				l_pcDlg = new SP_DLG_ColFCPNSimulationResults(l_pcGraph, l_pcUnfoldedNet, m_pcFrame);
+			}
+			else if (l_sName == SP_DS_FUZZY_ColSPN_CLASS)
+			{
+				l_pcDlg = new SP_DLG_ColFSPNSimulationResults(l_pcGraph, l_pcUnfoldedNet, m_pcFrame);
+			}
+			else if (l_sName==SP_DS_FUZZY_ColHPN_CLASS)
+			{
+				l_pcDlg = new SP_DLG_ColFHPNSimulationResults(l_pcGraph, l_pcUnfoldedNet, m_pcFrame);
+				
 			}
 		}
 		else if(l_sName == SP_DS_SPN_CLASS)

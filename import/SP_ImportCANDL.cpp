@@ -198,10 +198,19 @@ SP_ImportCANDL::CreatePlaces(const dssd::andl::Places& p_Places)
 
 		wxArrayString l_Markings;
 		size_t prev = 0;
-		for(size_t i = marking.find(wxT("++")); i != wxNOT_FOUND; i = marking.find(wxT("++"), i+2))
+		for(size_t i = marking.find(wxT("++")); i != wxNOT_FOUND; )
 		{
 			l_Markings.Add(marking.Mid(prev,i-prev));
-			prev = i;
+		    marking.Replace(marking.Mid(prev, i - prev), "");
+			prev = 0;
+			marking = marking.AfterFirst('+');
+			marking = marking.AfterFirst('+');
+			if (!marking.Contains("++"))
+			{
+				l_Markings.Add(marking.Mid(0, marking.length()));
+				marking.Replace("++", "");
+			}
+			i = marking.find(wxT("++"));
 		}
 		if(l_Markings.IsEmpty())
 		{
@@ -209,8 +218,9 @@ SP_ImportCANDL::CreatePlaces(const dssd::andl::Places& p_Places)
 		}
 		for(size_t i = 0; i < l_Markings.Count(); ++i)
 		{
-			wxString color,token;
-			if(l_Markings[i].Contains(wxT("`")))
+			wxString color,token,tupel;
+			tupel = wxT("()");
+			if(l_Markings[i].Contains(wxT("`"))&& !l_Markings[i].Contains(wxT("[")))
 			{
 				token = l_Markings[i].BeforeFirst('`');
 				token.Replace(wxT("("), wxT(""));//by george
@@ -238,7 +248,16 @@ SP_ImportCANDL::CreatePlaces(const dssd::andl::Places& p_Places)
 					//color.Replace(wxT(")"), wxT(""));
 				//}
 			}
-			
+			else if (l_Markings[i].Contains(wxT("`")) && l_Markings[i].Contains(wxT("[")))
+			{
+				token = l_Markings[i].BeforeFirst('`');
+				token = token.AfterFirst(']');
+
+				tupel= l_Markings[i].AfterFirst('`');
+
+				color = l_Markings[i].BeforeFirst(']');
+				color = color.AfterFirst('[');
+			}
 			else
 			{
 				token = wxT("1");
@@ -247,6 +266,7 @@ SP_ImportCANDL::CreatePlaces(const dssd::andl::Places& p_Places)
 			unsigned int l_nNewRow = l_pcColAttr->AppendEmptyRow();
 			l_pcColAttr->SetCell(l_nNewRow,0, color);
 			l_pcColAttr->SetCell(l_nNewRow,1, token);
+			l_pcColAttr->SetCell(l_nNewRow, 2, tupel);
 		}
 
 		if (p->fixed_)
@@ -347,7 +367,9 @@ for (auto& constant : p_Constants)
 				int l_nRowCol = l_pcColList1->AppendEmptyRow();
 				//wxString l_sVset;
 				///l_sVset << "Value-Set" << wxT("-")<<i-1;
+				if(p_Valuesets.size()>0)
 				l_pcColList1->SetCell(l_nRowCol, 0, p_Valuesets[i]);
+
 				l_pcColList1->SetCell(l_nRowCol, 1, value);
 			}
 

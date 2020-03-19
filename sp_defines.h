@@ -372,6 +372,15 @@ extern const wxString SP_DS_FUZZYCPN_CLASS;
 
 extern const wxString SP_DS_FUZZYHPN_CLASS;
 
+//SP_DS_FuzzyCOLCPN
+extern const wxString SP_DS_FUZZY_ColCPN_CLASS;
+
+//SP_DS_FuzzyCOLSPN
+extern const wxString SP_DS_FUZZY_ColSPN_CLASS;
+
+//SP_DS_FuzzyCOLHPN
+extern const wxString SP_DS_FUZZY_ColHPN_CLASS;
+
 // SP_DS_TimePT
 extern const wxString SP_DS_TIMEPN_CLASS;
 

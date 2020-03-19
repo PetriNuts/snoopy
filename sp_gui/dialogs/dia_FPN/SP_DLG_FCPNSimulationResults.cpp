@@ -231,7 +231,15 @@ std::vector<TriangularFN> SP_DLG_FCPNSimulationResults::LoadParams()
 
 			if (m_mTransParamNames.find(l_sMetadataName) != m_mTransParamNames.end())
 			{
-				int x = m_apcComboBoxes[1]->GetCurrentSelection();
+				int x = 0;
+				if (m_apcComboBoxes.size() > 1)
+				{
+					x = m_apcComboBoxes[1]->GetCurrentSelection();
+			    }
+				else
+				{
+					x = m_apcComboBoxes[0]->GetCurrentSelection();
+				}
 				for (unsigned int i = x; i < l_pcColList->GetRowCount(); ++i)
 				{
 					if (l_sMetadataType.Cmp(wxT("TFN")) == 0)
@@ -901,15 +909,15 @@ void SP_DLG_FCPNSimulationResults::LoadUsedParams()
 
 wxString SP_DLG_FCPNSimulationResults::GetKParameter(const wxString& func)
 {
-	wxString sKparam;
-	wxString sdelimiter = "(";
-	size_t stpos1, stpos2 = 0;
-	stpos1 = func.find(sdelimiter);
-	sdelimiter = ")";
-	stpos2 = func.find(sdelimiter);
-	stpos2 = stpos2 - stpos1 - 1;
-	sKparam = func.substr(stpos1 + 1, stpos2);
-	return sKparam;
+	wxString m_sKparam;
+	wxString l_msfun = func;
+	l_msfun.Replace("MassAction", "");
+	l_msfun.Replace("pow", "");
+	l_msfun.Replace("(", "");
+	l_msfun.Replace(")", "");
+	m_sKparam = l_msfun;
+
+	return m_sKparam;
 }
 
 

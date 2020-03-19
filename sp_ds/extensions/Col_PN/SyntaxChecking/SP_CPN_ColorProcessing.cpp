@@ -2062,7 +2062,18 @@ bool SP_CPN_ColorProcessing::GetConstant(map<wxString, SP_CPN_Variable_Constant>
 {
 
 	SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
-	SP_DS_Metadataclass* mc = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	wxString l_sMetaClass;
+	if (l_pcGraph->GetNetclass()->GetName().Contains(wxT("Fuzzy")))
+	{
+		l_sMetaClass = SP_DS_META_CONSTANT;
+	}
+	else
+	{
+		l_sMetaClass = SP_DS_CPN_CONSTANT_HARMONIZING;
+	}
+
+	
+	SP_DS_Metadataclass* mc = l_pcGraph->GetMetadataclass(l_sMetaClass);
 	SP_ListMetadata::const_iterator it;
 
 	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)

@@ -207,3 +207,11 @@ bool SP_WDG_DialogChoice::OnDlgOk()
     m_pcChoice.clear();
     return l_bReturn && SP_WDG_DialogBase::OnDlgOk();
 }
+wxString SP_WDG_DialogChoice::GetCurentSelection()//by george
+{
+	int l_nSelected = m_pcChoice.front()->GetSelection();
+	if (m_pcChoiceValues.size() >= 0 && l_nSelected >= 0)
+		return m_pcChoiceValues[l_nSelected];
+	else
+		return wxT("");
+}

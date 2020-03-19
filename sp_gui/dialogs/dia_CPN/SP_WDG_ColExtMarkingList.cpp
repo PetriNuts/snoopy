@@ -29,7 +29,7 @@
 #include <wx/tipwin.h>
 
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogText.h"
-
+#include "sp_gui/widgets/dialogs/SP_WDG_DialogChoice.h"
 enum
 {
 	SP_ID_BUTTON_ADD,
@@ -93,7 +93,7 @@ bool SP_WDG_ColExtMarkingList::AddToDialog(
     wxString l_sPage = GetName() + wxT(":") + l_pcAttr->GetParent()->GetClassName();
     SP_WDG_NotebookPage* l_pcPage = p_pcDlg->AddPage(l_sPage, GetDialogOrdering());
 	CHECK_POINTER( l_pcPage, return FALSE );
-
+	
 	//wxStaticText* l_StaticText=new wxStaticText(l_pcPage, -1, wxT("ColorSet:"));
 	//m_pcColorSetTextCtrl= new wxTextCtrl(l_pcPage, -1, wxT("0"), wxDefaultPosition, wxDefaultSize, 0);
 	//l_pcSizer->Add(l_StaticText, 1, wxALL , 5);
@@ -121,16 +121,19 @@ bool SP_WDG_ColExtMarkingList::AddToDialog(
 	m_pcMarkingGrid->SetColLabelSize(16);
 	m_pcMarkingGrid->SetRowLabelSize(0);
 
-	m_pcMarkingGrid->AppendCols(2);
+	m_pcMarkingGrid->AppendCols(3);
 
 	m_pcMarkingGrid->SetColLabelValue(0, wxT("Color/Predicate/Function") );
 	m_pcMarkingGrid->SetColSize(0, 150);
 
-	m_pcMarkingGrid->SetColLabelValue(1, wxT("Marking") );
-	m_pcMarkingGrid->SetColSize(1, 100);
 
-	//m_pcMarkingGrid->SetColLabelValue(1, wxT("Colors") );
-	//m_pcMarkingGrid->SetColSize(2, 100);
+	m_pcMarkingGrid->SetColLabelValue(1, wxT("Product Color"));//by george
+	m_pcMarkingGrid->SetColSize(1, 100);//by george
+
+	m_pcMarkingGrid->SetColLabelValue(2, wxT("Marking") );
+	m_pcMarkingGrid->SetColSize(2, 100);
+
+	
 
 	LoadData();
 
@@ -179,6 +182,11 @@ bool SP_WDG_ColExtMarkingList::LoadData()
 {
 	SP_DS_Attribute* l_pcAttr = (*m_tlAttributes.begin());
 	CHECK_BOOL( SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST == l_pcAttr->GetAttributeType(), return FALSE );
+
+	SP_DS_Node* l_pcCurrentNode;
+	l_pcCurrentNode = dynamic_cast<SP_DS_Node*> (l_pcAttr->GetParent());
+	if (!l_pcCurrentNode)
+		return false;
 
 	SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcAttr);
 
@@ -231,15 +239,61 @@ bool SP_WDG_ColExtMarkingList::LoadData()
 
 		//load token number
 		wxString l_sTokenValue = SP_WILDCARD;
+		wxString l_sTempToken;
 		if(!m_bMultiple)
 		{
 			l_sTokenValue = l_pcColList->GetCell(i,1);
+			l_sTempToken = l_sTokenValue;
 		}
-		m_pcMarkingGrid->SetCellValue(i, 1, l_sTokenValue);
-		m_pcMarkingGrid->SetCellAlignment(i, 1, wxALIGN_LEFT, wxALIGN_CENTER);
+		//if (l_sTempToken.Contains(wxT("(")) && l_sTempToken.Contains(wxT(")")))
+		//{
+		//	l_sTokenValue= l_pcColList->GetCell(i, 2);
+		//}
+		m_pcMarkingGrid->SetCellValue(i, 2, l_sTokenValue);//token value
+		m_pcMarkingGrid->SetCellAlignment(i, 2, wxALIGN_LEFT, wxALIGN_CENTER);
 
-		m_pcMarkingGrid->SetCellBackgroundColour(i, 1, (l_bWhite ? *wxWHITE	: *wxLIGHT_GREY));
+		m_pcMarkingGrid->SetCellBackgroundColour(i, 2, (l_bWhite ? *wxWHITE	: *wxLIGHT_GREY));
+		
+		wxString l_sProd;
+	 
+		l_sProd = l_pcColList->GetCell(i, 2);
+		if (l_sProd.IsEmpty())
+		{
+			l_sProd = wxT("()");
+		}
+		m_pcMarkingGrid->SetCellValue(i, 1, l_sProd);//product
+		m_pcMarkingGrid->SetCellAlignment(i,1, wxALIGN_LEFT, wxALIGN_CENTER);
+
+		m_pcMarkingGrid->SetCellBackgroundColour(i,1, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+
 		(l_bWhite ? l_bWhite = false : l_bWhite = true);
+
+
+		////
+		SP_DS_TextAttribute* l_pcNameAttibute = dynamic_cast< SP_DS_TextAttribute* >(l_pcCurrentNode->GetAttribute(SP_DS_CPN_COLORSETNAME));
+		if (!l_pcNameAttibute)
+			return false;
+
+		SP_CPN_ColorSetClass l_cColorSetClass;
+		SP_CPN_ColorSet* l_pcColorSet;
+		SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+		wxString l_sNetClassName = l_pcGraph->GetNetclass()->GetName();
+		SP_CPN_ValueAssign l_cValueAssign;
+
+		if (!l_cValueAssign.InitializeColorset(l_cColorSetClass))
+			return false;
+		//check if the color set of the place is not product, then make the tuple column read-olnly
+		wxString l_sColorSetName = l_pcNameAttibute->GetValue();
+		l_pcColorSet = l_cColorSetClass.LookupColorSet(l_sColorSetName);
+		if (l_pcColorSet->GetDataType() != CPN_PRODUCT)
+		{
+			for (unsigned i = 0; i < m_pcMarkingGrid->GetNumberRows(); i++)
+			{
+				m_pcMarkingGrid->SetReadOnly(i, 1);
+			}
+
+		}
+		////
 	}
 	return true;
 }
@@ -262,7 +316,18 @@ bool SP_WDG_ColExtMarkingList::SaveData()
 						wxString l_sValue = m_pcMarkingGrid->GetCellValue(l_nRow, l_nCol);
 						if((m_bMultiple && l_sValue != SP_WILDCARD) )
 						{
-							l_pcColList->SetCell(l_nRow, l_nCol, l_sValue);
+							if (l_nCol == 1)
+							{
+								l_pcColList->SetCell(l_nRow, 2, l_sValue);
+							}
+							else if (l_nCol == 2)
+							{
+								l_pcColList->SetCell(l_nRow, 1, l_sValue);
+							}
+							else
+							{
+								l_pcColList->SetCell(l_nRow, l_nCol, l_sValue);
+							}
 						}
 					}
 				}
@@ -334,7 +399,8 @@ bool SP_WDG_ColExtMarkingList::SaveData()
 		}
 		l_bFirst=false;
 		l_pcColList->SetCell(i, 0, m_pcMarkingGrid->GetCellValue(i, 0));
-		l_pcColList->SetCell(i, 1, m_pcMarkingGrid->GetCellValue(i, 1));
+		l_pcColList->SetCell(i, 1, m_pcMarkingGrid->GetCellValue(i, 2));
+		l_pcColList->SetCell(i, 2, m_pcMarkingGrid->GetCellValue(i, 1));//george
 
 		l_sMainMarking=l_pcColList->GetCell(i,1).c_str();
 		long l_lMarking = 0;
@@ -516,6 +582,53 @@ void SP_WDG_ColExtMarkingList::OnGridCellSelected(wxGridEvent& ev)
 {
 
 	m_sOldCellValue = m_pcMarkingGrid->GetCellValue(ev.GetRow(), ev.GetCol());
+	 
+	SP_WDG_DialogChoice * l_pcWDG_DialogText;
+	list<SP_WDG_DialogBase*>* l_ptlWidgets = m_pcDlg->GettlWidgets();
+	list<SP_WDG_DialogBase*>::iterator itList;
+	wxString l_sSelectedCs;
+	for (itList = l_ptlWidgets->begin(); itList != l_ptlWidgets->end(); itList++)
+	{
+		l_pcWDG_DialogText = dynamic_cast< SP_WDG_DialogChoice* >(*itList);
+
+		if (l_pcWDG_DialogText && l_pcWDG_DialogText->GetName() == wxT("Markings"))
+		{
+			l_sSelectedCs = l_pcWDG_DialogText->GetCurentSelection();
+			 
+		}
+	}
+
+	SP_CPN_ColorSetClass l_cColorSetClass;
+	SP_CPN_ColorSet* l_pcColorSet;
+	SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+	wxString l_sNetClassName = l_pcGraph->GetNetclass()->GetName();
+	SP_CPN_ValueAssign l_cValueAssign;
+
+	if (!l_cValueAssign.InitializeColorset(l_cColorSetClass))
+		return;
+	//check if the color set of the place is not product, then make the tuple column read-olnly
+	wxString l_sColorSetName = l_sSelectedCs;// l_pcNameAttibute->GetValue();
+	l_pcColorSet = l_cColorSetClass.LookupColorSet(l_sColorSetName);
+	if (l_pcColorSet->GetDataType() != CPN_PRODUCT)
+	{
+		for (unsigned i = 0; i < m_pcMarkingGrid->GetNumberRows(); i++)
+		{
+			m_pcMarkingGrid->SetReadOnly(i, 1);
+		}
+	}
+	else
+	{
+
+		for (unsigned i = 0; i < m_pcMarkingGrid->GetNumberRows(); i++)
+		{
+			m_pcMarkingGrid->SetReadOnly(i, 1, false);
+		}
+	}
+
+	 
+	////
+
+
 	ev.Skip();
 
 }
@@ -623,6 +736,7 @@ void SP_WDG_ColExtMarkingList::OnGridCellValueChanged(wxGridEvent& ev)
 	}
 
 */
+
 	ev.Skip();
 
 }

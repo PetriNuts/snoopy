@@ -766,10 +766,95 @@ void SP_MDI_Doc::HarmonizeConstantsForColPN()
 
 					}
 				}
+
+
 			}
-
-
 			wxDELETE(l_pcDelGraph);
+			/*******************/
+			 
+			l_pcNodeclass1 = m_pcGraph->GetNodeclass(SP_DS_COARSE_PARAMETER);
+			SP_DS_Graph*	l_pcDelGraph2 = m_pcGraph->CloneDefinition();
+			for (auto l_itElem1 = l_pcNodeclass1->GetElements()->begin(); l_itElem1 != l_pcNodeclass1->GetElements()->end(); ++l_itElem1)
+			{
+
+				std::map<SP_Graphic*, SP_Data*> l_mGraphic2Data;
+
+				//prepare the graph we will copy to
+				if (!l_pcDelGraph2)
+				{
+					continue;
+				}
+				l_pcDelGraph2->SetIsCopy(true);
+				l_mGraphic2Data.clear();
+				list<SP_DS_Coarse*> m_lCoarseNodes;
+				auto l_Gr = dynamic_cast<SP_DS_Node*>(*l_itElem1);
+				SP_ListGraphic* l_ListParamGrapics = l_Gr->GetGraphics();
+				SP_ListGraphic::iterator itG;
+				for (itG = l_ListParamGrapics->begin(); itG != l_ListParamGrapics->end(); ++itG)
+				{
+					SP_Graphic* l_pcGr = *itG;
+					SP_Data *l_pcParent = l_pcGr->GetParent();
+					//every graphic should have a parent, so this shouldn't happen, but check it anyway
+					if (!l_pcParent)
+						continue;
+
+					//	RemoveGraphicsFromCanvas(l_pcParent);
+					if (!l_pcParent || !l_pcParent->GetGraphics())
+						return;
+
+					//we don't actually remove any graphics from the graph
+					//we just remove them from canvas
+					for (SP_Graphic* l_pcGr : *l_pcParent->GetGraphics())
+					{
+
+						RemoveGraphicFromCanvas(l_pcGr);
+					}
+					//now actually remove the elements from the graph
+					//and with it automatically all of its graphics
+					switch (l_pcParent->GetElementType())
+					{
+					case SP_ELEMENT_NODE:
+					{
+						SP_DS_Node *l_pcNodeCopy = dynamic_cast<SP_DS_Node*> (l_pcParent);
+						l_pcDelGraph2->AddElement(l_pcNodeCopy);
+						m_pcGraph->GetParentDoc()->Refresh();
+						m_pcGraph->GetParentDoc()->Modify(true);
+						SP_DS_Coarse *p_pcCoarse=	l_pcParent->GetCoarse();
+						if (!p_pcCoarse)
+							continue;
+
+						SP_MDI_CoarseDoc* l_pcDoc = p_pcCoarse->GetCoarseDoc();
+						if (!l_pcDoc)
+						{
+							p_pcCoarse->SetUpdate(false);
+							p_pcCoarse->Show();
+							p_pcCoarse->GetCoarseDoc()->SetClose(false);
+							p_pcCoarse->GetCoarseDoc()->Modify(FALSE);
+							p_pcCoarse->GetCoarseDoc()->Close();
+							//Delete coarse tree from the hierarchy tree
+							wxTreeItemId l_nCoarseId = p_pcCoarse->GetCoarseId();
+							m_pcGraph->CreateCoarseTree()->InvalidateAllChildren(l_nCoarseId);
+							m_pcGraph->CreateCoarseTree()->Delete(l_nCoarseId);
+							SP_MDI_CoarseDoc *l_pcCoarseDoc = p_pcCoarse->GetCoarseDoc();
+							//... and closing the associated document
+							if (l_pcCoarseDoc)
+							{
+								l_pcCoarseDoc->SetClose(TRUE);
+								l_pcCoarseDoc->Modify(FALSE);
+								l_pcCoarseDoc->Close();
+								l_pcCoarseDoc->DeleteAllViews();
+								p_pcCoarse->SetCoarseDoc(0);
+							}
+							
+							 
+						}
+					}
+
+					}
+				}
+			}
+			/*********************/
+			wxDELETE(l_pcDelGraph2);
 
 		}
 
@@ -826,9 +911,14 @@ bool SP_MDI_Doc::OnOpenDocument(const wxString& p_sFile)
     	|| m_pcGraph->GetNetclass()->GetName()==SP_DS_COLSPN_CLASS
 		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_COLPN_CLASS
 		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_COLHPN_CLASS
-    	|| m_pcGraph->GetNetclass()->GetName()==SP_DS_COLCPN_CLASS)
+    	|| m_pcGraph->GetNetclass()->GetName()==SP_DS_COLCPN_CLASS
+		|| m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColCPN_CLASS//by george
+		|| m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS//by george
+	    || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColHPN_CLASS)//by george
 	{
 		m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();//liu
+		if(m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColHPN_CLASS&&m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColSPN_CLASS
+			&& m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColCPN_CLASS&& m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColSPN_CLASS&& m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColHPN_CLASS)
 		HarmonizeConstantsForColPN();// by george for harmonize constants
   
 	}
@@ -837,7 +927,12 @@ bool SP_MDI_Doc::OnOpenDocument(const wxString& p_sFile)
     		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_EXTPN_CLASS
     		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_SPN_CLASS
     		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_HYBRIDPN_CLASS
-    		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_CONTINUOUSPED_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZYSPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZYCPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZYHPN_CLASS)
+    		|| m_pcGraph->GetNetclass()->GetName()==SP_DS_CONTINUOUSPED_CLASS
+		    || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZYSPN_CLASS 
+		    || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZYCPN_CLASS 
+		    || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZYHPN_CLASS
+ 
+		)
     	m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
 
 	SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(GetFirstView());

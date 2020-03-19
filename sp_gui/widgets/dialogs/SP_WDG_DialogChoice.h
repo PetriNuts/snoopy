@@ -40,6 +40,8 @@ public:
     virtual bool AddToDialog(const SP_ListAttribute* p_ptlAttributes,
         SP_DLG_ShapeProperties* p_pcDlg, bool p_bOverview);
     virtual bool OnDlgOk();
+
+	wxString GetCurentSelection();//by george
 };
 
 #endif // __SP_WDG_DialogList_H__

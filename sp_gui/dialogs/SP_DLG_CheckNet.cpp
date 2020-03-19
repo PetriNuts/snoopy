@@ -89,6 +89,9 @@ SP_DLG_CheckNet::SP_DLG_CheckNet( SP_MDI_View* p_pcView, wxWindow *p_parent, con
 		|| m_sNetClassName==SP_DS_FUZZYCPN_CLASS
 		|| m_sNetClassName== SP_DS_FUZZYSPN_CLASS
 		||m_sNetClassName==SP_DS_FUZZYHPN_CLASS
+		|| m_sNetClassName == SP_DS_FUZZY_ColSPN_CLASS//by george
+		|| m_sNetClassName == SP_DS_FUZZY_ColCPN_CLASS//by george
+		|| m_sNetClassName == SP_DS_FUZZY_ColHPN_CLASS//by george
 		|| m_sNetClassName == SP_DS_SPN_CLASS)
 	{
 		m_cbSyntax = new wxCheckBox(this, SP_ID_CHECKLISTBOX_SYNTAX, wxT("Check Syntax (Consistency)"));
@@ -277,7 +280,8 @@ bool SP_DLG_CheckNet::Check()
 
 	if( m_sNetClassName == SP_DS_SPN_CLASS
 		|| m_sNetClassName == SP_DS_HYBRIDPN_CLASS
-		|| m_sNetClassName == SP_DS_CONTINUOUSPED_CLASS || m_sNetClassName ==SP_DS_FUZZYCPN_CLASS|| m_sNetClassName==SP_DS_FUZZYSPN_CLASS || m_sNetClassName==SP_DS_FUZZYHPN_CLASS )
+		|| m_sNetClassName == SP_DS_CONTINUOUSPED_CLASS || m_sNetClassName ==SP_DS_FUZZYCPN_CLASS|| m_sNetClassName==SP_DS_FUZZYSPN_CLASS || m_sNetClassName==SP_DS_FUZZYHPN_CLASS ||
+		m_sNetClassName == SP_DS_FUZZY_ColSPN_CLASS|| m_sNetClassName == SP_DS_FUZZY_ColCPN_CLASS || m_sNetClassName == SP_DS_FUZZY_ColHPN_CLASS)
 	{
 		if(m_cbSyntax->IsChecked())
 		{
