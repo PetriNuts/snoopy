@@ -208,8 +208,31 @@ void SP_DLG_StFunctionAssistent::LoadParameter()
 	wxString l_sParamType;
 
 	//Colored SPN
-	if( m_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")) )
+	if( m_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")) && !(m_pcGraph->GetNetclass()->GetName().Contains(wxT("Fuzzy"))))
 	{
+
+
+		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		SP_ListMetadata::const_iterator it;
+		m_pcParameterListCtrl->InsertColumn(0, wxT("Parameter"), wxLIST_FORMAT_LEFT);
+		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+		{
+			SP_DS_Metadata* l_pcConstant = *it;
+			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+		
+			//l_sParameterName = dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+
+			l_cItem.SetBackgroundColour(*wxWHITE);
+
+			l_cItem.m_itemId = l_nPos++;
+			l_cItem.m_col = 0;
+			l_cItem.m_mask = wxLIST_MASK_TEXT;
+			l_cItem.m_text = l_sName;
+
+			m_pcParameterListCtrl->InsertItem(l_cItem);
+		
+		}
+		/* - old code before harmonize the constants
 		SP_DS_Nodeclass* l_pcNodeclass;
 
 		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_PARAM);
@@ -234,6 +257,7 @@ void SP_DLG_StFunctionAssistent::LoadParameter()
 			m_pcParameterListCtrl->InsertItem(l_cItem);
 
 		}
+		*/
 	}
 	else
 	{
