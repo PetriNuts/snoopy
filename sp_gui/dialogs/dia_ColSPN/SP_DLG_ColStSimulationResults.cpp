@@ -368,11 +368,11 @@ void SP_DLG_ColStSimulationResults::LoadSets()
 			l_pcNode = m_pcGraph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->front();
 			m_apcColListAttr[4] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("PeriodicList")));
 		}
-		if (m_pcGraph->GetNodeclass(wxT("Parameter"))->GetElements()->size() > 0)
-		{
-			l_pcNode = m_pcGraph->GetNodeclass(wxT("Parameter"))->GetElements()->front();
-			m_apcColListAttr[5] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("ParameterList")));
-		}
+		//if (m_pcGraph->GetNodeclass(wxT("Parameter"))->GetElements()->size() > 0)
+		//{
+		//	l_pcNode = m_pcGraph->GetNodeclass(wxT("Parameter"))->GetElements()->front();
+		//	m_apcColListAttr[5] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("ParameterList")));
+		//}
 	}
 
 	//
