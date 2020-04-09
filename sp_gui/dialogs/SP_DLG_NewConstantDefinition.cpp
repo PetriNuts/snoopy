@@ -117,7 +117,7 @@ SP_DLG_NewConstantDefinition::SP_DLG_NewConstantDefinition(wxWindow* p_pcParent,
 	LoadSetNames();
 	LoadData();
 	LoadPlaces();
-
+	m_bIsApplyExecuted = false;
 	SP_AutoSizeRowLabelSize(m_pcConstantSetGrid);
 
 	wxBoxSizer* l_pcButtonSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -165,6 +165,7 @@ void SP_DLG_NewConstantDefinition::OnDlgApply(wxCommandEvent& p_cEvent)
 		return;
 	}
 	SaveData();
+	m_bIsApplyExecuted = true;
 }
 
 bool SP_DLG_NewConstantDefinition::CheckInput()
@@ -503,7 +504,9 @@ bool SP_DLG_NewConstantDefinition::SaveData()
 	for(auto l_pcConst : m_deleted)
 	{
 		m_pcConstants->RemoveElement(l_pcConst);
+		if (!m_bIsApplyExecuted)
 		wxDELETE(l_pcConst);
+		 
 	}
 	 
 	while (m_pcConstants->GetElements()->size() < m_pcConstantSetGrid->GetNumberRows())

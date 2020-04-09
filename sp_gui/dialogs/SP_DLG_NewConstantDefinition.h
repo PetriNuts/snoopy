@@ -49,6 +49,8 @@ class SP_DLG_NewConstantDefinition : public wxDialog
 
 	SP_ListMetadata m_deleted;
 
+	bool m_bIsApplyExecuted;
+
 	SP_SetString m_Places;
 
   private:
