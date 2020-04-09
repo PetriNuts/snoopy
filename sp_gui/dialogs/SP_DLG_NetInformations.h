@@ -28,6 +28,8 @@ public:
 	void OnDlgClose(wxCommandEvent& p_cEvent);
 
 	long ComputeTokenNUM();//Added by George 
+
+	void GetConstantValue(const wxString& p_sName,double & val);
 };
 
 #endif // __SP_DLG_NETINFORMATIONS_H__

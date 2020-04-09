@@ -18,6 +18,13 @@
 #include <wx/spinctrl.h>
 #include <wx/gbsizer.h>
 
+//by george
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
+#include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+#include "sp_ds/attributes/SP_DS_TextAttribute.h"
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
+#include "sp_ds/attributes/SP_DS_ColListAttribute.h"
+
 IMPLEMENT_CLASS(SP_DLG_NetInformations, wxDialog)
 
 BEGIN_EVENT_TABLE(SP_DLG_NetInformations, wxDialog)
@@ -99,7 +106,23 @@ void SP_DLG_NetInformations::OnDlgClose(wxCommandEvent& p_cEvent)
 		this->Show(FALSE);
 	}
 }
+void SP_DLG_NetInformations::GetConstantValue(const wxString& p_sName, double & val)
+{
+	SP_DS_Metadataclass* mc = m_graph->GetMetadataclass(SP_DS_META_CONSTANT);
+	SP_ListMetadata::const_iterator it;
+	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it) {
 
+		SP_DS_Metadata* l_pcMetadata = *it;
+		wxString l_sMetadataName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+		SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcMetadata->GetAttribute(wxT("ValueList")));
+		double l_nDouble = l_pcColList->GetActiveCellValueDouble(1);
+		val = 0.0;
+		if (l_sMetadataName == p_sName)
+		{
+			val = l_nDouble;
+		}
+	}
+}
 
 long SP_DLG_NetInformations::ComputeTokenNUM()
 {
@@ -136,6 +159,13 @@ long SP_DLG_NetInformations::ComputeTokenNUM()
 						   {
 							   l_num += l_lval;
 						   }
+						   else
+						   {
+							   double l_dVal = 0.0;
+							   GetConstantValue(l_smarking, l_dVal);
+							   l_num += l_dVal;
+							  
+						   }
 						}
 						else {
 
@@ -144,11 +174,19 @@ long SP_DLG_NetInformations::ComputeTokenNUM()
 								double l_dDoubleMarking;
 								wxString l_smarking = l_att->GetValueString();
 								bool l_b = l_smarking.ToDouble(&l_dDoubleMarking);
+
 								if (l_b)
 								{
 									double l_d = std::ceil(l_dDoubleMarking);
 									long l_lval = l_d;
 									l_num += l_lval;
+								}
+								else
+								{
+									double l_dVal = 0.0;
+									GetConstantValue(l_smarking, l_dVal);
+									l_num += l_dVal;
+									 
 								}
 							}
 						}
