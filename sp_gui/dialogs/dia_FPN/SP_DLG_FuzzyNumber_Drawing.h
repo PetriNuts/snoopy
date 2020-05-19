@@ -21,7 +21,7 @@
 #include <wx/xy/xydynamicdataset.h>
 #include <wx/xy/xyplot.h>
 #include <wx/spinctrl.h>
-class SP_DLG_FuzzyNumber_Drawing : public wxFrame/*, public wxEvtHandler */{
+class SP_DLG_FuzzyNumber_Drawing : public wxDialog/*, public wxEvtHandler */{
 protected:
 	wxChartPanel*      m_pcDrawingPanel;
 	wxStaticBoxSizer*	m_pcScroll;

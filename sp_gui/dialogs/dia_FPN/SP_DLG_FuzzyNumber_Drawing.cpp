@@ -16,18 +16,13 @@ enum {
 	SP_ID_TXT_C,
 	BUTTON_PLOT_SAVE
 };
-BEGIN_EVENT_TABLE(SP_DLG_FuzzyNumber_Drawing, wxFrame)
-//EVT_COMMAND_SCROLL_THUMBRELEASE(SP_ID_SCROLL_A, SP_DLG_FuzzyNumber_Drawing::OnScrolA)
-///EVT_COMMAND_SCROLL_THUMBRELEASE(SP_ID_SCROLL_B, SP_DLG_FuzzyNumber_Drawing::OnScrolB)
-//EVT_COMMAND_SCROLL_THUMBRELEASE(SP_ID_SCROLL_C, SP_DLG_FuzzyNumber_Drawing::OnScrolC)
-EVT_SPINCTRLDOUBLE(SP_ID_TXT_A,SP_DLG_FuzzyNumber_Drawing::OnSpinChanged)
-EVT_SPINCTRLDOUBLE(SP_ID_TXT_B,SP_DLG_FuzzyNumber_Drawing::OnSpinChanged)
-EVT_SPINCTRLDOUBLE(SP_ID_TXT_C,SP_DLG_FuzzyNumber_Drawing::OnSpinChanged)
+BEGIN_EVENT_TABLE(SP_DLG_FuzzyNumber_Drawing, wxDialog)
 EVT_BUTTON(BUTTON_PLOT_SAVE, SP_DLG_FuzzyNumber_Drawing::OnSavePlot)
 EVT_CLOSE(SP_DLG_FuzzyNumber_Drawing::OnCloseDrsawingFrame)
-END_EVENT_TABLE(SP_DLG_FuzzyNumber_Drawing::SP_DLG_FuzzyNumber_Drawing)
+END_EVENT_TABLE()
+
 SP_DLG_FuzzyNumber_Drawing::SP_DLG_FuzzyNumber_Drawing(wxWindow *p_pcParent, wxString& p_sTitle, int xpos, int ypos, int width, int height)
-	: wxFrame(p_pcParent, -1, p_sTitle, wxPoint(xpos, ypos), wxSize(width, height))
+	: wxDialog(p_pcParent, -1, p_sTitle, wxPoint(xpos, ypos), wxSize(width, height),  wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP)
 {
 	m_pcSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -37,30 +32,24 @@ SP_DLG_FuzzyNumber_Drawing::SP_DLG_FuzzyNumber_Drawing(wxWindow *p_pcParent, wxS
 
 	init();
 	 
-	//A value
-	//m_sliderA = new wxSlider(this, SP_ID_SCROLL_A, 0, 0, 50, wxPoint(-1,10),
-	//	wxSize(150, -1), wxSL_LABELS);	
-	//m_pcValALabel = new  wxStaticText(this, SP_ID_LBL_A_LABEL, wxT("A Vlaue:"), wxPoint(5,5), wxDefaultSize, 0);
-	//m_pctxtCtrlA = new wxTextCtrl(this, SP_ID_TXT_A, wxEmptyString, wxDefaultPosition, wxSize(40, 20), wxTE_PROCESS_ENTER | wxTE_CENTER);
-	m_pctxtCtrlA = new wxSpinCtrlDouble(this, SP_ID_TXT_A, wxEmptyString, wxPoint(20,-0), wxSize(80, 20), wxTE_PROCESS_ENTER | wxTE_CENTER);
+	 
+	m_pctxtCtrlA = new wxSpinCtrlDouble(this, SP_ID_TXT_A, wxEmptyString, wxPoint(20,-0), wxSize(80, 20), wxTE_PROCESS_ENTER | wxTE_CENTER,0.0,1000);
 	m_pctxtCtrlA->SetIncrement(0.01);
 	m_pctxtCtrlA->Enable(true);
-	 
-	//B value
-	//m_sliderB = new wxSlider(this, SP_ID_SCROLL_B, 0, 0, 100, wxPoint(-1, -1),
-	//	wxSize(150, -1), wxSL_LABELS);
-   /// m_pcValBLabel = new  wxStaticText(this, SP_ID_LBL_B_LABEL, wxT("B Vlaue:"), wxDefaultPosition, wxDefaultSize, 0);
-	m_pctxtCtrlB = new wxSpinCtrlDouble(this, SP_ID_TXT_B, wxEmptyString, wxDefaultPosition, wxSize(80, 20), wxTE_PROCESS_ENTER | wxTE_CENTER);
+	Connect(SP_ID_TXT_A, wxEVT_SPINCTRLDOUBLE, wxSpinDoubleEventHandler(SP_DLG_FuzzyNumber_Drawing::OnSpinChanged));
+	
+	m_pctxtCtrlB = new wxSpinCtrlDouble(this, SP_ID_TXT_B, wxEmptyString, wxDefaultPosition, wxSize(80, 20), wxTE_PROCESS_ENTER | wxTE_CENTER, 0.0, 1000);
 	m_pctxtCtrlB->SetIncrement(0.01);
 	m_pctxtCtrlB->Enable(true);
 
-	//C value
-	//m_sliderC = new wxSlider(this, SP_ID_SCROLL_C, 0, 0, 100, wxPoint(-1, -1),
-	//	wxSize(150, -1), wxSL_LABELS);
-	///m_pcValCLabel = new  wxStaticText(this, SP_ID_LBL_C_LABEL, wxT("C Vlaue:"), wxDefaultPosition, wxDefaultSize, 0);
-	m_pctxtCtrlC = new wxSpinCtrlDouble(this, SP_ID_TXT_C, wxEmptyString, wxDefaultPosition, wxSize(80, 20), wxTE_PROCESS_ENTER | wxTE_CENTER);
+	//Connect(ID_About, wxEVT_COMMAND_MENU_SELECTED,
+	//	wxCommandEventHandler(MyFrame::OnAbout));
+	 Connect(SP_ID_TXT_B, wxEVT_SPINCTRLDOUBLE, wxSpinDoubleEventHandler(SP_DLG_FuzzyNumber_Drawing::OnSpinChanged));
+	
+	m_pctxtCtrlC = new wxSpinCtrlDouble(this, SP_ID_TXT_C, wxEmptyString, wxDefaultPosition, wxSize(80, 20), wxTE_PROCESS_ENTER | wxTE_CENTER, 0.0, 1000);
 	m_pctxtCtrlC->SetIncrement(0.01);
 	m_pctxtCtrlC->Enable(true);
+	Connect(SP_ID_TXT_C, wxEVT_SPINCTRLDOUBLE, wxSpinDoubleEventHandler(SP_DLG_FuzzyNumber_Drawing::OnSpinChanged));
 	wxBoxSizer*  l_pcCartSizer = new  wxStaticBoxSizer(new wxStaticBox(this, 5000, wxT("Draw a Plot ")), wxHORIZONTAL);
 	wxBoxSizer* l_pcMainSizer = new  wxBoxSizer(wxVERTICAL);
 
@@ -68,8 +57,6 @@ SP_DLG_FuzzyNumber_Drawing::SP_DLG_FuzzyNumber_Drawing(wxWindow *p_pcParent, wxS
 	wxBoxSizer* l_pcAsizer = new wxStaticBoxSizer(new wxStaticBox(this, 100, wxT("adjust value of A")), wxHORIZONTAL);
 	wxBoxSizer* l_pcBsizer = new wxStaticBoxSizer(new wxStaticBox(this, 200, wxT("adjust value of B")), wxHORIZONTAL);
 	wxBoxSizer* l_pcCsizer = new wxStaticBoxSizer(new wxStaticBox(this, 300, wxT("adjust value of C")), wxHORIZONTAL);
-	
-	//l_pcPanelSizer->Add(m_pcDrawingPanel, 1, wxEXPAND | wxALL, 5);
 
 	l_pcCartSizer->Add(m_pcDrawingPanel, 1, wxEXPAND | wxALL, 5);
  
@@ -109,7 +96,7 @@ SP_DLG_FuzzyNumber_Drawing::SP_DLG_FuzzyNumber_Drawing(wxWindow *p_pcParent, wxS
 	 
 	m_pFileMenu->Append(quit);
 	m_pMenuBar->Append(file, wxT("&File"));
-	SetMenuBar(m_pMenuBar);
+	//SetMenuBar(m_pMenuBar);
 
 	Connect(BUTTON_PLOT_SAVE, wxEVT_COMMAND_MENU_SELECTED,
 		wxCommandEventHandler(SP_DLG_FuzzyNumber_Drawing::OnSavePlot));
