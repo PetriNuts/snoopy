@@ -1079,6 +1079,18 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b)
 					continue;
 				}
 			}
+			else {
+				if (l_sType == wxT("TFN"))// it is not identified by the parser
+				{
+					wxString l_sVal = l_pcSourceColList->GetCell(0, 1);
+					l_sVal=l_sVal.AfterFirst(',');
+					l_sVal = l_sVal.BeforeLast(',');
+					auto type = dssd::andl::ConstType::DOUBLE_T;
+					std::vector<std::string> values ={ l_sVal};// { l_sConstVal };
+					auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);//l_sGroup was "param"
+					b.addConstant(c);
+				}
+			}
 		}
 	}
 	else
