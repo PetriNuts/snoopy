@@ -267,7 +267,25 @@ void SP_GPR_Elements::SetExpressionShowOption(const wxString& p_sNetClass, bool 
 	}
 	
 }
+//by george
+void SP_GPR_Elements::SetNodeThickness(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal)
+{
+	wxString l_sKey = p_sNetClass + wxT("|") + p_sNodeClass;
+	map<wxString, SP_SetString>::iterator itNC = m_mlClassNodes.find(p_sNetClass);
 
+	if (itNC != m_mlClassNodes.end())
+	{
+		if (((*itNC).second).find(p_sNodeClass) != ((*itNC).second).end())
+		{
+			if (p_nVal >= NODE_THICKNESS_MIN && p_nVal <= NODE_THICKNESS_MAX)
+			{
+				m_mnThickness[l_sKey] = p_nVal;
+			}
+			else
+				m_mnThickness[l_sKey] = DEFAULT_THICKNESS;
+		}
+	}
+}
 
 void SP_GPR_Elements::SetNodeHeight(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal)
 {
@@ -395,6 +413,22 @@ int SP_GPR_Elements::GetNodeWidth(const wxString& p_sNetClass, const wxString& p
 	}
 
 	return DEFAULT_WIDTH;
+}
+
+
+int SP_GPR_Elements::GetNodeThickness(const wxString& p_sNetClass, const wxString& p_sNodeClass)
+{
+	wxString l_sKey = p_sNetClass + wxT("|") + p_sNodeClass;
+	SP_MapString2Int::iterator l_it = m_mnThickness.find(l_sKey);
+	if (l_it != m_mnThickness.end())
+	{
+		if (l_it->second >= NODE_THICKNESS_MIN)
+		{
+			return l_it->second;
+		}
+	}
+
+	return DEFAULT_THICKNESS;
 }
 
 int SP_GPR_Elements::GetNodeHeight(const wxString& p_sNetClass, const wxString& p_sNodeClass)
@@ -553,6 +587,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 	m_mcpGuard.clear();
 	m_mcpExpression.clear();
 	m_mcbDotExpressionShow.clear();
+	m_mscThickness.clear();//by george
 
 
 	//add some space at top
@@ -593,6 +628,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			l_pcNodeSectionSizer = new wxStaticBoxSizer(new wxStaticBox(p_pcPage, -1, *itN), wxVERTICAL);
 			int SP_ID_WIDTH = -1;
 			int SP_ID_HEIGHT = -1;
+			int SP_ID_THICKNESS = -1;//by george
 
 			//there are pre-defined shapes for transitions which are added here
 			if ((p_sNetClass.CmpNoCase(SP_DS_PN_CLASS) == 0 ||
@@ -622,6 +658,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 
 				SP_ID_WIDTH = SP_ID_SPINCTRL_TRANSWIDTH;
 				SP_ID_HEIGHT = SP_ID_SPINCTRL_TRANSHEIGHT;
+				SP_ID_THICKNESS = SP_ID_SPINCTRL_THICKNESS;
 			}
 			
 
@@ -629,6 +666,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			helpSizer = new wxBoxSizer(wxVERTICAL);
 			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Width (pt):")), 0, wxALL, 4);
 			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Height (pt):")), 0, wxALL, 4);
+			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Thickness (pt):")), 0, wxALL, 4);
 			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Fixed Size:")), 0, wxALL, 4);
 
 			if ((p_sNetClass.CmpNoCase(SP_DS_COLSPN_CLASS) == 0 ||			    
@@ -664,6 +702,10 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			helpSizer->Add(m_mscWidth[*itN], 0, wxLEFT | wxRIGHT, 5);
 			m_mscHeight[*itN] = new wxSpinCtrl(p_pcPage, SP_ID_HEIGHT, wxString::Format(wxT("%d"), GetNodeHeight(p_sNetClass, *itN)), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, NODE_DIM_MIN, NODE_DIM_MAX, GetNodeHeight(p_sNetClass, *itN));
 			helpSizer->Add(m_mscHeight[*itN], 0, wxLEFT | wxRIGHT, 5);
+
+			m_mscThickness[*itN] = new wxSpinCtrl(p_pcPage, SP_ID_THICKNESS, wxString::Format(wxT("%d"), GetNodeThickness(p_sNetClass, *itN)), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, NODE_DIM_MIN, NODE_DIM_MAX, GetNodeThickness(p_sNetClass, *itN));//by george
+			helpSizer->Add(m_mscThickness[*itN], 0, wxLEFT | wxRIGHT, 5);
+
 			wxCheckBox* l_pcCheckBox = new wxCheckBox(p_pcPage, -1, wxT(""));
 			l_pcCheckBox->SetValue(GetNodeFixed(p_sNetClass, *itN));
 			m_mcbFixed[*itN] = l_pcCheckBox;
@@ -949,6 +991,7 @@ bool SP_GPR_Elements::OnDialogOk(const wxString& p_sNetClass)
 		{
 			SetNodeWidth(p_sNetClass, *itN, m_mscWidth[*itN]->GetValue());
 			SetNodeHeight(p_sNetClass, *itN, m_mscHeight[*itN]->GetValue());
+			SetNodeThickness(p_sNetClass, *itN, m_mscHeight[*itN]->GetValue());
 			SetNodeFixed(p_sNetClass, *itN, m_mcbFixed[*itN]->GetValue());
 
 			if(m_mcpColorSet[*itN])
@@ -1124,6 +1167,10 @@ bool SP_GPR_Elements::UpdateFromConfig(wxConfig& p_config)
 			m_mnWidth[l_sKey] = tempInt;
 			p_config.Read(wxString::Format(wxT("%s//%s_Height"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), &tempInt, DEFAULT_HEIGHT);
 			m_mnHeight[l_sKey] = tempInt;
+
+			p_config.Read(wxString::Format(wxT("%s//%s_Thickness"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), &tempInt, DEFAULT_THICKNESS);//by george
+			m_mnThickness[l_sKey] = tempInt;
+
 			p_config.Read(wxString::Format(wxT("%s//%s_Fixed"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), &tempInt, DEFAULT_FIXED);
 			m_mbFixedSize[l_sKey] = tempInt;
 
@@ -1191,6 +1238,7 @@ bool SP_GPR_Elements::WriteToConfig(wxConfig& p_config)
 
 			p_config.Write(wxString::Format(wxT("%s//%s_Width"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), (long) m_mnWidth[l_sKey]);
 			p_config.Write(wxString::Format(wxT("%s//%s_Height"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), (long) m_mnHeight[l_sKey]);
+			p_config.Write(wxString::Format(wxT("%s//%s_Thickness"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), (long)m_mnThickness[l_sKey]);//by george
 			p_config.Write(wxString::Format(wxT("%s//%s_Fixed"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), (long) m_mbFixedSize[l_sKey]);
 
 			if(l_sCurrentClass.Find(wxT("Colored")) != wxNOT_FOUND)

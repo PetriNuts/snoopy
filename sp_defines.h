@@ -299,7 +299,7 @@ enum
 	SP_ID_BUTTON_SOUND,
 	SP_ID_BUTTON_BROWSE,
 	SP_ID_BUTTON_BROWSEFromFile,
-
+	SP_ID_SPINCTRL_THICKNESS,
     // let this always be the last entry!
     SP_ID_LAST_ID
 };

@@ -18,6 +18,9 @@
 #define NODE_DIM_MIN 5
 #define NODE_DIM_MAX 250
 
+#define NODE_THICKNESS_MIN 1//by george
+#define NODE_THICKNESS_MAX 20//by george
+#define DEFAULT_THICKNESS 1
 #include "sp_core/SP_GPR_Base.h"
 #include "sp_gr/shapes/SP_GR_ExtendedDrawnShape.h"
 #include "sp_gr/edges/SP_GR_ExtendedEdge.h"
@@ -43,6 +46,7 @@ protected:
 	//such as: "<net class>|<node class>"
 	SP_MapString2Int m_mnHeight;
 	SP_MapString2Int m_mnWidth;
+	SP_MapString2Int m_mnThickness;//by george
 	SP_MapString2Bool m_mbFixedSize;
 
 	map<wxString, wxString> m_msColorSetColor;
@@ -62,6 +66,8 @@ protected:
 	//the mapping key is the node class
 	map<wxString, wxSpinCtrl*> m_mscHeight;
 	map<wxString, wxSpinCtrl*> m_mscWidth;
+
+	map<wxString, wxSpinCtrl*> m_mscThickness;//by george
 	map<wxString, wxCheckBox*> m_mcbFixed;
 
 	map<wxString, wxColourPickerCtrl*> m_mcpColorSet;
@@ -100,6 +106,10 @@ public:
 
 	void SetNodeHeight(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal);
 	int GetNodeHeight(const wxString& p_sNetClass, const wxString& p_sNodeClass);
+
+	//by george
+	void SetNodeThickness(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal);
+	int GetNodeThickness(const wxString& p_sNetClass, const wxString& p_sNodeClass);
 
 	void SetNodeFixed(const wxString& p_sNetClass, const wxString& p_sNodeClass, bool p_bVal);
 	bool GetNodeFixed(const wxString& p_sNetClass, const wxString& p_sNodeClass);
