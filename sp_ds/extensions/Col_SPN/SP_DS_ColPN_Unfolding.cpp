@@ -26,6 +26,7 @@
 #include "sp_core/tools/SP_NetUnfolder.h"
 
 #include "dssd/extern/alphanum.hpp"
+
 // alphanumeric comparison of strings
 bool alphanum_comparer::operator() (const wxString& left, const wxString& right) const
 {
@@ -1415,7 +1416,7 @@ void SP_DS_ColPN_Unfolding::GetTransInstances(SP_CPN_UnfoldedTransition & p_mUnf
 				l_vFunctions.push_back(wxString(itMap2->second.m_anNetFunctions[k].c_str()));
 			}
 			l_stUnfoldedTransInfo.m_anNetFunctions = l_vFunctions;
-
+		
 			vector<SP_CPN_UnfoldedArcInfo> l_vInputArcs;	
 			for(unsigned int k = 0; k < itMap2->second.m_vInputArcs.size(); k++)
 			{
@@ -1456,9 +1457,9 @@ void SP_DS_ColPN_Unfolding::ThreadAddStochResult(SP_CPN_UnfoldedTransitions& p_m
 	wxCriticalSectionLocker locker(m_critsect);
 
 	SP_CPN_UnfoldedTransitions::iterator itMap1;
-	for( itMap1 = p_mmUnfoldedStochTransions.begin(); itMap1 != p_mmUnfoldedStochTransions.end(); itMap1++)
+	for (itMap1 = p_mmUnfoldedStochTransions.begin(); itMap1 != p_mmUnfoldedStochTransions.end(); itMap1++)
 	{
-		wxString l_sColTransName = wxString(itMap1->first.c_str());		
+		wxString l_sColTransName = wxString(itMap1->first.c_str());
 		SP_CPN_UnfoldedTransition l_msstUnfoldedTransInfo;
 
 		GetTransInstances(itMap1->second, l_msstUnfoldedTransInfo);
@@ -1467,71 +1468,68 @@ void SP_DS_ColPN_Unfolding::ThreadAddStochResult(SP_CPN_UnfoldedTransitions& p_m
 		SP_CPN_UnfoldedTransition::iterator itMap2;
 		for( itMap2 = itMap1->second.begin(); itMap2 != itMap1->second.end(); itMap2++)
 		{
-			SP_CPN_UnfoldedTransInfo l_stUnfoldedTransInfo;
-			wxString l_sBinding = wxString(itMap2->first.c_str());			
-			l_stUnfoldedTransInfo.m_sAnimTransInstName = wxString(itMap2->second.m_sAnimTransInstName.c_str());
-			l_stUnfoldedTransInfo.m_sType = wxString(itMap2->second.m_sType.c_str());
+		SP_CPN_UnfoldedTransInfo l_stUnfoldedTransInfo;
+		wxString l_sBinding = wxString(itMap2->first.c_str());
+		l_stUnfoldedTransInfo.m_sAnimTransInstName = wxString(itMap2->second.m_sAnimTransInstName.c_str());
+		l_stUnfoldedTransInfo.m_sType = wxString(itMap2->second.m_sType.c_str());
+		vector<wxString> l_vFunctions;
+		for(unsigned int k = 0; k < itMap2->second.m_anNetFunctions.size(); k++)
+		{
+		l_vFunctions.push_back(wxString(itMap2->second.m_anNetFunctions[k].c_str()));
+		}
+		l_stUnfoldedTransInfo.m_anNetFunctions = l_vFunctions;
+		vector<SP_CPN_UnfoldedArcInfo> l_vInputArcs;
+		for(unsigned int k = 0; k < itMap2->second.m_vInputArcs.size(); k++)
+		{
+		SP_CPN_UnfoldedArcInfo l_stUnfoldedArcInfo;
+		l_stUnfoldedArcInfo.m_dMultiplicity = itMap2->second.m_vInputArcs[k].m_dMultiplicity;
+		l_stUnfoldedArcInfo.m_nMultiplicity = itMap2->second.m_vInputArcs[k].m_nMultiplicity;
+		l_stUnfoldedArcInfo.m_sArcType = wxString(itMap2->second.m_vInputArcs[k].m_sArcType.c_str());
+		l_stUnfoldedArcInfo.m_sColor = wxString(itMap2->second.m_vInputArcs[k].m_sColor.c_str());
+		l_stUnfoldedArcInfo.m_sColPlaceName = wxString(itMap2->second.m_vInputArcs[k].m_sColPlaceName.c_str());
+		l_stUnfoldedArcInfo.m_sDiscContType = wxString(itMap2->second.m_vInputArcs[k].m_sDiscContType.c_str());
+		l_vInputArcs.push_back(l_stUnfoldedArcInfo);
+		}
+		l_stUnfoldedTransInfo.m_vInputArcs = l_vInputArcs;
 
-			vector<wxString> l_vFunctions;
-			for(unsigned int k = 0; k < itMap2->second.m_anNetFunctions.size(); k++)
-			{
-				l_vFunctions.push_back(wxString(itMap2->second.m_anNetFunctions[k].c_str()));
-			}
-			l_stUnfoldedTransInfo.m_anNetFunctions = l_vFunctions;
-
-			vector<SP_CPN_UnfoldedArcInfo> l_vInputArcs;	
-			for(unsigned int k = 0; k < itMap2->second.m_vInputArcs.size(); k++)
-			{
-				SP_CPN_UnfoldedArcInfo l_stUnfoldedArcInfo;
-				l_stUnfoldedArcInfo.m_dMultiplicity = itMap2->second.m_vInputArcs[k].m_dMultiplicity;
-				l_stUnfoldedArcInfo.m_nMultiplicity = itMap2->second.m_vInputArcs[k].m_nMultiplicity;
-				l_stUnfoldedArcInfo.m_sArcType = wxString(itMap2->second.m_vInputArcs[k].m_sArcType.c_str());
-				l_stUnfoldedArcInfo.m_sColor = wxString(itMap2->second.m_vInputArcs[k].m_sColor.c_str());
-				l_stUnfoldedArcInfo.m_sColPlaceName = wxString(itMap2->second.m_vInputArcs[k].m_sColPlaceName.c_str());
-				l_stUnfoldedArcInfo.m_sDiscContType = wxString(itMap2->second.m_vInputArcs[k].m_sDiscContType.c_str());
-				l_vInputArcs.push_back(l_stUnfoldedArcInfo);
-			}
-			l_stUnfoldedTransInfo.m_vInputArcs = l_vInputArcs;
-			
-			vector<SP_CPN_UnfoldedArcInfo> l_vOutputArcs;
-			for(unsigned int k = 0; k < itMap2->second.m_vOutputArcs.size(); k++)
-			{
-				SP_CPN_UnfoldedArcInfo l_stUnfoldedArcInfo;
-				l_stUnfoldedArcInfo.m_dMultiplicity = itMap2->second.m_vOutputArcs[k].m_dMultiplicity;
-				l_stUnfoldedArcInfo.m_nMultiplicity = itMap2->second.m_vOutputArcs[k].m_nMultiplicity;
-				l_stUnfoldedArcInfo.m_sArcType = wxString(itMap2->second.m_vOutputArcs[k].m_sArcType.c_str());
-				l_stUnfoldedArcInfo.m_sColor = wxString(itMap2->second.m_vOutputArcs[k].m_sColor.c_str());
-				l_stUnfoldedArcInfo.m_sColPlaceName = wxString(itMap2->second.m_vOutputArcs[k].m_sColPlaceName.c_str());
-				l_stUnfoldedArcInfo.m_sDiscContType = wxString(itMap2->second.m_vOutputArcs[k].m_sDiscContType.c_str());
-				l_vOutputArcs.push_back(l_stUnfoldedArcInfo);
-			}
-			l_stUnfoldedTransInfo.m_vOutputArcs = l_vOutputArcs;
-
-			l_msstUnfoldedTransInfo[l_sBinding]=l_stUnfoldedTransInfo;
+		vector<SP_CPN_UnfoldedArcInfo> l_vOutputArcs;
+		for(unsigned int k = 0; k < itMap2->second.m_vOutputArcs.size(); k++)
+		{
+		SP_CPN_UnfoldedArcInfo l_stUnfoldedArcInfo;
+		l_stUnfoldedArcInfo.m_dMultiplicity = itMap2->second.m_vOutputArcs[k].m_dMultiplicity;
+		l_stUnfoldedArcInfo.m_nMultiplicity = itMap2->second.m_vOutputArcs[k].m_nMultiplicity;
+		l_stUnfoldedArcInfo.m_sArcType = wxString(itMap2->second.m_vOutputArcs[k].m_sArcType.c_str());
+		l_stUnfoldedArcInfo.m_sColor = wxString(itMap2->second.m_vOutputArcs[k].m_sColor.c_str());
+		l_stUnfoldedArcInfo.m_sColPlaceName = wxString(itMap2->second.m_vOutputArcs[k].m_sColPlaceName.c_str());
+		l_stUnfoldedArcInfo.m_sDiscContType = wxString(itMap2->second.m_vOutputArcs[k].m_sDiscContType.c_str());
+		l_vOutputArcs.push_back(l_stUnfoldedArcInfo);
+		}
+		l_stUnfoldedTransInfo.m_vOutputArcs = l_vOutputArcs;
+		l_msstUnfoldedTransInfo[l_sBinding]=l_stUnfoldedTransInfo;
 		}
 		*/
 
 		m_mmUnfoldedStochTransions[l_sColTransName] = l_msstUnfoldedTransInfo;
-	}	
+	}
 }
 
-void SP_DS_ColPN_Unfolding::ThreadAddContResult(SP_CPN_UnfoldedTransitions& p_mmUnfoldedContTransions)
+void SP_DS_ColPN_Unfolding::ThreadAddContResult(SP_CPN_UnfoldedTransitions& p_mmUnfoldedContTransions )
 {
 	wxCriticalSectionLocker locker(m_critsect);
 
-	
+
 	SP_CPN_UnfoldedTransitions::iterator itMap1;
-	for( itMap1 = p_mmUnfoldedContTransions.begin(); itMap1 != p_mmUnfoldedContTransions.end(); itMap1++)
+	for (itMap1 = p_mmUnfoldedContTransions.begin(); itMap1 != p_mmUnfoldedContTransions.end(); itMap1++)
 	{
-		wxString l_sColTransName = wxString(itMap1->first.c_str());		
+		wxString l_sColTransName = wxString(itMap1->first.c_str());
 		SP_CPN_UnfoldedTransition l_msstUnfoldedTransInfo;
 
 		GetTransInstances(itMap1->second, l_msstUnfoldedTransInfo);
 
 		m_mmUnfoldedContTransions[l_sColTransName] = l_msstUnfoldedTransInfo;
-	}	
-
+	}
 }
+
 void SP_DS_ColPN_Unfolding::ThreadAddImmResult(SP_CPN_UnfoldedTransitions& p_mmUnfoldedImmTransions)
 {
 	wxCriticalSectionLocker locker(m_critsect);
@@ -1773,6 +1771,7 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::UnfoldOneTransition()
 		m_bTransitionUnique = false;
 	}
 	
+
 	//get instances
 	if( m_sTransNodeClass.IsSameAs(SP_DS_CONTINUOUS_TRANS)	)
 		m_mmUnfoldedContTransions[m_sColoredTransName] = m_mTransInstances;
@@ -1788,6 +1787,7 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::UnfoldOneTransition()
 
 	if( m_sTransNodeClass.IsSameAs(wxT("Scheduled Transition") ) )
 		m_mmUnfoldedSchedTransions[m_sColoredTransName] = m_mTransInstances;	
+
 
 	return true;
 }
@@ -2789,12 +2789,14 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::ProcessTransition()
 
 			//Get an unfolded name for a colored place in a rate function
 			vector<wxString> l_sUnfoldedRateFunctionVector;
+			 
 			GenerateUnfoledRateFunction(l_mPlaceToColors, m_scOneTransInfo.m_anNetFunctions, l_sUnfoldedRateFunctionVector);
-			for(unsigned i = 0; i < l_sUnfoldedRateFunctionVector.size(); i++)
+			 
+			 
+		    for (unsigned i = 0; i < l_sUnfoldedRateFunctionVector.size(); i++)
 			{
-				m_scOneTransInfo.m_anNetFunctions[i] = l_sUnfoldedRateFunctionVector[i];				
+				m_scOneTransInfo.m_anNetFunctions[i] = l_sUnfoldedRateFunctionVector[i];
 			}
-
 			l_bFoundRateFunc = true;
 			break;
 		}
@@ -2903,7 +2905,7 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::CollectPlace2ColorMapforATransition( m
 }
 
 void SP_DS_ColPN_Unfolding::UnfoldThread::GenerateUnfoledRateFunction(map<wxString, vector<wxString> > p_mPlaceToColors, vector<wxString> p_sColoredRateFunctionVector, vector<wxString> &p_sUnfoldedRateFunctionVector)
-{
+{	 
 	map<wxString, wxString> l_mReplaceString;
 	int l_nCount = 0;		
 
@@ -2983,9 +2985,37 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::GenerateUnfoledRateFunction(map<wxStri
 		l_sSepString = l_sSepString+l_sColoredRateFunction;
 
 		l_sColoredRateFunction = l_sSepString;
-		
+		/******** evalute variables in the rate function without [] *******/
+		//by george
+		wxStringTokenizer tokenizer(l_sColoredRateFunction, "+*(),-/%^ ");
+		std::vector<wxString> l_vRateFunTermsVector;
+		bool l_bContainVar = false;
+
+		while (tokenizer.HasMoreTokens())
+		{
+			wxString token = tokenizer.GetNextToken();
+			l_vRateFunTermsVector.push_back(token);
+		}
+
+		for (int i = 0; i < l_vRateFunTermsVector.size(); i++)
+		{
+			auto l_itFound = m_mVar2Val.find(l_vRateFunTermsVector[i]);
+			
+			if (l_itFound != m_mVar2Val.end())
+			{
+				l_sSepString.Replace(l_vRateFunTermsVector[i], l_itFound->second);
+				l_bContainVar = true;
+			}
+		}
+		if (l_bContainVar)
+		{
+			l_sColoredRateFunction = l_sSepString;
+		}
+		//////////////////////
 		p_sUnfoldedRateFunctionVector.push_back(l_sColoredRateFunction);		
 	}
+ 
+	 
 }
 
 void SP_DS_ColPN_Unfolding::UnfoldThread::ProcessArcs()
@@ -3021,11 +3051,13 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::ProcessArcs()
 						}
 						else
 						{
+				
 							l_scOneArcInfo.m_nMultiplicity = itEvalVector->m_Multiplicity;
 							if (itEvalVector->m_bPlaceFlag)
 								l_scOneArcInfo.m_sMultiplicity = itEvalVector->m_stringMultiplicity;
 							else
 								l_scOneArcInfo.m_sMultiplicity = wxString::Format(wxT("%d"), itEvalVector->m_Multiplicity);
+					  
 						}
 					}
 					else
@@ -3042,6 +3074,7 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::ProcessArcs()
 								l_scOneArcInfo.m_sMultiplicity = itEvalVector->m_stringMultiplicity;
 							else
 								l_scOneArcInfo.m_sMultiplicity = wxString::Format(wxT("%f"), itEvalVector->m_DoubleMultiplicity);
+						
 						}
 					}
 
@@ -3252,7 +3285,7 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::ProcessTransitionByCSP()
 
 bool SP_DS_ColPN_Unfolding::UnfoldThread::ProcessOneBinding(map<wxString,wxString>& p_mBindVar2Val)
 {
-
+	         m_mVar2Val = p_mBindVar2Val;//by george
 			//naming
 			map<wxString,wxString>::iterator itMap;
 
@@ -3330,7 +3363,8 @@ void* SP_DS_ColPN_Unfolding::UnfoldThread::Entry()
 	}
 	else
 	{
-		m_pcColPNUnfolding->ThreadAddContResult(m_mmUnfoldedContTransions);	
+	  
+		m_pcColPNUnfolding->ThreadAddContResult(m_mmUnfoldedContTransions);
 		m_pcColPNUnfolding->ThreadAddStochResult(m_mmUnfoldedStochTransions);	
 		m_pcColPNUnfolding->ThreadAddImmResult(m_mmUnfoldedImmTransions);	
 		m_pcColPNUnfolding->ThreadAddDetResult(m_mmUnfoldedDetTransions);	

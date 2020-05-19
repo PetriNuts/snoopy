@@ -527,6 +527,8 @@ protected: //for one transition
 	//CSP flag
 	bool m_bCSPFlag;
 
+	//by george
+	std::map<wxString, wxString> m_mVar2Val; // tempory remember the varlist binding for evaluate vars in the rate function
 protected:
 	SP_CPN_UnfoldedTransitions m_mmUnfoldedStochTransions; //colored name, color, other info
 	SP_CPN_UnfoldedTransitions m_mmUnfoldedContTransions; //colored name, color, other info
