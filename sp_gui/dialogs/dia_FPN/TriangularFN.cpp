@@ -2,6 +2,7 @@
 #include "TriangularFN.h"
 #include <iomanip>
 #include<math.h>
+#include <random>
 using namespace std;
 //#<include"bits/stdc++.h>"
 #include "wx/wx.h"
@@ -52,7 +53,19 @@ AlphaCutSet TriangularFN::getAlphaCutSet(double dAlphaLevel, int iSample)
 	return vdset;
 }
 
+AlphaCutSet  TriangularFN::getAlphaCutSetUsingUniformDist(const double& dalpha, const int& isample)
+{
+	std::default_random_engine generator;
+	AlphaCutSet l_vdAlphaCut;
+	std::uniform_real_distribution<double> distribution(m_dPointleft, m_dPointright);
 
+	for (int i = 0; i<isample; ++i) {
+		double l_dGeneratedSample = distribution(generator);
+		l_vdAlphaCut.push_back(l_dGeneratedSample);
+	}
+
+	return l_vdAlphaCut;
+}
 double TriangularFN::getMembershipValue(double dVal)
 {
 	double dResult = 0.0;
