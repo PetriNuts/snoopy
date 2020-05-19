@@ -11,6 +11,8 @@
 
 #include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStUnfolding.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
+#include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_CPN_SyntaxChecking.h"
+#include "sp_gui/dialogs/dia_CPN/SP_DLG_ConstantDefinition.h" 
 
 IMPLEMENT_CLASS( SP_DLG_ColStUnfolding, wxDialog )
 
@@ -22,20 +24,23 @@ enum SP_CPN_ID
 	SP_ID_CSPRADIOBOX,
 	SP_ID_CSPDSFRADIOBOX,
 	SP_ID_CSPBDBRADIOBOX,
-	SP_ID_BUTTON_PAUSE
+	SP_ID_BUTTON_PAUSE,
+	SP_ID_BUTTON_CHANGE_COL_CONSTANT_SETS,//by george
+	SP_ID_BUTTON_MODIFY_COL_CONSTANT_SETS
 };
 
 BEGIN_EVENT_TABLE( SP_DLG_ColStUnfolding, wxDialog )
-
+EVT_CLOSE(SP_DLG_ColStUnfolding::OnClose)
 EVT_BUTTON( wxID_OK, SP_DLG_ColStUnfolding::OnDlgOk )
 EVT_BUTTON( wxID_CANCEL, SP_DLG_ColStUnfolding::OnDlgCancel )
 EVT_BUTTON( SP_ID_BUTTON_PAUSE, SP_DLG_ColStUnfolding::OnPause )
 EVT_RADIOBUTTON(SP_ID_UNFOLD_RADIO_BUTTON, SP_DLG_ColStUnfolding::OnUnfoldRadioButton)
 EVT_RADIOBUTTON(SP_ID_LOAD_RADIO_BUTTON, SP_DLG_ColStUnfolding::OnUnLoadRadioButton)
-
+EVT_CHOICE(SP_ID_BUTTON_CHANGE_COL_CONSTANT_SETS, SP_DLG_ColStUnfolding::OnColoringSetChanged)
+EVT_BUTTON(SP_ID_BUTTON_MODIFY_COL_CONSTANT_SETS, SP_DLG_ColStUnfolding::OnModyfyingConstants)
 END_EVENT_TABLE()
 
-
+ 
 SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_Unfolding, wxWindow* p_pcParent,const wxString& p_sTitle, long p_nStyle) 
 		:wxDialog(p_pcParent, -1, p_sTitle, wxPoint( 120, 120),  wxSize( 1500, 400),
 			p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
@@ -109,25 +114,35 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 	l_pcThreadSizer->Add( m_pcThreadCountComboBox, 0, wxALL, 5 );
 
 	m_pcSizer->Add( l_pcThreadSizer, 0, wxALL| wxEXPAND, 5 );
+	///////////////////by george///////////////////
 
-	//fifth row 
-	wxSizer* l_pcStartSizer = new wxBoxSizer( wxHORIZONTAL );
-    m_pcStartButton = new wxButton( this, wxID_OK, wxT("Start"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_pcStartButton->SetBackgroundColour( *wxGREEN );
-    l_pcStartSizer->Add( m_pcStartButton, 1, wxALL | wxEXPAND, 5 );
+	wxSizer* l_pccoloringGroup = new wxBoxSizer(wxHORIZONTAL);
+	l_pccoloringGroup->Add(new wxStaticText(this, -1, wxT("Coloring group:")), 0, wxALL, 5);
 
-	m_pcPauseButton = new wxButton( this, SP_ID_BUTTON_PAUSE, wxT("Pause"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_pcPauseButton->SetBackgroundColour( *wxGREEN );
-    l_pcStartSizer->Add( m_pcPauseButton, 1, wxALL | wxEXPAND, 5 );    
+	m_pcSizer->Add(l_pccoloringGroup, 0, wxALL | wxEXPAND, 5);
 
-    m_pcSizer->Add( l_pcStartSizer, 0, wxALL | wxEXPAND, 5 );
+	//m_nGroupCounts = 0;
+	m_SetChoices.insert(_T("coloring"));
+	std::set<wxString>::iterator l_itChoice;
+	for (l_itChoice = m_SetChoices.begin(); l_itChoice != m_SetChoices.end(); ++l_itChoice)
+	{
+		wxString l_sGroup = *l_itChoice;
+		l_pcWriteSizer = new wxBoxSizer(wxHORIZONTAL);
+		//l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, l_sGroup + wxT(':')), wxSizerFlags(1).Expand().Border(wxALL, 2));
+		m_apcComboBoxes.push_back(new wxChoice(this, SP_ID_BUTTON_CHANGE_COL_CONSTANT_SETS, wxDefaultPosition, wxSize(100, -1), 0, NULL, 0, wxDefaultValidator, l_sGroup));
+		l_pcWriteSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], wxSizerFlags(1).Expand().Border(wxALL, 2));
+		l_pcWriteSizer->Add(new wxButton(this, SP_ID_BUTTON_MODIFY_COL_CONSTANT_SETS, wxT("modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
+		m_pcSizer->Add(l_pcWriteSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
+	//	m_nGroupCounts++;
+	}
+	 LoadColringGroupChoices();
+	////////////////////////////////
 
-
-	//sixth row
-	wxSizer* l_TimeProgressSizer = new wxBoxSizer( wxVERTICAL );
-	m_pcUnfoldingProgressGauge = new wxGauge( this, -1, 100, wxDefaultPosition, wxDefaultSize, 0 );
-    l_TimeProgressSizer->Add( m_pcUnfoldingProgressGauge, 1, wxALL | wxEXPAND, 5 );	
-
+	//fifth row
+	 wxSizer* l_TimeProgressSizer = new wxBoxSizer(wxVERTICAL);
+	 m_pcUnfoldingProgressGauge = new wxGauge(this, -1, 100, wxDefaultPosition, wxDefaultSize, 0);
+	 l_TimeProgressSizer->Add(m_pcUnfoldingProgressGauge, 1, wxALL | wxEXPAND, 5);
+	  
 	wxSizer* l_TimeSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_TimeSizer->Add(new wxStaticText(this, -1, wxT("Unfolding run time: ")), 0, wxALL | wxEXPAND, 5);
 	m_pcUnfoldingStopWatch = new wxStaticText(this, -1, wxT("0,0 sec"));
@@ -137,10 +152,22 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 	m_pcSizer->Add( l_TimeProgressSizer, 1, wxALL | wxEXPAND, 5 );
 
 
+	//sixth row 
+	wxSizer* l_pcStartSizer = new wxBoxSizer(wxHORIZONTAL);
+	m_pcStartButton = new wxButton(this, wxID_OK, wxT("Start"), wxDefaultPosition, wxDefaultSize, 0);
+	m_pcStartButton->SetBackgroundColour(*wxGREEN);
+	l_pcStartSizer->Add(m_pcStartButton, 1, wxALL | wxEXPAND, 5);
+
+	m_pcPauseButton = new wxButton(this, SP_ID_BUTTON_PAUSE, wxT("Pause"), wxDefaultPosition, wxDefaultSize, 0);
+	m_pcPauseButton->SetBackgroundColour(*wxGREEN);
+	l_pcStartSizer->Add(m_pcPauseButton, 1, wxALL | wxEXPAND, 5);
+
+	m_pcSizer->Add(l_pcStartSizer, 0, wxALL | wxEXPAND, 5);
+
     //close
-	wxSizer* l_pcCloseSizer = new wxBoxSizer( wxHORIZONTAL );
-	l_pcCloseSizer->Add( new wxButton( this, wxID_CANCEL, wxT("Close") ), 0, wxALL, 5 );
-	m_pcSizer->Add( l_pcCloseSizer, 0, wxALL | wxEXPAND, 5 );
+	//wxSizer* l_pcCloseSizer = new wxBoxSizer( wxHORIZONTAL );
+	//l_pcCloseSizer->Add( new wxButton( this, wxID_CANCEL, wxT("Close") ), 0, wxALL, 5 );
+	//m_pcSizer->Add( l_pcCloseSizer, 0, wxALL | wxEXPAND, 5 );
 
 
 
@@ -298,3 +325,105 @@ void SP_DLG_ColStUnfolding::OnPause( wxCommandEvent& p_cEvent )
 
 }
 
+void SP_DLG_ColStUnfolding::LoadColringGroupChoices()
+{
+	m_SetChoices.clear();
+	//l_pcGraph->GetMetadataclass();
+	SP_DS_Netclass* l_pcNetClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass();
+	SP_DS_Metadataclass* mc;
+	if(!l_pcNetClass->GetName().Contains(_T("Fuzzy")))
+	 mc= SP_Core::Instance()->GetRootDocument()->GetGraph()->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	else
+	mc= SP_Core::Instance()->GetRootDocument()->GetGraph()->GetMetadataclass(SP_DS_META_CONSTANT);
+	if (mc)
+	{
+		SP_ListMetadata::const_iterator it;
+		SP_DS_Metadata* l_pcMetadata = NULL;
+
+		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+		{
+			l_pcMetadata = *it;
+			SP_DS_Attribute* l_pcAttr = l_pcMetadata->GetAttribute(wxT("Group"));
+			if (l_pcAttr)
+			{
+				wxString l_sGroup = l_pcAttr->GetValueString();
+				if(l_sGroup==wxT("coloring"))
+				m_SetChoices.insert(l_sGroup);
+			}
+		}
+	}
+	int ss = m_apcColListAttr.size();
+
+	//SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+
+	SP_ListMetadata::const_iterator l_itElem;
+
+	std::set<wxString>::iterator l_itChoice;
+	for (l_itChoice = m_SetChoices.begin(); l_itChoice != m_SetChoices.end(); ++l_itChoice)
+	{
+		wxString l_sChoice = *l_itChoice;
+		SP_ListMetadata::const_iterator l_itElem;
+		for (l_itElem = mc->GetElements()->begin(); l_itElem != mc->GetElements()->end(); ++l_itElem)
+		{
+			SP_DS_Metadata* l_pcConstant = *l_itElem;
+			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
+			if (l_sChoice == l_sGroup  )
+			{
+				m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
+				break;
+			}
+		}
+	}
+
+
+	if(m_apcComboBoxes.size()>0)
+	for (size_t j = ss; j < m_apcColListAttr.size(); j++)
+	{
+		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
+		//int l_Index = j - m_nGroupCounts;
+		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
+		l_pcCombobox->Clear();
+		if (l_pcAttr)
+		{
+			for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
+			{
+				wxString l_sSetName = l_pcAttr->GetCell(i, 0);
+				l_pcCombobox->Append(l_sSetName);
+			}
+			l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
+		}
+	}
+}
+
+
+void SP_DLG_ColStUnfolding::OnColoringSetChanged(wxCommandEvent& p_cEvent)
+{
+	if (m_apcComboBoxes.size() == 0 || m_apcColListAttr.size() == 0)
+		return;
+
+	unsigned int l_nchosenSet  = m_apcComboBoxes[0]->GetSelection();
+	m_apcColListAttr[0]->SetActiveList(l_nchosenSet);
+	m_apcComboBoxes[0]->SetSelection(l_nchosenSet);
+	SP_CPN_SyntaxChecking l_cSyntaxChecking;
+	if (!l_cSyntaxChecking.Initialize())
+		return;
+	l_cSyntaxChecking.UpdateNetMarking();
+
+	SP_Core::Instance()->GetRootDocument()->RefreshAllViews();
+
+}
+
+void SP_DLG_ColStUnfolding::OnModyfyingConstants(wxCommandEvent& p_cEvent)
+{
+	SP_DLG_ConstantDefinition * l_pcConstantDialog = new SP_DLG_ConstantDefinition(this);
+
+	if (l_pcConstantDialog->ShowModal() == wxID_OK)
+	{
+		//LoadSets();
+	}
+}
+
+void SP_DLG_ColStUnfolding::OnClose(wxCloseEvent& event)//by george
+{
+	wxDialog::EndModal(wxID_CANCEL);
+}

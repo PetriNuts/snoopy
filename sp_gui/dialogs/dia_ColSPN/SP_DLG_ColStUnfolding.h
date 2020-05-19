@@ -16,10 +16,11 @@
 #include <wx/radiobut.h>
 #include <wx/radiobox.h>
 #include <wx/filepicker.h>
-
-
+#include <set>
+#include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 
 class SP_DS_ColPN_Unfolding;
+ 
 
 class  SP_DLG_ColStUnfolding : public wxDialog
 {
@@ -44,7 +45,9 @@ private:
 	wxStaticText* m_pcUnfoldingStopWatch;
 
 	SP_DS_ColPN_Unfolding* m_pcColPN_Unfolding;
- 
+	std::set<wxString> m_SetChoices;//by george
+	std::vector<wxChoice*> m_apcComboBoxes;
+	vector<SP_DS_ColListAttribute*> m_apcColListAttr;
   public:
 	
 
@@ -59,6 +62,11 @@ private:
 	void OnUnfoldRadioButton( wxCommandEvent& p_cEvent );
 	void OnUnLoadRadioButton( wxCommandEvent& p_cEvent );
 	
+	void  LoadColringGroupChoices();
+	void OnColoringSetChanged(wxCommandEvent& p_cEvent);
+	void OnModyfyingConstants(wxCommandEvent& p_cEvent);
+	void OnClose(wxCloseEvent& event);
+
 
 	void SetUnfoldingStopWatch(long p_nTime) 
 	{ 
