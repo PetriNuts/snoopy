@@ -145,59 +145,7 @@ EVT_MENU(SP_MENU_RITEM4_TREE, SP_WDG_DeclarationTreectrl::OnSelectAll) //Added b
 SP_WDG_DeclarationTreectrl::~SP_WDG_DeclarationTreectrl()
 {
 }
-/*
-void SP_WDG_DeclarationTreectrl::OnFirsMentItem(wxMouseEvent& p_cEvent)
-{
 
-wxMenu* ContextMenu = new wxMenu();
-ContextMenu->Append(new wxMenuItem());
-wxPoint Mouse = this->ScreenToClient(wxGetMousePosition());
-wxTreeItemId Hit = this->HitTest(Mouse);
-int temp_num1 = wxTREE_HITTEST_ONITEMLABEL;
-wxTreeItemId id = this->HitTest(wxGetMousePosition(), temp_num1);
-if (Hit.IsOk()) {
-if (this->ItemHasChildren(id)) {
-
-wxString l_selectedItem = this->GetItemText(id);
-PopupMenu(ContextMenu, Mouse);
-}
-else
-{
-wxRect Rect;
-this->GetBoundingRect(id, Rect, true);
-wxPoint Point(Rect.GetLeft() + Rect.GetHeight() / 2, Rect.GetTop() + Rect.GetHeight() / 2);
-PopupMenu(ContextMenu, Point);
-}
-}
-
-delete ContextMenu;
-
-
-wxPoint mouse_position = p_cEvent.GetPosition();
-int temp_num = wxTREE_HITTEST_ONITEMLABEL;
-//p_cEvent.Skip();
-wxTreeItemId id1 = this->HitTest(mouse_position, temp_num);
-if ( this->ItemHasChildren(id1))
-{
-this->Toggle(id1);
-if (!this->IsSelected(id1))
-{
-this->SelectItem(id1, true);
-wxMenu l_cMenu;
-l_cMenu.Append(SP_MENU_RITEM1_TREE, wxT("select"));
-l_cMenu.Append(SP_MENU_RITEM2_TREE, wxT("unselect"));
-
-
-PopupMenu(&l_cMenu);// p_cEvent.GetPosition());
-}
-}
-else
-{
-p_cEvent.Skip();
-}
-
-}
-*/
 
 void SP_WDG_DeclarationTreectrl::UpdateSetODeclarations(std::map<wxString, wxString> p_mGroup)
 {
@@ -249,29 +197,12 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 		{
 			l_bIsFound = true;
 			l_setDependencies.insert(l_sSelected);
-
-			//l_setDependencies.insert(m_vObserversInfo[it_vobs].m_setConstants.begin(), m_vObserversInfo[it_vobs].m_setConstants.end());
-			//l_setDependencies.insert(m_vObserversInfo[it_vobs].m_setFuns.begin(), m_vObserversInfo[it_vobs].m_setFuns.end());
-			//l_setDependencies.insert(m_vObserversInfo[it_vobs]..begin(), m_vObserversInfo[it_vobs].m_SetSimpleCS.end());
-			//l_setDependencies.insert(m_vObserversInfo[it_vobs].m_setObservers.begin(), m_vObserversInfo[it_vobs].m_setObservers.end());
 			l_mDep2Type[p_sItem] = wxT("Observer");
 			break;
 		}
 	}
 	if (l_bIsFound && l_mDep2Type[p_sItem] == wxT("Observer"))
 	{
-
-
-		for (int it_vConst = 0; it_vConst != m_vObserversInfo.size(); it_vConst++)
-		{
-			//	if (m_vObserversInfo[it_vConst].m_observerName == l_sSelected)
-			//	{
-			//for (auto it_con = m_vObserversInfo[it_vConst].m_setConstants.begin(); it_con != m_vObserversInfo[it_vConst].m_setConstants.end(); ++it_con)
-			//{
-			//l_mDep2Type[*it_con] = wxT("Constant");
-			//}
-			//}
-		}
 		//functions
 		for (int it_vfun = 0; it_vfun != m_vObserversInfo.size(); it_vfun++)
 		{
@@ -322,7 +253,6 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 
 
 			l_setDependencies.insert(m_vConstantsInfo[it_vConst].m_setFun.begin(), m_vConstantsInfo[it_vConst].m_setFun.end());
-			//l_setDependencies.insert(m_vConstantsInfo[it_vConst].m_setForwardFun.begin(), m_vConstantsInfo[it_vConst].m_setForwardFun.end());
 			l_setDependencies.insert(m_vConstantsInfo[it_vConst].m_SetSimpleCS.begin(), m_vConstantsInfo[it_vConst].m_SetSimpleCS.end());
 			l_setDependencies.insert(m_vConstantsInfo[it_vConst].m_setObservers.begin(), m_vConstantsInfo[it_vConst].m_setObservers.end());
 			l_mDep2Type[p_sItem] = wxT("Constant");
@@ -365,10 +295,6 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 				{
 					l_mDep2Type[*it_fun] = wxT("Function");
 				}
-				//	for (auto it_fun = m_vConstantsInfo[it_vConst].m_setForwardFun.begin(); it_fun != m_vConstantsInfo[it_vConst].m_setForwardFun.end(); ++it_fun)
-				//	{
-				//		l_mDep2Type[*it_fun] = wxT("Function");
-				//	}
 			}
 		}
 		//observers
@@ -414,10 +340,8 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 				l_bIsFound = true;
 				l_setDependencies.insert(l_sSelected);
 				l_setDependencies.insert(m_vSimpleCsInfo[it_vsimple].m_setIndirectCs.begin(), m_vSimpleCsInfo[it_vsimple].m_setIndirectCs.end());
-				//l_setDependencies.insert(m_vSimpleCsInfo[it_vsimple].m_setConst.begin(), m_vSimpleCsInfo[it_vsimple].m_setConst.end());
 				l_setDependencies.insert(m_vSimpleCsInfo[it_vsimple].m_setCompCs.begin(), m_vSimpleCsInfo[it_vsimple].m_setCompCs.end());
 				l_setDependencies.insert(m_vSimpleCsInfo[it_vsimple].m_setFun.begin(), m_vSimpleCsInfo[it_vsimple].m_setFun.end());
-				//l_setDependencies.insert(m_vSimpleCsInfo[it_vsimple].m_setConst.begin(), m_vSimpleCsInfo[it_vsimple].m_setConst.end());
 				l_setDependencies.insert(m_vSimpleCsInfo[it_vsimple].m_setVar.begin(), m_vSimpleCsInfo[it_vsimple].m_setVar.end());
 				l_mDep2Type[l_sSelected] = wxT("Simple");
 				for (auto it = m_vSimpleCsInfo[it_vsimple].m_setIndirectCs.begin(); it != m_vSimpleCsInfo[it_vsimple].m_setIndirectCs.end(); it++)
@@ -437,7 +361,7 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 			{
 				for (auto it_dec = m_vSimpleCsInfo[it_vsimple].m_setConst.begin(); it_dec != m_vSimpleCsInfo[it_vsimple].m_setConst.end(); ++it_dec)
 				{
-					//l_mDep2Type[*it_dec] = wxT("Constant");
+					
 				}
 			}
 		}
@@ -447,7 +371,6 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 			if ((m_vSimpleCsInfo[it_vsimple].m_sName == l_sSelected))
 			{
 				set<wxString> l_setComp = m_vSimpleCsInfo[it_vsimple].m_setCompCs;
-				//l_setComp.insert(m_vSimpleCsInfo[it_vsimple].m_setIndirectCs.begin(), m_vSimpleCsInfo[it_vsimple].m_setIndirectCs.end());
 				for (auto it = l_setComp.begin(); it != l_setComp.end(); it++)
 				{
 					l_mDep2Type[*it] = wxT("Compound");
@@ -457,7 +380,6 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 			if ((m_vSimpleCsInfo[it_vsimple].m_sName == l_sSelected))
 			{
 				set<wxString> l_setVar = m_vSimpleCsInfo[it_vsimple].m_setVar;
-				//l_setComp.insert(m_vSimpleCsInfo[it_vsimple].m_setIndirectCs.begin(), m_vSimpleCsInfo[it_vsimple].m_setIndirectCs.end());
 				for (auto it = l_setVar.begin(); it != l_setVar.end(); it++)
 				{
 					l_mDep2Type[*it] = wxT("Variable");
@@ -467,7 +389,6 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 			if ((m_vSimpleCsInfo[it_vsimple].m_sName == l_sSelected))
 			{
 				set<wxString> l_setfun = m_vSimpleCsInfo[it_vsimple].m_setFun;
-				//l_setComp.insert(m_vSimpleCsInfo[it_vsimple].m_setIndirectCs.begin(), m_vSimpleCsInfo[it_vsimple].m_setIndirectCs.end());
 				for (auto it = l_setfun.begin(); it != l_setfun.end(); it++)
 				{
 					l_mDep2Type[*it] = wxT("Function");
@@ -491,8 +412,8 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 				l_setDependencies.insert(m_vFunctionsInfo[j].m_setConst.begin(), m_vFunctionsInfo[j].m_setConst.end());
 				l_setDependencies.insert(m_vFunctionsInfo[j].m_setBackwordConst.begin(), m_vFunctionsInfo[j].m_setBackwordConst.end());
 				l_setDependencies.insert(m_vFunctionsInfo[j].m_setBackwordObservers.begin(), m_vFunctionsInfo[j].m_setBackwordObservers.end());
+				l_setDependencies.insert(m_vFunctionsInfo[j].m_setBackwardColoredFuns.begin(), m_vFunctionsInfo[j].m_setBackwardColoredFuns.end());
 				l_mDep2Type[l_sSelected] = wxT("Function");
-				//l_setDependencies.insert(m_vFunctionsInfo[j].m_setVars.begin(), m_vFunctionsInfo[j].m_setVars.end());
 				break;
 			}
 		}
@@ -529,6 +450,10 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 				for (auto it_dec = m_vFunctionsInfo[j].m_setBackwordObservers.begin(); it_dec != m_vFunctionsInfo[j].m_setBackwordObservers.end(); ++it_dec)
 				{
 					l_mDep2Type[*it_dec] = wxT("Observer");
+				}
+				for (auto it_dec = m_vFunctionsInfo[j].m_setBackwardColoredFuns.begin(); it_dec != m_vFunctionsInfo[j].m_setBackwardColoredFuns.end(); ++it_dec)
+				{
+					l_mDep2Type[*it_dec] = wxT("Function");
 				}
 			}
 		}
@@ -572,10 +497,6 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 				l_bIsFound = true;
 				l_setDependencies.insert(l_sSelected);
 				l_setDependencies.insert(m_vCompoundCsInfo[j].m_setFun.begin(), m_vCompoundCsInfo[j].m_setFun.end());
-				//	l_setDependencies.insert(m_vCompoundCsInfo[j].m_setSimpleCs.begin(), m_vCompoundCsInfo[j].m_setSimpleCs.end());
-				//	set<wxString> l_setComp = m_vCompoundCsInfo[j].m_setIndirectCompCs;
-				//l_setDependencies.insert(m_vCompoundCsInfo[j].m_setIndirectCompCs.begin(), m_vCompoundCsInfo[j].m_setIndirectCompCs.end());
-				//l_setDependencies.insert(m_vCompoundCsInfo[j].m_setConst.begin(), m_vCompoundCsInfo[j].m_setConst.end());
 				l_mDep2Type[l_sSelected] = wxT("Compound");
 				l_setDependencies.insert(m_vCompoundCsInfo[j].m_setVar.begin(), m_vCompoundCsInfo[j].m_setVar.end());
 				break;
@@ -590,16 +511,6 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 		{
 			if (m_vCompoundCsInfo[j].m_sName == l_sSelected)
 			{
-
-
-				//	for (auto it_dec = m_vCompoundCsInfo[j].m_setIndirectCompCs.begin(); it_dec != m_vCompoundCsInfo[j].m_setIndirectCompCs.end(); ++it_dec)
-				//	{
-				//		l_mDep2Type[*it_dec] = wxT("Compound");
-				//	 }
-				//	for (auto it_dec = m_vCompoundCsInfo[j].m_setConst.begin(); it_dec != m_vCompoundCsInfo[j].m_setConst.end(); ++it_dec)
-				//	{
-				//		l_mDep2Type[*it_dec] = wxT("Constant");
-				//}
 				for (auto it_dec = m_vCompoundCsInfo[j].m_setFun.begin(); it_dec != m_vCompoundCsInfo[j].m_setFun.end(); ++it_dec)
 				{
 					l_mDep2Type[*it_dec] = wxT("Function");
@@ -621,7 +532,6 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 			{
 				l_bIsFound = true;
 				l_setDependencies.insert(l_sSelected);
-				//l_setDependencies.insert(m_vSubCsInfo[j].m_setFun.begin(), m_vSubCsInfo[j].m_setFun.end());
 				l_setDependencies.insert(m_vSubCsInfo[j].m_setSimpleCs.begin(), m_vSubCsInfo[j].m_setSimpleCs.end());
 				l_setDependencies.insert(m_vSubCsInfo[j].m_setConst.begin(), m_vSubCsInfo[j].m_setConst.end());
 				l_setDependencies.insert(m_vSubCsInfo[j].m_CompoundCS.begin(), m_vSubCsInfo[j].m_CompoundCS.end());
@@ -632,13 +542,10 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 	}
 	if (l_bIsFound && l_mDep2Type[l_sSelected] == wxT("Compound"))
 	{
-		//l_mDep2Type[m_sSelected] = wxT("Compound");
 		for (int j = 0; j != m_vSubCsInfo.size(); j++)
 		{
 			if (m_vSubCsInfo[j].m_sName == l_sSelected)
 			{
-
-
 				l_setDependencies.insert(m_vSubCsInfo[j].m_setSimpleCs.begin(), m_vSubCsInfo[j].m_setSimpleCs.end());
 				for (auto it_dec = m_vSubCsInfo[j].m_setSimpleCs.begin(); it_dec != m_vSubCsInfo[j].m_setSimpleCs.end(); it_dec++)
 				{
@@ -653,14 +560,10 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 					l_mDep2Type[*it_dec] = wxT("Compound");
 				}
 
-
 			}
 		}
 
 	}
-
-
-
 
 	/*************return tree naming of unselected item(s)**********/
 
@@ -690,6 +593,7 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 			if (*itset == itmap->second)
 			{
 				l_setDependenciesTreeNaming.insert(itmap->first);
+				l_mRes[itmap->first] = itmap->second;
 			}
 		}
 	}
@@ -730,8 +634,6 @@ map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForSel
 
 	p_bIsFound = l_bIsFound;
 	return l_mRes;
-	//return l_setDependenciesTreeNaming;
-
 
 }
 
@@ -799,10 +701,7 @@ set<wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForUnSelect(wxSt
 				l_bIsFound = true;
 				l_setDependencies.insert(l_sSelected);
 				l_setDependencies.insert(m_vSimpleCsInfo[it_vsimple].m_setConst.begin(), m_vSimpleCsInfo[it_vsimple].m_setConst.end());
-				//l_setDependencies.insert(m_vSimpleCsInfo[it_vsimple].m_setCompCs.begin(), m_vSimpleCsInfo[it_vsimple].m_setCompCs.end());
-				//l_setDependencies.insert(m_vSimpleCsInfo[it_vsimple].m_setFun.begin(), m_vSimpleCsInfo[it_vsimple].m_setFun.end());
 				l_setDependencies.insert(m_vSimpleCsInfo[it_vsimple].m_setConst.begin(), m_vSimpleCsInfo[it_vsimple].m_setConst.end());
-				//l_setDependencies.insert(m_vSimpleCsInfo[it_vsimple].m_setVar.begin(), m_vSimpleCsInfo[it_vsimple].m_setVar.end());
 				break;
 			}
 		}
@@ -819,8 +718,8 @@ set<wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForUnSelect(wxSt
 				l_setDependencies.insert(m_vFunctionsInfo[j].m_setCompoundCs.begin(), m_vFunctionsInfo[j].m_setCompoundCs.end());
 				l_setDependencies.insert(m_vFunctionsInfo[j].m_setSimpleCs.begin(), m_vFunctionsInfo[j].m_setSimpleCs.end());
 				l_setDependencies.insert(m_vFunctionsInfo[j].m_setConst.begin(), m_vFunctionsInfo[j].m_setConst.end());
-				//l_setDependencies.insert(m_vFunctionsInfo[j].m_setConst.begin(), m_vFunctionsInfo[j].m_setConst.end());
-				///l_setDependencies.insert(m_vFunctionsInfo[j].m_setObservers.begin(), m_vFunctionsInfo[j].m_setObservers.end());
+				l_setDependencies.insert(m_vFunctionsInfo[j].m_setForwardColoredFuns.begin(), m_vFunctionsInfo[j].m_setForwardColoredFuns.end());
+				 
 				break;
 			}
 		}
@@ -833,12 +732,8 @@ set<wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForUnSelect(wxSt
 			{
 				l_bIsFound = true;
 				l_setDependencies.insert(l_sSelected);
-				//l_setDependencies.insert(m_vFunctionsInfo[j].m_setCompoundCs.begin(), m_vFunctionsInfo[j].m_setCompoundCs.end());
-				//	l_setDependencies.insert(m_vFunctionsInfo[j].m_setSimpleCs.begin(), m_vFunctionsInfo[j].m_setSimpleCs.end());
 				l_setDependencies.insert(m_vObserversInfo[j].m_setConstants.begin(), m_vObserversInfo[j].m_setConstants.end());
 				l_setDependencies.insert(m_vObserversInfo[j].m_setForwardFuns.begin(), m_vObserversInfo[j].m_setForwardFuns.end());
-				//	l_setDependencies.insert(m_vFunctionsInfo[j].m_setConst.begin(), m_vFunctionsInfo[j].m_setConst.end());
-				///l_setDependencies.insert(m_vFunctionsInfo[j].m_setObservers.begin(), m_vFunctionsInfo[j].m_setObservers.end());
 				break;
 			}
 		}
@@ -851,8 +746,6 @@ set<wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForUnSelect(wxSt
 				l_bIsFound = true;
 				l_setDependencies.insert(l_sSelected);
 				wxString l_sVarType = m_unUsedDec.ObtainVarType(l_sSelected);
-				//if (m_vVariablesInfo[j].m_setSimpleCs.size() > 0)
-				//{
 				auto findType = m_vVariablesInfo[j].m_setSimpleCs.find(l_sVarType);
 				if (findType != m_vVariablesInfo[j].m_setSimpleCs.end())
 				{
@@ -868,10 +761,7 @@ set<wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForUnSelect(wxSt
 
 
 				l_setDependencies.insert(m_vVariablesInfo[j].m_setConst.begin(), m_vVariablesInfo[j].m_setConst.end());
-
-				//l_setDependencies.insert(m_vVariablesInfo[j].m_CompoundCS.begin(), m_vVariablesInfo[j].m_CompoundCS.end());
 				break;
-				//}
 			}
 		}
 	}
@@ -883,10 +773,8 @@ set<wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForUnSelect(wxSt
 			{
 				l_bIsFound = true;
 				l_setDependencies.insert(l_sSelected);
-				//l_setDependencies.insert(m_vCompoundCsInfo[j].m_setFun.begin(), m_vCompoundCsInfo[j].m_setFun.end());
 				l_setDependencies.insert(m_vCompoundCsInfo[j].m_setSimpleCs.begin(), m_vCompoundCsInfo[j].m_setSimpleCs.end());
 				l_setDependencies.insert(m_vCompoundCsInfo[j].m_setConst.begin(), m_vCompoundCsInfo[j].m_setConst.end());
-				//l_setDependencies.insert(m_vCompoundCsInfo[j].m_setVar.begin(), m_vCompoundCsInfo[j].m_setVar.end());
 				break;
 			}
 		}
@@ -899,7 +787,6 @@ set<wxString> SP_WDG_DeclarationTreectrl::ObtainItemDependenciesForUnSelect(wxSt
 			{
 				l_bIsFound = true;
 				l_setDependencies.insert(l_sSelected);
-				//l_setDependencies.insert(m_vSubCsInfo[j].m_setFun.begin(), m_vSubCsInfo[j].m_setFun.end());
 				l_setDependencies.insert(m_vSubCsInfo[j].m_setSimpleCs.begin(), m_vSubCsInfo[j].m_setSimpleCs.end());
 				l_setDependencies.insert(m_vSubCsInfo[j].m_setConst.begin(), m_vSubCsInfo[j].m_setConst.end());
 				l_setDependencies.insert(m_vSubCsInfo[j].m_CompoundCS.begin(), m_vSubCsInfo[j].m_CompoundCS.end());
@@ -1651,18 +1538,7 @@ void SP_WDG_DeclarationTreectrl::CheckAllDeclarations()
 
 		m_setUnUsedAliasCS.clear();
 		m_setUnUsedAliasCS.insert(l_setAlias.begin(), l_setAlias.end());
-		/*if there is no unused dec, toggel log window with this info*/
-
-		//if (m_vUnUsedConstantsList.size() == 0 && m_setUnUsedFunctionsList.size() == 0 && m_setUnUsedVariablesList.size() == 0 && m_setUnUsedSimpleCS.size() == 0 && m_setUnUsedCompoundCS.size() == 0)
-		//{
-		//SP_LOGDEBUG(wxT("no unused declarations"));
-		//}
-
-		//if (m_mDeclarations2Dependencies.size() == 0)
-		//{
-		//	wxString s_warningMsg = wxT("no unused declarations");
-		//	SP_LOGWARNING(s_warningMsg);// add the message to log window
-		//}
+ 
 
 	}
 	else {
@@ -1680,21 +1556,14 @@ void SP_WDG_DeclarationTreectrl::CheckAllDeclarations()
 		wxString l_sgroupFun = wxT("Functions");
 		wxString l_sgroupObservers = wxT("Observers");
 
-
-
-
 		m_vtrimeddecFunctions = m_unUsedDec.TrimUserDec(l_sgroupFun);
 		m_vtrimeddecObservers = m_unUsedDec.TrimUserDec(l_sgroupObservers);
-
-
 		UpdateSetODeclarations(m_vtrimeddecConstants);
 		UpdateSetODeclarations(m_vtrimeddecFunctions);
 		UpdateSetODeclarations(m_vtrimeddecObservers);
 
 		set<wxString> l_setFun;
 		set<wxString> l_setObservers;
-
-
 
 		set<wxString> l_setAllconstant = m_unUsedDec.ObtainAllDefinedConstants();
 		for (auto it_ConstantSet = l_setAllconstant.begin(); it_ConstantSet != l_setAllconstant.end(); ++it_ConstantSet)
@@ -1733,11 +1602,9 @@ void SP_WDG_DeclarationTreectrl::CheckAllDeclarations()
 
 
 		m_setUnUsedFunctionsList = m_unUsedDec.FindUnusedFunctions();
-
 		UpdateSetODeclarations(m_vtrimeddecConstants);
 		UpdateSetODeclarations(m_vtrimeddecFunctions);
 		UpdateSetODeclarations(m_vtrimeddecObservers);
-
 
 		m_vFunctionsInfo.clear();
 		set<wxString> l_setUnusedFuns;
@@ -1774,8 +1641,6 @@ void SP_WDG_DeclarationTreectrl::CheckAllDeclarations()
 
 			}
 
-
-
 		}
 		m_setUnUsedFunctionsList.clear();
 		m_setUnUsedFunctionsList.insert(l_setUnusedFuns.begin(), l_setUnusedFuns.end());
@@ -1786,7 +1651,6 @@ void SP_WDG_DeclarationTreectrl::CheckAllDeclarations()
 
 		m_setUnUsedObserverList = m_unUsedDec.FindUnusedObservers();
 
-
 		UpdateSetODeclarations(m_vtrimeddecConstants);
 		UpdateSetODeclarations(m_vtrimeddecFunctions);
 		UpdateSetODeclarations(m_vtrimeddecObservers);
@@ -1795,7 +1659,6 @@ void SP_WDG_DeclarationTreectrl::CheckAllDeclarations()
 		set<wxString> l_setUnusedObservers;
 		set<wxString> l_setConstants1;
 		set<wxString> l_setFun2;
-
 
 		map<wxString, set<wxString>> l_mapAlldefObservers = m_unUsedDec.ObtainObserversConstantsDependent();
 		for (auto it_map = l_mapAlldefObservers.begin(); it_map != l_mapAlldefObservers.end(); ++it_map)
@@ -1828,15 +1691,12 @@ void SP_WDG_DeclarationTreectrl::CheckAllDeclarations()
 
 			}
 
-
-
 		}
-
-
 
 	}
 
 }
+
 void SP_WDG_DeclarationTreectrl::OnCheckForUnusedItems(wxCommandEvent& p_cEvent)//Added by G.Assaf
 {
 	m_bisSecond = true;
@@ -1928,15 +1788,37 @@ void SP_WDG_DeclarationTreectrl::OnCheckForUnusedItems(wxCommandEvent& p_cEvent)
 			m_vUnUsedConstantsList.insert(l_setAllselectedConst.begin(), l_setAllselectedConst.end());
 			m_setUnUsedFunctionsList.insert(l_setFun.begin(), l_setFun.end());
 
-			if (!l_bIsUnused)//report when no unused  consts found
+			std::map<wxString, wxString> l_mConstants2Group;
+			l_UnDec.ObtainConstants2GroupMap(l_mConstants2Group);
+			std::set<wxString> l_setNominatedGroups;
+
+			FindUnusedConstantGroups(l_mConstants2Group, m_vUnUsedConstantsList, l_setNominatedGroups);
+		 
+			if (!l_bIsUnused )//report when no unused  consts found
 			{
-				wxString s_warningMsg = wxT("no unused declarations (constants)");
+				wxString s_warningMsg = wxT("no unused declarations (constants and their groups that they belong to)");
 				SP_LOGMESSAGE(s_warningMsg);// add the message to log window
 			}
 			else {
 				wxString l_sFoundReport = wxT("the number of unused Constants is:");
-				l_sFoundReport << l_iUnuusedConstantsCount;
+				l_sFoundReport << l_iUnuusedConstantsCount<"\n";
 				SP_LOGMESSAGE(l_sFoundReport);
+				if (l_setNominatedGroups.size() > 0)
+				{
+					wxString l_sGroupWarning = wxT("the number of unused constant groups is: ");
+					unsigned l_nSize = l_setNominatedGroups.size();
+					l_sGroupWarning << l_nSize<<"\n";
+					wxString l_sGroups = wxT("group names: \n");
+					for (auto itSet = l_setNominatedGroups.begin(); itSet != l_setNominatedGroups.end(); ++itSet)
+					{
+						l_sGroups << *itSet << "\n";
+					}
+					 
+					l_sGroupWarning << l_sGroups;
+					SP_LOGMESSAGE(l_sGroupWarning);
+				}
+
+
 			}
 
 		}
@@ -2150,8 +2032,6 @@ void SP_WDG_DeclarationTreectrl::OnCheckForUnusedItems(wxCommandEvent& p_cEvent)
 			}
 
 			//functions
-
-
 			set<wxString> l_setConstants;
 			set<wxString> l_setObservers1;
 			set<wxString> l_setUnusedFuns;
@@ -2235,9 +2115,6 @@ void SP_WDG_DeclarationTreectrl::OnCheckForUnusedItems(wxCommandEvent& p_cEvent)
 			}
 
 
-
-
-
 			m_vUnUsedDecList.erase(m_vUnUsedDecList.begin(), m_vUnUsedDecList.end());
 			m_vUnUsedConstantsList.clear();
 			m_setUnUsedFunctionsList.clear();
@@ -2249,6 +2126,11 @@ void SP_WDG_DeclarationTreectrl::OnCheckForUnusedItems(wxCommandEvent& p_cEvent)
 			m_vUnUsedDecList.insert(m_setUnUsedFunctionsList.begin(), m_setUnUsedFunctionsList.end());//merging
 			m_vUnUsedDecList.insert(m_setUnUsedObserverList.begin(), m_setUnUsedObserverList.end());//merging
 
+			std::map<wxString, wxString> l_mConstants2Group;
+			l_UnDec.ObtainConstants2GroupMap(l_mConstants2Group);
+			std::set<wxString> l_setNominatedGroups;
+
+			FindUnusedConstantGroups(l_mConstants2Group, m_vUnUsedConstantsList, l_setNominatedGroups);
 
 			if (m_mDeclarations2Dependencies.size() == 0)
 			{
@@ -2261,9 +2143,17 @@ void SP_WDG_DeclarationTreectrl::OnCheckForUnusedItems(wxCommandEvent& p_cEvent)
 				l_sReport << l_iTotal << wxT("\n");
 				l_sReport << wxT("Details:");
 				l_sReport << wxT("\n");
-				l_sReport << wxT("Constants: ") << l_iUnuusedConstantsCount << wxT("\n");
 				l_sReport << wxT("Functions: ") << l_iUnusedFunctionsCount << wxT("\n");
 				l_sReport << wxT("Observers: ") << l_iUnusedObserversCount << wxT("\n");
+				l_sReport << wxT("Constants: ") << l_iUnuusedConstantsCount << wxT("\n");
+				//l_sReport << wxT("Constant Groups: ") << l_setNominatedGroups.size() << wxT("\n");
+				wxString l_sGroups = wxT("group names : \n");
+				for (auto itSet = l_setNominatedGroups.begin(); itSet != l_setNominatedGroups.end(); ++itSet)
+				{
+					l_sGroups << *itSet << "\n";
+				}
+				l_sReport << wxT("Constant Groups: ") << l_setNominatedGroups.size() << wxT("\n");
+				l_sReport << l_sGroups;
 				SP_LOGMESSAGE(l_sReport);
 			}
 
@@ -2474,14 +2364,26 @@ void SP_WDG_DeclarationTreectrl::OnCheckForUnusedItems(wxCommandEvent& p_cEvent)
 			m_setUnUsedCompoundCS.erase(m_setUnUsedCompoundCS.begin(), m_setUnUsedCompoundCS.end());
 			m_setUnUsedCompoundCS.insert(l_setComp.begin(), l_setComp.end());
 
+			std::map<wxString, wxString> l_mConstants2Group;
+			l_UnDec.ObtainConstants2GroupMap(l_mConstants2Group);
+			std::set<wxString> l_setNominatedGroups;
+			FindUnusedConstantGroups(l_mConstants2Group, m_vUnUsedConstantsList, l_setNominatedGroups);
+
 			if (!l_bIsUnused)
 			{
-				wxString s_warningMsg = wxT("no unused declarations (Constants)");
+				wxString s_warningMsg = wxT("no unused declarations (Constants) and their Groups that they belong to");
 				SP_LOGMESSAGE(s_warningMsg);// add the message to log window
 			}
 			else {
 				wxString l_sReport = wxT("the number of unused Constants is: ");
 				l_sReport << l_iUnusedconstants << wxT("\n");
+				wxString l_sGroups = wxT("group names : \n");
+				for (auto itSet = l_setNominatedGroups.begin(); itSet != l_setNominatedGroups.end(); ++itSet)
+				{
+					l_sGroups << *itSet << "\n";
+				}
+				l_sReport << wxT("the number of unused  constant groups is: ") << l_setNominatedGroups.size() << wxT("\n");
+				l_sReport << l_sGroups;
 				SP_LOGMESSAGE(l_sReport);
 			}
 		}
@@ -3643,6 +3545,11 @@ void SP_WDG_DeclarationTreectrl::OnCheckForUnusedItems(wxCommandEvent& p_cEvent)
 			m_setUnUsedCompoundCS.erase(m_setUnUsedCompoundCS.begin(), m_setUnUsedCompoundCS.end());
 			m_setUnUsedCompoundCS.insert(l_setAllCompoundCs.begin(), l_setAllCompoundCs.end());
 
+			std::map<wxString, wxString> l_mConstants2Group;
+			l_UnDec.ObtainConstants2GroupMap(l_mConstants2Group);
+			std::set<wxString> l_setNominatedGroups;
+
+			FindUnusedConstantGroups(l_mConstants2Group, m_vUnUsedConstantsList, l_setNominatedGroups);
 
 			if (m_mDeclarations2Dependencies.size() == 0)
 			{
@@ -3657,10 +3564,17 @@ void SP_WDG_DeclarationTreectrl::OnCheckForUnusedItems(wxCommandEvent& p_cEvent)
 				l_sReport << wxT("Simple Color Sets: ") << l_iUnusedSimpleCs << wxT("\n");
 				l_sReport << wxT("Compound Color Sets: ") << l_iUnusedCompCs << wxT("\n");
 				l_sReport << wxT("Alias Color Sets: ") << l_iUnusedAlias << wxT("\n");
-				l_sReport << wxT("Constants: ") << l_iUnusedconstants << wxT("\n");
 				l_sReport << wxT("Functions: ") << l_iUnusedFuns << wxT("\n");
 				l_sReport << wxT("Variables: ") << l_iUnusedVariables << wxT("\n");
-
+				l_sReport << wxT("Constants: ") << l_iUnusedconstants << wxT("\n");
+		
+				wxString l_sGroups = wxT("group names : \n");
+				for (auto itSet = l_setNominatedGroups.begin(); itSet != l_setNominatedGroups.end(); ++itSet)
+				{
+					l_sGroups << *itSet << "\n";
+				}
+				l_sReport << wxT("Constant Groups: ") << l_setNominatedGroups.size() << wxT("\n");
+				l_sReport << l_sGroups;
 				SP_LOGMESSAGE(l_sReport);
 			}
 
@@ -4661,7 +4575,7 @@ void SP_WDG_DeclarationTreectrl::OnCheckForUnusedItems(wxCommandEvent& p_cEvent)
 							{
 								wxString l_sLabel = itmap->first;
 								wxTreeItemId foundId = findTreeItem(pTreeCtrl, l_root, l_sLabel, true, true);
-								if (foundId.IsOk()) {//!=NULL
+								if (foundId.IsOk()) {
 									wxColour l_nColor1(wxT("RED"));
 									pTreeCtrl->SetItemTextColour(foundId, l_nColor1);
 								}
@@ -5020,9 +4934,6 @@ void SP_WDG_DeclarationTreectrl::OnCheckForUnusedItems(wxCommandEvent& p_cEvent)
 					}
 				}//end funs
 				 //consts
-
-
-
 
 			}
 
@@ -9991,7 +9902,40 @@ std::map<wxString, wxString> SP_WDG_DeclarationTreectrl::ObtainDeclarationGroup(
 	std::map<wxString, wxString> l_mDecGroup;
 	return l_mDecGroup;
 }
+void SP_WDG_DeclarationTreectrl::FindUnusedConstantGroups(std::map<wxString, wxString>& l_mConstants2Group, std::set<wxString>&  p_vUnUsedConstantsList,std::set<wxString>& l_setNominatedGroups)
+{
+	 
+	for (auto itSet = p_vUnUsedConstantsList.begin(); itSet != p_vUnUsedConstantsList.end(); ++itSet)
+	{
+		std::string l_sConst = (*itSet);
 
+		auto itFound = l_mConstants2Group.find(l_sConst);
+
+		if (itFound != l_mConstants2Group.end())
+		{
+			l_setNominatedGroups.insert(itFound->second);
+		}
+
+	}
+
+	for (auto itMap = l_mConstants2Group.begin(); itMap != l_mConstants2Group.end(); ++itMap)
+	{
+		std::string l_sTofind = itMap->first.ToStdString();
+		auto itFound = p_vUnUsedConstantsList.find(l_sTofind);
+
+		if (itFound == p_vUnUsedConstantsList.end())
+		{
+			std::string l_sTofind = itMap->second.ToStdString();
+			auto itSetFoud = l_setNominatedGroups.find(l_sTofind);
+			//the group is used by an used constant, so exclude it from the nominate list
+			if (itSetFoud != l_setNominatedGroups.end())
+			{
+				l_setNominatedGroups.erase(itSetFoud);
+			}
+		}
+
+	}
+}
 void SP_WDG_DeclarationTreectrl::ResetCheckingResults()
 {
 

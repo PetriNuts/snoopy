@@ -147,24 +147,42 @@ public:
 
 
 	void OnDoubleClick(wxTreeEvent& p_cEvent);
+
 	void OnToolTip(wxTreeEvent& p_cEvent);
+
 	void  OnRMouseClick(wxTreeEvent& p_cEvent);//Added by G.Assaf
 
 											   //void OnFirsMentItem(wxMouseEvent& p_cEvent);//Added by G.Assaf
 	void OnCheckForUnusedItems(wxCommandEvent& p_cEvent);//Added by G.Assaf
+
 	void OnCleanUnusedItems(wxCommandEvent& p_cEvent); //Added by G.Assaf
+
 	void  ReadTreeItems(wxTreeCtrl* pTreeCtrl, const wxTreeItemId& root, SP_VectorString &);//Added By G.Assaf
+
 	wxTreeItemId  findTreeItem(wxTreeCtrl* pTreeCtrl, const wxTreeItemId& root, const wxString& text, bool bCaseSensitive, bool bExactMatch);//Added by G.Assaf
+
 	void  OnSelecting(wxCommandEvent& p_cEvent);//Added by G.Assaf
+
 	void  OnSelectAll(wxCommandEvent& p_cEvent);//Added by G.Assaf
+
 	void  OnUnSelectAll(wxCommandEvent& p_cEvent);//Added by G.Assaf
+
 	void  OnUnSelecting(wxCommandEvent& p_cEvent);//Added by G.Assaf
+
 	std::map<wxString, wxString> ObtainDeclarationGroup(wxString &p_sGroup);
+
 	void UpdateSetODeclarations(std::map<wxString, wxString>);
+
 	set<wxString>  SetSelectItems(std::map<wxString, wxString> &p_mdec, set<wxString> &p_setUnused);
+
 	set<wxString> ObtainItemDependencies(wxString p_sItem);
+
 	set<wxString> ObtainItemDependenciesForUnSelect(wxString p_sItem);
+
 	map<wxString, wxString> ObtainItemDependenciesForSelect(wxString p_sItem, bool &p_bIsFound);
+
+	void FindUnusedConstantGroups(std::map<wxString, wxString>& l_mConstants2Group, std::set<wxString>&  p_vUnUsedConstantsList, std::set<wxString>& l_setNominatedGroups);
+
 	void CheckAllDeclarations();
 	void ResetCheckingResults();
 	void DeleteConstants();

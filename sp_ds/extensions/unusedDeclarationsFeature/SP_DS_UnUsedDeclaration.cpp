@@ -1,7 +1,7 @@
 /***********************************/
 /* $Source: $*/
 /* $Author: George Assaf $  */
-/* $Version: 0.0 $ */
+/* $Version: 2.0 $ */
 /* $Revision: 1.0 $
 /* $Date: 2018/10/16 11:20:00 $ */
 /*SP_DS_UnUsedDeclaration.cpp */
@@ -17,8 +17,8 @@
 #include "sp_core/SP_Core.h"
 #include <sstream>
 #include <iostream>
-
-/*construvtor*/
+#include "sp_ds/attributes/SP_DS_TextAttribute.h"
+/*construtor*/
 SP_DS_UnUsedDeclaration::SP_DS_UnUsedDeclaration(SP_DS_Graph* p_pcGraph, SP_VectorString p_vUserDec) :m_pcGraph(p_pcGraph), m_vUserDec(p_vUserDec) {}
 
 
@@ -141,7 +141,42 @@ std::set<wxString>  SP_DS_UnUsedDeclaration::FindUnusedConstants()
 			l_setRes.insert(l_sDec);
 		}
 	}
+	/**
+	//find used related groups
+	std::map<wxString, wxString> l_mConstants2Groups;
+	ObtainConstants2GroupMap(l_mConstants2Groups);
+	std::set<wxString> l_setUsedGroups;
+	for (auto itSet = l_setRes.begin(); itSet != l_setRes.end(); ++itSet)
+	{
+		std::string l_sToFind = (*itSet).ToStdString();
+		auto itFind = l_mConstants2Groups.find(l_sToFind);
+		
+		if (itFind != l_mConstants2Groups.end())
+		{
+			l_setUsedGroups.insert(itFind->second);
+		}
+	}
 
+	for (auto itmap = l_mConstants2Groups.begin(); itmap != l_mConstants2Groups.end(); ++itmap)
+	{
+		wxString l_sGroup = itmap->second;
+         
+		auto it_foundGroup = l_setUsedGroups.find(l_sGroup);
+
+		if (it_foundGroup == l_setUsedGroups.end())
+		{
+			if (l_sGroup == wxT("all") || l_sGroup == wxT("marking") || l_sGroup != wxT("parameter"))
+			{
+				continue;
+			}
+			else
+			{
+				m_setUnusedsedGroups.insert(l_sGroup);
+			}
+		}
+
+	}
+	*/
 	return l_setRes;
 }
 
@@ -521,7 +556,14 @@ std::set<wxString> SP_DS_UnUsedDeclaration::ReadNetMultiplicity()//const//25.11
 					{
 						SP_DS_Node* l_pcTarget = dynamic_cast<SP_DS_Node*>(l_pcEdge->GetTarget());
 						std::string l_sTarget = dynamic_cast<SP_DS_NameAttribute*>(l_pcTarget->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-						std::string l_sMult = l_pcEdge->GetAttribute(wxT("Multiplicity"))->GetValueString();
+						
+						SP_DS_Attribute* l_pcAtt = l_pcEdge->GetAttribute(wxT("Multiplicity"));
+
+						if (l_pcAtt == NULL) //e.g., modifier arc has no Multiplicity
+						{
+							continue;
+						}
+						std::string l_sMult = l_pcAtt->GetValueString();
 						p_vMultiplicityVector.insert(l_sMult);
 					}
 
@@ -1758,6 +1800,39 @@ std::set<string> SP_DS_UnUsedDeclaration::ReadUsedColouredFunctions()
 				if (!l_sUsedGaurd.empty())
 				{
 					l_setfuns.insert(l_sUsedGaurd);
+
+					std::set<string> l_sAllFunctions;
+
+					SP_DS_Metadataclass* l_pcMetadataclass;
+					l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);// SP_DS_CPN_FUNCTIONCLASS
+
+					
+					SP_DS_Metadata* l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+					SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("FunctionList")));
+
+					std::string l_sFunBody;
+					for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+					{
+						std::string l_sfunName = l_pcColList->GetCell(i, 1).ToStdString();
+
+						l_sAllFunctions.insert(l_sfunName);
+						
+						if (l_sUsedGaurd == l_sfunName)
+						{
+							l_sFunBody= l_pcColList->GetCell(i, 3).ToStdString();
+						}
+					}
+					 
+					std::set<std::string>::iterator it;
+					for (it = l_sAllFunctions.begin(); it != l_sAllFunctions.end(); ++it)
+					 {
+						std::string l_sFunction = *it;
+						if (l_sFunBody.find(l_sFunction) != std::string::npos)
+						{
+							l_setfuns.insert(l_sFunction);
+						}
+					 }
+
 				}
 
 			}
@@ -2536,7 +2611,7 @@ void SP_DS_UnUsedDeclaration::DeleteUnusedColorSet(wxString p_sCsName)
 }
 
 /*delete a given constant*/
-void SP_DS_UnUsedDeclaration::DeleteUnusedConstant(wxString p_sName)
+void SP_DS_UnUsedDeclaration::DeleteUnusedConstant(const wxString& p_sName)
 {
 	bool l_bIsColored = false;
 	wxString l_sNet = m_pcGraph->GetNetclass()->GetDisplayName();
@@ -2791,6 +2866,7 @@ map<wxString, set<wxString>> SP_DS_UnUsedDeclaration::ObtainObserversConstantsDe
 set<pair<wxString, set<wxString>>> SP_DS_UnUsedDeclaration::ObtainFunctionsConstantsDependent()
 {
 	set<pair<wxString, set<wxString>>> l_setUsedConstantsInFuns;
+	set<wxString> l_setAllConstants=ObtainAllDefinedConstants();
 
 	wxString l_netType = m_pcGraph->GetNetclass()->GetDisplayName();
 	set<wxString> l_setAllDefinedConstants = ObtainAllDefinedConstants();
@@ -2900,7 +2976,13 @@ set<pair<wxString, set<wxString>>> SP_DS_UnUsedDeclaration::ObtainFunctionsConst
 				{
 					wxString l_sToken = l_tkn;
 					l_sToken.Replace(" ", "");
-					l_setTempBodyConst.insert(l_sToken);
+
+					auto l_itFound = l_setAllConstants.find(l_sToken);
+
+					if (l_itFound != l_setAllConstants.end())
+					{
+						l_setTempBodyConst.insert(l_sToken);
+					}
 				}
 			}
 		}
@@ -3763,7 +3845,8 @@ FunctionDependencyInfo  SP_DS_UnUsedDeclaration::FindFunctionDependencies(wxStri
 
 	wxString l_netType = m_pcGraph->GetNetclass()->GetDisplayName();
 	set<wxString> l_setAllDefinedConstants = ObtainAllDefinedConstants();
-	if (l_netType.Contains(wxT("Colored")))
+
+	if (l_netType.Contains(_T("Colored")))
 	{
 		l_bIsColoured = true;
 	}
@@ -3863,6 +3946,35 @@ FunctionDependencyInfo  SP_DS_UnUsedDeclaration::FindFunctionDependencies(wxStri
 			}
 
 		}
+
+		//compute function forward dependency
+		SP_DS_Metadataclass* l_pcMetadataclass;
+		l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);// SP_DS_CPN_FUNCTIONCLASS
+
+
+		SP_DS_Metadata* l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+		SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("FunctionList")));
+
+		wxString l_sFunBody;
+		set<wxString> l_setFunChain;
+		for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+		{
+			std::string l_sfunName = l_pcColList->GetCell(i, 1).ToStdString();
+			if (l_sfunName == p_sfunName)
+			{
+				l_sFunBody = l_pcColList->GetCell(i, 3);
+				FindForwardColoredFunsDependency(p_sfunName, l_sFunBody, l_setFunChain);
+			}
+		}
+
+		if(l_setFunChain.size()>0)
+		l_funInfo.m_setForwardColoredFuns = l_setFunChain;
+
+		std::set<wxString> l_setBackwardFunChain;
+		FindBackwardColoredFunsDependency(p_sfunName, l_setBackwardFunChain);
+
+		if (l_setBackwardFunChain.size() > 0)
+			l_funInfo.m_setBackwardColoredFuns = l_setBackwardFunChain;
 
 	}
 	else {
@@ -4897,4 +5009,119 @@ bool SP_DS_UnUsedDeclaration::TokenizeRateFunctions(std::set<wxString>& p_setRat
 		p_setResultDeclarations.insert(l_setTemp.begin(), l_setTemp.end());
 	}
 	return true;
+}
+
+
+void SP_DS_UnUsedDeclaration::ObtainConstants2GroupMap(std::map<wxString,wxString>& p_mConstGroup)
+{
+	
+	wxString l_netType = m_pcGraph->GetNetclass()->GetDisplayName();
+
+
+	if (l_netType.Contains(wxT("Colored")))
+	{
+		wxString l_sTempClassName = m_pcGraph->GetNetclass()->GetName();
+		wxString l_sClass;
+		if (l_sTempClassName.Contains("Fuzzy"))
+		{
+			l_sClass = SP_DS_META_CONSTANT;
+		}
+		else
+		{
+			l_sClass = SP_DS_CPN_CONSTANT_HARMONIZING;
+		}
+		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(l_sClass);
+		SP_ListMetadata::const_iterator it;
+
+		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+		{
+			SP_DS_Metadata* l_pcMetadata = *it;
+			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Group")))->GetValue();
+			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+			p_mConstGroup[l_sName] = l_sGroup;
+		}
+
+		 
+	}
+	else {
+		//uncolored pn
+
+		SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+        
+		SP_ListMetadata::const_iterator it;
+
+		for (it = l_pcMetadataclass->GetElements()->begin(); it != l_pcMetadataclass->GetElements()->end(); ++it)
+		{
+			SP_DS_Metadata* l_pcMetadata = *it;
+			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Group")))->GetValue();
+			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+			p_mConstGroup[l_sName] = l_sGroup;
+		}
+	}
+}
+
+void SP_DS_UnUsedDeclaration::FindForwardColoredFunsDependency(const wxString& p_sFunName, const wxString& p_sFunBody, std::set<wxString>& p_setRes)
+{
+
+
+	if (!m_pcGraph->GetNetclass()->GetDisplayName().Contains(wxT("Colored"))) return;
+
+	SP_DS_Metadataclass* l_pcMetadataclass;
+	l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);// SP_DS_CPN_FUNCTIONCLASS
+
+
+	SP_DS_Metadata* l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+	SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("FunctionList")));
+
+	 
+	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+	{
+		std::string l_sfunName = l_pcColList->GetCell(i, 1).ToStdString();
+
+		if (p_sFunName != l_sfunName)
+		{
+			if (p_sFunBody.Contains(l_sfunName))
+			{
+				p_setRes.insert(l_sfunName);
+				wxString l_sFunBody = l_pcColList->GetCell(i, 3);
+				//recurrsion step
+				return FindForwardColoredFunsDependency(l_sfunName, l_sFunBody, p_setRes);
+			}
+			
+		}
+	}
+
+}
+
+void SP_DS_UnUsedDeclaration::FindBackwardColoredFunsDependency(const wxString& p_sFunName, std::set<wxString>& p_setRes)
+{
+
+	if (!m_pcGraph->GetNetclass()->GetDisplayName().Contains(wxT("Colored"))) return;
+
+	SP_DS_Metadataclass* l_pcMetadataclass;
+	l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);// SP_DS_CPN_FUNCTIONCLASS
+
+
+	SP_DS_Metadata* l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+	SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("FunctionList")));
+
+	 
+	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+	{
+		std::string l_sfunName = l_pcColList->GetCell(i, 1).ToStdString();
+
+		if (p_sFunName != l_sfunName)
+		{
+			wxString l_sFunBody = l_pcColList->GetCell(i, 3);
+
+			if (l_sFunBody.Contains(p_sFunName))
+			{
+				p_setRes.insert(l_sfunName);
+				
+				//recurrsion step
+				return FindBackwardColoredFunsDependency(l_sfunName, p_setRes);
+			}
+
+		}
+	}
 }

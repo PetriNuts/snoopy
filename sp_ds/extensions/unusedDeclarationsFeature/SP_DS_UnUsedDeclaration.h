@@ -40,6 +40,8 @@ struct FunctionDependencyInfo {
 	set<wxString> m_setVars;
 	set<wxString> m_setObservers;
 	set<wxString> m_setBackwordObservers;
+	set<wxString> m_setForwardColoredFuns;
+	set<wxString> m_setBackwardColoredFuns;
 	bool m_bIsUSed;
 
 };
@@ -236,9 +238,14 @@ private:
 	bool GetRateFunctionsOfTransitions(std::set<wxString>& p_setRateFun);
 
 	bool TokenizeRateFunctions(std::set<wxString>& p_setRateFun, std::set<wxString>& p_setResultDeclarations);
+
+	void FindForwardColoredFunsDependency(const wxString& p_sFunName, const wxString& p_sFunBody, std::set<wxString>& p_setRes);
+
+	void FindBackwardColoredFunsDependency(const wxString& p_sFunName, std::set<wxString>& p_setRes);
 public:
 	/*constructor*/
 	SP_DS_UnUsedDeclaration(SP_DS_Graph* p_pcGraph, SP_VectorString p_vUserDec);
+
 
 	/*returns the type of passed variable*/
 	wxString ObtainVarType(wxString p_sVarName);
@@ -285,7 +292,7 @@ public:
 	/*returns map oserver name, used constants if exists*/
 	map<wxString, set<wxString>> ObtainObserversConstantsDependent();
 
-	/*find un-used constants for (coloured) Petri net classes in declaration tree*/
+	/*find un-used constants for (coloured, uncoloured) Petri net classes in declaration tree*/
 	std::set<wxString>   FindUnusedConstants();
 
 	/*find unused functions in (coloured) Petri net classes*/
@@ -299,7 +306,7 @@ public:
 	std::set<wxString>   FindUnusedVariables();
 
 	/*delete unused constant from user defined declarations*/
-	void DeleteUnusedConstant(wxString p_sName);
+	void DeleteUnusedConstant(const wxString& p_sName);
 
 	/*delete unused function from declarations tree*/
 	void DeleteUnusedFunction(wxString p_sName);
@@ -341,9 +348,11 @@ public:
 	/*returns the dependency info of alias cs*/
 	AliasCsDependencyInfo   FindAliasCSDependency(wxString p_sAliasName);
 
-
 	/*returns all defined functions*/
 	set<wxString> ReadAllDefinedFunctions();
+
+	/*collect all constants 2 group that they belong to*/
+	void ObtainConstants2GroupMap(std::map<wxString, wxString>&);
 
 protected:
 	SP_DS_Graph* m_pcGraph;
