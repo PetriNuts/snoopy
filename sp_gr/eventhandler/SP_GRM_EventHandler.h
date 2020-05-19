@@ -48,6 +48,8 @@ public:
     virtual void OnSizingEndDragLeft(wxControlPoint* p_pcCP, double p_nX, double p_nY, int p_nKeys = 0, int p_nAttach = 0);
 
     virtual void OnSize(double p_nX, double p_nY);
+
+
 };
 
 #endif // __SP_GRM_EVENTHANDLER_H__

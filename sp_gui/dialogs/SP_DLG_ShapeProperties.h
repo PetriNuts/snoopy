@@ -17,9 +17,11 @@
 //! this dialog displays some data of an element
 #include "sp_core/base/SP_Data.h"
 
+ 
 class SP_WDG_DialogBase;
 class SP_Graphic;
-
+class SP_DS_Nodeclass;
+class SP_DS_Edgeclass;
 /**	\brief	The SP_DLG_ShapeProperties class
 
     Used to display all editable attributes of a given element
@@ -41,8 +43,12 @@ private:
     //! list of widgets
     list<SP_WDG_DialogBase*> m_tlWidgets;
     map<wxString, SP_ListGraphic > m_mlGraphics;
-	
-    
+	map<SP_DS_Node*, SP_Graphic*> m_mNode2Graphic;//by george
+	map<SP_DS_Node*, wxString> m_mNode2Type;//by george
+	map<SP_DS_Node*, SP_ListGraphic*> m_mConvertedNode2Graphic;//by george
+	SP_MapString2ListAttribute* m_ptmAttributes;
+	SP_Graphic* m_pcGraphic;//george
+	bool m_bIsConverted;
     DECLARE_CLASS(SP_DLG_ShapeProperties)
 protected:
 	void Init();
@@ -52,6 +58,13 @@ protected:
     bool DoDlgApply();
 	void CleanUpWidgets();
 	void RebuildDialog();
+	bool  CheckEdgeRequirementofNode(SP_DS_Node* p_pcNodeToCheck, SP_DS_Node* p_pcToConvertType);
+	bool EdgeRequirement(SP_DS_Edgeclass* p_pcEdgeclass, SP_Data* p_pcSrc, SP_Data* p_pcTrg);
+	SP_DS_Node* ConvertNode(SP_DS_Node* p_pcOldNode, SP_DS_Nodeclass* p_pcNewNodeClass);
+	bool  UpdateSourceEdgeGraphics(SP_DS_Edge* p_pcEdge, const SP_ListGraphic* p_pcOldGraphicList, const SP_ListGraphic* p_pcNewGraphicList);
+	bool  UpdateTargetEdgeGraphics(SP_DS_Edge* p_pcEdge, const SP_ListGraphic* p_pcOldGraphicList, const SP_ListGraphic* p_pcNewGraphicList);
+	SP_Graphic* FindGraphic(const SP_ListGraphic* p_pcOldGraphicList, const SP_ListGraphic* p_pcNewGraphicList, SP_Graphic* p_pcOldGraphic);
+	void  RemoveGraphicFromCanvas(SP_Graphic *p_pcGraphic);
 
 public:
     SP_DLG_ShapeProperties(SP_GUI_Mainframe* p_pcParent, 
@@ -87,7 +100,8 @@ public:
     */
     bool AddDialogGraphic(SP_Graphic* p_pcVal);
     inline bool GetShowsDifferent() const { return m_bShowsDifferent; }
-
+	bool UpdateDialogGraphic(SP_DS_Node*);//by george
+	SP_Graphic* GetUpdatedGraphic() { return m_pcGraphic; };
     /* EVENTS */
     /**	\brief	The OnDlgApply function
 
@@ -115,6 +129,8 @@ public:
     void OnRadio(wxCommandEvent& p_cEvent);
 
 	list<SP_WDG_DialogBase*>* GettlWidgets(){ return &m_tlWidgets;}
+
+	bool ISConverted() { return m_bIsConverted; }
 };
 
 #endif // __SP_DLG_SHAPEPROPERTIES_H__

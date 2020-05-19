@@ -20,7 +20,7 @@ class SP_WDG_DialogChoice: public SP_WDG_DialogBase
 {
 private:
     DECLARE_EVENT_TABLE()
-
+	std::pair<wxString, vector<wxChoice*>> m_pcPairPage2Choices;
 protected:
     std::vector<wxChoice*> m_pcChoice;
     wxArrayString m_pcChoiceValues;
@@ -29,6 +29,9 @@ protected:
     bool m_bFixedValues;
 
     void LoadData();
+	void LoadDataForNodeTypeAttribute(const SP_ListAttribute* p_ptlAttributes);
+	void LoadDataForNodeTypeAttribute(  SP_DS_Attribute* p_ptlAttributes);
+	 
 
 public:
     SP_WDG_DialogChoice(const wxString& p_sPage = wxT("Page 1"), unsigned int p_nOrdering = std::numeric_limits<unsigned int>::max());
@@ -41,7 +44,8 @@ public:
         SP_DLG_ShapeProperties* p_pcDlg, bool p_bOverview);
     virtual bool OnDlgOk();
 
-	wxString GetCurentSelection();//by george
+	wxString GetCurentSelection(bool p_bIsOverviewShow=false);//by george
+	std::pair<wxString, vector<wxChoice*>> GetPagePair() { return m_pcPairPage2Choices; }
 };
 
 #endif // __SP_WDG_DialogList_H__

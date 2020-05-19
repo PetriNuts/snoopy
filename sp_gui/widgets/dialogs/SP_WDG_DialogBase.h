@@ -61,6 +61,8 @@ public:
     virtual int GetEvalState() { return 0; }
 
     inline unsigned int GetDialogOrdering() { return m_nDialogOrdering; }
+
+	SP_ListAttribute GetDialogAttributes() { return m_tlAttributes; };//by george, we need this getter for editing node Type attribute 
 };
 
 #endif // __SP_WDG_DIALOGBASE_H__

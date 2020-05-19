@@ -56,48 +56,74 @@ SP_WDG_DialogGraphic::Clone()
 
 bool
 SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
-                                SP_DLG_ShapeProperties* p_pcDlg)
+	SP_DLG_ShapeProperties* p_pcDlg)
 {
-    CHECK_POINTER(p_plGraphics, return FALSE);
-    CHECK_BOOL((!p_plGraphics->empty()), return TRUE);
-    CHECK_POINTER(p_pcDlg, return FALSE);
+	CHECK_POINTER(p_plGraphics, return FALSE);
+	CHECK_BOOL((!p_plGraphics->empty()), return TRUE);
+	CHECK_POINTER(p_pcDlg, return FALSE);
 
 	/* change ckruge2 19.06.2009 */
 	//parent element
 	SP_Data* l_pctmp = (*(p_plGraphics->begin()))->GetParent();
 	//remeber parent for OkDlg
-	m_parent_tmp=l_pctmp;
+	m_parent_tmp = l_pctmp;
 	/* change end */
-    // remember the graphics
-    m_lGraphics = *p_plGraphics;
-    m_pcDlg = p_pcDlg;
-    m_bMultiple = (p_plGraphics->size() > 1);
+	// remember the graphics
+	m_lGraphics = *p_plGraphics;
+	m_pcDlg = p_pcDlg;
+	m_bMultiple = (p_plGraphics->size() > 1);
 
-    wxString l_sPage = GetName() + wxT(":") + (*m_lGraphics.begin())->GetParent()->GetClassName();
-    SP_WDG_NotebookPage* l_pcPage = p_pcDlg->AddPage(l_sPage, GetDialogOrdering());
-    CHECK_POINTER(l_pcPage, return FALSE);
+	if ((*m_lGraphics.begin())->GetDelete() == true)
+		return true;
 
-    wxBoxSizer* l_pcSizer;
+	wxString l_sPage = GetName() + wxT(":") + (*m_lGraphics.begin())->GetParent()->GetClassName();
+	SP_WDG_NotebookPage* l_pcPage = p_pcDlg->AddPage(l_sPage, GetDialogOrdering());
+	CHECK_POINTER(l_pcPage, return FALSE);
+
+	wxBoxSizer* l_pcSizer;
 
 	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Pen Colour:")), 0, wxALL , 5);
-    m_pcButtonPen = new wxColourPickerCtrl(l_pcPage, m_nDialogID+ SP_COLOURPEN + wxID_HIGHEST , (*m_lGraphics.begin())->GetPen()->GetColour(),
-                                            wxDefaultPosition, wxDefaultSize,
-                                            wxCLRP_DEFAULT_STYLE);
+	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Pen Colour:")), 0, wxALL, 5);
+	m_pcButtonPen = new wxColourPickerCtrl(l_pcPage, m_nDialogID + SP_COLOURPEN + wxID_HIGHEST, (*m_lGraphics.begin())->GetPen()->GetColour(),
+		wxDefaultPosition, wxDefaultSize,
+		wxCLRP_DEFAULT_STYLE);
 	l_pcSizer->Add(m_pcButtonPen, 0, wxALL, 5);
-    l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTPEN + m_nDialogID+ wxID_HIGHEST, _T("Default")), 0, wxALL , 5);
-    l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
+	l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTPEN + m_nDialogID + wxID_HIGHEST, _T("Default")), 0, wxALL, 5);
+	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
-    l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-    l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Brush Colour:")), 0, wxALL , 5);
+	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
+	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Brush Colour:")), 0, wxALL, 5);
 
-	m_pcButtonBrush = new wxColourPickerCtrl(l_pcPage, SP_COLOURBRUSH + m_nDialogID+ wxID_HIGHEST, (*m_lGraphics.begin())->GetBrush()->GetColour(),
-											wxDefaultPosition, wxDefaultSize);
+	m_pcButtonBrush = new wxColourPickerCtrl(l_pcPage, SP_COLOURBRUSH + m_nDialogID + wxID_HIGHEST, (*m_lGraphics.begin())->GetBrush()->GetColour(),
+		wxDefaultPosition, wxDefaultSize);
 
 	l_pcSizer->Add(m_pcButtonBrush, 0, wxALL, 5);
-    l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTBRUSH + m_nDialogID+ wxID_HIGHEST, _T("Default")), 0, wxALL , 5);
-    l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
+	l_pcSizer->Add(new wxButton(l_pcPage, SP_DEFAULTBRUSH + m_nDialogID + wxID_HIGHEST, _T("Default")), 0, wxALL, 5);
+	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
+	SP_Graphic* l_pcGr;
+
+	if (l_pctmp->GetElementType() == SP_ELEMENT_NODE)//by george
+	{
+		l_pcGr = *m_lGraphics.begin();
+    }
+	int l_nThick;
+	// -1 means unmodified
+	if (m_bMultiple) {
+		l_nThick = -1;
+	}
+	else {
+		l_nThick = l_pcGr->GetThickness();
+	}
+
+
+	//by george
+	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
+	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, _T("Thickness:")), 0, wxALL, 5);
+	m_scThickness = new wxSpinCtrl(l_pcPage, SP_ID_SPINCTRL_THICKNESS + 10009 + SP_ID_LAST_ID, wxString::Format(wxT("%d"), l_nThick));
+	l_pcSizer->Add(m_scThickness, 0, wxALL, 5);
+	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
+	
 	/* change ckruge2 19.06.2009 */
 	//only Nodes have hight and width
 	if (l_pctmp->GetElementType() == SP_ELEMENT_NODE)
@@ -141,17 +167,17 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
 		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 	}
 
-	SP_Graphic* l_pcGr;
+	SP_Graphic* l_pcGraphic;
 	if (m_parent_tmp->GetElementType() == SP_ELEMENT_EDGE)
 	{
-		l_pcGr = *m_lGraphics.begin();
+		l_pcGraphic = *m_lGraphics.begin();
 
         int l_intT;
         // -1 means unmodified
         if (m_bMultiple) {
             l_intT = -1;
         } else {
-            l_intT = l_pcGr->GetThickness();
+            l_intT = l_pcGraphic->GetThickness();
         }
         l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
         l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Line Thickness:")), 0, wxALL , 5);
@@ -195,8 +221,19 @@ SP_WDG_DialogGraphic::OnDlgOk()
 			{
 				(*itG)->SetPen(wxThePenList->FindOrCreatePen(m_pcButtonPen->GetColour(), (*itG)->GetPen()->GetWidth(), (*itG)->GetPen()->GetStyle()));
 				(*itG)->SetPenColour(m_pcButtonPen->GetColour());
+				
 			}
 		}
+
+		//by george
+		for (SP_ListGraphic::iterator itG = l_pcGr->GetParent()->GetGraphics()->begin();
+			itG != l_pcGr->GetParent()->GetGraphics()->end(); ++itG)
+		{
+			//(*itG)->SetPen(wxThePenList->FindOrCreatePen(m_pcButtonPen->GetColour(), (*itG)->GetPen()->GetWidth(), (*itG)->GetPen()->GetStyle()));
+			//(*itG)->SetPenColour(m_pcButtonPen->GetColour());
+			(*itG)->SetThickness(m_scThickness->GetValue());
+		}
+		
 		/* change ck 28.07.09 
 		 if graphik use with extend shapes*/
 

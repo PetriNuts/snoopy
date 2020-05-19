@@ -76,7 +76,8 @@
 #include "sp_gr/edges/SP_GR_ExtendedEdge.h"
 
 #include "sp_ds/animators/ani_HybridPN/SP_DS_HybridAnimation.h"
-
+#include "sp_ds/attributes/SP_DS_NodeTypeAttribute.h"
+#include "sp_gui/widgets/dialogs/SP_WDG_DialogChoice.h"
 SP_DS_HybridPN::SP_DS_HybridPN() :
 SP_DS_ExtPT(SP_DS_HYBRIDPN_CLASS)
 {
@@ -125,7 +126,8 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcNC = p_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE );
 	l_pcNC->SetDisplayName(wxT("Discrete Place"));
 
-
+	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
   	//==============================================================================================================
   	/*
      * Continuous Place
@@ -134,6 +136,9 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcNC->SetShortcut(wxT("Shift+P"));
   	 l_pcNC->SetDisplayName(wxT("Continuous Place"));
 
+	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));
+	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
+	
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_BoolAttribute(wxT("Fixed"), FALSE));//Fixed
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogBool(wxT("General"), 1));
 
@@ -162,7 +167,9 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcGr = new SP_GR_ExtendedCircle(l_pcNC->GetPrototype(), pwidth, SP_EXTENDED_TYPE_DEFAULT,3,wxColour(128,128,128));
   	 l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3 ));
   	 l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
-  	 l_pcNC->SetGraphic( l_pcGr );
+	// l_pcGr->SetThickness(wxGetApp().GetElementPrefs()->GetNodeThickness(GetName(), l_pcNC->GetName()));//by george 
+	// l_pcGr->SetThickness(3);//by george 
+	 l_pcNC->SetGraphic( l_pcGr );
   	 l_pcNC->RegisterGraphicWidget( new SP_WDG_DialogGraphic( wxT("Graphic") ) );
 
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_LogicAttribute(wxT("Logic"), wxT("Name")));
@@ -181,6 +188,9 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
      */
   	l_pcNC = p_pcGraph->GetNodeclass( SP_DS_STOCHASTIC_TRANS );
   	l_pcNC->SetDisplayName(wxT("Stochastic Transition"));
+
+	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 
   	l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( wxT("FunctionList"), SP_COLLIST_STRING, 2 ) );
 	l_pcAttr->SetDisplayName(wxT("Function set"));
@@ -211,6 +221,10 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	l_pcNC->SetDisplayName(wxT("Continuous Transition"));
 
   	 l_pcNC->SetShortcut( wxT("Shift+T") );
+
+	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george
+	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
+
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name"), wxT("")));
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
   	 l_pcAttr->SetGlobalShow();
@@ -267,6 +281,9 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name"), wxT("")));
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
   	 l_pcAttr->SetGlobalShow();
+
+	
+
   	 l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
   	 l_pcGrAttr->SetOffsetX(25);
   	 l_pcGrAttr->SetOffsetY(20);
@@ -288,6 +305,10 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
   	 l_pcGrAttr->SetOffsetX(25);
   	 l_pcGrAttr->SetOffsetX(40);
+
+
+	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));// by george
+	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 
   	 l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( wxT("FunctionList"), SP_COLLIST_STRING, 2 ) );
   	 l_pcAttr->SetDisplayName(wxT("Weight set"));
@@ -331,6 +352,7 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name"), wxT("")));
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
   	 l_pcAttr->SetGlobalShow();
+
   	 l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
   	 l_pcGrAttr->SetOffsetX(25);
   	 l_pcGrAttr->SetOffsetY(20);
@@ -351,6 +373,9 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcAttr->SetGlobalShow();
   	 l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
   	 l_pcGrAttr->SetOffsetX(40);
+
+	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george
+	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 
   	 //Delay Attribute
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_ColListAttribute( wxT("DelayList"), SP_COLLIST_DOUBLE, 2 ));
@@ -391,6 +416,7 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name"), wxT("")));
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
   	 l_pcAttr->SetGlobalShow();
+
   	 l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
   	 l_pcGrAttr->SetOffsetX(25);
   	 l_pcGrAttr->SetOffsetY(20);
@@ -434,6 +460,8 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcGrAttr->SetShow(TRUE);
   	 l_pcAttr->SetGlobalShow();
 
+	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george 
+	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 
   	 twidth = wxGetApp().GetElementPrefs()->GetNodeWidth(GetName(), SP_DS_SCHEDULED_TRANS);
   	 theight = wxGetApp().GetElementPrefs()->GetNodeHeight(GetName(), SP_DS_SCHEDULED_TRANS);
@@ -726,7 +754,10 @@ bool SP_DS_HybridPN::NodeRequirement(SP_DS_Node* p_pcNode)
 
 bool SP_DS_HybridPN::EdgeRequirement( SP_DS_Edgeclass* p_pcClass, SP_Data* p_pcSrc, SP_Data* p_pcTrg )
 {
-
+	if (p_pcSrc == NULL || p_pcTrg == NULL || p_pcClass == NULL)
+	{
+		return FALSE;
+	}
 	SP_LOGDEBUG(wxString::Format(wxT("EdgeRequirement %p->%p %s"), p_pcSrc, p_pcTrg, p_pcClass->GetName().c_str()));
 
 	if (!SP_DS_ExtPT::EdgeRequirement(p_pcClass, p_pcSrc, p_pcTrg))

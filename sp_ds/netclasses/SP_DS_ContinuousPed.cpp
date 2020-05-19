@@ -75,6 +75,9 @@
 #include "snoopy.h"
 #include "sp_core/SP_GPR_Elements.h"
 #include "sp_core/SP_GPR_Animation.h"
+//by george
+#include "sp_ds/attributes/SP_DS_NodeTypeAttribute.h"
+#include "sp_gui/widgets/dialogs/SP_WDG_DialogChoice.h"
 
 SP_DS_ContinuousPed::SP_DS_ContinuousPed() :
 	SP_DS_BipartGraph(SP_DS_CONTINUOUSPED_CLASS)
@@ -120,6 +123,8 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
      */
 	l_pcNC = p_pcGraph->RenameNodeclass(wxT("Circle"), SP_DS_CONTINUOUS_PLACE);
 	l_pcNC->SetDisplayName(wxT("Continuous Place"));
+	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 	l_pcNC->SetAbbreviation(wxT("PC"));
 	l_pcNC->SetShortcut(wxT("P"));
 	l_pcAttr = l_pcNC->GetPrototype()->GetAttribute(wxT("Name"));//Name
@@ -201,6 +206,9 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_BoolAttribute(wxT("Reversible"), FALSE));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogBool(wxT("Function")));
+
+	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 
 	int twidth = wxGetApp().GetElementPrefs()->GetNodeWidth(GetName(), SP_DS_CONTINUOUS_TRANS);
 	int theight = wxGetApp().GetElementPrefs()->GetNodeHeight(GetName(), SP_DS_CONTINUOUS_TRANS);

@@ -69,7 +69,8 @@
 
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogColList.h" //Added By Liu on 6 Mar. 2009
 #include "sp_gr/attributes/SP_GR_ColListAttribute.h" //Added By Liu on 6 Mar. 2009
-
+#include "sp_ds/attributes/SP_DS_NodeTypeAttribute.h"//Added by george assaf
+#include "sp_gui/widgets/dialogs/SP_WDG_DialogChoice.h"
 
 #include "sp_utilities.h"
 
@@ -81,6 +82,7 @@
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_core/SP_Core.h"
 
+ 
 SP_DS_EventSPN::SP_DS_EventSPN()
 :SP_DS_ExtPT( SP_DS_SPN_CLASS )
 {
@@ -226,6 +228,8 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
+	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 	// animator
 	l_pcNC->AddAnimator(new SP_DS_ExtPTTransAnimator());
 
@@ -280,6 +284,8 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcGrAttr->SetShow(TRUE);
 	l_pcAttr->SetGlobalShow();
 
+	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 	//////////////////////////////////////////////////////////////////////////////////////
 
 	twidth = wxGetApp().GetElementPrefs()->GetNodeWidth(GetName(), wxT("Deterministic Transition"));
@@ -349,6 +355,9 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr->SetGlobalShow();
 
 
+	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
+
 	twidth = wxGetApp().GetElementPrefs()->GetNodeWidth(GetName(), wxT("Scheduled Transition"));
 	theight = wxGetApp().GetElementPrefs()->GetNodeHeight(GetName(), wxT("Scheduled Transition"));
 
@@ -358,6 +367,8 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
+	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 	// animator
 	l_pcNC->AddAnimator(new SP_DS_ExtPTTransAnimator());
 
@@ -548,6 +559,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	p_pcGraph->SetAnimation( new SP_DS_StAnimation(refresh, duration, stepping));
 	///////////////////
+
 	/***********george constants harmonizing************/
 	//for export to colCPN 
 	l_pcMC = p_pcGraph->AddMetadataclass(new SP_DS_Metadataclass(p_pcGraph, SP_DS_CPN_CONSTANT_HARMONIZING));

@@ -79,12 +79,27 @@ SP_WDG_DialogText::AddToDialog(const SP_ListAttribute* p_ptlAttributes,
     	wxString l_pchValue = (m_bMultiple ? SP_WILDCARD : l_pcAttr->GetValueString());
 
         l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 0, wxALL , 5);
-		wxTextCtrl* l_pcTextCtrl = new wxTextCtrl(l_pcPage, -1, l_pchValue);
+		wxTextCtrl* l_pcTextCtrl;
+		if (l_pcAttr->GetName() == wxT("Node Type"))
+		{
+			l_pcAttr->SetValueString(wxT(""));
+			  l_pcTextCtrl = new wxTextCtrl(l_pcPage, -1, l_pcAttr->GetValueString());
+			  l_pcTextCtrl->SetEditable(false);
+		}
+
+		else
+		{
+			  l_pcTextCtrl = new wxTextCtrl(l_pcPage, -1, l_pchValue);
+		}
+		
 		m_pcTextCtrl.push_back(l_pcTextCtrl);
         l_pcSizer->Add(l_pcTextCtrl, 1, wxALL , 5);
-
-        AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);
-        l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
+		
+		 
+		AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);
+		l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
+		 
+     
     }
 
     return TRUE;
@@ -103,6 +118,7 @@ SP_WDG_DialogText::OnDlgOk()
         unsigned i = 0;
         for (l_Iter = m_tlAttributes.begin(); l_Iter != m_tlAttributes.end(); ++l_Iter, ++i)
         {
+			if (*l_Iter == NULL || m_pcTextCtrl[i]==NULL) continue;//george
             l_bReturn &= (*l_Iter)->SetValueString(m_pcTextCtrl[i]->GetValue());
         }
     }

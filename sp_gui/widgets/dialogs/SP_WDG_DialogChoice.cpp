@@ -12,7 +12,7 @@
 #include "sp_core/SP_Core.h"
 #include "sp_ds/SP_DS_Graph.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
-
+#include <wx/choice.h>//
 BEGIN_EVENT_TABLE(SP_WDG_DialogChoice, SP_WDG_DialogBase)
 // intentionally left blank
 END_EVENT_TABLE()
@@ -68,17 +68,30 @@ bool SP_WDG_DialogChoice::AddToDialog(const SP_ListAttribute* p_ptlAttributes, S
 
 		wxFlexGridSizer* l_pcFlexGridSizer = new wxFlexGridSizer(2);
 		l_pcFlexGridSizer->AddGrowableCol(1,1);
-
+		 
     	SP_ListAttribute::iterator it = m_tlAttributes.begin();
     	SP_ListAttribute::iterator end = m_tlAttributes.end();
     	for(; it != end; ++it)
     	{
 			SP_DS_Attribute* l_pcAttr = *it;
 
-			wxString l_pchValue = l_pcAttr->GetValueString();
+			wxString l_pchValue;
+			l_pchValue = l_pcAttr->GetValueString();
 			wxString l_sName = l_pcAttr->GetParentName();
 			l_pcFlexGridSizer->Add(new wxStaticText(l_pcPage, -1, l_sName), 0, wxALL , 5);
+			
+			///////////////////////
+			if (l_pcAttr->GetName() == _T("Node Type"))
+			{//by george for node type attribute
+				l_pcAttr->SetValueString(_T(""));
+				l_pchValue = l_pcAttr->GetValueString();
+				LoadDataForNodeTypeAttribute(l_pcAttr);
+			}
+			//////////////////////
 			wxChoice* l_pcChoice = new wxChoice(l_pcPage, -1, wxDefaultPosition, wxDefaultSize, m_pcChoiceValues);
+			
+		
+			
 			int l_nSelected = l_pcChoice->FindString(l_pchValue);
 			if (l_nSelected != wxNOT_FOUND)
 			{
@@ -92,6 +105,8 @@ bool SP_WDG_DialogChoice::AddToDialog(const SP_ListAttribute* p_ptlAttributes, S
 			l_pcFlexGridSizer->Add(l_pcSizer, 1, wxEXPAND);
     	}
 		l_pcPage->AddControl(l_pcFlexGridSizer, 0, wxEXPAND);
+		m_pcPairPage2Choices.first = l_sPage;
+		m_pcPairPage2Choices.second = m_pcChoice;
     }
     else
     {
@@ -100,6 +115,12 @@ bool SP_WDG_DialogChoice::AddToDialog(const SP_ListAttribute* p_ptlAttributes, S
         wxString l_sPage = GetName() + wxT(":") + l_pcAttr->GetParent()->GetClassName();
         SP_WDG_NotebookPage* l_pcPage = p_pcDlg->AddPage(l_sPage, GetDialogOrdering());
         CHECK_POINTER(l_pcPage, return FALSE);
+
+		if (l_pcAttr->GetName() == _T("Node Type"))
+		{
+			l_pcAttr->SetValueString(_T(""));
+			LoadDataForNodeTypeAttribute(p_ptlAttributes);
+		}
 
     	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 0, wxALL , 5);
 		wxChoice* l_pcChoice = new wxChoice(l_pcPage, -1, wxDefaultPosition, wxDefaultSize, m_pcChoiceValues);
@@ -123,11 +144,221 @@ bool SP_WDG_DialogChoice::AddToDialog(const SP_ListAttribute* p_ptlAttributes, S
 
         AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);
         l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
+	 
     }
 
 	return TRUE;
 }
+void SP_WDG_DialogChoice::LoadDataForNodeTypeAttribute(  SP_DS_Attribute* p_ptlAttributes)
+{
+	SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+	wxString l_sNetClass = l_pcGraph->GetNetclass()->GetName();
+	if (!l_sNetClass.Contains(wxT("Hybrid")))
+	{//one choice node type
+		//SP_ListAttribute::iterator it = m_tlAttributes.begin();
+		//SP_ListAttribute::iterator end = m_tlAttributes.end();
+		 
+			SP_DS_Attribute* l_pcAttr = p_ptlAttributes;
 
+			wxString l_pchValue = l_pcAttr->GetValueString();
+			wxString l_sName = l_pcAttr->GetParentName();
+			unsigned int l_nArraysize = 1;
+			m_pcChoiceValues.Clear();
+			m_pcChoiceValues.Alloc(l_nArraysize);
+
+			m_pcChoiceValues.Add(l_pchValue);
+
+	 
+	}
+	else
+	{//multi choices node type
+		SP_ListAttribute::iterator it = m_tlAttributes.begin();
+		SP_ListAttribute::iterator end = m_tlAttributes.end();
+		 
+			SP_DS_Attribute* l_pcAttr = p_ptlAttributes;
+
+			wxString l_pchValue = l_pcAttr->GetValueString();
+			wxString l_sName = l_pcAttr->GetParentName();
+			unsigned int l_nArraysize;
+			if (l_pchValue.Contains(wxT("Place")))
+			{
+				l_nArraysize = 2;
+				m_pcChoiceValues.Clear();
+				m_pcChoiceValues.Alloc(l_nArraysize);
+				if (l_pchValue == _T("Discrete Place"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Continuous Place"));
+				}
+				else if (l_pchValue == _T("Continuous Place"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Discrete Place"));
+				}
+
+			}
+			else if (l_pchValue.Contains(wxT("Transition")))
+			{
+				l_nArraysize = 5;
+				m_pcChoiceValues.Clear();
+				m_pcChoiceValues.Alloc(l_nArraysize);
+				if (l_pchValue == _T("Continuous Transition"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Stochastic Transition"));
+					m_pcChoiceValues.Add(_T("Deterministic Transition"));
+					m_pcChoiceValues.Add(_T("Immediate Transition"));
+					m_pcChoiceValues.Add(_T("Scheduled Transition"));
+				}
+				else if (l_pchValue == _T("Stochastic Transition"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Continuous Transition"));
+					m_pcChoiceValues.Add(_T("Deterministic Transition"));
+					m_pcChoiceValues.Add(_T("Immediate Transition"));
+					m_pcChoiceValues.Add(_T("Scheduled Transition"));
+				}
+				else if (l_pchValue == _T("Deterministic Transition"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Continuous Transition"));
+					m_pcChoiceValues.Add(_T("Stochastic Transition"));
+					m_pcChoiceValues.Add(_T("Immediate Transition"));
+					m_pcChoiceValues.Add(_T("Scheduled Transition"));
+				}
+				else if (l_pchValue == _T("Immediate Transition"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Continuous Transition"));
+					m_pcChoiceValues.Add(_T("Stochastic Transition"));
+					m_pcChoiceValues.Add(_T("Deterministic Transition"));
+					m_pcChoiceValues.Add(_T("Scheduled Transition"));
+				}
+				else if (l_pchValue == _T("Scheduled Transition"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Continuous Transition"));
+					m_pcChoiceValues.Add(_T("Stochastic Transition"));
+					m_pcChoiceValues.Add(_T("Deterministic Transition"));
+					m_pcChoiceValues.Add(_T("Immediate Transition"));
+				}
+
+			}
+			else
+			{
+
+			}
+
+	}
+}
+
+void SP_WDG_DialogChoice::LoadDataForNodeTypeAttribute(const SP_ListAttribute* p_ptlAttributes)
+{
+	SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+	wxString l_sNetClass = l_pcGraph->GetNetclass()->GetName();
+	if (!l_sNetClass.Contains(wxT("Hybrid")))
+	{//one choice node type
+		SP_ListAttribute::iterator it = m_tlAttributes.begin();
+		SP_ListAttribute::iterator end = m_tlAttributes.end();
+		for (; it != end; ++it)
+		{
+			SP_DS_Attribute* l_pcAttr = *it;
+
+			wxString l_pchValue = l_pcAttr->GetValueString();
+			wxString l_sName = l_pcAttr->GetParentName();
+			unsigned int l_nArraysize = 1;
+			m_pcChoiceValues.Clear();
+			m_pcChoiceValues.Alloc(l_nArraysize);
+
+			m_pcChoiceValues.Add(l_pchValue);
+
+		}
+	}
+	else
+	{//multi choices node type
+		SP_ListAttribute::iterator it = m_tlAttributes.begin();
+		SP_ListAttribute::iterator end = m_tlAttributes.end();
+		for (; it != end; ++it)
+		{
+			SP_DS_Attribute* l_pcAttr = *it;
+
+			wxString l_pchValue = l_pcAttr->GetValueString();
+			wxString l_sName = l_pcAttr->GetParentName();
+			unsigned int l_nArraysize;
+			if (l_pchValue.Contains(wxT("Place")))
+			{
+				l_nArraysize = 2;
+				m_pcChoiceValues.Clear();
+				m_pcChoiceValues.Alloc(l_nArraysize);
+				if (l_pchValue == _T("Discrete Place"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Continuous Place"));
+				}
+				else if (l_pchValue == _T("Continuous Place"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Discrete Place"));
+				}
+				 
+			}
+			else if (l_pchValue.Contains(wxT("Transition")))
+			{
+				l_nArraysize = 5;
+				m_pcChoiceValues.Clear();
+				m_pcChoiceValues.Alloc(l_nArraysize);
+				if (l_pchValue == _T("Continuous Transition"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Stochastic Transition"));
+					m_pcChoiceValues.Add(_T("Deterministic Transition"));
+					m_pcChoiceValues.Add(_T("Immediate Transition"));
+					m_pcChoiceValues.Add(_T("Scheduled Transition"));
+				}
+				else if (l_pchValue == _T("Stochastic Transition"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Continuous Transition"));
+					m_pcChoiceValues.Add(_T("Deterministic Transition"));
+					m_pcChoiceValues.Add(_T("Immediate Transition"));
+					m_pcChoiceValues.Add(_T("Scheduled Transition"));
+				}
+				else if (l_pchValue == _T("Deterministic Transition"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Continuous Transition"));
+					m_pcChoiceValues.Add(_T("Stochastic Transition"));
+					m_pcChoiceValues.Add(_T("Immediate Transition"));
+					m_pcChoiceValues.Add(_T("Scheduled Transition"));
+				}
+				else if (l_pchValue == _T("Immediate Transition"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Continuous Transition"));
+					m_pcChoiceValues.Add(_T("Stochastic Transition"));
+					m_pcChoiceValues.Add(_T("Deterministic Transition"));
+					m_pcChoiceValues.Add(_T("Scheduled Transition"));
+				}
+				else if (l_pchValue == _T("Scheduled Transition"))
+				{
+					m_pcChoiceValues.Add(l_pchValue);
+					m_pcChoiceValues.Add(_T("Continuous Transition"));
+					m_pcChoiceValues.Add(_T("Stochastic Transition"));
+					m_pcChoiceValues.Add(_T("Deterministic Transition"));
+					m_pcChoiceValues.Add(_T("Immediate Transition"));
+				}
+				
+			}
+			else
+			{
+				
+			}
+			
+
+		}
+
+	}
+}
 void SP_WDG_DialogChoice::LoadData()
 {
 	if(m_bFixedValues)
@@ -204,14 +435,29 @@ bool SP_WDG_DialogChoice::OnDlgOk()
         }
     }
 
+
+
     m_pcChoice.clear();
     return l_bReturn && SP_WDG_DialogBase::OnDlgOk();
+
 }
-wxString SP_WDG_DialogChoice::GetCurentSelection()//by george
+wxString SP_WDG_DialogChoice::GetCurentSelection(bool p_bIsOverviewShow)//by george
 {
+	if (p_bIsOverviewShow)
+	{
+		int l_nSelected = m_pcChoice.front()->GetSelection();
+		if (l_nSelected > 0) --l_nSelected;
+		if (l_nSelected == m_pcChoiceValues.size()) l_nSelected = l_nSelected - 1;
+		if (m_pcChoiceValues.size() >= 0 && l_nSelected >= 0)
+			return m_pcChoiceValues[l_nSelected];
+		else
+			return wxT("");
+	}
 	int l_nSelected = m_pcChoice.front()->GetSelection();
+	if (l_nSelected == m_pcChoiceValues.size()) l_nSelected = l_nSelected - 1;
 	if (m_pcChoiceValues.size() >= 0 && l_nSelected >= 0)
 		return m_pcChoiceValues[l_nSelected];
 	else
 		return wxT("");
 }
+ 

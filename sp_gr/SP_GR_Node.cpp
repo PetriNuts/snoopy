@@ -169,31 +169,41 @@ SP_GR_Node::EditProperties()
     SP_DLG_ShapeProperties l_cDialog(NULL, wxT("Edit Properties"));
     // add this to the list of affected nodes
     l_cDialog.AddDialogGraphic(this);
+	bool l_bIsDeleted;
+	if (l_cDialog.ShowDialogAttributes(&l_tmAttributes))
+	{
+		// show and forget about the dlg
+		// the dialog manages the events (OK, CANCEL) by itself
+		l_cDialog.ShowModal();
 
-    if (l_cDialog.ShowDialogAttributes(&l_tmAttributes))
-    {
-        // show and forget about the dlg
-        // the dialog manages the events (OK, CANCEL) by itself
-        l_cDialog.ShowModal();
 
-        if (GetPrimitive())
-        {
-			dynamic_cast<SP_GUI_Canvas*>(GetPrimitive()->GetCanvas())->Modify(TRUE);
-        }
+		l_bIsDeleted = GetDelete();
+		if (!l_bIsDeleted)
+		{
+		
+		if (GetGraphicChildren()->size() != 0 && !l_cDialog.ISConverted())
+			if (GetPrimitive())
+			{
+				dynamic_cast<SP_GUI_Canvas*>(GetPrimitive()->GetCanvas())->Modify(TRUE);
+			}
+	  }
     }
     else
     {
         SP_LOGDEBUG(wxT("No attributes on this node."));
     }
-
+	
     l_cDialog.Destroy();
-
+ 
+	if (l_bIsDeleted || l_cDialog.ISConverted())//by george
+	{
+		return true;
+	}
     if (GetParent())
     {
         return GetParent()->Update(TRUE);
     }
-
-    return Update(TRUE);
+ 
 }
 
 bool

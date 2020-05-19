@@ -86,7 +86,8 @@
 #include "sp_gui/dialogs/dia_CPN/SP_WDG_Guard.h"
 
 #include "sp_ds/attributes/SP_DS_TypeAttribute.h"//by george, for constants harmonizing 
-
+#include "sp_ds/attributes/SP_DS_NodeTypeAttribute.h"//Added by george assaf
+#include "sp_gui/widgets/dialogs/SP_WDG_DialogChoice.h"
 
 SP_DS_ColCPN::SP_DS_ColCPN() :
 	SP_DS_ContinuousPed(SP_DS_COLCPN_CLASS)
@@ -149,7 +150,8 @@ SP_DS_ColCPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcGrAttr->SetOffsetY(-25);  
 	l_pcGrAttr->SetShow(TRUE);
 	l_pcAttr->SetGlobalShow();
-
+	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george
+	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 	//////////////////////////////////////////////////////////////////////////////
 	// Colorset name
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_TextAttribute(SP_DS_CPN_COLORSETNAME, wxT("Dot")));

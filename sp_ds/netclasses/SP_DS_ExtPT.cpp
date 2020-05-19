@@ -33,7 +33,8 @@
 
 #include "snoopy.h"
 #include "sp_core/SP_GPR_Elements.h"
-
+#include "sp_ds/attributes/SP_DS_NodeTypeAttribute.h"//Added by george assaf
+#include "sp_gui/widgets/dialogs/SP_WDG_DialogChoice.h"
 
 SP_DS_ExtPT::SP_DS_ExtPT() :
 	SP_DS_SimplePed(SP_DS_EXTPN_CLASS)
@@ -74,8 +75,14 @@ SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph)
 
 	nc->AddAnimator(new SP_DS_ExtPTPlaceAnimator(wxT("Marking")));
 
+	attr = nc->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george
+	attr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
+
 	nc = p_graph->GetNodeclass(wxT("Transition"));
 	nc->AddAnimator(new SP_DS_ExtPTTransAnimator());
+
+	attr = nc->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george
+	attr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 	//////////////////////////////////////////////////////////////////////////////
 
 
