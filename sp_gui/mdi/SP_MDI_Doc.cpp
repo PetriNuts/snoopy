@@ -714,6 +714,88 @@ void SP_MDI_Doc::HarmonizeConstantsForColPN()
 			|| m_pcGraph->GetNetclass()->GetName() == SP_DS_COLCPN_CLASS
 			|| m_pcGraph->GetNetclass()->GetName() == SP_DS_COLSPN_CLASS)
 		{
+			SP_DS_Nodeclass* l_pcNodeclass1 = m_pcGraph->GetNodeclass(SP_DS_PARAM);
+			m_pcGraph->RemoveNodeclass(l_pcNodeclass1);
+		    l_pcNodeclass1 = m_pcGraph->GetNodeclass(SP_DS_COARSE_PARAMETER);
+			
+			 
+			for (auto l_itElem1 = l_pcNodeclass1->GetElements()->begin(); l_itElem1 != l_pcNodeclass1->GetElements()->end(); ++l_itElem1)
+			{
+
+				std::map<SP_Graphic*, SP_Data*> l_mGraphic2Data;
+				l_mGraphic2Data.clear();
+				list<SP_DS_Coarse*> m_lCoarseNodes;
+				auto l_Gr = dynamic_cast<SP_DS_Node*>(*l_itElem1);
+				SP_ListGraphic* l_ListParamGrapics = l_Gr->GetGraphics();
+				SP_ListGraphic::iterator itG;
+				for (itG = l_ListParamGrapics->begin(); itG != l_ListParamGrapics->end(); ++itG)
+				{
+					SP_Graphic* l_pcGr = *itG;
+					SP_Data *l_pcParent = l_pcGr->GetParent();
+					//every graphic should have a parent, so this shouldn't happen, but check it anyway
+					if (!l_pcParent)
+						continue;
+
+					//	RemoveGraphicsFromCanvas(l_pcParent);
+					if (!l_pcParent || !l_pcParent->GetGraphics())
+						return;
+
+					//we don't actually remove any graphics from the graph
+					//we just remove them from canvas
+					for (SP_Graphic* l_pcGr : *l_pcParent->GetGraphics())
+					{
+
+						RemoveGraphicFromCanvas(l_pcGr);
+					}
+					//now actually remove the elements from the graph
+					//and with it automatically all of its graphics
+				switch (l_pcParent->GetElementType())
+				{
+					case SP_ELEMENT_NODE:
+					{
+					 
+						SP_DS_Coarse *p_pcCoarse = l_pcParent->GetCoarse();
+						if (!p_pcCoarse)
+							continue;
+
+						SP_MDI_CoarseDoc* l_pcDoc = p_pcCoarse->GetCoarseDoc();
+						if (!l_pcDoc)
+						{
+							p_pcCoarse->SetUpdate(false);
+							p_pcCoarse->Show();
+							p_pcCoarse->GetCoarseDoc()->SetClose(false);
+							p_pcCoarse->GetCoarseDoc()->Modify(FALSE);
+							p_pcCoarse->GetCoarseDoc()->Close();
+							//Delete coarse tree from the hierarchy tree
+							wxTreeItemId l_nCoarseId = p_pcCoarse->GetCoarseId();
+							m_pcGraph->CreateCoarseTree()->InvalidateAllChildren(l_nCoarseId);
+							m_pcGraph->CreateCoarseTree()->Delete(l_nCoarseId);
+							SP_MDI_CoarseDoc *l_pcCoarseDoc = p_pcCoarse->GetCoarseDoc();
+							//... and closing the associated document
+							if (l_pcCoarseDoc)
+							{
+								l_pcCoarseDoc->SetClose(TRUE);
+								l_pcCoarseDoc->Modify(FALSE);
+								l_pcCoarseDoc->Close();
+								l_pcCoarseDoc->DeleteAllViews();
+								p_pcCoarse->SetCoarseDoc(0);
+							}
+
+
+						}
+					}
+				}
+				}
+			}
+			 
+			m_pcGraph->RemoveNodeclass(l_pcNodeclass1);
+
+
+			/*
+			TODO:
+			optimize this
+			*/
+			/**
 			SP_DS_Nodeclass* l_pcNodeclass1;
 			l_pcNodeclass1 = m_pcGraph->GetNodeclass(SP_DS_PARAM);
 			SP_DS_Graph*	l_pcDelGraph = m_pcGraph->CloneDefinition();
@@ -770,8 +852,7 @@ void SP_MDI_Doc::HarmonizeConstantsForColPN()
 
 			}
 			wxDELETE(l_pcDelGraph);
-			/*******************/
-			 
+		     
 			l_pcNodeclass1 = m_pcGraph->GetNodeclass(SP_DS_COARSE_PARAMETER);
 			SP_DS_Graph*	l_pcDelGraph2 = m_pcGraph->CloneDefinition();
 			for (auto l_itElem1 = l_pcNodeclass1->GetElements()->begin(); l_itElem1 != l_pcNodeclass1->GetElements()->end(); ++l_itElem1)
@@ -853,10 +934,11 @@ void SP_MDI_Doc::HarmonizeConstantsForColPN()
 					}
 				}
 			}
-			/*********************/
+			 
 			wxDELETE(l_pcDelGraph2);
-
+			*/
 		}
+		
 
 
 	/********************************/
