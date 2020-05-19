@@ -2336,8 +2336,15 @@ SP_DS_StParser :: CheckFormulaFunction( const wxString& p_sFormula, SP_DS_Node* 
 	
 	wxDELETEA(l_pchFormula);
 	FreeTree(l_pcRoot);
-
-	if ( ( m_bParseErrorParantheses ) || ( m_asMissingVariableList.size() > 0 ) )
+	bool l_bISExp = false;//by george for vlaues having -e 
+	if (m_asMissingVariableList.size() > 0)
+	{
+		if (m_asMissingVariableList[0] == wxT("1e"))
+		{
+			l_bISExp = true;
+		}
+	}
+	if ( ( m_bParseErrorParantheses ) || ( m_asMissingVariableList.size() > 0 ) && !l_bISExp)
 	{
 		return false;
 	}
