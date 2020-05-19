@@ -184,6 +184,7 @@
 #include "export/SP_ExportHPN2SPN.h"
 
 #include "export/SP_ExportERODE.h"
+//by george
 #include "export/SP_ExportColSPN2ColFSPN.h"
 #include "export/SP_ExportColCPN2ColFCPN.h"
 #include "export/SP_ExportColHPN2ColFHPN.h"
@@ -193,7 +194,12 @@
 #include "export/SP_ExportColFCPN2FCPN.h"
 #include "export/SP_ExportColFSPN2FSPN.h"
 #include "export/SP_ExportColFHPN2FHPN.h"
-
+#include "export/SP_ExportColFHPN2ColFSPN.h"
+#include "export/SP_ExportColFHPN2ColFCPN.h"
+#include "export/SP_ExportColFSPN2ColFHPN.h"
+#include "export/SP_ExportColFCPN2ColFHPN.h"
+#include "export/SP_ExportColFCPN2ColFSPN.h"
+#include "export/SP_ExportColFSPN2ColFCPN.h"
 
 #include <wx/cmdline.h>
 #include <wx/fs_zip.h>
@@ -711,6 +717,47 @@ bool Snoopy::OnInit()
 
 	//colFHPN==>FHPN
 	l_pcExport = new SP_ExportColFHPN2FHPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	//colFHPN==>colFSPN
+	l_pcExport = new SP_ExportColFHPN2ColFSPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	//colFHPN==>colFCPN
+	l_pcExport = new SP_ExportColFHPN2ColFCPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	//colFSPN ==> colFHPN
+	l_pcExport = new SP_ExportColFSPN2ColFHPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	//colFCPN ==> colFHPN
+	l_pcExport = new SP_ExportColFCPN2ColFHPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+
+	//colFCPN ==> colFSPN
+	l_pcExport = new SP_ExportColFCPN2ColFSPN();
+	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
+	{
+		wxDELETE(l_pcExport);
+	}
+	
+	//colFSPN ==> colFCPN
+	l_pcExport = new SP_ExportColFSPN2ColFCPN();
 	if (!m_pcExportManager->AddExportRoutine(l_pcExport))
 	{
 		wxDELETE(l_pcExport);

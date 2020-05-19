@@ -10,8 +10,10 @@
 
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 
-SpConvertElement::SpConvertElement()
-{}
+SpConvertElement::SpConvertElement(double p_dMVal)
+{
+	m_dSourceMarking = p_dMVal;
+}
 SpConvertElement::~SpConvertElement()
  {}
 
@@ -341,3 +343,116 @@ SpConvertElement::~SpConvertElement()
 	 return l_pcNewNode;
  }
  
+ void SpConvertElement::ChangeRepresentation(SP_DS_Node* p_pcOldNode, const bool& p_bChangeMarking)
+ {
+	 SP_ListGraphic::const_iterator l_itOldGraphic;
+	 //	CHECK_POINTER(p_pcOldNode,return );
+
+	 const SP_ListGraphic* l_pcOldGraphicList = p_pcOldNode->GetGraphics();
+	 wxString l_sOldNodeClass = p_pcOldNode->GetClassName();
+	 for (l_itOldGraphic = l_pcOldGraphicList->begin();
+		 l_itOldGraphic != l_pcOldGraphicList->end();
+		 l_itOldGraphic++)
+	 {
+		 if (l_sOldNodeClass == wxT("Place") || l_sOldNodeClass == wxT("Transition"))//Discrete place
+		 {//convert to continuous representaion
+
+			 SP_Graphic* l_pcOldGraphic = (*l_itOldGraphic);
+			 wxColour l_pcGray(128, 128, 128);
+			 l_pcOldGraphic->SetPen(new wxPen(l_pcGray, 1));
+			 wxColour l_pcWhite(255, 255, 255);
+			 wxBrush* l_pcBrush = wxTheBrushList->FindOrCreateBrush(*wxWHITE, l_pcOldGraphic->GetBrush()->GetStyle());
+			 l_pcOldGraphic->SetBrush(l_pcBrush);
+			 l_pcOldGraphic->SetThickness(3);
+			 
+		 }
+		 else if ((l_sOldNodeClass.Contains(wxT("Place")) && l_sOldNodeClass.Contains(wxT("Continuous"))) || l_sOldNodeClass.Contains(wxT("Transition, Continuous")))
+		 {
+			 //convert to discrete representaion
+			 SP_Graphic* l_pcOldGraphic = (*l_itOldGraphic);
+			 l_pcOldGraphic->SetPen(new wxPen(*wxBLACK, 1));
+			 wxColour l_pcWhite(255, 255, 255);
+			 wxBrush* l_pcBrush = wxTheBrushList->FindOrCreateBrush(*wxWHITE, l_pcOldGraphic->GetBrush()->GetStyle());
+			 l_pcOldGraphic->SetBrush(l_pcBrush);
+			 l_pcOldGraphic->SetThickness(1);
+			 if (p_bChangeMarking &&l_sOldNodeClass.Contains(wxT("Place")))
+			 {
+				 SP_DS_Attribute* l_pcOldAttribute = (p_pcOldNode)->GetAttribute(wxT("Marking"));
+				 wxString valString = l_pcOldAttribute->GetValueString();
+
+				// m_sSourceMarking = valString.ToStdString();
+				 double l_dmarking;
+				 bool l_bIsNumeric=valString.ToDouble(&l_dmarking);
+				 m_dSourceMarking = l_dmarking;
+				 m_sMarking = valString;
+
+				 if (l_bIsNumeric)
+				 {
+					 if (floor(l_dmarking) == ceil(l_dmarking))
+					 {
+						 //do nothing
+					 }
+					 else
+					 {
+						 int roundedVal = round(l_dmarking);
+						 wxString l_sRoundedMarking;// = wxString::Format(wxT("%i"), (int)l_dmarking);
+						 l_sRoundedMarking << roundedVal;
+						 (p_pcOldNode)->GetAttribute(wxT("Marking"))->SetValueString(l_sRoundedMarking);
+
+					 }
+
+				 }
+			 }
+
+		 }
+
+
+
+	 }
+
+ }
+
+
+ void SpConvertElement::ResetNodeRepresentation(SP_DS_Node* p_pcOldNode, const bool& p_bChangeMarking)
+ {
+	 SP_ListGraphic::const_iterator l_itOldGraphic;
+	 //	CHECK_POINTER(p_pcOldNode,return );
+
+	 const SP_ListGraphic* l_pcOldGraphicList = p_pcOldNode->GetGraphics();
+	 wxString l_sOldNodeClass = p_pcOldNode->GetClassName();
+	 for (l_itOldGraphic = l_pcOldGraphicList->begin();
+		 l_itOldGraphic != l_pcOldGraphicList->end();
+		 l_itOldGraphic++)
+	 {
+		 if (l_sOldNodeClass == wxT("Place") || l_sOldNodeClass == wxT("Transition"))//Discrete place or Stochastic transition
+		 {
+			 SP_Graphic* l_pcOldGraphic = (*l_itOldGraphic);
+			 l_pcOldGraphic->SetPen(new wxPen(*wxBLACK, 1));
+			 wxColour l_pcWhite(255, 255, 255);
+			 wxBrush* l_pcBrush = wxTheBrushList->FindOrCreateBrush(*wxWHITE, l_pcOldGraphic->GetBrush()->GetStyle());
+			 l_pcOldGraphic->SetBrush(l_pcBrush);
+			 l_pcOldGraphic->SetThickness(1);
+		 }
+		 else if (l_sOldNodeClass == wxT("Place, Continuous") || l_sOldNodeClass == wxT("Transition, Continuous"))
+		 {
+			 SP_Graphic* l_pcOldGraphic = (*l_itOldGraphic);
+			 wxColour l_pcGray(128, 128, 128);
+			 l_pcOldGraphic->SetPen(new wxPen(l_pcGray, 1));
+			 wxColour l_pcWhite(255, 255, 255);
+			 wxBrush* l_pcBrush = wxTheBrushList->FindOrCreateBrush(*wxWHITE, l_pcOldGraphic->GetBrush()->GetStyle());
+			 l_pcOldGraphic->SetBrush(l_pcBrush);
+			 l_pcOldGraphic->SetThickness(3);
+
+			 //Check Reset flag 
+			 if(l_sOldNodeClass == wxT("Place, Continuous")&&p_bChangeMarking)
+			 {
+				 wxString l_sMarkingVal;
+				 l_sMarkingVal << m_dSourceMarking;
+				 (p_pcOldNode)->GetAttribute(wxT("Marking"))->SetValueString(m_sMarking);
+			 }
+		 }
+	 }
+
+
+	 p_pcOldNode->Update();
+ }
