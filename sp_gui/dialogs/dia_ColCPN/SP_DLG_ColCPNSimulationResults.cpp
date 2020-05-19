@@ -90,6 +90,9 @@ EVT_CHOICE( SP_ID_CHOICE_SOLVER, SP_DLG_ColCPNSimulationResults::OnSolverChanged
 EVT_BUTTON( SP_ID_BUTTON_SIMULATION_PROPERTIES, SP_DLG_ColCPNSimulationResults :: OnSimulationProperties )
 EVT_BUTTON( SP_ID_BUTTON_SAVE_ODE, SP_DLG_ColCPNSimulationResults :: SaveODE )
 EVT_BUTTON(SP_ID_BUTTON_MODIFY_COL_CONSTANT_SETS, SP_DLG_ColCPNSimulationResults::OnModifyConstants)// by george
+
+EVT_CHOICE(SP_ID_BUTTON_CHANGE_COL_CONSTANT_SETS, SP_DLG_ColCPNSimulationResults::OnConstantsSetChanged)
+
 END_EVENT_TABLE()
 
 SP_DLG_ColCPNSimulationResults::SP_DLG_ColCPNSimulationResults(SP_DS_Graph* p_pcGraph, SP_DS_ColPN_Unfolding* p_pcUnfoldedNet, wxWindow* p_pcParent, wxString p_sHelpText, wxString p_sTitle,
@@ -179,8 +182,8 @@ SP_DLG_ColCPNSimulationResults::~SP_DLG_ColCPNSimulationResults()
 		{
 			if (i < m_apcComboBoxes.size())
 			{
-				m_apcComboBoxes[i]->SetSelection(0);
-				m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i]->GetSelection());
+				///m_apcComboBoxes[i]->SetSelection(0);
+				//m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i]->GetSelection());
 			}
 		 
 		}
@@ -360,6 +363,21 @@ void SP_DLG_ColCPNSimulationResults::OnParameterSetChanged(wxCommandEvent& p_cEv
 	//Reload the parameters
 	LoadParameters();
 }
+
+void SP_DLG_ColCPNSimulationResults::OnConstantsSetChanged(wxCommandEvent& p_cEvent)
+{
+	//remember the selected sets
+	unsigned i = 0;
+	if(m_mGroup2Selction.size()==m_apcComboBoxes.size())
+	for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+	{
+		(it)->second = m_apcComboBoxes[i]->GetSelection();
+		i++;
+	}
+	 
+}
+
+
 //
 void SP_DLG_ColCPNSimulationResults::OnFunctionSetChanged(wxCommandEvent& p_cEvent)
 {
@@ -419,8 +437,19 @@ void SP_DLG_ColCPNSimulationResults::OnModifyParameterSets(wxCommandEvent& p_cEv
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{
 		LoadSets();
+
+		//recover selected groups befor modyfying constants
+		unsigned i = 0;
+		if (m_mGroup2Selction.size() == m_apcComboBoxes.size())
+			for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+			{
+			    m_apcComboBoxes[i]->SetSelection((it)->second);
+				i++;
+			}
+
 	}
 	m_bIsSimulatorInitialized = false;
+
 }
 //=============================================================================================
 void SP_DLG_ColCPNSimulationResults::LoadSets()
@@ -457,6 +486,7 @@ void SP_DLG_ColCPNSimulationResults::LoadSets()
 			m_pcMarkingSetComboBox->SetSelection(l_pcColListAttr->GetActiveColumn());
 	}
 
+	/**
 	//load parameter set
 	l_pcNodesList = (SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_PARAM)->GetElements());
 	if (!l_pcNodesList->empty())
@@ -471,7 +501,7 @@ void SP_DLG_ColCPNSimulationResults::LoadSets()
 		//Select the first Parameter
 		//m_pcParameterSetComboBox->SetSelection(l_pcColListAttr->GetActiveList());
 	}
-
+	*/
 	//load function set
 	l_pcNodesList = (SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements());
 	if (!l_pcNodesList->empty())
@@ -797,12 +827,13 @@ vector<SP_CPN_ContinuousArc>::const_iterator l_itConnection;
 			double l_nNumericArcWeight = 0;
 
 			wxString l_sArcWeight=l_itConnection->m_sMultiplicity;
-
+			 
 			//l_itConnection->m_sMultiplicity.ToDouble(&l_nWeight);
 
 			spsim::ConnectionType l_nArcType=GetConnectionType(l_itConnection->m_sArcClass);
-
-			if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+			
+			//if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+			if (IsEvaluatedArcWeight(l_sArcWeight, l_nNumericArcWeight))
 			{
 				m_pcMainSimulator->SetPreTransitionConnection(l_itConnection->m_nTranPos,l_itConnection->m_nPlaceID, l_nArcType, l_nNumericArcWeight);
 			}
@@ -826,7 +857,8 @@ vector<SP_CPN_ContinuousArc>::const_iterator l_itConnection;
 
 			//l_itConnection->m_sMultiplicity.ToDouble(&l_nWeight);
 
-			if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+			//if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+			if (IsEvaluatedArcWeight(l_sArcWeight, l_nNumericArcWeight))
 			{
 				m_pcMainSimulator->SetPostTransitionConnection(l_itConnection->m_nTranPos,l_itConnection->m_nPlaceID,l_nNumericArcWeight);
 			}
@@ -1085,8 +1117,10 @@ void SP_DLG_ColCPNSimulationResults::LoadParameters()
 	{
 		if (m_apcColListAttr[i])
 		{
-			if (i<m_apcComboBoxes.size())
+			if (i < m_apcComboBoxes.size())
+			{
 				m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i]->GetSelection());
+			}
 			else
 			{
 				m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i - m_nGroupCounts]->GetSelection());
@@ -1229,6 +1263,8 @@ void SP_DLG_ColCPNSimulationResults::LoadConstantsSetsForColPN()
 			if (l_sChoice == l_sGroup && m_iModifyCount == 0)
 			{
 				m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
+				SP_DS_ColListAttribute* l_pcColList=dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+				m_mGroup2Selction[l_sGroup] = l_pcColList->GetActiveColumn();
 				break;
 			}
 		}

@@ -636,7 +636,8 @@ bool SP_DLG_ColFSPNSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcVie
 
 			}
 			else {
-				p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
+				p_pcViewer->AddFuzzyCurves(l_sName, l_nPosition, &(*m_pcCompressedBand));
+				//p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
 			}
 		 
 		}

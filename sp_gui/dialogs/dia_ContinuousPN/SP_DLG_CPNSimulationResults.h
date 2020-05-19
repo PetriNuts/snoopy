@@ -68,6 +68,8 @@ class SP_DLG_CPNSimulationResults : public SP_DLG_Simulation
 
 	    virtual void OnParameterSetChanged( wxCommandEvent& p_cEvent );
 
+		virtual void OnConstantsSetChanged(wxCommandEvent& p_cEvent);
+
 	    virtual void OnFunctionSetChanged( wxCommandEvent& p_cEvent );
 
 	    //call the special csv export dialog
@@ -91,6 +93,8 @@ protected:
 
 	    virtual wxString GetEdgeWeight(SP_DS_Edge* p_pcEdge);
 	    virtual bool IsConstantArcWeight(const wxString& p_sWeight, double& p_nReturnValue);
+
+		virtual bool IsEvaluatedArcWeight(const wxString& p_sArcWeight, double& p_dVal);//by george
 
 	    virtual void LoadPlaces();
 

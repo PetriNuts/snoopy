@@ -73,6 +73,8 @@ protected:
 	virtual wxString GetEdgeWeight(SP_DS_Edge* p_pcEdge);
 	virtual bool IsConstantArcWeight(const wxString& p_sWeight, double& p_nReturnValue);
 
+	virtual bool IsEvaluatedArcWeight(const wxString& p_sArcWeight, double& p_dVal);
+
 	virtual double GetSimulatorProgress();
 
 	virtual bool InitializeSimulator();
@@ -140,6 +142,8 @@ public:
 	virtual void OnSimulatorThreadEvent(SP_DS_ThreadEvent& event);
 
 	virtual void DoSingleExport(const unsigned long& p_nCurrentRunNumber);
+
+	virtual void   OnConstantsSetChanged(wxCommandEvent& p_cEvent);//by george
 
 };
 

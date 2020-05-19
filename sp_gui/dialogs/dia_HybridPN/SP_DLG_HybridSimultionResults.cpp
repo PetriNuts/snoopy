@@ -395,7 +395,13 @@ void SP_DLG_HybridSimulationResults::OnMarkingSetChanged(wxCommandEvent& p_cEven
 			l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
 		}
 	}
-
+	//update contants sets selection
+	unsigned i = 0;
+	for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+	{
+		(it)->second = m_apcComboBoxes[i]->GetSelection();
+		i++;
+	}
    m_bIsSimulatorInitialized = false;
 }
 //
@@ -501,6 +507,16 @@ void SP_DLG_HybridSimulationResults::OnModifyMarkingSets(wxCommandEvent& p_cEven
 		LoadSets();
 	}
 	l_pcDlg->Destroy();
+
+
+	unsigned i = 5;
+	for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+	{
+		m_apcComboBoxes[i]->SetSelection((it)->second);
+		i++;
+	}
+
+	m_bIsSimulatorInitialized = false;
 
 	m_bIsSimulatorInitialized = false;
 }
@@ -992,6 +1008,7 @@ void SP_DLG_HybridSimulationResults::LoadPlacesOfType(const wxString& p_sPlaceTy
 	for (SP_ListNode::const_iterator l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
 	{
 		SP_DS_Node* l_pcNode = (*l_itElem);
+		CHECK_POINTER(l_pcNode, return);//by george
 		l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 
 		m_asPlaceNames[p_nPosition] = l_sName;
@@ -1550,7 +1567,9 @@ void SP_DLG_HybridSimulationResults::LoadConnectionOfType(const wxString& p_sArc
 		//Get the arc Weight
 		if (l_pcSourceNode->GetClassName().Contains(wxT("Transition")) == true)
 		{
-			if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight) == true)
+			
+		//	if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight) == true)
+			if (IsEvaluatedArcWeight(l_sArcWeight, l_nNumericArcWeight) == true)
 			{
 				m_pcMainSimulator->SetPostTransitionConnection(l_sSourceNodeName, l_sDestNodeName, l_nNumericArcWeight);
 			}
@@ -1562,7 +1581,8 @@ void SP_DLG_HybridSimulationResults::LoadConnectionOfType(const wxString& p_sArc
 		}
 		else
 		{
-			if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight) == true)
+			//if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight) == true)
+			if (IsEvaluatedArcWeight(l_sArcWeight, l_nNumericArcWeight) == true)
 			{
 				m_pcMainSimulator->SetPreTransitionConnection(l_sDestNodeName, l_sSourceNodeName, p_ArcType, l_nNumericArcWeight);
 			}
@@ -1590,6 +1610,40 @@ wxString SP_DLG_HybridSimulationResults::GetEdgeWeight(SP_DS_Edge* p_pcEdge)
 	l_sWeight = l_pcAtt->GetValueString();
 
 	return l_sWeight;
+}
+
+bool SP_DLG_HybridSimulationResults::IsEvaluatedArcWeight(const wxString& p_sArcWeight, double& p_dVal)
+{
+	double dValue = 0.0;
+	std::string strValue = p_sArcWeight;
+
+	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+	wxString l_sArcWeight = p_sArcWeight;
+	SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sArcWeight);
+	wxString l_sExpanded;
+	if (l_pcFunction)
+	{
+		SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+		l_sExpanded = l_pcExpanded->toString();
+
+		if (l_sExpanded.ToDouble(&dValue))
+		{
+			p_dVal = dValue;
+			return true; //constant
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+
+		l_sExpanded = l_sArcWeight;
+		return false;
+	}
+	return true;
+
 }
 
 bool SP_DLG_HybridSimulationResults::IsConstantArcWeight(const wxString& p_sWeight, double& p_nReturnValue)

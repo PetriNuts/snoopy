@@ -77,7 +77,8 @@ class SP_DLG_ColHPNSimultionResults : public SP_DS_ColoredPNSimulation, public S
 		virtual void UpdateChoices();//by george for constant harmonizing
 		virtual void LoadConstantsSetsForColPN();//by george for constants harmo
 		void OnModifyConstants(wxCommandEvent& p_cEvent);//by george
-
+		void OnConstantsSetsChanged(wxCommandEvent& p_cEvent);//by george
+		
  public:
 
 	    //virtual void OnStartAbortSimulation(wxCommandEvent& p_cEvent);

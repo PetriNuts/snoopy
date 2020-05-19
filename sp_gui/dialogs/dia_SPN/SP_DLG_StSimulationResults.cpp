@@ -69,7 +69,8 @@ enum
 	SP_ID_BUTTON_ENTER_ILFORMULAE,
 	SP_ID_BUTTON_CHECK_ILFORMULAE,
 
-	SP_ID_BUTTON_CHECK_ILFORMULAE_MENU
+	SP_ID_BUTTON_CHECK_ILFORMULAE_MENU,
+	SP_ID_CHOICE_MARKING_SETS
 
 };
 BEGIN_EVENT_TABLE( SP_DLG_StSimulationResults, SP_DLG_Simulation )
@@ -95,7 +96,7 @@ EVT_BUTTON( SP_ID_BUTTON_CHECK_ILFORMULAE_MENU, SP_DLG_StSimulationResults :: On
 EVT_GRID_LABEL_RIGHT_DCLICK(SP_DLG_StSimulationResults::OnLabelRightDClick)
 
 EVT_SIMTHREAD(SP_SIMULATION_THREAD_EVENT, SP_DLG_StSimulationResults::OnSimulatorThreadEvent)
-
+EVT_CHOICE(SP_ID_CHOICE_MARKING_SETS, SP_DLG_StSimulationResults::OnConstantsSetChanged)
 END_EVENT_TABLE()
 
 SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText, const wxString& p_sTitle, long p_nStyle)
@@ -150,7 +151,7 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 			wxString l_sGroup = *l_itChoice;
 			l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 			l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, l_sGroup + wxT(':') ), wxSizerFlags(1).Expand().Border(wxALL, 2));
-			m_apcComboBoxes.push_back(new wxChoice( m_pcPropertyWindowSetsSizer, -1 , wxDefaultPosition, wxSize(100,-1), 0, NULL, 0, wxDefaultValidator, l_sGroup ));
+			m_apcComboBoxes.push_back(new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_MARKING_SETS, wxDefaultPosition, wxSize(100,-1), 0, NULL, 0, wxDefaultValidator, l_sGroup ));
 			l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], wxSizerFlags(1).Expand().Border(wxALL, 2));
 			l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("modify") ), wxSizerFlags(0).Expand().Border(wxALL, 2));
 			m_pcSetsSizer->Add( l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
@@ -193,13 +194,106 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 
 void SP_DLG_StSimulationResults::OnSimulatorSelect(wxCommandEvent& p_cEvent)
 {
-	wxDELETE(m_pcMainSimulator);
+	spsim::Simulator* l_pcOldSimulator = m_pcMainSimulator;
+	//wxDELETE(m_pcMainSimulator);
 
 	m_pcMainSimulator = CreateSimulator(m_pcSimulatorComboBox->GetSelection());
+	 
+	/////////////////
+ 
+	if (m_pcSimulatorComboBox->GetSelection() != 3)
+	{
+		spsim::VectorProperty::iterator l_itProperty;
+		spsim::VectorProperty::iterator l_itProperty1;
+		spsim::VectorProperty* l_pcProperties = l_pcOldSimulator->GetSimulatorOptions()->GetAllOptions();
+		SP_VectorString::const_iterator l_itStr;
+
+		unsigned int l_nPropertyPos = 0;
+		unsigned int l_nPropertyPos1 = 0;
+		double l_nValue = 0;
+		wxString l_sUserInput;
+
+		for (l_itProperty = l_pcProperties->begin(); l_itProperty != l_pcProperties->end(); l_itProperty++, l_nPropertyPos++)
+		{
+			switch ((*l_itProperty)->GetCtrlGuiType())
+			{
+			case spsim::GUI_TYPE_TXTBOX:
+
+				l_sUserInput = (*l_itProperty)->GetValue();
+
+				l_sUserInput.ToDouble(&l_nValue);
+				if ((*l_itProperty)->GetDisplayedText() == wxT("Number of Runs") || (*l_itProperty)->GetDisplayedText() == wxT("Number of Thread"))
+				{
+					spsim::VectorProperty* l_pcProperties1 = m_pcMainSimulator->GetSimulatorOptions()->GetAllOptions();
+
+					for (l_itProperty1 = l_pcProperties1->begin(); l_itProperty1 != l_pcProperties1->end(); l_itProperty1++, l_nPropertyPos1++)
+					{
+						switch ((*l_itProperty1)->GetCtrlGuiType())
+						{
+						case spsim::GUI_TYPE_TXTBOX:
+							if ((*l_itProperty1)->GetDisplayedText() == wxT("Number of Runs") || (*l_itProperty1)->GetDisplayedText() == wxT("Number of Thread"))
+							{
+								(*l_itProperty1)->SetValue
+								(
+									l_sUserInput
+								);
+								break;
+							}
+						default:;
+						}
+					}
+				}
+
+
+			 
+				break;
+
+			case spsim::GUI_TYPE_CHECKBOX:
+			 
+				break;
+			case spsim::GUI_TYPE_COMBOBOX:
+				l_sUserInput = (*l_itProperty)->GetValue();
+
+				l_sUserInput.ToDouble(&l_nValue);
+				if ((*l_itProperty)->GetDisplayedText() == wxT("Number of Thread"))
+				{
+					spsim::VectorProperty* l_pcProperties1 = m_pcMainSimulator->GetSimulatorOptions()->GetAllOptions();
+
+					for (l_itProperty1 = l_pcProperties1->begin(); l_itProperty1 != l_pcProperties1->end(); l_itProperty1++, l_nPropertyPos1++)
+					{
+						switch ((*l_itProperty1)->GetCtrlGuiType())
+						{
+						case spsim::GUI_TYPE_COMBOBOX:
+							if ((*l_itProperty1)->GetDisplayedText() == wxT("Number of Thread"))
+							{
+								(*l_itProperty1)->SetValue
+								(
+									l_sUserInput
+								);
+								break;
+							}
+						}
+					}
+				}
+
+				break;
+			default:
+
+				continue;
+
+			}
+		}
+	}
+	 
+	 // m_nRefreshRate = 5000;
+	  
+	wxDELETE(l_pcOldSimulator);
 }
 
 spsim::Simulator* SP_DLG_StSimulationResults::CreateSimulator(const int& p_nSimulatorType)
 {
+	m_nSimTypeForStoch = p_nSimulatorType;//by georg
+
 	if (p_nSimulatorType == 0)
 	{
 		return new spsim::Gillespie();
@@ -216,7 +310,7 @@ spsim::Simulator* SP_DLG_StSimulationResults::CreateSimulator(const int& p_nSimu
 	{
 		return new spsim::Fau();
 	}
-
+	
 	return new spsim::Gillespie();
 }
 
@@ -1263,7 +1357,8 @@ void SP_DLG_StSimulationResults::LoadConnectionOfType(const wxString& p_sArcType
 		//Get the arc Weight
 		if (l_pcSourceNode->GetClassName().Contains(wxT("Transition")))
 		{
-			if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+			//if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+			if (IsEvaluatedArcWeight(l_sArcWeight, l_nNumericArcWeight))
 			{
 				m_pcMainSimulator->SetPostTransitionConnection(l_sSourceNodeName, l_sDestNodeName, l_nNumericArcWeight);
 			}
@@ -1275,7 +1370,8 @@ void SP_DLG_StSimulationResults::LoadConnectionOfType(const wxString& p_sArcType
 		}
 		else
 		{
-			if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+			//if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+			if (IsEvaluatedArcWeight(l_sArcWeight, l_nNumericArcWeight))
 			{
 				m_pcMainSimulator->SetPreTransitionConnection(l_sDestNodeName, l_sSourceNodeName, p_ArcType, l_nNumericArcWeight);
 			}
@@ -1303,6 +1399,40 @@ wxString SP_DLG_StSimulationResults::GetEdgeWeight(SP_DS_Edge* p_pcEdge)
 	l_sWeight = l_pcAtt->GetValueString();
 
 	return l_sWeight;
+}
+
+bool SP_DLG_StSimulationResults::IsEvaluatedArcWeight(const wxString& p_sArcWeight, double& p_dVal)
+{
+	double dValue = 0.0;
+	std::string strValue = p_sArcWeight;
+
+	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+	wxString l_sArcWeight = p_sArcWeight;
+	SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sArcWeight);
+	wxString l_sExpanded;
+	if (l_pcFunction)
+	{
+		SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+		l_sExpanded = l_pcExpanded->toString();
+
+		if (l_sExpanded.ToDouble(&dValue))
+		{
+			p_dVal = dValue;
+			return true; //constant
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+
+		l_sExpanded = l_sArcWeight;
+		return false;
+	}
+	return true;
+
 }
 
 bool SP_DLG_StSimulationResults::IsConstantArcWeight(const wxString& p_sWeight, double& p_nReturnValue)
@@ -1748,4 +1878,17 @@ void SP_DLG_StSimulationResults::DoSingleExport(const unsigned long& p_nCurrentR
 
 		DirectSingleExportToCSV(p_nCurrentRunNumber);
 	}
+}
+
+void SP_DLG_StSimulationResults::OnConstantsSetChanged(wxCommandEvent& p_cEvent)
+{
+	 
+	//update contants sets selection
+	unsigned i = 4;
+	for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+	{
+		(it)->second = m_apcComboBoxes[i]->GetSelection();
+		i++;
+	}
+ 
 }

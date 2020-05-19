@@ -23,7 +23,7 @@ class SP_DLG_ColCPNSimulationResults : public SP_DS_ColoredPNSimulation, public 
 	 SP_SetString m_choicesForColPNs;//by george
 	 int m_iModifyCount;//by george, this data member prevents load doublicate two identical CollistAttributes
 	 int m_nGroupCounts;//by george, this member counts the extra comboboxes (extra constants groups)
- private:
+private:
 	    DECLARE_EVENT_TABLE();
 	    virtual void OnModifyMarkingSets( wxCommandEvent& p_cEvent );
 
@@ -34,6 +34,8 @@ class SP_DLG_ColCPNSimulationResults : public SP_DS_ColoredPNSimulation, public 
 	    virtual void OnMarkingSetChanged( wxCommandEvent& p_cEvent );
 
 	    virtual void OnParameterSetChanged( wxCommandEvent& p_cEvent );
+
+		virtual void OnConstantsSetChanged(wxCommandEvent& p_cEvent);
 
 	    virtual void OnFunctionSetChanged( wxCommandEvent& p_cEvent );
 

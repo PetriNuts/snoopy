@@ -97,6 +97,7 @@ EVT_MENU( SP_ID_BUTTON_ENTER_ILFORMULAE, SP_DLG_ColStSimulationResults :: OnEnte
 EVT_MENU( SP_ID_BUTTON_CHECK_ILFORMULAE, SP_DLG_ColStSimulationResults :: CheckApFormulae )
 EVT_BUTTON( SP_ID_BUTTON_CHECK_ILFORMULAE_MENU, SP_DLG_ColStSimulationResults :: OnCheckFormulaMenu )
 EVT_SIMTHREAD(SP_SIMULATION_THREAD_EVENT,SP_DLG_StSimulationResults::OnSimulatorThreadEvent)
+EVT_CHOICE(SP_ID_BUTTON_CHANGE_COL_CONSTANT_SETS, SP_DLG_ColStSimulationResults::OnConstantsSetChanged)
 
 EVT_BUTTON(SP_ID_BUTTON_MODIFY_COL_CONSTANT_SETS, SP_DLG_ColStSimulationResults::OnModifyConstants)// by george
 END_EVENT_TABLE()
@@ -468,6 +469,13 @@ void SP_DLG_ColStSimulationResults::OnModifyMarkingSets(wxCommandEvent& p_cEvent
 	{
 		LoadSets();
 
+		//recover the selected groups
+		unsigned i = 5;
+		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+		{
+			m_apcComboBoxes[i]->SetSelection((it)->second);
+			i++;
+		}
 		if (!LoadUnfoldedPlaces())
 		{
 			SP_MESSAGEBOX(wxT("Unfolding error"), wxT("Unfolding checking"), wxOK | wxICON_ERROR);
@@ -486,6 +494,14 @@ void SP_DLG_ColStSimulationResults::OnModifyFunctionSets(wxCommandEvent& p_cEven
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{
 		LoadSets();
+
+		//recover the selected groups
+		unsigned i = 5;
+		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+		{
+			m_apcComboBoxes[i]->SetSelection((it)->second);
+			i++;
+		}
 
 		if( LoadUnfoldedPlaces() )
 		{
@@ -507,6 +523,14 @@ void SP_DLG_ColStSimulationResults::OnModifyWeightSets(wxCommandEvent& p_cEvent)
 	{
 		LoadSets();
 
+		//recover the selected groups
+		unsigned i = 5;
+		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+		{
+			m_apcComboBoxes[i]->SetSelection((it)->second);
+			i++;
+		}
+
 		if( LoadUnfoldedPlaces() )
 		{
 			if( LoadUnfoldingData() )
@@ -526,6 +550,14 @@ void SP_DLG_ColStSimulationResults::OnModifyDelaySets(wxCommandEvent& p_cEvent)
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{
 		LoadSets();
+
+		//recover the selected groups
+		unsigned i = 5;
+		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+		{
+			m_apcComboBoxes[i]->SetSelection((it)->second);
+			i++;
+		}
 
 		if( LoadUnfoldedPlaces() )
 		{
@@ -547,6 +579,14 @@ void SP_DLG_ColStSimulationResults::OnModifyScheduleSets(wxCommandEvent& p_cEven
 	{
 		LoadSets();
 
+		//recover the selected groups
+		unsigned i = 5;
+		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+		{
+			m_apcComboBoxes[i]->SetSelection((it)->second);
+			i++;
+		}
+
 		if( LoadUnfoldedPlaces() )
 		{
 			if( LoadUnfoldingData() )
@@ -566,13 +606,17 @@ void SP_DLG_ColStSimulationResults::OnModifyParameterSets(wxCommandEvent& p_cEve
 	if (l_pcConstantDialog->ShowModal() == wxID_OK)
 	{
 		LoadSets();
+
+		unsigned i = 0;
+		if (m_mGroup2Selction.size() == m_apcComboBoxes.size())
+			for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+			{
+				m_apcComboBoxes[i]->SetSelection((it)->second);
+				i++;
+			}
 	}
 
-
-	//if (l_pcDlg->ShowModal() == wxID_OK)
-//	{
-//		LoadSets();
-//	}
+ 
 }
 
 void SP_DLG_ColStSimulationResults::DirectSingleExportToCSV(long p_nSimulationRunNumber)
@@ -1339,12 +1383,12 @@ void SP_DLG_ColStSimulationResults::LoadConnections()
 		double l_nNumericArcWeight = 0;
 
 		wxString l_sArcWeight=l_itConnection->m_sMultiplicity;
-
+		 
 		//l_itConnection->m_sMultiplicity.ToDouble(&l_nWeight);
 
 		spsim::ConnectionType l_nArcType=GetConnectionType(l_itConnection->m_sArcClass);
-
-		if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+		if (IsEvaluatedArcWeight(l_sArcWeight, l_nNumericArcWeight))
+		//if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
 		{
 			m_pcMainSimulator->SetPreTransitionConnection(l_itConnection->m_nTranPos,l_itConnection->m_nPlaceID, l_nArcType, l_nNumericArcWeight);
 		}
@@ -1368,8 +1412,8 @@ void SP_DLG_ColStSimulationResults::LoadConnections()
 		wxString l_sArcWeight=l_itConnection->m_sMultiplicity;
 
 		//l_itConnection->m_sMultiplicity.ToDouble(&l_nWeight);
-
-		if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
+		if (IsEvaluatedArcWeight(l_sArcWeight, l_nNumericArcWeight))
+		//if (IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight))
 		{
 			m_pcMainSimulator->SetPostTransitionConnection(l_itConnection->m_nTranPos,l_itConnection->m_nPlaceID,l_nNumericArcWeight);
 		}
@@ -1597,6 +1641,8 @@ void SP_DLG_ColStSimulationResults::LoadConstantsSetsForColPN()
 				if (l_sChoice == l_sGroup && m_iModifyCount==0)
 				{
 					m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
+					SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+					m_mGroup2Selction[l_sGroup] = l_pcColList->GetActiveColumn();
 					break;
 				}
 			}
@@ -1609,6 +1655,7 @@ void SP_DLG_ColStSimulationResults::LoadConstantsSetsForColPN()
 			SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
 			int l_Index = j - m_nGroupCounts;
 			wxChoice* l_pcCombobox = m_apcComboBoxes[l_Index];
+			if(l_pcCombobox)
 			l_pcCombobox->Clear();
 			if (l_pcAttr)
 			{
@@ -1641,8 +1688,29 @@ void SP_DLG_ColStSimulationResults::OnModifyConstants(wxCommandEvent& p_cEvent)
 			m_iModifyCount++;
 
 			LoadSets();
+
+			//recover the selected groups
+			unsigned i = 5;
+			for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+			{
+				m_apcComboBoxes[i]->SetSelection((it)->second);
+				i++;
+			}
 		}
 		
 	}
 	
+}
+
+
+void SP_DLG_ColStSimulationResults::OnConstantsSetChanged(wxCommandEvent& p_cEvent)
+{
+	//remember the selected sets of constants groups
+	    unsigned i = 5;
+		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+		{
+			(it)->second = m_apcComboBoxes[i]->GetSelection();
+			i++;
+		}
+
 }

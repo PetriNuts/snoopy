@@ -42,7 +42,6 @@
 #include "sp_gui/dialogs/dia_SPN/SP_DLG_StDirectExportProperties.h"
 #include "sp_gui/dialogs/dia_ContinuousPN/SP_DLG_CSVExport.h"
 
-
 //New simulator header file
 #include "spsim/spsim.h"
 #if !defined(__WXMSW__) && !defined(__WXPM__)
@@ -188,7 +187,6 @@ int l_nSimulatorIndex =
 
 	//At the end call this function for alignment
 	SetSizerAndFit(m_pcMainSizer);
-
 	Layout();
 }
 void SP_DLG_CPNSimulationResults::InitializeEmptyView(SP_DS_Metadata* p_pcView)
@@ -359,9 +357,22 @@ void SP_DLG_CPNSimulationResults::OnMarkingSetChanged(wxCommandEvent& p_cEvent)
 		}
 	}
 
+	unsigned i = 1;
+	for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+	{
+		(it)->second = m_apcComboBoxes[i]->GetSelection();
+		i++;
+	}
 	m_bIsSimulatorInitialized = false;
 }
 //
+
+
+void SP_DLG_CPNSimulationResults::OnConstantsSetChanged(wxCommandEvent& p_cEvent)
+{
+	
+}
+
 void SP_DLG_CPNSimulationResults::OnParameterSetChanged(wxCommandEvent& p_cEvent)
 {
 	unsigned int l_nCurrentParameterSet = m_pcParameterSetComboBox->GetSelection();
@@ -371,6 +382,8 @@ void SP_DLG_CPNSimulationResults::OnParameterSetChanged(wxCommandEvent& p_cEvent
 	for (SP_ListNode::const_iterator l_itParam = l_pcParams->begin(); l_itParam != l_pcParams->end(); l_itParam++)
 		(dynamic_cast<SP_DS_ColListAttribute*>((*l_itParam)->GetAttribute(wxT("ParameterList"))))->SetActiveList(l_nCurrentParameterSet);
 
+
+	 
 	//Reload the parameters
 	LoadParameters();
 
@@ -397,6 +410,13 @@ void SP_DLG_CPNSimulationResults::OnModifyMarkingSets(wxCommandEvent& p_cEvent)
 	{
 		LoadSets();
 
+		unsigned i = 0;
+		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+		{
+			m_apcComboBoxes[i]->SetSelection((it)->second);
+			i++;
+		}
+
 		//TODO: load only the current active Marking
 		LoadPlaces();
 
@@ -416,6 +436,13 @@ void SP_DLG_CPNSimulationResults::OnModifyFunctionSets(wxCommandEvent& p_cEvent)
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{
 		LoadSets();
+
+		unsigned i = 0;
+		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+		{
+			m_apcComboBoxes[i]->SetSelection((it)->second);
+			i++;
+		}
 
 		//TODO: load only rate functions to save time
 		m_bIsSimulatorInitialized = false;
@@ -459,6 +486,13 @@ void SP_DLG_CPNSimulationResults::OnModifyParameterSets(wxCommandEvent& p_cEvent
 	if (l_cDlg.ShowModal() == wxID_OK)
 	{
 		LoadSets();
+
+		unsigned i = 0;
+		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+		{
+			m_apcComboBoxes[i]->SetSelection((it)->second);
+			i++;
+		}
 
 		//Reload the parameters
 		LoadParameters();
@@ -556,7 +590,7 @@ bool SP_DLG_CPNSimulationResults::InitializeSimulator()
 	if (m_pcIntervalEndTextCtrl->GetValue().ToDouble(&l_nOutputEndPoint) && l_nOutputEndPoint > 0)
 	{
 		m_pcMainSimulator->SetOutputEndPoint(l_nOutputEndPoint);
-
+		 
 		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("Simulation Properties"))->GetElements()->begin());
 		SP_DS_Attribute* l_pcAttr = l_pcSimProp->GetAttribute(wxT("interval end"));
 		l_pcAttr->SetValueString(m_pcIntervalEndTextCtrl->GetValue());
@@ -570,7 +604,6 @@ bool SP_DLG_CPNSimulationResults::InitializeSimulator()
 	if (m_pcIntervalStartTextCtrl->GetValue().ToDouble(&l_nOutputStartPoint) && l_nOutputStartPoint >= 0 && l_nOutputStartPoint < l_nOutputEndPoint)
 	{
 		m_pcMainSimulator->SetOutputStartPoint(l_nOutputStartPoint);
-
 		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("Simulation Properties"))->GetElements()->begin());
 		SP_DS_Attribute* l_pcAttr = l_pcSimProp->GetAttribute(wxT("interval start"));
 		l_pcAttr->SetValueString(m_pcIntervalStartTextCtrl->GetValue());
@@ -586,7 +619,6 @@ bool SP_DLG_CPNSimulationResults::InitializeSimulator()
 		m_nResultPointCount = l_nLong0 + 1;
 
 		m_pcMainSimulator->SetOutputSampleSize((l_nOutputEndPoint - l_nOutputStartPoint) / (m_nResultPointCount - 1));
-
 		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("Simulation Properties"))->GetElements()->begin());
 		SP_DS_Attribute* l_pcAttr = l_pcSimProp->GetAttribute(wxT("output step"));
 		l_pcAttr->SetValueString(m_pcResultPointCountTextCtrl->GetValue());
@@ -615,10 +647,14 @@ bool SP_DLG_CPNSimulationResults::InitializeSimulator()
 		// load observers
 		LoadObservers();
 	}
-
+	bool l_bIsInitialized;
 	wxBusyInfo* l_pcInfo = new wxBusyInfo(wxT("Initializing the ODEs solver, please wait...."), this);
-	bool l_bIsInitialized = m_pcMainSimulator->Initialise(true);
-
+	
+ 
+	 l_bIsInitialized = m_pcMainSimulator->Initialise(true);
+ 
+ 
+	 
 	wxDELETE(l_pcInfo);
 
 	//Get some properties from the user
@@ -759,7 +795,8 @@ CreateSimulator(const int& p_nSimulatorType)
     {
     	if(p_nSimulatorType==0)
     	{
-    		return new spsim::ContinuousSimulatorAdaptive(CV_BDF, CV_NEWTON);
+			 
+			return new spsim::ContinuousSimulatorAdaptive(CV_BDF, CV_NEWTON);
     	}
     	else if(p_nSimulatorType==1)
     	{
@@ -989,12 +1026,10 @@ void SP_DLG_CPNSimulationResults::LoadTransitions()
 	SP_DS_ColListAttribute* l_pcColList;
 
 	m_pcMainSimulator->SetTransitionCount(l_pcNodeclass->GetElements()->size());
-
 	unsigned long l_nPosition = 0;
 
 	//clear old transitions
 	m_pcMainSimulator->ClearTransitions();
-
 	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
 
 	//Go through all the transition nodes
@@ -1019,7 +1054,6 @@ void SP_DLG_CPNSimulationResults::LoadTransitions()
 
 		//add a transition
 		m_pcMainSimulator->AddTransition(l_sName, l_sExpanded, spsim::TRANSITION_TYPE_CONTINUOUS);
-
 		m_asTransitionNames.push_back(l_sName);
 		m_mTransitionName2Position[l_sName] = l_nPosition;
 
@@ -1092,25 +1126,30 @@ void SP_DLG_CPNSimulationResults::LoadConnectionOfType(const wxString& p_sArcTyp
 		//Get the arc Weight
 		if(l_pcSourceNode->GetClassName().Contains(wxT("Transition"))==true)
 		{
-			if (IsConstantArcWeight(l_sArcWeight,l_nNumericArcWeight)==true)
+			
+			//if (IsConstantArcWeight(l_sArcWeight,l_nNumericArcWeight)==true)
+			if (IsEvaluatedArcWeight(l_sArcWeight, l_nNumericArcWeight) == true)
 			{
 				m_pcMainSimulator->SetPostTransitionConnection(l_sSourceNodeName,l_sDestNodeName,l_nNumericArcWeight);
 			}
 			else
 			{
-				m_pcMainSimulator->SetPostSelfModifyingWeights(l_sSourceNodeName,l_sDestNodeName,l_sArcWeight);
+			  m_pcMainSimulator->SetPostSelfModifyingWeights(l_sSourceNodeName,l_sDestNodeName,l_sArcWeight);
 			}
 
 		}
 		else
 		{
-			if (IsConstantArcWeight(l_sArcWeight,l_nNumericArcWeight)==true)
+			bool l_bIsConstant = false;
+			//l_bIsConstant=IsConstantArcWeight(l_sArcWeight, l_nNumericArcWeight);
+			l_bIsConstant=IsEvaluatedArcWeight(l_sArcWeight, l_nNumericArcWeight);
+			if (l_bIsConstant == true)
 			{
 				m_pcMainSimulator->SetPreTransitionConnection(l_sDestNodeName,l_sSourceNodeName,p_ArcType,l_nNumericArcWeight);
 			}
 			else
 			{
-				m_pcMainSimulator->SetPreSelfModifyingWeights(l_sDestNodeName,l_sSourceNodeName,p_ArcType,l_sArcWeight);
+			    m_pcMainSimulator->SetPreSelfModifyingWeights(l_sDestNodeName,l_sSourceNodeName,p_ArcType,l_sArcWeight);
 			}
 
 		}
@@ -1134,6 +1173,39 @@ wxString SP_DLG_CPNSimulationResults::GetEdgeWeight(SP_DS_Edge* p_pcEdge)
 
 	return l_sWeight;
 }
+bool SP_DLG_CPNSimulationResults::IsEvaluatedArcWeight(const wxString& p_sArcWeight, double& p_dVal)
+{
+	   double dValue = 0.0;
+	   std::string strValue = p_sArcWeight;
+	 
+		SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+		wxString l_sArcWeight = p_sArcWeight;
+		SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sArcWeight);
+		wxString l_sExpanded;
+		if (l_pcFunction)
+		{
+			SP_FunctionPtr l_pcExpanded = l_pcFR->substituteFunctions(l_pcFunction);
+			l_sExpanded = l_pcExpanded->toString();
+	 
+			if (l_sExpanded.ToDouble(&dValue))
+			{
+				p_dVal = dValue;
+				return true; //constant
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			
+			l_sExpanded = l_sArcWeight;
+			return false;
+		}
+		return true;
+	 
+}
 
 bool SP_DLG_CPNSimulationResults::IsConstantArcWeight(const wxString& p_sWeight, double& p_nReturnValue)
 {
@@ -1152,6 +1224,7 @@ bool SP_DLG_CPNSimulationResults::IsConstantArcWeight(const wxString& p_sWeight,
 
 		  return true; //constant
 	  }
+
 
 	  return false; //not a constant
 }
@@ -1211,9 +1284,9 @@ void SP_DLG_CPNSimulationResults::LoadPlaces()
 
 		l_nPosition++;
 	}
-
+ 
 	m_pcMainSimulator->SetPlaceNames(l_asPlaceNames);
-
+ 
 	(dynamic_cast<spsim::ContinuousSimulator*>(m_pcMainSimulator))->SetInitialMarking(l_anCurrentMarking);
 
 	//set fixed flag

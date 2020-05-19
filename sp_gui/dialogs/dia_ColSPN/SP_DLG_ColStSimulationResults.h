@@ -56,6 +56,7 @@ protected :
 
 	  virtual void LoadConstantsSetsForColPN();//by george for constants harmo
 	  void OnModifyConstants(wxCommandEvent& p_cEvent);//by george
+	  void  OnConstantsSetChanged(wxCommandEvent& p_cEvent);//by george
 
 
 	  virtual void LoadSimulatorData();

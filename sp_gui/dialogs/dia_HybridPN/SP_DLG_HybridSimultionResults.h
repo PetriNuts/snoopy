@@ -119,6 +119,8 @@ protected:
 	virtual wxString GetEdgeWeight(SP_DS_Edge* p_pcEdge);
 	virtual bool IsConstantArcWeight(const wxString& p_sWeight, double& p_nReturnValue);
 
+	bool   IsEvaluatedArcWeight(const wxString& p_sArcWeight, double& p_dVal);//bug fix:george
+
 	virtual double GetSimulatorProgress();
 
 	virtual spsim::Simulator* CreateSimulator(const int& p_nSimulatorType);
