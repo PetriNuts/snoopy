@@ -46,6 +46,11 @@ class SP_DLG_ConstantDefinition : public wxDialog
 	SP_SetString m_Places;
 	SP_DS_Graph* l_pcGraph;
 	map<wxString, wxString> m_mID2Val;
+	bool m_bSortFlag;
+	unsigned m_norgRow;//for move row
+	wxArrayString m_RowData;
+	bool m_bIsAsc;
+	wxButton* m_pcSortingButton;
   private:
 
     void LoadSetNames();
@@ -66,6 +71,22 @@ class SP_DLG_ConstantDefinition : public wxDialog
 	bool  ExistSetName(const wxString& p_sName);
 	bool GetIntConstantValue(wxString p_sConstExpr, double& p_nValue);
     bool DoCheckUserInput();
+
+	void  OnGridLabelLeftClick(wxGridEvent& event);
+
+	void  OnRowRightClick(wxGridEvent& event);
+
+	void Operate(const unsigned&,const unsigned& r=0);
+
+	void OnPopupClick(wxCommandEvent& evt);
+
+	void SortVlaueSets(std::multimap<std::string, float>&p_mVset2Val, std::vector<std::string>&p_vRes, bool p_bIsAscending);
+
+	void SortConstants(const bool& p_bIsAscending=true);
+
+	bool  EvalConstantExpression(const wxString& p_sArcWeight, double& p_dVal);
+
+
   public:
 	
     SP_DLG_ConstantDefinition( wxWindow* p_pcParent,
@@ -83,6 +104,7 @@ class SP_DLG_ConstantDefinition : public wxDialog
 	void OnAddValueSet(wxCommandEvent& p_cEvent);
 	void OnRenameSet(wxCommandEvent& p_cEvent);
 	void OnDeleteValueSet(wxCommandEvent& p_cEvent);
+	void OnSortVsets(wxCommandEvent& p_cEvent);
    DECLARE_CLASS( SP_DLG_ColorSetSetting )
    DECLARE_EVENT_TABLE()
 

@@ -44,7 +44,7 @@ private:
 	wxString *dataFn;//Added by G.A
 
 	wxString m_sAvailableDatatypes;
-
+	std::map<wxString, wxString> m_mAcceptedConst2Val;
 	SP_DS_Graph* m_pcGraph;
 	SP_DS_Metadataclass* m_pcConstants;
 
@@ -59,7 +59,11 @@ private:
 	wxString l_sTFNFromDrawingPanel;
 	int m_nRow;
 	int m_nCol;
-
+	bool m_bSortFlag;
+	unsigned m_norgRow;//for move row
+	wxArrayString m_RowData;
+	bool m_bIsAsc;
+	wxButton* m_pcSortingButton;
 private:
 
 	bool SaveData();
@@ -77,12 +81,32 @@ private:
 
 	bool FindCycle();
 
-	bool DoCheckFunction(const wxString& p_sName, const wxString& p_sType, const wxString& p_sValue);
+	bool DoCheckFunction1(const wxString& p_sName, const wxString& p_sType, const wxString& p_sValue);
+	//bool DoCheckFunction(const wxString& p_sName, const wxString& p_sType, const wxString& p_sValue);
 	bool CheckFN(const wxString& type, wxString &consta, wxString& constb, wxString& constc, wxString& constd);
+	
 	bool  ParseFN(const wxString& type,const wxString &val);
+	
 	SP_VectorDouble  GetFNConstants( const wxString &val);
-
+	
+	bool SubstituteConstant(const wxString& p_sName, wxString& p_sValue);//by george to fix bug of constants dependencies
+	
 	void OnChildDestroy(wxCloseEvent& event);
+
+	void OnGridLabelLeftClick(wxGridEvent& event);
+
+	void SortConstants(const bool& p_bIsAscending = true);
+
+	void SortVlaueSets(std::multimap<std::string, float>&p_mVset2Val, std::vector<std::string>&p_vRes, bool p_bIsAscending);
+
+	bool EvalConstantExpression(const wxString& p_sexp, double& p_dVal);
+
+	void  OnRowRightClick(wxGridEvent& event);
+
+	void Operate(const unsigned&, const unsigned& r = 0);
+	void  OnSortVsets(wxCommandEvent& p_cEvent);
+
+	void OnPopupClick(wxCommandEvent& evt);
 protected:
 	bool FindString(wxArrayString& p_asStrArray, wxString& p_sValue);
 

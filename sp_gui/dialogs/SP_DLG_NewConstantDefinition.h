@@ -30,7 +30,7 @@ class SP_DLG_NewConstantDefinition : public wxDialog
     wxBoxSizer* m_pcSizer;
 
     wxGrid* m_pcConstantSetGrid;
-
+	 
     wxArrayString m_asGroups;
 
 	wxArrayString  m_datatypes;
@@ -39,7 +39,8 @@ class SP_DLG_NewConstantDefinition : public wxDialog
 
 	wxArrayString m_ftn;// Added by G.A
 	wxString *dataFn;//Added by G.A
-
+	std::set<wxString> m_vAlreadyAcceptedConstants;
+	std::map<wxString, wxString> m_mAcceptedConst2Val;
 	wxString m_sAvailableDatatypes;
 
 	SP_DS_Graph* m_pcGraph;
@@ -52,7 +53,11 @@ class SP_DLG_NewConstantDefinition : public wxDialog
 	bool m_bIsApplyExecuted;
 
 	SP_SetString m_Places;
-
+	bool m_bSortFlag;
+	unsigned m_norgRow;//for move row
+	wxArrayString m_RowData;
+	bool m_bIsAsc;
+	wxButton* m_pcSortingButton;
   private:
 
 	bool SaveData();
@@ -72,13 +77,29 @@ class SP_DLG_NewConstantDefinition : public wxDialog
 
 	bool DoCheckFunction(const wxString& p_sName, const wxString& p_sType, const wxString& p_sValue);
 
+	bool SubstituteConstant(const wxString& p_sName, wxString& p_sValue);//by george to fix bug of constants dependencies
+
+	void  OnRowRightClick(wxGridEvent& event);
+
+	void Operate(const unsigned&, const unsigned& r = 0);
+
+	void OnPopupClick(wxCommandEvent& evt);
+
+	void OnSortVsets(wxCommandEvent& p_cEvent);
+
   protected:
 	bool FindString(wxArrayString& p_asStrArray,wxString& p_sValue);
 
 	//checks the user inputs
 	bool CheckInput();
 
-  public:
+	void SortConstants(const bool& p_bIsAscending=true);//by george
+
+	void SortVlaueSets(std::multimap<std::string, float>&, std::vector<std::string>&p_vRes,bool p_bIsAscending = true);//by george
+ 
+	bool  EvalConstantExpression(const wxString& p_sexp, double& p_dVal);
+
+public:
 
 	SP_DLG_NewConstantDefinition( wxWindow* p_pcParent,
       const wxString& p_sTitle = wxT("Constant Definition"),
@@ -99,7 +120,7 @@ class SP_DLG_NewConstantDefinition : public wxDialog
 	void OnGridCellValueChanged( wxGridEvent& p_gEvent);
 	void OnGridCellSelected(wxGridEvent& ev);
 	void OnEditorShown(wxGridEvent& ev);
-
+	void OnGridLabelLeftClick(wxGridEvent& event);
 
    DECLARE_CLASS( SP_DLG_NewConstantDefinition )
    DECLARE_EVENT_TABLE()
