@@ -113,6 +113,9 @@ private:
 	bool InitializeFunction(SP_CPN_ColorSetClass &p_ColorSetClass);
 	bool InitializeFunctionParseTree(SP_CPN_ColorSetClass &p_ColorSetClass);
 	
+	
+	bool CheckAndSubstituteForwardDependency(map<wxString, SP_CPN_Function>& p_functionMap, const wxString& p_sfunBody, std::map<wxString, SP_CPN_Parameter>, wxString& p_sNewFunction);//by george
+
 };
 
 #endif // __SP_CPN_ValueAssign__

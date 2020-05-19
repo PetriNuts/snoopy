@@ -968,7 +968,7 @@ bool SP_CPN_ValueAssign:: InitializeFunction(SP_CPN_ColorSetClass &p_ColorSetCla
 {
 	vector<int> l_vInt;
 	vector<wxString> l_vString;
-
+	std::map<wxString,SP_CPN_Parameter> l_mParamName2Info;//by george
 
 	
 	vector<SP_CPN_Collist_Declarations>* l_pvDeclarations = &(m_svDeclarations[wxT("FunctionList")]);
@@ -1110,16 +1110,143 @@ bool SP_CPN_ValueAssign:: InitializeFunction(SP_CPN_ColorSetClass &p_ColorSetCla
 			l_ParameterStruct.m_nPosition = k/2;
 			l_FunctionStruct.m_ParameterMap[l_vResult[k+1]] = l_ParameterStruct;
 
+			l_mParamName2Info = l_FunctionStruct.m_ParameterMap;//by george
 			k++;
 		}
+		wxString l_sConstitutedFun;
+		bool l_bIsSubstituted=CheckAndSubstituteForwardDependency(m_FunctionMap, (*l_pvDeclarations)[i].m_sFunctionBody, l_mParamName2Info, l_sConstitutedFun);
+		l_mParamName2Info.clear();
 
-		wxString l_sFunctionBody= (*l_pvDeclarations)[i].m_sFunctionBody;
+		wxString l_sFunctionBody;
+		if(!l_bIsSubstituted)
+			l_sFunctionBody = (*l_pvDeclarations)[i].m_sFunctionBody;
+		else
+		{
+			l_sFunctionBody = l_sConstitutedFun;
+		}
 		l_FunctionStruct.m_sFunctionBody = l_sFunctionBody;
 		m_FunctionMap[l_sFunctionName] = l_FunctionStruct;    // first store the declaration information
 				
 	}
 
 	return true;
+}
+
+bool SP_CPN_ValueAssign::CheckAndSubstituteForwardDependency(map<wxString, SP_CPN_Function>& p_functionMap, const wxString& p_sOldFunBody, std::map<wxString, SP_CPN_Parameter> p_mParam2Inf, wxString& p_sNewFunction)
+{
+
+	wxString l_sCleanedBody = p_sOldFunBody;
+
+	l_sCleanedBody.Replace(wxT(" "), wxT(""));
+	l_sCleanedBody.Replace(wxT("\t"), wxT(""));
+	l_sCleanedBody.Replace(wxT("\n"), wxT(""));
+
+	std::string l_sOldBody = l_sCleanedBody.ToStdString();
+	bool l_bIsSubstitued = false;
+
+	p_sNewFunction = l_sCleanedBody;
+	wxString l_sNewBody;
+
+	wxString l_sTobeTokenized = p_sOldFunBody;
+	 
+	wxStringTokenizer tokenizer(l_sCleanedBody, wxT("()+*/^=<>!%&|,- "));
+
+	while (tokenizer.HasMoreTokens())
+	{
+		wxString token = tokenizer.GetNextToken();
+
+		for (auto itMap = p_functionMap.begin(); itMap != p_functionMap.end(); ++itMap)
+		{
+			if (itMap->first == token)
+			{
+				size_t l_nStartPos = l_sOldBody.find(token);
+				size_t l_nLength = token.length();
+				wxString l_sFunParam;
+
+
+				size_t i = l_nLength;
+				unsigned  l_nlastPos= l_nLength;
+
+				vector<wxString> l_vParams;
+
+				if (l_sOldBody.find('(') == std::string::npos || l_sOldBody.find(')') == std::string::npos)
+				{
+					return false;
+				}
+
+				while (l_sOldBody[i] != wxChar('('))
+				{
+					i++;
+				}
+
+				unsigned j = 0;
+			    while (l_sOldBody[i] != wxChar(')'))
+				{
+					j++;
+				  if (l_sOldBody[i] == wxChar(','))
+				  {
+					  l_vParams.push_back(l_sFunParam);
+					  l_sFunParam.Empty();
+					  i++;
+					  continue;
+				  }
+
+				  if(l_sOldBody[i]!=wxChar('('))
+				  l_sFunParam << l_sOldBody[i];
+
+				  i++;
+				}
+
+
+				l_nlastPos += j;
+				l_vParams.push_back(l_sFunParam);
+
+				//check compatibility with the function signature
+				unsigned index = 0;
+				bool l_bFound = false;
+				for (auto itM = p_mParam2Inf.begin(); itM != p_mParam2Inf.end();)
+				{
+					l_bFound = false;
+					if (l_vParams[index] == itM->first && itM->second.m_nPosition == index)
+					{
+						//check color set type
+						auto itFindCs = itMap->second.m_ParameterMap.find(l_vParams[index]);
+						if (itFindCs != itMap->second.m_ParameterMap.end())
+						{
+							if (itFindCs->second.m_sParaColorSet != itM->second.m_sParaColorSet)
+							{
+								return false;
+							}
+						}
+						
+						index++;
+						itM = p_mParam2Inf.begin();
+						l_bFound = true;
+					}
+					if(!l_bFound)
+					++itM;
+				}
+
+				if (index != l_vParams.size() )
+				{
+					return false;
+				}
+				else
+				{
+					//substitute
+					wxString l_sNewBody = itMap->second.m_sFunctionBody;
+					wxString l_sTobeReplaced = p_sNewFunction.substr(l_nStartPos, l_nlastPos+1);
+					p_sNewFunction.Replace(l_sTobeReplaced, l_sNewBody);
+					l_bIsSubstitued = true;
+				}
+			}
+		}
+		
+	} 
+	if (l_bIsSubstitued)
+		return true;
+	else
+		return false;
 }
 
 bool SP_CPN_ValueAssign::InitializeFunctionParseTree(SP_CPN_ColorSetClass &p_ColorSetClass)
@@ -1332,14 +1459,18 @@ bool SP_CPN_ValueAssign::CollectAllDeclarations()
 		{//fuzzy nets which have been exported from plain col pns
 			SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
 			wxString l_sMainVAl = l_pcColList->GetCell(0, 1);
-			l_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, l_sMainVAl);
+			
 			if (l_sType == wxT("int"))
 			{
+				l_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, l_sMainVAl);
 				SP_CPN_Collist_Declarations l_scDeclaration;
 				l_scDeclaration.m_sName = l_sName;
 				l_scDeclaration.m_sType = l_sType;
 				l_scDeclaration.m_sConstantvalue = l_sMainVAl;
 				l_vDeclarations.push_back(l_scDeclaration);
+			}
+			else if(l_sType == wxT("double")) {
+				l_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, l_sMainVAl);
 			}
 		}
 	}
