@@ -56,7 +56,18 @@ using namespace dssd::ds;
 using solution_space = idd_guard_representation;
  
 using dssd::colexpr::evalColExpr;
- 
+struct UnfoldedPlace1
+{
+	unsigned arcs_ = 0;
+	dssd::andl::Place_ptr unfoldedPlace1_ = {};
+
+	UnfoldedPlace1(unsigned arcs, dssd::andl::Place_ptr unfoldedPlace)
+		: arcs_(arcs), unfoldedPlace1_(unfoldedPlace)
+	{}
+
+};
+using placeLookUpTable1 = std::map<std::string, UnfoldedPlace1, doj::alphanum_less<std::string> >;
+
 class SP_IddUnFoldExpr {
 public:
 	
@@ -76,26 +87,48 @@ public:
 	
 	placeLookUpTable GetPlaceLookupTable() { return m_lkt; }
 
-
+	  
 
 	private:
 		colExpr parseExpr(const std::string& expr_string);
-		void    substituteColorFunctions(colExpr &expr);
+		void    substituteColorFunctions(colExpr &expr,std::string s="");
 		void    flatExpression(colExpr &expr, std::string colorset="");
 	unsigned    createPlaces(solution_space &sol,
 			    std::string name, dssd::andl::PlType type, bool fixed,
 			    colExpr color, colEnv &env,
 			    colExpr token, dssd::andl::simple_net_builder &netBuilder, placeLookUpTable &unfoldedPlaces,bool evalTokens);
+	bool        ISValidIdientifer(std::string& p_SId, colEnv &env);
 
-		
+	 
+ 
+	template<typename ArcListT, typename ArcT, typename InfoListT>
+	void unfoldArcs1(ArcListT &arcs,
+		InfoListT& infos,
+		std::set<std::string> &colorsetNames,
+		std::set<std::string> &variables);
+	 
+	unsigned createPlaces1(solution_space &sol,
+		std::string name, andl::PlType type, bool fixed,
+		colExpr color, colEnv &env,
+		colExpr token, dssd::andl::builder &netBuilder,
+		placeLookUpTable1 &unfoldedPlaces, bool evalTokens = false);
+
+	int unfoldPlace(Place_ptr p, bool evalTokens = false);
+	 
 
 private:
 		colExprBuilder* colExprBuilder_;
 		colExprParser* colExprParser_;
 		dssd::colexpr::environment colDefinitions_;
 		placeLookUpTable m_lkt;
-		 
-
+		std::vector<string> m_vRegisteredConstants;//for checking rate fun
+		std::vector<string> m_vPlaceNames;//for checking rate function
+		using transLookUpTable = std::map<std::string, dssd::andl::Transition_ptr, doj::alphanum_less<std::string>>;
+		transLookUpTable unfoldedTrans_;
+		using str2str = std::map<std::string, std::string>;
+		str2str places2Colorset_;
+		dssd::andl::simple_net_builder netBuilder_;
+		placeLookUpTable1 unfoldedPlaces_;
 protected:
 	SP_DS_Graph* m_pcGraph;
 	wxString     m_sColExpr;

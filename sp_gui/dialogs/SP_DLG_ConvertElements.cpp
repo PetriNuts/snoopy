@@ -33,7 +33,7 @@ enum
 };
 
 SP_DLG_ConvertElements::SP_DLG_ConvertElements(SP_MDI_View* p_pcView, wxWindow *p_parent, const wxString& p_title) :
-		wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER), m_nCopyBrush(false), m_nCanConvert(true)
+	wxDialog(p_parent, -1, p_title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER), m_nCopyBrush(false), m_nCanConvert(true)
 {
 	SP_VectorString l_vsPossibleConversions;
 
@@ -81,7 +81,7 @@ SP_DLG_ConvertElements::SP_DLG_ConvertElements(SP_MDI_View* p_pcView, wxWindow *
 		wxString l_sSelectedElementType = m_lSelectedElements.front()->GetClassName();
 
 		if (dynamic_cast<SP_DS_Edge*>((m_lSelectedElements.front()))
-				&& (dynamic_cast<SP_DS_Node*>(dynamic_cast<SP_DS_Edge*>((m_lSelectedElements.front()))->GetSource()))->GetNodeclass()->GetName().Find(wxT("Place")) == wxNOT_FOUND)
+			&& (dynamic_cast<SP_DS_Node*>(dynamic_cast<SP_DS_Edge*>((m_lSelectedElements.front()))->GetSource()))->GetNodeclass()->GetName().Find(wxT("Place")) == wxNOT_FOUND)
 		{
 			SP_MESSAGEBOX(wxT("Output edge is not allowed to convert to other types."), wxT("Notification"));
 
@@ -301,9 +301,57 @@ bool SP_DLG_ConvertElements::ConvertNodes()
 	for (itElement = m_lSelectedElements.begin(); itElement != m_lSelectedElements.end(); itElement++)
 	{
 		SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*itElement);
-
+		
+		CHECK_POINTER(l_pcOldNode, return NULL);
 		wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcOldNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 
+		wxString l_sOldNodeClass = l_pcOldNode->GetClassName();
+		wxString l_sToNodeClass = l_pcConvertToNodeClass->GetName();
+
+		if (l_sOldNodeClass == l_sToNodeClass &&l_sToNodeClass.Contains("Place"))
+		{
+		   //a case which should not be happen, conversion between two similiar node classes
+			SP_DS_Nodeclass* l_pcConvertToNodeClassTemp;
+			if(m_sConvertToType=="Continuous Place")
+			{
+				l_pcConvertToNodeClassTemp = m_pcGraph->GetNodeclassByDisplayedName("Discrete Place");
+			}
+			else
+			{
+				l_pcConvertToNodeClassTemp = m_pcGraph->GetNodeclassByDisplayedName(m_sConvertToType);
+			}
+			
+			//make the conversion
+			SP_DS_Node* l_pcNewNode1 = ConvertNode(l_pcOldNode, l_pcConvertToNodeClassTemp);
+
+			//delete old Node
+			l_pcOldNetClass->RemoveElement(l_pcOldNode);
+ 
+			l_pcNewNode1->Update();
+			l_pcOldNode = l_pcNewNode1;
+		}
+
+		if(l_sOldNodeClass.Contains(wxT("Transition")) && l_sToNodeClass.Contains(wxT("Place")))
+		{
+			wxString l_sMsg = wxT("Can not convert this node (");
+			l_sMsg << l_sName;
+			l_sMsg << wxT("). Conversion Transition <-> Place is not allowed \n");
+
+			SP_LOGERROR(l_sMsg);
+			SP_MESSAGEBOX(l_sMsg, wxT("Error"));
+			break;
+		}
+		if (l_sOldNodeClass.Contains(wxT("Place")) && l_sToNodeClass.Contains(wxT("Transition")))
+		{
+			wxString l_sMsg = wxT("Can not convert this node (");
+			l_sMsg << l_sName;
+			l_sMsg << wxT("). This type of conversion is not allowed\n");
+
+			SP_LOGERROR(l_sMsg);
+			SP_MESSAGEBOX(l_sMsg, wxT("Error"));
+			break;
+
+		}
 		//check edge requirements here
 		if (CheckEdgeRequirementofNode(l_pcOldNode, l_pcConvertToNodeClass->GetPrototype()) == false)
 		{
@@ -339,6 +387,7 @@ bool SP_DLG_ConvertElements::ConvertNodes()
 	return true;
 }
 
+ 
 SP_DS_Node* SP_DLG_ConvertElements::ConvertNode(SP_DS_Node* p_pcOldNode, SP_DS_Nodeclass* p_pcNewNodeClass)
 {
 	SP_ListGraphic::const_iterator l_itOldGraphic;
@@ -420,8 +469,8 @@ SP_DS_Node* SP_DLG_ConvertElements::ConvertNode(SP_DS_Node* p_pcOldNode, SP_DS_N
 			l_pcNewGraphicChild->SetOffsetX(l_pcOldGraphicChild->GetOffsetX());
 			l_pcNewGraphicChild->SetOffsetY(l_pcOldGraphicChild->GetOffsetY());
 		}
-
 		l_pcNewGraphic->AddToCanvas(m_pcView->GetCanvas(), l_pcOldGraphic->GetPrimitive()->GetX(), l_pcOldGraphic->GetPrimitive()->GetY(), false);
+		 
 	}
 
 	//copy source and targets edges
@@ -477,7 +526,10 @@ bool SP_DLG_ConvertElements::ConvertEdges()
 	for (itElement = m_lSelectedElements.begin(); itElement != m_lSelectedElements.end(); itElement++)
 	{
 		SP_DS_Edge* l_pcNewNode = dynamic_cast<SP_DS_Edge*>(*itElement);
-
+		if(l_pcNewNode==NULL) 
+		{
+			continue;
+		}
 		//check edge requirements here
 		if (EdgeRequirement(l_pcConvertToNodeClass, l_pcNewNode->GetSource(), l_pcNewNode->GetTarget()) == false)
 		{
@@ -616,7 +668,7 @@ bool SP_DLG_ConvertElements::ConvertEdges()
 
 		}
 	}
-
+	if (l_pcConvertToNodeClass==NULL) return true;
 	//tell the user about the conversions
 	ShowConversionMessage(l_vsConvertedElements, m_sOriginalElementType, l_pcConvertToNodeClass->GetDisplayName());
 
