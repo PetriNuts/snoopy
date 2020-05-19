@@ -99,7 +99,7 @@ public:
 	bool Initialize();
 	//bool IsDefFunction(wxString p_sColor);					//used	
 	std::map<wxString, SP_CPN_Variable_Constant>* GetVariableMap();
-
+	void UpdateNetMarking();//because we need too update the ped upon changing the constants sets e.g, colouring group
 private:
 	bool CheckPlaceClass(wxString p_sPlaceNCName);			//used
 	bool CheckTransitionClass(wxString p_sTransNCName);		//used
@@ -139,7 +139,7 @@ public:
 																																//used in the color set definition
 	bool GenerateSubSetColorSet(wxString p_sSubSetName, wxString p_sColors, wxString p_sFatherColorSetName, SP_CPN_ColorSetClass* p_pcColorSetClass, vector<wxString> &l_vColors);  //used
 																																													//used to update marking when a color set or constant changes
-	void UpdateNetMarking();
+	//void UpdateNetMarking();
 	void UpdateMarkingPlaceClass(wxString p_sPlaceNCName); //used
 
 

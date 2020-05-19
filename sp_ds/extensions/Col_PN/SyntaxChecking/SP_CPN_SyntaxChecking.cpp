@@ -526,7 +526,7 @@ bool SP_CPN_SyntaxChecking::CheckGuard(SP_DS_Node* p_pcTransNode)
 	//dssd_util checking, if the model does not have one of the un-supported color set by Dssd_util
    SP_IddUnFoldExpr   expEval(m_pcGraph, m_sPlaceExp, m_sPlaceName);
  
-	bool l_bCheck = expEval.CheckGuardEXpression(l_sGuard.ToStdString(), m_sErrorPosition.ToStdString()); 
+	bool l_bCheck = expEval.CheckGuardEXpression(l_sGuard.ToStdString(), l_sErrorPosition.ToStdString());
 
 	return l_bCheck;
 
@@ -760,13 +760,21 @@ wxString SP_CPN_SyntaxChecking::GetEdgeName(SP_DS_Edge* p_pcEdge)
 
 bool SP_CPN_SyntaxChecking::CheckFormula(SP_DS_Node* p_pcTransNode, wxString p_sRateFunExpr, SP_DS_StParser* p_pcParser, bool p_bSingle)
 {
+ 
+	//checkk rate function using dssd_util
 	if (!p_sRateFunExpr.Contains("val"))
 	{
+		std::vector<string> ssres;
 		SP_IddUnFoldExpr   expEval(m_pcGraph, m_sPlaceExp, m_sPlaceName);//
 		if (!expEval.CheckTransRateFunction(p_pcTransNode, p_sRateFunExpr))//
 			return false;
 		else
-			return true;
+		{
+			//SP_IddUnFoldExpr   expEval1(m_pcGraph, m_sPlaceExp, m_sPlaceName);//
+			//expEval1.createTransitionRate(p_pcTransNode, p_sRateFunExpr, ssres);
+			//return true;
+		}
+			
 	}
 	 
 	//sum function
@@ -975,20 +983,44 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 			wxString l_sPRocessedExp;
 
 			////////////////////////
-			//wxString test="((1,2),A)";
-			bool l_bTupelCheck;
-			l_bTupelCheck=CheckBracketStructure(l_sTupeExpression, l_sCSName);
-			if (!l_bTupelCheck)
-			{
-				SP_LOGERROR_("please check bracket structure of the tupel" + l_sTupeExpression);
-			}
+			//bool l_bTupelCheck;
+			//l_bTupelCheck=CheckBracketStructure(l_sTupeExpression, l_sCSName);
+			//if (!l_bTupelCheck)
+		   	//{
+			//	SP_LOGERROR_("please check bracket structure of the tupel" + l_sTupeExpression);
+			//}
 			///////////////////////
 			//prepare the expression for checking and computing the marking 
 			PrepareExpressionString(l_sExpression, l_sTupeExpression,l_sPRocessedExp);
 
 			if (p_bMarkingCheck)
 			{//only for marking checking
-				m_sErrorPosition = wxT("miss matching type in marking expression!. Error Position: ") + l_sColourExpBeforSubstitueConstants + wxT(" | ") + l_sPlaceName;
+				
+				SP_CPN_ColorSet* l_pcColorSet = m_cColorSetClass.LookupColorSet(l_sCSName);
+
+				if (!l_pcColorSet)
+					return false;
+
+					if (l_sPRocessedExp.Contains(wxT("&")) || l_sPRocessedExp.Contains(wxT("|"))
+						|| l_sPRocessedExp.Contains(wxT(">")) || l_sPRocessedExp.Contains(wxT("<")) ||
+						l_sPRocessedExp.Contains(wxT(">=")) || l_sPRocessedExp.Contains(wxT("<=")) ||
+						l_sPRocessedExp.Contains(wxT("<>")) || l_sPRocessedExp.Contains(wxT("!="))
+						)
+					{
+						if (l_pcColorSet->GetDataType() == CPN_PRODUCT && l_sTupeExpression.IsEmpty())
+						{
+							m_sErrorPosition = wxT("the product coloumn of marking expression is missed!. Error Position: ") + l_sColourExpBeforSubstitueConstants + wxT(" | ") + l_sPlaceName;
+						}
+						else
+						{
+							m_sErrorPosition = wxT("miss matching type in marking expression!. Error Position: ") + l_sColourExpBeforSubstitueConstants + wxT(" | ") + l_sPlaceName;
+						}
+					}
+					else
+					{
+						m_sErrorPosition = wxT("miss matching type in marking expression!. Error Position: ") + l_sColourExpBeforSubstitueConstants + wxT(" | ") + l_sPlaceName;
+					}
+				 
 				if (l_cColorSet.GetDataType() == CPN_UNION || l_cColorSet.GetDataType() == CPN_INDEX /*|| l_cColorSet.GetDataType() == CPN_STRING|| l_cColorSet.GetDataType() == CPN_BOOLEAN*/)
 				{
 					if (!ComputeInitialMarkingStep2(l_sColorExpr, l_ColorVector, &l_cColorSet, l_vParsedColors))
