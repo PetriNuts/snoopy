@@ -23,6 +23,7 @@ private:
 
     std::vector<wxControl*> m_apcPropertiesCtrl;
 
+	unsigned m_nSimAlgo;//for stoch sim properties bug when changing the sim algo, by george
     DECLARE_CLASS(SP_DLG_SimulationProperties)
 protected:
 
@@ -31,7 +32,7 @@ protected:
 
 public:
       SP_DLG_SimulationProperties(
-    	spsim::Simulator* p_pcMainSimulator,wxWindow* p_pcParent,
+    	spsim::Simulator* p_pcMainSimulator,wxWindow* p_pcParent,const int& p_nSimAlgo=0,
         const wxString& p_sTitle = wxT("Simulation Properties"),
         long p_nStyle = wxDEFAULT_DIALOG_STYLE);
 

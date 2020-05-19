@@ -198,6 +198,8 @@ SP_DLG_Simulation::SP_DLG_Simulation(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParen
 	//load initial simulator configuration
 	LoadInitialSimulatorConfig();
 
+	m_nSimTypeForStoch = 0;
+
     Bind(wxEVT_CLOSE_WINDOW, &SP_DLG_Simulation::OnCloseWindow, this);
 }
 
@@ -1076,7 +1078,15 @@ void SP_DLG_Simulation::LoadSets()
             if (l_sChoice == l_sGroup)
             {
                 m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
-                break;
+               
+				SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));//george, remember the chosen sets
+				
+				auto it = m_mGroup2Selction.find(l_sGroup);
+
+				if(it== m_mGroup2Selction.end())
+				m_mGroup2Selction[l_sGroup] = l_pcColList->GetActiveColumn();
+
+				break;
             }
         }
     }
@@ -1150,7 +1160,7 @@ void SP_DLG_Simulation::LoadParameters()
 			 
         }
     }
-
+  
     m_pcMainSimulator->SetParameterNames(l_asParameterNames);
     m_pcMainSimulator->SetParameterValues(l_anParameterValue);
 }
@@ -1669,6 +1679,7 @@ void SP_DLG_Simulation::OnModifyConstantSets(wxCommandEvent& p_cEvent)
 		if (l_pcDlg->ShowModal() == wxID_OK)
 		{
 			LoadSets();
+
 		}
 
 		l_pcDlg->Destroy();
@@ -1678,7 +1689,37 @@ void SP_DLG_Simulation::OnModifyConstantSets(wxCommandEvent& p_cEvent)
 		SP_DLG_NewConstantDefinition* l_pcDlg = new SP_DLG_NewConstantDefinition(NULL);
 		if (l_pcDlg->ShowModal() == wxID_OK)
 		{
-			LoadSets();
+			     LoadSets();
+			     
+			    //recover selected groups after modifying constants, by george 03/05/2020
+			    unsigned i = 1;
+
+				if (SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName() == SP_DS_HYBRIDPN_CLASS)
+				{
+					i = 0;
+				}
+				else if (SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName() == SP_DS_SPN_CLASS)
+				{
+					i = 4;
+				}
+
+				for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+				{
+					m_apcComboBoxes[i]->SetSelection((it)->second);
+					i++;
+				}
+
+				for (size_t j = 0; j < m_apcColListAttr.size(); j++)
+				{
+					SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
+					wxChoice* l_pcCombobox = m_apcComboBoxes[j];
+					unsigned int l_nCurrentMarkingSet = l_pcCombobox->GetSelection();
+					if (l_pcAttr)
+					{
+						l_pcAttr->SetActiveList(l_nCurrentMarkingSet);
+						l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
+					}
+				}
 		}
 
 		l_pcDlg->Destroy();
@@ -1750,7 +1791,7 @@ void SP_DLG_Simulation::OnSimulationProperties(wxCommandEvent& p_cEvent)
 
     SP_DLG_SimulationProperties* l_pcDlg;
 
-    l_pcDlg = new SP_DLG_SimulationProperties(m_pcMainSimulator, this);
+    l_pcDlg = new SP_DLG_SimulationProperties(m_pcMainSimulator, this, m_nSimTypeForStoch);
 
     l_pcDlg->ShowModal();
 

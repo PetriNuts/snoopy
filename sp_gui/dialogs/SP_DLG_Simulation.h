@@ -66,12 +66,13 @@ protected:
 	//New Simulator
 	spsim::Simulator* m_pcMainSimulator;
 	//Number of result points
+	unsigned m_nSimTypeForStoch;
 	unsigned long m_nResultPointCount;
 	bool m_bSimThreadCreated;
 
 	vector<wxChoice*> m_apcComboBoxes;
 	vector<SP_DS_ColListAttribute*> m_apcColListAttr;
-
+	std::map<wxString, unsigned> m_mGroup2Selction;//to remember ltest selections
 	SP_ExportType m_ExportType;
 
 	//Export file

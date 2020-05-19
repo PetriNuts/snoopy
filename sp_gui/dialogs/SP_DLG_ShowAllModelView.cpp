@@ -390,14 +390,13 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 	if (l_pcCurveInfoList == NULL)
 		return false;
 	m_pcPlaceChoiceCheckListBox->Clear();
-
+	 
 	for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
 	{
 		m_pcPlaceChoiceCheckListBox->Insert(l_pcCurveInfoList->GetCell(l_nRow, 6), m_pcPlaceChoiceCheckListBox->GetCount());
 		//show selected curves
 		LoadCurveSetting(p_pcResultViewer, l_pcCurveInfoList, l_nRow);
 		wxString ddd = l_pcCurveInfoList->GetCell(l_nRow, 6);
-
 	}
 
 	m_pcParentWnd->CalculateXAxisValues(p_pcModelView, m_anXValues);

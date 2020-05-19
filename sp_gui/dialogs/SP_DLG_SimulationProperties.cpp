@@ -20,6 +20,7 @@ END_EVENT_TABLE()
 //TODO: Clear out all the old code after the end of implementing the old simulator for all the classes
 SP_DLG_SimulationProperties::SP_DLG_SimulationProperties(spsim::Simulator* p_pcMainSimulator,
                                                        wxWindow* p_pcParent,
+	                                                   const int& p_nSimAlg,
                                                        const wxString& p_sTitle,
                                                        long p_nStyle)
   : wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxDefaultSize, 
@@ -28,12 +29,13 @@ SP_DLG_SimulationProperties::SP_DLG_SimulationProperties(spsim::Simulator* p_pcM
 {
     /* top level sizer */
     m_pcSizer = new wxBoxSizer(wxVERTICAL);
-    
+	m_nSimAlgo = p_nSimAlg;
     if(m_pcMainSimulator!=NULL)
     {
     	SetProperties();
     }
 
+	
     /* Buttons in the lower right hand corner */
 	m_pcSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
 
@@ -87,7 +89,17 @@ void SP_DLG_SimulationProperties::SetProperties()
 	unsigned int l_nPropertyPos=0;
 	wxSizer* l_pcRowSizer;
 	long l_nVal=0;
-
+	wxString l_sClassSim;
+	l_sClassSim=m_pcMainSimulator->GetSimulatorClass();
+	if (l_sClassSim.Contains("Stochastic"))
+	{
+		unsigned l_size = l_pcProperties->size();
+		if (l_size< 4 && m_nSimAlgo==0)
+		{
+			m_pcMainSimulator->GetSimulatorOptions()->AddNewOption(new spsim::Property("Refreshrate", "5000", "Refresh rate(ms)", spsim::GUI_TYPE_TXTBOX));
+			m_pcMainSimulator->GetSimulatorOptions()->AddNewOption(new spsim::Property("In Between Visualization", "1", "Visualize in between results", spsim::GUI_TYPE_CHECKBOX));
+		}
+	}
 	m_apcPropertiesCtrl.assign(l_pcProperties->size(),NULL);
 
 	for(l_itProperty=l_pcProperties->begin();l_itProperty!=l_pcProperties->end();l_itProperty++,l_nPropertyPos++)
