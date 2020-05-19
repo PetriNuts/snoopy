@@ -174,7 +174,7 @@ bool SP_WDG_ColStMarkingList::AddToDialog(
 
 bool SP_WDG_ColStMarkingList::OnDlgOk()
 {
-
+ 
 	SaveData();
 	UpdatePlaceColor();
 	return SP_WDG_DialogBase::OnDlgOk();
@@ -679,7 +679,8 @@ void SP_WDG_ColStMarkingList::OnGridCellSelected(wxGridEvent& ev)
 {
 
 	m_sOldCellValue = m_pcMarkingGrid->GetCellValue(ev.GetRow(), ev.GetCol());
-
+	 
+	 
 	SP_WDG_DialogChoice * l_pcWDG_DialogText;
 	list<SP_WDG_DialogBase*>* l_ptlWidgets = m_pcDlg->GettlWidgets();
 	list<SP_WDG_DialogBase*>::iterator itList;
@@ -722,9 +723,26 @@ void SP_WDG_ColStMarkingList::OnGridCellSelected(wxGridEvent& ev)
 		}
 	}
 		
+	//make product coloum editable only if it contains marking condition
+	for (unsigned i = 0; i < m_pcMarkingGrid->GetNumberRows(); i++)
+	{
+		wxString l_sMarking = m_pcMarkingGrid->GetCellValue(i, 0);
+		if (l_sMarking.Contains(_T("&")) || l_sMarking.Contains(_T("|")) || l_sMarking.Contains(_T("=<"))
+			|| l_sMarking.Contains(_T(">=")) || l_sMarking.Contains(_T(">")) || l_sMarking.Contains(_T("<")))
+		{
+			m_pcMarkingGrid->SetReadOnly(i, 1, false);
+		}
+		else
+		{
+			m_pcMarkingGrid->SetReadOnly(i, 1);
+		}
+		
+	}
+	
 	////
 	ev.Skip();
 
+ 
 }
 
 void SP_WDG_ColStMarkingList::OnGridCellValueChanged(wxGridEvent& ev)
