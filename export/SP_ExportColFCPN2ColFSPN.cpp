@@ -25,8 +25,8 @@ bool SP_ExportColFCPN2ColFSPN::Write(SP_MDI_Doc* p_doc,
 
 	m_doc = p_doc;
 	m_graph = m_doc->GetGraph();
-	m_fileName = p_fileName;
-	return SP_XmlWriter::Write(m_graph, m_fileName);
+	 
+	return SP_XmlWriter::Write(m_graph, p_fileName);
 }
 
 bool SP_ExportColFCPN2ColFSPN::WriteNetclass(SP_DS_Netclass* p_pcVal,
@@ -66,7 +66,11 @@ bool SP_ExportColFCPN2ColFSPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WriteStochPlace((*l_Iter), l_pcElem);
+			SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+			m_converter.ChangeRepresentation(l_pcOldNode);
+			WriteStochPlace(l_pcOldNode, l_pcElem);
+			m_converter.ResetNodeRepresentation(l_pcOldNode);
+			//WriteStochPlace((*l_Iter), l_pcElem);
 		}
 		return true;
 	}
@@ -78,7 +82,11 @@ bool SP_ExportColFCPN2ColFSPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		p_pcRoot->AddChild(l_pcElem);
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WriteStochTransition((*l_Iter), l_pcElem);
+			SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+			m_converter.ChangeRepresentation(l_pcOldNode);
+			WriteStochTransition(l_pcOldNode, l_pcElem);
+			m_converter.ResetNodeRepresentation(l_pcOldNode);
+			 
 		}
 		return true;
 	}

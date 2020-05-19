@@ -26,7 +26,7 @@ class SP_ExportANDL: public SP_ExportRoutine, public SP_Error
   virtual bool Write(SP_MDI_Doc*, const wxString&);
 
   inline virtual wxString GetName()
-    { return wxT("Export to ANDL (Charlie, Marcie & Spike)");}
+    { return wxT("Export to ANDL (Charlie)");}
   inline virtual wxString GetDescr()
     { return wxT("Export a Petri Net in ANDL Format");}
   virtual wxString GetExtension()

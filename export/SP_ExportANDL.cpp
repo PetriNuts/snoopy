@@ -30,9 +30,10 @@ bool SP_ExportANDL::AcceptsDoc(SP_MDI_Doc* p_doc)
 	return (cName == SP_DS_PN_CLASS ||
 			cName == SP_DS_EXTPN_CLASS ||
 			cName == SP_DS_TIMEPN_CLASS ||
-			cName == SP_DS_SPN_CLASS ||
+			cName == SP_DS_SPN_CLASS    ||
 			cName == SP_DS_CONTINUOUSPED_CLASS ||
-		cName==SP_DS_FUZZYSPN_CLASS|| //Added by G.A
+		    cName==SP_DS_FUZZYSPN_CLASS  || //Added by G.A
+		    cName == SP_DS_FUZZYCPN_CLASS ||
 			cName == SP_DS_HYBRIDPN_CLASS);
 }
 

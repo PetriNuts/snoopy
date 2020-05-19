@@ -89,6 +89,9 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 						for(unsigned i = 1; i < l_pcColAttr->GetColCount(); i++)
 						{
 							wxString l_sSetName = l_pcColAttr->GetColLabel(i);
+
+							if (l_sSetName == wxT("Product Color"))  continue;//by george
+
 							l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
 							if(SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end())
 							{

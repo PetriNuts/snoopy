@@ -40,7 +40,12 @@ bool SP_ExportColSPN2ColCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WritePlace((*l_Iter), l_pcElem);
+			//WritePlace((*l_Iter), l_pcElem);
+			SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+			m_converter.ChangeRepresentation(l_pcOldNode);
+			WritePlace(l_pcOldNode, l_pcElem);
+			m_converter.ResetNodeRepresentation(l_pcOldNode);
+
 		}
 	}
 	else if (wxT("Transition") == l_sNodeclassName)
@@ -58,7 +63,11 @@ bool SP_ExportColSPN2ColCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		m_nTransitionNumber = 0;
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			WriteTransition((*l_Iter), l_pcElem);
+			//WriteTransition((*l_Iter), l_pcElem);
+			SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+			m_converter.ChangeRepresentation(l_pcOldNode);
+			WriteTransition(l_pcOldNode, l_pcElem);
+			m_converter.ResetNodeRepresentation(l_pcOldNode);
 		}
 	}
 	else if ((wxT("Immediate Transition") == l_sNodeclassName))
@@ -216,8 +225,8 @@ bool SP_ExportColSPN2ColCPN::Write(SP_MDI_Doc* p_doc,
 	m_nDeterministicTran = m_graph->GetNodeclass(wxT("Deterministic Transition"))->GetElements()->size();
 	m_nScheduledTran = m_graph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->size();
 	/////
-	m_fileName = p_fileName;
-	return SP_XmlWriter::Write(m_graph, m_fileName);
+	//m_fileName = p_fileName;
+	return SP_XmlWriter::Write(m_graph, p_fileName);
 }
 
 bool SP_ExportColSPN2ColCPN::WriteNetclass(SP_DS_Netclass* p_pcVal,

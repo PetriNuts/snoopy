@@ -21,11 +21,10 @@ private:
 	unsigned long m_mTransitionCount;
 	SP_MDI_Doc* m_doc;
 	SP_DS_Graph* m_graph;
-	wxString m_fileName;
+	 
 	wxXmlNode* m_pcElem;
 	SpConvertElement m_converter = SpConvertElement();
-	std::vector<wxString> m_sIds;
-
+	 
 protected:
 
 	bool WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcRoot);

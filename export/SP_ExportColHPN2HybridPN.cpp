@@ -329,7 +329,13 @@ bool SP_ExportColHPN2HybridPN::WriteMetadataclass( SP_DS_Metadataclass* p_pcVal,
 			}
 			++l_itElem;
 		}
-		SP_XmlWriter::WriteMetadataclass(l_pcMC, p_pcRoot);
+		if (l_pcMC != NULL)
+		{
+			SP_XmlWriter::WriteMetadataclass(l_pcMC, p_pcRoot);
+			l_pcMC->RemoveAll();
+			m_pcExportGraph->RemoveMetadataclass(l_pcMC);
+		}
+		return true;
 	}
 	else if(l_sName == SP_DS_META_FUNCTION)
 	{
@@ -337,7 +343,7 @@ bool SP_ExportColHPN2HybridPN::WriteMetadataclass( SP_DS_Metadataclass* p_pcVal,
 	}
 	else if(m_pcExportGraph->GetMetadataclass(l_sName))
 	{
-		if(l_sName!=wxT("Constant Class"))//this line by george
+		if(l_sName!=wxT("Constant Class")&& l_sName != wxT("Constant Class1"))//this line by george
 		SP_XmlWriter::WriteMetadataclass(p_pcVal, p_pcRoot);
 	}
 	return true;

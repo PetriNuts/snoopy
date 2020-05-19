@@ -60,7 +60,9 @@ bool SP_ExportHPN2CPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
+		
 			/*lines 64-69 Added by G.A and line 70 is modified also*/
+			/**
 			wxString m_newType = wxT("Continuous Place");//to be removed
 			SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);//to be removed
 			SP_DS_Node* ConvertedNode1 = m_converter.Clone((**l_Iter), *l_pcConvertToNodeClass);// ConvertNode((*l_Iter), l_pcConvertToNodeClass);// to be removed
@@ -68,6 +70,11 @@ bool SP_ExportHPN2CPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 			wxString valString = nameAttr->GetValueString();
 			m_names.push_back(valString);
 			WritePlace(ConvertedNode1, m_pcElem);
+			 */
+			SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+			m_converter.ChangeRepresentation(l_pcOldNode);
+			WriteNode(l_pcOldNode, m_pcElem);
+			m_converter.ResetNodeRepresentation(l_pcOldNode);
 		}
 	}
 	else
@@ -75,6 +82,7 @@ bool SP_ExportHPN2CPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 		{
 			for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 			{
+				/**
 				SP_DS_Attribute* nameAttr = (*l_Iter)->GetAttribute(wxT("Name"));
 				wxString valString = nameAttr->GetValueString();
 				bool isConv = m_converter.IsConverted(valString);
@@ -85,6 +93,7 @@ bool SP_ExportHPN2CPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 						return TRUE;
 					}
 				}
+				*/
 				WritePlace((*l_Iter), m_pcElem);
 				 
 			}
@@ -101,6 +110,7 @@ bool SP_ExportHPN2CPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 
 				for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 				{
+					/**
 					wxString m_newType = wxT("Continuous Transition"); 
 
 					SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);
@@ -116,6 +126,11 @@ bool SP_ExportHPN2CPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 					m_names.push_back(valString);
 
 					WriteTransition(ConvertedNode, m_pcElem); 
+					*/
+					SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+					m_converter.ChangeRepresentation(l_pcOldNode);
+					WriteNode(l_pcOldNode, m_pcElem);
+					m_converter.ResetNodeRepresentation(l_pcOldNode);
  				}
 			}
 			else

@@ -11,7 +11,7 @@
 
 #include "sp_core/SP_XmlWriter.h"
 #include "export/SP_ExportRoutine.h"
-
+#include "export/SpConvertElement.h"
 class SP_ExportColCPN2ColSPN: public SP_XmlWriter, public SP_ExportRoutine
 {
 private:
@@ -24,7 +24,7 @@ protected:
 
   bool WriteStochPlace( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
   bool WriteStochTransition( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
-
+  SpConvertElement m_converter = SpConvertElement();//Added by G.A
 public:
 
   // must be implemented in successors

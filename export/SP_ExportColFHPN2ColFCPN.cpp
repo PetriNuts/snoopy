@@ -50,8 +50,7 @@ bool SP_ExportColFHPN2ColFCPN::Write(SP_MDI_Doc* p_doc,
 	m_pcPlaceNodeclass = NULL;
 
 
-	m_fileName = p_fileName;
-	return SP_XmlWriter::Write(m_graph, m_fileName);
+	return SP_XmlWriter::Write(m_graph, p_fileName);
 }
 
 bool SP_ExportColFHPN2ColFCPN::WriteNetclass(SP_DS_Netclass* p_pcVal,
@@ -99,23 +98,17 @@ bool SP_ExportColFHPN2ColFCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
 			wxString l_sNodeClass = p_pcVal->GetName();
-			if (wxT("Place") == l_sNodeClass) {
+			if (wxT("Place") == l_sNodeClass)
+			{
 
-				wxString m_newType = wxT("Continuous Place");//to be removed
-				SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);//to be removed
-				SP_DS_Node* ConvertedNode1 = m_converter.Clone((**l_Iter), *l_pcConvertToNodeClass);// ConvertNode((*l_Iter), l_pcConvertToNodeClass);// to be removed
-				SP_DS_Attribute* nameAttr = ConvertedNode1->GetAttribute(wxT("ID"));
-				wxString valString = nameAttr->GetValueString();
-				m_names.push_back(valString);
-				WritePlace(ConvertedNode1, l_pcElem);
+				SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+				m_converter.ChangeRepresentation(l_pcOldNode);
+				WritePlace(l_pcOldNode, l_pcElem);
+				m_converter.ResetNodeRepresentation(l_pcOldNode);
+				//WritePlace(ConvertedNode1, l_pcElem);
 			}
 			else
 			{
-				SP_DS_Attribute* IdAttr = (*l_Iter)->GetAttribute(wxT("ID"));
-
-				wxString valString = IdAttr->GetValueString();
-				for (int i = 0; i<m_names.size(); i++)
-					if (m_names[i] == valString) { return TRUE; }
 				WritePlace((*l_Iter), l_pcElem);
 			}
 		}
@@ -142,29 +135,15 @@ bool SP_ExportColFHPN2ColFCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		{
 			wxString l_sNodeClass = p_pcVal->GetName();
 			if (wxT("Transition") == l_sNodeClass) {
-				wxString m_newType = wxT("Continuous Transition");
-
-				SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);
-
-				SP_DS_Node* ConvertedNode = m_converter.Clone((**l_Iter), *l_pcConvertToNodeClass);
-
-				ConvertedNode->Update();
-
-				SP_DS_Attribute* nameAttr = ConvertedNode->GetAttribute(wxT("ID"));
-
-				wxString valString = nameAttr->GetValueString();
-
-				m_names.push_back(valString);
-				WriteTransition(ConvertedNode, l_pcElem);
+				SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+				m_converter.ChangeRepresentation(l_pcOldNode);
+				WriteTransition(l_pcOldNode, l_pcElem);
+				m_converter.ResetNodeRepresentation(l_pcOldNode);
+				//WriteTransition(ConvertedNode, l_pcElem);
 
 			}
 			else
 			{
-				SP_DS_Attribute* IdAttr = (*l_Iter)->GetAttribute(wxT("ID"));
-
-				wxString valString = IdAttr->GetValueString();
-				for (int i = 0; i<m_names.size(); i++)
-					if (m_names[i] == valString) { return TRUE; }
 				WriteTransition((*l_Iter), l_pcElem);
 			}
 		}

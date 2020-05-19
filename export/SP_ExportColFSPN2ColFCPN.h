@@ -23,13 +23,13 @@ private:
 	wxXmlNode* m_pcTransitionNodeclass;
 	wxString m_edgeClass;
 	bool m_changeColour;
-
+	SpConvertElement m_converter = SpConvertElement();
 
 protected:
 
 	SP_MDI_Doc* m_doc;
 	SP_DS_Graph* m_graph;
-	wxString m_fileName;
+	//wxString m_fileName;
 
 	virtual bool WriteNetclass(SP_DS_Netclass* p_pcVal, wxXmlNode* p_pcRoot);
 	virtual bool WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcRoot);

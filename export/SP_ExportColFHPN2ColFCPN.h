@@ -25,7 +25,7 @@ private:
 	wxString m_edgeClass;
 	bool m_changeColour;
 
-	std::vector<wxString> m_names;//Added by G.A
+	//std::vector<wxString> m_names;//Added by G.A
 	SpConvertElement m_converter = SpConvertElement();//Added by G.A
 
 protected:

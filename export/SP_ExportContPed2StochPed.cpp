@@ -97,7 +97,7 @@ bool SP_ExportContPed2StochPed::Write(SP_MDI_Doc* p_doc,
 	CHECK_BOOL((!p_fileName.IsEmpty()), return false);
 
 	SP_LOGWARNING(wxT("Tokens and Multiplicities are converted to the smallest integer value not less than value!"));
-
+	SP_LOGWARNING(wxT("Constants with double data types will be kept as such"));//by george
 	m_doc = p_doc;
 	m_graph = m_doc->GetGraph();
 	m_fileName = p_fileName;
@@ -143,6 +143,7 @@ bool SP_ExportContPed2StochPed::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 
 		{
+			/**
 			////////////
 			SP_DS_Attribute* l_pcAttr;
 			SP_GR_Node* l_pcGr;
@@ -199,7 +200,9 @@ bool SP_ExportContPed2StochPed::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 			SP_DS_Nodeclass* l_pcConvertToNodeClass1 = m_graph->GetNodeclassByDisplayedName(wxT("Discrete Place"));
 			SP_DS_Node* ConvertedNode1 = m_converter.Clone((**l_Iter), *l_pcNC);
 			SP_DS_Attribute* nameAttr = ConvertedNode1->GetAttribute(wxT("Name"));
+			*/
 			/*change marking to zero*/
+			/**
 			wxString l_sAttributeName = wxT("Marking");
 
 			SP_DS_Attribute* l_pcNewAttribute = ConvertedNode1->GetAttribute(l_sAttributeName);
@@ -221,6 +224,11 @@ bool SP_ExportContPed2StochPed::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 
 			////////////
 			WriteNode(ConvertedNode1, l_pcElem);
+			*/
+			SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+			m_converter.ChangeRepresentation(l_pcOldNode,true);
+			WriteNode(l_pcOldNode, l_pcElem);
+			m_converter.ResetNodeRepresentation(l_pcOldNode,true);
 		}
 		return TRUE;
 
@@ -235,6 +243,7 @@ bool SP_ExportContPed2StochPed::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 
 		{
+			/**
 			SP_DS_Nodeclass* l_pcNC;
 			SP_DS_Attribute* l_pcAttr;
 			SP_GR_Node* l_pcGr;
@@ -292,27 +301,24 @@ bool SP_ExportContPed2StochPed::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 			l_pcGr = new SP_GR_Rectangle(l_pcNC->GetPrototype(), twidth, theight);
 			l_pcGr->SetHeight(20.0);
 			l_pcGr->SetWidth(10.0);
-			//l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(0, 0, 0)));
+			 
 			l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
 			l_pcNC->SetGraphic(l_pcGr);
 			l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
-			/*
-			int twidth = wxGetApp().GetElementPrefs()->GetNodeWidth(GetName(), SP_DS_STOCHASTIC_TRANS);
-			int theight = wxGetApp().GetElementPrefs()->GetNodeHeight(GetName(), SP_DS_STOCHASTIC_TRANS);
-			l_pcGr = new SP_GR_ExtendedRectangle(l_pcNC->GetPrototype(), twidth, theight, TRUE, SP_EXTENDED_TYPE_DEFAULT, 3, wxColour(128, 128, 128));
-			l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3));
-			l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
-			l_pcNC->SetGraphic(l_pcGr);
-			l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
-			*/
+			 
 			SP_DS_Node* ConvertedNode = m_converter.Clone((**l_Iter), *l_pcNC);
 
-			//WriteTransition(ConvertedNode, m_pcElem);
+			 
 			SP_DS_Attribute* nameAttr = ConvertedNode->GetAttribute(wxT("ID"));
 			wxString valString = nameAttr->GetValueString();
 			m_sIds.push_back(valString);
 			WriteNode(ConvertedNode, l_pcElem);
+			*/
+			SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+			m_converter.ChangeRepresentation(l_pcOldNode);
+			WriteNode(l_pcOldNode, l_pcElem);
+			m_converter.ResetNodeRepresentation(l_pcOldNode);
 		}
 		return TRUE;
 	}

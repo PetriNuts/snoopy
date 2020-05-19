@@ -24,7 +24,7 @@ private:
 	SP_MDI_Doc* m_doc;
 	SP_DS_Graph* m_graph;
 	SP_DS_Metadataclass* m_pcMetaDataConstants;
-	wxString m_fileName;
+	//wxString m_fileName;
 	wxXmlNode* m_pcElem;
 	SpConvertElement m_converter = SpConvertElement();
 

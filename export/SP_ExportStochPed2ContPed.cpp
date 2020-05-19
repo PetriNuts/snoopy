@@ -109,14 +109,15 @@ bool SP_ExportStochPed2ContPed::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			SP_DS_Nodeclass*	l_pcConvertToNodeClass;// = m_graph->AddNodeclass(new SP_DS_Nodeclass(m_graph, wxT("Continuous Place")));
-			l_pcConvertToNodeClass = m_graph->AddNodeclass(new SP_DS_Nodeclass(m_graph, SP_DS_CONTINUOUS_PLACE, m_graph->GetNodeclass(SP_DS_DISCRETE_PLACE)->GetIdCountPtr()));
+		//	SP_DS_Nodeclass*	l_pcConvertToNodeClass;// = m_graph->AddNodeclass(new SP_DS_Nodeclass(m_graph, wxT("Continuous Place")));
+		//	l_pcConvertToNodeClass = m_graph->AddNodeclass(new SP_DS_Nodeclass(m_graph, SP_DS_CONTINUOUS_PLACE, m_graph->GetNodeclass(SP_DS_DISCRETE_PLACE)->GetIdCountPtr()));
 
 			/* there is no Continuous place in our current (SPN) Ped, so we need to
 			create a new one and initialize it with its default attributes, so that
 			we can make copy of the attributes of Discrete place to the new Continuous Place.
 
 			*/
+			/**
 			SP_DS_Nodeclass* l_pcNC;
 			SP_DS_Attribute* l_pcAttr;
 			SP_GR_Node* l_pcGr;
@@ -159,17 +160,28 @@ bool SP_ExportStochPed2ContPed::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 			l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogBool(wxT("General")));
 
 			l_pcAttr = l_pcNC->AddAttribute(new SP_DS_TextAttribute(wxT("Comment"), wxT("")));
+			*/
 			//l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogMultiline(wxT("General")));
+			/**
 			l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
 			l_pcGrAttr->SetOffsetY(40);
 			l_pcAttr->SetGlobalShow();
+			*/
 			/* to this point, a new Cont. place is ready to be created from Discrete one via convert method in our converter*/
+		    /**
 			SP_DS_Nodeclass* l_pcConvertToNodeClass1 = m_graph->GetNodeclassByDisplayedName(SP_DS_CONTINUOUS_PLACE);
 			SP_DS_Node* ConvertedNode1 = m_converter.Clone((**l_Iter), *l_pcNC);
 			SP_DS_Attribute* nameAttr = ConvertedNode1->GetAttribute(wxT("ID"));
 			wxString valString = nameAttr->GetValueString();
 			m_sIds.push_back(valString);
 			WritePlace(ConvertedNode1, l_pcElem);
+			*/
+			//////////////////////////////////////////////////
+			SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+			m_converter.ChangeRepresentation(l_pcOldNode);
+			WritePlace(l_pcOldNode, l_pcElem);
+			m_converter.ResetNodeRepresentation(l_pcOldNode);
+
 		}
 	}
 	else if (wxT("Transition") == l_sNodeclassName)
@@ -187,6 +199,7 @@ bool SP_ExportStochPed2ContPed::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		m_nTransitionNumber=0;
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
+			/**
 			SP_DS_Nodeclass* l_pcNC;
 			SP_DS_Attribute* l_pcAttr;
 			SP_GR_Node* l_pcGr;
@@ -254,6 +267,13 @@ bool SP_ExportStochPed2ContPed::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 			wxString valString = nameAttr->GetValueString();
 			m_sIds.push_back(valString);
 			WriteTransition( (ConvertedNode), l_pcElem);
+			*/
+			//////////////////////////////////////////////////
+			SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+			m_converter.ChangeRepresentation(l_pcOldNode);
+			WritePlace(l_pcOldNode, l_pcElem);
+			m_converter.ResetNodeRepresentation(l_pcOldNode);
+
 		}
 	}
 	else if((wxT("Immediate Transition") == l_sNodeclassName ) )

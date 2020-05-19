@@ -26,7 +26,7 @@ class SP_ExportCANDL_new: public SP_ExportRoutine, public SP_Error
   virtual bool Write(SP_MDI_Doc*, const wxString&);
 
   inline virtual wxString GetName()
-    { return wxT("Export to CANDL using dssz_util");}
+    { return wxT("Export to CANDL using dssd_util");}
   inline virtual wxString GetDescr()
     { return wxT("Export a Petri Net in CANDL Format");}
   virtual wxString GetExtension()

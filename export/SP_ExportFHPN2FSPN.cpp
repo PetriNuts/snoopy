@@ -11,28 +11,13 @@
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_utilities.h"
 #include "sp_revision.h"
-//////////
-//#include "sp_core/SP_Core.h"
-//#include "sp_ds/SP_DS_Graph.h"
-//#include "sp_gui/mdi/SP_MDI_View.h"
-//#include "sp_gui/mdi/SP_MDI_Doc.h"
-//#include "sp_gui/dialogs/SP_DLG_ConvertElements.h"
-//#include "snoopy.h"
-//#include "sp_core/SP_GPR_Elements.h"
-//#include "sp_ds/attributes/SP_DS_ColListAttribute.h"
-//#include "sp_gr/edges/SP_GR_ExtendedEdge.h"
-//#include "sp_gr/edges/SP_GR_ArrowEdge.h"
-//#include "sp_gr/edges/SP_GR_ExtendedEdge.h"
-//#include "sp_ds/attributes/SP_DS_MultiplicityAttribute.h"
-//#include "sp_gr/attributes/SP_GR_MultiplicityAttribute.h"
+ 
 
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 
-//#include "sp_gui/widgets/dialogs/SP_WDG_DialogUnsigned.h"
-//#include "sp_gui/dialogs/dia_CPN/SP_WDG_ArcInscription.h"
-//#include "sp_gr/attributes/SP_GR_ColListAttribute.h" 
+  
 #include "sp_ds/attributes/SP_DS_MarkingAttribute.h"
-/////////
+ 
 
 bool SP_ExportFHPN2FSPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 {
@@ -44,7 +29,7 @@ bool SP_ExportFHPN2FSPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 
 	m_graph = m_doc->GetGraph();
 
-	m_fileName = p_fileName;
+	//m_fileName = p_fileName;
 
 	//Get the total number of place
 	m_nPlaceCount = m_graph->GetNodeclass(SP_DS_CONTINUOUS_PLACE)->GetElements()->size();
@@ -57,7 +42,7 @@ bool SP_ExportFHPN2FSPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 	m_mTransitionCount += m_graph->GetNodeclass(SP_DS_IMMEDIATE_TRANS)->GetElements()->size();
 	m_mTransitionCount += m_graph->GetNodeclass(SP_DS_SCHEDULED_TRANS)->GetElements()->size();
 
-	return SP_XmlWriter::Write(m_graph, m_fileName);
+	return SP_XmlWriter::Write(m_graph, p_fileName);
 }
 
 bool SP_ExportFHPN2FSPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcRoot)
@@ -89,6 +74,7 @@ bool SP_ExportFHPN2FSPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_p
 		{
 			for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 			{
+				/**
 				//////Obtain Marking of the Node//////
 				wxString l_sAttributeName = wxT("Marking");
 				SP_DS_Attribute* l_pcOldAttribute = (*l_Iter)->GetAttribute(l_sAttributeName);
@@ -123,7 +109,14 @@ bool SP_ExportFHPN2FSPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_p
 
 				l_pcNewAttribute->CopyValueFrom(att);
 				WritePlace(ConvertedNode, m_pcElem);// replace convertedNode by (*l_Iter)
+				*/
+
+				SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+				m_converter.ChangeRepresentation(l_pcOldNode,true);
+				WritePlace(l_pcOldNode, m_pcElem);
+				m_converter.ResetNodeRepresentation(l_pcOldNode,true);
 			}
+
 		}
 		else
 			if (l_sNodeclassName == SP_DS_STOCHASTIC_TRANS)
@@ -147,7 +140,7 @@ bool SP_ExportFHPN2FSPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_p
 
 				for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 				{
-
+					/**
 					wxString m_newType = wxT("Stochastic Transition");//to be removed
 					SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);//to be removed
 					//SP_DS_Node* ConvertedNode = ConvertNode(*l_Iter, l_pcConvertToNodeClass);// to be removed
@@ -156,6 +149,12 @@ bool SP_ExportFHPN2FSPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_p
 					ConvertedNode->Update();
 					
 					WriteTransition(ConvertedNode, m_pcElem);//WriteTransition
+				*/
+
+					SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+					m_converter.ChangeRepresentation(l_pcOldNode);
+					WritePlace(l_pcOldNode, m_pcElem);
+					m_converter.ResetNodeRepresentation(l_pcOldNode);
 				}
 			}
 			else

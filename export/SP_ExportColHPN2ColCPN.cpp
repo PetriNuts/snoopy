@@ -50,8 +50,8 @@ bool SP_ExportColHPN2ColCPN::Write(SP_MDI_Doc* p_doc,
 	m_pcPlaceNodeclass = NULL;
 
 
-	m_fileName = p_fileName;
-	return SP_XmlWriter::Write(m_graph, m_fileName);
+	//m_fileName = p_fileName;
+	return SP_XmlWriter::Write(m_graph, p_fileName);
 }
 
 bool SP_ExportColHPN2ColCPN::WriteNetclass(SP_DS_Netclass* p_pcVal,
@@ -100,7 +100,7 @@ bool SP_ExportColHPN2ColCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		{
 			wxString l_sNodeClass= p_pcVal->GetName();
 			if (wxT("Place") == l_sNodeClass) {
-			
+			   /**
 				wxString m_newType = wxT("Continuous Place");//to be removed
 				SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);//to be removed
 				SP_DS_Node* ConvertedNode1 = m_converter.Clone((**l_Iter), *l_pcConvertToNodeClass);// ConvertNode((*l_Iter), l_pcConvertToNodeClass);// to be removed
@@ -108,14 +108,20 @@ bool SP_ExportColHPN2ColCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 				wxString valString = nameAttr->GetValueString();
 				m_names.push_back(valString);
 				WritePlace(ConvertedNode1, l_pcElem);
+				*/
+				/////////////////
+				SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+				m_converter.ChangeRepresentation(l_pcOldNode);
+				WritePlace(l_pcOldNode, l_pcElem);
+				m_converter.ResetNodeRepresentation(l_pcOldNode);
 			}
 			else
 			{  
-				SP_DS_Attribute* IdAttr = (*l_Iter)->GetAttribute(wxT("ID"));
+				//SP_DS_Attribute* IdAttr = (*l_Iter)->GetAttribute(wxT("ID"));
 
-				wxString valString = IdAttr->GetValueString();
-				for(int i=0;i<m_names.size();i++)
-					if (m_names[i] == valString) { return TRUE; }
+				//wxString valString = IdAttr->GetValueString();
+				//for(int i=0;i<m_names.size();i++)
+					//if (m_names[i] == valString) { return TRUE; }
 				WritePlace((*l_Iter), l_pcElem);
 			}
 		}
@@ -142,6 +148,7 @@ bool SP_ExportColHPN2ColCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 		{
 			wxString l_sNodeClass = p_pcVal->GetName();
 			if (wxT("Transition")== l_sNodeClass) {
+				/**
 				wxString m_newType = wxT("Continuous Transition");
 
 				SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);
@@ -156,15 +163,21 @@ bool SP_ExportColHPN2ColCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal,
 
 				m_names.push_back(valString);
 				WriteTransition(ConvertedNode, l_pcElem);
+				*/
+				//////////////////
+				SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+				m_converter.ChangeRepresentation(l_pcOldNode);
+				WriteTransition(l_pcOldNode, l_pcElem);
+				m_converter.ResetNodeRepresentation(l_pcOldNode);
 
 			}
 			else
 			{
-				SP_DS_Attribute* IdAttr = (*l_Iter)->GetAttribute(wxT("ID"));
+				//SP_DS_Attribute* IdAttr = (*l_Iter)->GetAttribute(wxT("ID"));
 
-				wxString valString = IdAttr->GetValueString();
-				for (int i = 0; i<m_names.size(); i++)
-					if (m_names[i] == valString) { return TRUE; }
+				//wxString valString = IdAttr->GetValueString();
+				//for (int i = 0; i<m_names.size(); i++)
+				//	if (m_names[i] == valString) { return TRUE; }
 			WriteTransition((*l_Iter), l_pcElem);
 		}
 		}

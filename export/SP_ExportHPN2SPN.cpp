@@ -72,12 +72,13 @@ bool SP_ExportHPN2SPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 			for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 			{
 				//////Obtain Marking of the Node//////
+				/**
 				wxString l_sAttributeName = wxT("Marking");
 				SP_DS_Attribute* l_pcOldAttribute = (*l_Iter)->GetAttribute(l_sAttributeName);
 				wxString valString = l_pcOldAttribute->GetValueString();
 				double marking;
 				valString.ToDouble(&marking);
-				/************************************/
+				 
 
 				wxString m_newType = wxT("Discrete Place");
 
@@ -105,6 +106,12 @@ bool SP_ExportHPN2SPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 				l_pcNewAttribute->CopyValueFrom(att);
 
 				WritePlace(ConvertedNode, m_pcElem);
+				*/
+				////////////////////////
+				SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+				m_converter.ChangeRepresentation(l_pcOldNode,true);
+				WriteNode(l_pcOldNode, m_pcElem);
+				m_converter.ResetNodeRepresentation(l_pcOldNode,true);
 			}
 		}
 		else
@@ -126,12 +133,20 @@ bool SP_ExportHPN2SPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcR
 			{
 				for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 				{
+					/**
 					wxString m_newType = wxT("Stochastic Transition");
 					SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType); 
 																											  
 					SP_DS_Node* ConvertedNode = m_converter.Clone(**l_Iter, *l_pcConvertToNodeClass);
 					ConvertedNode->Update();
 					WriteTransition(ConvertedNode, m_pcElem);
+					*/
+					////////////////////////////
+					////////////////////////
+					SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+					m_converter.ChangeRepresentation(l_pcOldNode);
+					WriteNode(l_pcOldNode, m_pcElem);
+					m_converter.ResetNodeRepresentation(l_pcOldNode);
 				}
 			}
 			else

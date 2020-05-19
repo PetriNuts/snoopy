@@ -23,6 +23,7 @@ class SP_ExportColSPN2ColCPN:  public SP_ExportRoutine, private SP_XmlWriter
 	 wxXmlNode* m_pcTransitionNodeclass;
 	 wxString m_edgeClass;
 	 bool m_changeColour;
+	 SpConvertElement m_converter;
 	 
 
  protected:

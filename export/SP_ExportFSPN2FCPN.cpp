@@ -93,14 +93,11 @@ bool SP_ExportFSPN2FCPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 
 	m_graph = m_doc->GetGraph();
 	m_pcMetaDataConstants = m_graph->GetMetadataclass(SP_DS_META_CONSTANT);
-	m_fileName = p_fileName;
-	//m_graph->AddMetadataclass(m_pcMetaDataConstants);
-	//Get the total number of place
-//	m_nPlaceCount = m_graph->GetNodeclass(SP_DS_CONTINUOUS_PLACE)->GetElements()->size();
+	  
 	m_nPlaceCount += m_graph->GetNodeclass(SP_DS_DISCRETE_PLACE)->GetElements()->size();
 
 	//Get the total number of transitions
-	//m_mTransitionCount = m_graph->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements()->size();
+	 
 	m_mTransitionCount += m_graph->GetNodeclass(SP_DS_STOCHASTIC_TRANS)->GetElements()->size();
 	m_mTransitionCount += m_graph->GetNodeclass(SP_DS_DETERMINISTIC_TRANS)->GetElements()->size();
 	m_mTransitionCount += m_graph->GetNodeclass(SP_DS_IMMEDIATE_TRANS)->GetElements()->size();
@@ -110,8 +107,8 @@ bool SP_ExportFSPN2FCPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 	////////////////////////////
 
 	///////////////////////
-	bool b = SP_XmlWriter::Write(m_graph, m_fileName);
-	//m_graph->AddMetadataclass(m_pcMetaDataConstants);
+	bool b = SP_XmlWriter::Write(m_graph, p_fileName);
+	 
 	return b;
 }
 
@@ -140,66 +137,11 @@ bool SP_ExportFSPN2FCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_p
 
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			wxString m_newType = wxT("Continuous Place");//to be removed
-			SP_DS_Nodeclass*	l_pcConvertToNodeClass;// = m_graph->AddNodeclass(new SP_DS_Nodeclass(m_graph, wxT("Continuous Place")));
-			l_pcConvertToNodeClass = m_graph->AddNodeclass(new SP_DS_Nodeclass(m_graph, SP_DS_CONTINUOUS_PLACE, m_graph->GetNodeclass(SP_DS_DISCRETE_PLACE)->GetIdCountPtr()));
-			 
-			/* there is no Continuous place in our current (SPN) Ped, so we need to 
-			create a new one and initialize it with its default attributes, so that 
-			we can make copy of the attributes of Discrete place to the new Continuous Place.
-			
-			*/
-			SP_DS_Nodeclass* l_pcNC;
-			SP_DS_Attribute* l_pcAttr;
-			SP_GR_Node* l_pcGr;
-			SP_Graphic* l_pcGrAttr;
-			l_pcNC = m_graph->AddNodeclass(new SP_DS_Nodeclass(m_graph, SP_DS_CONTINUOUS_PLACE, m_graph->GetNodeclass(SP_DS_DISCRETE_PLACE)->GetIdCountPtr()));
-			l_pcNC->SetShortcut(wxT("Shift+P"));
-			l_pcNC->SetDisplayName(wxT("Continuous Place"));
-
-			l_pcAttr = l_pcNC->AddAttribute(new SP_DS_BoolAttribute(wxT("Fixed"), FALSE));//Fixed
-			l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogBool(wxT("General"), 1));
-
-			l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name")));
-			l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
-			l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-			l_pcGrAttr->SetOffsetY(20);
-			l_pcGrAttr->SetShow(TRUE);
-			l_pcAttr->SetGlobalShow();
-
-			l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
-			l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));
-			l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_NumberAttribute(l_pcAttr, wxT("_pa%_")));
-			l_pcGrAttr->SetOffsetX(20);
-			l_pcGrAttr->SetShow(FALSE);
-			l_pcAttr->SetGlobalShow();
-
-
-			l_pcAttr = l_pcNC->AddAttribute(new SP_DS_DoubleMarkingAttribute(wxT("Marking"), 0.0));
-			l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
-			l_pcAttr->AddGraphic(new SP_GR_MarkNumberAttribute(l_pcAttr));
-
-
-			int pwidth = wxGetApp().GetElementPrefs()->GetNodeWidth(GetName(), SP_DS_CONTINUOUS_PLACE);
-			l_pcGr = new SP_GR_ExtendedCircle(l_pcNC->GetPrototype(), pwidth, SP_EXTENDED_TYPE_DEFAULT, 3, wxColour(128, 128, 128));
-			l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3));
-			l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
-			l_pcNC->SetGraphic(l_pcGr);
-			l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
-
-			l_pcAttr = l_pcNC->AddAttribute(new SP_DS_LogicAttribute(wxT("Logic"), wxT("Name")));
-			l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogBool(wxT("General")));
-
-			l_pcAttr = l_pcNC->AddAttribute(new SP_DS_TextAttribute(wxT("Comment"), wxT("")));
-			//l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogMultiline(wxT("General")));
-			l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-			l_pcGrAttr->SetOffsetY(40);
-			l_pcAttr->SetGlobalShow();
-			/* to this point, a new Cont. place is ready to be created from Discrete one via convert method in our converter*/
-			SP_DS_Nodeclass* l_pcConvertToNodeClass1 = m_graph->GetNodeclassByDisplayedName(SP_DS_CONTINUOUS_PLACE); 
-			SP_DS_Node* ConvertedNode1 = m_converter.ConvertNode((*l_Iter), l_pcNC); 
-			SP_DS_Attribute* nameAttr = ConvertedNode1->GetAttribute(wxT("Name"));
-			WritePlace(ConvertedNode1, m_pcElem);
+			SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+			m_converter.ChangeRepresentation(l_pcOldNode);
+			WritePlace(l_pcOldNode, m_pcElem);
+			m_converter.ResetNodeRepresentation(l_pcOldNode);
+		//	WritePlace(ConvertedNode1, m_pcElem);
 		 
 		}
 	}
@@ -232,72 +174,12 @@ bool SP_ExportFSPN2FCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_p
 
 				for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 				{
-					SP_DS_Nodeclass* l_pcNC;
-					SP_DS_Attribute* l_pcAttr;
-					SP_GR_Node* l_pcGr;
-					SP_Graphic* l_pcGrAttr;
-					SP_DS_ColListAttribute* l_pcColList;
-					unsigned int l_nNewRow;
-
-					SP_DS_Node* l_pcNode = *l_Iter;
-					wxString l_sTransitionName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-					wxString m_newType = wxT("Continuous Transition");//to be removed
-					SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);//to be removed
-				
-					l_pcNC = m_graph->AddNodeclass(new SP_DS_Nodeclass(m_graph,
-						SP_DS_CONTINUOUS_TRANS,
-						m_graph->GetNodeclass(SP_DS_STOCHASTIC_TRANS)->GetIdCountPtr()));
-					l_pcNC->SetDisplayName(wxT("Continuous Transition"));
-
-					l_pcNC->SetShortcut(wxT("Shift+T"));
-					l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name"), wxT("")));
-					l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
-					l_pcAttr->SetGlobalShow();
-					l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-					l_pcGrAttr->SetOffsetX(25);
-					l_pcGrAttr->SetOffsetY(20);
-
-					l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
-					l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));
-					l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_NumberAttribute(l_pcAttr, wxT("_it%_")));
-					l_pcGrAttr->SetOffsetX(25);
-					l_pcGrAttr->SetOffsetY(20);
-					l_pcGrAttr->SetShow(FALSE);
-					l_pcAttr->SetGlobalShow();
-					l_pcAttr = l_pcNC->AddAttribute(new SP_DS_LogicAttribute(wxT("Logic"), wxT("Name")));
-					l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogBool(wxT("General")));
-					l_pcAttr = l_pcNC->AddAttribute(new SP_DS_TextAttribute(wxT("Comment"), wxT("")));
-					l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogMultiline(wxT("General")));
-					l_pcAttr->SetGlobalShow();
-					l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-					l_pcGrAttr->SetOffsetX(25);
-					l_pcGrAttr->SetOffsetX(40);
-
-					l_pcAttr = l_pcNC->AddAttribute(new SP_DS_ColListAttribute(wxT("FunctionList"), SP_COLLIST_STRING, 2));
-					l_pcAttr->SetDisplayName(wxT("Function set"));
-					l_pcAttr->RegisterDialogWidget(new SP_WDG_StFunctionList(wxT("Functions")));
-					l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_ColListAttribute(l_pcAttr));
-					l_pcGrAttr->SetOffsetX(25);
-					l_pcGrAttr->SetOffsetY(30);
-					l_pcGrAttr->SetShow(FALSE);
-					l_pcAttr->SetGlobalShow();
-					l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcAttr);
-					l_pcColList->SetColLabel(0, wxT("Function set"));
-					l_pcColList->SetColLabel(1, wxT("Function"));
-					l_nNewRow = l_pcColList->AppendEmptyRow();
-					l_pcColList->SetCell(l_nNewRow, 0, wxT("Main"));
-					l_pcColList->SetCell(l_nNewRow, 1, wxT("MassAction(1)"));
-					int twidth = wxGetApp().GetElementPrefs()->GetNodeWidth(GetName(), SP_DS_CONTINUOUS_TRANS);
-					int theight = wxGetApp().GetElementPrefs()->GetNodeHeight(GetName(), SP_DS_CONTINUOUS_TRANS);
-					l_pcGr = new SP_GR_ExtendedRectangle(l_pcNC->GetPrototype(), twidth, theight, TRUE, SP_EXTENDED_TYPE_DEFAULT, 3, wxColour(128, 128, 128));
-					l_pcGr->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(128, 128, 128), 3));
-					l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
-					l_pcNC->SetGraphic(l_pcGr);
-					l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
-					SP_DS_Node* ConvertedNode = m_converter.ConvertNode((*l_Iter), l_pcNC);//ConvertNode(*l_Iter, l_pcConvertToNodeClass);// to be removed
-					//ConvertedNode->Update();
-				 
-					WriteTransition(ConvertedNode, m_pcElem);//	WriteTransition((*l_Iter), m_pcElem);
+					 
+					SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+					m_converter.ChangeRepresentation(l_pcOldNode);
+					WriteTransition(l_pcOldNode, m_pcElem);
+					m_converter.ResetNodeRepresentation(l_pcOldNode);
+				//	WriteTransition(ConvertedNode, m_pcElem);//	WriteTransition((*l_Iter), m_pcElem);
 					 
 				}
 			}

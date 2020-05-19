@@ -24,13 +24,13 @@ private:
 	wxString m_edgeClass;
 	bool m_changeColour;
 
-	std::vector<wxString> m_names;//Added by G.A
+	 
 	SpConvertElement m_converter = SpConvertElement();//Added by G.A
 protected:
 
 	SP_MDI_Doc* m_doc;
 	SP_DS_Graph* m_graph;
-	wxString m_fileName;
+ 
 
 	virtual bool WriteNetclass(SP_DS_Netclass* p_pcVal, wxXmlNode* p_pcRoot);
 	virtual bool WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcRoot);

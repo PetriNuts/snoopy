@@ -25,7 +25,7 @@ bool SP_ExportFHPN2FCPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 
 	m_graph = m_doc->GetGraph();
 
-	m_fileName = p_fileName;
+	 
 
 	//Get the total number of place
 	m_nPlaceCount = m_graph->GetNodeclass(SP_DS_CONTINUOUS_PLACE)->GetElements()->size();
@@ -38,7 +38,7 @@ bool SP_ExportFHPN2FCPN::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 	m_mTransitionCount += m_graph->GetNodeclass(SP_DS_IMMEDIATE_TRANS)->GetElements()->size();
 	m_mTransitionCount += m_graph->GetNodeclass(SP_DS_SCHEDULED_TRANS)->GetElements()->size();
 	//m_converter SpConvertElement();
-	return SP_XmlWriter::Write(m_graph, m_fileName);
+	return SP_XmlWriter::Write(m_graph, p_fileName);
 }
 
 bool SP_ExportFHPN2FCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcRoot)
@@ -62,13 +62,10 @@ bool SP_ExportFHPN2FCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_p
 
 		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 		{
-			wxString m_newType = wxT("Continuous Place");//to be removed
-			SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);//to be removed
-			SP_DS_Node* ConvertedNode1 =m_converter.Clone((**l_Iter), *l_pcConvertToNodeClass);// ConvertNode((*l_Iter), l_pcConvertToNodeClass);// to be removed
-			SP_DS_Attribute* nameAttr = ConvertedNode1->GetAttribute(wxT("Name"));
-			wxString valString = nameAttr->GetValueString();
-			m_names.push_back(valString);
-			WritePlace(ConvertedNode1, m_pcElem);
+			SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+			m_converter.ChangeRepresentation(l_pcOldNode);
+			WritePlace(l_pcOldNode, m_pcElem);
+			m_converter.ResetNodeRepresentation(l_pcOldNode);
 			
 		}
 	}
@@ -77,19 +74,8 @@ bool SP_ExportFHPN2FCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_p
 		{
 			for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 			{
-			 
-				SP_DS_Attribute* nameAttr = (*l_Iter)->GetAttribute(wxT("Name"));
-				
-				wxString valString = nameAttr->GetValueString();
-				bool isConv = m_converter.IsConverted(valString);
-				for (int i = 0; i < m_names.size(); i++)
-				{
-					if (m_names[i] == valString)
-					{ 
-						return TRUE;
-					}
-				}
-				WritePlace((*l_Iter), m_pcElem);// replace convertedNode by (*l_Iter)
+ 
+				WritePlace((*l_Iter), m_pcElem);
 			}
 		}
 		else
@@ -105,15 +91,11 @@ bool SP_ExportFHPN2FCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_p
 
 				for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 				{
-						wxString m_newType = wxT("Continuous Transition");//to be removed
-						SP_DS_Nodeclass* l_pcConvertToNodeClass = m_graph->GetNodeclassByDisplayedName(m_newType);//to be removed
-						SP_DS_Node* ConvertedNode = m_converter.Clone((**l_Iter), *l_pcConvertToNodeClass);//ConvertNode(*l_Iter, l_pcConvertToNodeClass);// to be removed
-					    ConvertedNode->Update();
-						SP_DS_Attribute* nameAttr = ConvertedNode->GetAttribute(wxT("Name"));
-						wxString valString = nameAttr->GetValueString();
-						m_names.push_back(valString);
-					    WriteTransition(ConvertedNode, m_pcElem);//WriteTransition
-				
+ 
+					SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(*l_Iter);
+					m_converter.ChangeRepresentation(l_pcOldNode);
+					WriteTransition(l_pcOldNode, m_pcElem);
+					m_converter.ResetNodeRepresentation(l_pcOldNode);
 					
 				}
 			}
@@ -123,14 +105,6 @@ bool SP_ExportFHPN2FCPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_p
 
 				for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 				{
-
-					SP_DS_Attribute* nameAttr = (*l_Iter)->GetAttribute(wxT("Name"));
-					wxString valString = nameAttr->GetValueString();
-					for (int i = 0; i < m_names.size(); i++)
-					{
-						if (m_names[i] == valString) return TRUE;
-					}
-
 					WriteTransition((*l_Iter), m_pcElem);//WriteTransition
 				}
 			}

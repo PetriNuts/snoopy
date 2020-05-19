@@ -747,7 +747,10 @@ bool SP_DS_ColPN_ExportUnfolding::CreateDuplicateEdge(SP_DS_Node* p_pcTransOldNo
 
 		//if( m_sNetClass !=  SP_DS_COLHPN_CLASS )
 		{
+			
 			l_pcAttr->SetValueString( l_sMultiplicity );
+			l_pcAttr->SetShow(TRUE);//by george, to show the multiplicity 
+			l_pcAttr->Update(TRUE);//by george
 		}
 		//else
 		{		

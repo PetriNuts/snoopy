@@ -26,7 +26,7 @@ class SP_ExportColPN2ANDL_new: public SP_ExportRoutine, public SP_Error
   virtual bool Write(SP_MDI_Doc*, const wxString&);
 
   inline virtual wxString GetName()
-    { return wxT("Export to ANDL using dssz_util");}
+    { return wxT("Export to ANDL using dssd_util");}
   inline virtual wxString GetDescr()
     { return wxT("Export a Petri Net in ANDL Format");}
   virtual wxString GetExtension()

@@ -10,6 +10,7 @@
 
 #include "sp_core/SP_XmlWriter.h"
 #include "export/SP_ExportRoutine.h"
+#include "export/SpConvertElement.h"
 
 class SP_ExportColFCPN2ColFSPN : public SP_XmlWriter, public SP_ExportRoutine
 {
@@ -17,13 +18,13 @@ private:
 protected:
 	SP_MDI_Doc* m_doc;
 	SP_DS_Graph* m_graph;
-	wxString m_fileName;
+	 
 	virtual bool WriteNetclass(SP_DS_Netclass* p_pcVal, wxXmlNode* p_pcRoot);
 	virtual bool WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcRoot);
 
 	bool WriteStochPlace(SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
 	bool WriteStochTransition(SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoot);
-
+	SpConvertElement m_converter;
 public:
 
 	// must be implemented in successors
