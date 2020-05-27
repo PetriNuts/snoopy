@@ -530,6 +530,16 @@ bool SP_ImportCANDL::CreateColorsets(const dssd::andl::Colorsets& p_Colorsets)
 			colors.Replace(wxT(".."), wxT("-"));
 			colors.Replace(wxT("{"), wxT(""));
 			colors.Replace(wxT("}"), wxT(""));
+			//bugfix by george, importing subsets
+			if (colors.Contains(wxT("[")) && colors.Contains(wxT("]")))
+			{
+				wxString l_sExpression = colors;
+				colors = colors.AfterFirst(wxChar('['));
+				colors = colors.BeforeLast(wxChar(']'));
+				type = l_sExpression.BeforeFirst(wxChar('['));
+				l_bSimple = false;
+
+			}
 		}
 		//TODO: add acyclic attribute to colorset definition in snoopy
 		if(!cs->cyclic_)
