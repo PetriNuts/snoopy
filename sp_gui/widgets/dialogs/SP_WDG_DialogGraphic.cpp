@@ -102,20 +102,21 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
 	SP_Graphic* l_pcGr;
-
-	if (l_pctmp->GetElementType() == SP_ELEMENT_NODE)//by george
+	if (l_pctmp->GetElementType() != SP_ELEMENT_EDGE)
 	{
-		l_pcGr = *m_lGraphics.begin();
-    }
-	int l_nThick;
-	// -1 means unmodified
-	if (m_bMultiple) {
-		l_nThick = -1;
-	}
-	else {
-		l_nThick = l_pcGr->GetThickness();
-	}
-
+		if (l_pctmp->GetElementType() == SP_ELEMENT_NODE)//by george
+		{
+			l_pcGr = *m_lGraphics.begin();
+		}
+		int l_nThick;
+		// -1 means unmodified
+		if (m_bMultiple) {
+			l_nThick = -1;
+		}
+		else {
+			l_nThick = l_pcGr->GetThickness();
+		}
+	
 
 	//by george
 	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -123,7 +124,7 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
 	m_scThickness = new wxSpinCtrl(l_pcPage, SP_ID_SPINCTRL_THICKNESS + 10009 + SP_ID_LAST_ID, wxString::Format(wxT("%d"), l_nThick));
 	l_pcSizer->Add(m_scThickness, 0, wxALL, 5);
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
-	
+	}
 	/* change ckruge2 19.06.2009 */
 	//only Nodes have hight and width
 	if (l_pctmp->GetElementType() == SP_ELEMENT_NODE)
