@@ -16,7 +16,7 @@
 #include "sp_utilities.h"
 #include"TriangularFN.h"
 #include<vector>
-#include "sp_gui\dialogs\dia_FPN\SP_DLG_FuzzyNumber_Drawing.h"
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_FuzzyNumber_Drawing.h"
 class SP_DS_Metadataclass;
 //class TriangularFN;
 class SP_DLG_FpnConstantDefinition : public wxDialog
