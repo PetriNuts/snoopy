@@ -1,6 +1,6 @@
 
 #include "wx/scrolbar.h"
-#include "sp_gui\dialogs\dia_FPN\SP_DLG_FuzzyNumber_Drawing.h"
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_FuzzyNumber_Drawing.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 //IMPLEMENT_CLASS(SP_DLG_FuzzyNumber_Drawing, wxFrame)
 enum {
