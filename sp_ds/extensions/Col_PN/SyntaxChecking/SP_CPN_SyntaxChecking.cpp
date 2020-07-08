@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
 // $Source: $
 // $Author: fei liu $
 // $Version: 0.0 $
@@ -53,6 +53,7 @@
 SP_CPN_SyntaxChecking::SP_CPN_SyntaxChecking()
 {
 	m_mvCSExpr2PColors.clear();
+	//m_bIsNotUniqueNet = false;
 }
 
 SP_CPN_SyntaxChecking::~SP_CPN_SyntaxChecking()
@@ -80,7 +81,7 @@ bool SP_CPN_SyntaxChecking::SyntaxChecking()
 
 	if (!Initialize())
 		return false;
-
+	//m_bIsNotUniqueNet = p_bIsDoublicated;
 	//check places
 	if (!CheckPlaceClass(SP_DS_CONTINUOUS_PLACE))
 		return false;
@@ -217,9 +218,11 @@ bool SP_CPN_SyntaxChecking::CheckArcExpression(SP_DS_Node* p_pcPlaceNode, SP_DS_
 
 	wxString l_sErrorPosition = wxT("miss matching type in arc expression! Error Position:") + l_sExpression + wxT(" | ") + l_sEdgeName;
 
+	bool l_bIsDuplicateOrUnion = CheckDuplicateNodes();
+
 	if (l_cColorSet.GetDataType() != CPN_UNION 
 		&& l_cColorSet.GetDataType() != CPN_INDEX /*&& l_cColorSet.GetDataType() != CPN_STRING&& l_cColorSet.GetDataType() != CPN_BOOLEAN*/
-		)
+		&& l_bIsDuplicateOrUnion ==false)
 	{
 		SP_IddUnFoldExpr   expEval(m_pcGraph, m_sPlaceExp, m_sPlaceName);
 		wxString l_sCSName = l_cColorSet.GetName();
@@ -386,10 +389,14 @@ bool SP_CPN_SyntaxChecking::CheckExpression(wxString p_sExpression, wxString p_s
 
 
 	bool l_bISSupportedByDssd = true;
+
+	bool l_bIsDuplicateOrUnion = CheckDuplicateNodes();
+
+
 	vector<SP_CPN_ColorSet*>* l_pcColorSet = m_cColorSetClass.GetColorSetVector();
 	for (auto l_pcColorSet : *l_pcColorSet)
 	{
-		if (l_pcColorSet->GetDataType() == CPN_UNION || p_sExpression.Contains("val")
+		if (l_pcColorSet->GetDataType() == CPN_UNION || p_sExpression.Contains("val")  || l_bIsDuplicateOrUnion
 			/*	|| l_pcColorSet->GetDataType() == CPN_STRING*/ || l_pcColorSet->GetDataType() == CPN_INDEX)
 		{
 			l_bISSupportedByDssd = false;
@@ -499,13 +506,13 @@ bool SP_CPN_SyntaxChecking::CheckGuard(SP_DS_Node* p_pcTransNode)
 
 //	if (!CheckExpression(l_sGuard, l_sErrorPosition, wxT(""), wxT("Place"), false, true))
 //		return false;
-
+	bool l_bIsDuplicateOrUnion = CheckDuplicateNodes();
 
 	vector<SP_CPN_ColorSet*>* l_pcColorSet = m_cColorSetClass.GetColorSetVector();
 	for (auto l_pcColorSet : *l_pcColorSet)
 	{
 		if (l_pcColorSet->GetDataType() == CPN_UNION /*|| l_pcColorSet->GetDataType() == CPN_BOOLEAN*/
-			|| l_pcColorSet->GetDataType() == CPN_STRING || l_pcColorSet->GetDataType() == CPN_INDEX)
+			|| l_pcColorSet->GetDataType() == CPN_STRING || l_pcColorSet->GetDataType() == CPN_INDEX  || l_bIsDuplicateOrUnion)
 		{
 			 
 
@@ -522,11 +529,25 @@ bool SP_CPN_SyntaxChecking::CheckGuard(SP_DS_Node* p_pcTransNode)
 
 	}
 
- 
-	//dssd_util checking, if the model does not have one of the un-supported color set by Dssd_util
-   SP_IddUnFoldExpr   expEval(m_pcGraph, m_sPlaceExp, m_sPlaceName);
- 
-	bool l_bCheck = expEval.CheckGuardEXpression(l_sGuard.ToStdString(), l_sErrorPosition.ToStdString());
+	if (l_bIsDuplicateOrUnion)
+	{
+		if (!CheckExpression(l_sGuard, l_sErrorPosition, wxT(""), wxT("Place"), false, true))
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	bool l_bCheck = false;
+
+		//dssd_util checking, if the model does not have one of the un-supported color set by Dssd_util
+		SP_IddUnFoldExpr   expEval(m_pcGraph, m_sPlaceExp, m_sPlaceName);
+
+		l_bCheck = expEval.CheckGuardEXpression(l_sGuard.ToStdString(), l_sErrorPosition.ToStdString());
+
 
 	return l_bCheck;
 
@@ -886,6 +907,110 @@ void SP_CPN_SyntaxChecking::UpdateMarkingPlaceClass(wxString p_sPlaceNCName)
 
 
 
+bool SP_CPN_SyntaxChecking::ComputeInitialMarkingWithoutDssdUtil(SP_DS_Node* p_pcPlaceNode, map<wxString, vector<SP_CPN_TokenNum> >& p_mColorToMarkingMap, bool p_bMarkingCheck)
+{
+	m_bMarkingCheck = p_bMarkingCheck;
+
+	wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(p_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+	wxString l_sPlaceType = p_pcPlaceNode->GetNodeclass()->GetName();
+
+	//check the color set
+	SP_CPN_ColorSet l_cColorSet;
+	if (!GetPlaceColorSet(p_pcPlaceNode, l_cColorSet))
+		return false;
+	vector<wxString> l_ColorVector;
+
+	//only for computing marking
+	map<wxString, SP_CPN_TokenNum> l_mColor2TokenNumOrg;
+	if (!m_bMarkingCheck)
+	{
+		l_ColorVector = l_cColorSet.GetStringValue();
+		for (unsigned i = 0; i < l_ColorVector.size(); i++)
+		{
+			l_mColor2TokenNumOrg[l_ColorVector[i]].m_intMultiplicity = 0;  //initialized as 0
+		}
+	}
+
+	SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(p_pcPlaceNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
+	if (!l_pcColList)
+		return false;
+
+	//if there is no marking defined
+	if (l_pcColList->GetRowCount() == 0)
+	{
+		int l_nCount = l_pcColList->GetColCount() / 2;
+		l_ColorVector = l_cColorSet.GetStringValue();
+		SP_CPN_TokenNum l_nNum;
+		l_nNum.m_intMultiplicity = 0;
+		vector<SP_CPN_TokenNum> l_nColTokens;
+		l_nColTokens.assign(l_nCount, l_nNum);
+		for (unsigned i = 0; i < l_ColorVector.size(); i++)
+		{
+			p_mColorToMarkingMap[l_ColorVector[i]] = l_nColTokens;
+		}
+		return true;
+	}
+
+	//if there is initial marking
+	for (unsigned int j = 0; j < l_pcColList->GetColCount(); j++)
+	{
+		map<wxString, SP_CPN_TokenNum> l_mColor2TokenNum;
+		l_mColor2TokenNum = l_mColor2TokenNumOrg;
+
+		for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+		{
+			wxString l_sColorExpr = l_pcColList->GetCell(i, j);
+			wxString l_sTokenNum = l_pcColList->GetCell(i, j + 1);
+
+			m_sErrorPosition = wxT("Error Position: ") + l_sColorExpr + wxT(" | ") + l_sPlaceName;
+
+			SP_CPN_TokenNum l_uTokenNumber;
+			if (!GetTokenNumber(l_sTokenNum, l_uTokenNumber, m_sErrorPosition, l_sPlaceType))
+				return false;
+
+			vector<wxString> l_vParsedColors;
+			if (!ComputeInitialMarkingStep2(l_sColorExpr, l_ColorVector, &l_cColorSet, l_vParsedColors))
+				return false;
+
+			//only for computing marking
+			if (!m_bMarkingCheck)
+			{
+				for (unsigned k = 0; k < l_vParsedColors.size(); k++)
+				{
+					wxString l_sColor = l_vParsedColors[k];
+					SP_CPN_TokenNum l_uNewTokenNum;
+					if (l_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+					{
+						l_uNewTokenNum.m_DoubleMultiplicity = l_mColor2TokenNum[l_sColor].m_DoubleMultiplicity + l_uTokenNumber.m_DoubleMultiplicity;
+						l_mColor2TokenNum[l_sColor] = l_uNewTokenNum;
+					}
+					else
+					{
+						l_uNewTokenNum.m_intMultiplicity = l_mColor2TokenNum[l_sColor].m_intMultiplicity + l_uTokenNumber.m_intMultiplicity;
+						l_mColor2TokenNum[l_sColor] = l_uNewTokenNum;
+					}
+				}
+			}
+		}
+
+		//only for computing marking
+		if (!m_bMarkingCheck)
+		{
+			//collect tokens for one column
+			map<wxString, SP_CPN_TokenNum>::iterator itMap;
+			for (itMap = l_mColor2TokenNum.begin(); itMap != l_mColor2TokenNum.end(); itMap++)
+			{
+				p_mColorToMarkingMap[itMap->first].push_back(itMap->second);
+			}
+		}
+		if (l_pcColList->GetColCount() == 3)
+			j = j + 2;
+		else
+		    j++;
+	}
+
+	return true;
+}
 
 
 
@@ -893,8 +1018,17 @@ void SP_CPN_SyntaxChecking::UpdateMarkingPlaceClass(wxString p_sPlaceNCName)
 
 //new functions
 
-bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map<wxString, vector<SP_CPN_TokenNum> >& p_mColorToMarkingMap, bool p_bMarkingCheck)
+bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map<wxString, vector<SP_CPN_TokenNum> >& p_mColorToMarkingMap, bool p_bMarkingCheck )
 {
+	bool l_bIsContainDuplicatedNodes=CheckDuplicateNodes();
+
+	if (l_bIsContainDuplicatedNodes)
+	 {
+
+		return ComputeInitialMarkingWithoutDssdUtil(p_pcPlaceNode, p_mColorToMarkingMap, p_bMarkingCheck);
+	 }
+
+
 	m_bMarkingCheck = p_bMarkingCheck;
 
 	wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(p_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
@@ -1173,6 +1307,10 @@ std::map<wxString, SP_CPN_Variable_Constant>* SP_CPN_SyntaxChecking:: GetVariabl
 wxString
 SP_CPN_SyntaxChecking::SubstituteConstants(wxString p_sColorExpr)
 {
+
+	if (p_sColorExpr == wxT("all") || p_sColorExpr == wxT("all()"))
+		return p_sColorExpr;
+
 	wxString l_sColorExpr;
 	if (m_cColorSetClass.GetConstantMap())
 	{
@@ -1475,6 +1613,7 @@ bool SP_CPN_SyntaxChecking::OrdinarySolve(SP_CPN_Parse_Context_ptr p_pcParseCont
 			}
 		}
 	}
+
 	return true;
 }
 
@@ -1906,12 +2045,13 @@ bool SP_CPN_SyntaxChecking::CheckPredicateInRateFunction(wxString p_sPredicate, 
 	if (l_sPredicate == wxT("true"))//george
 		return true;
 	
+	bool l_bIsDuplicateOrUnion = CheckDuplicateNodes();
 	//begin to deal with predicates
 	vector<SP_CPN_ColorSet*>* l_pcColorSet = m_cColorSetClass.GetColorSetVector();
 	for (auto l_pcColorSet : *l_pcColorSet)
 	{
 		if(l_pcColorSet->GetDataType()==CPN_UNION  /*|| l_pcColorSet->GetDataType() == CPN_BOOLEAN*/
-		/*|| l_pcColorSet->GetDataType()==CPN_STRING*/|| l_pcColorSet->GetDataType()==CPN_INDEX)
+		/*|| l_pcColorSet->GetDataType()==CPN_STRING*/|| l_pcColorSet->GetDataType()==CPN_INDEX  || l_bIsDuplicateOrUnion)
 		{ 
 			
 
@@ -1927,12 +2067,25 @@ bool SP_CPN_SyntaxChecking::CheckPredicateInRateFunction(wxString p_sPredicate, 
 		}
 		 
 	}
-	//if (!CheckExpression(l_sPredicate, p_sErrorPosition, wxT(""), wxT("Place"), false, true))
-	//	return false;
+
+	if (l_bIsDuplicateOrUnion)
+	 {
+	 	if (!CheckExpression(l_sPredicate, p_sErrorPosition, wxT(""), wxT("Place"), false, true))
+	 	{
+	 		return false;
+	 	}
+	 	else
+	 	{
+	 		return true;
+	 	}
+	 }
+
  
 
 	SP_IddUnFoldExpr   expEval(m_pcGraph, m_sPlaceExp, m_sPlaceName);
 	p_sErrorPosition = wxT("Predicate Checking:");
+	std::string  l_sExprTocheck=l_sPredicate.ToStdString();
+
 	bool l_bCheck = expEval.CheckGuardEXpression(l_sPredicate.ToStdString(), p_sErrorPosition.ToStdString());
 
 	return l_bCheck;
@@ -2137,7 +2290,7 @@ void SP_CPN_SyntaxChecking::ComputeResultMarkingColours(dssd::unfolding::placeLo
 		for (auto it = p_placeLookupTable.begin(); it != p_placeLookupTable.end(); ++it)
 		{
 			
-			auto pl = it->second.unfoldedPlace_._Get();
+			auto pl = it->second.unfoldedPlace_;
 			wxString l_sFullFlatName = it->first;
 			wxString l_sTokens= pl->marking_;
 			if (l_sFullFlatName.Contains(wxT("__"))&& p_sTokenNum== l_sTokens)//a place does not have a name!
@@ -2376,4 +2529,108 @@ bool SP_CPN_SyntaxChecking::CheckBracketStructure(wxString p_sExpression, wxStri
 	//return true;
 }
 
- 
+bool SP_CPN_SyntaxChecking::CheckDuplicateNodes()
+
+{
+	m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+
+	bool l_bUniqueNodes = true;
+	map<wxString, SP_Data*> l_mpNodes;
+
+	for (SP_DS_Nodeclass* nc : *(m_pcGraph->GetNodeclasses()))
+	{
+
+		if (nc->GetShowInElementTree())
+		{
+			if (nc->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID) && nc->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))
+			{
+
+				for (SP_DS_Node* node : *(nc->GetElements()))
+				{
+					wxString l_sNodeclass = nc->GetDisplayName();
+					wxString l_sName = node->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)->GetValueString();
+					if (l_sName.IsEmpty())
+					{
+
+						wxString l_sMessage = l_sNodeclass + wxT(" with ID=")
+							+ node->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID)->GetValueString()
+							+ wxT(" has no name!");
+					//	SP_LOGWARNING(l_sMessage);
+					}
+					else
+					{
+						if (l_mpNodes[l_sName])
+						{
+							wxString l_sMessage = l_sNodeclass + wxT(" ") + l_sName + wxT(" is not unique!");
+							//SP_LOGWARNING(l_sMessage);
+							l_bUniqueNodes = false;
+						}
+						l_mpNodes[l_sName] = node;
+					}
+				}
+			}
+		}
+	}
+
+	for (SP_DS_Metadataclass* mc : *(m_pcGraph->GetMetadataclasses()))
+	{
+		if (mc->GetShowInDeclarationTreeOther()
+			|| mc->GetShowInDeclarationTreeColorSet())
+		{
+			if (mc->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID) && mc->HasAttributeType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))
+			{
+				for (SP_DS_Metadata* meta : *(mc->GetElements()))
+				{
+					wxString l_sMetaclass = mc->GetDisplayName();
+					wxString l_sName = meta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)->GetValueString();
+
+
+					if (l_sName.IsEmpty())
+					{
+
+						wxString l_sMessage = l_sMetaclass + wxT(" with ID=")
+							+ meta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_ID)->GetValueString()
+							+ wxT(" has no name!");
+						//SP_LOGWARNING( l_sMessage);
+					}
+					else
+					{
+						if (l_mpNodes[l_sName])
+						{
+							wxString l_sMessage = l_sMetaclass + wxT(" ") + l_sName + wxT(" is not unique!");
+							//SP_LOGWARNING( l_sMessage);
+							l_bUniqueNodes = false;
+						}
+						l_mpNodes[l_sName] = meta;
+					}
+				}
+			}
+		}
+	}
+	//m_bIsDoublicated = l_bUniqueNodes;
+	if (l_bUniqueNodes==false || IsContainUnionColorSet()==true)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+
+}
+
+bool SP_CPN_SyntaxChecking::IsContainUnionColorSet()
+{
+	vector<SP_CPN_ColorSet*>* l_pcColorSet = m_cColorSetClass.GetColorSetVector();
+	for (auto l_pcColorSet : *l_pcColorSet)
+	{
+		if (l_pcColorSet->GetDataType() == CPN_UNION
+			/*	|| l_pcColorSet->GetDataType() == CPN_STRING*/ || l_pcColorSet->GetDataType() == CPN_INDEX)
+		{
+
+			return true;
+		}
+	}
+	return false;
+}

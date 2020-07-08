@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ //////////////////////////////////////////////////////////////////////
 // $Source: $
 // $Author: fei liu $
 // $Version: 0.0 $
@@ -25,6 +25,7 @@
 #include "sp_ds/extensions/Col_PN/FlexBison/SP_CPN_Parse_Context.h"
 
 #include "sp_ds/extensions/ext_SPN/SP_DS_StParser.h"
+
 #include <dssd/auxi/exceptions.h>
 #include <dssd/colexpr/colexpr_parser.h>
 
@@ -43,6 +44,7 @@
 #include "dssd/unfolding/gecode_representation.h"
 #include "dssd/unfolding/idd_representation.h"
 
+using namespace dssd::unfolding;
 struct SP_CPN_PredicateExpression
 {
 	wxString						m_sExpression;
@@ -88,10 +90,7 @@ private:
 
 	SP_CPN_ColorSetClass m_cColorSetClass;
 	SP_CPN_ValueAssign m_cValueAssign;
-
-	dssd::colexpr::environment colDefinitions_;
-	dssd::colexpr::parser* l_pcdssdParser;//experemental snoopy syntax checking of colPN using dssd util grammer
-	dssd::colexpr::builder* l_pcBuilder;
+	//bool m_bIsNotUniqueNet;
 	 
 public:
 	SP_CPN_SyntaxChecking();
@@ -129,7 +128,10 @@ private:
 	bool CSPSolve(SP_CPN_Parse_Context_ptr p_pcParseContext, SP_CPN_ColorSet* p_pcColorSet, vector<SP_CPN_Var_Color>& p_vVariable2Color, vector<wxString> &p_vParsedColors);
 	bool OrdinarySolve(SP_CPN_Parse_Context_ptr p_pcParseContext, SP_CPN_ColorSet* p_pcColorSet, vector<SP_CPN_Var_Color>& p_vVariable2Color, vector<wxString> &p_vParsedColors);
 
-
+	/*we need this checking because dssd_util does not support nets with not unique Ids*/
+	bool  CheckDuplicateNodes();
+	/*we need this checking because dssd_util does not support union color sets*/
+	bool IsContainUnionColorSet();
 public:
 	bool SyntaxChecking();
 	bool CheckArcExpression(SP_DS_Node* p_pcPlaceNode, SP_DS_Edge* p_pcEdge, SP_DS_Node* p_pcTransNode);							//used
@@ -156,7 +158,7 @@ private:
 
 public:
 	//marking check
-	bool ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map<wxString, vector<SP_CPN_TokenNum> >& p_mColorToMarkingMap, bool p_bMarkingCheck = true);   //used
+	bool ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map<wxString, vector<SP_CPN_TokenNum> >& p_mColorToMarkingMap,bool p_bMarkingCheck = true);   //used
 
 	bool CheckPredicateInRateFunction(wxString p_sPredicate, wxString p_sErrorPosition);																//used
 
@@ -164,8 +166,9 @@ public:
 
 	bool ComputeMarkingUsingDssdUtil(wxString& p_sPlaceExp, wxString& p_sPlaceName, SP_CPN_ColorSet& p_cColorSet,std::vector<wxString>& l_vColorVector);//george
 
-	void ComputeResultMarkingColours(dssd::unfolding::placeLookUpTable p_placeLookupTable, SP_CPN_ColorSet& p_cColorSet, wxString& p_sTokenNum, wxString& p_sPlaceName, vector<wxString>& p_vColVector);
+	void ComputeResultMarkingColours(placeLookUpTable p_placeLookupTable, SP_CPN_ColorSet& p_cColorSet, wxString& p_sTokenNum, wxString& p_sPlaceName, vector<wxString>& p_vColVector);
 	 
+	bool  ComputeInitialMarkingWithoutDssdUtil(SP_DS_Node* p_pcPlaceNode, map<wxString, vector<SP_CPN_TokenNum> >& p_mColorToMarkingMap, bool p_bMarkingCheck=true);
 
 private:
 	//marking check
