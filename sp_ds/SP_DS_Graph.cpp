@@ -456,6 +456,11 @@ bool SP_DS_Graph::AddToDeclarationTreectrl(SP_WDG_DeclarationTreectrl* p_pcCtrl)
     // with a folder icon
     l_bReturn &= p_pcCtrl->SetFolderIcons(l_cRootId);
 
+	if (this->GetNetclass()->GetName().Contains(_T("Colored")))
+
+	{
+		l_cIdParent = p_pcCtrl->AppendFolderItem(l_cRootId, wxT("Constants"));
+	}
     // the item for the Metadata
 
     SP_ListMetadataclass::const_iterator l_itMC;
@@ -470,6 +475,7 @@ bool SP_DS_Graph::AddToDeclarationTreectrl(SP_WDG_DeclarationTreectrl* p_pcCtrl)
 		|| (this->GetNetclass()->GetName() == SP_DS_COLEPN_CLASS)))
 	{
 		l_cIdParent = p_pcCtrl->AppendFolderItem(l_cRootId, wxT("Color Sets"));
+
 		// with a folder icon
 		l_bReturn &= p_pcCtrl->SetFolderIcons(l_cIdParent);
 
@@ -477,7 +483,10 @@ bool SP_DS_Graph::AddToDeclarationTreectrl(SP_WDG_DeclarationTreectrl* p_pcCtrl)
 
 		for (l_itMC = m_lMetadataclass.begin(); l_itMC != m_lMetadataclass.end(); ++l_itMC)
 		{
-
+			if ((*l_itMC)->GetDisplayName()==(_T("Constants")))//by george
+			{
+				continue;
+			}
 			if ((*l_itMC)->GetShowInDeclarationTreeColorSet())
 			{
 				// adding the entry, by calling the function of the tree control
@@ -491,8 +500,13 @@ bool SP_DS_Graph::AddToDeclarationTreectrl(SP_WDG_DeclarationTreectrl* p_pcCtrl)
 		p_pcCtrl->Expand(l_cIdParent);
 
 	 }
+
 	for (l_itMC = m_lMetadataclass.begin(); l_itMC != m_lMetadataclass.end(); ++l_itMC)
     {
+		if ((*l_itMC)->GetDisplayName()==(_T("Constants"))&& this->GetNetclass()->GetName().Contains(_T("Colored")))//by george
+		{
+			continue;
+		}
       if( (*l_itMC)->GetShowInDeclarationTreeOther() )
       {
         // adding the entry, by calling the function of the tree control

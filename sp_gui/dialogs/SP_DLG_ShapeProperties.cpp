@@ -204,15 +204,15 @@ SP_DLG_ShapeProperties::AddDialogGraphic(SP_Graphic* p_pcVal)
     if (!p_pcVal)
         return FALSE;
 	/////////////george////////////////
-
-	SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(p_pcVal->GetParent());//dynamic_cast<SP_DS_Node*>(p_pcVal);
-	if(l_pcOldNode!=NULL)
-	m_mNode2Graphic[l_pcOldNode] = p_pcVal;
+	if (p_pcVal->GetGraphicType() == SP_GRAPHIC_NODE)
+	{
+		SP_DS_Node* l_pcOldNode = dynamic_cast<SP_DS_Node*>(p_pcVal->GetParent());//dynamic_cast<SP_DS_Node*>(p_pcVal);
+		if (l_pcOldNode != NULL)
+			m_mNode2Graphic[l_pcOldNode] = p_pcVal;
 
 	bool l_bType;
 	wxString l_sType;
-	if (p_pcVal->GetGraphicType() == SP_GRAPHIC_NODE)
-	{
+
 		auto l_pcType = dynamic_cast<SP_DS_NodeTypeAttribute*>(l_pcOldNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NODETYPE));
 		if (l_pcType)
 		{
@@ -418,7 +418,7 @@ SP_DLG_ShapeProperties::DoDlgApply()
 		{
 			wxString l_sNodeName = l_it->first;
 			wxString l_sToType = l_it->second;
-
+			map<SP_DS_Node*, wxString> l_mNode2Type;
 			for (auto it = m_mNode2Type.begin(); it != m_mNode2Type.end(); ++it)
 			{
 				SP_DS_Node* l_pcNode = (it->first);
@@ -461,16 +461,29 @@ SP_DLG_ShapeProperties::DoDlgApply()
 							SP_Graphic* dd = (*l_pcNewNode->GetGraphics()->begin());
 							dd->Select(true);
 
-							const_cast<SP_DS_Node*>(it->first) = l_pcNewNode;
-							(it->second) = l_sToType;
-
+							//const_cast<SP_DS_Node*>(it->first) = l_pcNewNode;
+							//(it->second) = l_sToType;
+							l_mNode2Type[l_pcNewNode] = l_sToType;
 							m_mConvertedNode2Graphic[l_pcNewNode] = l_pcNewNode->GetGraphics();
 							bool b = UpdateDialogGraphic(l_pcNewNode);
 						}
+						else
+						{
+							l_mNode2Type[l_pcNode] = it->second;
+						}
 					}
+					else
+					{
+						l_mNode2Type[l_pcNode] = it->second;
+					}
+				}
+				else
+				{
+					l_mNode2Type[l_pcNode]= it->second;
 				}
 
 			}
+			m_mNode2Type = l_mNode2Type;
 		}
 
 	}
@@ -481,6 +494,7 @@ SP_DLG_ShapeProperties::DoDlgApply()
 	//convert only the one selected node
 	if (m_mNode2Graphic.size() == 1)
 	{
+		map<SP_DS_Node*, SP_Graphic*> l_mNode2GraphicUpdated;
 		for (auto it = m_mNode2Graphic.begin(); it != m_mNode2Graphic.end(); ++it)
 		{
 			SP_DS_Node* l_pcNode = (it->first);
@@ -537,14 +551,16 @@ SP_DLG_ShapeProperties::DoDlgApply()
 
 				//refersh the new node
 				l_pcNewNode->Update();
-
-				const_cast<SP_DS_Node*>(it->first) = l_pcNewNode;
+				l_mNode2GraphicUpdated[l_pcNewNode] = l_pcNewNode->GetGraphics()->front();
+				//const_cast<SP_DS_Node*>(it->first) = l_pcNewNode;
 				m_bIsConverted = true;
 				m_mConvertedNode2Graphic[l_pcNewNode] = l_pcNewNode->GetGraphics();
 				bool b = UpdateDialogGraphic(l_pcNewNode);
 
 			}
 		}
+
+		m_mNode2Graphic = l_mNode2GraphicUpdated;
 	}
 	SP_Core::Instance()->GetRootDocument()->Modify(true);
 	SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->Modify(true);

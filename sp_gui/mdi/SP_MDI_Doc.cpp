@@ -544,7 +544,7 @@ void SP_MDI_Doc::HarmonizeConstantsForColPN()
 				wxString l_sComment = l_pcColList->GetCell(l_nRow, 3);
 				wxString l_sMainVal = l_pcColList->GetCell(l_nRow, 2);
 
-				if (l_sType != wxT("int"))
+				if (!(l_sType == wxT("int") || l_sType == wxT("bool")))
 				{
 					l_pcConstant->Remove();//remove the constant if it is not int, old versions only support constants of type int, otherwise it is wrong constant
 					l_nConstantsCount--;
@@ -998,10 +998,12 @@ bool SP_MDI_Doc::OnOpenDocument(const wxString& p_sFile)
 		|| m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS//by george
 	    || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColHPN_CLASS)//by george
 	{
-		m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();//liu
+		//m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();//liu
 		if(m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColHPN_CLASS&&m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColSPN_CLASS
 			&& m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColCPN_CLASS&& m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColSPN_CLASS&& m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColHPN_CLASS)
 		HarmonizeConstantsForColPN();// by george for harmonize constants
+		else
+			m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
   
 	}
     //by sl
