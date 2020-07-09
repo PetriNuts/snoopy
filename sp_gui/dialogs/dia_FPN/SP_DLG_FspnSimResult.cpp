@@ -1113,6 +1113,7 @@ void SP_DLG_FspnSimResult::LoadUsedParams()
 		/***/
 		//this step is important to let the simulator's parser evalute the 
 		//rate expression when the last contains at least one kinetic parameter as a fuzzy number
+		/*
 		string l_str =  m_sParamName.ToStdString();
 		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 		boost::char_separator<char> sep("(+-/%*), ");
@@ -1125,8 +1126,16 @@ void SP_DLG_FspnSimResult::LoadUsedParams()
 
 
 		}
+		*/
 		/***/
-	
+		   wxString l_sTobeTokenized=m_sParamName;
+			wxStringTokenizer tokenize(l_sTobeTokenized,"(+-/%*) ");
+			while(tokenize.HasMoreTokens())
+			{
+				  wxString l_sToken=tokenize.GetNextToken();
+				  m_mTransParamNames[l_sToken] = l_sName;
+
+			}
 
 
 	}
@@ -1316,6 +1325,7 @@ void SP_DLG_FspnSimResult::LoadTransitions()
 		
 		/********************/
 		string l_str = l_sTransitionFunction.ToStdString();
+		/*
 		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 		boost::char_separator<char> sep("(+-/%*) ");
 		tokenizer tokens(l_str, sep);
@@ -1333,6 +1343,22 @@ void SP_DLG_FspnSimResult::LoadTransitions()
 			}
 
 		}
+		*/
+		        wxString l_sTobeTokenized=l_sTransitionFunction;
+				wxStringTokenizer tokenize(l_sTobeTokenized,"(+-/%*) ");
+				while(tokenize.HasMoreTokens())
+				{
+				  wxString l_sToken=tokenize.GetNextToken();
+				  auto pos = m_msParameterName2Value.find(l_sToken);
+				  if (pos != m_msParameterName2Value.end())
+				  	{
+				  		double l_dValue = m_msParameterName2Value[l_sToken];
+				  		wxString l_sVal;
+				  	   l_sVal << l_dValue;
+				  	   l_sTransitionFunction.Replace(l_sToken, l_sVal);
+
+				  	}
+				}
 		/************/
 		
 		SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);

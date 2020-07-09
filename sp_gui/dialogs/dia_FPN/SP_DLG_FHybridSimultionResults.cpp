@@ -315,6 +315,7 @@ void SP_DLG_FHybridSimulationResults::LoadUsedParams()
 		/***/
 		//this step is important to let the simulator's parser evalute the 
 		//rate expression when the last contains at least one kinetic parameter as a fuzzy number
+		/*
 		string l_str = m_sParamName.ToStdString();
 		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 		boost::char_separator<char> sep("(+-/%*) ");
@@ -325,6 +326,16 @@ void SP_DLG_FHybridSimulationResults::LoadUsedParams()
 			wxString result = *beg;
 			m_mTransParamNames[result] = l_sName;
 
+
+		}
+		*/
+
+		wxString l_sTobeTokenized=m_sParamName;
+		wxStringTokenizer tokenize(l_sTobeTokenized,"(+-/%*) ");
+		while(tokenize.HasMoreTokens())
+		{
+		 wxString l_sToken=tokenize.GetNextToken();
+		 m_mTransParamNames[l_sToken] = l_sName;
 
 		}
 		/***/
@@ -350,6 +361,7 @@ void SP_DLG_FHybridSimulationResults::LoadUsedParams()
 		wxString m_sParamName = GetKParameter(l_sTransitionFunction);
 		//this step is important to let the simulator's parser evalute the 
 		//rate expression when the last contains at least one kinetic parameter as a fuzzy number
+		/*
 		string l_str = m_sParamName.ToStdString();
 		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 		boost::char_separator<char> sep("(+-/%*) ");
@@ -362,10 +374,15 @@ void SP_DLG_FHybridSimulationResults::LoadUsedParams()
 			m_mTransParamNames[result] = l_sName;
 
 		}
-		//if (m_sParamName != wxT("1"))
-		//{
-		//	m_mTransParamNames[m_sParamName] = l_sName;
-		//}
+		*/
+		wxString l_sTobeTokenized=m_sParamName;
+		wxStringTokenizer tokenize(l_sTobeTokenized,"(+-/%*) ");
+		while(tokenize.HasMoreTokens())
+		{
+			wxString l_sToken=tokenize.GetNextToken();
+			m_mTransParamNames[l_sToken] = l_sName;
+
+		}
 	}
 
 
@@ -1252,6 +1269,7 @@ void SP_DLG_FHybridSimulationResults::LoadTransitions()
 		wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue(1);
 
 		/**********/
+		/*
 		string l_str = l_sTransitionFunction.ToStdString();
 		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 		boost::char_separator<char> sep("(+-/%*) ");
@@ -1270,6 +1288,22 @@ void SP_DLG_FHybridSimulationResults::LoadTransitions()
 
 			}
 
+		}
+*/
+		wxString l_sTobeTokenized=l_sTransitionFunction;
+		wxStringTokenizer tokenize(l_sTobeTokenized,"(+-/%*) ");
+		while(tokenize.HasMoreTokens())
+		{
+		  wxString l_sToken=tokenize.GetNextToken();
+		  auto pos = m_msParameterName2Value.find(l_sToken);
+		  if (pos != m_msParameterName2Value.end())
+		  	{
+		  		double l_dValue = m_msParameterName2Value[l_sToken];
+		  		wxString l_sVal;
+		  	   l_sVal << l_dValue;
+		  	   l_sTransitionFunction.Replace(l_sToken, l_sVal);
+
+		  	}
 		}
 		/**************/
 		SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);

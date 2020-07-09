@@ -812,6 +812,7 @@ void  SP_DLG_FCPNSimulationResults::LoadTransitions()
 		//double vv = m_msParameterName2Value[""];
 		wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue(1);
 		/********************/
+		/*
 		string l_str = l_sTransitionFunction.ToStdString();
 		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 		boost::char_separator<char> sep("(+-/%*) ");
@@ -828,6 +829,23 @@ void  SP_DLG_FCPNSimulationResults::LoadTransitions()
 				l_sTransitionFunction.Replace(*beg, l_sVal);
 		 
 			}
+
+		}
+		*/
+		wxString l_sTobeTokenized=l_sTransitionFunction;
+		wxStringTokenizer tokenize(l_sTobeTokenized,"(+-/%*) ");
+		while(tokenize.HasMoreTokens())
+		{
+			wxString token=tokenize.GetNextToken();
+			auto pos = m_msParameterName2Value.find(token);
+			if (pos != m_msParameterName2Value.end())
+				{
+					double l_dValue = m_msParameterName2Value[token];
+					wxString l_sVal;
+					l_sVal << l_dValue;
+					l_sTransitionFunction.Replace(token, l_sVal);
+
+				}
 
 		}
 		/**********************/
@@ -882,6 +900,7 @@ void SP_DLG_FCPNSimulationResults::LoadUsedParams()
 		wxString m_sParamName = GetKParameter(l_sTransitionFunction);
 		/***/
 		string l_str = m_sParamName.ToStdString();
+		/*
 		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 		boost::char_separator<char> sep("(+-/%*) ");
 		tokenizer tokens(l_str, sep);
@@ -890,16 +909,21 @@ void SP_DLG_FCPNSimulationResults::LoadUsedParams()
 			//auto pos = m_msParameterName2Value.find(*beg);
 			wxString result = *beg;
 			
-				//double l_dValue = m_msParameterName2Value[*beg];
-				//wxString l_sVal;
-				//l_sVal << l_dValue;
-				//l_sTransitionFunction.Replace(*beg, l_sVal);
 			m_mTransParamNames[result] = l_sName;
 			
 
 		}
+		*/
+		wxString l_sTobeTokenized=m_sParamName;
+				wxStringTokenizer tokenize(l_sTobeTokenized,"(+-/%*) ");
+				while(tokenize.HasMoreTokens())
+				{
+					wxString l_sToken=tokenize.GetNextToken();
+					m_mTransParamNames[l_sToken] = l_sName;
+
+				}
 		/***/
-	//	m_mTransParamNames[m_sParamName] = l_sName;//old
+
 
 
 	}
