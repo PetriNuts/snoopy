@@ -31,152 +31,82 @@ bool SP_ExportStochPed2ColSPT::AcceptsDoc(SP_MDI_Doc* p_doc)
 bool SP_ExportStochPed2ColSPT::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
 {
 	CHECK_POINTER(p_doc, return false);
-	CHECK_POINTER(p_doc->GetGraph(), return false);
-	CHECK_BOOL((!p_fileName.IsEmpty()), return false);
+		CHECK_POINTER(p_doc->GetGraph(), return false);
+		CHECK_BOOL((!p_fileName.IsEmpty()), return false);
 
+		SP_ListMetadata l_pcListConst;
+		SP_DS_Metadataclass* l_pcMC;
+		l_pcMC = m_pcGraph->GetMetadataclass(SP_DS_CPN_BASICCOLORSETCLASS);   //first check if it exists
 
-	SP_DS_Metadataclass* l_pcMC;
-	l_pcMC = m_pcGraph->GetMetadataclass(SP_DS_CPN_BASICCOLORSETCLASS);   //first check if it exists
-	
-	if(l_pcMC)
-		return SP_XmlWriter::Write(p_doc->GetGraph(), p_fileName);
+		if(l_pcMC)
+		 SP_XmlWriter::Write(p_doc->GetGraph(), p_fileName);
+			//return SP_XmlWriter::Write(p_doc->GetGraph(), p_fileName);
 
-	l_pcMC = m_pcGraph->AddMetadataclass( new SP_DS_Metadataclass( m_pcGraph, SP_DS_CPN_BASICCOLORSETCLASS ) );	
-	l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("ColorsetList"), SP_COLLIST_UNSIGNED_INTEGER, 3 ) );
-	SP_DS_Metadata* l_pcNewMetadata = l_pcMC->NewElement( 1 );		
+		l_pcMC = m_pcGraph->AddMetadataclass( new SP_DS_Metadataclass( m_pcGraph, SP_DS_CPN_BASICCOLORSETCLASS ) );
+		l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("ColorsetList"), SP_COLLIST_UNSIGNED_INTEGER, 3 ) );
+		SP_DS_Metadata* l_pcNewMetadata = l_pcMC->NewElement( 1 );
 
-	SP_DS_ColListAttribute* l_pcColListAttr;
-	l_pcNewMetadata = *(l_pcMC->GetElements()->begin());
-	l_pcColListAttr = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ColorsetList")));
+		SP_DS_ColListAttribute* l_pcColListAttr;
+		l_pcNewMetadata = *(l_pcMC->GetElements()->begin());
+		l_pcColListAttr = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ColorsetList")));
 
-	l_pcColListAttr->AppendEmptyRow();
-	l_pcColListAttr->SetCell(0,0,wxT("Dot"));
-	l_pcColListAttr->SetCell(0,1,wxT("dot"));
-	l_pcColListAttr->SetCell(0,2,wxT("dot"));
-
-
-	/////////////////////////////////
-	/**
-	l_pcMC = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
-	SP_DS_Metadata* l_pcConstant;
-	SP_ListMetadata::const_iterator l_itElem;
-	vector< vector<wxString> > l_vvValuelist;
-	for(l_itElem = l_pcMC->GetElements()->begin(); l_itElem != l_pcMC->GetElements()->end(); l_itElem++)
-	{
-		vector<wxString> l_vValues;
-		l_pcConstant = *l_itElem;
-		wxString l_sName = l_pcConstant->GetAttribute(wxT("Name"))->GetValueString();
-		wxString l_sGroup = l_pcConstant->GetAttribute(wxT("Group"))->GetValueString();
-		wxString l_sType =  l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
-		l_vValues.push_back(l_sName);
-		l_vValues.push_back(l_sGroup);
-		l_vValues.push_back(l_sType);
-
-		SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
-		for(unsigned int i=0; i < l_pcColList->GetRowCount(); i++)
-		{
-			l_vValues.push_back(l_pcColList->GetCell(i, 0));
-			l_vValues.push_back(l_pcColList->GetCell(i, 1));
-		}	
-		l_vvValuelist.push_back(l_vValues);
-	}	
-	
-	//create new elements and assign values
-	l_pcMC->RemoveAll();
-	l_pcMC->AddAttribute( new SP_DS_ColListAttribute( wxT("ConstantList"), SP_COLLIST_UNSIGNED_INTEGER, 4 ) );
-	l_pcNewMetadata = l_pcMC->NewElement( 1 );		
-	l_pcNewMetadata = *(l_pcMC->GetElements()->begin());
-	l_pcColListAttr = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
-
-	for(int i=0; i<l_vvValuelist.size();i++)
-	{		
-		vector<wxString> l_vValues = l_vvValuelist[i];
-		if(l_vValues[2] != wxT("int"))
-			continue;
 		l_pcColListAttr->AppendEmptyRow();
-	
-		l_pcColListAttr->SetCell(i,0,l_vValues[0]);
-		l_pcColListAttr->SetCell(i,1,l_vValues[2]);
-		l_pcColListAttr->SetCell(i,2,l_vValues[4]);
-	}
-	//end of constants
+		l_pcColListAttr->SetCell(0,0,wxT("Dot"));
+		l_pcColListAttr->SetCell(0,1,wxT("dot"));
+		l_pcColListAttr->SetCell(0,2,wxT("dot"));
 
-	//add parameters
-	SP_DS_Nodeclass* l_pcParameterNC = m_pcGraph->AddNodeclass( new SP_DS_Nodeclass( m_pcGraph, wxT("Parameter") ) );
-	SP_DS_Attribute* l_pcAttr;
-	l_pcAttr = l_pcParameterNC->AddAttribute(new SP_DS_NameAttribute( wxT("Name") ) );
-	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText( wxT("General") ) );
-	l_pcAttr = l_pcParameterNC->AddAttribute( new SP_DS_ColListAttribute( wxT("ParameterList"), SP_COLLIST_DOUBLE, 2 ) );
-	l_pcAttr->RegisterDialogWidget( new SP_WDG_StParameterList( wxT("Parameters") ) );
-	
-	l_pcColListAttr = dynamic_cast< SP_DS_ColListAttribute* >( l_pcAttr );
-	l_pcColListAttr->SetColLabel( 0, wxT("Parameter set") );
-	l_pcColListAttr->SetColLabel( 1, wxT("Parameter") );
 
-	for(int i=0; i<l_vvValuelist.size();i++)
-	{		
-		vector<wxString> l_vValues = l_vvValuelist[i];
-		if(l_vValues[2] != wxT("double"))
-			continue;
-
-		SP_DS_Node* l_pcParameter = l_pcParameterNC->NewElement(1);
-		l_pcParameter->GetAttribute(wxT("Name"))->SetValueString( l_vValues[0] );	
-	
-		//assign value
-		l_pcColListAttr = dynamic_cast< SP_DS_ColListAttribute* >(l_pcParameter->GetAttribute(wxT("ParameterList")) );
-		int k=0;
-		for(int j=3; j<l_vValues.size(); j++)
+		////constants
+		l_pcMC = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+		SP_DS_Metadataclass* l_pcNewConstants = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		//SP_DS_Metadata* l_pcConstant;
+		SP_ListMetadata::const_iterator l_itElem;
+		for (l_itElem = l_pcMC->GetElements()->begin(); l_itElem != l_pcMC->GetElements()->end(); l_itElem++)
 		{
-			l_pcColListAttr->AppendEmptyRow();
-			l_pcColListAttr->SetCell(k, 0, l_vValues[j] );	
-			l_pcColListAttr->SetCell(k, 1, l_vValues[j+1] );
-			j++;
-			k++;
+			SP_DS_Metadata* l_pcNewConstant = l_pcNewConstants->NewElement(1);
+			//l_pcConstant = *l_itElem;
+			wxString l_sName = (*l_itElem)->GetAttribute(wxT("Name"))->GetValueString();
+			wxString l_sGroup = (*l_itElem)->GetAttribute(wxT("Group"))->GetValueString();
+			wxString l_sType = (*l_itElem)->GetAttribute(wxT("Type"))->GetValueString();
+			wxString l_sComment = (*l_itElem)->GetAttribute(wxT("Comment"))->GetValueString();
+
+			l_pcNewConstant->GetAttribute(wxT("Group"))->SetValueString(l_sGroup);
+			l_pcNewConstant->GetAttribute(wxT("Type"))->SetValueString(l_sType);
+			l_pcNewConstant->GetAttribute(wxT("Name"))->SetValueString(l_sName);
+			l_pcNewConstant->GetAttribute(wxT("Comment"))->SetValueString(l_sComment);
+
+			//copy value lists
+			SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNewConstant->GetAttribute(wxT("ValueList")));
+
+			SP_DS_ColListAttribute * l_pcSourceColList = dynamic_cast<SP_DS_ColListAttribute*>((*l_itElem)->GetAttribute(wxT("ValueList")));
+			l_pcColList->Clear();
+
+			for (unsigned int i = 0; i < l_pcSourceColList->GetRowCount(); i++)
+			{
+				int l_nRowCol = l_pcColList->AppendEmptyRow();
+				l_pcColList->SetCell(l_nRowCol, 0, l_pcSourceColList->GetCell(l_nRowCol, 0));
+				l_pcColList->SetCell(l_nRowCol, 1, l_pcSourceColList->GetCell(l_nRowCol, 1));
+			}
+
+			l_pcListConst.push_back(l_pcNewConstant);
+
 		}
-	}
-	*/
+         if(l_pcListConst.size()>0)
+         {
+        	 m_pcGraph->Update();
+         }
 
+		bool l_bSuccess =  SP_XmlWriter::Write(p_doc->GetGraph(), p_fileName);
 
-	////constants
-	l_pcMC = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
-	SP_DS_Metadataclass* l_pcNewConstants = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
-	SP_DS_Metadata* l_pcConstant;
-	SP_ListMetadata::const_iterator l_itElem;
-	for (l_itElem = l_pcMC->GetElements()->begin(); l_itElem != l_pcMC->GetElements()->end(); l_itElem++)
-	{
-		SP_DS_Metadata* l_pcNewConstant = l_pcNewConstants->NewElement(1);
-		l_pcConstant = *l_itElem;
-		wxString l_sName = l_pcConstant->GetAttribute(wxT("Name"))->GetValueString();
-		wxString l_sGroup = l_pcConstant->GetAttribute(wxT("Group"))->GetValueString();
-		wxString l_sType = l_pcConstant->GetAttribute(wxT("Type"))->GetValueString();
-		wxString l_sComment = l_pcConstant->GetAttribute(wxT("Comment"))->GetValueString();
-
-		l_pcNewConstant->GetAttribute(wxT("Group"))->SetValueString(l_sGroup);
-		l_pcNewConstant->GetAttribute(wxT("Type"))->SetValueString(l_sType);
-		l_pcNewConstant->GetAttribute(wxT("Name"))->SetValueString(l_sName);
-		l_pcNewConstant->GetAttribute(wxT("Comment"))->SetValueString(l_sComment);
-
-		//copy value lists
-		SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNewConstant->GetAttribute(wxT("ValueList")));
-
-		SP_DS_ColListAttribute * l_pcSourceColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
-		l_pcColList->Clear();
-
-		for (unsigned int i = 0; i < l_pcSourceColList->GetRowCount(); i++)
+		l_pcMC = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		for(auto l_pcConst : l_pcListConst)
 		{
-			int l_nRowCol = l_pcColList->AppendEmptyRow();
-			l_pcColList->SetCell(l_nRowCol, 0, l_pcSourceColList->GetCell(l_nRowCol, 0));
-			l_pcColList->SetCell(l_nRowCol, 1, l_pcSourceColList->GetCell(l_nRowCol, 1));
+			l_pcMC->RemoveElement(l_pcConst);
+			wxDELETE(l_pcConst);
+
 		}
 
-	}
 
-
-	bool l_bSuccess =  SP_XmlWriter::Write(p_doc->GetGraph(), p_fileName);
-	m_pcGraph->RemoveMetadataclass(l_pcNewConstants);//george
-	//m_pcGraph->RemoveNodeclass(l_pcParameterNC);
-	//wxDELETE(l_pcParameterNC);
-	return l_bSuccess;
 }
 
 bool SP_ExportStochPed2ColSPT::WriteNetclass(SP_DS_Netclass* p_pcVal, wxXmlNode* p_pcRoot)
