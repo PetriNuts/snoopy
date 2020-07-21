@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ //////////////////////////////////////////////////////////////////////
 // $Source: $
 // $Author: fei liu $
 // $Version: 0.0 $
@@ -11,7 +11,8 @@
 #define __SP_WDG_DeclarationTreectrl_H__
 
 #include "sp_gui/widgets/SP_WDG_Treectrl.h"
-#include "sp_ds/extensions/unusedDeclarationsFeature/SP_DS_UnUsedDeclaration.h"
+//#include "sp_ds/extensions/unusedDeclarationsFeature/SP_DS_UnUsedDeclaration.h"
+#include "sp_ds/extensions/unusedDeclarationsFeature/SP_DS_Graph_Declarations.h"
 
 class SP_DeclarationTreeItemdata : public SP_TreeItemdata
 {
@@ -44,47 +45,53 @@ private:
 	SP_DS_Graph* m_pcGraph;
 
 	SP_MapString2String m_ColorsMap;
-
-	SP_DS_UnUsedDeclaration m_unUsedDec = {};
+	SP_DS_Graph_Declarations m_CheckDecDep ;
+	vector<DependencyTree> l_pcConstantsDependencies;
+	vector<DependencyTree> l_pcColorSetDependencies;
+	vector<DependencyTree> l_pcColorfunctionsDependencies;
+	vector<DependencyTree> l_pcVariableDependencies;
+	vector<DependencyTree> l_pcObserverDependencies;
+	///////////////////////////////////////////
+	// m_unUsedDec = {};
 	wxString        m_sSelected;
-	set<wxString> m_setSelectedItems;
-	set<wxString> m_setSelectedConstants;
-	set<wxString> m_setSelectedfunctions;
-	set<wxString> m_setSelectedObservers;
-	set<wxString> m_setUnSelectedItems;
-	set<wxString> m_setUnSelectedContants;
-	set<wxString> m_setUnSelectedFunctions;
-	set<wxString> m_setUnSelectedObservers;
-	std::set<wxString> m_vUnUsedDecList;
-	std::set<wxString> m_vUnUsedConstantsList;
-	std::set<wxString> m_setUnUsedFunctionsList;
-	std::set<wxString> m_setUnUsedVariablesList;
-	std::set<wxString> m_setUnUsedColorSetsList;
-	std::set<wxString> m_setUnUsedObserverList;
-	std::set<wxString> m_setUnUsedSimpleCS;
-	std::set<wxString> m_setUnUsedCompoundCS;
-	std::set<wxString> m_setUnUsedAliasCS;
-	std::set<wxString> m_setFinalUnusedDec;
-	std::vector<ConstantDependencyInfo> m_vConstantsInfo;
-	std::vector<SimpleCsDependencyInfo> m_vSimpleCsInfo;
-	std::vector<CompoundCsDependencyInfo> m_vCompoundCsInfo;
-	std::vector<AliasCsDependencyInfo> m_vAliasCsInfo;
-	std::vector<FunctionDependencyInfo> m_vFunctionsInfo;
-	std::vector<SubSetCsDependencyInfo> m_vSubCsInfo;
-	std::vector<VariableDependencyInfo> m_vVariablesInfo;
-	std::vector<ObserverDependencyInfo> m_vObserversInfo;
-	std::map<wxString, set<wxString>> m_mGroup2SelectedSet;
-	std::map<wxString, map<wxString, wxString>>  m_mDeclarations2Dependencies;
+	//set<wxString> m_setSelectedItems;
+//	set<wxString> m_setSelectedConstants;
+	//set<wxString> m_setSelectedfunctions;
+	//set<wxString> m_setSelectedObservers;
+	//set<wxString> m_setUnSelectedItems;
+	//set<wxString> m_setUnSelectedContants;
+	///set<wxString> m_setUnSelectedFunctions;
+	//set<wxString> m_setUnSelectedObservers;
+	//std::set<wxString> m_vUnUsedDecList;
+	//std::set<wxString> m_vUnUsedConstantsList;
+	//std::set<wxString> m_setUnUsedFunctionsList;
+	//std::set<wxString> m_setUnUsedVariablesList;
+	//::set<wxString> m_setUnUsedColorSetsList;
+	//std::set<wxString> m_setUnUsedObserverList;
+	//std::set<wxString> m_setUnUsedSimpleCS;
+	//std::set<wxString> m_setUnUsedCompoundCS;
+	//std::set<wxString> m_setUnUsedAliasCS;
+	//std::set<wxString> m_setFinalUnusedDec;
+	//std::vector<ConstantDependencyInfo> m_vConstantsInfo;
+	//std::vector<SimpleCsDependencyInfo> m_vSimpleCsInfo;
+	//std::vector<CompoundCsDependencyInfo> m_vCompoundCsInfo;
+	//std::vector<AliasCsDependencyInfo> m_vAliasCsInfo;
+	//std::vector<FunctionDependencyInfo> m_vFunctionsInfo;
+	//std::vector<SubSetCsDependencyInfo> m_vSubCsInfo;
+	//std::vector<VariableDependencyInfo> m_vVariablesInfo;
+	//std::vector<ObserverDependencyInfo> m_vObserversInfo;
+	//std::map<wxString, set<wxString>> m_mGroup2SelectedSet;
+	//std::map<wxString, map<wxString, wxString>>  m_mDeclarations2Dependencies;
 	//std::map<wxString, map<wxString,wxString>>  m_mDeclarations2Depend;
-	std::map<wxString, wxString> m_vtrimeddecConstants;
-	std::map<wxString, wxString> m_vtrimeddecFunctions;
-	std::map<wxString, wxString> m_vtrimeddecVariables;
-	std::map<wxString, wxString> m_vtrimeddecObservers;
-	std::map<wxString, wxString> m_vtrimeddecSimplCS;
-	std::map<wxString, wxString> m_vtrimeddecCompoundCS;
-	std::map<wxString, wxString> m_vtrimeddecAliasCS;
-	std::map<wxString, wxString> m_vtrimeddecAll;
-	std::map<wxString, wxString> m_vtrimeddecALLCs;
+	//std::map<wxString, wxString> m_vtrimeddecConstants;
+	//std::map<wxString, wxString> m_vtrimeddecFunctions;
+	//std::map<wxString, wxString> m_vtrimeddecVariables;
+	//std::map<wxString, wxString> m_vtrimeddecObservers;
+	//std::map<wxString, wxString> m_vtrimeddecSimplCS;
+	//std::map<wxString, wxString> m_vtrimeddecCompoundCS;
+	//std::map<wxString, wxString> m_vtrimeddecAliasCS;
+	//std::map<wxString, wxString> m_vtrimeddecAll;
+	//std::map<wxString, wxString> m_vtrimeddecALLCs;
 protected:
 	wxTreeItemId m_curTreeItem;
 	wxMenuItemList l_pcItem1;
@@ -93,6 +100,8 @@ protected:
 	wxMenu l_cMenu;
 	bool m_bisIsFirst;
 	bool m_bisSecond;
+
+
 	// on msw dbl click collapses/expands an item, we will check
 	// the situation and reject it
 #ifdef __WXMSW__
@@ -152,14 +161,19 @@ public:
 
 	void  OnRMouseClick(wxTreeEvent& p_cEvent);//Added by G.Assaf
 
-											   //void OnFirsMentItem(wxMouseEvent& p_cEvent);//Added by G.Assaf
-	void OnCheckForUnusedItems(wxCommandEvent& p_cEvent);//Added by G.Assaf
+	//void OnFirsMentItem(wxMouseEvent& p_cEvent);//Added by G.Assaf
+	//void OnCheckForUnusedItems(wxCommandEvent& p_cEvent);//Added by G.Assaf
+	void OnCheckForUnusedItemsNew(wxCommandEvent& p_cEvent);//Added by G.Assaf
 
 	void OnCleanUnusedItems(wxCommandEvent& p_cEvent); //Added by G.Assaf
 
 	void  ReadTreeItems(wxTreeCtrl* pTreeCtrl, const wxTreeItemId& root, SP_VectorString &);//Added By G.Assaf
 
 	wxTreeItemId  findTreeItem(wxTreeCtrl* pTreeCtrl, const wxTreeItemId& root, const wxString& text, bool bCaseSensitive, bool bExactMatch);//Added by G.Assaf
+
+	void MarkTreeWithDefaultColour(wxTreeCtrl* pTreeCtrl, const wxTreeItemId& root);
+
+	//bool DeleteTreeItems(wxTreeCtrl* pTreeCtrl, const wxTreeItemId& root);
 
 	void  OnSelecting(wxCommandEvent& p_cEvent);//Added by G.Assaf
 
@@ -171,20 +185,21 @@ public:
 
 	std::map<wxString, wxString> ObtainDeclarationGroup(wxString &p_sGroup);
 
-	void UpdateSetODeclarations(std::map<wxString, wxString>);
+	void ClearAll();
+	//void UpdateSetODeclarations(std::map<wxString, wxString>);
 
-	set<wxString>  SetSelectItems(std::map<wxString, wxString> &p_mdec, set<wxString> &p_setUnused);
+	//set<wxString>  SetSelectItems(std::map<wxString, wxString> &p_mdec, set<wxString> &p_setUnused);
 
-	set<wxString> ObtainItemDependencies(wxString p_sItem);
+	//set<wxString> ObtainItemDependencies(wxString p_sItem);
 
-	set<wxString> ObtainItemDependenciesForUnSelect(wxString p_sItem);
+	//set<wxString> ObtainItemDependenciesForUnSelect(wxString p_sItem);
 
-	map<wxString, wxString> ObtainItemDependenciesForSelect(wxString p_sItem, bool &p_bIsFound);
+	//map<wxString, wxString> ObtainItemDependenciesForSelect(wxString p_sItem, bool &p_bIsFound);
 
 	void FindUnusedConstantGroups(std::map<wxString, wxString>& l_mConstants2Group, std::set<wxString>&  p_vUnUsedConstantsList, std::set<wxString>& l_setNominatedGroups);
 
-	void CheckAllDeclarations();
-	void ResetCheckingResults();
+	//void CheckAllDeclarations();
+	//void ResetCheckingResults();
 	void DeleteConstants();
 	void DeleteFunctions();
 	void DeleteObservers();
@@ -194,6 +209,10 @@ public:
 	void DeleteSimpleColorSet();
 	void DeleteCompoundColorSet();
 	map<wxString, int> ComputeSelection(wxTreeItemId p_TreeITem);
+
+	///////////////
+	void   MarkTree(sp_node * root, wxTreeCtrl*,const wxTreeItemId& DecTreeRoot,wxColour& p_color);
+
 
 #ifdef __WXMSW__
 	void OnCollapsingExpanding(wxTreeEvent& p_cEvent);

@@ -42,7 +42,9 @@ enum
 	SP_ID_VALUESET_DELETE,//added by G.A
 	SP_ID_BUTTON_RENAMESET,//added by G.A
 	SP_ID_NEWGROUP,
-	SP_ID_SORTSETS
+	SP_ID_SORTSETS,
+	SP_ID_MOVE_ROW_BUTTTON,
+	SP_IT_MEN
 
 };
  
@@ -69,6 +71,7 @@ EVT_BUTTON(SP_ID_BUTTON_RENAMESET, SP_DLG_ConstantDefinition::OnRenameSet)
 EVT_GRID_CMD_LABEL_LEFT_CLICK(SP_ID_GRID_MARKING, SP_DLG_ConstantDefinition::OnGridLabelLeftClick)
 EVT_GRID_CMD_CELL_RIGHT_CLICK(SP_ID_GRID_MARKING, SP_DLG_ConstantDefinition::OnRowRightClick)
 EVT_BUTTON(SP_ID_SORTSETS, SP_DLG_ConstantDefinition::OnSortVsets)
+EVT_BUTTON(SP_ID_MOVE_ROW_BUTTTON, SP_DLG_ConstantDefinition::OnMoveRow)
 #if wxABI_VERSION > 30000
     EVT_GRID_CELL_CHANGED( SP_DLG_ConstantDefinition::OnGridCellValueChanged ) 
 #else
@@ -99,14 +102,16 @@ SP_DLG_ConstantDefinition::SP_DLG_ConstantDefinition( wxWindow* p_pcParent,
 
 	// new row
 	m_pcColorSetGrid = new wxGrid( this, SP_ID_GRID_MARKING,
-	wxDefaultPosition, wxSize( 700, 300 ), wxSUNKEN_BORDER );
+	wxDefaultPosition, wxSize( 300, 300 ), wxSUNKEN_BORDER );
+
 	m_pcColorSetGrid->CreateGrid( 0, 0);
 	m_pcColorSetGrid->EnableEditing( true);	
-	m_pcColorSetGrid->SetDefaultColSize( 220, TRUE);
+
+	m_pcColorSetGrid->SetDefaultColSize( 70, TRUE);
 	m_pcColorSetGrid->SetDefaultRowSize( 20, TRUE);
 
 	m_pcColorSetGrid->SetColLabelSize( 16);
-	m_pcColorSetGrid->SetRowLabelSize( 0); //do not let it show.
+	m_pcColorSetGrid->SetRowLabelSize( 0);
 
 	l_pcRowSizer->Add(m_pcColorSetGrid, 1, wxALL | wxEXPAND, 2);
 	l_pcGridSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND, 5);
@@ -114,22 +119,6 @@ SP_DLG_ConstantDefinition::SP_DLG_ConstantDefinition( wxWindow* p_pcParent,
 	m_pcColorSetGrid->EnableEditing(true);
 	m_pcColorSetGrid->SetSelectionMode(wxGrid::wxGridSelectCells);	
 
-	//m_pcColorSetGrid->AppendCols(5);
-
-	//m_pcColorSetGrid->SetColLabelValue(0, wxT("Name") );
-	//m_pcColorSetGrid->SetColSize(0, 100);
-
-	//m_pcColorSetGrid->SetColLabelValue(1, wxT("Group"));
-	//m_pcColorSetGrid->SetColSize(1, 100);
-
-	//m_pcColorSetGrid->SetColLabelValue(2, wxT("Type") );
-	//m_pcColorSetGrid->SetColSize(2, 100);
-
-	//m_pcColorSetGrid->SetColLabelValue(3, wxT("Comment"));
-	//m_pcColorSetGrid->SetColSize(3, 100);
-
-	//m_pcColorSetGrid->SetColLabelValue(4, wxT("Value") );
-	//m_pcColorSetGrid->SetColSize(4, 100);
 
 	l_bWhite = false;
 	m_lMain = 4;
@@ -137,25 +126,24 @@ SP_DLG_ConstantDefinition::SP_DLG_ConstantDefinition( wxWindow* p_pcParent,
 	m_bIsAsc = true;
 	l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
 	m_pcConstants = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+
 	LoadPlaces();
-	//LoadOldParam();
-	//InitializeChoice();
-	//LoadData();
 	LoadHarmonizedData();
  
     SP_AutoSizeRowLabelSize(m_pcColorSetGrid);
 
 	wxBoxSizer* l_pcButtonSizer = new wxBoxSizer(wxHORIZONTAL );
-
 	wxSizer *l_pcSizer = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_pcSortingButton = new wxButton(this, SP_ID_SORTSETS, wxT("Sort Value Sets (Asc)"));
+	//m_pcMovingRowsButton=new wxButton(this,SP_ID_MOVE_ROW_BUTTTON,_T("Move to ..."));
+
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ADD, wxT("Add constant") ), 1, wxALL, 5);
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_DELETE, wxT("Delete constant") ), 1, wxALL, 5);
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check constants") ), 1, wxALL, 5);
 	l_pcSizer->Add(new wxButton(this, SP_ID_NEWGROUP, wxT("New Group")), 1, wxALL, 5);
 	l_pcSizer->Add(m_pcSortingButton, 1, wxALL, 5);
-	
+	//l_pcSizer->Add(m_pcMovingRowsButton, 1, wxALL, 5);
 
 	wxSizer *l_pcSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
@@ -171,14 +159,12 @@ SP_DLG_ConstantDefinition::SP_DLG_ConstantDefinition( wxWindow* p_pcParent,
 
 
 	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND );
-	//l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND );
 	l_pcButtonSizer2->Add(l_pcBottomButtonSizer, 0, wxEXPAND);
 
 	m_pcSizer->Add(l_pcGridSizer, 1, wxEXPAND );
-	//m_pcSizer->Add(l_pcButtonSizer2, 0, wxEXPAND);
 	m_pcSizer->Add(l_pcButtonSizer, 0, wxEXPAND);
 	m_pcSizer->Add(l_pcButtonSizer2, 0, wxEXPAND);
-	///m_pcSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND);
+
 
 	
 
@@ -373,8 +359,8 @@ void SP_DLG_ConstantDefinition::LoadSetNames()
 	m_pcColorSetGrid->AppendCols(5);
 	
 	//for sorting coloumn appearance
-	m_pcColorSetGrid->SetUseNativeColLabels();
-	m_pcColorSetGrid->UseNativeColHeader();//
+	//m_pcColorSetGrid->SetUseNativeColLabels();
+//	m_pcColorSetGrid->UseNativeColHeader();//
 
 	m_pcColorSetGrid->SetColLabelValue(0, wxT("Name"));
 	m_pcColorSetGrid->SetColSize(0, 100);
@@ -402,6 +388,10 @@ void SP_DLG_ConstantDefinition::LoadSetNames()
 
 	for (unsigned int i = 1; i < l_nSize; i++)
 	{
+		if( l_pcColListTemp->GetCell(i, 0).IsEmpty())
+		{
+			continue;
+		}
 		m_pcColorSetGrid->AppendCols(1);
 		m_pcColorSetGrid->SetColLabelValue(i + 4, l_pcColListTemp->GetCell(i, 0));
 		m_pcColorSetGrid->SetColSize(i + 3, 70);
@@ -748,123 +738,10 @@ bool SP_DLG_ConstantDefinition::SaveData()
 
 	SaveNewDate();
 
-/*************************************/
-//	m_pcColorSetGrid->SaveEditControlValue();
-
-//	SP_DS_Metadata* l_pcConstant;
-
-	// delete constants
-//	for (auto l_pcConst : m_deleted)
-//	{
-//		m_pcConstants->RemoveElement(l_pcConst);
-//		wxDELETE(l_pcConst);
-//	}
-
-//	while (l_pcMetadataclass->GetElements()->size() < m_pcColorSetGrid->GetNumberRows())
-	//{
-	//	l_pcMetadataclass->NewElement(1);
-//	}
-
-	//SP_ListMetadata::const_iterator l_itElem;
-	//l_itElem = l_pcMetadataclass->GetElements()->begin();
-
-//	for (int l_nRow = 0; l_nRow < m_pcColorSetGrid->GetNumberRows(); l_nRow++)
-	//{
-		//l_pcConstant = *l_itElem;
-
-		//wxString l_sName = m_pcColorSetGrid->GetCellValue(l_nRow, 0);
-		//wxString l_sGroup = m_pcColorSetGrid->GetCellValue(l_nRow, 1);
-		//wxString l_sType = m_pcColorSetGrid->GetCellValue(l_nRow, 2);
-		//wxString l_sComment = m_pcColorSetGrid->GetCellValue(l_nRow, 3);
-
-		//l_pcConstant->GetAttribute(wxT("Name"))->SetValueString(l_sName);
-		//l_pcConstant->GetAttribute(wxT("Group"))->SetValueString(l_sGroup);
-		//l_pcConstant->GetAttribute(wxT("Comment"))->SetValueString(l_sComment);
-
-		//bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(l_sType);
-		//if (!l_bValue)
-		//{
-			//SP_MESSAGEBOX(wxT("datatype '") + l_sType + wxT("' for constant '") + l_sName + wxT("' is not allowed (use one of '") + m_sAvailableDatatypes + wxT("')"), wxT("Error"),
-				//wxOK | wxICON_ERROR);
-			//return false;
-	//	}
-
-//		SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
-
-		//l_pcColList->Clear();
-		//for (int j = m_lMain; j < m_pcColorSetGrid->GetNumberCols(); j++)
-		//{
-		//	int l_nRowCol = l_pcColList->AppendEmptyRow();
-			//l_pcColList->SetCell(l_nRowCol, 0, m_pcColorSetGrid->GetColLabelValue(j));
-			//l_pcColList->SetCell(l_nRowCol, 1, m_pcColorSetGrid->GetCellValue(l_nRow, j));
-		//}
-
-		 
-		//l_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, m_pcColorSetGrid->GetCellValue(l_nRow, m_lMain));
-
-		//l_pcColList->UpdateActiveListColumnPtr();
-
-		//bool l_bShow = m_pcConstantSetGrid->GetCellValue(l_nRow, SHOW) == wxT("1") ? true : false;
-		//l_pcConstant->SetShow(l_bShow);
-		//for (SP_DS_Attribute* l_pcAttr : *l_pcConstant->GetAttributes())
-	//	{
-		//	l_pcAttr->SetShow(l_bShow);
-	//	}
-		//l_pcConstant->Update();
-
-		//++l_itElem;
-
-//	}
-
-//	l_pcGraph->Update();
-
-	 
-
-/************************************/
-
-
-
-
-
 	return true;
 
 }
 
-
-/*
-void SP_DLG_NewConstantDefinition::InitializeChoice()
-{
-	SP_ListMetadata::const_iterator it;
-	set<wxString>::iterator iter;
-
-	set<wxString> l_lsChoice;
-
-	l_lsChoice.clear();
-	l_lsChoice.insert(wxT("all"));
-	l_lsChoice.insert(wxT("marking"));
-	l_lsChoice.insert(wxT("parameter"));
-
-	//bool flag = false;
-	for (it = m_pcConstants->GetElements()->begin(); it != m_pcConstants->GetElements()->end(); ++it)
-	{
-
-		SP_DS_Metadata* l_pcMetadata = *it;
-
-		wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Group")))->GetValue();
-
-		//set's elements are unique, therefore we do not need to make a check
-		l_lsChoice.insert(l_sGroup);
-	}
-
-	m_asGroups.Alloc(l_lsChoice.size());
-
-	for (iter = l_lsChoice.begin(); iter != l_lsChoice.end(); ++iter)
-	{
-		m_asGroups.Add(*iter);
-	}
-
-}
-*/
 
 void SP_DLG_ConstantDefinition::InitializeChoice()
 {
@@ -921,17 +798,7 @@ void SP_DLG_ConstantDefinition::InitializeChoice()
 		groups[n] = *it;
 		n++;
 	}
-	 
-	//for (it = m_pcConstants->GetElements()->begin(); it != m_pcConstants->GetElements()->end(); ++it)
-//	{
 
-	//	SP_DS_Metadata* l_pcMetadata = *it;
-
-	//	wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Group")))->GetValue();
-
-		//set's elements are unique, therefore we do not need to make a check
-   //		l_lsChoice.insert(l_sGroup);
-	//}
 
 	m_asGroups.Alloc(l_lsChoice.size());
 
@@ -945,83 +812,6 @@ void SP_DLG_ConstantDefinition::InitializeChoice()
 		}
 		
 	}
-/*****************/
-
-/*	
-	unsigned l_nArraysize;
-	l_nArraysize = 0;
-
-	SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
-	SP_DS_Metadataclass* l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_BASICCOLORSETCLASS);
-	SP_DS_Metadata* l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
-	SP_DS_ColListAttribute *l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ColorsetList")));
-	l_nArraysize = l_nArraysize + l_pcColList->GetRowCount();
-	
-	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_STRUCTUREDCOLORSETCLASS);
-	l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
-	l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("StructuredColorsetList")));		
-	l_nArraysize = l_nArraysize + l_pcColList->GetRowCount();
-	
-
-	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_ALIASCOLORSETCLASS);
-	l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
-	l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("AliasColorsetList")));		
-	l_nArraysize = l_nArraysize + l_pcColList->GetRowCount();
-
-	
-	m_choices.Alloc(l_nArraysize + 10);
-	m_choices.Empty();
-
-	m_choices.Add(wxT("----Basic types----"));
-	m_choices.Add(wxT("string"));
-	m_choices.Add(wxT("int"));
-	m_choices.Add(wxT("bool"));
-	m_choices.Add(wxT("enum"));
-	m_choices.Add(wxT("index"));
-	m_choices.Add(wxT("----Structured types----"));
-	m_choices.Add(wxT("product"));
-	m_choices.Add(wxT("union"));
-
-	m_choices.Add(wxT("----User-defined color sets----"));
-
-	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_BASICCOLORSETCLASS);
-	l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
-	l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ColorsetList")));
-	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
-	{
-		
-		wxString s = l_pcColList->GetCell(i,0).c_str();
-		m_choices.Add(l_pcColList->GetCell(i,0).c_str());
-	}
-
-	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_STRUCTUREDCOLORSETCLASS);
-	l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
-	l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("StructuredColorsetList")));	
-	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
-	{
-		
-		m_choices.Add(l_pcColList->GetCell(i,0).c_str());
-	}
-
-	
-	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_ALIASCOLORSETCLASS);
-	l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
-	l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("AliasColorsetList")));	
-	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
-	{
-		m_choices.Add(l_pcColList->GetCell(i,0).c_str());
-	}
-
-	size_t count = m_choices.GetCount();
-	choices = new wxString[count];
-	for ( size_t n = 0; n < count; n++ )
-	{
-		
-		choices[n] = m_choices[n];
-		wxString s = choices[n];
-	}
-*/
-
 }
 
 
@@ -1856,7 +1646,10 @@ void SP_DLG_ConstantDefinition::OnPopupClick(wxCommandEvent& evt)
 	int l_nToRow = 0;
 	l_nToRow=evt.GetId();
 	l_nToRow=l_nToRow - 1;
-	 
+	wxString l_Smsg;
+	l_Smsg<<wxT("here is line:");
+	l_Smsg<<l_nToRow;
+	 SP_MESSAGEBOX(l_Smsg);
 	m_RowData.clear();
 	m_RowData.Alloc(m_pcColorSetGrid->GetNumberCols());
 	for (unsigned i = 0; i < m_pcColorSetGrid->GetNumberCols(); i++)
@@ -1914,6 +1707,17 @@ void SP_DLG_ConstantDefinition::OnPopupClick(wxCommandEvent& evt)
 	 }
 }
 
+void SP_DLG_ConstantDefinition::OnMoveRow(wxCommandEvent& p_cEvent)
+{
+ l_pcMenu=new wxMenu;
+ l_pcMenu->Append(700,wxT("bbbb"));
+ l_pcMenu->AppendSeparator();
+l_pcMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SP_DLG_ConstantDefinition::OnPopupClick), NULL, this);
+PopupMenu(l_pcMenu);
+//Operate(2,3);
+
+}
+
 void SP_DLG_ConstantDefinition::Operate(const unsigned& p_nReason, const unsigned& r)
 {
 
@@ -1931,8 +1735,7 @@ void SP_DLG_ConstantDefinition::Operate(const unsigned& p_nReason, const unsigne
 
 		menu->Append(i, l_sOption);
 	}
-	 
-	menu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SP_DLG_ConstantDefinition::OnPopupClick), NULL, this);
+	menu->AppendSeparator();
 	 
 	PopupMenu(menu);
     }
@@ -1989,15 +1792,20 @@ void SP_DLG_ConstantDefinition::Operate(const unsigned& p_nReason, const unsigne
 	 
 }
 
+
+
 void SP_DLG_ConstantDefinition::OnRowRightClick(wxGridEvent& event)
 {
+
 	unsigned row;
 	row= event.GetRow();
 	wxString l_sRow;
 	row++;
 	 
-	Operate(1,row);
+	//Operate(1,row);
+
 }
+
 
 void SP_DLG_ConstantDefinition::OnSortVsets(wxCommandEvent& p_cEvent)
 {

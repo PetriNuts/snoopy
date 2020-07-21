@@ -818,8 +818,8 @@ bool SP_IddUnFoldExpr::CheckTransRateFunction(SP_DS_Node* p_pcTr, wxString& p_sR
 				else
 				{
 					l_bRes = false;
-					//throw dssd::exc::Exc(_FLINE_, "syntax error in rate function");
-					SP_LOGERROR("syntax error in rate function");
+					wxString l_sError=wxT("syntax error in rate function") + l_sTransName+wxT(" |")+l_sTransName;
+					SP_LOGERROR(l_sError);
 					return l_bRes;
 				}
 			}

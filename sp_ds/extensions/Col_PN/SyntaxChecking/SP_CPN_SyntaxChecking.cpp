@@ -1143,7 +1143,7 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 					{
 						if (l_pcColorSet->GetDataType() == CPN_PRODUCT && l_sTupeExpression.IsEmpty())
 						{
-							m_sErrorPosition = wxT("the product coloumn of marking expression is missed!. Error Position: ") + l_sColourExpBeforSubstitueConstants + wxT(" | ") + l_sPlaceName;
+							m_sErrorPosition = wxT("the product coloumn of marking expression is missing!. Error Position: ") + l_sColourExpBeforSubstitueConstants + wxT(" | ") + l_sPlaceName;
 						}
 						else
 						{
@@ -2083,7 +2083,7 @@ bool SP_CPN_SyntaxChecking::CheckPredicateInRateFunction(wxString p_sPredicate, 
  
 
 	SP_IddUnFoldExpr   expEval(m_pcGraph, m_sPlaceExp, m_sPlaceName);
-	p_sErrorPosition = wxT("Predicate Checking:");
+//	p_sErrorPosition = wxT("Predicate Checking:");
 	std::string  l_sExprTocheck=l_sPredicate.ToStdString();
 
 	bool l_bCheck = expEval.CheckGuardEXpression(l_sPredicate.ToStdString(), p_sErrorPosition.ToStdString());

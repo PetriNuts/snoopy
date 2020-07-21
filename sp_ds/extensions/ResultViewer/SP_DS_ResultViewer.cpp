@@ -235,6 +235,11 @@ void SP_DS_ResultViewer::SetCurveLineStyle(const unsigned long& p_nIndex, const 
 	{
 		m_aPlotCurves[p_nIndex]->SetLineStyle(p_nLineSyle);
 	}
+
+	if (p_nIndex < m_aPlotFuzzyCurves.size())//by george, for the line style of fuzzy curves
+	{
+		m_aPlotFuzzyCurves[p_nIndex]->SetLineStyle(p_nLineSyle);
+	}
 }
 void SP_DS_ResultViewer::SetCurveLineStyle(const wxString& l_nName, const int& p_nLineSyle)
 {
@@ -250,6 +255,17 @@ void SP_DS_ResultViewer::SetCurveLineStyle(const wxString& l_nName, const int& p
 		}
 	}
 
+	SP_VectorFuzzyCurve::iterator l_itFuzzyCurve;
+	for (l_itFuzzyCurve = m_aPlotFuzzyCurves.begin(); l_itFuzzyCurve != m_aPlotFuzzyCurves.end(); l_itFuzzyCurve++)
+		{
+			if ((*l_itFuzzyCurve)->GetName() == l_nName)
+			{
+				(*l_itFuzzyCurve)->SetLineStyle(p_nLineSyle);
+
+				return;
+			}
+		}
+
 }
 
 void SP_DS_ResultViewer::SetCurveColor(const unsigned long& p_nIndex, const wxString& p_sColor)
@@ -257,6 +273,11 @@ void SP_DS_ResultViewer::SetCurveColor(const unsigned long& p_nIndex, const wxSt
 	if (p_nIndex < m_aPlotCurves.size())
 	{
 		m_aPlotCurves[p_nIndex]->SetColor(p_sColor);
+	}
+
+	if (p_nIndex < m_aPlotFuzzyCurves.size())//by george
+	{
+		m_aPlotFuzzyCurves[p_nIndex]->SetColor(p_sColor);
 	}
 }
 
@@ -268,6 +289,11 @@ wxString SP_DS_ResultViewer::GetCurveColor(const unsigned long& p_nIndex)
 	}
 	else
 	{
+		if (p_nIndex < m_aPlotFuzzyCurves.size())//by george
+		{
+		  return m_aPlotFuzzyCurves[p_nIndex]->GetColor();
+		}
+
 		return wxT("rgb(0,0,0)");
 	}
 }
@@ -279,6 +305,10 @@ int SP_DS_ResultViewer::GetCurveLineWidth(const unsigned long& p_nIndex)
 	}
 	else
 	{
+		if (p_nIndex < m_aPlotFuzzyCurves.size())//by george
+		{
+		 return m_aPlotFuzzyCurves[p_nIndex]->GetLineWidth();
+		}
 		return 2;
 	}
 }
@@ -290,6 +320,10 @@ int SP_DS_ResultViewer::GetCurveLineStyle(const unsigned long& p_nIndex)
 	}
 	else
 	{
+		if (p_nIndex < m_aPlotFuzzyCurves.size())//by george
+		{
+		 return m_aPlotFuzzyCurves[p_nIndex]->GetLineStyle();
+		}
 		return wxSOLID;
 	}
 }

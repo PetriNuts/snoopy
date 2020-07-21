@@ -2130,8 +2130,8 @@ bool SP_CPN_ColorProcessing::GetConstant(map<wxString, SP_CPN_Variable_Constant>
 			}
 			else {
 				m_mConstant[l_sName] = l_cConstant;
-				return true;
-			}
+				continue;
+ 			}
 		}
 	}
 

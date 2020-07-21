@@ -881,6 +881,12 @@ SP_CPN_ParseNode_Info SP_CPN_Parse_Function_Node::evaluate()
 		SP_CPN_Function l_FunctionStruct;
 		l_FunctionStruct = m_pColorSetClass->GetFunctionMap()->find(l_sFunctionName)->second;
 		//l_FunctionStruct.m_pParseContext->SetFunctionFlag(true);
+		wxString l_sFunBody=l_FunctionStruct.m_sFunctionBody;
+		if(l_sFunBody.Contains("elemOf"))
+		{
+			SP_LOGMESSAGE(wxT("elemOf operator is not supported yet by Gecode and Generic unfolders"));
+			return m_ParseNode_Info;
+		}
 		l_FunctionStruct.m_pParseContext->SetFunctionName(l_FunctionStruct.m_sFunctionName);
 
 		//SP_CPN_ParseNode* l_pcParseNode = *(l_FunctionStruct.m_pParseContext->GetExpressionsVector()->begin());

@@ -51,6 +51,8 @@ class SP_DLG_ConstantDefinition : public wxDialog
 	wxArrayString m_RowData;
 	bool m_bIsAsc;
 	wxButton* m_pcSortingButton;
+	wxButton* m_pcMovingRowsButton;
+	wxMenu* l_pcMenu;
   private:
 
     void LoadSetNames();
@@ -86,6 +88,7 @@ class SP_DLG_ConstantDefinition : public wxDialog
 
 	bool  EvalConstantExpression(const wxString& p_sArcWeight, double& p_dVal);
 
+	void OnMoveRow(wxCommandEvent& p_cEvent);
 
   public:
 	

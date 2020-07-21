@@ -1286,7 +1286,7 @@ void SP_ColoredNetBuilder::PrePareMarkingString(wxString& p_sMarkingExpression, 
 	wxString l_sProcessed;
 	std::vector<wxString> l_vList;
 	if(l_sResultExp.Contains("++"))
-	{
+	{/*
 		char_separator<char> sep("++");
 		tokenizer<char_separator<char>> tokens(l_sResultExp.ToStdString(), sep);
 
@@ -1295,6 +1295,16 @@ void SP_ColoredNetBuilder::PrePareMarkingString(wxString& p_sMarkingExpression, 
 			wxString xx;
 			xx =wxString( t);
 			l_vList.push_back(t);
+		}
+		*/
+		///
+		wxString l_sTobeTokenized=l_sResultExp;
+		wxStringTokenizer tokenize(l_sTobeTokenized,"++");
+		while(tokenize.HasMoreTokens())
+		{
+		  wxString l_sToken=tokenize.GetNextToken();
+		  l_vList.push_back(l_sToken);
+
 		}
 	}
 	else 
@@ -1372,6 +1382,7 @@ void SP_ColoredNetBuilder::PrePareMarkingString(wxString& p_sMarkingExpression, 
 			)
 		{
 			std::set<std::string> l_setVar;
+			/*
 			std::string tupel = "";
 			char_separator<char> sep("&|=)(-*+`%!<>,/ ");
 			tokenizer<char_separator<char>> tokens(l_sPred, sep);
@@ -1385,7 +1396,24 @@ void SP_ColoredNetBuilder::PrePareMarkingString(wxString& p_sMarkingExpression, 
 					tupel += t + ",";
 				}
 			}
+*/
+			   wxString l_sTup;
+			    wxString l_sTobeTokenized=l_sPred;
+				wxStringTokenizer tokenize(l_sTobeTokenized,"&|=)(-*+`%!<>,/ ");
+				while(tokenize.HasMoreTokens())
+				{
+					wxString l_sToken=tokenize.GetNextToken();
+					auto it = l_mVar2Type.find(l_sToken);
+					if (it != l_mVar2Type.end())
+					{
+					 /// tupell_STup += t + ",";
+					  l_sTup<<l_sToken<<wxT(",");
+					}
 
+
+				}
+				std::string tupel = std::string(l_sTup.mb_str());
+			////
 			if (tupel[tupel.length() - 1] == ',')
 			{
 				tupel[tupel.length() - 1] = ' ';

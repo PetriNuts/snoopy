@@ -1256,6 +1256,10 @@ bool SP_CPN_ValueAssign::InitializeFunctionParseTree(SP_CPN_ColorSetClass &p_Col
 	for(itMap = m_FunctionMap.begin(); itMap != m_FunctionMap.end(); itMap++)
 	{	
 
+		if(itMap->second.m_sFunctionBody.Contains(wxT("elemOf")))
+		{
+			continue;
+		}
 		m_pParseContext = make_CPN_Parse_Context();
 		m_pDriver = make_CPN_Driver(*m_pParseContext);
 		

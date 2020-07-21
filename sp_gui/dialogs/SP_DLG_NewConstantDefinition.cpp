@@ -956,13 +956,13 @@ void SP_DLG_NewConstantDefinition::LoadSetNames()
 	}
 
 	m_pcConstantSetGrid->AppendCols(6);
-	m_pcConstantSetGrid->SetUseNativeColLabels();
-	m_pcConstantSetGrid->UseNativeColHeader();//
+	//m_pcConstantSetGrid->SetUseNativeColLabels();
+	//m_pcConstantSetGrid->UseNativeColHeader();//
 	m_pcConstantSetGrid->SetColLabelValue(NAME, wxT("Constant"));
 	m_pcConstantSetGrid->SetColSize(NAME, 100);
 	
 	if(!m_bSortFlag)
-	m_pcConstantSetGrid->SetSortingColumn(NAME,true);
+	//m_pcConstantSetGrid->SetSortingColumn(NAME,true);
 	
 	 
 
@@ -1512,7 +1512,7 @@ void SP_DLG_NewConstantDefinition::Operate(const unsigned& p_nReason, const unsi
 
 		menu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SP_DLG_NewConstantDefinition::OnPopupClick), NULL, this);
 
-		PopupMenu(menu);
+		//PopupMenu(menu);
 	}
 	else if (p_nReason == 2)
 	{

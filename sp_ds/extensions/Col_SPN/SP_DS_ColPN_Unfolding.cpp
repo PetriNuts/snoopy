@@ -192,7 +192,7 @@ bool SP_DS_ColPN_Unfolding::Start()
 		}
 		else
 		{
-			SP_LOGERROR(wxT(" while unfolding colored net using IDD (dssz_util) engine!"));
+			SP_LOGERROR(wxT(" while unfolding colored net using IDD (dssd_util) engine!"));
 			return false;
 		}
 	}
@@ -205,7 +205,7 @@ bool SP_DS_ColPN_Unfolding::Start()
 		}
 		else
 		{
-			SP_LOGERROR(wxT(" while unfolding colored net using Gecode (dssz_util) engine!"));
+			SP_LOGERROR(wxT(" while unfolding colored net using Gecode (dssd_util) engine!"));
 			return false;
 		}
 	}
