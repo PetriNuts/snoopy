@@ -13,7 +13,6 @@
 #include "wx/chartpanel.h"
 #include <wx/xy/xyplot.h>
 #include <wx/areadraw.h>
-//#include "sp_ds/extensions/ResultViewer/SP_DS_ResultViewer.h"
 #include "wx/wx.h"
 #include <wx/event.h>
 #include <wx/xy/xylinerenderer.h>
@@ -27,19 +26,13 @@ protected:
 	wxStaticBoxSizer*	m_pcScroll;
 	wxScrollBar* scrollBar;
 	wxSizer*     m_pcSizer;
-	wxMenuBar *m_pMenuBar;
-	wxMenu *m_pFileMenu;
 private:
 	XYDynamicDataset*  m_pcDataSet;
 	XYDynamicSerie     *m_pcSerie;
 	Chart              * m_pcChart;
  
 	wxSpinCtrlDouble* m_pctxtCtrlA;
-
- 
 	wxSpinCtrlDouble* m_pctxtCtrlB;
-
- 
 	wxSpinCtrlDouble* m_pctxtCtrlC;
 
 	double m_dA;
@@ -57,14 +50,16 @@ public:
 private:
  
 	void  OnSpinChanged(wxSpinDoubleEvent& event);
-	void  OnSavePlot(wxCommandEvent& event);
-	void  ExportToImageFile(wxString &p_sFileName, const int &p_nFileType);
+
+
 	void init();
 	Chart* CreateFuzzzyNumChart();
-
+	void OnDlgOk(wxCommandEvent& event);
+	void OnDlgCancel(wxCommandEvent& event);
+	void DrawData(const wxString& p_stfnVal);
 public:
 	
-	SP_DLG_FuzzyNumber_Drawing(wxWindow *p_pcParent, wxString& p_sTitle, int xpos, int ypos, int width, int height);
+	SP_DLG_FuzzyNumber_Drawing(wxWindow *p_pcParent, wxString& p_sTitle, wxString& psVal , int xpos, int ypos, int width, int height);
 
 	
 	DECLARE_EVENT_TABLE()

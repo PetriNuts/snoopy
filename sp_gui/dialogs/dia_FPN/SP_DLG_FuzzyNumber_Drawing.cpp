@@ -2,7 +2,7 @@
 #include "wx/scrolbar.h"
 #include "sp_gui/dialogs/dia_FPN/SP_DLG_FuzzyNumber_Drawing.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
-//IMPLEMENT_CLASS(SP_DLG_FuzzyNumber_Drawing, wxFrame)
+
 enum {
 	SP_ID_PANEL,
 	SP_ID_SCROLL_A,
@@ -17,12 +17,14 @@ enum {
 	BUTTON_PLOT_SAVE
 };
 BEGIN_EVENT_TABLE(SP_DLG_FuzzyNumber_Drawing, wxDialog)
-EVT_BUTTON(BUTTON_PLOT_SAVE, SP_DLG_FuzzyNumber_Drawing::OnSavePlot)
-EVT_CLOSE(SP_DLG_FuzzyNumber_Drawing::OnCloseDrsawingFrame)
+
+//EVT_CLOSE(SP_DLG_FuzzyNumber_Drawing::OnCloseDrsawingFrame)
+
+
 END_EVENT_TABLE()
 
-SP_DLG_FuzzyNumber_Drawing::SP_DLG_FuzzyNumber_Drawing(wxWindow *p_pcParent, wxString& p_sTitle, int xpos, int ypos, int width, int height)
-	: wxDialog(p_pcParent, -1, p_sTitle, wxPoint(xpos, ypos), wxSize(width, height),  wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP)
+SP_DLG_FuzzyNumber_Drawing::SP_DLG_FuzzyNumber_Drawing(wxWindow *p_pcParent, wxString& p_sTitle,wxString& p_sVal, int xpos, int ypos, int width, int height)
+	: wxDialog(p_pcParent, -1, p_sTitle, wxPoint(xpos, ypos), wxSize(width, height),  wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP  |wxRESIZE_BORDER | wxMAXIMIZE_BOX)
 {
 	m_pcSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -42,8 +44,7 @@ SP_DLG_FuzzyNumber_Drawing::SP_DLG_FuzzyNumber_Drawing(wxWindow *p_pcParent, wxS
 	m_pctxtCtrlB->SetIncrement(0.01);
 	m_pctxtCtrlB->Enable(true);
 
-	//Connect(ID_About, wxEVT_COMMAND_MENU_SELECTED,
-	//	wxCommandEventHandler(MyFrame::OnAbout));
+
 	 Connect(SP_ID_TXT_B, wxEVT_SPINCTRLDOUBLE, wxSpinDoubleEventHandler(SP_DLG_FuzzyNumber_Drawing::OnSpinChanged));
 	
 	m_pctxtCtrlC = new wxSpinCtrlDouble(this, SP_ID_TXT_C, wxEmptyString, wxDefaultPosition, wxSize(80, 20), wxTE_PROCESS_ENTER | wxTE_CENTER, 0.0, 1000);
@@ -52,8 +53,8 @@ SP_DLG_FuzzyNumber_Drawing::SP_DLG_FuzzyNumber_Drawing(wxWindow *p_pcParent, wxS
 	Connect(SP_ID_TXT_C, wxEVT_SPINCTRLDOUBLE, wxSpinDoubleEventHandler(SP_DLG_FuzzyNumber_Drawing::OnSpinChanged));
 	wxBoxSizer*  l_pcCartSizer = new  wxStaticBoxSizer(new wxStaticBox(this, 5000, wxT("Draw a Plot ")), wxHORIZONTAL);
 	wxBoxSizer* l_pcMainSizer = new  wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* l_pcVluesSizer = new  wxBoxSizer(wxHORIZONTAL);
 
-	//wxBoxSizer* l_pcPanelSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer* l_pcAsizer = new wxStaticBoxSizer(new wxStaticBox(this, 100, wxT("adjust value of A")), wxHORIZONTAL);
 	wxBoxSizer* l_pcBsizer = new wxStaticBoxSizer(new wxStaticBox(this, 200, wxT("adjust value of B")), wxHORIZONTAL);
 	wxBoxSizer* l_pcCsizer = new wxStaticBoxSizer(new wxStaticBox(this, 300, wxT("adjust value of C")), wxHORIZONTAL);
@@ -64,45 +65,20 @@ SP_DLG_FuzzyNumber_Drawing::SP_DLG_FuzzyNumber_Drawing(wxWindow *p_pcParent, wxS
 	l_pcBsizer->Add(m_pctxtCtrlB);
 	l_pcCsizer->Add(m_pctxtCtrlC);
 
-	//m_pcSizer->Add(l_pcPanelSizer);
+	l_pcVluesSizer->Add(l_pcAsizer);
+	l_pcVluesSizer->Add(l_pcBsizer);
+	l_pcVluesSizer->Add(l_pcCsizer);
+	l_pcVluesSizer->Add(this->CreateButtonSizer(wxOK | wxCANCEL), 0, wxEXPAND | wxALL, 5);
+
 	m_pcSizer->Add(l_pcCartSizer);
-	m_pcSizer->Add(l_pcAsizer);
-	m_pcSizer->Add(l_pcBsizer);
-	m_pcSizer->Add(l_pcCsizer);
 
-	 
-	wxButton* l_pcButton = new wxButton(this, BUTTON_PLOT_SAVE, "Save Plot As", wxPoint(20, 20));
-	wxBoxSizer* l_pcButtonSizer = new wxBoxSizer(wxHORIZONTAL);
-	
+	m_pcSizer->Add(l_pcVluesSizer);
 
-
-	l_pcButtonSizer->Add(l_pcButton, 0, wxALL, 5);
-	l_pcButton->Show(true);
-	l_pcButton->SetFocus();
-	
-	 
-	//l_pcMainSizer->Add(l_pcCartSizer);
 	l_pcMainSizer->Add(m_pcSizer);
-	l_pcMainSizer->Add(l_pcButtonSizer);
-	 
-	m_pMenuBar = new wxMenuBar();
-	// File Menu
-	m_pFileMenu = new wxMenu();
- 
-
-	wxMenu*	file = new wxMenu;
-	file->Append(BUTTON_PLOT_SAVE, wxT("&Save"));
-	wxMenuItem* quit = new wxMenuItem(file, BUTTON_PLOT_SAVE, wxT("&Quit\tCtrl+S"));
-	 
-	m_pFileMenu->Append(quit);
-	m_pMenuBar->Append(file, wxT("&File"));
-	//SetMenuBar(m_pMenuBar);
-
-	Connect(BUTTON_PLOT_SAVE, wxEVT_COMMAND_MENU_SELECTED,
-		wxCommandEventHandler(SP_DLG_FuzzyNumber_Drawing::OnSavePlot));
 	 
 	////////////////////////////////////////////
-	l_pcMainSizer->Layout();
+	DrawData(p_sVal);
+	Layout();
 	this->SetSizerAndFit(m_pcSizer);
  
 	Centre();
@@ -201,87 +177,50 @@ void  SP_DLG_FuzzyNumber_Drawing::OnSpinChanged(wxSpinDoubleEvent& event)
 	}
 }
  
-void SP_DLG_FuzzyNumber_Drawing::ExportToImageFile(wxString &p_sFileName, const int &p_nFileType)
+
+
+
+void SP_DLG_FuzzyNumber_Drawing::DrawData(const wxString& p_stfnVal)
 {
-	wxBitmapType l_nExportType;
-
-	if (m_pcDrawingPanel == nullptr || m_pcChart==nullptr)
+	if (!p_stfnVal.IsEmpty())
 	{
-		return;
+		wxString l_sVal = p_stfnVal;
+		wxString l_sAval = l_sVal.BeforeFirst(',');
+		l_sVal.Replace(l_sAval, "", false);
+		l_sVal.Replace(",", "", false);
+
+		wxString l_sBval=l_sVal.BeforeFirst(',');
+		wxString l_sCval = l_sVal.AfterLast(',');
+
+ 		if (!l_sAval.ToDouble(&m_dA)) { return; }
+		if (!l_sBval.ToDouble(&m_dB)) { return; }
+		if (!l_sCval.ToDouble(&m_dC)) { return; }
+
+		//assign the values to the text control objects
+		m_pctxtCtrlA->SetValue(l_sAval);
+		m_pctxtCtrlB->SetValue(l_sBval);
+		m_pctxtCtrlC->SetValue(l_sCval);
+
+		//draw the coresponding TFN
+		m_pcChart = CreateFuzzzyNumChart();
+		m_pcDrawingPanel->SetChart(m_pcChart);
+
 	}
-	 
-
-	if (p_sFileName.BeforeLast(wxT('.')) != wxT("")) {
-		p_sFileName = p_sFileName.BeforeLast(wxT('.'));
-	}
-
-	wxSize temp = m_pcDrawingPanel->GetSize();
-	wxSize temp1 = temp;
-	long l_ChartWidth = 300;
-	//.ToLong(&l_ChartWidth);
-
-	long l_ChartHeight = 300;
-	//m_ChartHeight.ToLong(&l_ChartHeight);
-
-	temp1.SetWidth(l_ChartWidth);
-	temp1.SetHeight(l_ChartHeight);
-	m_pcDrawingPanel->SetSize(temp1);
-	wxBitmap bitmap = m_pcDrawingPanel->CopyBackbuffer();
-
-	switch (p_nFileType) {
-	case 0:
-		l_nExportType = wxBITMAP_TYPE_BMP;
-		p_sFileName = p_sFileName + wxT(".bmp");
-		break;
-	case 1:
-		l_nExportType = wxBITMAP_TYPE_GIF;
-		p_sFileName = p_sFileName + wxT(".gif");
-		break;
-	case 2:
-		l_nExportType = wxBITMAP_TYPE_PNG;
-		p_sFileName = p_sFileName + wxT(".png");
-		break;
-	case 3:
-		l_nExportType = wxBITMAP_TYPE_JPEG;
-		p_sFileName = p_sFileName + wxT(".jpg");
-		break;
-	case 4:
-		SP_LOGERROR(wxT("This function has not been implemented"));
-		return;
-	default:
-		l_nExportType = wxBITMAP_TYPE_BMP;
-		p_sFileName = p_sFileName + wxT(".bmp");
-		break;
-	}
-
-	bitmap.SaveFile(p_sFileName, l_nExportType);
-	m_pcDrawingPanel->SetSize(temp);
 }
-
-void  SP_DLG_FuzzyNumber_Drawing::OnSavePlot(wxCommandEvent& event)
+void SP_DLG_FuzzyNumber_Drawing::OnDlgOk(wxCommandEvent& event)
 {
-	//wxFileName l_FileName;
-	//wxString l_sDefaultName = l_FileName.GetName() + wxT("_")
-	//	+ GetViewAttributeValue(m_pcModelView, wxT("Name"));
-
-	wxFileDialog* l_pcSaveDlg = new wxFileDialog(this, wxT("Export file name"),".", "Plot_TFN", wxT(""), wxFD_SAVE | wxFD_OVERWRITE_PROMPT | wxSTAY_ON_TOP);
-	l_pcSaveDlg->Fit();
-	//l_pcSaveDlg->SetWildcard(dynamic_cast<SP_DS_PlotViewer*>(m_pcResultViewer)->GetSupportedSaveExtensions());
-	l_pcSaveDlg->SetFilterIndex(2);
-	if (l_pcSaveDlg->ShowModal() == wxID_OK)
+	if (!(m_dA <= m_dB &&  m_dB < m_dC))
 	{
-		wxString l_sFileName = l_pcSaveDlg->GetPath();
-		int l_nExportType = l_pcSaveDlg->GetFilterIndex();
-
-		if (l_sFileName.BeforeLast(wxT('.')) != wxT(""))
-		{
-			l_sFileName = l_sFileName.BeforeLast(wxT('.'));
-		}
-
-		 ExportToImageFile(l_sFileName, l_nExportType);
-
+		m_dA = 0;
+		m_dB = 0;
+		m_dC = 0;
 	}
-
-	l_pcSaveDlg->Destroy();
 }
+void SP_DLG_FuzzyNumber_Drawing::OnDlgCancel(wxCommandEvent& event)
+{
+
+		m_dA = 0;
+		m_dB = 0;
+		m_dC = 0;
  
+}
