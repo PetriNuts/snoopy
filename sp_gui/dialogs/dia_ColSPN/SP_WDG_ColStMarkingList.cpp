@@ -205,7 +205,6 @@ bool SP_WDG_ColStMarkingList::LoadData()
 	//	m_pcMarkingGrid->DeleteCols(0, m_pcMarkingGrid->GetNumberCols());
 	}
 	
-	//m_pcMarkingGrid->AppendCols(l_pcColList->GetColCount());
 
 	//Get the maximum number of rows for one place
 	unsigned int l_nMaxRow = 0;
@@ -233,64 +232,62 @@ bool SP_WDG_ColStMarkingList::LoadData()
 	{		
 		m_pcMarkingGrid->AppendRows( l_nMaxRow );
 	}
-	/////
+
 	//load data
-	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+	for (unsigned int j = 0;j < l_pcColList->GetColCount(); j++)
 	{
-		//load color value
-		bool l_bWhite = true;
-		wxString l_sColorValue = SP_WILDCARD;
-		if (!m_bMultiple)
+		for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 		{
-			l_sColorValue = l_pcColList->GetCell(i, 0);
-		}
-		m_pcMarkingGrid->SetCellValue(i, 0, l_sColorValue);
-		m_pcMarkingGrid->SetCellAlignment(i, 0, wxALIGN_LEFT, wxALIGN_CENTER);
-		m_pcMarkingGrid->SetCellBackgroundColour(i, 0, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-
-		//load token number
-		wxString l_sTokenValue = SP_WILDCARD;
-		wxString l_sTempMarking;
-		wxString l_sProduct;
-		if (!m_bMultiple)
-		{
-			l_sTokenValue = l_pcColList->GetCell(i, 1);
-			l_sTempMarking = l_sTokenValue;
-		}
-		if (l_sTempMarking.IsEmpty())
-		{
-			l_sTokenValue = l_pcColList->GetCell(i, 2);
-		}
-		m_pcMarkingGrid->SetCellValue(i, 2, l_sTokenValue);//token value
-		m_pcMarkingGrid->SetCellAlignment(i, 2, wxALIGN_LEFT, wxALIGN_CENTER);
-
-		m_pcMarkingGrid->SetCellBackgroundColour(i, 2, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-
-		if (l_sTempMarking.IsEmpty())
-		{
-			l_sProduct = l_pcColList->GetCell(i, 1);
-			if (l_sProduct.IsEmpty())
+			bool l_bWhite = true;
+			wxString l_sColorValue = SP_WILDCARD;
+			if (!m_bMultiple)
 			{
+				l_sColorValue = l_pcColList->GetCell(j, 0);
+			}
+			//fill out the first coloumn
+			m_pcMarkingGrid->SetCellValue(j, 0, l_sColorValue);
+			m_pcMarkingGrid->SetCellAlignment(j, 0, wxALIGN_LEFT, wxALIGN_CENTER);
+			m_pcMarkingGrid->SetCellBackgroundColour(j, 0, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+
+			wxString l_sTokenValue;
+			l_sTokenValue = l_pcColList->GetCell(j, 1);
+			if (!m_bMultiple)
+			{
+				l_sTokenValue = l_pcColList->GetCell(j, 1);
+			}
+
+			if (!m_bMultiple)
+			{
+				m_pcMarkingGrid->SetCellValue(j, 2, l_sTokenValue);//token value
+				m_pcMarkingGrid->SetCellAlignment(j, 2, wxALIGN_LEFT, wxALIGN_CENTER);
+				m_pcMarkingGrid->SetCellBackgroundColour(j, 2, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+			}
+			else
+			{//multiple
+				l_sTokenValue = SP_WILDCARD;
+				m_pcMarkingGrid->SetCellValue(j, 2, l_sTokenValue);//token value
+				m_pcMarkingGrid->SetCellAlignment(j, 2, wxALIGN_LEFT, wxALIGN_CENTER);
+				m_pcMarkingGrid->SetCellBackgroundColour(j, 2, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+			}
+
+			wxString l_sProduct = l_pcColList->GetCell(j, 2);
+			if (!m_bMultiple)
+			{
+				if(l_sProduct.IsEmpty())
 				l_sProduct = wxT("()");
 			}
-		}
-		else
-		{
-			l_sProduct = l_pcColList->GetCell(i, 2);
-			if (l_sProduct.IsEmpty())
+			else
 			{
-				l_sProduct = wxT("()");
+				l_sProduct = SP_WILDCARD;
 			}
+			m_pcMarkingGrid->SetCellValue(j, 1, l_sProduct);//product
+			m_pcMarkingGrid->SetCellAlignment(j, 1, wxALIGN_LEFT, wxALIGN_CENTER);
+
+			m_pcMarkingGrid->SetCellBackgroundColour(j, 1, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+
+			(l_bWhite ? l_bWhite = false : l_bWhite = true);
 		}
-		m_pcMarkingGrid->SetCellValue(i, 1, l_sProduct);//product
-		m_pcMarkingGrid->SetCellAlignment(i, 1, wxALIGN_LEFT, wxALIGN_CENTER);
-
-		m_pcMarkingGrid->SetCellBackgroundColour(i, 1, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-
-		(l_bWhite ? l_bWhite = false : l_bWhite = true);
 	}
-
-
 	////
 	SP_DS_TextAttribute* l_pcNameAttibute = dynamic_cast< SP_DS_TextAttribute* >(l_pcNode->GetAttribute(SP_DS_CPN_COLORSETNAME));
 	if (!l_pcNameAttibute)
@@ -315,28 +312,7 @@ bool SP_WDG_ColStMarkingList::LoadData()
 		}
 
 	}
-	////
-	///
-	/**
-	for (unsigned int i = 0; i < l_pcColList->GetColCount(); i++)
-	{	
-		bool l_bWhite = true;
-		m_pcMarkingGrid->SetColLabelValue(i,l_pcColList->GetColLabel(i));
-		for(unsigned int j = 0; j < l_pcColList->GetRowCount(); j++)
-		{
-			wxString l_sColorValue = SP_WILDCARD;
-			if(!m_bMultiple)
-			{
-				l_sColorValue = l_pcColList->GetCell(j,i);
-			}
 
-			m_pcMarkingGrid->SetCellValue(j, i, l_sColorValue );
-			m_pcMarkingGrid->SetCellAlignment(j, i, wxALIGN_LEFT, wxALIGN_CENTER);
-			m_pcMarkingGrid->SetCellBackgroundColour(j,i, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));			
-			(l_bWhite ? l_bWhite = false : l_bWhite = true );
-		}	
-	}	
-	*/
 	return true;
 
 }
@@ -820,7 +796,7 @@ void SP_WDG_ColStMarkingList::OnCheck(wxCommandEvent& p_cEvent)
 	
 	//new marking solving 
 	map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
-	if( ! l_cSyntaxChecking.ComputeInitialMarking(l_pcNode,l_mColorToMarkingMap) )
+	if( ! l_cSyntaxChecking.ComputeInitialMarking(l_pcNode,l_mColorToMarkingMap,false) )
 		return;
 	//end 
 
