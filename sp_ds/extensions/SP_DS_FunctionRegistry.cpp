@@ -75,7 +75,7 @@ SP_DS_FunctionRegistry::~SP_DS_FunctionRegistry()
 void
 SP_DS_FunctionRegistry::LoadFromNet(SP_DS_Graph* p_pcGraph)
 {
-	if(p_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")))
+	if(p_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")) && !(p_pcGraph->GetNetclass()->GetName().Contains(wxT("Fuzzy"))))//by george
 	{
 		/****************for coloured nets***********/
 		SP_DS_Metadataclass* l_pcMC = NULL;
@@ -101,7 +101,7 @@ SP_DS_FunctionRegistry::LoadFromNet(SP_DS_Graph* p_pcGraph)
 
 	//load functions
 	l_pcMC = p_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);
-	if(l_pcMC)
+	if(l_pcMC && !(p_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored"))))
 	{
 		for(SP_DS_Metadata* l_pcMeta : *(l_pcMC->GetElements()))
 		{

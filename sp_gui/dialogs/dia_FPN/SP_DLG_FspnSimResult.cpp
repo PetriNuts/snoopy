@@ -110,78 +110,94 @@ SP_DLG_FspnSimResult::~SP_DLG_FspnSimResult() {}
 
 std::vector<TriangularFN> SP_DLG_FspnSimResult::LoadParams()
 {
-	//////////////////////////////////////////////////
+	std::vector<TriangularFN>  asTFNParams;
 
-	wxString strSelection = GetCurrentSelectedSet();
-	int iPos = 0;
-	m_lnFuzzyNum = 0;
-	std::vector<TriangularFN>  vasTFNParams;
-	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
-	if (l_pcMetadataclass)
-	{
-		SP_ListMetadata::const_iterator l_itElem;
-		for (l_itElem = l_pcMetadataclass->GetElements()->begin();
-			l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+		int iPos = 0;
+		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+		if (mc)
 		{
-			SP_DS_Metadata* l_pcMetadata = *l_itElem;
-			wxString l_sMetadataName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-			wxString l_sMetadataGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Group")))->GetValue();
-			SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcMetadata->GetAttribute(wxT("ValueList")));
-			wxString l_sMetadataValue;
-			wxString l_sMetadataType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcMetadata->GetAttribute(wxT("Type")))->GetValue();
-			if (m_mTransParamNames.find(l_sMetadataName) != m_mTransParamNames.end())
+			//go through all groups and activate the current selective set
+			for (size_t i = 0; i < m_apcColListAttr.size(); i++)
 			{
-				int iSelection = m_apcComboBoxes[4]->GetCurrentSelection();
-				if (iSelection == -1)//for color fuzzy spn
+				if (m_apcColListAttr[i])
 				{
-					iSelection = 0;
-				}
-				for (unsigned int iIter = iSelection; iIter < l_pcColList->GetRowCount(); ++iIter)
-				{
-					if (l_sMetadataType.Cmp(wxT("TFN")) == 0)
+					if (i < m_apcComboBoxes.size())
 					{
-						wxString m_sVset = l_pcColList->GetCell(iIter, 0);
-						SP_VectorDouble constants = GetFNConstants(l_pcColList->GetCell(iIter, 1));
-						double dConstA;
-						double dContB;
-						double dContC;
-						dConstA = constants[0];
-						dContB = constants[1];
-						dContC = constants[2];
-						if (dConstA &&  dContB && dContC) {
-							TriangularFN ttf(dConstA, dContC, dContB);
-							vasTFNParams.push_back(ttf);
-							m_lnFuzzyNum++;
-							m_mFuzzyParam2Position[l_sMetadataName] = iPos;
-							m_fuzzyParams.push_back(l_sMetadataName);
-							m_fuzzyParamPositions.push_back(iPos);
-							break;//for fcolsp
-						}
+						m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[i]->GetSelection());
 					}
-					else if (l_sMetadataType.Cmp(wxT("double")) == 0 || l_sMetadataType.Cmp(wxT("int")) == 0)
-					{
-						double main;
-						l_pcColList->GetCell(iIter, 1).ToDouble(&main);
-						if (main)
-						{
-							TriangularFN ttf(main, main, main);
-							vasTFNParams.push_back(ttf);
-						}
-
-					}
-
 					else
 					{
-
+						m_apcColListAttr[i]->SetActiveList(m_apcComboBoxes[m_apcComboBoxes.size()-1]->GetSelection());
 					}
-
 
 				}
 			}
-			iPos++;
+			/******************************/
+			SP_ListMetadata::const_iterator it;
+			for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+			{
+				SP_DS_Metadata* l_pcConstant = *it;
+				wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+				wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();///Added by G.A
+
+				SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+				wxString l_sValue;
+				if (l_sType == wxT("TFN") && (m_mTransParamNames.find(l_sName) != m_mTransParamNames.end()))
+				{
+					l_sValue = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")))->GetActiveCellValue(1);
+
+					SP_VectorDouble constants = GetFNConstants(l_sValue);
+					double a;
+					double b;
+					double c;
+					a = constants[0];
+					b = constants[1];
+					c = constants[2];
+					if (a&&b&&c) {
+						TriangularFN ttf(a, c, b);
+						asTFNParams.push_back(ttf);
+						m_lnFuzzyNum++;
+						m_mFuzzyParam2Position[l_sName] = iPos;
+						m_fuzzyParams.push_back(l_sName);
+						m_fuzzyParamPositions.push_back(iPos);
+						iPos++;
+						continue;
+					}
+				}
+
+
+				SP_DS_FunctionRegistryEntry l_FE = l_pcFR->lookUpFunction(l_sName);
+				if (l_FE.IsOk() && (m_mTransParamNames.find(l_sName) != m_mTransParamNames.end()))
+				{
+					SP_FunctionPtr l_Function = l_FE.getFunction();
+
+					double l_nValue = 0.0;
+					if (l_Function->isValue())
+					{
+						if (l_sType == wxT("int"))
+						{
+							l_nValue = (int)l_Function->getValue();
+
+						}
+						else if (l_sType == wxT("double"))
+						{
+							l_nValue = l_Function->getValue();
+
+						}
+
+						if (l_nValue)
+						{
+							TriangularFN ttf(l_nValue, l_nValue, l_nValue);
+							asTFNParams.push_back(ttf);
+						}
+					}
+
+				}
+				iPos++;
+			}
 		}
-	}
-	return vasTFNParams;
+		return asTFNParams;
 }
 
 
@@ -189,6 +205,11 @@ bool SP_DLG_FspnSimResult::InitializeFuzzySetting()
 {
 	long m_lAlphaLevels;
 	long m_lnDiscPoints;
+	m_lnFuzzyNum=0;
+	m_fuzzyParams.clear();
+	m_fuzzyParamPositions.clear();
+	m_mFuzzyParam2Position.clear();
+
 	if ((m_alphaLevels1->GetValue().ToLong(&m_lAlphaLevels)) && (m_pSamplePints->GetValue().ToLong(&m_lnDiscPoints)))
 	{
 		if (m_lAlphaLevels > 0 && m_lnDiscPoints > 0)
@@ -200,12 +221,12 @@ bool SP_DLG_FspnSimResult::InitializeFuzzySetting()
 			return true;
 		}
 		else {
-			SP_MESSAGEBOX(wxT("The intered values of Alpha levels or Sample points must be larger than 0"));
+			SP_MESSAGEBOX(wxT("The chosen values of Alpha levels or Sample points must be larger than 0"));
 			return false;
 		}
 	}
 	else {
-		SP_MESSAGEBOX(wxT("The intered values of Alpha levels or Sample points must be numerical values"));
+		SP_MESSAGEBOX(wxT("The chosen values of Alpha levels or Sample points must be numerical values"));
 		return false;
 	}
 

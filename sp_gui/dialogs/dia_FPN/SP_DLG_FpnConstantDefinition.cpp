@@ -1,5 +1,5 @@
 /*
-* SP_DLG_NewConstantDefinition.cpp
+* SP_DLG_FpnConstantDefinition.cpp
 *
 *  Created on: 07.02.2019
 *      Author: G. Assaf
@@ -116,7 +116,7 @@ SP_DLG_FpnConstantDefinition::SP_DLG_FpnConstantDefinition(wxWindow* p_pcParent,
 	l_pcGridSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND, 5);
 
 	m_pcConstantSetGrid->EnableEditing(true);
-	m_pcConstantSetGrid->SetSelectionMode(wxGrid::wxGridSelectCells);
+	//m_pcConstantSetGrid->SetSelectionMode(wxGrid::wxGridSelectCells);
 	
 	m_bSortFlag = false;
 	l_bWhite = false;
@@ -624,7 +624,10 @@ bool SP_DLG_FpnConstantDefinition::SaveData()
 			int l_nRowCol = l_pcColList->AppendEmptyRow();
 			l_pcColList->SetCell(l_nRowCol, 0, m_pcConstantSetGrid->GetColLabelValue(j));
 			if (l_sType.Cmp(wxT("TFN")) != 0 || l_sType.Cmp(wxT("BFN")) != 0 || l_sType.Cmp(wxT("TZN")) != 0)
-			l_pcColList->SetCell(l_nRowCol, 1, m_pcConstantSetGrid->GetCellValue(l_nRow, j));
+			{
+				l_pcColList->SetCell(l_nRowCol, 1, m_pcConstantSetGrid->GetCellValue(l_nRow, j));
+
+			}
 			else
 			{
 				SP_VectorDouble l_constants = GetFNConstants(m_pcConstantSetGrid->GetCellValue(l_nRow, j));
@@ -1055,10 +1058,29 @@ void SP_DLG_FpnConstantDefinition::OnGridCellDClicked(wxGridEvent& ev)
 	if (colType == wxT("TFN")&& m_nCol>4)
 	{
 		wxString l_sT = "TFN";
-		m_pcDraw =new SP_DLG_FuzzyNumber_Drawing(this, l_sT, 20, 30, 100, 200);
-		m_pcDraw->Show();
-	}
+		wxString l_sCurrentVal= m_pcConstantSetGrid->GetCellValue(m_nRow, m_nCol);
+		m_pcDraw =new SP_DLG_FuzzyNumber_Drawing(this, l_sT, l_sCurrentVal, 20, 30, 100, 200);
+		//m_pcDraw->Show();
+		if (m_pcDraw->ShowModal() == wxID_OK)
+		{
+			wxString l_sValA = wxString::Format(wxT("%f"), m_pcDraw->GetAVal());
+			wxString l_sValB = wxString::Format(wxT("%f"), m_pcDraw->GetBVal());
+			wxString l_sValC = wxString::Format(wxT("%f"), m_pcDraw->GetCVal());
 
+			if (!(m_pcDraw->GetAVal() < m_pcDraw->GetBVal()&& m_pcDraw->GetBVal() <= m_pcDraw->GetCVal()))
+			{
+				wxString l_sCosnt = m_pcConstantSetGrid->GetCellValue(m_nRow, NAME);
+				wxString l_sMsg = wxT("The values of the TFN ") + l_sCosnt + wxT(" are not valid");
+				SP_LOGMESSAGE(l_sMsg);
+				return;
+			}
+			l_sTFNFromDrawingPanel << l_sValA << wxT(",") << l_sValB << wxT(",") << l_sValC;
+			m_pcConstantSetGrid->SetCellValue(m_nRow, m_nCol, l_sTFNFromDrawingPanel);
+			l_sTFNFromDrawingPanel.Empty();
+
+		}
+	}
+	ev.Skip();
 }
 void SP_DLG_FpnConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 {
@@ -1303,8 +1325,8 @@ void SP_DLG_FpnConstantDefinition::LoadSetNames()
 
 	  
 	m_pcConstantSetGrid->AppendCols(6);
-	m_pcConstantSetGrid->SetUseNativeColLabels();
-	m_pcConstantSetGrid->UseNativeColHeader();//
+	//m_pcConstantSetGrid->SetUseNativeColLabels();
+	//m_pcConstantSetGrid->UseNativeColHeader();//
 
 	m_pcConstantSetGrid->SetColLabelValue(NAME, wxT("Constant"));
 	m_pcConstantSetGrid->SetColSize(NAME, 100);
@@ -1580,7 +1602,7 @@ void SP_DLG_FpnConstantDefinition::OnChildDestroy(wxCloseEvent& event)
 		return;
 	}
 	if (m_pcDraw)
-	{
+	{/**
 		wxString l_sValA = wxString::Format(wxT("%f"), m_pcDraw->GetAVal());
 		wxString l_sValB = wxString::Format(wxT("%f"), m_pcDraw->GetBVal());
 		wxString l_sValC = wxString::Format(wxT("%f"), m_pcDraw->GetCVal());
@@ -1588,7 +1610,7 @@ void SP_DLG_FpnConstantDefinition::OnChildDestroy(wxCloseEvent& event)
 		m_pcConstantSetGrid->SetCellValue(m_nRow, m_nCol, l_sTFNFromDrawingPanel);
 		l_sTFNFromDrawingPanel.Empty();
 		m_pcDraw->Destroy();
-		//wxDELETE(m_pcDraw);
+	*/
 	}
 }
 
