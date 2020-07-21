@@ -161,7 +161,7 @@ class SP_ImportAPNN: public SP_ImportRoutine,
 	SP_ImportAPNN();
 	virtual ~SP_ImportAPNN();
 
-	virtual bool ReadFile(const wxString& fileName);
+	virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
 
 	inline virtual wxString GetName()
 		{ return wxT("Import APNN");}

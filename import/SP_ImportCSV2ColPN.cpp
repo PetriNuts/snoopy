@@ -41,7 +41,7 @@ SP_ImportCSV2ColPN::~SP_ImportCSV2ColPN()
 
 }
 
-bool SP_ImportCSV2ColPN::ReadFile(const wxString& p_sFile)
+bool SP_ImportCSV2ColPN::ReadFile(const wxString& p_sFile,SP_ImportRoutine* p_sIR)
 {
 	SP_MDI_Doc* l_pcDoc = SP_Core::Instance()->GetRootDocument();
 	if( !l_pcDoc )

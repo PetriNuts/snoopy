@@ -16,7 +16,7 @@ SP_ImportPNML::~SP_ImportPNML()
 {
 }
 
-bool SP_ImportPNML::ReadFile(const wxString& p_sFile)
+bool SP_ImportPNML::ReadFile(const wxString& p_sFile,SP_ImportRoutine* p_sIR)
 {
 	ClearAll();
 

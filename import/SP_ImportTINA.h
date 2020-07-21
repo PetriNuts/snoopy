@@ -85,7 +85,7 @@ class SP_ImportTINA: public SP_ImportRoutine,
 	SP_ImportTINA();
 	~SP_ImportTINA();
 
-	virtual bool ReadFile(const wxString& p_sFile);
+	virtual bool ReadFile(const wxString& p_sFile,SP_ImportRoutine* p_sIR=NULL);
 
 	inline virtual wxString GetName()
 		{ return wxT("Import TINA");}

@@ -38,7 +38,7 @@ SP_ImportCSV::Clear()
 }
 
 bool
-SP_ImportCSV::ReadFile(const wxString& fileName)
+SP_ImportCSV::ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR)
 {
 	Clear();
 

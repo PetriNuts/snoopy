@@ -35,7 +35,7 @@ SP_ImportTINA::~SP_ImportTINA()
 
 }
 
-bool SP_ImportTINA::ReadFile(const wxString& p_sFile)
+bool SP_ImportTINA::ReadFile(const wxString& p_sFile,SP_ImportRoutine* p_sIR)
 {
 	g_bError = FALSE;
 	g_sMessage = wxT("");

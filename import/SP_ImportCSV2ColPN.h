@@ -63,7 +63,7 @@ class SP_ImportCSV2ColPN: public SP_ImportRoutine,
 	SP_ImportCSV2ColPN();
 	~SP_ImportCSV2ColPN();
 
-	virtual bool ReadFile(const wxString& p_sFile);
+	virtual bool ReadFile(const wxString& p_sFile,SP_ImportRoutine* p_sIR=NULL);
 
 	inline virtual wxString GetName()
 		{ return wxT("Import Color Petri Net Declarations from CSV");}

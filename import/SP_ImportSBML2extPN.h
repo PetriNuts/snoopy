@@ -46,7 +46,7 @@ public:
 	SP_ImportSBML2extPN();
 	virtual ~SP_ImportSBML2extPN();
 
-	virtual bool ReadFile(const wxString& fileName);
+	virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
 
 	inline virtual wxString GetName()
 		{ return wxT("Import SBML to discrete Petri Net");}

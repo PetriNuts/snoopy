@@ -159,7 +159,7 @@ bool SP_ImportAPNN::Open(const wxString& p_sFile)
 	}
 	return false;
 }
-bool SP_ImportAPNN::ReadFile(const wxString& p_sFile)
+bool SP_ImportAPNN::ReadFile(const wxString& p_sFile,SP_ImportRoutine* p_pcImpr)
 {
 	m_eNetType = SIMPLE_PT;
 	wxString input;

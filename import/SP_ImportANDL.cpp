@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ //////////////////////////////////////////////////////////////////////
 // $Author: cr $
 // $Version: 0.1 $
 // $Date: 2011/10/27 $
@@ -23,28 +23,53 @@
 #include "sp_gui/windows/SP_GUI_Childframe.h"
 #include "sp_gui/mdi/SP_MDI_Doc.h"
 #include "sp_gui/dialogs/SP_DLG_LayoutProperties.h"
-
+#include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 #include "snoopy.h"
 #include "sp_utilities.h"
-
-
 #include "dssd/misc/net_reader.h"
-
 #include <wx/spinctrl.h>
-
 #include <algorithm>
+#include "sp_ds/extensions/SP_DS_FunctionRegistry.h"
+#include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
+enum {
+	SP_ID_CHECK_SELECTIVE,
+	SP_ID_IS_NEW_DOC,
+	SP_ID_CONSTANTS_TESXT,
+	SP_ID_CHECK_ALL,
+	SP_ID_DECLARATIONS_CONSTANTS,
+	SP_ID_FUNS_DEF,
+	SP_ID_DECLARATIONS_UPDATE,
+	SP_ID_DECLARATIONS_OBSERVERS,
+	SP_ID_CONSTANTS_OBSERVERS,
+
+
+};
 
 SP_ImportANDL::SP_ImportANDL()
 {
+	m_bIsNewDoc = true;
 }
 
 SP_ImportANDL::~SP_ImportANDL()
 {
+	for(auto p: m_vConstDependenciesVector)
+	{
+		delete p;
+	}
+	for(auto p: m_vFunDependenciesVector)
+	{
+		delete p;
+	}
+	for(auto p: m_vFunDependenciesVector)
+	{
+			delete p;
+	}
+
 }
 
-bool SP_ImportANDL::ReadFile(const wxString& p_sFile)
+bool SP_ImportANDL::ReadFile(const wxString& p_sFile, SP_ImportRoutine* p_importRT)
 {
-	ClearAll();
+	//ClearAll();
 
 	m_fileName = p_sFile;
 
@@ -56,6 +81,61 @@ bool SP_ImportANDL::ReadFile(const wxString& p_sFile)
 		if (l_Return)
 		{
 			auto l_Net = p.get();
+
+			/********************/
+			dssd::andl::Net_ptr l_plainNet = p.get();
+			SP_DS_Graph_Declarations l_CheckDec(l_plainNet, true);
+
+			 l_CheckDec();
+			 m_CheckDec = l_CheckDec;
+			 m_vConstDependenciesVector = l_CheckDec.GetConstantsDependencyVector();
+			 m_vFunDependenciesVector = l_CheckDec.GetFunctionDependencyVector();
+			SP_DLG_ImportProperties*  l_pcDialog = new SP_DLG_ImportProperties(p_importRT, NULL, l_plainNet, p_sFile);
+			if (l_pcDialog->ShowModal() == wxID_OK)
+			{
+				for (int i = 0; i < m_Options_constants.size(); i++)
+				{
+					if (m_pcRearrangelist_constants->IsChecked(i))
+					{
+						l_finalconstants.Add(m_Options_constants[i]);
+					}
+				}
+
+				for (int i = 0; i < m_Options_funs.size(); i++)
+				{
+					if (m_pcRearrangelist_function->IsChecked(i))
+					{
+						l_finalFunSel.Add(m_Options_funs[i]);
+					}
+				}
+				for (int i = 0; i < m_Options_observers.size(); i++)
+				{
+					if (m_pcRearrangelist_observers->IsChecked(i))
+					{
+						l_finalobservers.Add(m_Options_observers[i]);
+					}
+				}
+				if (!m_bIsNewDoc)
+				{
+					if (AddToGraph(*l_Net))
+					{
+						ClearAll();
+						return true;
+					}
+					else
+					{
+						SP_MESSAGEBOX(wxT("There is no an opend PN document!!"), wxT("Error"));
+						return false;
+					}
+				}
+
+			}
+			else
+			{
+				ClearAll();
+				return false;
+			}
+
 			wxString l_sMsg = wxT("parse successful\n");
 			SP_LOGMESSAGE(l_sMsg);
 			l_Return = CreateGraph(p_sFile, *l_Net);
@@ -88,9 +168,576 @@ void SP_ImportANDL::ClearAll()
 	lookupPlaces.clear();
 	lookupTransitions.clear();
 	arcs.clear();
+
+	l_finalFunSel.clear();
+	l_finalconstants.clear();
+	l_finalobservers.clear();
+	m_mGroup2Const.clear();
+	m_mType2Ob.clear();
+
+	m_vConstDependenciesVector.clear();
+	m_vFunDependenciesVector.clear();
+	m_vObserversDependenciesVector.clear();
+
+	if (p_pcDlg)
+	{
+		if (m_pcTextconstants)
+		{
+			m_pcTextconstants->SetValue("");
+			wxDELETE(m_pcTextfunctions);
+		}
+
+
+		if (m_pcTextfunctions)
+		{
+
+			m_pcTextfunctions->SetValue("");
+			wxDELETE(m_pcTextfunctions);
+		}
+
+		wxDELETE(p_pcDlg);
+	}
+	m_bIsNewDoc = true;
 }
 
+void SP_ImportANDL::AddConstants()
+{
+	m_pcNotebookPageConstants = p_pcDlg->AddPage(wxT("constants"));
+
+	m_pcMainSizer_constants = new wxBoxSizer(wxHORIZONTAL);
+	m_pcLeftSizer_constants = new wxStaticBoxSizer(new wxStaticBox(m_pcNotebookPageConstants, -1, wxT("Constants")), wxVERTICAL);
+	m_pcRightSizer_constants = new wxBoxSizer(wxVERTICAL);
+	m_pcRightSizer_constants = new wxStaticBoxSizer(new wxStaticBox(m_pcNotebookPageConstants, -1, wxT("constants definitions")), wxVERTICAL);
+
+	m_pcTextconstants = new wxTextCtrl(m_pcNotebookPageConstants, SP_ID_CONSTANTS_TESXT, "", wxDefaultPosition, wxSize(300, 300), wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL);
+
+	m_pcMainSizer_constants->Add(m_pcLeftSizer_constants, 1, wxALL | wxEXPAND, 5);
+	m_pcMainSizer_constants->Add(m_pcRightSizer_constants, 1, wxALL | wxEXPAND, 5);
+
+	m_pcCheckAll = new wxCheckBox(p_pcDlg, SP_ID_CHECK_ALL, wxT("Select all"), wxDefaultPosition);
+	m_pcCheckAll->SetValue(true);
+	p_pcDlg->AddCheckBoxSelectAll(m_pcCheckAll);
+	m_pcCheckAll->Bind(wxEVT_CHECKBOX, &SP_ImportANDL::ONselectAll, this, SP_ID_CHECK_ALL);
+	m_pcCheckAll->Enable(false);
+
+	wxSizer* l_pcSizer = new wxBoxSizer(wxVERTICAL);
+	//l_pcSizer->Add(m_pcCheckAll);
+	AddConstants_Att();
+
+	m_pcRearrangelist_constants = new wxRearrangeList(m_pcNotebookPageConstants, SP_ID_DECLARATIONS_CONSTANTS, wxDefaultPosition,
+		wxSize(40, 175), m_Options_constants_order, m_Options_constants);
+	m_pcLeftSizer_constants->Add(m_pcRearrangelist_constants, 1, wxALL | wxEXPAND, 5);
+
+	m_pcRearrangelist_constants->Enable(false);
+
+
+	m_pcRightSizer_constants->Add(m_pcTextconstants);
+
+
+	m_pcRearrangelist_constants->Bind(wxEVT_CHECKLISTBOX, &SP_ImportANDL::OnSelChange_Constants, this, SP_ID_DECLARATIONS_CONSTANTS);
+
+
+	m_pcNotebookPageConstants->AddControl(m_pcMainSizer_constants, 1, wxALL | wxEXPAND, 5);
+}
+
+void SP_ImportANDL::AddFunctions()
+{
+	m_pcNotebookPageFunctions = p_pcDlg->AddPage(wxT("functions"));
+
+	m_pcMainSizer_funs = new wxBoxSizer(wxHORIZONTAL);
+	m_pcLeftSizer_funs = new wxStaticBoxSizer(new wxStaticBox(m_pcNotebookPageFunctions, -1, wxT("functions")), wxVERTICAL);
+	m_pcRightSizer_funs = new wxBoxSizer(wxVERTICAL);
+	m_pcRightSizer_funs = new wxStaticBoxSizer(new wxStaticBox(m_pcNotebookPageFunctions, -1, wxT("function definitions")), wxVERTICAL);
+
+	m_pcTextfunctions = new wxTextCtrl(m_pcNotebookPageFunctions, SP_ID_FUNS_DEF, "", wxDefaultPosition, wxSize(400, 300), wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL);
+
+	m_pcMainSizer_funs->Add(m_pcLeftSizer_funs, 1, wxALL | wxEXPAND, 5);
+	m_pcMainSizer_funs->Add(m_pcRightSizer_funs, 1, wxALL | wxEXPAND, 5);
+
+	AddFunctions_Att();
+
+
+	//Rearrangelist for reordering the sequence of Declarations
+	m_pcRearrangelist_function = new wxRearrangeList(m_pcNotebookPageFunctions, SP_ID_DECLARATIONS_UPDATE, wxDefaultPosition,
+		wxSize(50, 200), m_Options_funs_order, m_Options_funs);
+	m_pcLeftSizer_funs->Add(m_pcRearrangelist_function, 1, wxALL | wxEXPAND, 5);
+
+
+	m_pcRearrangelist_function->Enable(false);
+
+	m_pcRightSizer_funs->Add(m_pcTextfunctions);
+
+
+	m_pcRearrangelist_function->Bind(wxEVT_CHECKLISTBOX, &SP_ImportANDL::OnSelChange_funs, this, SP_ID_DECLARATIONS_UPDATE);
+
+
+
+
+	m_pcNotebookPageFunctions->AddControl(m_pcMainSizer_funs, 1, wxALL | wxEXPAND, 5);
+}
+
+
+void SP_ImportANDL::AddObservers()
+{
+	m_pcNotebookPageObservers= p_pcDlg->AddPage(wxT("Observers"));
+
+	m_pcMainSizer_observers = new wxBoxSizer(wxHORIZONTAL);
+	m_pcLeftSizer_observers = new wxStaticBoxSizer(new wxStaticBox(m_pcNotebookPageObservers, -1, wxT("Observers")), wxVERTICAL);
+	m_pcRightSizer_observers= new wxBoxSizer(wxVERTICAL);
+	m_pcRightSizer_observers = new wxStaticBoxSizer(new wxStaticBox(m_pcNotebookPageObservers, -1, wxT("observers definitions")), wxVERTICAL);
+
+	m_pcTextobservers = new wxTextCtrl(m_pcNotebookPageObservers, SP_ID_CONSTANTS_OBSERVERS, "", wxDefaultPosition, wxSize(300, 300), wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL);
+
+	m_pcMainSizer_observers->Add(m_pcLeftSizer_observers, 1, wxALL | wxEXPAND, 5);
+	m_pcMainSizer_observers->Add(m_pcRightSizer_observers, 1, wxALL | wxEXPAND, 5);
+
+	wxSizer* l_pcSizer = new wxBoxSizer(wxVERTICAL);
+	//l_pcSizer->Add(m_pcCheckAll);
+	AddObservers_Att();
+
+	m_pcRearrangelist_observers = new wxRearrangeList(m_pcNotebookPageObservers, SP_ID_DECLARATIONS_OBSERVERS, wxDefaultPosition,
+		wxSize(40, 175), m_Options_observers_order, m_Options_observers);
+	m_pcLeftSizer_observers->Add(m_pcRearrangelist_observers, 1, wxALL | wxEXPAND, 5);
+
+	m_pcRearrangelist_observers->Enable(false);
+
+
+	m_pcRightSizer_observers->Add(m_pcTextobservers);
+
+
+	m_pcRearrangelist_observers->Bind(wxEVT_CHECKLISTBOX, &SP_ImportANDL::OnSelChange_Observers, this, SP_ID_DECLARATIONS_OBSERVERS);
+
+
+	m_pcNotebookPageObservers->AddControl(m_pcMainSizer_observers, 1, wxALL | wxEXPAND, 5);
+}
 /////////////////////////////////////////////////Graph Creation////////////////////////////////////////////////////
+bool SP_ImportANDL::AddToGraph(const dssd::andl::Net& p_Net)
+{
+
+	if (!SP_Core::Instance()->GetRootDocument())
+	{
+		return false;
+	}
+
+	m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+
+
+
+	if (!m_pcGraph)
+		return false;
+
+	if (m_pcGraph->GetNetclass()->GetName().Contains("Colored"))
+	{
+		return false;
+	}
+	if (p_Net.constants_ && p_Net.valuesets_)
+		AppendConstants(*p_Net.constants_, *p_Net.valuesets_);
+
+
+	if (p_Net.functions_)
+		AppendFunctions(*p_Net.functions_);
+
+	if (p_Net.observers_)
+		AppendObservers(*p_Net.observers_);
+
+	m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
+
+	wxString l_sLogMsg;
+	if (m_mDeclaration2Overwritten.size()>0)
+	{
+		l_sLogMsg << wxT("the defintions of the following declarations were overwritten:\n");
+	}
+	for (auto itMap = m_mDeclaration2Overwritten.begin(); itMap != m_mDeclaration2Overwritten.end(); ++itMap)
+	{
+		l_sLogMsg << itMap->first << wxT(":\n");
+		wxString l_sMssg;
+		for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+		{
+			l_sMssg << *itSet << wxT("\n");
+		}
+		l_sLogMsg << l_sMssg;
+	}
+
+	if (m_mDeclaration2Overwritten.size()>0)
+		SP_LOGMESSAGE(l_sLogMsg);
+
+	return true;
+
+}
+
+bool SP_ImportANDL::AppendConstants(const dssd::andl::Constants& p_Constants, const dssd::andl::Valuesets& p_Valuesets)
+{
+	struct temp_constant {
+		wxString constname;
+		wxString consttype;
+		wxString constGroup;
+		wxString constcomment;
+		vector<wxString> vsets;
+	};
+
+	vector<temp_constant> l_vConstantsInGraph;
+	SP_DS_Metadataclass*	l_pcConstantsOrgin = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+	vector<wxString> l_vSetNAmes;
+	int l_nOrgSize = l_pcConstantsOrgin->GetElements()->size();
+	int k = 0;
+
+	if (l_pcConstantsOrgin->GetElements()->size() > 0)
+	{
+		for (SP_DS_Metadata* l_pcMetadata : *(l_pcConstantsOrgin->GetElements()))
+		{
+			k++;
+			wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+			wxString l_sGroup = l_pcMetadata->GetAttribute(wxT("Group"))->GetValueString();
+			wxString l_sComment = l_pcMetadata->GetAttribute(wxT("Comment"))->GetValueString();
+			wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcMetadata->GetAttribute(wxT("Type")))->GetValue();
+
+
+			SP_DS_ColListAttribute * l_pcColList1 = dynamic_cast<SP_DS_ColListAttribute*>(l_pcMetadata->GetAttribute(wxT("ValueList")));
+			vector<wxString> l_vSets;
+			for (unsigned int i = 0; i < l_pcColList1->GetRowCount(); i++)
+			{
+				l_vSets.push_back(l_pcColList1->GetCell(i, 1));
+				if (k == 1)
+				{
+					l_vSetNAmes.push_back(l_pcColList1->GetCell(i, 0));
+				}
+			}
+
+			temp_constant l_const;
+			l_const.constname = l_sName;
+			l_const.constGroup = l_sGroup;
+			l_const.consttype = l_sType;
+			l_const.constcomment = l_sComment;
+			l_const.vsets = l_vSets;
+			l_vConstantsInGraph.push_back(l_const);
+		}
+	}
+
+	for (auto& constant : p_Constants)
+	{
+		bool l_bFound = false;
+		for (int i = 0; i < l_vConstantsInGraph.size(); i++)
+		{
+
+			if (constant->name_ == l_vConstantsInGraph[i].constname)
+			{
+				l_bFound = true;
+				wxString l_sMessage;
+				l_sMessage << wxT("the constant ") << constant->name_ << wxT(" is exist in the model!") << wxT("\n");
+				l_sMessage << wxT("Would you like to overwrite its value?");
+				if (l_finalconstants.Index(constant->name_) != wxNOT_FOUND)
+				{
+
+					int l_nChoose = SP_MESSAGEBOX(l_sMessage, wxT("overwrite declarations"), wxYES | wxNO | wxICON_INFORMATION);
+
+					if (l_nChoose == wxYES)
+					{
+						l_vConstantsInGraph[i].constGroup = constant->group_;
+						if (constant->type_ == dssd::andl::ConstType::DOUBLE_T)
+							l_vConstantsInGraph[i].consttype = wxT("double");
+						else
+							l_vConstantsInGraph[i].consttype = wxT("int");
+
+						vector<wxString> vsets;
+						for (auto& ss : constant->values_)
+						{
+							vsets.push_back(ss);
+						}
+						l_vConstantsInGraph[i].vsets = vsets;
+
+						m_mDeclaration2Overwritten[wxT("Constants")].insert(l_vConstantsInGraph[i].constname);
+
+					}
+
+				}
+			}
+		}
+
+		if (!l_bFound && l_finalconstants.Index(constant->name_) != wxNOT_FOUND)
+		{
+			temp_constant l_const;
+			l_const.constname = constant->name_;
+			l_const.constGroup = constant->group_;
+			if (constant->type_ == dssd::andl::ConstType::DOUBLE_T)
+				l_const.consttype = wxT("double");
+			else
+				l_const.consttype = wxT("int");
+
+			vector<wxString> vsets;
+			for (auto& ss : constant->values_)
+			{
+				vsets.push_back(ss);
+			}
+			l_const.vsets = vsets;
+			l_vConstantsInGraph.push_back(l_const);
+		}
+	}
+
+	SP_DS_Metadataclass*	l_pcConstants = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+
+
+	//remove old constants
+	if (l_pcConstants->GetElements()->size() > 0)
+	{
+		l_pcConstants->RemoveAll();
+
+	}
+
+	//add new constants with number of temporarliy stored ones
+	for (int i = 0; i < l_vConstantsInGraph.size(); i++)
+	{
+
+		l_pcConstants->NewElement(1);
+
+	}
+	SP_ListMetadata::const_iterator l_itElem;
+	l_itElem = l_pcConstants->GetElements()->begin();
+	SP_DS_Metadata* l_pcConstant;
+	for (int i = 0; i < l_vConstantsInGraph.size(); i++)
+	{
+		l_pcConstant = *l_itElem;
+
+		wxString l_sName = l_vConstantsInGraph[i].constname;
+		wxString l_sGroup = l_vConstantsInGraph[i].constGroup;
+		wxString l_sType = l_vConstantsInGraph[i].consttype;
+		wxString l_sComment = l_vConstantsInGraph[i].constcomment;
+
+		l_pcConstant->GetAttribute(wxT("Name"))->SetValueString(l_sName);
+		l_pcConstant->GetAttribute(wxT("Group"))->SetValueString(l_sGroup);
+		l_pcConstant->GetAttribute(wxT("Comment"))->SetValueString(l_sComment);
+
+		bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(l_sType);
+
+
+		SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+
+		l_pcColList->Clear();
+		for (int j = 0; j < l_vConstantsInGraph[i].vsets.size(); j++)
+		{
+			int l_nRowCol = l_pcColList->AppendEmptyRow();
+			wxString l_sVsetMain = wxT("Main");
+			l_pcColList->SetCell(l_nRowCol, 1, l_vConstantsInGraph[i].vsets[j]);
+			if (l_vSetNAmes.size() == 1)
+				l_pcColList->SetCell(l_nRowCol, 0, l_sVsetMain);
+			else
+			{
+				if (l_vConstantsInGraph[i].vsets.size() == l_vSetNAmes.size())
+					l_pcColList->SetCell(l_nRowCol, 0, l_vSetNAmes[j]);
+			}
+
+		}
+
+		wxString l_sMainVal = wxT("0");
+		if (l_vConstantsInGraph[i].vsets.size()>0)
+			l_sMainVal = l_vConstantsInGraph[i].vsets[0];
+
+		SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+		SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sMainVal));
+		if (l_sType == wxT("double"))
+		{
+			double l_Val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, std::numeric_limits<double>::min() }();
+			wxString l_sDouble;
+			l_sDouble << l_Val;
+			m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, l_sDouble);
+			l_pcColList->UpdateActiveListColumnPtr();
+
+			l_pcConstant->SetShow(true);
+			l_pcConstant->Update();
+
+			++l_itElem;
+			continue;
+		}
+
+		m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, l_sMainVal);
+
+		l_pcColList->UpdateActiveListColumnPtr();
+
+		l_pcConstant->SetShow(true);
+		l_pcConstant->Update();
+
+		++l_itElem;
+
+	}
+	return true;
+}
+
+bool SP_ImportANDL::AppendFunctions(const dssd::andl::Functions& p_Functions)
+{
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);
+	if (mc)
+	{
+		for (auto& func : p_Functions)
+		{
+			if (!func) continue;
+
+			wxString name = func->name_;
+			wxString param = func->param_;
+			wxString body = func->body_;
+
+			if (l_finalFunSel.Index(name, true) == wxNOT_FOUND) { continue; }
+
+			bool l_bIsExist = false;
+			bool l_bOverwrite = false;
+
+			SP_DS_Metadataclass* l_pcMetadataclass;
+			l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_FUNCTION);
+			if (!l_pcMetadataclass)
+				return false;
+			SP_DS_Metadata* l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+			if (l_pcMetadataclass)
+			{
+				if (l_pcMetadataclass)
+				{
+					SP_ListMetadata::const_iterator l_itElem;
+					for (l_itElem = l_pcMetadataclass->GetElements()->begin();
+						l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+					{
+						SP_DS_Metadata* l_pcMetadata = *l_itElem;
+						wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+						wxString l_sParam = l_pcMetadata->GetAttribute(wxT("Parameter"))->GetValueString();
+						wxString l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
+
+						if (l_sName == name)
+						{
+							l_bIsExist = true;
+
+							m_mDeclaration2Overwritten[wxT("Functions")].insert(l_sName);
+							break;
+						}
+					}
+				}
+			}
+
+
+			if (l_bIsExist)
+			{
+
+				wxString l_sMessage;
+				l_sMessage << wxT("the function ") << name << wxT(" is exist in the model!") << wxT("\n");
+				l_sMessage << wxT("Would you like to overwrite its definition?");
+
+				int l_nChoose = SP_MESSAGEBOX(l_sMessage, wxT("overwrite declarations"), wxYES | wxNO | wxICON_INFORMATION);
+
+				if (l_nChoose == wxYES)
+				{
+					l_bOverwrite = true;
+
+				}
+				else if (l_nChoose == wxNO)
+				{
+					l_bOverwrite = false;
+				}
+
+
+			}
+			if (l_bIsExist && !l_bOverwrite) continue;//the function is already defined in the model
+
+			if (l_bIsExist && l_bOverwrite)
+			{
+				if (l_pcMetadataclass)
+				{
+					if (l_pcMetadataclass)
+					{
+						SP_ListMetadata::const_iterator l_itElem;
+						for (l_itElem = l_pcMetadataclass->GetElements()->begin();
+							l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+						{
+							SP_DS_Metadata* l_pcMetadata = *l_itElem;
+							wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+							wxString l_sParam = l_pcMetadata->GetAttribute(wxT("Parameter"))->GetValueString();
+							wxString l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
+
+							if (l_sName == name)
+							{
+								l_pcMetadata->GetAttribute(wxT("Parameter"))->SetValueString(name);
+								l_pcMetadata->GetAttribute(wxT("Body"))->SetValueString(body);;
+								l_bOverwrite = false;
+								break;
+							}
+						}
+						if (!l_bOverwrite) continue;
+					}
+				}
+			}
+				SP_DS_Metadata* l_Func = mc->NewElement(1);
+				l_Func->GetAttribute(wxT("Name"))->SetValueString(name);
+				l_Func->GetAttribute(wxT("Parameter"))->SetValueString(param);
+				l_Func->GetAttribute(wxT("Body"))->SetValueString(body);
+
+		}
+	}
+	return true;
+}
+
+bool SP_ImportANDL::AppendObservers(const dssd::andl::Observers& p_Observers)
+{
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+	if (mc)
+	{
+		for (auto& obs : p_Observers)
+		{
+			if (!obs) continue;
+
+			wxString name = obs->name_;
+
+			//if the constant is not chosen, then ignore it
+			if (l_finalobservers.Index(name, true) == wxNOT_FOUND) { continue; }//by george
+
+			bool l_bOverwrite = false;
+			for (auto mc1 : *mc->GetElements())
+			{
+				wxString l_sObInNet=mc1->GetAttribute(wxT("Name"))->GetValueString();
+				if (l_sObInNet == name)
+				{
+					wxString l_sMessage;
+					l_sMessage << wxT("the observer ") << name << wxT(" is exist in the model!") << wxT("\n");
+					l_sMessage << wxT("Would you like to overwrite its definition?");
+
+					int l_nChoose = SP_MESSAGEBOX(l_sMessage, wxT("overwrite declarations"), wxYES | wxNO | wxICON_INFORMATION);
+
+					if (l_nChoose == wxYES)
+					{
+						l_bOverwrite = true;
+
+					}
+					else if (l_nChoose == wxNO)
+					{
+						l_bOverwrite = false;
+					}
+
+					if (!l_bOverwrite) break;
+
+					//overwrite the type and body of observer
+
+					wxString l_sBody = obs->function_;
+					wxString l_sType = wxT("Place");
+					if (obs->type_ == dssd::andl::ObserverType::TRANS_T)
+					{
+						l_sType = wxT("Transition");
+					}
+					mc1->GetAttribute(wxT("Type"))->SetValueString(l_sType);
+					mc1->GetAttribute(wxT("Body"))->SetValueString(l_sBody);
+
+					m_mDeclaration2Overwritten[wxT("Observer")].insert(name);
+					break;
+				}
+			}
+			if (l_bOverwrite) continue;//the observer gets overwrote
+
+			wxString type = wxT("Place");
+			if (obs->type_ == dssd::andl::ObserverType::TRANS_T) {
+				type = wxT("Transition");
+			}
+			wxString body = obs->function_;
+			SP_DS_Metadata* l_Obs = mc->NewElement(1);
+			l_Obs->GetAttribute(wxT("Name"))->SetValueString(name);
+			l_Obs->GetAttribute(wxT("Type"))->SetValueString(type);
+			l_Obs->GetAttribute(wxT("Body"))->SetValueString(body);
+		}
+	}
+
+	return true;
+}
 
 bool SP_ImportANDL::CreateGraph(const wxString& p_sFile, const dssd::andl::Net& p_Net)
 {
@@ -137,6 +784,9 @@ bool SP_ImportANDL::CreateFunc(const dssd::andl::Functions& p_Functions)
 			wxString name = func->name_;
 			wxString param = func->param_;
 			wxString body = func->body_;
+
+			if (l_finalFunSel.Index(name, true) == wxNOT_FOUND) { continue; }//by george
+
 			SP_DS_Metadata* l_Func = mc->NewElement(1);
 			l_Func->GetAttribute(wxT("Name"))->SetValueString(name);
 			l_Func->GetAttribute(wxT("Parameter"))->SetValueString(param);
@@ -214,6 +864,10 @@ bool SP_ImportANDL::CreateConst(const dssd::andl::Constants& p_Constants, const 
 
 			wxString name = constant->name_;
 			wxString type = wxT("int");
+
+			//if the constant is not chosen, then ignore it
+			if (l_finalconstants.Index(name, true) == wxNOT_FOUND) { continue; }//by george
+
 			if(constant->type_ == dssd::andl::ConstType::DOUBLE_T)
 			{
 				type = wxT("double");
@@ -265,6 +919,10 @@ bool SP_ImportANDL::CreateObservers(const dssd::andl::Observers & p_Observers)
 			if(!obs) continue;
 
 			wxString name = obs->name_;
+
+			//if the constant is not chosen, then ignore it
+			if (l_finalobservers.Index(name, true) == wxNOT_FOUND) { continue; }//by george
+
 			wxString type = wxT("Place");
 			if(obs->type_ == dssd::andl::ObserverType::TRANS_T) {
 				type = wxT("Transition");
@@ -563,3 +1221,923 @@ bool SP_ImportANDL::CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxS
 }
 
 
+bool
+SP_ImportANDL::AddToDialog(SP_DLG_ImportProperties* p_pcDlg, dssd::andl::Net_ptr net)
+{
+	SP_LOGMESSAGE("inside AddToDialog for SP_ExportReport");
+
+	m_pcCheckSelectiveChoices = new wxCheckBox(p_pcDlg, SP_ID_CHECK_SELECTIVE, "Selective import");
+	m_pcCheckSelectiveChoices->SetValue(false);
+
+	m_pcCheckIsNewDoc = new wxCheckBox(p_pcDlg, SP_ID_IS_NEW_DOC, "New model");
+	m_pcCheckIsNewDoc->SetValue(true);
+
+	m_pcCheckSelectiveChoices->Bind(wxEVT_CHECKBOX, &SP_ImportANDL::OnSelectiveChoice, this, SP_ID_CHECK_SELECTIVE);
+	m_pcCheckIsNewDoc->Bind(wxEVT_CHECKBOX, &SP_ImportANDL::OnIsNewDoc, this, SP_ID_IS_NEW_DOC);
+
+	p_pcDlg->SetNotebookSize(400, 200);
+	p_pcDlg->AddCheckBox(m_pcCheckSelectiveChoices);
+	p_pcDlg->AddCheckBox(m_pcCheckIsNewDoc);
+
+
+	this->p_pcDoc = net;
+	this->p_pcDlg = p_pcDlg;
+
+
+
+	 m_Options_constants.clear();
+	 m_Options_constants_order.Clear();
+	 m_Options_funs.clear();
+	 m_Options_funs_order.clear();
+ 	 l_finalconstants.clear();
+	 l_finalFunSel.clear();
+	 m_Options_observers.clear();
+	 m_Options_observers_order.clear();
+	 l_finalobservers.clear();
+
+	 AddConstants();
+	AddFunctions();
+	AddObservers();
+
+
+	return true;
+
+}
+
+void SP_ImportANDL::OnSelectiveChoice(wxCommandEvent& p_cEvent)
+{
+	if (m_pcCheckSelectiveChoices->IsChecked())
+	{
+		m_pcCheckAll->Enable(true);
+		m_pcRearrangelist_function->Enable(true);
+		m_pcRearrangelist_constants->Enable(true);
+		m_pcRearrangelist_observers->Enable(true);
+	}
+	else
+	{
+		m_pcCheckAll->Enable(false);
+		m_pcRearrangelist_function->Enable(false);
+		m_pcRearrangelist_constants->Enable(false);
+		m_pcRearrangelist_observers->Enable(false);
+
+	}
+}
+
+void SP_ImportANDL::OnIsNewDoc(wxCommandEvent& p_cEvent)
+{
+	if (m_pcCheckIsNewDoc->IsChecked())
+	{
+		m_bIsNewDoc = true;
+
+	}
+	else
+	{
+		m_bIsNewDoc = false;
+	}
+}
+
+void SP_ImportANDL::OnSelChange_Observers(wxCommandEvent& p_cEvent)
+{
+	bool b = m_pcRearrangelist_observers->IsChecked(p_cEvent.GetInt());
+	wxString l_sCheckedObserverName = m_Options_observers[p_cEvent.GetInt()];
+	m_pcCheckAll->SetValue(false);
+	if (!b)
+	{//user uncheck the option
+		bool l_bOverwrite = 0;
+
+		for (auto itMap = m_mType2Ob.begin(); itMap != m_mType2Ob.end(); ++itMap)
+		{
+			if (!l_bOverwrite)
+				m_pcTextobservers->SetValue(itMap->first + _T(":\n"));
+			else
+				m_pcTextobservers->AppendText(itMap->first + _T(":\n"));
+
+			for (auto itMapOb = itMap->second.begin(); itMapOb != itMap->second.end(); ++itMapOb)
+			{
+
+				for (auto& observ : *p_pcDoc->observers_)
+				{
+					wxString name_(observ->name_.c_str(), wxConvUTF8);
+
+					if (name_ == itMapOb->first)
+					{
+
+						int ind = m_Options_observers.Index(name_);
+						if (!m_pcRearrangelist_observers->IsChecked(ind)) { continue; }
+
+						wxString l_sObs;
+						wxString l_sBody = observ->function_;
+						l_sObs << name_ << wxT(" = ") << l_sBody << wxT(";\n");
+						m_pcTextobservers->AppendText(l_sObs);
+
+					}
+				}
+			}
+
+			m_pcTextobservers->AppendText(wxT("\n"));
+
+		}
+
+	}
+	else
+	{
+		bool l_bOverwrite = 0;
+		for (auto itMap = m_mType2Ob.begin(); itMap != m_mType2Ob.end(); ++itMap)
+		{
+			if (!l_bOverwrite)
+				m_pcTextobservers->SetValue(itMap->first + _T(":\n"));
+			else
+				m_pcTextobservers->AppendText(itMap->first + _T(":\n"));
+
+
+
+			for (auto itMapOb = itMap->second.begin(); itMapOb != itMap->second.end(); ++itMapOb)
+			{
+				for (auto& observ : *p_pcDoc->observers_)
+				{
+					wxString name_(observ->name_.c_str(), wxConvUTF8);
+					l_bOverwrite = true;
+					if (name_ == itMapOb->first)
+					{
+						int ind = m_Options_observers.Index(name_);
+						if (m_pcRearrangelist_observers->IsChecked(ind))
+
+						{
+							wxString l_sObs;
+							wxString l_sBody = observ->function_;
+							l_sObs << name_ << wxT(" = ") << l_sBody << wxT(";\n");
+							m_pcTextobservers->AppendText(l_sObs);
+						}
+					}
+				}
+			}
+
+			m_pcTextobservers->AppendText(wxT("\n"));
+
+		}
+
+
+	}
+
+	if (b)
+	{
+		set<wxString> l_setDec;
+		m_CheckDec.ComputeBackwardDependency(l_sCheckedObserverName, NODE_TYPE::OBSERVER, l_setDec);
+		for (auto itSet = l_setDec.begin(); itSet != l_setDec.end(); ++itSet)
+		{
+			if (m_Options_constants.Index(*itSet) != wxNOT_FOUND)
+			{
+				int index = m_Options_constants.Index(*itSet);
+				m_pcRearrangelist_constants->Check(index, true);
+
+			}
+			else if (m_Options_funs.Index(*itSet) != wxNOT_FOUND)
+			{
+				int index = m_Options_funs.Index(*itSet);
+				m_pcRearrangelist_function->Check(index, true);
+			}
+
+		}
+
+	}
+}
+void SP_ImportANDL::OnSelChange_Constants(wxCommandEvent& p_cEvent)
+{
+	bool b = m_pcRearrangelist_constants->IsChecked(p_cEvent.GetInt());
+
+	m_pcCheckAll->SetValue(false);
+	if (!b)
+	{
+		bool l_bOverwrite = 0;
+		wxString l_sCheckedconstName = m_Options_constants[p_cEvent.GetInt()];
+		for (auto itMap = m_mGroup2Const.begin(); itMap != m_mGroup2Const.end(); ++itMap)
+		{
+			if(!l_bOverwrite)
+			m_pcTextconstants->SetValue(itMap->first + _T(":\n"));
+			else
+			m_pcTextconstants->AppendText(itMap->first + _T(":\n"));
+			for (unsigned i = 0; i < itMap->second.size(); i++)
+			{
+				l_bOverwrite = true;
+				for (auto& constant : *p_pcDoc->constants_)
+				{
+					wxString name_(constant->name_.c_str(), wxConvUTF8);
+
+					if (name_ == itMap->second[i])
+					{
+						int ind = m_Options_constants.Index(name_);
+						if (!m_pcRearrangelist_constants->IsChecked(ind)) { continue; }
+						if (name_ == l_sCheckedconstName) continue;
+
+						wxString l_sConstDef;
+						wxString l_sType;
+						wxString l_sValues;
+						if (constant->type_ == dssd::andl::ConstType::DOUBLE_T)
+						{
+							l_sType = wxT("double");
+						}
+						if (constant->type_ == dssd::andl::ConstType::INT_T)
+						{
+							l_sType = wxT("int");
+						}
+						l_sValues << wxT("[");
+						for (unsigned i = 0; i < constant->values_.size(); i++)
+						{
+							wxString val_(constant->values_[i].c_str(), wxConvUTF8);
+							l_sValues << val_ << wxT(";");
+						}
+						l_sValues << wxT("]");
+
+						if (constant->values_.size() == 1)
+						{
+							l_sValues.Replace(wxT("["), "");
+							l_sValues.Replace(wxT("]"), "");
+							l_sValues.Replace(wxT(";"), "");
+						}
+						l_sConstDef << l_sType << wxT(" ") << name_ << wxT(" =") << l_sValues << wxT(";\n");
+						m_pcTextconstants->AppendText(l_sConstDef);
+					}
+				}
+			}
+
+			m_pcTextconstants->AppendText(wxT("\n"));
+
+		}
+
+	}
+	else
+	{
+		wxString l_sCheckedconstName = m_Options_constants[p_cEvent.GetInt()];
+		for (auto itMap = m_mGroup2Const.begin(); itMap != m_mGroup2Const.end(); ++itMap)
+		{
+			for (unsigned i = 0; i < itMap->second.size(); i++)
+			{
+
+				for (auto& constant : *p_pcDoc->constants_)
+				{
+					wxString name_(constant->name_.c_str(), wxConvUTF8);
+
+					if (name_ == itMap->second[i])
+					{
+						int ind = m_Options_constants.Index(name_);
+						if (m_pcRearrangelist_constants->IsChecked(ind)) //{ continue; }
+
+							if (name_ == l_sCheckedconstName)
+							{
+
+								wxString l_sConstDef;
+								wxString l_sType;
+								wxString l_sValues;
+								if (constant->type_ == dssd::andl::ConstType::DOUBLE_T)
+								{
+									l_sType = wxT("double");
+								}
+								if (constant->type_ == dssd::andl::ConstType::INT_T)
+								{
+									l_sType = wxT("int");
+								}
+								l_sValues << wxT("[");
+								for (unsigned i = 0; i < constant->values_.size(); i++)
+								{
+									wxString val_(constant->values_[i].c_str(), wxConvUTF8);
+									l_sValues << val_ << wxT(";");
+								}
+								l_sValues << wxT("]");
+
+								if (constant->values_.size() == 1)
+								{
+									l_sValues.Replace(wxT("["), "");
+									l_sValues.Replace(wxT("]"), "");
+									l_sValues.Replace(wxT(";"), "");
+								}
+								l_sConstDef << l_sType << wxT(" ") << name_ << wxT(" =") << l_sValues << wxT(";\n");
+								m_pcTextconstants->AppendText(l_sConstDef);
+							}
+					}
+				}
+			}
+
+
+
+		}
+
+
+
+	}
+	////////////////////dependency checking////////////////////
+	wxString l_selectedConstant = m_Options_constants[p_cEvent.GetInt()];
+
+
+	if (!b)
+	{
+		for (int j = 0; j < m_vConstDependenciesVector.size(); j++)
+		{
+			if (m_vConstDependenciesVector[j]->key == l_selectedConstant)
+			{
+				std::map<NODE_TYPE, set<wxString>> l_DepMap;
+
+				LevelOrderTraversal(m_vConstDependenciesVector[j], l_DepMap);
+
+				if (l_DepMap.size() > 0)
+				{
+					for (auto itMap = l_DepMap.begin(); itMap != l_DepMap.end(); ++itMap)
+					{
+
+
+					 if (itMap->first == NODE_TYPE::FUN_COLOOR)
+						{
+							for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+							{
+								int index = m_Options_funs.Index(*itSet);
+								m_pcRearrangelist_function->Check(index, false);
+							}
+						}
+						else if (itMap->first == NODE_TYPE::CONSTANT)
+						{
+							for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+							{
+								int index = m_Options_constants.Index(*itSet);
+								m_pcRearrangelist_constants->Check(index, false);
+								//CheckConstant(*itSet, false);
+							}
+						}
+						else
+						{
+							if (itMap->first == NODE_TYPE::OBSERVER)
+							{
+								for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+								{
+									int index = m_Options_observers.Index(*itSet);
+									m_pcRearrangelist_observers->Check(index, false);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+	}
+	if (b)
+	{
+		set<wxString> l_setDec;
+		//vector<wxString> l_vDec;
+		m_CheckDec.ComputeBackwardDependency(l_selectedConstant, NODE_TYPE::CONSTANT, l_setDec);
+
+		for (auto itSet = l_setDec.begin(); itSet != l_setDec.end(); ++itSet)
+		{
+			if (m_Options_constants.Index(*itSet) != wxNOT_FOUND)
+			{
+				int index = m_Options_constants.Index(*itSet);
+				m_pcRearrangelist_constants->Check(index, true);
+			///	m_mMap2ConstDep[l_selectedConstant].insert(*itSet);
+			}
+			else
+			{
+				if (m_Options_funs.Index(*itSet) != wxNOT_FOUND)
+				{
+					int index = m_Options_funs.Index(*itSet);
+					m_pcRearrangelist_function->Check(index, true);
+				}
+			}
+
+		}
+	}
+		/**
+		for (auto itMap = m_mMap2ConstDep.begin(); itMap != m_mMap2ConstDep.end(); ++itMap)
+		{
+			if (itMap->first == l_selectedConstant)
+			{
+				for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+				{
+					int index = m_Options_constants.Index(*itSet);
+					m_pcRearrangelist_constants->Check(index, true);
+					//	CheckConstant(*itSet, true);
+				}
+			}
+		}
+	}
+	*/
+
+	///do printing on the right hand panel
+	PrintChosenConstants();
+	PrintChosenFunctions();
+	PrintChosenObservers();
+}
+
+void SP_ImportANDL::OnSelChange_funs(wxCommandEvent& p_cEvent)
+{
+	bool b = m_pcRearrangelist_function->IsChecked(p_cEvent.GetInt());
+	m_pcCheckAll->SetValue(false);
+	if (!b)
+	{
+		wxString l_sFunctions;
+		wxString funName = m_Options_funs[p_cEvent.GetInt()];
+		for (auto& fun : *p_pcDoc->functions_)
+		{
+			int ind = m_Options_funs.Index(fun->name_);
+			if (!m_pcRearrangelist_function->IsChecked(ind)) { continue; }
+			if (fun->name_ == funName) { continue; }
+			wxString par=fun->param_;
+
+			l_sFunctions << fun->name_ << wxT("(") << par << wxT(") ") << wxT("= ") << fun->body_ << wxT(";\n");
+
+		}
+
+		m_pcTextfunctions->SetValue(l_sFunctions);
+	}
+	else
+	{
+		wxString l_sfundef;
+		for (int i = 0; i < m_Options_funs.size(); i++)
+		{
+			wxString funName1 = m_Options_funs[i];
+			if (m_pcRearrangelist_function->IsChecked(i))
+			{
+				for (auto& fun : *p_pcDoc->functions_)
+				{
+					if (fun->name_ != funName1) { continue; }
+					wxString par1=fun->param_;
+
+					l_sfundef<< fun->name_ << wxT("(") << par1 << wxT(") ") << wxT("= ") << fun->body_ << wxT(";\n");
+
+				}
+			}
+
+		}
+		m_pcTextfunctions->SetValue(l_sfundef);
+
+	}
+	wxString funName = m_Options_funs[p_cEvent.GetInt()];
+	if (!b)
+	{
+		for (int j = 0; j < m_vFunDependenciesVector.size(); j++)
+		{
+			if (m_vFunDependenciesVector[j]->key == funName)
+			{
+				std::map<NODE_TYPE, set<wxString>> l_DepMap;
+
+				LevelOrderTraversal(m_vFunDependenciesVector[j], l_DepMap);
+
+				if (l_DepMap.size() > 0)
+				{
+					for (auto itMap = l_DepMap.begin(); itMap != l_DepMap.end(); ++itMap)
+					{
+
+
+						if (itMap->first == NODE_TYPE::FUN_COLOOR)
+						{
+							for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+							{
+								int index = m_Options_funs.Index(*itSet);
+								m_pcRearrangelist_function->Check(index, false);
+							}
+						}
+						else if (itMap->first == NODE_TYPE::CONSTANT)
+						{
+							for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+							{
+								int index = m_Options_constants.Index(*itSet);
+								m_pcRearrangelist_constants->Check(index, false);
+								//CheckConstant(*itSet, false);
+							}
+						}
+						else
+						{
+							if (itMap->first == NODE_TYPE::OBSERVER)
+							{
+								for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+								{
+									int index = m_Options_observers.Index(*itSet);
+									m_pcRearrangelist_observers->Check(index, false);
+									//CheckConstant(*itSet, false);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (b)
+	{
+		set<wxString> l_setDec;
+		m_CheckDec.ComputeBackwardDependency(funName, NODE_TYPE::FUN_COLOOR, l_setDec);
+
+		for (auto itSet = l_setDec.begin(); itSet != l_setDec.end(); ++itSet)
+		{
+			if (m_Options_constants.Index(*itSet) != wxNOT_FOUND)
+			{
+				int index = m_Options_constants.Index(*itSet);
+				m_pcRearrangelist_constants->Check(index, true);
+				///	m_mMap2ConstDep[l_selectedConstant].insert(*itSet);
+			}
+			else if (m_Options_funs.Index(*itSet) != wxNOT_FOUND)
+			{
+				int index = m_Options_funs.Index(*itSet);
+				m_pcRearrangelist_function->Check(index, true);
+
+			}
+			else
+			{
+				if (m_Options_observers.Index(*itSet) != wxNOT_FOUND)
+				{
+					int index = m_Options_observers.Index(*itSet);
+					m_pcRearrangelist_observers->Check(index, true);
+
+				}
+			}
+
+		}
+	}
+
+	PrintChosenConstants();
+	PrintChosenFunctions();
+	PrintChosenObservers();
+
+}
+void SP_ImportANDL::AddConstants_Att()
+{
+	wxString l_sConstant;
+
+	int l_nOrder = 0;
+	for (auto& constant : *p_pcDoc->constants_)
+	{
+		wxString group_(constant->group_.c_str(), wxConvUTF8);
+		wxString name_(constant->name_.c_str(), wxConvUTF8);
+
+		m_mGroup2Const[group_].push_back(name_);
+
+		m_Options_constants.Add(name_);
+
+		m_Options_constants_order.Add(l_nOrder);
+		l_nOrder++;
+	}
+
+		for (auto itMap = m_mGroup2Const.begin(); itMap != m_mGroup2Const.end(); ++itMap)
+		{
+			if(m_mGroup2Const.size()==1)//for preventing overwriting the old value
+			m_pcTextconstants->SetValue(itMap->first + _T(":\n"));
+			else
+			m_pcTextconstants->AppendText(itMap->first + _T(":\n"));
+
+			for (unsigned i = 0; i < itMap->second.size(); i++)
+			{
+
+				for (auto& constant : *p_pcDoc->constants_)
+				{
+					wxString name_(constant->name_.c_str(), wxConvUTF8);
+
+					if (name_ == itMap->second[i])
+					{
+						wxString l_sConstDef;
+						wxString l_sType;
+						wxString l_sValues;
+						if (constant->type_ == dssd::andl::ConstType::DOUBLE_T)
+						{
+							l_sType = wxT("double");
+						}
+						if (constant->type_ == dssd::andl::ConstType::INT_T)
+						{
+							l_sType = wxT("int");
+						}
+						l_sValues << wxT("[");
+						for (unsigned i = 0; i < constant->values_.size(); i++)
+						{
+							wxString val_(constant->values_[i].c_str(), wxConvUTF8);
+							l_sValues << val_ << wxT(";");
+						}
+						l_sValues << wxT("]");
+
+						if (constant->values_.size() == 1)
+						{
+							l_sValues.Replace(wxT("["), "");
+							l_sValues.Replace(wxT("]"), "");
+							l_sValues.Replace(wxT(";"), "");
+						}
+						l_sConstDef << l_sType << wxT(" ") << name_ << wxT(" =") << l_sValues << wxT(";\n");
+						m_pcTextconstants->AppendText(l_sConstDef);
+					}
+				}
+			}
+		}
+
+}
+
+
+void SP_ImportANDL::AddObservers_Att()
+{
+	int order = 0;
+	for (auto& obs : *p_pcDoc->observers_)
+	{
+		if (!obs) continue;
+
+		wxString name = obs->name_;
+		wxString type = wxT("Place");
+		if (obs->type_ == dssd::andl::ObserverType::TRANS_T) {
+			type = wxT("Transition");
+		}
+		wxString body = obs->function_;
+		std::pair<wxString,wxString> ob;
+		ob.first = name;
+		ob.second = body;
+		m_mType2Ob[type].insert(ob);
+		m_Options_observers.Add(name);
+		m_Options_observers_order.Add(order);
+		order++;
+		//SP_DS_Metadata* l_Obs = mc->NewElement(1);
+	//	l_Obs->GetAttribute(wxT("Name"))->SetValueString(name);
+		//l_Obs->GetAttribute(wxT("Type"))->SetValueString(type);
+		//l_Obs->GetAttribute(wxT("Body"))->SetValueString(body);
+	}
+
+	for (auto itMap = m_mType2Ob.begin(); itMap != m_mType2Ob.end(); ++itMap)
+	{
+		if (m_mType2Ob.size() == 1)//for preventing overwriting the old value
+			m_pcTextobservers->SetValue(itMap->first + _T(":\n"));
+		else
+			m_pcTextobservers->AppendText(itMap->first + _T(":\n"));
+
+		for (auto itMapOb= itMap->second.begin(); itMapOb!= itMap->second.end();++itMapOb)
+		{
+
+			for (auto& observ : *p_pcDoc->observers_)
+			{
+				wxString name_(observ->name_.c_str(), wxConvUTF8);
+
+				if (name_ == itMapOb->first)
+				{
+					wxString l_sObs;
+					wxString l_sBody = observ->function_;
+					l_sObs << name_ << wxT(" = ") << l_sBody << wxT(";\n");
+					m_pcTextobservers->AppendText(l_sObs);
+				}
+			}
+		}
+	}
+}
+
+
+void  SP_ImportANDL::AddFunctions_Att()
+{
+	wxString l_sFunctions;
+
+	int l_nOrder = 0;
+	for (auto& fun : *p_pcDoc->functions_)
+	{
+		wxString par= fun->param_;
+
+		l_sFunctions  << fun->name_ << wxT("(") << par << wxT(") ") << wxT("= ") << fun->body_ << wxT(";\n");
+
+		m_Options_funs.Add(fun->name_);
+
+		m_Options_funs_order.Add(l_nOrder);
+		l_nOrder++;
+
+	}
+	m_pcTextfunctions->SetValue(l_sFunctions);
+}
+void SP_ImportANDL::ONselectAll(wxCommandEvent& p_cEvent)
+{
+	if (m_pcCheckAll->IsChecked())
+	{
+
+		for (int i = 0; i < m_Options_constants_order.size(); i++)
+		{
+			m_pcRearrangelist_constants->Check(m_Options_constants_order[i], true);
+		}
+
+		for (int i = 0; i < m_Options_funs_order.size(); i++)
+		{
+			m_pcRearrangelist_function->Check(m_Options_funs_order[i], true);
+		}
+		for (int i = 0; i < m_Options_observers_order.size(); i++)
+		{
+			m_pcRearrangelist_observers->Check(m_Options_observers_order[i], true);
+		}
+		PrintChosenConstants();
+
+		PrintChosenFunctions();
+		PrintChosenObservers();
+
+	}
+	else
+	{
+
+		for (int i = 0; i < m_Options_constants_order.size(); i++)
+		{
+			m_pcRearrangelist_constants->Check(m_Options_constants_order[i], false);
+		}
+
+		for (int i = 0; i < m_Options_funs_order.size(); i++)
+		{
+			m_pcRearrangelist_function->Check(m_Options_funs_order[i], false);
+		}
+		for (int i = 0; i < m_Options_observers_order.size(); i++)
+		{
+			m_pcRearrangelist_observers->Check(m_Options_observers_order[i], false);
+		}
+
+		PrintChosenConstants();
+
+		PrintChosenFunctions();
+
+		PrintChosenObservers();
+
+		m_pcTextconstants->SetValue(wxT(""));
+	}
+}
+
+
+void SP_ImportANDL::PrintChosenConstants()
+{
+	/**
+	for (auto itMap = m_mGroup2Const.begin(); itMap != m_mGroup2Const.end(); ++itMap)
+	{
+		m_pcTextconstants->SetValue(itMap->first + _T(":\n"));
+
+		for (unsigned i = 0; i < itMap->second.size(); i++)
+		{
+
+			for (auto& constant : *p_pcDoc->constants_)
+			{
+				wxString name_(constant->name_.c_str(), wxConvUTF8);
+
+				if (name_ == itMap->second[i])
+				{
+					int ind = m_Options_constants.Index(name_);
+					if (!m_pcRearrangelist_constants->IsChecked(ind)) { continue; }
+					//if (name_ == l_sCheckedconstName) continue;
+
+					wxString l_sConstDef;
+					wxString l_sType;
+					wxString l_sValues;
+					if (constant->type_ == dssd::andl::ConstType::DOUBLE_T)
+					{
+						l_sType = wxT("double");
+					}
+					if (constant->type_ == dssd::andl::ConstType::INT_T)
+					{
+						l_sType = wxT("int");
+					}
+					l_sValues << wxT("[");
+					for (unsigned i = 0; i < constant->values_.size(); i++)
+					{
+						wxString val_(constant->values_[i].c_str(), wxConvUTF8);
+						l_sValues << val_ << wxT(";");
+					}
+					l_sValues << wxT("]");
+
+					if (constant->values_.size() == 1)
+					{
+						l_sValues.Replace(wxT("["), "");
+						l_sValues.Replace(wxT("]"), "");
+						l_sValues.Replace(wxT(";"), "");
+					}
+					l_sConstDef << l_sType << wxT(" ") << name_ << wxT(" =") << l_sValues << wxT(";\n");
+					m_pcTextconstants->AppendText(l_sConstDef);
+				}
+			}
+		}
+
+
+
+	}
+
+	*/
+	m_pcTextconstants->Clear();
+	for (auto itMap = m_mGroup2Const.begin(); itMap != m_mGroup2Const.end(); ++itMap)
+	{
+		if (m_mGroup2Const.size() == 1)//for preventing overwriting the old value
+			m_pcTextconstants->SetValue(itMap->first + _T(":\n"));
+		else
+			m_pcTextconstants->AppendText(itMap->first + _T(":\n"));
+
+		for (unsigned i = 0; i < itMap->second.size(); i++)
+		{
+
+			for (auto& constant : *p_pcDoc->constants_)
+			{
+				wxString name_(constant->name_.c_str(), wxConvUTF8);
+
+				int ind = m_Options_constants.Index(name_);
+				if (!m_pcRearrangelist_constants->IsChecked(ind)) { continue; }
+
+				if (name_ == itMap->second[i])
+				{
+					wxString l_sConstDef;
+					wxString l_sType;
+					wxString l_sValues;
+					if (constant->type_ == dssd::andl::ConstType::DOUBLE_T)
+					{
+						l_sType = wxT("double");
+					}
+					if (constant->type_ == dssd::andl::ConstType::INT_T)
+					{
+						l_sType = wxT("int");
+					}
+					l_sValues << wxT("[");
+					for (unsigned i = 0; i < constant->values_.size(); i++)
+					{
+						wxString val_(constant->values_[i].c_str(), wxConvUTF8);
+						l_sValues << val_ << wxT(";");
+					}
+					l_sValues << wxT("]");
+
+					if (constant->values_.size() == 1)
+					{
+						l_sValues.Replace(wxT("["), "");
+						l_sValues.Replace(wxT("]"), "");
+						l_sValues.Replace(wxT(";"), "");
+					}
+					l_sConstDef << l_sType << wxT(" ") << name_ << wxT(" =") << l_sValues << wxT(";\n");
+					m_pcTextconstants->AppendText(l_sConstDef);
+				}
+			}
+		}
+	}
+
+}
+void SP_ImportANDL::LevelOrderTraversal(sp_node * root, std::map<NODE_TYPE, std::set<wxString>>& l_ResultKey)
+{
+
+	if (root == NULL)
+		return;
+
+	// Standard level order traversal code
+	// using queue
+	queue<sp_node *> q;  // Create a queue
+	q.push(root); // Enqueue root
+	while (!q.empty())
+	{
+		int n = q.size();
+
+		// If this node has children
+		while (n > 0)
+		{
+			// Dequeue an item from queue and print it
+			sp_node * p = q.front();
+			q.pop();
+			l_ResultKey[p->type].insert(p->key);
+			// Enqueue all children of the dequeued item
+			if (p)//added later
+				for (int i = 0; i<p->child.size(); i++)
+					q.push(p->child[i]);
+			n--;
+		}
+	}
+}
+
+void SP_ImportANDL::PrintChosenObservers()
+{
+	m_pcTextobservers->Clear();
+	for (auto itMap = m_mType2Ob.begin(); itMap != m_mType2Ob.end(); ++itMap)
+	{
+		if (m_mType2Ob.size() == 1)//for preventing overwriting the old value
+			m_pcTextobservers->SetValue(itMap->first + _T(":\n"));
+		else
+			m_pcTextobservers->AppendText(itMap->first + _T(":\n"));
+
+		for (auto itMapOb = itMap->second.begin(); itMapOb != itMap->second.end(); ++itMapOb)
+		{
+
+			for (auto& observ : *p_pcDoc->observers_)
+			{
+				wxString name_(observ->name_.c_str(), wxConvUTF8);
+
+				int ind = m_Options_observers.Index(name_);
+				if (!m_pcRearrangelist_observers->IsChecked(ind)) { continue; }
+
+				if (name_ == itMapOb->first)
+				{
+					wxString l_sObs;
+					wxString l_sBody = observ->function_;
+					l_sObs << name_ << wxT(" = ") << l_sBody << wxT(";\n");
+					m_pcTextobservers->AppendText(l_sObs);
+				}
+			}
+		}
+	}
+}
+
+
+void SP_ImportANDL::PrintChosenFunctions()
+{
+	wxString l_sFunctions;
+
+	//int l_nOrder = 0;
+	for (auto& fun : *p_pcDoc->functions_)
+	{
+		wxString val_(fun->name_.c_str(), wxConvUTF8);
+		int ind = m_Options_funs.Index(val_);
+		if (!m_pcRearrangelist_function->IsChecked(ind)) { continue; }
+
+		wxString par = fun->param_;
+
+		l_sFunctions<< fun->name_ << wxT("(") << par << wxT(") ") << wxT("= ") << fun->body_ << wxT(";\n");
+
+
+	}
+	m_pcTextfunctions->SetValue(l_sFunctions);
+}

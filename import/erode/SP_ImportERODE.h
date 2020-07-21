@@ -15,7 +15,7 @@ class SP_ImportERODE : public SP_ImportRoutine {
 		SP_ImportERODE() = default;
 		virtual ~SP_ImportERODE() = default;
 
-		virtual bool ReadFile(const wxString& fileName);
+		virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
 
 		inline virtual wxString GetName()
 			{ return wxT("Import ERODE");}

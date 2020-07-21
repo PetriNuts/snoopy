@@ -86,7 +86,7 @@ class SP_ImportPED: public SP_ImportRoutine,
 	SP_ImportPED();
 	virtual ~SP_ImportPED();
 
-	virtual bool ReadFile(const wxString& fileName);
+	virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
 
 	inline virtual wxString GetName()
 		{ return wxT("Import PED");}

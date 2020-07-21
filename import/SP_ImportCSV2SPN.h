@@ -40,7 +40,7 @@ public:
 	SP_ImportCSV2SPN();
 	virtual ~SP_ImportCSV2SPN();
 
-	virtual bool ReadFile(const wxString& fileName);
+	virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
 
 	inline virtual wxString GetName()
 		{ return wxT("Import CSV to stochastic Petri Net");}

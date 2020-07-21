@@ -42,7 +42,7 @@ SP_ImportPED::~SP_ImportPED()
 
 }
 
-bool SP_ImportPED::ReadFile(const wxString& p_sFile)
+bool SP_ImportPED::ReadFile(const wxString& p_sFile,SP_ImportRoutine* p_sIR)
 {
 	g_bError = FALSE;
 	g_sMessage = wxT("");

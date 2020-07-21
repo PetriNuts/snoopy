@@ -21,7 +21,7 @@ class SP_ImportPNML: public SP_ImportANDL
 	SP_ImportPNML();
 	virtual ~SP_ImportPNML();
 
-	virtual bool ReadFile(const wxString& fileName);
+	virtual bool ReadFile(const wxString& ,SP_ImportRoutine* p_sIR=NULL);
 
 	inline virtual wxString GetName()
 		{ return wxT("Import P/T Net PNML");}

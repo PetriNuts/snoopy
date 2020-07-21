@@ -127,11 +127,23 @@ SP_ImportManager::DoImport()
 							fileName.c_str()),
 						wxT("Finished import in"));
 
-		res &= impR->ReadFile(fileName);
+		//res &= impR->ReadFile(fileName);
+		//by  george
+		SP_ImportRoutine* imprRoutine=GetImportRoutine(choices[sel[n]]);
+        res &=impR->ReadFile(fileName,imprRoutine);
 
 		if(res)
 		{
 			SP_MDI_Doc* l_pcDoc = SP_Core::Instance()->GetRootDocument();
+
+			if(!l_pcDoc->GetFilename().IsEmpty())//by george, to avoid overwriting the name of orginal file in case of import to an existing file
+			{
+				l_pcDoc->Modify(true);
+				SP_DS_Transformer transform;
+				transform.Check(l_pcDoc->GetGraph());
+				wxDELETEA(choices);
+				return res;
+			}
 			l_pcDoc->SetFilename(fileName + wxT(".") + l_pcDoc->GetGraph()->GetNetclass()->GetExtension(), true);
 			l_pcDoc->Modify(true);
 			SP_DS_Transformer transform;

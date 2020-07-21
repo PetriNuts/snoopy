@@ -27,7 +27,7 @@ SP_ImportSBML2sPn::~SP_ImportSBML2sPn()
 
 }
 
-bool SP_ImportSBML2sPn::ReadFile(const wxString& p_sFile)
+bool SP_ImportSBML2sPn::ReadFile(const wxString& p_sFile,SP_ImportRoutine* p_sIR)
 {
 	m_Species.clear();
 	m_Reactions.clear();

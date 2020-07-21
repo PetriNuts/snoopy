@@ -78,7 +78,7 @@ class SP_ImportFTree_DNF: public SP_ImportRoutine,
 	SP_ImportFTree_DNF();
 	virtual ~SP_ImportFTree_DNF();
 
-	virtual bool ReadFile(const wxString& fileName);
+	virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
 		
 	inline virtual wxString GetName()
 		{ return wxT("Import DNF");}

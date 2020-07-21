@@ -44,7 +44,7 @@ public:
 	SP_ImportCSV();
 	virtual ~SP_ImportCSV();
 
-	virtual bool ReadFile(const wxString& fileName);
+	virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
 	virtual bool ReadFile(const wxString& fileName, spsim::Simulator* simulator);
 
 	inline virtual wxString GetName()

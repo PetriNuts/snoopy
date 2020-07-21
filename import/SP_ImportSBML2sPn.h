@@ -70,7 +70,7 @@ public:
 	virtual ~SP_ImportSBML2sPn();
 
 
-	virtual bool ReadFile(const wxString& fileName);
+	virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
 
 	inline virtual wxString GetName()
 		{ return wxT("Import SBML to stochastic Petri Net");}

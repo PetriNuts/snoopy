@@ -29,7 +29,7 @@
 /**
  *
  */
-bool SP_ImportERODE::ReadFile(const wxString& fileName) {
+bool SP_ImportERODE::ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR) {
 
 	sp::import::erode::ErodeParser erodeParser;
 

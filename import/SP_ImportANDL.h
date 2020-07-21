@@ -1,6 +1,8 @@
 //////////////////////////////////////////////////////////////////////
 // $Author: cr $
 // $Version: 0.1 $
+// $modified@2020: by George Assaf.
+// $modification: adding selctive import with dependency checking
 // $Date: 2011/10/27 $
 ////////////////////////////////////////////////////////////////////
 #ifndef __SP_IMPORTANDLH__
@@ -22,7 +24,7 @@
 #include "sp_gui/management/SP_GM_DocTemplate.h"
 
 #include "dssd/misc/net.h"
-
+#include "sp_gui/dialogs/SP_DLG_ImportProperties.h"//by george
 class SP_DS_Graph;
 class SP_DS_Edge;
 class SP_DS_Node;
@@ -69,7 +71,7 @@ protected:
 	wxString netName;
 
 	dssd::andl::NetType m_eNetType;
-
+	SP_DS_Graph_Declarations m_CheckDec;
 	////////////////////////Graph Creation////////////////
 	SP_MDI_View* m_pcView;
 	SP_DS_Graph* m_pcGraph;
@@ -92,14 +94,90 @@ protected:
 	bool CreateTransitions(const dssd::andl::Transitions& p_Transitions);
 	bool CreateArcs();
 	void doLayout();
+private:
+	//check boxes
+	wxCheckBox* m_pcCheckSelectiveChoices;
+	wxCheckBox* m_pcCheckIsNewDoc;
+	bool m_bIsNewDoc;
+	wxCheckBox* m_pcCheckAll;
 
 
+private:
+	void AddConstants();
+	void AddFunctions();
+	void AddObservers();
+
+	wxArrayString l_finalconstants;
+	wxArrayString l_finalFunSel;
+	wxArrayString l_finalobservers;
+	std::map<wxString, std::set<wxString>> m_mDeclaration2Overwritten;
+
+	void OnSelectiveChoice(wxCommandEvent& p_cEvent);
+	void OnIsNewDoc(wxCommandEvent& p_cEvent);
+	void OnSelChange_Constants(wxCommandEvent& p_cEvent);
+	void ONselectAll(wxCommandEvent& p_cEvent);
+	void OnSelChange_funs(wxCommandEvent& p_cEvent);
+	void OnSelChange_Observers(wxCommandEvent& p_cEvent);
+
+	void PrintChosenConstants();
+	void PrintChosenFunctions();
+	void PrintChosenObservers();
+
+	//Append declarations to graph
+	bool  AddToGraph(const dssd::andl::Net& p_Net);
+	bool AppendConstants(const dssd::andl::Constants& p_Constants, const dssd::andl::Valuesets& p_Valuesets);
+	bool AppendFunctions(const dssd::andl::Functions& p_Functions);
+	bool AppendObservers(const dssd::andl::Observers& p_Functions);
+	//traverse declaration dependency tree
+	void LevelOrderTraversal(sp_node * root, std::map<NODE_TYPE, std::set<wxString>>& l_ResultKey);
+	/*************/
+	vector<DependencyTree> m_vConstDependenciesVector;
+	vector<DependencyTree> m_vFunDependenciesVector;
+	vector<DependencyTree> m_vObserversDependenciesVector;
+	/********constants****/
+
+	SP_DLG_ImportProperties* p_pcDlg;//by george
+	dssd::andl::Net_ptr  p_pcDoc;//by george
+	wxSizer* m_pcMainSizer_constants;
+	wxSizer* m_pcLeftSizer_constants;
+	wxSizer*	 m_pcRightSizer_constants;
+	SP_WDG_NotebookPage* m_pcNotebookPageConstants;
+	wxRearrangeList* m_pcRearrangelist_constants;
+	wxTextCtrl * m_pcTextconstants;
+	wxArrayString m_Options_constants;
+	wxArrayInt m_Options_constants_order;
+	std::map<wxString, vector<wxString>> m_mGroup2Const;
+	std::map<wxString, std::set<wxString>> m_mMap2ConstDep;
+	/******functions***/
+
+	wxSizer* m_pcMainSizer_funs;
+	wxSizer* m_pcLeftSizer_funs;
+	wxSizer*	 m_pcRightSizer_funs;
+	SP_WDG_NotebookPage* m_pcNotebookPageFunctions;
+	wxRearrangeList* m_pcRearrangelist_function;
+	wxTextCtrl * m_pcTextfunctions;
+	wxArrayString m_Options_funs;
+	wxArrayInt m_Options_funs_order;
+	/*********Observers page******/
+	wxSizer* m_pcMainSizer_observers;
+	wxSizer* m_pcLeftSizer_observers;
+	wxSizer*	 m_pcRightSizer_observers;
+	SP_WDG_NotebookPage* m_pcNotebookPageObservers;
+	wxRearrangeList* m_pcRearrangelist_observers;
+	wxTextCtrl * m_pcTextobservers;
+	wxArrayString m_Options_observers;
+	wxArrayInt m_Options_observers_order;
+	std::map<wxString, map<wxString,wxString>> m_mType2Ob;
+	private:
+		void AddConstants_Att();
+		void AddFunctions_Att();
+		void AddObservers_Att();
  public:
 	SP_ImportANDL();
 	virtual ~SP_ImportANDL();
 
-	virtual bool ReadFile(const wxString& fileName);
-
+	virtual bool ReadFile(const wxString& fileName, SP_ImportRoutine* p_import = NULL);
+	virtual bool AddToDialog(SP_DLG_ImportProperties* p_pcDlg, dssd::andl::Net_ptr);
 	inline virtual wxString GetName()
 		{ return wxT("Import ANDL");}
 	inline virtual wxString GetDescr()

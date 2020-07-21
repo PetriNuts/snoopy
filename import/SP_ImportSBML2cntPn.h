@@ -65,7 +65,7 @@ public:
 	virtual ~SP_ImportSBML2cntPn();
 
 
-	virtual bool ReadFile(const wxString& fileName);
+	virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
 
 	inline virtual wxString GetName()
 		{ return wxT("Import SBML to continuous Petri Net");}

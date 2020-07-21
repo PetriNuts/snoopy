@@ -46,7 +46,7 @@ SP_ImportFTree_DNF::~SP_ImportFTree_DNF()
 }
 
 bool
-SP_ImportFTree_DNF::ReadFile(const wxString& p_sFile)
+SP_ImportFTree_DNF::ReadFile(const wxString& p_sFile,SP_ImportRoutine* p_sIR)
 {
 	NodeList = new SP_ListString();
 	m_pcScanner = new SP_FTree_TermScanner();

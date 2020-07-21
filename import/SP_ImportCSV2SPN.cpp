@@ -23,7 +23,7 @@ SP_ImportCSV2SPN::~SP_ImportCSV2SPN()
 }
 
 bool
-SP_ImportCSV2SPN::ReadFile(const wxString& fileName)
+SP_ImportCSV2SPN::ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR)
 {
 	m_mImportValues.clear();
 	ResetErrors();
