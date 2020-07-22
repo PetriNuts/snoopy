@@ -25,7 +25,7 @@
 //by george
 #include "sp_gui/dialogs/dia_colFCPN/SP_DLG_ColFCPNSimulationResults.h"
 #include "sp_gui/dialogs/dia_colFSPN/SP_DLG_ColFSPNSimulationResults.h"
-#include "sp_gui/dialogs/dia_ColFHPN/SP_DLG_ColFHPNSimulationResults.h"
+#include "sp_gui/dialogs/dia_colFHPN/SP_DLG_ColFHPNSimulationResults.h"
 IMPLEMENT_CLASS( SP_DLG_ColPlacesSelection, SP_DLG_PlacesSelection )
 
 enum
