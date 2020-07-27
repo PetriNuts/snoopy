@@ -114,9 +114,17 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
 			l_nThick = -1;
 		}
 		else {
-			l_nThick = l_pcGr->GetThickness();
+			if(l_pcGr &&  l_pcGr->GetParent()!=NULL)//comments do not have thickness we must check parent of the graphics
+			{
+			   l_nThick = l_pcGr->GetThickness();
+			}
+			else
+			{
+				l_nThick=1;
+			}
 		}
 	
+
 
 	//by george
 	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -178,7 +186,10 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
         if (m_bMultiple) {
             l_intT = -1;
         } else {
+        	if(l_pcGr)
+        	{
             l_intT = l_pcGraphic->GetThickness();
+        }
         }
         l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
         l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("Line Thickness:")), 0, wxALL , 5);
