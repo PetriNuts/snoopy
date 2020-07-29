@@ -1270,21 +1270,23 @@ void SP_DS_ColStAnimation::LoadSets()
 			l_pcNode = m_pcGraph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->front();
 			m_apcColListAttr[4] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("PeriodicList")));
 		}
+		/*
 		if (m_pcGraph->GetNodeclass(wxT("Parameter"))->GetElements()->size() > 0)
 		{
 			l_pcNode = m_pcGraph->GetNodeclass(wxT("Parameter"))->GetElements()->front();
 			m_apcColListAttr[5] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("ParameterList")));
 		}
+		*/
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////////
-	for (unsigned j = 0; j <= 4; j++)
+	for (unsigned j = 0; j <= 3; j++)
 	{
 		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
 		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
 		l_pcCombobox->Clear();
-		if (l_pcAttr)
+		if (l_pcAttr && l_pcCombobox)
 		{
 			if (j == 0)
 			{
@@ -1297,7 +1299,7 @@ void SP_DS_ColStAnimation::LoadSets()
 				}
 			}
 
-			if (j >0 && j<4)
+			if (j >0 && j<3)
 			{
 				for (unsigned int i = 1; i < l_pcAttr->GetColCount(); i++)
 				{
@@ -1308,7 +1310,7 @@ void SP_DS_ColStAnimation::LoadSets()
 			}
 
 			//deal with the case: Scheduled Transition
-			if (j == 4)
+			if (j == 3)
 			{
 				for (unsigned i = 1; i < l_pcAttr->GetColCount(); i++)
 				{
@@ -1333,22 +1335,25 @@ void SP_DS_ColStAnimation::LoadSets()
 	}
 
 
-	for (size_t j = 5; j < m_apcColListAttr.size(); j++)
+	for (size_t j = 4; j < m_apcColListAttr.size(); j++)
 	{
 		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
 		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
 		l_pcCombobox->Clear();
-		if (l_pcAttr)
+		if (l_pcAttr && l_pcCombobox)
 		{
 			for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
 			{
 				wxString l_sSetName = l_pcAttr->GetCell(i, 0);
+				if(l_sSetName.IsEmpty()) continue;
 				l_pcCombobox->Append(l_sSetName);
 			}
 			l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
 		}
 	}
 	/************george *******************/
+
+
 	m_apcColListAttrForConstants.clear();
 	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
 
@@ -1359,33 +1364,41 @@ void SP_DS_ColStAnimation::LoadSets()
 	{
 	wxString l_sChoice = *l_itChoice;
 	SP_ListMetadata::const_iterator l_itElem;
-	for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
-	{
-	SP_DS_Metadata* l_pcConstant = *l_itElem;
-	wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
-	if (l_sChoice == l_sGroup)
-	{
-	m_apcColListAttrForConstants.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
-	break;
-	}
-	}
+	  for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+	  {
+	  SP_DS_Metadata* l_pcConstant = *l_itElem;
+	  wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
+	     if (l_sChoice == l_sGroup)
+	     {
+	    	    SP_DS_ColListAttribute* l_pcCollistVlist=dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+	    	    if(l_pcCollistVlist!=NULL)
+	         {
+	    	    	  m_apcColListAttrForConstants.push_back(l_pcCollistVlist);
+	    	      break;
+	         }
+
+	     }
+	   }
 	}
 
 
 	for (size_t j = 0; j < m_apcColListAttrForConstants.size(); j++)
 	{
-	SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttrForConstants[j];
-	wxChoice* l_pcCombobox = m_apcComboBoxes1[j];
-	l_pcCombobox->Clear();
-	if (l_pcAttr)
-	{
-	for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
-	{
-	wxString l_sSetName = l_pcAttr->GetCell(i, 0);
-	l_pcCombobox->Append(l_sSetName);
-	}
-	l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
-	}
+	   SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttrForConstants[j];
+	   wxChoice* l_pcCombobox = m_apcComboBoxes1[j];
+
+
+	  if (l_pcAttr && l_pcCombobox)
+	   {
+		  l_pcCombobox->Clear();
+
+	       for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
+	       {
+	           wxString l_sSetName = l_pcAttr->GetCell(i, 0);
+	           l_pcCombobox->Append(l_sSetName);
+	       }
+	     l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
+	    }
 	}
 	 
 	/**********************************/
