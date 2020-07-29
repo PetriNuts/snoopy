@@ -102,9 +102,9 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
 	SP_Graphic* l_pcGr;
-	if (l_pctmp->GetElementType() != SP_ELEMENT_EDGE)
+	if (l_pctmp->GetElementType() != SP_ELEMENT_EDGE && l_pctmp->GetElementType() != SP_ELEMENT_METADATA )
 	{
-		if (l_pctmp->GetElementType() == SP_ELEMENT_NODE)//by george
+		if (l_pctmp->GetElementType() == SP_ELEMENT_NODE )//by george
 		{
 			l_pcGr = *m_lGraphics.begin();
 		}
@@ -197,11 +197,12 @@ SP_WDG_DialogGraphic::AddToDialog(SP_ListGraphic* p_plGraphics,
                 wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, INT_MAX, l_intT);
         l_pcSizer->Add(m_scThickness, 0, wxALL, 5);
         l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
+
+    	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
+    	l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL , 5);
+    	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
     }
 
-	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
-	l_pcSizer->Add(new wxStaticLine( l_pcPage, -1, wxDefaultPosition, wxSize(300,3), wxHORIZONTAL),0, wxALL , 5);
-	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
     ConnectEvents();
     p_pcDlg->PushEventHandler(this);
     return TRUE;
@@ -243,6 +244,7 @@ SP_WDG_DialogGraphic::OnDlgOk()
 		{
 			//(*itG)->SetPen(wxThePenList->FindOrCreatePen(m_pcButtonPen->GetColour(), (*itG)->GetPen()->GetWidth(), (*itG)->GetPen()->GetStyle()));
 			//(*itG)->SetPenColour(m_pcButtonPen->GetColour());
+			if((*itG)->GetGraphicType()==SP_GRAPHIC_METADATA) continue;
 			(*itG)->SetThickness(m_scThickness->GetValue());
 		}
 		
