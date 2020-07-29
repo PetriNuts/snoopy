@@ -288,52 +288,87 @@ bool SP_WDG_ColStFunctionList::SaveData()
 {
 	m_pcFunctionGrid->SaveEditControlValue();
 
-	if( m_bMultiple )
-	{
-		for(SP_ListAttribute::const_iterator it = m_tlAttributes.begin(); it != m_tlAttributes.end(); it++)
-			{
-				SP_DS_Attribute* l_pcAttr = *it;
-				SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcAttr);
-				for (int l_nRow = 0; l_nRow < m_pcFunctionGrid->GetNumberRows(); l_nRow++)
+		if( m_bMultiple )
+		{
+
+			for(SP_ListAttribute::const_iterator it = m_tlAttributes.begin(); it != m_tlAttributes.end(); it++)
 				{
-					for(int l_nCol = 0; l_nCol < m_pcFunctionGrid->GetNumberCols(); l_nCol++)
+					SP_DS_Attribute* l_pcAttr = *it;
+					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcAttr);
+
+					//backup old data, this is necessary to sve old data whe wildcard mask is not changed by user
+					//which prevent assigning empty values
+					std::map<wxString, wxString> l_mBackup;
+					for (int i = 0; i < l_pcColList->GetRowCount(); i++)
+					{//by george
+
+						l_mBackup[l_pcColList->GetCell(i, 0)] = l_pcColList->GetCell(i, 1);
+					}
+
+					l_pcColList->Clear();//by george
+					for (int l_nRow = 0; l_nRow < m_pcFunctionGrid->GetNumberRows(); l_nRow++)
 					{
-						wxString l_sValue = m_pcFunctionGrid->GetCellValue(l_nRow, l_nCol);
-						if((m_bMultiple && l_sValue != SP_WILDCARD) )
+						l_pcColList->AppendEmptyRow();//by george
+						for(int l_nCol = 0; l_nCol < m_pcFunctionGrid->GetNumberCols(); l_nCol++)
 						{
-							l_pcColList->SetCell(l_nRow, l_nCol, l_sValue);
+							wxString l_sValue = m_pcFunctionGrid->GetCellValue(l_nRow, l_nCol);
+							if((m_bMultiple && l_sValue != SP_WILDCARD) )
+							{
+								l_pcColList->SetCell(l_nRow, l_nCol, l_sValue);
+							}
+							else
+							{//by george
+								int l_nCount = 0;
+								for (auto itMap = l_mBackup.begin(); itMap != l_mBackup.end(); ++itMap)
+								{
+									if (l_nCount == l_nRow && l_nCol==0)
+									{
+										l_pcColList->SetCell(l_nRow, l_nCol, itMap->first);
+										break;
+									}
+									else if (l_nCount == l_nRow && l_nCol == 1)
+									{
+										l_pcColList->SetCell(l_nRow, l_nCol, itMap->second);
+										break;
+									}
+									else
+									{
+										//do nothing
+									}
+									l_nCount++;
+								}
+							}
 						}
 					}
 				}
-			}
-		return true;
-	}
-
-
-	SP_ListAttribute::const_iterator l_Iter = m_tlAttributes.begin();
-	SP_DS_Attribute* l_pcFunctionAttr = *(l_Iter);
-
-	CHECK_BOOL( ! m_tlAttributes.empty(), return FALSE );
-
-	SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcFunctionAttr);
-
-	l_pcColList->Clear();
-
-	for(int i = 0; i < m_pcFunctionGrid->GetNumberCols(); i++)
-	{
-
-		l_pcColList->SetColLabel(i,m_pcFunctionGrid->GetColLabelValue(i));
-
-		for(int j = 0; j < m_pcFunctionGrid->GetNumberRows(); j++)
-		{
-			if(i == 0)
-				l_pcColList->AppendEmptyRow();
-
-			l_pcColList->SetCell(j, i, m_pcFunctionGrid->GetCellValue(j, i));			
+			return true;
 		}
-	}	
 
-	return true;
+
+		SP_ListAttribute::const_iterator l_Iter = m_tlAttributes.begin();
+		SP_DS_Attribute* l_pcFunctionAttr = *(l_Iter);
+
+		CHECK_BOOL( ! m_tlAttributes.empty(), return FALSE );
+
+		SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcFunctionAttr);
+
+		l_pcColList->Clear();
+
+		for(int i = 0; i < m_pcFunctionGrid->GetNumberCols(); i++)
+		{
+
+			l_pcColList->SetColLabel(i,m_pcFunctionGrid->GetColLabelValue(i));
+
+			for(int j = 0; j < m_pcFunctionGrid->GetNumberRows(); j++)
+			{
+				if(i == 0)
+					l_pcColList->AppendEmptyRow();
+
+				l_pcColList->SetCell(j, i, m_pcFunctionGrid->GetCellValue(j, i));
+			}
+		}
+
+		return true;
 }
 
 void SP_WDG_ColStFunctionList::OnCheck(wxCommandEvent& p_cEvent)
