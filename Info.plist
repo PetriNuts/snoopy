@@ -54,11 +54,14 @@
 				<string>colspn</string>
 				<string>colhpn</string>
 				<string>fspn</string>
-                <string>fcpn</string>
-                <string>fhpn</string>
-                <string>colfcpn</string>
-                <string>colfspn</string>
-                <string>colfhpn</string>
+                                <string>fcpn</string>
+                                <string>fhpn</string>
+                                <string>colfcpn</string>
+                                <string>colfspn</string>
+                                <string>colfhpn</string>
+                                <string>tpn</string>
+                                <string>mpn</string>
+
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>snoopy.icns</string>
