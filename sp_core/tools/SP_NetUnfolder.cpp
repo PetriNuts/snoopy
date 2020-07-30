@@ -27,7 +27,7 @@ SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph, bool evalToken
 	m_pcGraph = p_pcGraph;
 
 	SP_ColoredNetBuilder builder;
-	if(builder(m_pcGraph))
+	if(builder(m_pcGraph,true))
 	{
 		m_ColoredNet = builder.GetNet();
 		//dssd::candl::writer w(m_ColoredNet);

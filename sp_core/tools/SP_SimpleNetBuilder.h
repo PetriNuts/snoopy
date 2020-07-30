@@ -25,7 +25,7 @@ class SP_AbstractNetBuilder
 public:
 	virtual ~SP_AbstractNetBuilder() = default;
 
-	virtual bool operator()(SP_DS_Graph* p_pcGraph) = 0;
+	virtual bool operator()(SP_DS_Graph* p_pcGraph,bool p_bUpdateConstants=false) = 0;//the second argument added by george
 
 	dssd::andl::Net_ptr GetNet() { return m_Net; }
 	SP_DS_Graph* GetGraph() { return m_pcGraph; }
@@ -41,7 +41,7 @@ class SP_SimpleNetBuilder final : public SP_AbstractNetBuilder
 public:
 	virtual ~SP_SimpleNetBuilder() = default;
 
-	bool operator()(SP_DS_Graph* p_pcGraph);
+	bool operator()(SP_DS_Graph* p_pcGraph,bool p_bUpdateConstants=false);
 
 private:
 	bool CreatePlaces(dssd::andl::simple_net_builder& b);
@@ -58,7 +58,7 @@ public:
 	SP_ColoredNetBuilder(bool p_bIsExport = false) { m_bIsExport = p_bIsExport; }
 	virtual ~SP_ColoredNetBuilder() = default;
 
-	bool operator()(SP_DS_Graph* p_pcGraph);
+	bool operator()(SP_DS_Graph* p_pcGraph,bool p_bUpdateConstants=false);
 
 private:
 	  bool CreateVariables(dssd::andl::simple_net_builder& b);
@@ -66,7 +66,7 @@ private:
 	  bool CreateColorFunctions(dssd::andl::simple_net_builder& b);
 	  bool CreatePlaces(dssd::andl::simple_net_builder& b);
 	  bool CreateTransitions(dssd::andl::simple_net_builder& b);
-	  bool CreateConstants(dssd::andl::simple_net_builder& b);
+	  bool CreateConstants(dssd::andl::simple_net_builder& b,bool p_bUpdateConst=false);
 	  bool CreateFunctions(dssd::andl::simple_net_builder& b);
 	  bool CreateObservers(dssd::andl::simple_net_builder& b);
 	  void PrePareMarkingString(wxString& p_sMarkingExpression,wxString& p_sOutput);

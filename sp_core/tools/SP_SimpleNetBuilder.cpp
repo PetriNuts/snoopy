@@ -33,7 +33,7 @@
 #include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_CPN_SyntaxChecking.h"
 //////////////////////////////////////////////////////////////////////
 #include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_CPN_ColorProcessing.h"//george
-bool SP_SimpleNetBuilder::operator ()(SP_DS_Graph* p_pcGraph)
+bool SP_SimpleNetBuilder::operator ()(SP_DS_Graph* p_pcGraph,bool p_bUpdateConst)
 {
 	if(!p_pcGraph) return false;
 
@@ -393,7 +393,7 @@ bool SP_SimpleNetBuilder::CreateObservers(dssd::andl::simple_net_builder& b)
 
 //////////////////////////////////////////////////////////////////////
 
-bool SP_ColoredNetBuilder::operator ()(SP_DS_Graph* p_pcGraph )
+bool SP_ColoredNetBuilder::operator ()(SP_DS_Graph* p_pcGraph, bool p_bUpdateConstants )
 {
 	if(!p_pcGraph) return false;
 
@@ -452,7 +452,7 @@ bool SP_ColoredNetBuilder::operator ()(SP_DS_Graph* p_pcGraph )
 		b.setName(SP_NormalizeString(netName, false).ToStdString());
 
 		//l_bFinish &= CreateFunctions(b);
-		l_bFinish &= CreateConstants(b);
+		l_bFinish &= CreateConstants(b,p_bUpdateConstants);
 		l_bFinish &= CreateColorsets(b);
 		l_bFinish &= CreateVariables(b);
 		l_bFinish &= CreateColorFunctions(b);
@@ -962,10 +962,15 @@ bool SP_ColoredNetBuilder::CreateTransitions(dssd::andl::simple_net_builder& b)
 	return TRUE;
 }
 
-bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b)
+bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,bool p_bUpdateConstants)
 {
 	if(!m_pcGraph)
 		return false;
+
+	if(p_bUpdateConstants)
+	{
+		m_bIsExport=true;
+	}
   
 	bool l_bForUpdateMarking = m_bIsExport;
 	/*************** by george*************/
