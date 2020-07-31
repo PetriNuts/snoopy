@@ -18,7 +18,8 @@
 
 #include "sp_core/SP_Core.h"
 #include "snoopy.h"
-
+#include "sp_gui/mdi/SP_MDI_Doc.h"
+#include "sp_gui/mdi/SP_MDI_View.h"
 SP_GR_Node::SP_GR_Node(SP_DS_Node* p_pcDataParent)
     :SP_Graphic(SP_GRAPHIC_NODE),
     m_bFixedSize(FALSE)
@@ -176,6 +177,24 @@ SP_GR_Node::EditProperties()
 		// the dialog manages the events (OK, CANCEL) by itself
 		l_cDialog.ShowModal();
 
+		if(!SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName().Contains(_T("Hybrid")))//when there is no node type converion
+		{
+			if (GetPrimitive())
+			 {
+				dynamic_cast<SP_GUI_Canvas*>(GetPrimitive()->GetCanvas())->Modify(TRUE);
+			 }
+
+			l_cDialog.Destroy();
+
+			SP_Core::Instance()->ClearDialogGraphicList();//by george
+
+			if(GetParent())
+			 {
+				return GetParent()->Update(true);
+			 }
+
+			return Update(true);
+		}
 
 		l_bIsDeleted = GetDelete();
 		if (!l_bIsDeleted)

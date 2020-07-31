@@ -104,22 +104,12 @@ SP_GRM_EventHandler::OnLeftDoubleClick(double p_nX, double p_nY, int p_nKeys, in
         return;
 
     l_pcGraphic->OnDoubleClick(p_nKeys);
-	/**  
-	SP_DS_Node* node = dynamic_cast<SP_DS_Node*>(l_pcGraphic->GetParent());
-	SP_DS_Nodeclass* l_pcOldNetClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(_T("Place"));
-	 
 	
-	bool bb;
-		wxShape* lll = GetShape();
-		  bb = lll->Selected();
-		  if(bb)
-	lll->RemoveFromCanvas(l_pcCanvas);
-	l_pcOldNetClass->RemoveElement(node);
-
-	wxDELETE(node);
-	l_pcCanvas->GetView()->Refresh();
-
- */
+    if(!SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName().Contains(_T("Hybrid")))//by george
+    	{
+    	   l_pcCanvas->Refresh();
+    	   SP_Core::Instance()->ClearDialogGraphicList();
+    	}
 }
 
 void

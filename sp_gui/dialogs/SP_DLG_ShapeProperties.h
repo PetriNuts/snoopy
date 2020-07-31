@@ -46,7 +46,7 @@ private:
 	map<SP_DS_Node*, SP_Graphic*> m_mNode2Graphic;//by george
 	map<SP_DS_Node*, wxString> m_mNode2Type;//by george
 	map<SP_DS_Node*, SP_ListGraphic*> m_mConvertedNode2Graphic;//by george
-	SP_MapString2ListAttribute* m_ptmAttributes;
+
 	SP_Graphic* m_pcGraphic;//george
 	bool m_bIsConverted;
     DECLARE_CLASS(SP_DLG_ShapeProperties)

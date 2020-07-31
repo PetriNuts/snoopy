@@ -203,6 +203,7 @@ SP_DLG_ShapeProperties::AddDialogGraphic(SP_Graphic* p_pcVal)
 {
     if (!p_pcVal)
         return FALSE;
+    m_mNode2Graphic.clear();
 	/////////////george////////////////
 	if (p_pcVal->GetGraphicType() == SP_GRAPHIC_NODE)
 	{
@@ -248,7 +249,7 @@ SP_DLG_ShapeProperties::ShowDialogAttributes(SP_MapString2ListAttribute* p_ptmAt
     SP_Core* l_pcCore = SP_Core::Instance();
     SP_WDG_DialogBase* l_pcWidget;
     SP_MapString2ListAttribute::iterator l_IterMap;
-	m_ptmAttributes = p_ptmAttributes;
+
     for (l_IterMap = p_ptmAttributes->begin(); l_IterMap != p_ptmAttributes->end(); ++l_IterMap)
     {
         l_pcWidget = l_pcCore->GetDialogWidget(l_IterMap->first);
@@ -328,9 +329,9 @@ SP_DLG_ShapeProperties::DoDlgApply()
 	std::map<wxString, wxString> l_mNodeName2SelectedType;
 
 	wxString l_sSelection;
-	//l_sSelection = GetCurentSelection();
+
 	SP_WDG_DialogChoice * l_pcWDG_DialogText;
-	//list<SP_WDG_DialogBase*>* l_ptlWidgets = m_tlWidgets;// m_pcDlg->GettlWidgets();
+
 	list<SP_WDG_DialogBase*>::iterator itList;
  
 	map<wxString, vector<wxString>> l_mPage2SelctedTypes;
@@ -704,16 +705,10 @@ SP_DLG_ShapeProperties::RebuildDialog()
 		SP_ListGraphic* l_lGraphics;
 		auto l_It = m_mlGraphics.begin();
 		int i = 0;
-		for (; l_It != m_mlGraphics.end(); ++l_It)
-		{
-			 
-			//	m_mlGraphics.erase(l_It);
-			//	break;
-			//	if(l_It->first)
+		///for (; l_It != m_mlGraphics.end(); ++l_It)
+		//{
 
-			 
-			 
-		}
+		//}
 
 		l_It = m_mlGraphics.begin();
 		 
