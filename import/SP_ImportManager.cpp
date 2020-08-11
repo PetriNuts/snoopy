@@ -138,6 +138,7 @@ SP_ImportManager::DoImport()
 
 			if(!l_pcDoc->GetFilename().IsEmpty())//by george, to avoid overwriting the name of orginal file in case of import to an existing file
 			{
+				l_pcDoc->SetFilename(fileName + wxT(".") + l_pcDoc->GetGraph()->GetNetclass()->GetExtension(), true);
 				l_pcDoc->Modify(true);
 				SP_DS_Transformer transform;
 				transform.Check(l_pcDoc->GetGraph());
