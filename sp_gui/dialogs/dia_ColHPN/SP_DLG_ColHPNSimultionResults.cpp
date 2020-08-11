@@ -851,6 +851,7 @@ void SP_DLG_ColHPNSimultionResults::LoadSets()
 			m_pcMarkingSetComboBox->SetSelection(l_pcColListAttr->GetActiveColumn());			
     }
 
+    /*
 	//load parameter set
 	l_pcNodesList=(SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_PARAM)->GetElements());
     if(!l_pcNodesList->empty())
@@ -865,6 +866,7 @@ void SP_DLG_ColHPNSimultionResults::LoadSets()
 		 //Select the first Parameter
 		// m_pcParameterSetComboBox->SetSelection(l_pcColListAttr->GetActiveList());//commented by george
     }
+    */
 
 	//load continusou function set
 	l_pcNodesList=(SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements());
