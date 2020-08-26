@@ -1324,6 +1324,17 @@ void SP_DLG_ColStSimulationResults::LoadTransitions()
 	SP_VectorString* l_pcTransitionFunction = m_pcUnfoldedNet->GetCurRateFunction();
 	SP_VectorString* l_pcTransitionType = m_pcUnfoldedNet->GetTransNodeType();
 
+	if (l_pcTransitionFunction)//bugfix:by george
+	{
+		for (auto itVectorFun = l_pcTransitionFunction->begin(); itVectorFun != l_pcTransitionFunction->end(); ++itVectorFun)
+		{
+			if ((itVectorFun)->IsEmpty())
+			{
+				*itVectorFun = wxT("0");
+			}
+		}
+	}
+
 	for (unsigned long l_nTransPos = 0; l_nTransPos < l_pcTransitionName->size(); l_nTransPos++)
 	{
 
