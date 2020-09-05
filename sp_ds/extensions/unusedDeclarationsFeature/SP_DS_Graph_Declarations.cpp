@@ -1,3 +1,9 @@
+//////////////////////////////////////////////////////////////////////
+// $Author: george assaf $
+// $Version: 0.1 $
+// $Date: 2020/06/14 $
+//description: compuation of graph/ANDL/CANDL declarations dependency, and unused declaration of an input graph
+////////////////////////////////////////////////////////////////////
 #include "sp_ds/extensions/unusedDeclarationsFeature/SP_DS_Graph_Declarations.h"
 SP_DS_Graph_Declarations::SP_DS_Graph_Declarations(SP_DS_Graph* graph,bool p_bisAndl) :m_pcGraph1(graph),m_bIsANDL(p_bisAndl)
 {
@@ -159,6 +165,20 @@ void SP_DS_Graph_Declarations::operator()()
 			m_mConstant2Values[l_sName] = l_vVluesets;
 		}
 
+		//collect observers
+		SP_DS_Metadataclass* l_pcMetadataclassObservers = m_pcGraph1->GetMetadataclass(SP_DS_META_OBSERVER);
+		if (l_pcMetadataclassObservers)
+		  {
+			SP_ListMetadata::const_iterator l_itElem;
+			for (l_itElem = l_pcMetadataclassObservers->GetElements()->begin();
+				l_itElem != l_pcMetadataclassObservers->GetElements()->end(); ++l_itElem)
+				{
+				  SP_DS_Metadata* l_pcMetadata = *l_itElem;
+				  wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+				  wxString l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
+                  m_mObserver2Body[l_sName] = l_sBody;
+				}
+			}
 	}
 	else if(!m_bIsANDL && m_pcGraph1)
 	{//plain PN
@@ -297,6 +317,34 @@ void SP_DS_Graph_Declarations::operator()()
 				wxString body = obs->function_;
 				m_mObserver2Body[name] = body;
 			}
+			//////////////CANDL part if exists/////////////////
+			for (auto& cs : *m_pcANDLFile->colorsets_)
+			{
+				wxString l_sCsName(cs->name_.c_str(), wxConvUTF8);
+				wxString l_sCsdef(cs->definition_.c_str(), wxConvUTF8);
+				m_mColorSet2Definition[l_sCsName] = l_sCsdef;
+			 }
+
+			for (auto& var: *m_pcANDLFile->variables_)
+			{
+				 wxString l_sVarName(var->name_.c_str(), wxConvUTF8);
+				 wxString l_sCs(var->colorset_.c_str(), wxConvUTF8);
+				 m_mVar2ColorSet[l_sVarName] = l_sCs;
+			}
+
+			for (auto& fun : *m_pcANDLFile->color_functions_)
+			{
+				 wxString l_sFunName(fun->name_.c_str(), wxConvUTF8);
+				 FuncStruct fun1;
+				 fun1.body = fun->body_.c_str();
+				 std::set<wxString> l_setParam;
+				 for (auto par : fun->params_)
+				 {
+					l_setParam.insert(par.first);
+				 }
+				  fun1.paramTypes = l_setParam;
+				  m_Function2Definition[l_sFunName] = fun1;
+			}
 		}
 	}
 	BuildDeclarationDependencies();//build dependency trees of the declarations
@@ -370,6 +418,7 @@ void SP_DS_Graph_Declarations::BuildConstantDependencyTree(const wxString& p_sCo
 			if (IsToken(l_sObserverBody, itConstMap->first))
 			{
 				(tree->child).push_back(newNode(itObserverMap->first, NODE_TYPE::OBSERVER));
+				BuildObserverDependencyTree(itObserverMap->first, tree->child[tree->child.size() - 1]);
 				
 			}
 		}
@@ -463,8 +512,6 @@ void SP_DS_Graph_Declarations::BuildVariableDependencyTree(const wxString& p_Var
 			{
 				if (IsToken(itMapcCS->second, itVarMap->first))
 				{
-					//(tree->child).push_back(newNode(itVarMap->first, NODE_TYPE::VAR));
-					//tree->child[tree->child.size() - 1]->child.push_back(newNode(itMapcCS->first, NODE_TYPE::COLOR_SET));
 					tree->child.push_back(newNode(itMapcCS->first, NODE_TYPE::COLOR_SET));
 					BuildColorSetDependencyTree(itMapcCS->first, tree->child[tree->child.size() - 1]);
 				}
@@ -478,7 +525,6 @@ void SP_DS_Graph_Declarations:: BuildFunctionsDependencyTrees()
 	for (auto itFunMap = m_Function2Definition.begin(); itFunMap != m_Function2Definition.end(); ++itFunMap)
 	{
 		sp_node* l_pcfunTreeRoot = newNode(itFunMap->first, NODE_TYPE::FUN_COLOOR);
-		//BuildVariableDependencyTree(itFunMap->first, l_pcfunTreeRoot);
 		BuildFunctionDependencyTree(itFunMap->first, l_pcfunTreeRoot);
 		m_vFunctionsDepTrees.push_back(l_pcfunTreeRoot);
 	}
@@ -490,9 +536,24 @@ void SP_DS_Graph_Declarations::BuildObserverssDependencyTrees()
 	for (auto itMap = m_mObserver2Body.begin(); itMap != m_mObserver2Body.end(); ++itMap)
 	{
 		sp_node* l_pcObserverTree = newNode(itMap->first, NODE_TYPE::OBSERVER);
-		//BuildObserverDependencyTree(itMap->first, l_pcColorSetTree);
-
+		BuildObserverDependencyTree(itMap->first, l_pcObserverTree);
 		m_vObserverDepTrees.push_back(l_pcObserverTree);
+	}
+}
+
+void SP_DS_Graph_Declarations::BuildObserverDependencyTree(const wxString& p_sObservName, sp_node* tree)
+{
+	for (auto itObserverMap = m_mObserver2Body.begin(); itObserverMap != m_mObserver2Body.end(); ++itObserverMap)
+	{
+		if (itObserverMap->first != p_sObservName)
+		{
+			wxString l_sBody = itObserverMap->second;
+			if (IsToken(l_sBody, p_sObservName))
+			{
+				(tree->child).push_back(newNode(itObserverMap->first, NODE_TYPE::OBSERVER));
+				BuildFunctionDependencyTree(itObserverMap->first, tree->child[tree->child.size() - 1]);
+			}
+		}
 	}
 }
 
@@ -620,10 +681,12 @@ void SP_DS_Graph_Declarations::ClearAll()
 	m_mConstant2Values.clear();
 	m_mVar2ColorSet.clear();
 	m_Function2Definition.clear();
+	m_mObserver2Body.clear();
 	m_vColorsetDepTrees.clear();
 	m_vConstantsDepTrees.clear();
 	m_vFunctionsDepTrees.clear();
 	m_vVarsDepTrees.clear();
+	m_vObserverDepTrees.clear();
 
 }
 
@@ -1468,6 +1531,32 @@ void SP_DS_Graph_Declarations::ComputeUsedObservers()
 		{
 			m_vObserverDepTrees[i]->isUsed = true;
 		}
+		else
+		{
+			std::map<NODE_TYPE, set<wxString>> l_mNode2Childers;
+			LevelOrderTraversal(m_vObserverDepTrees[i], l_mNode2Childers);
+			for (auto itMapChildern = l_mNode2Childers.begin(); itMapChildern != l_mNode2Childers.end(); ++itMapChildern)
+			{
+				for (auto iTSet = itMapChildern->second.begin(); iTSet != itMapChildern->second.end(); ++iTSet)
+				{
+					if (itMapChildern->first == NODE_TYPE::OBSERVER)
+					{
+						if (CheckObserverInViewe(*iTSet))
+						{
+							for (unsigned int j = 0; j < m_vObserverDepTrees.size(); j++)
+							{
+								if (m_vObserverDepTrees[j]->key == *iTSet)
+								{
+									m_vObserverDepTrees[j]->isUsed = true;
+									m_vObserverDepTrees[i]->isUsed = true;
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -1786,6 +1875,24 @@ void SP_DS_Graph_Declarations::ComputeBackwardDependency( wxString& p_sdec, NODE
 					if (*itSet == p_sdec)
 					{
 						p_sSet.insert(m_vFunctionsDepTrees[j]->key);
+						break;
+					}
+				}
+			}
+		}
+
+		for (unsigned int i = 0; i < m_vObserverDepTrees.size(); i++)
+		{
+			std::map<NODE_TYPE, std::set<wxString>> l_mNodeType2Children;
+			LevelOrderTraversal(m_vObserverDepTrees[i], l_mNodeType2Children);
+
+			for (auto itMap = l_mNodeType2Children.begin(); itMap != l_mNodeType2Children.end(); ++itMap)
+			{
+				for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+				{
+					if (*itSet == p_sdec)
+					{
+						p_sSet.insert(m_vObserverDepTrees[i]->key);
 						break;
 					}
 				}

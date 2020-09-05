@@ -2,6 +2,7 @@
 // $Author: george assaf $
 // $Version: 0.1 $
 // $Date: 2020/06/14 $
+//description: compuation of graph/ANDL/CANDL declarations dependency, and unused declaration of an input graph
 ////////////////////////////////////////////////////////////////////
 #ifndef __SP_DS_DEPENDENCIY__
 #define __SP_DS_DEPENDENCIY__
@@ -9,22 +10,12 @@
 
 #include <wx/wx.h>
 #include <wx/colordlg.h>
-//#include "sp_core/SP_List.h"
-//#include "sp_core/SP_Map.h"
 #include "sp_ds/SP_DS_Graph.h"
-//#include "sp_core/base/SP_Error.h"
-//#include "sp_gui/mdi/SP_MDI_Doc.h"
- 
 #include "sp_ds/attributes/SP_DS_IdAttribute.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include "sp_ds/attributes/SP_DS_ColListAttribute.h"
 #include <wx/tokenzr.h>
 #include "dssd/misc/net.h"
-//#include "sp_core/base/SP_Graphic.h"
-//#include "sp_core/SP_Core.h"
-//#include "sp_gui/mdi/SP_MDI_Doc.h"
-//#include "sp_gui/management/SP_GM_Docmanager.h"
-//#include "sp_gui/management/SP_GM_DocTemplate.h"
 #include <iostream> 
 #include <queue> 
 
@@ -89,7 +80,7 @@ private:
 	void BuildFunctionDependencyTree(const wxString& p_sFunName, sp_node* tree);
 	void BuildFunctionsDependencyTrees();
 	void BuildObserverssDependencyTrees();
-	//void BuildObserverDependencyTree(const wxString& p_sObservName, sp_node* tree);
+	void BuildObserverDependencyTree(const wxString& p_sObservName, sp_node* tree);
 	void BuildDeclarationDependencies();
 
 	void LevelOrderTraversal(sp_node * root, std::map<NODE_TYPE, std::set<wxString>>& l_ResultKey);
