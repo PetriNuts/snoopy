@@ -1,9 +1,8 @@
 //////////////////////////////////////////////////////////////////////
-// $Author: cr $
+// $Author: george assaf $
 // $Version: 0.1 $
-// $modified@2020: by George Assaf.
-// $modification: adding selctive import with dependency checking
-// $Date: 2011/10/27 $
+// $Date: 2020/10/27 $
+// the basic class written by cr, but totally changed by george
 ////////////////////////////////////////////////////////////////////
 #ifndef __SP_IMPORTANDLH__
 #define __SP_IMPORTANDLH__
@@ -110,8 +109,7 @@ private:
 	wxArrayString l_finalconstants;
 	wxArrayString l_finalFunSel;
 	wxArrayString l_finalobservers;
-	std::map<wxString, std::set<wxString>> m_mDeclaration2Overwritten;
-
+	std::map<wxString, std::set<wxString>> m_mType2Declartions;
 	void OnSelectiveChoice(wxCommandEvent& p_cEvent);
 	void OnIsNewDoc(wxCommandEvent& p_cEvent);
 	void OnSelChange_Constants(wxCommandEvent& p_cEvent);
@@ -128,6 +126,10 @@ private:
 	bool AppendConstants(const dssd::andl::Constants& p_Constants, const dssd::andl::Valuesets& p_Valuesets);
 	bool AppendFunctions(const dssd::andl::Functions& p_Functions);
 	bool AppendObservers(const dssd::andl::Observers& p_Functions);
+	bool Overwritedeclarations(const std::map<wxString, std::set<wxString>>& p_mType2Dec, const dssd::andl::Net& p_Net);
+	bool OverwriteExistConstant(const wxString& p_sConstant, const dssd::andl::Net& p_Net);
+	bool OverwriteExistFunction(const wxString& p_sFunction, const dssd::andl::Net& p_Net);
+	bool OverwriteExistObserver(const wxString& p_sObserver, const dssd::andl::Net& p_Net);
 	//traverse declaration dependency tree
 	void LevelOrderTraversal(sp_node * root, std::map<NODE_TYPE, std::set<wxString>>& l_ResultKey);
 	/*************/
