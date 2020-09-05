@@ -242,6 +242,7 @@ void SP_DLG_ConstantDefinition::OnDlgOk(wxCommandEvent& p_cEvent)
 
 void SP_DLG_ConstantDefinition::OnDlgCancel(wxCommandEvent& p_cEvent)
 {
+	m_deleted.clear();
 	if (IsModal())
 	{
 		EndModal(wxID_CANCEL);
@@ -281,10 +282,22 @@ void SP_DLG_ConstantDefinition::OnDeleteColorSet( wxCommandEvent& p_cEvent )
 		m_pcColorSetGrid->BeginBatch();
         for ( int n = 0; n < m_pcColorSetGrid->GetNumberRows(); )
         {
-            if ( m_pcColorSetGrid->IsInSelection( n , 0 ) )
-            	m_pcColorSetGrid->DeleteRows( n, 1 );
-            else
-                n++;
+          if (m_pcColorSetGrid->IsInSelection(n, 0))
+		  {
+			wxString l_sName = m_pcColorSetGrid->GetCellValue(n, NAME);
+			for (SP_DS_Metadata* l_pcMeta : *(m_pcConstants->GetElements()))
+			{
+				if (l_pcMeta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)->GetValueString()
+					== l_sName)
+				{
+					m_deleted.push_back(l_pcMeta);//keep it temporarly to be deleted when saving
+				}
+			}
+			m_pcColorSetGrid->DeleteRows(n, 1);
+		 }
+
+        else
+            n++;
         }
         m_pcColorSetGrid->EndBatch();
     }
