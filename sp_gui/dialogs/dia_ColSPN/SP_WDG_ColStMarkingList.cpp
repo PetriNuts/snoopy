@@ -710,7 +710,31 @@ void SP_WDG_ColStMarkingList::OnGridCellSelected(wxGridEvent& ev)
 		}
 		else
 		{
-			m_pcMarkingGrid->SetReadOnly(i, 1);
+			SP_DS_Metadataclass* l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_FUNCTIONCLASS);
+			bool l_bIsFunctionCall = false;
+
+			if (l_pcMetadataclass)
+			 {
+					SP_DS_Metadata*  l_pcNewMetadata = l_pcMetadataclass->GetElements()->front();
+					if (l_pcNewMetadata) {
+						SP_DS_ColListAttribute*	l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("FunctionList")));
+
+						for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+							{
+								wxString l_sName = l_pcColList->GetCell(i, 1).c_str();
+								if (l_sMarking.Contains(l_sName))
+								{
+									l_bIsFunctionCall = true;
+									break;
+								}
+							}
+							}
+			 }
+
+		if(l_bIsFunctionCall)//because function call most probably contains boolean guard
+			m_pcMarkingGrid->SetReadOnly(i, 1,false);
+				else
+			 m_pcMarkingGrid->SetReadOnly(i, 1);
 		}
 		
 	}
