@@ -1059,6 +1059,10 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 	//if there is no marking defined
 	if (l_pcColList->GetRowCount() == 0)
 	{
+		wxString l_sError = wxT("there is no initial marking: |") + m_sPlaceName;
+		SP_LOGERROR(l_sError);
+		return false;
+		/*
 		int l_nCount = l_pcColList->GetColCount() / 2;
 		l_ColorVector = l_cColorSet.GetStringValue();
 		SP_CPN_TokenNum l_nNum;
@@ -1070,6 +1074,7 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 			p_mColorToMarkingMap[l_ColorVector[i]] = l_nColTokens;
 		}
 		return true;
+		*/
 	}
 	 
 
