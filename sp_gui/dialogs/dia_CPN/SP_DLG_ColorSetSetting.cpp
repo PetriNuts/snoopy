@@ -1089,7 +1089,15 @@ void SP_DLG_ColorSetSetting::InitializeStructuredChoice()
 	l_nArraysize = 0;
 
 	l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+	////////////////////////////by george///////////////////////////////////////
+		SP_DS_ColListAttribute* l_pcColListBasic;
 
+		l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_BASICCOLORSETCLASS);
+		l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
+		l_pcColListBasic = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ColorsetList")));
+		l_nArraysize = l_nArraysize + l_pcColListBasic->GetRowCount();
+
+	//////////////////////////////////////////////////////////////////
 	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_STRUCTUREDCOLORSETCLASS);
 	l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
 	l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("StructuredColorsetList")));		
@@ -1099,10 +1107,22 @@ void SP_DLG_ColorSetSetting::InitializeStructuredChoice()
 	m_choices.Alloc(l_nArraysize+4);
 	m_choices.Empty();
 
+	m_choices.Add(wxT("----Basic types----"));//by george
 	m_choices.Add(wxT("----Structured types----"));
 	m_choices.Add(wxT("product"));
 	m_choices.Add(wxT("union"));
 	m_choices.Add(wxT("----User-defined colorsets----"));
+
+
+	/////////////////////////////by george////////////////////////
+
+	for (unsigned int i = 0; i < l_pcColListBasic->GetRowCount(); i++)
+	{
+		wxString l_sColorSetName = l_pcColListBasic->GetCell(i, 0).c_str();
+		m_choices.Add(l_pcColListBasic->GetCell(i, 0).c_str());
+	}
+
+		/////////////////////////////////////////////////////////////
 
 	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 	{		
