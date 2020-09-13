@@ -97,6 +97,7 @@ protected:
 	bool CreateGraph(const wxString& p_sFile, const dssd::andl::Net& p_Net);
 	bool CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxString& weight,const wxString& type);
 
+	void ComputeInitMarking();//by george
 
 	SP_DS_Graph* CreateDocument(const wxString& p_sFile, dssd::andl::NetType p_eType);
 	bool CreatePlaces(const dssd::andl::Places& p_Places);

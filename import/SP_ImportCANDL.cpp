@@ -44,6 +44,7 @@
 #include <iostream>
 #include <queue>
 #include "sp_gui/dialogs/SP_DLG_OverwriteDeclarations.h"
+#include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_CPN_SyntaxChecking.h"
 using namespace std;
 enum {
 	SP_ID_DECLARATIONS_UPDATE,
@@ -187,6 +188,8 @@ SP_ImportCANDL::ReadFile(const wxString& p_sFile, SP_ImportRoutine* p_importRT)
 			l_Return = CreateGraph(p_sFile, *l_Net);
 			if (l_Return)
                 doLayout();
+			//compute initial marking
+			ComputeInitMarking();
 		}
 	}
 	catch(const std::exception& e)
@@ -643,6 +646,74 @@ SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dssd::andl::Net& p_Ne
 	m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
 
 	return true;
+}
+
+void SP_ImportCANDL::ComputeInitMarking()
+{
+	SP_DS_Nodeclass *nodeClass = NULL;
+	wxString l_sNodeType;
+	if (m_eNetType == dssd::andl::NetType::COL_CPN_T)
+	{
+		nodeClass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+		l_sNodeType << SP_DS_CONTINUOUS_PLACE;
+	}
+	else
+	{
+		nodeClass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+		l_sNodeType << SP_DS_DISCRETE_PLACE;
+	}
+
+
+	SP_CPN_SyntaxChecking l_cSyntaxChecking;
+	if (!l_cSyntaxChecking.Initialize())
+		return ;
+
+	SP_ListNode::const_iterator  l_itElem;
+	for (l_itElem = nodeClass->GetElements()->begin(); l_itElem != nodeClass->GetElements()->end(); ++l_itElem)
+	{
+		SP_DS_Node* l_pcPlaceNode = (*l_itElem);
+
+		wxString l_sMainMarking = wxT("");
+		map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
+		if (!l_cSyntaxChecking.ComputeInitialMarking(l_pcPlaceNode, l_mColorToMarkingMap, false))
+			 continue;
+		map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
+
+		if (l_sNodeType == SP_DS_CONTINUOUS_PLACE)
+		{
+			double l_dMarking = 0;
+			for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+			{
+				l_dMarking = l_dMarking + itMap->second[0].m_DoubleMultiplicity;
+			}
+			l_sMainMarking << l_dMarking;
+		}
+		else
+		{
+			long l_nMarking = 0;
+			for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+			{
+				l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
+			}
+			l_sMainMarking << l_nMarking;
+		}
+
+		///////////////////////////////////////////////////////////
+
+
+		SP_DS_Attribute* l_pcMarkingAttr = l_pcPlaceNode->GetAttribute(wxT("Marking"));
+		if (l_pcMarkingAttr)
+		{
+			l_pcMarkingAttr->SetValueString(l_sMainMarking);
+		}
+
+	}
+	/////////////////////////////////////////////////////////
+	SP_Core::Instance()->GetRootDocument()->GetGraph()->SqueezeIdAttributes();
+	SP_Core::Instance()->GetRootDocument()->GetGraph()->CheckIntegrity();
+	SP_Core::Instance()->GetRootDocument()->Modify(true);
+	SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->Modify(true);
+	SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->Refresh();
 }
 
 
@@ -1677,10 +1748,17 @@ SP_ImportCANDL::CreateTransitions(const dssd::andl::Transitions& p_Transitions)
 			l_pcAttr->Clear();
 			wxArrayString l_Functions;
 			size_t prev = 0;
+			bool l_bIscolouredDependentRate=false;
 			for(size_t i = function.find(wxT("++")); i != wxNOT_FOUND; i = function.find(wxT("++"), i+2))
 			{
 				l_Functions.Add(function.Mid(prev,i-prev));
 				prev = i;
+				l_bIscolouredDependentRate=true;
+			}
+			if (l_bIscolouredDependentRate)
+			{
+				wxString l_sLastRate = function.Mid(prev + 2, function.length()-1);
+				l_Functions.Add(l_sLastRate);
 			}
 			if(l_Functions.IsEmpty())
 			{
