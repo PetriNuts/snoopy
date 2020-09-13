@@ -275,7 +275,7 @@ bool SP_ExportContPed2ColCPT::WriteExtPlace(SP_DS_Node* p_pcVal, wxXmlNode* p_pc
 	l_pcColList->SetColLabel( 0, wxT("Color") );
 	l_pcColList->SetColLabel( 1, wxT("Marking") );
 	unsigned int l_nNewRow = l_pcColList->AppendEmptyRow();
-	l_pcColList->SetCell(l_nNewRow, 0, wxT("dot"));
+	l_pcColList->SetCell(l_nNewRow, 0, wxT("all()"));//was dot, changed by george
 	l_pcColList->SetCell(l_nNewRow, 1, l_sMarking);
 
 	SP_Graphic* l_pcGrAttr;
