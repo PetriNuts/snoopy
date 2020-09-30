@@ -699,21 +699,50 @@ bool SP_ColoredNetBuilder::CreatePlaces(dssd::andl::simple_net_builder& b)
 					SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
 					for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 					{
-						wxString l_sColors = l_pcColList->GetCell(i, l_pcColList->GetActiveColumn());
+						unsigned int l_nActiveCol=0;
+					    l_nActiveCol=l_pcColList->GetActiveColumn();
+						wxString l_sColors;
+					    wxString l_sToken;
+						wxString l_sTupel;
+						if (l_nActiveCol == 0)
+						{
+							l_sColors = l_pcColList->GetCell(i, l_pcColList->GetActiveColumn());
+						}
+						else
+						{
+							l_sColors = l_pcColList->GetCell(i, l_pcColList->GetActiveColumn()*3);
+						}
 						if (l_sColors.IsEmpty())
 						{
 							l_sColors = "all";
 						}
-						wxString l_sToken = l_pcColList->GetCell(i, l_pcColList->GetActiveColumn() + 1);
+						if (l_nActiveCol == 0)
+						{
+							 l_sToken = l_pcColList->GetCell(i, l_pcColList->GetActiveColumn() + 1);
+						}
+						else
+						{
+							l_sToken = l_pcColList->GetCell(i, (l_pcColList->GetActiveColumn() *3)+ 1);
+						}
+
 						if (l_sToken.IsEmpty())
 						{
 							l_sToken = "0";
 						}
 						if (i > 0)
 						{
-							l_sMarking += "++";
+								l_sMarking += "++";
 						}
-						wxString l_sTupel = l_pcColList->GetCell(i, l_pcColList->GetActiveColumn() + 2);
+						if (l_nActiveCol == 0)
+						{
+							 l_sTupel = l_pcColList->GetCell(i, l_pcColList->GetActiveColumn() + 2);
+						}
+						else
+						{
+							l_sTupel = l_pcColList->GetCell(i, (l_pcColList->GetActiveColumn() *3)+ 2);
+						}
+
+
 						if (l_sTupel.Contains(","))//if tupel column exists
 						{
 							l_sMarking += "[" + l_sColors +"]"+ l_sToken
