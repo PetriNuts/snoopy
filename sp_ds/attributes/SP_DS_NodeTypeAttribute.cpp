@@ -66,7 +66,21 @@ SP_DS_NodeTypeAttribute::IsOk()
 			}
 			else if (GetParent()->GetClassName() == SP_DS_STOCHASTIC_TRANS || GetParent()->GetClassName() == SP_DS_DISCRETE_TRANS)
 			{
-				m_sValue = wxT("Stochastic Transition");
+				SP_DS_Node* l_pcNode = dynamic_cast<SP_DS_Node*>(m_pcParent);
+
+				if (!l_pcNode) return TRUE;
+
+				wxString l_sNetClass=l_pcNode->GetNodeclass()->GetParentGraph()->GetNetclass()->GetDisplayName();
+
+				if (l_sNetClass.Contains(wxT("Extended")))
+				{
+
+						m_sValue = wxT("Discrete Transition");
+				}
+				else
+				{
+					   m_sValue = wxT("Stochastic Transition");
+				}
 				return TRUE;
 			}
 			else if (GetParent()->GetClassName() == SP_DS_DETERMINISTIC_TRANS)
