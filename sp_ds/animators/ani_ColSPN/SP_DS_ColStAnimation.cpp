@@ -1285,17 +1285,23 @@ void SP_DS_ColStAnimation::LoadSets()
 	{
 		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
 		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
+		if(l_pcCombobox)
 		l_pcCombobox->Clear();
+
 		if (l_pcAttr && l_pcCombobox)
 		{
 			if (j == 0)
 			{
-				for (unsigned int i = 1; i < l_pcAttr->GetColCount(); i++)
+				for (unsigned int i = 0; i < l_pcAttr->GetColCount(); i++)
 				{
 					wxString l_sSetName = l_pcAttr->GetColLabel(i);
-					l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
-					l_pcCombobox->Append(l_sSetName);
-					i++;
+					if (l_sSetName.Contains(wxT(":")))//by george
+					{
+						l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
+						if (l_pcCombobox)
+						 l_pcCombobox->Append(l_sSetName);
+					}
+				 i = i + 2;
 				}
 			}
 
@@ -1305,7 +1311,9 @@ void SP_DS_ColStAnimation::LoadSets()
 				{
 					wxString l_sSetName = l_pcAttr->GetColLabel(i);
 					l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
+					if (l_pcCombobox)
 					l_pcCombobox->Append(l_sSetName);
+
 				}
 			}
 
@@ -1913,6 +1921,15 @@ void SP_DS_ColStAnimation::LoadTransitions()
 	SP_VectorString* l_pcTransitionName = m_pcUnfolding->GetTransitionNames();
 	SP_VectorString* l_pcTransitionFunction = m_pcUnfolding->GetCurRateFunction();
 	SP_VectorString* l_pcTransitionType = m_pcUnfolding->GetTransNodeType();
+
+	//bug fix:by george, fillout the empty rate funs with zeros, this is special case when unfolding using idd
+	for (unsigned i = 0; i < l_pcTransitionFunction->size(); i++)
+	{
+		if (l_pcTransitionFunction->at(i).IsEmpty())
+		{
+			l_pcTransitionFunction->at(i) = wxT("0");
+		}
+	}
 
 	for (unsigned long l_nTransPos = 0; l_nTransPos<l_pcTransitionName->size(); l_nTransPos++)
 	{
