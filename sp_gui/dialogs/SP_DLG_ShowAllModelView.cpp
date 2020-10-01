@@ -116,6 +116,47 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	wxSize size = p_pcWnd->GetSize();
 	pos.x += size.GetX() + 10;
 	SetPosition(pos);
+
+	//by george, for loading default variables of the view
+	wxString l_TempClassName = m_pcGraph->GetNetclass()->GetName();
+
+		if (l_TempClassName == SP_DS_COLSPN_CLASS
+			|| l_TempClassName == SP_DS_COLCPN_CLASS
+			|| l_TempClassName == SP_DS_COLHPN_CLASS
+			|| l_TempClassName == SP_DS_FUZZY_ColCPN_CLASS//by george
+			|| l_TempClassName == SP_DS_FUZZY_ColSPN_CLASS//by george
+			|| l_TempClassName == SP_DS_FUZZY_ColHPN_CLASS)//by george
+		{
+			//m_pcParentWnd->SaveCurrentView();
+
+			SP_DLG_ColPlacesSelection* l_pcDlg = new SP_DLG_ColPlacesSelection(m_pcParentWnd, m_pcModelView, this);
+
+			if (l_pcDlg)
+			{
+				l_pcDlg->DoSave();
+				m_pcParentWnd->InitializeViews();
+				m_pcParentWnd->LoadData(true);
+				RefreshWindow();
+				SP_Core::Instance()->GetRootDocument()->Modify(true);
+			}
+
+			l_pcDlg->Destroy();
+		}
+		else
+		{
+			//m_pcParentWnd->SaveCurrentView();
+
+			SP_DLG_PlacesSelection* l_pcDlg = new SP_DLG_PlacesSelection(m_pcModelView, this);
+			l_pcDlg->DoSave();
+			if (l_pcDlg)
+			{
+				m_pcParentWnd->InitializeViews();
+				m_pcParentWnd->LoadData(true);
+				RefreshWindow();
+				SP_Core::Instance()->GetRootDocument()->Modify(true);
+			}
+			l_pcDlg->Destroy();
+		}
 }
 void SP_DLG_ShowAllModelView::OnChangeThumbPage( wxScrollEvent&  event)//wxCommandEvent&
 {
@@ -390,13 +431,36 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 	if (l_pcCurveInfoList == NULL)
 		return false;
 	m_pcPlaceChoiceCheckListBox->Clear();
+
+	    wxString l_sOutputType;
+		//by george
+		if (p_pcModelView)
+		{
+			SP_DS_Attribute* l_pcAttr = p_pcModelView->GetAttribute(wxT("OutputType"));
+			if (l_pcAttr)
+				l_sOutputType << l_pcAttr->GetValueString();
+		}
 	 
 	for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
 	{
-		m_pcPlaceChoiceCheckListBox->Insert(l_pcCurveInfoList->GetCell(l_nRow, 6), m_pcPlaceChoiceCheckListBox->GetCount());
-		//show selected curves
-		LoadCurveSetting(p_pcResultViewer, l_pcCurveInfoList, l_nRow);
-		wxString ddd = l_pcCurveInfoList->GetCell(l_nRow, 6);
+		wxString l_sType = l_pcCurveInfoList->GetCell(l_nRow, 1);
+
+		if (l_sType == l_sOutputType)//by george
+		 {
+			m_pcPlaceChoiceCheckListBox->Insert(l_pcCurveInfoList->GetCell(l_nRow, 6), m_pcPlaceChoiceCheckListBox->GetCount());
+			//show selected curves
+			LoadCurveSetting(p_pcResultViewer, l_pcCurveInfoList, l_nRow);
+			m_pcPlaceChoiceCheckListBox->Check(m_pcPlaceChoiceCheckListBox->GetCount() - 1);
+			wxString ddd = l_pcCurveInfoList->GetCell(l_nRow, 6);
+		}
+
+		if (l_sOutputType.IsEmpty())//uncoloured net
+		{
+			m_pcPlaceChoiceCheckListBox->Insert(l_pcCurveInfoList->GetCell(l_nRow, 6), m_pcPlaceChoiceCheckListBox->GetCount());
+			//show selected curves
+			LoadCurveSetting(p_pcResultViewer, l_pcCurveInfoList, l_nRow);
+			wxString ddd = l_pcCurveInfoList->GetCell(l_nRow, 6);
+		}
 	}
 
 	m_pcParentWnd->CalculateXAxisValues(p_pcModelView, m_anXValues);

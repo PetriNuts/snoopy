@@ -340,6 +340,14 @@ void SP_DLG_PlacesSelection::LoadData()
 	NodesThroughRegEx();
 }
 
+void SP_DLG_PlacesSelection::DoSave()
+{
+
+		GetSelResults();
+		SaveMetaData();
+	   this->Show(FALSE);
+
+}
 
 void SP_DLG_PlacesSelection::OnDlgOk(wxCommandEvent& p_cEvent)
 {
@@ -1014,6 +1022,7 @@ void SP_DLG_PlacesSelection::InitilizeFromMetaData()
 			}
 		}
 	}
+	m_pcPlaceChoiceOutRegex->SetValue(wxT("."));//default value, by george
 }
 
 void SP_DLG_PlacesSelection::AddtoCurLBInStrings(wxString p_sName)

@@ -114,6 +114,7 @@ public:
 		return m_vmSelectedNodes;
 	}
 	virtual void GetSelResults();
+	void DoSave( );//by george to enforece viewer to load default variables
 
 protected:
 	//void SetCommonLayout();
