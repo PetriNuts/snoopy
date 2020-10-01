@@ -110,6 +110,9 @@ SP_GRM_EventHandler::OnLeftDoubleClick(double p_nX, double p_nY, int p_nKeys, in
     	   l_pcCanvas->Refresh();
     	   SP_Core::Instance()->ClearDialogGraphicList();
     	}
+
+    l_pcCanvas->Refresh();
+    SP_Core::Instance()->ClearDialogGraphicList();
 }
 
 void

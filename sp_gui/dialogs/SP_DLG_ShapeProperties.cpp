@@ -359,8 +359,7 @@ SP_DLG_ShapeProperties::DoDlgApply()
 				}
 			}
 			
-		
-			 
+
 			SP_VectorString l_vToTypes;
 			if (m_bShowOverview)
 			{
@@ -378,6 +377,7 @@ SP_DLG_ShapeProperties::DoDlgApply()
 			bool l_bIsNewPage = false;
 			std::pair<wxString,vector<wxChoice*>> ss=l_pcWDG_DialogText->GetPagePair();
 			 
+
 			for (auto it = ss.second.begin(); it != ss.second.end(); ++it)
 			{
 				wxString l_sSel=(*it)->GetStringSelection();
@@ -385,6 +385,7 @@ SP_DLG_ShapeProperties::DoDlgApply()
 				l_bIsNewPage = true;
 
 			}
+
 			if (l_bIsNewPage)
 			{
 				l_mPage2SelctedTypes[ss.first] = l_vToTypes;
@@ -462,8 +463,7 @@ SP_DLG_ShapeProperties::DoDlgApply()
 							SP_Graphic* dd = (*l_pcNewNode->GetGraphics()->begin());
 							dd->Select(true);
 
-							//const_cast<SP_DS_Node*>(it->first) = l_pcNewNode;
-							//(it->second) = l_sToType;
+
 							l_mNode2Type[l_pcNewNode] = l_sToType;
 							m_mConvertedNode2Graphic[l_pcNewNode] = l_pcNewNode->GetGraphics();
 							bool b = UpdateDialogGraphic(l_pcNewNode);
@@ -522,6 +522,10 @@ SP_DLG_ShapeProperties::DoDlgApply()
 			{
 				continue;
 			}
+			else if (l_sClassName == _T("Transition, Continuous") && l_sSelectedType.Contains(_T("Continuous Transition")))
+			{
+				continue;
+			}
 			else
 			{
 				//try to convert a node if possible
@@ -565,7 +569,7 @@ SP_DLG_ShapeProperties::DoDlgApply()
 	}
 	SP_Core::Instance()->GetRootDocument()->Modify(true);
 	SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->Modify(true);
- 
+
     return l_bReturn;
 }
 
@@ -595,41 +599,13 @@ SP_DLG_ShapeProperties::OnDlgOk(wxCommandEvent& p_cEvent)
     // continue with the event handling
     if (l_bReturn)
     {
-    	CleanUpWidgets();
-		//SP_GUI_Childframe *l_pcFrame = wxGetApp().GetMainframe()->GetActiveChildframe();
-		//if (l_pcFrame)
-		//{
-		//	SP_GUI_Canvas* canvas = dynamic_cast<SP_MDI_View*>(l_pcFrame->GetView())->GetCanvas();
-		//	wxClientDC dc(canvas);
+    	if(!m_mConvertedNode2Graphic.size()>0){
 
-		//	canvas->DoPrepareDC(dc);
-		//	SP_Core::Instance()->GetRootDocument()->GetGraph()->ShowOnCanvas(canvas, true);
-		//}
-		 //  SP_Core::Instance()->GetRootDocument();
-		/*
-		if (SP_Core::Instance()->GetRootDocument()->GetDiagram() && SP_Core::Instance()->GetRootDocument()->GetDiagram()->GetShapeList())
-		{
-			SP_ListGraphic l_lGraphics;
-			SP_MDI_View* l_pcView = dynamic_cast<SP_MDI_View*>(SP_Core::Instance()->GetRootDocument()->GetFirstView());
-			wxNode *l_pcNode = SP_Core::Instance()->GetRootDocument()->GetDiagram()->GetShapeList()->GetFirst();
-			while (l_pcNode)
-			{
-				wxShape *l_pcShape = dynamic_cast<wxShape*>(l_pcNode->GetData());
-				if (l_pcShape && l_pcShape->GetParent() == NULL
-					&& !l_pcShape->IsKindOf(CLASSINFO(wxControlPoint))
-					&& !l_pcShape->IsKindOf(CLASSINFO(wxLabelShape)))
-				{
-					SP_Graphic* l_pcGraphic = SP_Core::Instance()->ResolveExtern(l_pcShape);
-					if (l_pcGraphic && l_pcGraphic->GetParent())
-					{
-						l_lGraphics.push_back(l_pcGraphic);
-					}
-				}
-				l_pcNode = l_pcNode->GetNext();
-			}
-			l_pcView->DoUnHide(l_lGraphics);
-		}
-		*/
+    		CleanUpWidgets();
+    	}
+    	else
+    	{SP_Core::Instance()->ClearDialogGraphicList();}//by george}
+
 	  
 		//bug fix: show multiplicities on arcs G.Assaf
 		SP_Core::Instance()->GetRootDocument()->GetGraph()->SqueezeIdAttributes();
@@ -637,7 +613,7 @@ SP_DLG_ShapeProperties::OnDlgOk(wxCommandEvent& p_cEvent)
 		SP_Core::Instance()->GetRootDocument()->Modify(true);
 		SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->Modify(true);
 		SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->Refresh();
-		 
+
        p_cEvent.Skip();
     }
 }
@@ -691,9 +667,16 @@ SP_DLG_ShapeProperties::OnRadio(wxCommandEvent& p_cEvent)
 void
 SP_DLG_ShapeProperties::RebuildDialog()
 {
+
     // clean up the widgets and
 	// display new widgets again, because of Logicattribute
-	CleanUpWidgets();
+
+	 CleanUpWidgets();
+
+
+
+	//CleanUpWidgets();
+	//SP_MESSAGEBOX(wxT("converted"));
 	int l_nCurrentPage = m_pcNotebook->GetSelection();
 	  m_pcNotebook->DeleteAllPages();
 	// m_pcNotebook->DeletePage(0);
@@ -705,10 +688,6 @@ SP_DLG_ShapeProperties::RebuildDialog()
 		SP_ListGraphic* l_lGraphics;
 		auto l_It = m_mlGraphics.begin();
 		int i = 0;
-		///for (; l_It != m_mlGraphics.end(); ++l_It)
-		//{
-
-		//}
 
 		l_It = m_mlGraphics.begin();
 		 
