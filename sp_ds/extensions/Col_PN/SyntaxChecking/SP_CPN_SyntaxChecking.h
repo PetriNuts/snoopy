@@ -109,6 +109,8 @@ private:
 
 	bool CheckExpression(wxString p_sExpression, wxString p_sErrorPosition, wxString p_sColorSetName, wxString p_sPlaceType, bool p_bFunctionFlag = false, bool p_bGuardFlag = false);   //used	
 
+	bool SubstituteDoubleConstant(const wxString& p_sExpression, wxString& p_sOutPut);//by george
+
 	bool IsDefFunction(wxString p_sColor);					//used	
 
 	wxString SubstituteConstants(wxString p_sColorExpr);    //used
@@ -125,8 +127,8 @@ private:
 	wxString ObtainPlaceUnfoldedColor(wxString p_sPlaceName);
 private:
 	bool IntCSSuccessiveTest(vector<SP_CPN_Var_Color>& p_vVariable2Color);
-	bool CSPSolve(SP_CPN_Parse_Context_ptr p_pcParseContext, SP_CPN_ColorSet* p_pcColorSet, vector<SP_CPN_Var_Color>& p_vVariable2Color, vector<wxString> &p_vParsedColors);
-	bool OrdinarySolve(SP_CPN_Parse_Context_ptr p_pcParseContext, SP_CPN_ColorSet* p_pcColorSet, vector<SP_CPN_Var_Color>& p_vVariable2Color, vector<wxString> &p_vParsedColors);
+	bool CSPSolve(SP_CPN_Parse_Context_ptr p_pcParseContext, SP_CPN_ColorSet* p_pcColorSet, vector<SP_CPN_Var_Color>& p_vVariable2Color, vector<wxString> &p_vParsedColors,bool p_bWithElemOfSorting=false);
+	bool OrdinarySolve(SP_CPN_Parse_Context_ptr p_pcParseContext, SP_CPN_ColorSet* p_pcColorSet, vector<SP_CPN_Var_Color>& p_vVariable2Color, vector<wxString> &p_vParsedColors, bool p_bWithElemOfSorting=false);
 
 	/*we need this checking because dssd_util does not support nets with not unique Ids*/
 	bool  CheckDuplicateNodes();
@@ -139,7 +141,7 @@ public:
 																																//used for checking rate functions of stochastic transitions
 	bool CheckFormula(SP_DS_Node* p_pcTransNode, wxString p_sRateFunExpr, SP_DS_StParser* p_pcParser, bool p_bSingle = true);	//used
 																																//used in the color set definition
-	bool GenerateSubSetColorSet(wxString p_sSubSetName, wxString p_sColors, wxString p_sFatherColorSetName, SP_CPN_ColorSetClass* p_pcColorSetClass, vector<wxString> &l_vColors);  //used
+	bool GenerateSubSetColorSet(wxString p_sSubSetName, wxString p_sColors, wxString p_sFatherColorSetName, SP_CPN_ColorSetClass* p_pcColorSetClass, vector<wxString> &l_vColors,bool p_bISElemOf=false);  //used
 																																													//used to update marking when a color set or constant changes
 	//void UpdateNetMarking();
 	void UpdateMarkingPlaceClass(wxString p_sPlaceNCName); //used
@@ -175,7 +177,7 @@ private:
 	bool GetTokenNumber(wxString p_sTokenNumber, SP_CPN_TokenNum &p_uNumber, wxString p_sErrorPosition, wxString p_sPlaceType);						//used
 	bool GetPlaceColorSet(SP_DS_Node* p_pcPlaceNode, SP_CPN_ColorSet &p_cColorSet);																	//used
 	bool ComputeInitialMarkingStep2(wxString p_sColorExpr, vector<wxString> p_vColorVector, SP_CPN_ColorSet* p_pcColorSet, vector<wxString> &p_vParsedColors); //used
-	bool ComputeSinglePredicate(wxString p_sColorExpr, SP_CPN_ColorSet* p_pcColorSet, vector<wxString> &p_vParsedColors);							//used
+	bool ComputeSinglePredicate(wxString p_sColorExpr, SP_CPN_ColorSet* p_pcColorSet, vector<wxString> &p_vParsedColors,bool p_bIsElemOf=false);							//used
 	bool ComputeAllFunction(wxString p_sColorExpr, SP_CPN_ColorSet* p_pcColorSet, vector<wxString> &p_vParsedColors);							//used
 	bool ComputeOtherCase(wxString p_sColorExpr, wxString p_sSubSetName, SP_CPN_ColorSet* p_pcColorSet, vector<wxString> &p_vParsedColors);	//used
 

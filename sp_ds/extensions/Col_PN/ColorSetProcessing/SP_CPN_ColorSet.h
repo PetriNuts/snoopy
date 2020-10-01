@@ -26,7 +26,8 @@ enum SP_CPN_DATATYPE
     CPN_INDEX,
     CPN_PRODUCT,    
     CPN_UNION,
-	CPN_NULL
+	CPN_NULL,
+	CPN_DOUBLE//added by george for continious nets
 };
 
 class SP_CPN_ColorSetClass;
@@ -38,6 +39,7 @@ private:
 	wxString m_sName;									// Name of colorset
 	SP_CPN_DATATYPE m_DataType;							// Datatype of colorset	
 	vector<wxString> m_ColorValues;						// Store colors with any data type as string
+	vector<wxString> m_RealColorValues;                 //by george
 
 	vector<int> m_vIntColorValues;                      //for CSP solver 23.08.2011
 	bool m_bIntSuccessive;
@@ -120,6 +122,18 @@ public:
 	vector<wxString> GetStringValue()
 	{
 		return m_ColorValues;
+	}
+
+	void SetRealColor(vector<wxString> p_StringValue)//by george
+	{
+		m_RealColorValues.clear();
+		m_RealColorValues = p_StringValue;;
+
+	}
+
+	vector<wxString> GetRealColorStringValue()//by george
+	{
+		return m_RealColorValues;
 	}
 
 	void SetIntColorValues( vector<int> p_vIntColorValues )

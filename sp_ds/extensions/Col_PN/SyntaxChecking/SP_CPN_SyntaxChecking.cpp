@@ -217,11 +217,11 @@ bool SP_CPN_SyntaxChecking::CheckArcExpression(SP_DS_Node* p_pcPlaceNode, SP_DS_
 	
 
 	wxString l_sErrorPosition = wxT("miss matching type in arc expression! Error Position:") + l_sExpression + wxT(" | ") + l_sEdgeName;
-
+    /*
 	bool l_bIsDuplicateOrUnion = CheckDuplicateNodes();
 
 	if (l_cColorSet.GetDataType() != CPN_UNION 
-		&& l_cColorSet.GetDataType() != CPN_INDEX /*&& l_cColorSet.GetDataType() != CPN_STRING&& l_cColorSet.GetDataType() != CPN_BOOLEAN*/
+		&& l_cColorSet.GetDataType() != CPN_INDEX
 		&& l_bIsDuplicateOrUnion ==false)
 	{
 		SP_IddUnFoldExpr   expEval(m_pcGraph, m_sPlaceExp, m_sPlaceName);
@@ -233,6 +233,7 @@ bool SP_CPN_SyntaxChecking::CheckArcExpression(SP_DS_Node* p_pcPlaceNode, SP_DS_
 		bool l_bCheck = expEval.CheckCoLourExpression(l_sExpression.ToStdString(), l_sCSName.ToStdString(), l_sErrorPosition);
 		return l_bCheck;
 	}
+	*/
 	//has to be removed
 	l_sExpression.Replace(wxT(" "), wxT(""));
 	l_sExpression.Replace(wxT("\t"), wxT(""));
@@ -385,9 +386,6 @@ bool SP_CPN_SyntaxChecking::CheckAllExprSpecialCase(wxString p_sColExpr, SP_CPN_
 bool SP_CPN_SyntaxChecking::CheckExpression(wxString p_sExpression, wxString p_sErrorPosition, wxString p_sColorSetName, wxString p_sPlaceType, bool p_bFunctionFlag, bool p_bGuardFlag)
 {
 
-
-
-
 	bool l_bISSupportedByDssd = true;
 
 	bool l_bIsDuplicateOrUnion = CheckDuplicateNodes();
@@ -404,6 +402,7 @@ bool SP_CPN_SyntaxChecking::CheckExpression(wxString p_sExpression, wxString p_s
 		}
 	}
 
+	/*
 	if (l_bISSupportedByDssd)
 	{
 		m_sErrorPosition = wxT("Error Position: ") + p_sExpression + wxT(" | ");// +l_sPlaceName;
@@ -414,7 +413,7 @@ bool SP_CPN_SyntaxChecking::CheckExpression(wxString p_sExpression, wxString p_s
 		bool l_bCheck = expEval.CheckCoLourExpression(p_sExpression.ToStdString(), l_sCSName.ToStdString(), m_sErrorPosition);// expEval.CheckCoLourExpression(p_sExpression.ToStdString(), l_sCSName.ToStdString(), m_sErrorPosition);
 		return l_bCheck;
 	}
-	
+	*/
 
 
 	SP_DS_ColPN_Unfolding l_cColPN_Unfolding;
@@ -437,6 +436,14 @@ bool SP_CPN_SyntaxChecking::CheckExpression(wxString p_sExpression, wxString p_s
 	
 	std::string l_ParseString;
 	l_ParseString = string(p_sExpression.mb_str());
+
+	wxString l_sSubstituted;
+
+	if (SubstituteDoubleConstant(l_ParseString, l_sSubstituted))
+	{
+		l_ParseString= l_sSubstituted;
+	}
+
 	bool l_bSuccess = l_pcDriver->parse_string(l_ParseString, "input");
 
 	if (!l_bSuccess)
@@ -462,11 +469,39 @@ bool SP_CPN_SyntaxChecking::CheckExpression(wxString p_sExpression, wxString p_s
 	}
 
 
-
-
-	
-
 	return true;
+}
+
+bool SP_CPN_SyntaxChecking::SubstituteDoubleConstant(const wxString& p_sExpression, wxString& p_sOutPut)
+{
+	p_sOutPut = p_sExpression;
+
+	if (p_sExpression.Contains(wxChar('`')))
+	{
+		wxString l_sValue = p_sExpression.BeforeFirst(wxChar('`'));
+		l_sValue.Replace(wxT(" "), wxT(""));
+
+		if (m_cColorSetClass.GetConstantMap())
+		{
+
+			std::map<wxString, SP_CPN_Variable_Constant>::const_iterator it = m_cColorSetClass.GetConstantMap()->find(l_sValue);
+			if (it != m_cColorSetClass.GetConstantMap()->end())
+			{
+				SP_CPN_DATATYPE l_DataType = it->second.m_DataType;
+				//now not support real constant
+				if (l_DataType == CPN_DOUBLE)
+				{
+					double l_dVal = it->second.m_DoubleValue;
+					wxString l_sStringVal;
+					l_sStringVal << l_dVal;
+					p_sOutPut.Replace(l_sValue, l_sStringVal, true);
+					return true;
+				}
+			}
+
+		}
+	}
+	return false;
 }
 
 
@@ -705,7 +740,7 @@ void SP_CPN_SyntaxChecking::SeperateColors(wxString p_sVariableString, vector<wx
 	}
 }
 
-bool SP_CPN_SyntaxChecking::GenerateSubSetColorSet(wxString p_sSubSetName, wxString p_sColors, wxString p_sFatherColorSetName, SP_CPN_ColorSetClass* p_pcColorSetClass, vector<wxString> &p_vColors)
+bool SP_CPN_SyntaxChecking::GenerateSubSetColorSet(wxString p_sSubSetName, wxString p_sColors, wxString p_sFatherColorSetName, SP_CPN_ColorSetClass* p_pcColorSetClass, vector<wxString> &p_vColors,bool p_bIsElemOf)
 {
 	m_cColorSetClass = *p_pcColorSetClass;
 
@@ -729,7 +764,7 @@ bool SP_CPN_SyntaxChecking::GenerateSubSetColorSet(wxString p_sSubSetName, wxStr
 		p_sColors.Find(wxT("true")) != wxNOT_FOUND ||
 		p_sColors.Find(wxT("false")) != wxNOT_FOUND)
 	{
-		if (!ComputeSinglePredicate(p_sColors, l_pcColorSet, p_vColors))
+		if (!ComputeSinglePredicate(p_sColors, l_pcColorSet, p_vColors,p_bIsElemOf))
 			return false;
 	}
 	else
@@ -1121,14 +1156,7 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 			wxString l_sCSName = l_cColorSet.GetName();
 			wxString l_sPRocessedExp;
 
-			////////////////////////
-			//bool l_bTupelCheck;
-			//l_bTupelCheck=CheckBracketStructure(l_sTupeExpression, l_sCSName);
-			//if (!l_bTupelCheck)
-		   	//{
-			//	SP_LOGERROR_("please check bracket structure of the tupel" + l_sTupeExpression);
-			//}
-			///////////////////////
+
 			//prepare the expression for checking and computing the marking 
 			PrepareExpressionString(l_sExpression, l_sTupeExpression,l_sPRocessedExp);
 
@@ -1253,7 +1281,7 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 		}
 		else
 		{
-			j = j + 1;
+			j = j + 2;
 		}
 	}
 
@@ -1362,7 +1390,7 @@ SP_CPN_SyntaxChecking::SubstituteConstants(wxString p_sColorExpr)
 	return l_sColorExpr;
 }
 
-bool SP_CPN_SyntaxChecking::ComputeSinglePredicate(wxString p_sColorExpr, SP_CPN_ColorSet* p_pcColorSet, vector<wxString> &p_vParsedColors)
+bool SP_CPN_SyntaxChecking::ComputeSinglePredicate(wxString p_sColorExpr, SP_CPN_ColorSet* p_pcColorSet, vector<wxString> &p_vParsedColors, bool p_bIsElemOf)
 {
 	SP_CPN_ColorSet* l_pcColorSet = p_pcColorSet;
 
@@ -1416,12 +1444,12 @@ bool SP_CPN_SyntaxChecking::ComputeSinglePredicate(wxString p_sColorExpr, SP_CPN
 		bool l_bCSPSucceed = false;
 		if (l_vVariable2Color.size() > 0)
 		{
-			l_bCSPSucceed = CSPSolve(l_pcParseContext, l_pcColorSet, l_vVariable2Color, p_vParsedColors);
+			l_bCSPSucceed = CSPSolve(l_pcParseContext, l_pcColorSet, l_vVariable2Color, p_vParsedColors, p_bIsElemOf);
 		}
 
 		if (!l_bCSPSucceed)
 		{
-			if (!OrdinarySolve(l_pcParseContext, l_pcColorSet, l_vVariable2Color, p_vParsedColors))
+			if (!OrdinarySolve(l_pcParseContext, l_pcColorSet, l_vVariable2Color, p_vParsedColors,p_bIsElemOf))
 				return false;
 		}
 	}
@@ -1450,7 +1478,7 @@ bool SP_CPN_SyntaxChecking::IntCSSuccessiveTest(vector<SP_CPN_Var_Color>& p_vVar
 	return true;
 }
 
-bool SP_CPN_SyntaxChecking::CSPSolve(SP_CPN_Parse_Context_ptr p_pcParseContext, SP_CPN_ColorSet* p_pcColorSet, vector<SP_CPN_Var_Color>& p_vVariable2Color, vector<wxString> &p_vParsedColors)
+bool SP_CPN_SyntaxChecking::CSPSolve(SP_CPN_Parse_Context_ptr p_pcParseContext, SP_CPN_ColorSet* p_pcColorSet, vector<SP_CPN_Var_Color>& p_vVariable2Color, vector<wxString> &p_vParsedColors, bool p_bWithElemOfSorting)
 {
 	if (!IntCSSuccessiveTest(p_vVariable2Color))
 		return false;
@@ -1534,8 +1562,34 @@ bool SP_CPN_SyntaxChecking::CSPSolve(SP_CPN_Parse_Context_ptr p_pcParseContext, 
 				vector<wxString>  l_vColors = l_pcColorSet->GetColorsForMarkingPredicat(l_mColorSetToValue);
 				for (unsigned i = 0; i < l_vColors.size(); i++)
 				{
+					if (!p_bWithElemOfSorting)
+					{
 					p_vParsedColors.push_back(l_vColors[i]);
+					}
 				}
+				if (l_vColors.size() > 0 && p_bWithElemOfSorting)//to know how many elements in the colors
+				{
+					int freq_comma = l_vColors[0].Freq(wxChar(','));
+					if (freq_comma > 0)
+						{
+							int j = freq_comma + 1;
+							wxString l_str = wxT("(");
+							for (int k = 0; k < j; k++)
+							{
+								l_str << m_vvCSPAssigns[i1][k] << wxT(",");
+							}
+							l_str = l_str.BeforeLast(wxChar(','));
+							l_str << wxT(")");
+							p_vParsedColors.push_back(l_str);
+						}
+						else
+						{
+							for (unsigned i = 0; i < l_vColors.size(); i++)
+							{
+								p_vParsedColors.push_back(l_vColors[i]);
+							}
+						}
+					}
 			}
 		}
 	}
@@ -1546,7 +1600,7 @@ bool SP_CPN_SyntaxChecking::CSPSolve(SP_CPN_Parse_Context_ptr p_pcParseContext, 
 }
 
 
-bool SP_CPN_SyntaxChecking::OrdinarySolve(SP_CPN_Parse_Context_ptr p_pcParseContext, SP_CPN_ColorSet* p_pcColorSet, vector<SP_CPN_Var_Color>& p_vVariable2Color, vector<wxString> &p_vParsedColors)
+bool SP_CPN_SyntaxChecking::OrdinarySolve(SP_CPN_Parse_Context_ptr p_pcParseContext, SP_CPN_ColorSet* p_pcColorSet, vector<SP_CPN_Var_Color>& p_vVariable2Color, vector<wxString> &p_vParsedColors, bool p_bWithElemOfSorting)
 {
 	SP_CPN_Parse_Context_ptr l_pcParseContext = p_pcParseContext;
 	SP_CPN_ColorSet* l_pcColorSet = p_pcColorSet;
@@ -1613,7 +1667,34 @@ bool SP_CPN_SyntaxChecking::OrdinarySolve(SP_CPN_Parse_Context_ptr p_pcParseCont
 				vector<wxString>  l_vColors = l_pcColorSet->GetColorsForMarkingPredicat(l_mColorSetToValue);
 				for (unsigned i = 0; i < l_vColors.size(); i++)
 				{
-					p_vParsedColors.push_back(l_vColors[i]);
+					if (!p_bWithElemOfSorting)
+					{
+					 p_vParsedColors.push_back(l_vColors[i]);
+					}
+				}
+				// by george
+				if (l_vColors.size() > 0&& p_bWithElemOfSorting)//to know how many elements in the colors
+				{
+					int freq_comma = l_vColors[0].Freq(wxChar(','));
+					if (freq_comma > 0)
+					{
+						int j = freq_comma+1;
+					    wxString l_str = wxT("(");
+						for (int k = 0; k < j; k++)
+						{
+								l_str << l_CompleteBinding[i][k] << wxT(",");
+						}
+						l_str = l_str.BeforeLast(wxChar(','));
+						l_str  << wxT(")");
+						p_vParsedColors.push_back(l_str);
+					}
+					else
+					{
+						for (unsigned i = 0; i < l_vColors.size(); i++)
+							{
+								p_vParsedColors.push_back(l_vColors[i]);
+							}
+					}
 				}
 			}
 		}
@@ -1890,12 +1971,10 @@ bool SP_CPN_SyntaxChecking::GetTokenNumber(wxString p_sTokenNumber, SP_CPN_Token
 		}
 		else if (m_cColorSetClass.GetConstantMap() && m_cColorSetClass.GetConstantMap()->find(l_sConstant) != m_cColorSetClass.GetConstantMap()->end())
 		{
-			 
-		 
 
 			SP_CPN_DATATYPE l_DataType = m_cColorSetClass.GetConstantMap()->find(l_sConstant)->second.m_DataType;
-			//now not support real constant
-			if (l_DataType != CPN_INTEGER)
+			// real constant for colCPN
+			if (!(l_DataType == CPN_INTEGER || l_DataType == CPN_DOUBLE))
 			{
 				wxString l_sError = wxT(": Constant type error: ") + l_sConstant + wxT(" | ") + p_sErrorPosition;
 				SP_LOGERROR(l_sError);
@@ -1903,12 +1982,31 @@ bool SP_CPN_SyntaxChecking::GetTokenNumber(wxString p_sTokenNumber, SP_CPN_Token
 			}
 			else
 			{
-				int l_nMarking = m_cColorSetClass.GetConstantMap()->find(l_sConstant)->second.m_IntegerValue;
-				if (p_sPlaceType == SP_DS_CONTINUOUS_PLACE)
-					l_doubleMarking = (double)l_nMarking;
-				else 
-					l_longMarking = l_nMarking;
+			int l_nMarking;
+			double l_dMarking;
+			if(l_DataType == CPN_INTEGER)
+			{
+				l_nMarking = m_cColorSetClass.GetConstantMap()->find(l_sConstant)->second.m_IntegerValue;
+			    l_longMarking = l_nMarking;
 			}
+			else
+				l_dMarking = m_cColorSetClass.GetConstantMap()->find(l_sConstant)->second.m_DoubleValue;
+
+			if (p_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+			{
+					l_doubleMarking = l_dMarking;// (double)l_nMarking;
+			}
+			else
+			{
+			  if (l_DataType != CPN_INTEGER)
+			  {
+				  wxString l_sError = wxT(": Constant type error: ") + l_sConstant + wxT(" | ") + p_sErrorPosition;
+				  SP_LOGERROR(l_sError);
+				  return false;
+			  }
+
+			}
+		 }
 		}
 		else
 		{

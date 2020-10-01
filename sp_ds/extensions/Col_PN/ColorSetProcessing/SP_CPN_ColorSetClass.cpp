@@ -59,6 +59,13 @@ bool SP_CPN_ColorSetClass::SetVariableValue(wxString p_VariableName, wxString p_
 {
 	map<wxString, SP_CPN_Variable_Constant>::iterator itMap;
 	itMap = m_pVariableMap->find(p_VariableName);
+
+	/**********by george for elemOf**********/
+	if (itMap == m_pVariableMap->end() && LookupColorSet(p_VariableName) != NULL)
+	{
+		return true;
+	}
+
 	if(itMap != m_pVariableMap->end())
 	{	
 		SP_CPN_ColorSet* l_pcColorSet = LookupColorSet(itMap->second.m_ColorSet);

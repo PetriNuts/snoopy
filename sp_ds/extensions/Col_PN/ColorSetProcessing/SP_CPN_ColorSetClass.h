@@ -28,7 +28,7 @@ struct SP_CPN_Variable_Constant
 {
 	SP_CPN_DATATYPE m_DataType;
 	wxString m_ColorSet;
-	
+	double   m_DoubleValue;//by george 2020
 	int m_IntegerValue;		
 	wxString m_StringValue;
 	bool m_BooeanValue;
