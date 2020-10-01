@@ -474,9 +474,12 @@ void SP_DLG_ColCPNSimulationResults::LoadSets()
 		for (unsigned int i = 1; i < l_pcColListAttr->GetColCount(); i++)
 		{
 			wxString l_sSetName = l_pcColListAttr->GetColLabel(i);
-			l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
-			m_pcMarkingSetComboBox->Append(l_sSetName);
-			i++;
+			if (l_sSetName.Contains(wxT(":")))//by george
+			{
+				l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
+				m_pcMarkingSetComboBox->Append(l_sSetName);
+			}
+			i = i + 2;
 		}
 
 		//Select the first marking
