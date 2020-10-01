@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "SP_IddUnFoldExpr.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
-
+#include <ctype.h>
 SP_IddUnFoldExpr::SP_IddUnFoldExpr(SP_DS_Graph* p_pcGraph, wxString p_sColExpr,wxString p_sPna)
 {
 	m_pcGraph = p_pcGraph;
@@ -550,6 +550,17 @@ unsigned  SP_IddUnFoldExpr::createPlaces(solution_space &sol,
 bool SP_IddUnFoldExpr::CheckGuardEXpression(const std::string& p_sExp,const std::string& p_sErrorPos)
 {
 	
+    std::string l_sGuard="[" + p_sExp + "]";//added on 18.09.2020
+
+    std::string funName="";
+
+
+    if (l_sGuard.find('(') != std::string::npos && l_sGuard.find(')') != std::string::npos)
+    {
+    	funName = l_sGuard.substr(1, l_sGuard.find('(')-1);
+
+    }
+
 
 	//first step:register the net definitions
 	dssd::andl::Net_ptr m_ColoredNet;
@@ -576,7 +587,7 @@ bool SP_IddUnFoldExpr::CheckGuardEXpression(const std::string& p_sExp,const std:
 	}
 	try{
 	colExprVec	guards;
-	colExpr expr = parseExpr(p_sExp);
+	colExpr expr = parseExpr(l_sGuard);
 	substituteColorFunctions(expr);
 	flatExpression(expr);
 	guards.push_back(expr);
@@ -589,15 +600,83 @@ bool SP_IddUnFoldExpr::CheckGuardEXpression(const std::string& p_sExp,const std:
 	//
 	auto r = evalColExpr<colexpr_descriptor_evaluator>(expr, colDefinitions_);
 
-	wxString l_s;
-	if (!r.isGuard())
+	bool isValid = true;
+	if (funName != "")
 	{
-	 
+			std::string expression = l_sGuard;
+			expression.erase(std::remove_if(expression.begin(), expression.end(),
+									[](char &c) {
+										return std::isspace<char>(c, std::locale::classic());
+									}),
+					expression.end());
+			//std::remove_if(expression.begin(), expression.end(), static_cast<int(&)(int)>(std::isspace));
+			std::string params;
+			size_t start = expression.find('(');
+			params = expression.substr(expression.find('(')+1, expression.length()-3- start);
+
+
+			std::vector<string> tokens;
+			std::vector<string> colorsets;
+			stringstream check1(params);
+
+			string intermediate;
+
+		     //tokenize
+			while (getline(check1, intermediate, ','))
+			{
+				tokens.push_back(intermediate);
+			}
+
+			auto colfun = colDefinitions_.lookUpColorFunction(funName);
+
+			if(colfun){
+
+			if (colfun->params_.size() != tokens.size())
+			{
+				isValid = false;
+			}
+			for (int i = 0; i < tokens.size(); i++)
+			{
+			   std::string csName= colDefinitions_.getVarColorsetName(tokens[i]);
+			   if(!csName.empty())
+			   colorsets.push_back(csName);
+			}
+			if (colfun->params_.size() != colorsets.size())
+			{
+				isValid = false;
+			}
+
+			if (colfun && isValid)
+			{
+				int k = 0;
+			for (auto itPar = colfun->params_.begin(); itPar != colfun->params_.end(); ++itPar)
+			{
+				std::string arg = itPar->first;
+				if (colorsets[k] != arg)
+				{
+					isValid = false;
+					break;
+				}
+				k++;
+			 }
+		     }
+			}
+	}
+
+	if (!r.isGuard() || !isValid)
+	{
+		if (p_sErrorPos=="")
+		{
+			SP_LOGERROR_("Not a valid predicate " + p_sErrorPos);//added on 18.09.2020
+		}
+		else
+		{
+		SP_LOGERROR_("Not a valid guard, " + p_sErrorPos);//added on 18.09.2020
+		}
+	return false;//added on 18.9.20
 	}
 	}catch(dssd::exc::Exc& e){
-		wxString l_sCaught = e.what();
-		l_sCaught.Replace("\n", "; ");
-		SP_LOGERROR_(l_sCaught +p_sErrorPos);
+		SP_LOGERROR_("Not a valid expression, " + p_sErrorPos);//added on 18.09.2020
 		l_bRes = false;
 	}
 	return l_bRes;
