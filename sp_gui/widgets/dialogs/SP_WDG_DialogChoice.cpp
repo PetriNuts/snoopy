@@ -263,14 +263,15 @@ void SP_WDG_DialogChoice::LoadDataForNodeTypeAttribute(const SP_ListAttribute* p
 		for (; it != end; ++it)
 		{
 			SP_DS_Attribute* l_pcAttr = *it;
-
+			if(l_pcAttr)
+			{
 			wxString l_pchValue = l_pcAttr->GetValueString();
-			wxString l_sName = l_pcAttr->GetParentName();
 			unsigned int l_nArraysize = 1;
 			m_pcChoiceValues.Clear();
 			m_pcChoiceValues.Alloc(l_nArraysize);
 
 			m_pcChoiceValues.Add(l_pchValue);
+			}
 
 		}
 	}
@@ -282,8 +283,9 @@ void SP_WDG_DialogChoice::LoadDataForNodeTypeAttribute(const SP_ListAttribute* p
 		{
 			SP_DS_Attribute* l_pcAttr = *it;
 
+			if(l_pcAttr)
+			{
 			wxString l_pchValue = l_pcAttr->GetValueString();
-			wxString l_sName = l_pcAttr->GetParentName();
 			unsigned int l_nArraysize;
 			if (l_pchValue.Contains(wxT("Place")))
 			{
@@ -354,7 +356,7 @@ void SP_WDG_DialogChoice::LoadDataForNodeTypeAttribute(const SP_ListAttribute* p
 				
 			}
 			
-
+			}
 		}
 
 	}
@@ -378,12 +380,20 @@ void SP_WDG_DialogChoice::LoadData()
 	l_nArraysize += l_pcBasicColList->GetRowCount();
 
 	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_STRUCTUREDCOLORSETCLASS);
+	if(!l_pcMetadataclass)//by george
+	{
+		return;
+	}
 	l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
 	SP_DS_ColListAttribute *l_pcStructColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("StructuredColorsetList")));
 	l_nArraysize += l_pcStructColList->GetRowCount();
 
 
 	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_ALIASCOLORSETCLASS);
+	if(!l_pcMetadataclass)//by george
+	{
+			return;
+	}
 	l_pcNewMetadata = *(l_pcMetadataclass->GetElements()->begin());
 	SP_DS_ColListAttribute *l_pcAliasColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("AliasColorsetList")));
 	l_nArraysize += l_pcAliasColList->GetRowCount();

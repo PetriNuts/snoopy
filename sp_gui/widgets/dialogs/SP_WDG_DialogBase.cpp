@@ -90,6 +90,16 @@ bool
 SP_WDG_DialogBase::CleanUpAttributes()
 {
     SP_ListAttribute::iterator l_Iter = m_tlAttributes.begin();
+    if(m_tlAttributes.size()==1 )
+    	{
+    	 SP_DS_Attribute* l_pcAttribute = (*l_Iter);
+    	 if(l_pcAttribute!=NULL)
+    	 {
+    		 if(!l_pcAttribute->GetDelete())return TRUE;
+    	 }
+    	 return TRUE;
+
+    	}
     while (l_Iter != m_tlAttributes.end())
     {
         SP_DS_Attribute* l_pcAttribute = (*l_Iter);
@@ -101,6 +111,7 @@ SP_WDG_DialogBase::CleanUpAttributes()
         }
         else
             l_Iter++;
+
     }
 
     return TRUE;
