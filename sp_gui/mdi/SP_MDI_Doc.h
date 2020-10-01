@@ -73,6 +73,7 @@ public:
     virtual bool SaveAs();
 
 	virtual void HarmonizeConstantsForColPN();//by George
+	virtual void HarmonizeMarking();//by george, for harmonizing the marking sets of places
 
     virtual SP_DS_Graph* InitGraph(SP_DS_Netclass* p_pcNetclass);
     virtual SP_DS_Graph* SetGraph(SP_DS_Graph* p_pcVal) { return m_pcGraph; }

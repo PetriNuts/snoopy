@@ -469,6 +469,218 @@ bool SP_MDI_Doc::OnSaveDocument(const wxString& p_sFile)
 
 	return TRUE;
 }
+
+void SP_MDI_Doc::HarmonizeMarking()
+{
+	SP_DS_ColListAttribute* l_pcColList;
+
+	SP_ListNode::const_iterator l_itElem;
+	vector<SP_DS_Node*> l_vPlaceNodes;
+	SP_DS_Nodeclass* l_pcNodeclass;
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		{
+			l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+		}
+	}
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		{
+			l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+		}
+	}
+
+	for (unsigned int l_nPos = 0; l_nPos < l_vPlaceNodes.size(); l_nPos++)
+	{
+
+		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
+
+		if (!l_pcColList) continue;
+		/////////////////old marking sets, which do not have product coloumn//////////
+		unsigned l_nColnum = l_pcColList->GetColCount();
+		if (l_nColnum % 2 == 0 && l_nColnum % 3 != 0)
+		{
+			while (l_pcColList->GetColCount() % 3 != 0)
+			{
+				unsigned l_nCol = l_pcColList->AppendEmptyColum();
+			}
+			std::vector<wxString> l_vLabels;
+			for (unsigned i = 0; i < l_pcColList->GetColCount(); i++)
+			{
+				wxString l_setLabel = l_pcColList->GetColLabel(i);
+				if (i % 2 == 0)
+				{
+					l_vLabels.push_back(l_setLabel);
+					l_vLabels.push_back("");
+
+					continue;
+				}
+				l_vLabels.push_back(l_setLabel);
+
+				if (l_vLabels.size() == l_pcColList->GetColCount())
+				{
+					break;
+				}
+			}
+
+			for (unsigned i = 0; i < l_vLabels.size(); i++)
+			{
+				if (l_vLabels[i].IsEmpty())
+				{
+					wxString label = l_vLabels[i - 1];
+					wxString ProdCol = label.BeforeFirst(':');
+					ProdCol << wxT(": Product Color");
+					l_vLabels[i] = ProdCol;
+				}
+			}
+
+			if (l_vLabels.size() == l_pcColList->GetColCount())
+			{
+				for (unsigned j = 0; j < l_pcColList->GetColCount(); j++)
+				{
+					if (j % 3 == 0)
+					{
+						l_pcColList->SetColLabel(j, l_vLabels[j]);
+					}
+					else if (j % 3 == 1)
+					{
+						l_pcColList->SetColLabel(j, l_vLabels[j+1]);
+					}
+					else
+					{
+						l_pcColList->SetColLabel(j, l_vLabels[j - 1]);
+					}
+
+				}
+
+				std::vector<wxString> l_vVlaues;
+				for (unsigned i = 0; i < l_pcColList->GetRowCount(); i++)
+				{
+					l_vVlaues.clear();
+					for (unsigned j = 0; j < l_pcColList->GetColCount(); j++)
+					{
+						wxString value = l_pcColList->GetCell(i, j);
+						if (value.IsEmpty())
+						{
+							value = wxT("()");
+						}
+						if (j % 3 == 1)
+						{
+
+							l_vVlaues.push_back(value);
+							l_vVlaues.push_back(wxT("()"));
+
+							continue;
+						}
+						l_vVlaues.push_back(value);
+					}
+
+					for (unsigned j = 0; j < l_pcColList->GetColCount(); j++)
+					{
+						l_pcColList->SetCell(i, j, l_vVlaues[j]);
+					}
+
+				}
+
+
+			}
+			l_nColnum = l_pcColList->GetColCount();
+		}
+		else
+		{//check the coloumn ordering
+			if (l_nColnum % 3 == 0)
+			{
+				for (unsigned i = 0; i < l_pcColList->GetColCount(); i++)
+				{
+					wxString l_setLabel = l_pcColList->GetColLabel(i);
+					if (i % 3 == 0)
+					{
+						if (l_setLabel.Contains(wxT("Color")) && !l_setLabel.Contains(wxT("Product")))
+						{
+							continue;
+						}
+					}
+					else if (i % 3 == 1)
+					{
+						if (l_setLabel.Contains(wxT("Marking")))
+						{
+							continue;
+						}
+						else
+						{//swap coloumn labels
+							wxString l_set = l_pcColList->GetColLabel(i + 1);
+							l_pcColList->SetColLabel(i, l_set);
+							l_pcColList->SetColLabel(i + 1, l_setLabel);
+						}
+					}
+				}
+		     }
+			else
+			{// a case, where number of coloumn is odd number, e.g, 5
+				while (l_pcColList->GetColCount() % 3 != 0)
+				{
+					wxString l_sLastLabel = l_pcColList->GetColLabel(l_pcColList->GetColCount() - 1);
+					unsigned l_nCol = l_pcColList->AppendEmptyColum();
+					if (l_sLastLabel.Contains(wxT("Marking")))
+					{
+						wxString l_sSetName = l_sLastLabel.BeforeFirst(wxChar(':'));
+						l_sSetName << wxT(": ") << wxT("Product Color");
+						l_pcColList->SetColLabel(l_nCol, l_sSetName);
+					}
+
+					for (unsigned j = 0; j < l_pcColList->GetColCount(); j++)
+					{
+						for (unsigned i = 0; i < l_pcColList->GetRowCount(); i++)
+						{
+							wxString l_sCellval = l_pcColList->GetCell(i,j);
+							if (j % 3 == 2 && l_sCellval.IsEmpty())
+							{
+								l_pcColList->SetCell(i, j, wxT("()"));
+							}
+
+							if (j % 3 == 0 && l_sCellval.IsEmpty())
+							{
+								if (j != 0)
+								{
+									l_pcColList->SetCell(i, j, l_pcColList->GetCell(i, 0));
+								}
+							}
+
+							if (j % 3 == 1 && l_sCellval.IsEmpty())
+							{
+								if (j != 1)
+								{
+									l_pcColList->SetCell(i, j, l_pcColList->GetCell(i, 1));
+								}
+							}
+
+						}
+					}
+
+				}
+
+				for (unsigned i = 0; i < l_pcColList->GetColCount(); i++)
+				{
+					wxString l_sLastLabel = l_pcColList->GetColLabel(i);
+					if (i % 3 == 1)
+					{
+						if (!l_sLastLabel.Contains(wxT("Marking")))
+						{
+							wxString l_slabel =	l_pcColList->GetColLabel(i + 1);
+							l_pcColList->SetColLabel(i, l_slabel);
+							l_pcColList->SetColLabel(i+1, l_sLastLabel);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 void SP_MDI_Doc::HarmonizeConstantsForColPN()
 {
 	std::vector<wxString> l_vParamNames;
@@ -1001,7 +1213,18 @@ bool SP_MDI_Doc::OnOpenDocument(const wxString& p_sFile)
 		//m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();//liu
 		if(m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColHPN_CLASS&&m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColSPN_CLASS
 			&& m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColCPN_CLASS&& m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColSPN_CLASS&& m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColHPN_CLASS)
-		HarmonizeConstantsForColPN();// by george for harmonize constants
+		{
+			HarmonizeConstantsForColPN();// by george for harmonize constants
+			HarmonizeMarking();//harmonize marking sets if required
+		}
+		else if (m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColHPN_CLASS ||
+			m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS ||
+			m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColCPN_CLASS
+			)
+		{
+			HarmonizeMarking();
+			m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
+		}
 		else
 			m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
   
