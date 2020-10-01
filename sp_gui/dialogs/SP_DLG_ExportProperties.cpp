@@ -65,6 +65,7 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 
 	auto l_pcSetsSizer = new wxGridBagSizer(5,5);
 	int row = 0;
+	vector<wxString> l_vGroupNames;
 	//search for collist attributes
 	for (SP_ListNodeclass::const_iterator itNC = m_pcDoc->GetGraph()->GetNodeclasses()->begin(); itNC != m_pcDoc->GetGraph()->GetNodeclasses()->end(); itNC++)
 	{
@@ -86,13 +87,41 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 					
 					if(l_pcProtoColAttr->GetColLabel(1).Find(wxT(":")) != wxNOT_FOUND)
 					{
-						for(unsigned i = 1; i < l_pcColAttr->GetColCount(); i++)
+						 unsigned i = 1;
+						if (l_pcColAttr->GetName() == wxT("MarkingList"))
+						 {
+						  i = 0;
+						 }
+						 else
+					     {
+						  i = 1;
+						 }
+						for(; i < l_pcColAttr->GetColCount(); i++)
 						{
 							wxString l_sSetName = l_pcColAttr->GetColLabel(i);
 
-							if (l_sSetName == wxT("Product Color"))  continue;//by george
+							if (l_sSetName == wxT("Color"))
+							{//old snoopy versions sometimes have coloumns without set names
+								if (SP_Find(l_vSetNames, wxT("Main")) == l_vSetNames.end())
+									{
+										l_vSetNames.push_back(wxT("Main"));
+										continue;
+									}
+							}
 
-							l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
+							if (l_pcColAttr->GetName() == wxT("MarkingList") && !l_sSetName.Contains(":")) continue;//by george
+
+							if (l_sSetName.Contains( wxT("Product Color"))&& !l_sSetName.Contains(":"))  continue;//by george
+
+						   if (l_sSetName.Contains(wxT("Product Color")))
+							{
+									l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
+							}
+							if (l_pcColAttr->GetName() == wxT("MarkingList"))
+							{
+								l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
+							}
+
 							if(SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end())
 							{
 								l_vSetNames.push_back(l_sSetName);
@@ -112,7 +141,16 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 					}
 
 					wxString l_sName;
-					l_sName << l_pcProtoColAttr->GetDisplayName() << wxT(":");
+				    l_sName << l_pcProtoColAttr->GetDisplayName() << wxT(":");
+                    //preventing repetion of group names
+					if (SP_Find(l_vGroupNames, l_sName) == l_vGroupNames.end())
+					{
+				  	   l_vGroupNames.push_back(l_sName);
+					}
+					else
+				    {
+						continue;
+					}
 					l_pcSetsSizer->Add(new wxStaticText( l_pcNotebookPage, wxID_ANY, l_sName ), wxGBPosition{row,0});
 
 					auto l_pcComboBox = new wxChoice( l_pcNotebookPage, wxID_ANY );
