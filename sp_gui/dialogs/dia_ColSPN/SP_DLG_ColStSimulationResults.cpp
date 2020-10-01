@@ -385,14 +385,17 @@ void SP_DLG_ColStSimulationResults::LoadSets()
 		l_pcCombobox->Clear();
 		if (l_pcAttr)
 		{
-			if (j == 0)
+			if (j == 0)//marking set
 			{
 				for (unsigned int i = 1; i < l_pcAttr->GetColCount(); i++)
 				{
 					wxString l_sSetName = l_pcAttr->GetColLabel(i);
-					l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
-					l_pcCombobox->Append(l_sSetName);
-					i++;
+				   if (l_sSetName.Contains(wxT(":")))//by george
+					{
+						l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
+						l_pcCombobox->Append(l_sSetName);
+					}
+					i = i + 2;
 				}
 			}
 
