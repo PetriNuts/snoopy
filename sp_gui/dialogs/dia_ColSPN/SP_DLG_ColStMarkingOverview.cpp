@@ -181,7 +181,7 @@ void SP_DLG_ColStMarkingOverview::OnAddSet(wxCommandEvent& p_cEvent)
 	bool l_bWhite = false;
 	wxTextEntryDialog l_pcDialog( this, _T("Name of the new marking set:"), wxT("Add marking set"));
 	wxString l_sName= wxT("M-Set ");
-	l_sName.Append(wxString::Format(wxT("%d"), m_pcMarkingGrid->GetNumberCols()/2 + 1 ) );
+	l_sName.Append(wxString::Format(wxT("%d"), m_pcMarkingGrid->GetNumberCols()/3 + 1 ) );
 	l_pcDialog.SetValue(l_sName);
 	int l_nModalResult = l_pcDialog.ShowModal();
 	if (wxID_OK == l_nModalResult)
@@ -195,29 +195,37 @@ void SP_DLG_ColStMarkingOverview::OnAddSet(wxCommandEvent& p_cEvent)
 		l_sName = l_pcDialog.GetValue();
 
 		//append
-		int l_nColorCol,l_nValueColumn;
-		if( l_nSelected%2==0 )
+		int l_nColorCol, l_nValueColumn, l_nProdColumn;
+		if( l_nSelected%3==0 )
 		{
 			l_nColorCol = l_nSelected;
-			l_nValueColumn = l_nSelected+1;
+			l_nValueColumn = l_nSelected+2;
+			l_nProdColumn = l_nSelected + 1;
 		}
 		else
 		{
-			l_nColorCol = l_nSelected-1;
+			l_nColorCol = l_nSelected-2;
 			l_nValueColumn = l_nSelected;
+			l_nProdColumn = l_nColorCol + 1;
 		}
 
 		m_pcMarkingGrid->AppendCols( 1);
 		m_pcMarkingGrid->SetColLabelValue(m_pcMarkingGrid->GetNumberCols()-1,	l_sName + wxT(": Color(s)"));
+		m_pcMarkingGrid->AppendCols(1);
+		m_pcMarkingGrid->SetColLabelValue(m_pcMarkingGrid->GetNumberCols() - 1, l_sName + wxT(": Product Color"));
 		m_pcMarkingGrid->AppendCols( 1);
 		m_pcMarkingGrid->SetColLabelValue(m_pcMarkingGrid->GetNumberCols()-1,	l_sName + wxT(": Marking"));
 
 		int l_nGridRow = 0;
 		for (l_nGridRow = 0; l_nGridRow < m_pcMarkingGrid->GetNumberRows(); l_nGridRow++)
 		{
-			m_pcMarkingGrid->SetCellValue(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-2, m_pcMarkingGrid->GetCellValue(l_nGridRow, l_nColorCol) );
-			m_pcMarkingGrid->SetCellAlignment(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-2,wxALIGN_RIGHT, wxALIGN_CENTER);
-			m_pcMarkingGrid->SetCellBackgroundColour(l_nGridRow,m_pcMarkingGrid->GetNumberCols()-2, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+			m_pcMarkingGrid->SetCellValue(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-3, m_pcMarkingGrid->GetCellValue(l_nGridRow, l_nColorCol) );
+			m_pcMarkingGrid->SetCellAlignment(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-3,wxALIGN_RIGHT, wxALIGN_CENTER);
+			m_pcMarkingGrid->SetCellBackgroundColour(l_nGridRow,m_pcMarkingGrid->GetNumberCols()-3, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+
+			m_pcMarkingGrid->SetCellValue(l_nGridRow, m_pcMarkingGrid->GetNumberCols() - 2, m_pcMarkingGrid->GetCellValue(l_nGridRow, l_nProdColumn));
+			m_pcMarkingGrid->SetCellAlignment(l_nGridRow, m_pcMarkingGrid->GetNumberCols() - 2, wxALIGN_RIGHT, wxALIGN_CENTER);
+			m_pcMarkingGrid->SetCellBackgroundColour(l_nGridRow, m_pcMarkingGrid->GetNumberCols() - 2, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
 
 			m_pcMarkingGrid->SetCellValue(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-1, m_pcMarkingGrid->GetCellValue(l_nGridRow, l_nValueColumn) );
 			m_pcMarkingGrid->SetCellAlignment(l_nGridRow, m_pcMarkingGrid->GetNumberCols()-1, wxALIGN_RIGHT, wxALIGN_CENTER);
@@ -227,10 +235,11 @@ void SP_DLG_ColStMarkingOverview::OnAddSet(wxCommandEvent& p_cEvent)
 		}		
 	}
 
+
 }
 
 void SP_DLG_ColStMarkingOverview::OnDeleteSet(wxCommandEvent& p_cEvent)
-{
+{//modified by george
 
 	wxArrayInt l_cSelCols = m_pcMarkingGrid->GetSelectedCols();
 	if ( ! (l_cSelCols.Count() > 0 ))
@@ -243,15 +252,23 @@ void SP_DLG_ColStMarkingOverview::OnDeleteSet(wxCommandEvent& p_cEvent)
 	for(unsigned i = 0; i < l_cSelCols.Count(); i++)
 	{
 		int l_nSelected = l_cSelCols.Item( i);
-		if(l_nSelected%2 == 0)
-		{
+		if(l_nSelected%3 == 0)
+		  {
 			l_vnSelCols.push_back( l_nSelected );
 			l_vnSelCols.push_back( l_nSelected+1 );
+			l_vnSelCols.push_back(l_nSelected +2);
+		}
+		else if (l_nSelected % 3 == 1)
+		{
+		  l_vnSelCols.push_back(l_nSelected - 1);
+		  l_vnSelCols.push_back(l_nSelected);
+		  l_vnSelCols.push_back(l_nSelected + 1);
 		}
 		else
 		{
-			l_vnSelCols.push_back( l_nSelected-1 );
-			l_vnSelCols.push_back( l_nSelected );
+		  l_vnSelCols.push_back( l_nSelected-1 );
+		  l_vnSelCols.push_back(l_nSelected -2);
+		  l_vnSelCols.push_back( l_nSelected );
 		}
 	}
 
@@ -357,97 +374,126 @@ void SP_DLG_ColStMarkingOverview::OnRenameSet(wxCommandEvent& p_cEvent)
 void SP_DLG_ColStMarkingOverview::LoadData()
 {
 	if(! m_pcGraph )
-		return;
+			return;
 
-	SP_DS_ColListAttribute* l_pcColList;
+		SP_DS_ColListAttribute* l_pcColList;
 
-	SP_ListNode::const_iterator l_itElem;
-	vector<SP_DS_Node*> l_vPlaceNodes; 
-	SP_DS_Nodeclass* l_pcNodeclass;	
-	l_pcNodeclass= m_pcGraph->GetNodeclass( SP_DS_DISCRETE_PLACE );
-	if(l_pcNodeclass )
-	{
-		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		SP_ListNode::const_iterator l_itElem;
+		vector<SP_DS_Node*> l_vPlaceNodes;
+		SP_DS_Nodeclass* l_pcNodeclass;
+		l_pcNodeclass= m_pcGraph->GetNodeclass( SP_DS_DISCRETE_PLACE );
+		if(l_pcNodeclass )
 		{
-			l_vPlaceNodes.push_back( dynamic_cast<SP_DS_Node*>(*l_itElem) );
-		}
-	}
-	l_pcNodeclass= m_pcGraph->GetNodeclass( SP_DS_CONTINUOUS_PLACE );
-	if(l_pcNodeclass )
-	{
-		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
-		{
-			l_vPlaceNodes.push_back( dynamic_cast<SP_DS_Node*>(*l_itElem) );
-		}
-	}
-
-	
-	bool l_bWhite = false;
-	wxString l_sPlaceName;
-	wxString l_sLoadName = wxT("-1");
-
-	int l_nGridRowNumber = 0;
-
-	if (m_pcMarkingGrid->GetNumberRows() > 0)
-	{
-		m_pcMarkingGrid->DeleteRows(0, m_pcMarkingGrid->GetNumberRows());
-	}
-	if (m_pcMarkingGrid->GetNumberCols() > 0)
-	{
-		m_pcMarkingGrid->DeleteCols(0, m_pcMarkingGrid->GetNumberCols());
-	}
-
-	LoadSetNames();
-
-	//for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
-	for(unsigned int l_nPos = 0; l_nPos < l_vPlaceNodes.size(); l_nPos++)
-	{
-
-		l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_vPlaceNodes[l_nPos]->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-
-		//( *l_itElem )->Update( true);
-
-		m_pcMarkingGrid->AppendRows( 1);
-		m_pcMarkingGrid->SetRowLabelValue(l_nGridRowNumber, l_sPlaceName);
-
-		l_pcColList	= dynamic_cast< SP_DS_ColListAttribute* >(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST) );
-
-		if(l_pcColList->GetRowCount() == 0)
-		{
-			l_nGridRowNumber++;
-		}
-
-		for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
-		{
-			if(i >= 1)
+			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
 			{
-				m_pcMarkingGrid->AppendRows( 1);
-				m_pcMarkingGrid->SetRowLabelValue(l_nGridRowNumber, wxT(""));
+				l_vPlaceNodes.push_back( dynamic_cast<SP_DS_Node*>(*l_itElem) );
+			}
+		}
+		l_pcNodeclass= m_pcGraph->GetNodeclass( SP_DS_CONTINUOUS_PLACE );
+		if(l_pcNodeclass )
+		{
+			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+			{
+				l_vPlaceNodes.push_back( dynamic_cast<SP_DS_Node*>(*l_itElem) );
+			}
+		}
+
+
+		bool l_bWhite = false;
+		wxString l_sPlaceName;
+		wxString l_sLoadName = wxT("-1");
+
+		int l_nGridRowNumber = 0;
+
+		if (m_pcMarkingGrid->GetNumberRows() > 0)
+		{
+			m_pcMarkingGrid->DeleteRows(0, m_pcMarkingGrid->GetNumberRows());
+		}
+		if (m_pcMarkingGrid->GetNumberCols() > 0)
+		{
+			m_pcMarkingGrid->DeleteCols(0, m_pcMarkingGrid->GetNumberCols());
+		}
+
+		LoadSetNames();
+
+		//for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		for(unsigned int l_nPos = 0; l_nPos < l_vPlaceNodes.size(); l_nPos++)
+		{
+
+			l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_vPlaceNodes[l_nPos]->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+
+			//( *l_itElem )->Update( true);
+
+			m_pcMarkingGrid->AppendRows( 1);
+			m_pcMarkingGrid->SetRowLabelValue(l_nGridRowNumber, l_sPlaceName);
+
+			l_pcColList	= dynamic_cast< SP_DS_ColListAttribute* >(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST) );
+
+			/////////////////old marking sets, which do not have product coloumn//////////
+			unsigned l_nColnum = l_pcColList->GetColCount();
+
+			if(l_pcColList->GetRowCount() == 0)
+			{
+				l_nGridRowNumber++;
 			}
 
-			for (unsigned int j = 0; j < l_pcColList->GetColCount(); j++)
-			{				
-				m_pcMarkingGrid->SetCellValue(l_nGridRowNumber, j, l_pcColList->GetCell(i, j));	
-				m_pcMarkingGrid->SetCellAlignment(l_nGridRowNumber, j, wxALIGN_RIGHT, wxALIGN_CENTER);
-				m_pcMarkingGrid->SetCellBackgroundColour(l_nGridRowNumber,j, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+			for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+			{
+				if(i >= 1)
+				{
+					m_pcMarkingGrid->AppendRows( 1);
+					m_pcMarkingGrid->SetRowLabelValue(l_nGridRowNumber, wxT(""));
+				}
 
-				if(j%2==1)
-					(l_bWhite ? l_bWhite = false : l_bWhite = true );
+				for (unsigned int j = 0; j < l_pcColList->GetColCount(); j++)
+				{
+					if (j % 3 == 1)
+					{
+						m_pcMarkingGrid->SetCellValue(l_nGridRowNumber, j, l_pcColList->GetCell(i, j+1));
+					}
+					else if (j % 3 == 2)
+					{
+						m_pcMarkingGrid->SetCellValue(l_nGridRowNumber, j, l_pcColList->GetCell(i, j-1));
+					}
+					else
+					{
+						m_pcMarkingGrid->SetCellValue(l_nGridRowNumber, j, l_pcColList->GetCell(i, j));
+					}
+
+
+					m_pcMarkingGrid->SetCellAlignment(l_nGridRowNumber, j, wxALIGN_RIGHT, wxALIGN_CENTER);
+					m_pcMarkingGrid->SetCellBackgroundColour(l_nGridRowNumber,j, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
+
+					if(j%3==2)//was 2, changed by george
+						(l_bWhite ? l_bWhite = false : l_bWhite = true );
+				}
+
+				l_nGridRowNumber++;
 			}
-			
-			l_nGridRowNumber++;
-		}			
 
-	}
-
-/*
-	if ( (m_pcMarkingGrid->GetNumberRows() > 0 )
-			&& (m_pcMarkingGrid->GetNumberCols() > 0 ))
-	{
-		m_sOldCellValue = m_pcMarkingGrid->GetCellValue( 0, 0);
-	}
-*/
-
+		}
+		for (unsigned i = 0; i < m_pcMarkingGrid->GetNumberRows(); i++)
+		{
+			for (unsigned j = 0; j < m_pcMarkingGrid->GetNumberCols(); j++)
+			{
+				wxString l_sVal = m_pcMarkingGrid->GetCellValue(i, j);
+				if (l_sVal.IsEmpty())
+				{
+					if (j % 3 == 1)
+					{
+						m_pcMarkingGrid->SetCellValue(i, j, m_pcMarkingGrid->GetCellValue(i,1));
+					}
+					if (j % 3 == 2)
+					{
+						m_pcMarkingGrid->SetCellValue(i, j, m_pcMarkingGrid->GetCellValue(i, 2));
+					}
+					if (j % 3 == 0)
+					{
+						m_pcMarkingGrid->SetCellValue(i, j, m_pcMarkingGrid->GetCellValue(i, 0));
+					}
+				}
+			}
+		}
 }
 
 void SP_DLG_ColStMarkingOverview::SaveData()
@@ -494,11 +540,31 @@ void SP_DLG_ColStMarkingOverview::SaveData()
 
 		int l_nBegin = l_nGridRowNumber;		
 		
-		for(int i = 0; i < m_pcMarkingGrid->GetNumberCols(); i++ )
+		while(l_pcColList->GetColCount() != m_pcMarkingGrid->GetNumberCols())
 		{
 			l_pcColList->AppendEmptyColum();
-			l_pcColList->SetColLabel(i,m_pcMarkingGrid->GetColLabelValue(i));
-		}		
+		}
+
+		for(int i = 0; i < m_pcMarkingGrid->GetNumberCols(); i++ )
+		{
+			//l_pcColList->AppendEmptyColum();
+			if (i % 3 == 0)
+			{
+				l_pcColList->SetColLabel(i, m_pcMarkingGrid->GetColLabelValue(i));
+			}
+			else if (i % 3 == 1)
+			{
+				l_pcColList->SetColLabel(i+1, m_pcMarkingGrid->GetColLabelValue(i));
+			}
+			else if(i%3==2)
+			{
+				l_pcColList->SetColLabel(i-1, m_pcMarkingGrid->GetColLabelValue(i));
+			}
+
+		}
+
+
+		l_pcColList->SetColLabel(m_pcMarkingGrid->GetNumberCols()-1, m_pcMarkingGrid->GetColLabelValue(m_pcMarkingGrid->GetNumberCols() - 2));
 
 		l_pcColList->AppendEmptyRow();
 
@@ -511,7 +577,20 @@ void SP_DLG_ColStMarkingOverview::SaveData()
 			for (int i = 0; i < m_pcMarkingGrid->GetNumberCols(); i++)
 			{
 				wxString l_sValue = m_pcMarkingGrid->GetCellValue(j, i);
-				l_pcColList->SetCell(j-l_nBegin, i, l_sValue);				
+
+				if (i % 3 == 1)
+				{
+					l_pcColList->SetCell(j - l_nBegin, i+1, l_sValue);//i+1
+				}
+				else if (i % 3 == 2)
+				{
+					l_pcColList->SetCell(j - l_nBegin, i-1, l_sValue);//i-1
+				}
+				else
+				{
+					l_pcColList->SetCell(j - l_nBegin, i, l_sValue);
+				}
+
 			}
 
 			if( j < m_pcMarkingGrid->GetNumberRows()-1 )
@@ -573,6 +652,7 @@ void SP_DLG_ColStMarkingOverview::SaveData()
 	SP_Core::Instance()->GetRootDocument()->Modify(true);
 }
 
+
 void SP_DLG_ColStMarkingOverview::OnCellValueChanged(wxGridEvent& ev)
 {
 
@@ -599,42 +679,79 @@ void SP_DLG_ColStMarkingOverview::OnGridCellSelected(wxGridEvent& ev)
 void SP_DLG_ColStMarkingOverview::LoadSetNames()
 {
 	SP_DS_Nodeclass* l_pcNodeclass;	
-	l_pcNodeclass= m_pcGraph->GetNodeclass( SP_DS_DISCRETE_PLACE );
-	if(l_pcNodeclass)
-	{
-		if(l_pcNodeclass->GetElements()->size() > 0)
+		l_pcNodeclass= m_pcGraph->GetNodeclass( SP_DS_DISCRETE_PLACE );
+		if(l_pcNodeclass)
 		{
-			SP_DS_Node* l_pcNode = l_pcNodeclass->GetElements()->front();
-			SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
-			for(unsigned int i = 0; i < l_pcAttr->GetColCount(); i++ )
+			if(l_pcNodeclass->GetElements()->size() > 0)
 			{
-				wxString l_sSetName = l_pcAttr->GetColLabel(i);
-				m_pcMarkingGrid->AppendCols(1);
-				m_pcMarkingGrid->SetColLabelValue(i, l_sSetName);
+				SP_DS_Node* l_pcNode = l_pcNodeclass->GetElements()->front();
+				SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
+
+				for (unsigned int i = 0; i < l_pcAttr->GetColCount(); i++)//by george , first add coloumns first
+				{
+
+					m_pcMarkingGrid->AppendCols(1);
+
+				}
+
+				for (unsigned int i = 0; i < l_pcAttr->GetColCount(); i++)//by george , first add coloumns first
+				{
+					wxString l_sSetName = l_pcAttr->GetColLabel(i);
+
+					if (i % 3 == 0)
+					{
+						m_pcMarkingGrid->SetColLabelValue(i, l_sSetName);
+					}
+					else if (i % 3 == 1)
+					{
+						m_pcMarkingGrid->SetColLabelValue(i + 1, l_sSetName);
+					}
+					else
+					{
+						m_pcMarkingGrid->SetColLabelValue(i - 1, l_sSetName);
+					}
+				}
+
+				return;
 			}
-			return;
 		}
-	}
 
 
-	l_pcNodeclass= m_pcGraph->GetNodeclass( SP_DS_CONTINUOUS_PLACE );
-	if(l_pcNodeclass)
-	{
-		if(l_pcNodeclass->GetElements()->size() > 0)
+		l_pcNodeclass= m_pcGraph->GetNodeclass( SP_DS_CONTINUOUS_PLACE );
+		if(l_pcNodeclass)
 		{
-			SP_DS_Node* l_pcNode = l_pcNodeclass->GetElements()->front();
-			SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
-			for(unsigned int i = 0; i < l_pcAttr->GetColCount(); i++ )
+			if(l_pcNodeclass->GetElements()->size() > 0)
 			{
-				wxString l_sSetName = l_pcAttr->GetColLabel(i);
-				m_pcMarkingGrid->AppendCols(1);
-				m_pcMarkingGrid->SetColLabelValue(i, l_sSetName);
+				SP_DS_Node* l_pcNode = l_pcNodeclass->GetElements()->front();
+				SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
+
+				for (unsigned int i = 0; i < l_pcAttr->GetColCount(); i++)//by george , first add coloumns first
+				{
+
+					m_pcMarkingGrid->AppendCols(1);
+
+				}
+				for (unsigned int i = 0; i < l_pcAttr->GetColCount(); i++)//by george , first add coloumns first
+				{
+					wxString l_sSetName = l_pcAttr->GetColLabel(i);
+
+					if (i % 3 == 0)
+					{
+						m_pcMarkingGrid->SetColLabelValue(i, l_sSetName);
+					}
+					else if (i % 3 == 1)
+					{
+						m_pcMarkingGrid->SetColLabelValue(i + 1, l_sSetName);
+					}
+					else
+					{
+						m_pcMarkingGrid->SetColLabelValue(i - 1, l_sSetName);
+					}
+				}
+
+				return;
 			}
-			return;
 		}
-	}
-	
-	
 }
 
 bool SP_DLG_ColStMarkingOverview::ExistMarkingSetName(const wxString& p_sName)
