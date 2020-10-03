@@ -1462,6 +1462,12 @@ bool SP_CPN_ValueAssign::CollectAllDeclarations()
 				 
 				wxString l_sConstVal;
 				l_sConstVal << l_nValue;
+
+				if (l_sType == wxT("double"))
+				{
+					l_sConstVal.Clear();
+					l_sConstVal <<  l_dVal;
+				}
 				SP_CPN_Collist_Declarations l_scDeclaration;
 	  		    l_scDeclaration.m_sName = l_sName;
 	      	    l_scDeclaration.m_sType = l_sType;
