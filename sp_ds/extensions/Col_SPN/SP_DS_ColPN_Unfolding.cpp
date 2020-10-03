@@ -453,6 +453,7 @@ bool SP_DS_ColPN_Unfolding::UnfoldPlaceNodeClass(wxString p_sPlaceNodeClass)
 				l_structDetails.m_sNodeType = p_sPlaceNodeClass;
 				l_structDetails.m_sColorSet = l_sColorSetName;
 				l_structDetails.m_bFixed = l_bColPlaceFixed;
+				l_structDetails.m_bIsolated = true;//by george 23.8.2020
 
 				wxString l_sColor = itMap->first;
 				if( p_sPlaceNodeClass == SP_DS_CONTINUOUS_PLACE )
