@@ -268,8 +268,12 @@ bool SP_CPN_ValueAssign::InitializeBasicColorset()
 		{
 			//Deal with subset
 			vector<wxString> l_vColors;
+			vector<wxString> l_vRealColor;
 			SP_CPN_SyntaxChecking l_cSyntaxChecking;
 			if( ! l_cSyntaxChecking.GenerateSubSetColorSet(l_sColorsetName,l_sParseString,l_sDataType,m_pcColorSetClass,l_vColors))
+				return false;
+
+			if (!l_cSyntaxChecking.GenerateSubSetColorSet(l_sColorsetName, l_sParseString, l_sDataType, m_pcColorSetClass, l_vRealColor,true))//by george
 				return false;
 
 			SP_CPN_ColorSet* l_pcColorSet = m_pcColorSetClass->LookupColorSet( l_sDataType );
@@ -278,7 +282,8 @@ bool SP_CPN_ValueAssign::InitializeBasicColorset()
 
 			SP_CPN_DATATYPE l_eDataType = l_pcColorSet->GetDataType();
 			m_pColorSet->SetDataType( l_eDataType );
-			m_pColorSet->SetStringValue( l_vColors );	
+			m_pColorSet->SetStringValue( l_vColors );
+			m_pColorSet->SetRealColor(l_vRealColor);//by george,for elemOf operator
 
 			m_pColorSet->SetFatherSet( l_sDataType );
 			l_pcColorSet->SetSubSet( l_sColorsetName );
@@ -392,10 +397,14 @@ bool SP_CPN_ValueAssign::InitializeStructuredColorset()
 		{
 			//Deal with subset
 			vector<wxString> l_vColors;
+			vector<wxString> l_vRealColor;
 			SP_CPN_SyntaxChecking l_cSyntaxChecking;
 			
 			if( ! l_cSyntaxChecking.GenerateSubSetColorSet(l_sColorsetName,l_sParseString,l_sDataType,m_pcColorSetClass,l_vColors))
 				return false;
+
+			if( ! l_cSyntaxChecking.GenerateSubSetColorSet(l_sColorsetName,l_sParseString,l_sDataType,m_pcColorSetClass,l_vRealColor,true))
+							return false;
 
 			wxString l_serror = l_sColorsetName;
 			SP_CPN_ColorSet* l_pcColorSet = m_pcColorSetClass->LookupColorSet( l_sDataType );	
@@ -408,7 +417,8 @@ bool SP_CPN_ValueAssign::InitializeStructuredColorset()
 			
 			SP_CPN_DATATYPE l_eDataType = l_pcColorSet->GetDataType();		
 			m_pColorSet->SetDataType( l_eDataType );		
-			m_pColorSet->SetStringValue( l_vColors );			
+			m_pColorSet->SetStringValue( l_vColors );
+			m_pColorSet->SetRealColor(l_vRealColor);//by george
 
 			m_pColorSet->SetFatherSet( l_sDataType );		
 			l_pcColorSet->SetSubSet( l_sColorsetName );		
@@ -699,6 +709,8 @@ bool SP_CPN_ValueAssign::InitializeConstant()
 			l_ConstantStruct.m_DataType = CPN_INDEX;
 		else if(l_ConstantType == wxT("product"))
 			l_ConstantStruct.m_DataType = CPN_PRODUCT;
+		else if(l_ConstantType == wxT("double"))
+			l_ConstantStruct.m_DataType = CPN_DOUBLE;//by george for cont. pns
 
 		else if(l_ConstantType == wxT("----Basic types----"))
 		{
@@ -863,7 +875,22 @@ bool SP_CPN_ValueAssign::InitializeBasicTypeConstant()
 		}
 		else if (l_ConstantType == wxT("double") || l_ConstantType == wxT("TFN"))
 		{//add by George Assaf (constant harmonizing)
-			//constant as a parameter
+			//double constant to be used as multiplicity or to init. marking in colCpn nets
+			if(l_ConstantType == wxT("double"))//by george
+			 {
+				double l_dValue;
+				l_ConstantStruct.m_DataType = CPN_DOUBLE;
+
+				if (l_sConstantValue.ToDouble(&l_dValue))
+				{
+				   l_ConstantStruct.m_DoubleValue = l_dValue;
+				}
+				else
+				{
+				 return false;
+				}
+
+			}
 			 
 		}
 		else 
@@ -1256,10 +1283,10 @@ bool SP_CPN_ValueAssign::InitializeFunctionParseTree(SP_CPN_ColorSetClass &p_Col
 	for(itMap = m_FunctionMap.begin(); itMap != m_FunctionMap.end(); itMap++)
 	{	
 
-		if(itMap->second.m_sFunctionBody.Contains(wxT("elemOf")))
-		{
-			continue;
-		}
+		//if(itMap->second.m_sFunctionBody.Contains(wxT("elemOf")))
+		//{
+		//	continue;
+		//}
 		m_pParseContext = make_CPN_Parse_Context();
 		m_pDriver = make_CPN_Driver(*m_pParseContext);
 		
@@ -1422,10 +1449,16 @@ bool SP_CPN_ValueAssign::CollectAllDeclarations()
 		if (l_FE.IsOk())
 		{
 			SP_FunctionPtr l_Function = l_FE.getFunction();
+			double l_dVal = 0.0;
 			long l_nValue = 0;
 			if (l_Function->isValue())
 			{
 				l_nValue = l_Function->getValue();
+
+				if (l_sType == wxT("double"))
+				{
+				  l_dVal= l_Function->getValue();
+				}
 				 
 				wxString l_sConstVal;
 				l_sConstVal << l_nValue;
@@ -1455,6 +1488,13 @@ bool SP_CPN_ValueAssign::CollectAllDeclarations()
 				else if (l_sType == wxT("double"))
 				{
 					l_nValue = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
+					wxString l_sConstVal;
+					l_sConstVal << l_nValue;
+					SP_CPN_Collist_Declarations l_scDeclaration;
+					l_scDeclaration.m_sName = l_sName;
+					l_scDeclaration.m_sType = l_sType;
+					l_scDeclaration.m_sConstantvalue = l_sConstVal;
+					l_vDeclarations.push_back(l_scDeclaration);
 				}
 				l_pcFR->registerFunction(l_sName, to_string(l_nValue));
 			}

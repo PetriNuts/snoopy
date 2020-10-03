@@ -180,7 +180,58 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 									m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;		
 								return true;
 							}
+							else if(l_pcColorSet->GetName()== m_VariableName)
+							{//byy beorge
+								m_ParseNode_Info.m_NodeType = CPN_VARIABLE_NODE;//CPN_ELEMENT_OF_NODE
+								m_ParseNode_Info.m_ColorSet = l_pcColorSet->GetName();
+								m_ParseNode_Info.m_DataType = CPN_ENUM;
+								m_ParseNode_Info.m_StringValue = &m_VariableName;
+								m_ParseNode_Info.m_CheckedString = m_VariableName;
+								m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
+								if (m_ParseNode_Info.m_sColorSetList == wxT(""))
+									m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+								return true;
+							}
 						}
+					}
+					else
+					{//by george for elemOf operator
+						if (l_pcColorSet->GetName() == m_VariableName)
+						{
+							if ((l_pcColorSet)->GetName() == m_VariableName && (l_pcColorSet)->GetDataType() == CPN_PRODUCT)
+							{
+								m_ParseNode_Info.m_NodeType = CPN_VARIABLE_NODE;
+								m_ParseNode_Info.m_ColorSet = (l_pcColorSet)->GetName();
+								m_ParseNode_Info.m_DataType = (l_pcColorSet)->GetDataType();
+								m_ParseNode_Info.m_StringValue = &m_VariableName;
+								auto vComp = (l_pcColorSet)->GetComponentName();
+								wxString l_sList;
+								if (vComp.size()>0)
+								{
+									for (auto vit = vComp.begin(); vit != vComp.end(); ++vit)
+									{
+										l_sList << (*vit) << wxT(",");
+									}
+									l_sList = l_sList.BeforeLast(wxChar(','));
+								}
+								m_ParseNode_Info.m_sColorSetList = l_sList;// m_ParseNode_Info.m_ColorSet;
+								if (m_ParseNode_Info.m_sColorSetList == wxT(""))
+									m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+								return true;
+							}
+							else
+							{
+								m_ParseNode_Info.m_NodeType = CPN_VARIABLE_NODE;
+								m_ParseNode_Info.m_ColorSet = (l_pcColorSet)->GetName();
+								m_ParseNode_Info.m_DataType = (l_pcColorSet)->GetDataType();
+								m_ParseNode_Info.m_StringValue = &m_VariableName;
+
+								m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
+								if (m_ParseNode_Info.m_sColorSetList == wxT(""))
+									m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+								return true;
+							}
+					    }
 					}
 				}
 
@@ -362,11 +413,51 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 				}
 			}
 
+		////////////////////////////
+		//check if the Identifier is a colorset name, required for elemOf operator
+		for (it = m_pColorSetClass->GetColorSetVector()->begin(); it != m_pColorSetClass->GetColorSetVector()->end(); it++)
+		{
+			if ((*it)->GetName() == m_VariableName && (*it)->GetDataType()!=CPN_PRODUCT)
+			{
+				m_ParseNode_Info.m_NodeType = CPN_VARIABLE_NODE;
+				m_ParseNode_Info.m_ColorSet = (*it)->GetName();
+				m_ParseNode_Info.m_DataType = (*it)->GetDataType();
+				m_ParseNode_Info.m_StringValue = &m_VariableName;
+
+				m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
+				if (m_ParseNode_Info.m_sColorSetList == wxT(""))
+                   m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+             return true;
+			}
+
+			if ((*it)->GetName() == m_VariableName && (*it)->GetDataType() == CPN_PRODUCT)
+			{
+				m_ParseNode_Info.m_NodeType = CPN_VARIABLE_NODE;
+				m_ParseNode_Info.m_ColorSet = (*it)->GetName();
+				m_ParseNode_Info.m_DataType = (*it)->GetDataType();
+				m_ParseNode_Info.m_StringValue = &m_VariableName;
+				auto vComp=(*it)->GetComponentName();
+				wxString l_sList;
+				if (vComp.size()>0)
+				{
+					for (auto vit = vComp.begin(); vit != vComp.end(); ++vit)
+					{
+						l_sList << (*vit) << wxT(",");
+					}
+					l_sList=l_sList.BeforeLast(wxChar(','));
+				}
+				m_ParseNode_Info.m_sColorSetList = l_sList;// m_ParseNode_Info.m_ColorSet;
+				if (m_ParseNode_Info.m_sColorSetList == wxT(""))
+					m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+				return true;
+			}
+		}
+		//////////////////////////
 		//for other cases, we report errors			
-		wxString l_sError;				
+		wxString l_sError;
 		l_sError << wxT("Variable, constant or color: ") << m_VariableName << wxT(" is not defined. Position: ") << m_sErrorPosition;
 		SP_LOGERROR(l_sError);
-		return false;		
+		return false;
 	}
 
 	return false;
@@ -375,6 +466,7 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 ////only for evaluation
 void SP_CPN_Parse_Variable_Node::SetValue()
 {
+	/******************/
 	//for user-defined functions
 	if (!(m_ParseNode_Info.m_NodeType == CPN_VARIABLE_NODE || m_ParseNode_Info.m_NodeType == CPN_PLACE_NODE))
 		return;
@@ -392,49 +484,173 @@ void SP_CPN_Parse_Variable_Node::SetValue()
 		m_ParseNode_Info.m_stringMultiplicity = l_sValue;
 		return;
 	}
-		
 
-	if( m_bFunctionFlag )
+	//check if the var name is a color set name, required for elemOf operator
+	//by george
+	bool l_bIsColorSet = false;
+	for (auto itV = m_pColorSetClass->GetColorSetVector()->begin(); itV != m_pColorSetClass->GetColorSetVector()->end(); ++itV)
 	{
+		if (m_VariableName == (*itV)->GetName())
+		{
+			l_bIsColorSet = true;
+			break;
+		}
+	}
+
+	if (m_bFunctionFlag)
+	{
+		if (l_bIsColorSet) return;//by george
+
 		SP_CPN_Function l_FunctionStruct = m_pColorSetClass->GetFunctionMap()->find(m_sFunctionName)->second;
 		SP_CPN_Parameter l_ParameterStruct = l_FunctionStruct.m_ParameterMap.find(m_VariableName)->second;
-		if(m_ParseNode_Info.m_DataType == CPN_INTEGER)
+		if (m_ParseNode_Info.m_DataType == CPN_INTEGER)
 			m_ParseNode_Info.m_IntegerValue = l_ParameterStruct.m_IntegerValue;
 
-		if(m_ParseNode_Info.m_DataType == CPN_BOOLEAN)
+		if (m_ParseNode_Info.m_DataType == CPN_BOOLEAN)
 			m_ParseNode_Info.m_BooleanValue = l_ParameterStruct.m_BooeanValue;
 
-		if( m_ParseNode_Info.m_DataType == CPN_STRING||
-			m_ParseNode_Info.m_DataType == CPN_INDEX||
-			m_ParseNode_Info.m_DataType == CPN_DOT||
-			m_ParseNode_Info.m_DataType == CPN_PRODUCT||
-			m_ParseNode_Info.m_DataType == CPN_ENUM )			// the enum should be carefully considered.
-			{
-				m_String = l_ParameterStruct.m_StringValue;
-				m_ParseNode_Info.m_StringValue = &m_String;
-			}	
+		if (m_ParseNode_Info.m_DataType == CPN_STRING ||
+			m_ParseNode_Info.m_DataType == CPN_INDEX ||
+			m_ParseNode_Info.m_DataType == CPN_DOT ||
+			m_ParseNode_Info.m_DataType == CPN_PRODUCT ||
+			m_ParseNode_Info.m_DataType == CPN_ENUM)			// the enum should be carefully considered.
+		{
+			m_String = l_ParameterStruct.m_StringValue;
+			m_ParseNode_Info.m_StringValue = &m_String;
+		}
 		//for the union type, its data type should be dynamically determined 			
 	}
 	//for ordinary expressions
 	else
-	{				
-		if(m_ParseNode_Info.m_DataType == CPN_INTEGER)
+	{
+		if(l_bIsColorSet)
+		  {
+			///for elemOf with gecode unfolder
+			if (m_String.IsEmpty())//for elemOf, by george
+			{
+				for (auto l_itFind = m_pColorSetClass->GetVariableMap()->begin(); l_itFind != m_pColorSetClass->GetVariableMap()->end(); ++l_itFind)
+				{
+					if (l_itFind->first.Contains(wxT("__AUX_CS_")) && l_itFind->first.Contains(m_VariableName))
+					{
+						m_String = l_itFind->second.m_StringValue;
+						m_ParseNode_Info.m_StringValue = &m_String;
+					}
+				}
+
+				//by george for elemOF
+				if (m_String.IsEmpty())
+				{
+					SP_CPN_ColorSet* l_pcColorSet = m_pColorSetClass->LookupColorSet(m_VariableName);
+					wxString l_sVal;
+					int l_nelemCount = 0;
+					l_sVal << wxT("(");
+					std::vector<wxString> l_sCompCSNames;
+
+					if (l_pcColorSet)
+					{
+						l_sCompCSNames = l_pcColorSet->GetComponentName();
+					}
+					for (auto v : l_sCompCSNames)
+					{
+						for (auto l_itFind = m_pColorSetClass->GetVariableMap()->begin(); l_itFind != m_pColorSetClass->GetVariableMap()->end(); ++l_itFind)
+						{
+							wxString l_sRankAux; l_sRankAux << l_nelemCount;
+							if (l_itFind->first.Contains(wxT("__AUX_CS_")) && l_itFind->first.Contains(v) && l_itFind->first.Contains(l_sRankAux))
+							{
+								//m_String = l_itFind->second.m_StringValue;
+								m_String = l_itFind->second.m_ColorSet;
+								//m_ParseNode_Info.m_StringValue = &m_String;
+								l_sVal << m_String << wxT(",");
+								l_nelemCount++;
+							}
+						}
+					}
+
+					if (l_nelemCount == l_sCompCSNames.size())
+					{
+						l_sVal = l_sVal.BeforeLast(wxChar(','));
+						l_sVal << wxT(")");
+						m_String = l_sVal;
+						m_ParseNode_Info.m_StringValue = &m_String;
+					}
+
+				}
+
+			}
+			/////for gecode///
+			return;
+		}
+
+		if (m_ParseNode_Info.m_DataType == CPN_INTEGER)
 			m_ParseNode_Info.m_IntegerValue = m_pColorSetClass->GetVariableMap()->find(m_VariableName)->second.m_IntegerValue;
 
-		if(m_ParseNode_Info.m_DataType == CPN_BOOLEAN)
+		if (m_ParseNode_Info.m_DataType == CPN_BOOLEAN)
 			m_ParseNode_Info.m_BooleanValue = m_pColorSetClass->GetVariableMap()->find(m_VariableName)->second.m_BooeanValue;
 
-		if( m_ParseNode_Info.m_DataType == CPN_STRING||
-			m_ParseNode_Info.m_DataType == CPN_INDEX||
-			m_ParseNode_Info.m_DataType == CPN_DOT||
-			m_ParseNode_Info.m_DataType == CPN_PRODUCT||
-			m_ParseNode_Info.m_DataType == CPN_ENUM )			// the enum should be carefully considered.
+		if (m_ParseNode_Info.m_DataType == CPN_STRING ||
+			m_ParseNode_Info.m_DataType == CPN_INDEX ||
+			m_ParseNode_Info.m_DataType == CPN_DOT ||
+			m_ParseNode_Info.m_DataType == CPN_PRODUCT ||
+			m_ParseNode_Info.m_DataType == CPN_ENUM)			// the enum should be carefully considered.
 		{
 			m_String = m_pColorSetClass->GetVariableMap()->find(m_VariableName)->second.m_StringValue;
 			m_ParseNode_Info.m_StringValue = &m_String;
-		}				
+
+		}
 	}
-	
+
+	/**
+	if (m_String.IsEmpty())//for elemOf, by george
+	{
+		for (auto l_itFind = m_pColorSetClass->GetVariableMap()->begin(); l_itFind != m_pColorSetClass->GetVariableMap()->end(); ++l_itFind)
+		{
+			if (l_itFind->first.Contains(wxT("__AUX_CS_")) && l_itFind->first.Contains(m_VariableName))
+			{
+				m_String = l_itFind->second.m_StringValue;
+				m_ParseNode_Info.m_StringValue = &m_String;
+            }
+		}
+
+		//by george for elemOF
+		if (m_String.IsEmpty())
+		{
+			SP_CPN_ColorSet* l_pcColorSet = m_pColorSetClass->LookupColorSet(m_VariableName);
+			wxString l_sVal;
+			int l_nelemCount = 0;
+			l_sVal << wxT("(");
+			std::vector<wxString> l_sCompCSNames;
+
+			if (l_pcColorSet)
+			{
+				 l_sCompCSNames = l_pcColorSet->GetComponentName();
+			}
+			for (auto v : l_sCompCSNames)
+			{
+				for (auto l_itFind = m_pColorSetClass->GetVariableMap()->begin(); l_itFind != m_pColorSetClass->GetVariableMap()->end(); ++l_itFind)
+				{
+					wxString l_sRankAux; l_sRankAux << l_nelemCount;
+					if (l_itFind->first.Contains(wxT("__AUX_CS_")) && l_itFind->first.Contains(v) && l_itFind->first.Contains(l_sRankAux))
+					{
+						m_String = l_itFind->second.m_StringValue;
+						//m_ParseNode_Info.m_StringValue = &m_String;
+						l_sVal << m_String << wxT(",");
+						l_nelemCount++;
+					}
+				}
+			}
+
+			if (l_nelemCount == l_sCompCSNames.size())
+			{
+				l_sVal = l_sVal.BeforeLast(wxChar(','));
+				l_sVal << wxT(")");
+				m_String = l_sVal;
+				m_ParseNode_Info.m_StringValue = &m_String;
+			}
+
+		}
+
+	}
+	*/
 }
 
 
@@ -451,6 +667,41 @@ bool SP_CPN_Parse_Variable_Node::GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver
 		{
 			m_ParseNode_Info.m_IntConstraintExpr = expr(p_cCSPSolver, m_ParseNode_Info.m_IntegerValue );		
 			return true;
+		}
+
+		else if (m_ParseNode_Info.m_NodeType == CPN_VARIABLE_NODE && m_ParseNode_Info.m_DataType == CPN_PRODUCT)
+		{//by george
+			bool l_bIsfound = false;
+			std::vector<IntVar> vvc;
+			for (auto itV = m_pColorSetClass->GetColorSetVector()->begin(); itV != m_pColorSetClass->GetColorSetVector()->end(); ++itV)
+			{
+				if (m_VariableName == (*itV)->GetName())
+				{
+					for (auto itVar = m_pColorSetClass->GetVariableMap()->begin(); itVar != m_pColorSetClass->GetVariableMap()->end(); ++itVar)
+					{
+						if (itVar->first.Contains(wxT("__AUX_CS")))
+						{
+							l_bIsfound = true;
+							wxString l_sVarName = itVar->first;
+
+							vvc.push_back(expr(p_cCSPSolver, p_cCSPSolver.GetGecodeIntVar(l_sVarName)));
+						}
+
+					}
+
+				}
+			}
+			if (vvc.size() > 0)
+			{
+				//m_ParseNode_Info.m_vIntconstraintVector = new std::vector<IntVar>(2);
+				for (auto elem : vvc)
+				{
+					m_ParseNode_Info.m_vIntconstraintVector->push_back(elem);
+
+
+				}
+			}
+			return l_bIsfound;
 		}
 		else
 		{
@@ -881,12 +1132,6 @@ SP_CPN_ParseNode_Info SP_CPN_Parse_Function_Node::evaluate()
 		SP_CPN_Function l_FunctionStruct;
 		l_FunctionStruct = m_pColorSetClass->GetFunctionMap()->find(l_sFunctionName)->second;
 		//l_FunctionStruct.m_pParseContext->SetFunctionFlag(true);
-		wxString l_sFunBody=l_FunctionStruct.m_sFunctionBody;
-		if(l_sFunBody.Contains("elemOf"))
-		{
-			SP_LOGMESSAGE(wxT("elemOf operator is not supported yet by Gecode and Generic unfolders"));
-			return m_ParseNode_Info;
-		}
 		l_FunctionStruct.m_pParseContext->SetFunctionName(l_FunctionStruct.m_sFunctionName);
 
 		//SP_CPN_ParseNode* l_pcParseNode = *(l_FunctionStruct.m_pParseContext->GetExpressionsVector()->begin());
@@ -1552,20 +1797,20 @@ bool SP_CPN_Parse_Power_Node::check()
 	{
 		wxString l_sError;					
 		l_sError = wxT("Operands of the power operator error. Position: ") +m_sErrorPosition;
-		SP_LOGERROR(l_sError);
-		return false;
+SP_LOGERROR(l_sError);
+return false;
 	}
 
 	m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
 
-	if(l_LeftNodeInfo->m_ColorSet != wxT(""))
+	if (l_LeftNodeInfo->m_ColorSet != wxT(""))
 		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
 
-	if(l_RightNodeInfo->m_ColorSet != wxT(""))
+	if (l_RightNodeInfo->m_ColorSet != wxT(""))
 		m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
 
-	if(m_ParseNode_Info.m_ColorSet != wxT(""))
-		m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;	
+	if (m_ParseNode_Info.m_ColorSet != wxT(""))
+		m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
 	else
 	{
 		m_ParseNode_Info.m_sColorSetList = wxT("");
@@ -1578,18 +1823,18 @@ bool SP_CPN_Parse_Power_Node::check()
 
 bool SP_CPN_Parse_Equal_Node::check()
 {
-	if(!m_pLeft->check())
+	if (!m_pLeft->check())
 		return false;
-	if(!m_pRight->check())
+	if (!m_pRight->check())
 		return false;
 
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if(l_LeftNodeInfo->m_DataType != l_RightNodeInfo->m_DataType  )
+	if (l_LeftNodeInfo->m_DataType != l_RightNodeInfo->m_DataType)
 	{
-		wxString l_sError;					
-		l_sError = wxT("Operands of the logic Equal operator error. Position: ") +m_sErrorPosition;
+		wxString l_sError;
+		l_sError = wxT("Operands of the logic Equal operator error. Position: ") + m_sErrorPosition;
 		SP_LOGERROR(l_sError);
 		return false;
 	}
@@ -1599,18 +1844,18 @@ bool SP_CPN_Parse_Equal_Node::check()
 
 bool SP_CPN_Parse_NotEqual_Node::check()
 {
-	if(!m_pLeft->check())
+	if (!m_pLeft->check())
 		return false;
-	if(!m_pRight->check())
+	if (!m_pRight->check())
 		return false;
 
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if(l_LeftNodeInfo->m_DataType != l_RightNodeInfo->m_DataType  )
+	if (l_LeftNodeInfo->m_DataType != l_RightNodeInfo->m_DataType)
 	{
-		wxString l_sError;					
-		l_sError = wxT("Operands of the logic NotEqual operator error. Position: ") +m_sErrorPosition;
+		wxString l_sError;
+		l_sError = wxT("Operands of the logic NotEqual operator error. Position: ") + m_sErrorPosition;
 		SP_LOGERROR(l_sError);
 		return false;
 	}
@@ -1620,18 +1865,18 @@ bool SP_CPN_Parse_NotEqual_Node::check()
 
 bool SP_CPN_Parse_GreaterThan_Node::check()
 {
-	if(!m_pLeft->check())
+	if (!m_pLeft->check())
 		return false;
-	if(!m_pRight->check())
+	if (!m_pRight->check())
 		return false;
 
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if(!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER))
+	if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER))
 	{
-		wxString l_sError;					
-		l_sError = wxT("Operands of the logic Greatthan operator error. Position: ") +m_sErrorPosition;
+		wxString l_sError;
+		l_sError = wxT("Operands of the logic Greatthan operator error. Position: ") + m_sErrorPosition;
 		SP_LOGERROR(l_sError);
 		return false;
 	}
@@ -1640,16 +1885,18 @@ bool SP_CPN_Parse_GreaterThan_Node::check()
 
 bool SP_CPN_Parse_GreaterEqual_Node::check()
 {
-	if(!m_pLeft->check())
+	if (!m_pLeft->check())
 		return false;
-	if(!m_pRight->check())
+	if (!m_pRight->check())
 		return false;
 
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if(!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER))
+	if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER))
+
 	{
+
 		wxString l_sError;					
 		l_sError = wxT("Operands of the logic Greaterthan&Equal operator error. Position: ") +m_sErrorPosition;
 		SP_LOGERROR(l_sError);
@@ -1657,7 +1904,161 @@ bool SP_CPN_Parse_GreaterEqual_Node::check()
 	}
 	return true;
 }
+////////////////////////////////////////
 
+bool SP_CPN_Parse_Element_Of_Node::DoEval(wxString p_sColorSet, std::vector<wxString>& p_vColors)
+{
+	SP_CPN_ColorSet* l_pcColorSet2 = m_pColorSetClass->LookupColorSet(p_sColorSet);// (*m_pColorSetClass->GetColorSetVector())[k];
+
+	if (!l_pcColorSet2)
+		return false;
+
+	//std::vector<int> llV=l_pcColorSet2->GetRealColorStringValue();
+
+	p_vColors = l_pcColorSet2->GetRealColorStringValue();
+
+	return true;
+	/**
+	wxString l_sCsName = l_pcColorSet2->GetName();
+	if (l_sCsName == p_sColorSet)
+	{
+
+		if (l_pcColorSet2->IsColor(p_sColor))
+		{
+			m_ParseNode_Info.m_BooleanValue = TRUE;
+			return true;
+
+		}
+		else
+		{
+			m_ParseNode_Info.m_BooleanValue = FALSE;
+			return false;
+		}
+
+	}
+	*/
+	return false;
+}
+
+bool SP_CPN_Parse_Element_Of_Node::check()
+{
+	if (!m_pLeft->check())
+		return false;
+	if (!m_pRight->check())
+		return false;
+
+	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
+	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
+
+	if (!((l_LeftNodeInfo->m_NodeType==CPN_VARIABLE_NODE || l_LeftNodeInfo->m_DataType == CPN_INTEGER || l_LeftNodeInfo->m_DataType == CPN_PRODUCT)&& (  m_pRight->GetParseNodeInfo()->m_ColorSet !=wxT(""))))
+
+	{
+
+		wxString l_sError;
+		l_sError = wxT("Operands of the elemOf operator error. Position: ") +m_sErrorPosition;
+		SP_LOGERROR(l_sError);
+		return false;
+	}
+
+
+	//here we must add aux variable
+	if (l_RightNodeInfo->m_NodeType == CPN_VARIABLE_NODE && l_RightNodeInfo->m_DataType != CPN_PRODUCT)
+	{
+
+		if (l_RightNodeInfo->m_DataType == CPN_ENUM || l_RightNodeInfo->m_DataType == CPN_INTEGER)
+		{
+			wxString l_sColourSets = l_RightNodeInfo->m_ColorSet;
+			wxString l_sTemp = wxT("__AUX_CS_");
+			wxString l_sCs = l_RightNodeInfo->m_CheckedString;
+			l_sTemp << l_sCs << wxT("_0");
+
+			SP_CPN_Variable_Constant l_variableStruct;
+			l_variableStruct.m_ColorSet = l_sCs;
+			l_variableStruct.m_DataType = l_RightNodeInfo->m_DataType;
+			std::pair<wxString, SP_CPN_Variable_Constant> l_pair;
+			l_pair.first = l_sTemp;
+	    	l_pair.second = l_variableStruct;
+			m_pColorSetClass->GetVariableMap()->insert(l_pair);
+
+	 	}
+
+	}
+	else if (l_RightNodeInfo->m_NodeType == CPN_VARIABLE_NODE &&  l_RightNodeInfo->m_DataType ==CPN_PRODUCT)
+	{
+		wxArrayString l_arrCS;
+		wxString l_sColourSets = l_RightNodeInfo->m_sColorSetList;
+		if (l_sColourSets.Contains(","))
+		{
+			l_arrCS.Add(l_sColourSets.BeforeFirst(','));
+			l_arrCS.Add(l_sColourSets.AfterFirst(','));
+
+		}
+		//auxuliary varibles naming convention for Product: __AUX_CS_PRODCS_SIMPLECS_i
+		wxString l_sTemp = wxT("__AUX_CS_");
+		l_sTemp << l_RightNodeInfo->m_ColorSet << wxT("_");
+		int j = 0;
+		for (auto cs : l_arrCS)
+		{
+			wxString l_var;
+			l_var << l_sTemp << cs << wxT("_") << j;
+
+			SP_CPN_Variable_Constant l_variableStruct;
+
+			l_variableStruct.m_ColorSet = cs;
+
+		SP_CPN_ColorSet* l_pcColorSet=m_pColorSetClass->LookupColorSet(cs);
+
+			if (l_pcColorSet)
+			{
+				l_variableStruct.m_DataType = l_pcColorSet->GetDataType();
+			}
+
+			std::pair<wxString, SP_CPN_Variable_Constant> l_pair;
+
+			l_pair.first = l_var;
+			l_pair.second = l_variableStruct;
+			m_pColorSetClass->GetVariableMap()->insert(l_pair);
+			j++;
+		}
+
+
+	}
+
+
+	return true;
+}
+  bool SP_CPN_Parse_Element_Of_Node::GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver)
+	{
+	  m_pLeft->GetParseNodeInfo()->m_bIsElemOf = true;
+
+      if (!m_pRight->GetConstraints(p_cCSPSolver))
+          return false;
+
+       if (!m_pLeft->GetConstraints(p_cCSPSolver))
+           return false;
+
+       SP_CPN_ParseNode_Info* l_pcLeftParseNode_Info = m_pLeft->GetParseNodeInfo();
+
+
+        SP_CPN_ParseNode_Info* l_pcRightParseNode_Info = m_pRight->GetParseNodeInfo();
+
+		std::vector<IntVar>* l_vRight = l_pcRightParseNode_Info->m_vIntconstraintVector;
+
+		std::vector<IntVar>* l_vLeft = l_pcLeftParseNode_Info->m_vIntconstraintVector;
+
+		if (l_vRight->size() == 2 && l_vLeft->size() == 2)
+		{
+			m_ParseNode_Info.m_BoolConstraintExpr = expr(p_cCSPSolver, m_pLeft->GetParseNodeInfo()->m_vIntconstraintVector->at(0)== m_pRight->GetParseNodeInfo()->m_vIntconstraintVector->at(0)&& m_pLeft->GetParseNodeInfo()->m_vIntconstraintVector->at(1) == m_pRight->GetParseNodeInfo()->m_vIntconstraintVector->at(1));
+			return true;
+		}
+
+		return false;
+  }
+
+
+
+
+////////////////////////////////////////
 bool SP_CPN_Parse_LessThan_Node::check()
 {
 	if(!m_pLeft->check())
@@ -3039,6 +3440,96 @@ bool SP_CPN_Parse_Context::TraverseVariablesforUnfolding(SP_CPN_ParseNode* p_Nod
 		}
 		if(!l_bFound)
 		{
+			bool l_bIsColorSet = false;
+			for (auto itV = m_pColorSetClass->GetColorSetVector()->begin(); itV != m_pColorSetClass->GetColorSetVector()->end(); ++itV)
+			{
+				if ((*itV)->GetName() == l_str_Var_Col.m_sVariable)
+				{
+					l_bIsColorSet = true;
+					break;
+				}
+			}
+
+			// step for elemOf
+			bool l_bIsCS = false;
+			for (auto itV = m_pColorSetClass->GetColorSetVector()->begin(); itV != m_pColorSetClass->GetColorSetVector()->end(); ++itV)
+			{
+				if((*itV)->GetName()== l_str_Var_Col.m_sVariable)
+				{
+					l_bIsCS = true;
+					break;
+				}
+			}
+			if (l_bIsCS)
+			{
+				SP_CPN_ColorSet* l_pcCS = m_pColorSetClass->LookupColorSet(l_str_Var_Col.m_sVariable);
+				if (l_pcCS)
+				{
+					if (l_pcCS->GetDataType() == CPN_PRODUCT)
+					{
+						std::vector<wxString> l_vCsNAmes = l_pcCS->GetComponentName();
+						if (l_vCsNAmes.size() > 0)
+						{
+							for (auto v : l_vCsNAmes)
+							{
+								for (auto itMap = m_pColorSetClass->GetVariableMap()->begin(); itMap != m_pColorSetClass->GetVariableMap()->end(); ++itMap)
+								{
+									if (itMap->first.Contains(wxT("__AUX_CS")) && itMap->first.Contains(v))
+									{
+										SP_CPN_Var_Color l_str_Var_Col1;
+										l_str_Var_Col1.m_sVariable = itMap->first;
+										l_str_Var_Col1.m_sColor = v;
+
+										bool l_bfound1 = false;
+										for (unsigned i = 0; i < p_vVariable2Color.size(); i++)
+										{
+											wxString l_sExistVar = p_vVariable2Color[i].m_sVariable;
+											if (itMap->first == l_sExistVar)
+											{
+												l_bfound1 = true;
+											}
+										}
+										if (!l_bfound1)
+										{
+											p_vVariable2Color.push_back(l_str_Var_Col1);
+										}
+									}
+								}
+							}
+							return true;
+						}
+					}
+					else
+					{//simple color set
+						for (auto itMap = m_pColorSetClass->GetVariableMap()->begin(); itMap != m_pColorSetClass->GetVariableMap()->end(); ++itMap)
+						{
+							if (itMap->first.Contains(wxT("__AUX_CS")) && itMap->first.Contains(l_pcCS->GetName()))
+							{
+								SP_CPN_Var_Color l_str_Var_Col1;
+								l_str_Var_Col1.m_sVariable = itMap->first;
+								l_str_Var_Col1.m_sColor = l_pcCS->GetName();
+
+								bool l_bfound2= false;
+								for (unsigned i = 0; i < p_vVariable2Color.size(); i++)
+								{
+									wxString l_sExistVar = p_vVariable2Color[i].m_sVariable;
+									if (itMap->first == l_sExistVar)
+									{
+										l_bfound2 = true;
+									}
+								}
+								if (!l_bfound2)
+								{
+									p_vVariable2Color.push_back(l_str_Var_Col1);
+								}
+							}
+						}
+						return true;
+					}
+				}
+			}
+
+			if(!l_bIsColorSet)
 			p_vVariable2Color.push_back( l_str_Var_Col );
 		}
 		

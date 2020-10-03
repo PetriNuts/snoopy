@@ -91,7 +91,9 @@ typedef SP_CPN::SP_CPN_Parser::token_type token_type;
 "val"  { 
 	yylval->stringVal = new std::string(yytext, yyleng);
     return token::VALFUNC; 
-}		
+}	
+	
+"elemOf"    { yylval->stringVal = new std::string(yytext, yyleng); return(token::ELEM); }
 
 [A-Za-z_][A-Za-z0-9_]* {
     yylval->stringVal = new std::string(yytext, yyleng);
@@ -107,10 +109,14 @@ typedef SP_CPN::SP_CPN_Parser::token_type token_type;
 "<="		{ return(token::LE_OP); }
 ">="		{ return(token::GE_OP); }
 "<>"		{ return(token::NE_OP); }
+"!="		{ return(token::NE_OP); }
 "&"			{ return static_cast<token_type>(*yytext); }
+"&&"			{ return static_cast<token_type>(*yytext); }
 "|"			{ return static_cast<token_type>(*yytext); }
+"||"			{ return static_cast<token_type>(*yytext); }
 ","			{ return static_cast<token_type>(*yytext); }
 "="			{ return static_cast<token_type>(*yytext); }
+"=="			{ return static_cast<token_type>(*yytext); }
 "("			{ return static_cast<token_type>(*yytext); }
 ")"			{ return static_cast<token_type>(*yytext); }
 ("[")		{ return static_cast<token_type>(*yytext);}

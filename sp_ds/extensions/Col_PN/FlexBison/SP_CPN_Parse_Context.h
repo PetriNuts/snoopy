@@ -20,7 +20,8 @@
 
 #include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ColorSetClass.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColCSPSovler.h"
-
+#include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ColorSet.h"
+//#include <wx/tokenzr.h>//by george
 //#include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
 ////////////define the structs for parser//////////
 
@@ -64,7 +65,8 @@ enum SP_CPN_NODETYPE
 	CPN_SEPERATOR_NODE,
 	CPN_PREDICATE_NODE,
 	CPN_CONNECTOR_NODE,
-	CPN_PLACE_NODE
+	CPN_PLACE_NODE,
+	CPN_ELEMENT_OF_NODE
 };
 
 // Define the pattern types for bindings
@@ -163,7 +165,7 @@ struct SP_CPN_ParseNode_Info
 			  int			m_Multiplicity;
 			  double		m_DoubleMultiplicity;
 			  wxString		m_stringMultiplicity;	//for marking-dependent arcs, added by Fei, 09.2015
-
+			  bool m_bIsElemOf;//by george.20.2020
 
 	  union
       {
@@ -175,8 +177,7 @@ struct SP_CPN_ParseNode_Info
 
 	  vector<SP_CPN_EvaluatedSingleValue> m_EvalResults;   //only for collecting the final results  
 
-	  //vector<wxString>      m_vsContraints;
-
+	  std::vector<IntVar>*  m_vIntconstraintVector= new std::vector<IntVar>();//by george
 	  IntVar                m_IntConstraintExpr;
 	  BoolVar               m_BoolConstraintExpr;
  };
@@ -242,7 +243,7 @@ public:
 	virtual void CollectResult();
 
 	virtual bool GetConstraints(SP_DS_ColCSPSovler &p_cCSPSolver) = 0;
-	
+
 
 	SP_CPN_ParseNode* GetLeftNode()	{ return m_pLeft; }	
 	SP_CPN_ParseNode* GetRightNode(){ return m_pRight; }
@@ -288,6 +289,7 @@ public:
 		m_ParseNode_Info.m_IntConstraintExpr = expr(p_cCSPSolver, m_ParseNode_Info.m_IntegerValue);		
 		return true;
 	}
+
 
 };
 
@@ -340,6 +342,7 @@ public:
 		return false;		
 	}
 
+
 };
 
 
@@ -388,6 +391,7 @@ public:
 	{		
 		return false;	
 	}
+
 };
 
 
@@ -446,7 +450,7 @@ public:
 
 	
 	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver);
-	
+
 
 };
 
@@ -491,6 +495,7 @@ public:
 	{	
 		return false;
 	}
+
 };
 
 
@@ -534,6 +539,7 @@ public:
 	{			
 		return false;
 	}
+
 };
 
 /** parse node always returning an abs function value. */
@@ -569,6 +575,8 @@ public:
 	{			
 		return false;
 	}
+
+
 };
 
 
@@ -605,6 +613,7 @@ public:
 	{			
 		return false;
 	}
+
 };
 
 
@@ -654,6 +663,8 @@ public:
 		return false;
 	}
 
+
+
 };
 
 
@@ -702,6 +713,7 @@ public:
 		return false;
 	}
 
+
 };
 
 
@@ -746,6 +758,7 @@ public:
 	{			
 		return false;
 	}
+
 
 };
 
@@ -799,7 +812,6 @@ public:
 		
 		return true;
 	}
-
 	
 
 };
@@ -918,6 +930,7 @@ public:
 		return false;
 	}
 
+
 };
 
 
@@ -959,6 +972,7 @@ public:
 	{			
 		return false;
 	}
+
 
 
 };
@@ -1054,6 +1068,7 @@ public:
 	{	
 		return false;
 	}
+
 
 };
 
@@ -1364,6 +1379,7 @@ public:
 		
 		return true;
 	}
+
 
 };
 
@@ -1866,6 +1882,7 @@ public:
 		
 		return true;
 	}
+
 };
 
 
@@ -2067,9 +2084,213 @@ public:
 		
 		return true;
 	}
+
+};
+////////////////////////////////////////////////
+/** parse node elemOf . */
+
+class SP_CPN_Parse_Element_Of_Node : public SP_CPN_ParseNode
+{
+
+public:
+	explicit SP_CPN_Parse_Element_Of_Node(SP_CPN_ParseNode* p_pcLeft, SP_CPN_ParseNode* p_pcRight)
+		: SP_CPN_ParseNode()
+	{
+		m_pLeft = p_pcLeft;
+		m_pRight = p_pcRight;
+		m_ParseNode_Info.m_NodeType = CPN_ELEMENT_OF_NODE;
+		m_ParseNode_Info.m_DataType = CPN_BOOLEAN;
+
+		m_ParseNode_Info.m_sColorSetList = wxT("");
+		m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+
+	}
+
+	virtual ~SP_CPN_Parse_Element_Of_Node()
+	{
+		delete m_pLeft;
+		delete m_pRight;
+	}
+
+	virtual SP_CPN_ParseNode_Info evaluate()
+	{
+
+		SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
+		SP_CPN_ParseNode_Info l_RightNodeInfo = m_pRight->evaluate();
+
+		if (l_LeftNodeInfo.m_DataType == CPN_INTEGER && l_RightNodeInfo.m_DataType == CPN_INTEGER)
+		{
+			m_ParseNode_Info.m_BooleanValue = l_LeftNodeInfo.m_IntegerValue == l_RightNodeInfo.m_IntegerValue;
+		}
+
+		if (l_LeftNodeInfo.m_DataType != CPN_PRODUCT /*&& l_RightNodeInfo.m_DataType == CPN_ENUM*/)
+		{
+
+			bool l_bResult = false;
+			wxString l_sRightOperand = *(l_RightNodeInfo.m_StringValue);
+			l_sRightOperand.Replace(wxT(" "), wxT(""));
+
+			wxString l_sCSName = (l_RightNodeInfo.m_ColorSet);
+			wxString l_sLeftOperand;
+			if (l_LeftNodeInfo.m_DataType == CPN_ENUM || l_LeftNodeInfo.m_DataType == CPN_STRING)
+			{
+				l_sLeftOperand = *(l_LeftNodeInfo.m_StringValue);
+				l_sRightOperand = l_sRightOperand.Trim();
+			}
+			else if (l_LeftNodeInfo.m_DataType == CPN_INTEGER)
+			{
+				int val = l_LeftNodeInfo.m_IntegerValue;
+				l_sLeftOperand << val;
+			}
+
+
+
+			std::vector<wxString> l_sVColors;
+
+			if (!DoEval(l_sCSName, l_sVColors))
+			{
+				m_ParseNode_Info.m_BooleanValue = false;
+				return m_ParseNode_Info;
+			}
+
+			for (auto color : l_sVColors)
+			{
+
+				if (color.IsSameAs(l_sLeftOperand))
+				{
+					l_bResult = true;
+					break;
+				}
+			}
+
+			m_ParseNode_Info.m_BooleanValue = l_bResult;
+		}
+
+		//left operand is a tupel and the right operand is a product colour set
+		if (l_LeftNodeInfo.m_DataType == CPN_PRODUCT && l_RightNodeInfo.m_DataType == CPN_PRODUCT)
+		{
+			bool l_bResult = true;
+			wxString l_sRightOperand = *(l_RightNodeInfo.m_StringValue);
+			l_bResult= l_LeftNodeInfo.m_StringValue->IsSameAs(l_sRightOperand);
+
+			wxString l_sLeftOperand = *(l_LeftNodeInfo.m_StringValue);
+			l_sRightOperand.Replace(wxT(" "), wxT(""));
+			l_sRightOperand=l_sRightOperand.Trim();
+
+			std::vector<wxString> l_sVColors;
+
+			wxString l_sCSName = (l_RightNodeInfo.m_ColorSet);
+
+			if (!DoEval(l_sCSName, l_sVColors))
+			{
+				m_ParseNode_Info.m_BooleanValue = false;
+				return m_ParseNode_Info;
+			}
+
+			//check the membership
+			for (auto color : l_sVColors)
+			{
+				if (color.IsSameAs(l_sLeftOperand) )
+				{
+					l_bResult = true;
+					break;
+				}
+			}
+
+			m_ParseNode_Info.m_BooleanValue = l_bResult;
+			/**
+			std::vector<wxString> l_vRightVector;
+			std::vector<wxString> l_vLeftVector;
+
+
+			wxStringTokenizer tokenizer(l_sRightOperand, "(,)");
+			while (tokenizer.HasMoreTokens())
+			{
+				wxString token = tokenizer.GetNextToken();
+				if(!token.IsEmpty())
+				l_vRightVector.push_back(token);
+			}
+
+			wxStringTokenizer tokenizer1(l_sLeftOperand, "(,)");
+			while (tokenizer1.HasMoreTokens())
+			{
+				wxString token = tokenizer1.GetNextToken();
+				if (!token.IsEmpty())
+					l_vLeftVector.push_back(token);
+			}
+			bool l_bRes = true;
+			if (l_vLeftVector.size() == l_vRightVector.size())
+			{
+				for (int i = 0; i < l_vLeftVector.size(); i++)
+				{
+					if (l_vRightVector[i] != l_vLeftVector[i])
+					{
+						l_bRes = false;
+						break;
+					}
+				}
+			}
+			else
+			{
+				l_bRes = false;
+			}
+
+			m_ParseNode_Info.m_BooleanValue = l_bRes;
+			*/
+			/**
+			bool uniqueElt = true;
+			if (l_vLeftVector.size() == l_vRightVector.size())
+			{
+
+				wxString firstItem = *l_vLeftVector.begin();
+				for (std::vector<wxString>::const_iterator it = l_vLeftVector.begin() + 1; it != l_vLeftVector.end(); ++it) {
+					if (*it != firstItem) {
+						uniqueElt = false;
+						break;
+					}
+				}
+
+				if (uniqueElt)
+				{
+					wxString firstItem = *l_vRightVector.begin();
+					for (std::vector<wxString>::const_iterator it = l_vRightVector.begin() + 1; it != l_vRightVector.end(); ++it) {
+						if (*it != firstItem) {
+							uniqueElt = false;
+							break;
+						}
+					}
+				}
+			}
+			m_ParseNode_Info.m_BooleanValue = uniqueElt;
+
+			if (l_vLeftVector.size() != l_vRightVector.size())
+			{
+				m_ParseNode_Info.m_BooleanValue = false;
+			}
+			*/
+		}
+		CollectResult();
+
+		return m_ParseNode_Info;
+    }
+	bool DoEval(wxString p_sColorSet, std::vector<wxString>& p_vColors);
+
+	virtual wxString GenerateExpression()
+	{
+		return wxT("");
+	}
+
+	virtual bool check();
+
+	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver);
+
+
 };
 
 
+
+
+////////////////////////////////////////////////
 /** parse node less than. */
 
 class SP_CPN_Parse_LessThan_Node : public SP_CPN_ParseNode
@@ -2130,6 +2351,7 @@ public:
 		
 		return true;
 	}
+
 };
 
 
@@ -2259,6 +2481,7 @@ public:
 		
 		return true;
 	}
+
 };
 
 
@@ -2322,6 +2545,7 @@ public:
 		
 		return true;
 	}
+
 };
 
 
@@ -2405,9 +2629,25 @@ public:
 	virtual bool check();
 
 	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver) 
-	{			
-		return false;
+	{
+		if (!this->GetParseNodeInfo()->m_bIsElemOf)
+			return false;
+
+		if (!m_pLeft->GetConstraints(p_cCSPSolver))
+			return false;
+		SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
+
+		if (!m_pRight->GetConstraints(p_cCSPSolver))
+			return false;
+		SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
+
+
+		m_ParseNode_Info.m_vIntconstraintVector->push_back(l_LeftNodeInfo->m_IntConstraintExpr);
+		m_ParseNode_Info.m_vIntconstraintVector->push_back(l_RightNodeInfo->m_IntConstraintExpr);
+		return true;
 	}
+
+
 };
 
 
@@ -2452,8 +2692,18 @@ public:
 
 	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver) 
 	{			
-		return false;
+		if (!this->GetParseNodeInfo()->m_bIsElemOf)
+			return false;
+		m_pLeft->GetParseNodeInfo()->m_bIsElemOf = true;//set comma node elemOf flag
+
+		if (!m_pLeft->GetConstraints(p_cCSPSolver))
+			return false;
+		m_ParseNode_Info.m_vIntconstraintVector->push_back( m_pLeft->GetParseNodeInfo()->m_vIntconstraintVector->at(0));
+		m_ParseNode_Info.m_vIntconstraintVector->push_back(m_pLeft->GetParseNodeInfo()->m_vIntconstraintVector->at(1));
+
+		return true;
 	}
+
 };
 
 
@@ -2494,6 +2744,7 @@ public:
 	{			
 		return false;
 	}
+
 };
 
 
@@ -2533,6 +2784,9 @@ public:
 	{			
 		return false;
 	}
+
+
+
 
 };
 
@@ -2607,6 +2861,8 @@ public:
 	{			
 		return false;
 	}
+
+
 };
 
 

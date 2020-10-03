@@ -1756,6 +1756,44 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::UnfoldOneTransition()
 			{
 				//old unfolding way	//at least one variable	
 				m_bCSPFlag = false;
+
+				if (!m_bCSPFlag)//for elemOF becuase there generic unfolding does not support auxuliary vars to eval elemOf, by george
+				{
+					for (auto itV = m_vGuardVar2ColorSet.begin(); itV != m_vGuardVar2ColorSet.end(); ++itV)
+					{
+						wxString l_sTmp = (*itV).m_sVariable;
+						l_sTmp.Replace(wxT("__AUX_CS_"), wxT(""));
+
+						if ((*itV).m_sVariable.Contains(wxT("__AUX_CS")) )
+						{
+							m_vGuardVar2ColorSet.pop_back();
+						    itV = m_vGuardVar2ColorSet.begin();
+						    m_ExpressionVector[0].m_vVariable2Color = m_vGuardVar2ColorSet;
+
+						}
+
+					}
+				}
+				for (auto itV = m_vVar2ColorSet.begin(); itV != m_vVar2ColorSet.end(); ++itV)
+				{
+					wxString l_sTmp = (*itV).m_sVariable;
+					l_sTmp.Replace(wxT("__AUX_CS_"), wxT(""));
+
+					if ((*itV).m_sVariable.Contains(wxT("__AUX_CS")) )
+					{
+						m_vVar2ColorSet.pop_back();
+						itV = m_vVar2ColorSet.begin();
+					}
+				}
+				for (auto itMap = m_mBindVar2Val.begin(); itMap != m_mBindVar2Val.end(); ++itMap)
+				{
+			    	if (itMap->first.Contains(wxT("__AUX_CS")))
+						{
+							m_mBindVar2Val.erase(itMap->first);
+							itMap= m_mBindVar2Val.begin();
+						}
+				}
+
 				if( ! ProcessVariableTransition() )
 					return false;
 			}
@@ -2323,6 +2361,36 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::BuildParserTree()
 
 		if(itVector->m_eExprType == CPN_INPUT_EXPR || itVector->m_eExprType ==	CPN_OUTPUT_EXPR)	
 		{
+			//substitute double constants for cpn if exists//by george
+			wxString l_sExpression=itVector->m_sExpression;
+			if (l_sExpression.Contains(wxChar('`')))
+			{
+				wxString l_sValue = l_sExpression.BeforeFirst(wxChar('`'));
+				l_sValue.Replace(wxT(" "), wxT(""));
+			     wxString p_sOutPut;
+				p_sOutPut = l_sExpression;
+				if (m_ColorSetClass.GetConstantMap())
+				{
+
+				std::map<wxString, SP_CPN_Variable_Constant>::const_iterator it = m_ColorSetClass.GetConstantMap()->find(l_sValue);
+				if (it != m_ColorSetClass.GetConstantMap()->end())
+				{
+					SP_CPN_DATATYPE l_DataType = it->second.m_DataType;
+					//now not support real constant
+					if (l_DataType == CPN_DOUBLE)
+					{
+						double l_dVal = it->second.m_DoubleValue;
+						wxString l_sStringVal;
+						l_sStringVal << l_dVal;
+						p_sOutPut.Replace(l_sValue, l_sStringVal, true);
+						itVector->m_sExpression = p_sOutPut;
+
+						}
+					}
+
+				}
+
+			}
 			l_pParseContext->SetColorSetName(itVector->m_sColorSetName);
 			l_pParseContext->SetColored2UnColoredPlaceNames(m_pcColPNUnfolding->GetsvColored2UnColoredPlaceNames());
 		}
@@ -2414,6 +2482,22 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::CollectVariables()
 
 	m_vGuardVar2ColorSet.clear();
 	m_vGuardVar2ColorSet = m_ExpressionVector[0].m_vVariable2Color;
+
+
+	  if (!m_bCSPSolve)
+		{//by george for elemOf with generic unfolder
+			for (auto itV = m_vGuardVar2ColorSet.begin(); itV != m_vGuardVar2ColorSet.end(); ++itV)
+			{
+				if ((*itV).m_sVariable.Contains(wxT("__AUX_CS")))
+				{
+					m_vGuardVar2ColorSet.pop_back();
+					itV = m_vGuardVar2ColorSet.begin();
+					m_ExpressionVector[0].m_vVariable2Color = m_vGuardVar2ColorSet;
+
+				}
+
+			}
+		}
 
 	unsigned int l_nMaxNumber = 0;
 	unsigned int l_nMaxIndex  = 0;
@@ -2736,6 +2820,8 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::DynamicParse()
 			m_sAnimationTransitionInstanceName = m_sAnimationTransitionInstanceName + wxT("_") + itMap->second ;		
 		}
 	}
+
+	m_mVar2Val= m_mBindVar2Val;//for substitute rate fun vars, by george
 
 	//Here order the variables for display
 	m_sOneBinding = wxT("");		
@@ -3120,6 +3206,52 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::CSPSolve()
 		long l_nLow, l_nHigh;
 		l_sLow.ToLong(&l_nLow);
 		l_sHigh.ToLong(&l_nHigh);
+
+		/////////////////////////
+
+		if (l_sVarName.Contains(wxT("__AUX_CS")))//elemOf resolving, thus we need to constraint the auxuliary variables to bounds of the product set
+				{
+					wxString l_sTmp = l_sVarName;
+					l_sTmp.Replace(wxT("__AUX_CS_"),wxT(""));
+					if (l_sTmp.Freq(wxChar('_')) > 1)
+					{//aux var product set
+						wxString l_sCS = l_sTmp.BeforeFirst(wxChar('_'));
+					    SP_CPN_ColorSet* l_pcColorProdSet = m_ColorSetClass.LookupColorSet(l_sCS);
+						if (!l_pcColorProdSet)
+						{
+							continue;
+						}
+						wxString l_sFirstColor = l_pcColorProdSet->GetStringValue()[0];
+						l_sFirstColor.Replace(wxT("("), wxT(""));
+						l_sFirstColor.Replace(wxT(")"), wxT(""));
+
+					    l_sLow = l_sFirstColor.BeforeFirst(wxChar(','));
+						l_sLow.ToLong(&l_nLow);
+
+						wxString l_sLastcolour= l_pcColorProdSet->GetStringValue()[l_pcColorProdSet->GetStringValue().size() - 1];
+						l_sLastcolour.Replace(wxT("("), wxT(""));
+						l_sLastcolour.Replace(wxT(")"), wxT(""));
+
+						l_sHigh = l_sLastcolour.AfterLast(wxChar(','));
+						l_sHigh.ToLong(&l_nHigh);
+
+					}
+					else
+					{//aux var over simple set
+						wxString l_sCS = l_sTmp.BeforeFirst(wxChar('_'));
+						SP_CPN_ColorSet* l_pcColorProdSet = m_ColorSetClass.LookupColorSet(l_sCS);
+						if (!l_pcColorProdSet)
+						{
+							continue;
+						}
+						wxString l_sFirstColor = l_pcColorProdSet->GetStringValue()[0];
+						l_sLow.ToLong(&l_nLow);
+						wxString l_sLastcolour = l_pcColorProdSet->GetStringValue()[l_pcColorProdSet->GetStringValue().size() - 1];
+						l_sHigh.ToLong(&l_nHigh);
+					}
+
+				}
+		/////////////////////////
 
 		l_pcCSPSolver->InitializeVariable(l_sVarName, i, l_nLow, l_nHigh);
 	}

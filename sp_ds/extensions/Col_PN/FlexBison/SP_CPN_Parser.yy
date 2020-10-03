@@ -59,14 +59,14 @@
     class SP_CPN_ParseNode*		calcnode;
 }
 
-%token LE_OP GE_OP NE_OP IF INDEX CNN
+%token LE_OP GE_OP ELEM_OP NE_OP IF INDEX CNN 
 
 %left CNN
 %left '`'
 %left ','
-%left '&' '|'
+%left '&' '|' 
 %left '=' NE_OP
-%left '>' '<' GE_OP LE_OP
+%left '>' '<' GE_OP LE_OP 
 %left '+' '-'
 %left '*' '/' '%' '^'
 %left '@' ':' '!'
@@ -85,6 +85,8 @@
 %token <stringVal> 		ALLFUNC		"allfunc"
 %token <stringVal> 		ABSFUNC		"absfunc"
 %token <stringVal> 		VALFUNC		"valfunc"
+%token <stringVal> 		ELEM		"elemOfOP"
+
 
 
 %type <calcnode>	CPN_Constant CPN_Variable CPN_Neighbor1D CPN_Neighbor2D CPN_AllFunc CPN_ABSFunc CPN_VALFunc
@@ -219,18 +221,32 @@ CPN_Atomexpr : CPN_Constant
            {
 				$$ = $1;
 			}
+		
          | '(' CPN_expr ')'
            {
 				$$ = $2;
 			}
+			
+	  
 		| '(' CPN_Orexpr ')'
 		 {	
 			$$ = $2;
 		 }
+  
+		 
 		 | '(' CPN_Normalexpr ')'
 		 {	
 			$$ = $2;
 		 }
+		  
+		  
+	 
+ 
+		| '(' CPN_Commaexpr ')'
+	{		
+		$$ = new SP_CPN_Parse_Bracket_Node($2);
+	 }
+	 
 
 CPN_Postfixexpr
 		: CPN_Postfixexpr ':' INTEGER  %prec INDEX
@@ -309,6 +325,7 @@ CPN_Relexpr
 	  {	
 		$$ = $1;
 	  }
+ 
 	| CPN_Relexpr '<' CPN_Addexpr
 	  {	
 		$$ = new SP_CPN_Parse_LessThan_Node($1, $3);
@@ -325,8 +342,14 @@ CPN_Relexpr
 	  {	
 		$$ = new SP_CPN_Parse_GreaterEqual_Node($1, $3);
 	  }
-	
-
+	 
+	|  
+	  CPN_Relexpr ELEM CPN_Addexpr
+	 {
+	 $$ =new SP_CPN_Parse_Element_Of_Node($1, $3);
+	 }
+	   
+     
 CPN_Eqexpr
 	: CPN_Relexpr
 	  {	
@@ -347,6 +370,7 @@ CPN_Andexpr
 	  {	
 		$$ = $1;
 	  }
+	 
 	| CPN_Andexpr '&' CPN_Eqexpr
 	  {	
 		$$ = new SP_CPN_Parse_And_Node($1, $3);
@@ -358,6 +382,7 @@ CPN_Orexpr
 	  {	
 		$$ = $1;
 	  }
+ 
 	| CPN_Orexpr '|' CPN_Andexpr	
 	  {	
 		$$ = new SP_CPN_Parse_Or_Node($1, $3);
@@ -400,7 +425,10 @@ CPN_Seperatorexpr
 	{
 		$$ = new SP_CPN_Parse_Seperator_Node($1, $3);
 	}
-
+	
+	 
+	
+	
 CPN_Predicateexpr	
 	: CPN_Seperatorexpr
 	{
