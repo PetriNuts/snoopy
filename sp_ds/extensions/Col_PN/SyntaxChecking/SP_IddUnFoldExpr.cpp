@@ -1162,8 +1162,10 @@ unsigned SP_IddUnFoldExpr::createPlaces1(solution_space &sol,
 bool  SP_IddUnFoldExpr::ISValidIdientifer(std::string& p_SId, colEnv &env)
 {
 	std::vector<std::string> l_vFunctions = { "massaction","MassAction","ceil","cos",
-		"floor","log","log10","sin","sqr","tan","abs","LigandBindingPotentia","BinomialCoefficient",
-		"nlinlog","linlog"
+			"floor","log","log10","sin","sqr","tan","abs","LigandBindingPotentia","BinomialCoefficient",
+			"nlinlog","linlog","geq","or","eq","and","neq","leq","lt","gt","min","max","pow","CountXY",
+			"linlog","nlinlog","BinomialCoefficient","LigandBindingPotential","acos","asin","ceil","exp",
+			"Move2DGrid"
 	};
 	//is it pre-defined function?
 	for (auto id : l_vFunctions)
