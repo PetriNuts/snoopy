@@ -432,29 +432,59 @@ bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_
 		return false;
 	m_pcPlaceChoiceCheckListBox->Clear();
 
-	    wxString l_sOutputType;
+	/////////////////////////////////////////////////////
+	wxString l_sViewerName = p_pcModelView->GetAttribute(wxT("Name"))->GetValueString();
+	//if the selected view is the defuat view, then we initialise it with reg exp "."
+	if (l_sViewerName.IsSameAs(wxT("Default View"))|| l_sViewerName.IsSameAs(wxT("Main Plot")))
+	{
+		wxString l_sOutputType;
 		//by george
 		if (p_pcModelView)
 		{
 			SP_DS_Attribute* l_pcAttr = p_pcModelView->GetAttribute(wxT("OutputType"));
 			if (l_pcAttr)
 				l_sOutputType << l_pcAttr->GetValueString();
-		}
-	 
-	for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
-	{
-		wxString l_sType = l_pcCurveInfoList->GetCell(l_nRow, 1);
 
-		if (l_sType == l_sOutputType)//by george
-		 {
-			m_pcPlaceChoiceCheckListBox->Insert(l_pcCurveInfoList->GetCell(l_nRow, 6), m_pcPlaceChoiceCheckListBox->GetCount());
-			//show selected curves
-			LoadCurveSetting(p_pcResultViewer, l_pcCurveInfoList, l_nRow);
-			m_pcPlaceChoiceCheckListBox->Check(m_pcPlaceChoiceCheckListBox->GetCount() - 1);
-			wxString ddd = l_pcCurveInfoList->GetCell(l_nRow, 6);
+			if (!l_sOutputType.IsEmpty())
+			{
+				for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
+				{
+					if (l_pcCurveInfoList->GetCell(l_nRow, 1) != l_sOutputType)
+					{
+						l_pcCurveInfoList->RemoveRow(l_nRow);
+						l_nRow = 0;
+					}
+				}
+			}
 		}
 
-		if (l_sOutputType.IsEmpty())//uncoloured net
+		for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
+		{
+			wxString l_sType = l_pcCurveInfoList->GetCell(l_nRow, 1);
+
+			if (l_sType == l_sOutputType)//by george
+			{
+				wxString l_sItem = l_pcCurveInfoList->GetCell(l_nRow, 6);
+				wxString l_sSelected = l_pcCurveInfoList->GetCell(l_nRow, 2);
+				m_pcPlaceChoiceCheckListBox->Insert(l_pcCurveInfoList->GetCell(l_nRow, 6), m_pcPlaceChoiceCheckListBox->GetCount());
+				wxArrayString ss = m_pcPlaceChoiceCheckListBox->GetStrings();
+				//show selected curves
+				LoadCurveSetting(p_pcResultViewer, l_pcCurveInfoList, l_nRow);
+
+			}
+
+			if (l_sOutputType.IsEmpty())//uncoloured net
+			{
+				m_pcPlaceChoiceCheckListBox->Insert(l_pcCurveInfoList->GetCell(l_nRow, 6), m_pcPlaceChoiceCheckListBox->GetCount());
+				//show selected curves
+				LoadCurveSetting(p_pcResultViewer, l_pcCurveInfoList, l_nRow);
+				wxString ddd = l_pcCurveInfoList->GetCell(l_nRow, 6);
+			}
+		}
+	}
+	else
+	{//a pre-defined view
+		for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
 		{
 			m_pcPlaceChoiceCheckListBox->Insert(l_pcCurveInfoList->GetCell(l_nRow, 6), m_pcPlaceChoiceCheckListBox->GetCount());
 			//show selected curves
