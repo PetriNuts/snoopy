@@ -367,6 +367,16 @@ void SP_DLG_ColFSPNSimulationResults::LoadTransitions()
 	SP_VectorString* l_pcTransitionFunction = m_pcUnfoldedNet->GetCurRateFunction();
 	SP_VectorString* l_pcTransitionType = m_pcUnfoldedNet->GetTransNodeType();
 
+	if (l_pcTransitionFunction)//bugfix:by george
+		{
+			for (auto itVectorFun = l_pcTransitionFunction->begin(); itVectorFun != l_pcTransitionFunction->end(); ++itVectorFun)
+			{
+				if ((itVectorFun)->IsEmpty())
+				{
+					*itVectorFun = wxT("0");
+				}
+			}
+		}
 	for (unsigned long l_nTransPos = 0; l_nTransPos < l_pcTransitionName->size(); l_nTransPos++)
 	{
 
@@ -757,12 +767,16 @@ void SP_DLG_ColFSPNSimulationResults::LoadSets()
 		{
 			if (j == 0)
 			{
-				for (unsigned int i = 1; i < l_pcAttr->GetColCount(); i++)
+				for (unsigned int i = 0; i < l_pcAttr->GetColCount(); i++)
 				{
+
 					wxString l_sSetName = l_pcAttr->GetColLabel(i);
-					l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
-					l_pcCombobox->Append(l_sSetName);
-					i++;
+					if (l_sSetName.Contains(wxT(":")))//by george
+					{
+						l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
+						l_pcCombobox->Append(l_sSetName);
+					}
+				  i = i + 2;
 				}
 			}
 

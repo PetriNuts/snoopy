@@ -132,12 +132,16 @@ void SP_DLG_ColFCPNSimulationResults::LoadSets()
 		l_pcAttr = l_pcFstNode->GetAttribute(wxT("MarkingList"));
 		l_pcColListAttr = dynamic_cast<SP_DS_ColListAttribute *>(l_pcAttr);
 
-		for (unsigned int i = 1; i < l_pcColListAttr->GetColCount(); i++)
+		for (unsigned int i = 0; i < l_pcColListAttr->GetColCount(); i++)
 		{
 			wxString l_sSetName = l_pcColListAttr->GetColLabel(i);
-			l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
-			m_pcMarkingSetComboBox->Append(l_sSetName);
-			i++;
+			if (l_sSetName.Contains(wxT(":")))//by george
+			{
+				l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
+				m_pcMarkingSetComboBox->Append(l_sSetName);
+			}
+			i = i + 2;
+
 		}
 
 		//Select the first marking
@@ -597,6 +601,17 @@ void SP_DLG_ColFCPNSimulationResults::LoadTransitions()
 
 	SP_VectorString* l_pcTransitionName = m_pcUnfoldedNet->GetTransitionNames();
 	SP_VectorString* l_pcTransitionFunction = m_pcUnfoldedNet->GetCurRateFunction();
+
+	if (l_pcTransitionFunction)//bugfix:by george
+		{
+			for (auto itVectorFun = l_pcTransitionFunction->begin(); itVectorFun != l_pcTransitionFunction->end(); ++itVectorFun)
+			{
+				if ((itVectorFun)->IsEmpty())
+				{
+					*itVectorFun = wxT("0");
+				}
+			}
+		}
 
 	for (unsigned long l_nTransPos = 0; l_nTransPos < l_pcTransitionName->size(); l_nTransPos++)
 	{
