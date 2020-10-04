@@ -512,13 +512,13 @@ void SP_DLG_HybridSimulationResults::OnModifyMarkingSets(wxCommandEvent& p_cEven
 	unsigned i = 5;
 	for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
 	{
+		if(m_apcComboBoxes.size()<=5) break;
 		m_apcComboBoxes[i]->SetSelection((it)->second);
 		i++;
 	}
 
 	m_bIsSimulatorInitialized = false;
 
-	m_bIsSimulatorInitialized = false;
 }
 
 void SP_DLG_HybridSimulationResults::OnModifyFunctionSets(wxCommandEvent& p_cEvent)
@@ -1124,6 +1124,11 @@ bool SP_DLG_HybridSimulationResults::InitializeSimulator()
 	double l_nOutputEndPoint = 0;
 	double l_nOutputStartPoint;
 	long l_nLong0;
+
+	//added by george, to creae the imulator object, insure reset all the vectors before re-initialising
+	LoadSimulatorProperties();
+	ChangeODESolver();
+	SetSynchroType();
 
 	if (m_pcIntervalEndTextCtrl->GetValue().ToDouble(&l_nOutputEndPoint) && l_nOutputEndPoint > 0)
 	{
@@ -1860,3 +1865,37 @@ void SP_DLG_HybridSimulationResults::SaveODESolverProperties()
 	    }
 }
 
+void SP_DLG_HybridSimulationResults::SetSynchroType()
+{
+	if (m_pcMainSimulator->IsSimulationRunning())
+	{
+		return;
+	}
+
+   int l_nMethodType = m_pcTimeSyncComboBox->GetSelection();
+
+   //Store properties of the old one
+   spsim::Simulator* l_pcNewSimulator = CreateSimulator(l_nMethodType);
+
+   m_bIsSimulatorInitialized = false;
+
+   //copy old setting
+   l_pcNewSimulator->CopySettingFrom(m_pcMainSimulator);
+
+  wxDELETE(m_pcMainSimulator);
+  m_pcMainSimulator = l_pcNewSimulator;
+
+  m_pcWorkerThread->SetSimulator(m_pcMainSimulator);
+
+   AddGuiOption2Simulator();
+
+  //change the current ODE solver
+  int l_nSolverIndex = m_pcContinuousSolver->GetSelection();
+
+  //change the ODE simulator
+  spsim::HybridSimulator* l_pcHybridSimulator = dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator);
+
+  CHECK_POINTER(l_pcHybridSimulator, return);
+
+  l_pcHybridSimulator->SetODESolver((spsim::ODESolverType) (l_nSolverIndex));
+}

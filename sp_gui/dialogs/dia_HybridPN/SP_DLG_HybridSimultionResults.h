@@ -142,6 +142,9 @@ protected:
     //load fixed flags for continuous places
     virtual void LoadFixedFlag();
 
+    //re-assign the chosen synchroniser, sometimes re-initialising the hpn sim cause snoopy crash, this insure to prevent this case
+    virtual void SetSynchroType();//by george
+
 public:
 
 	virtual void OnStartAbortSimulation(wxCommandEvent& p_cEvent);DECLARE_CLASS( SP_DLG_HybridSimulationResults )
