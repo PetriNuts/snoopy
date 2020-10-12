@@ -582,7 +582,7 @@ protected:
 	bool ProcessRateFunction(SP_CPN_Expression* p_eExpression, SP_VectorString& p_sNetFunctions, bool p_bExport = false);
 	void CollectPlace2ColorMapforATransition( map<wxString, vector<wxString> > &p_mPlace2ColorsMap );
 	void GenerateUnfoledRateFunction(map<wxString, vector<wxString> > p_mPlaceToColors, vector<wxString> p_sColoredRateFunctionVector, vector<wxString> &p_sUnfoldedRateFunctionVector);
-
+	bool SubStituteVariable(const wxString& p_sRateFun, const wxString& var, const wxString& p_sVal, wxString& p_sSubstituted);//by george
 	void ProcessArcs();
 	void ModifyPlaceName(wxString &p_sPlaceName);
 

@@ -2526,6 +2526,7 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::CollectVariables()
 		for(unsigned j =0; j < m_ExpressionVector[l_nMaxIndex].m_vVariable2Color.size(); j++)
 		{
 			SP_CPN_Var_Color l_str_Var_Col = m_ExpressionVector[l_nMaxIndex].m_vVariable2Color[j];
+			if (l_str_Var_Col.m_sVariable.Contains(wxT("val"))) continue;
 			if(m_mBindVar2Val.find(l_str_Var_Col.m_sVariable) == m_mBindVar2Val.end() )
 			{				
 				m_mBindVar2Val[l_str_Var_Col.m_sVariable] = wxT("");				
@@ -2545,6 +2546,7 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::CollectVariables()
 		for(unsigned j =0; j < m_ExpressionVector[i].m_vVariable2Color.size(); j++)
 		{
 			SP_CPN_Var_Color l_str_Var_Col = m_ExpressionVector[i].m_vVariable2Color[j];
+			if (l_str_Var_Col.m_sVariable.Contains(wxT("val"))) continue;
 			if(m_mBindVar2Val.find(l_str_Var_Col.m_sVariable) == m_mBindVar2Val.end() )
 			{				
 				m_mBindVar2Val[l_str_Var_Col.m_sVariable] = wxT("");				
@@ -3074,7 +3076,7 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::GenerateUnfoledRateFunction(map<wxStri
 		l_sColoredRateFunction = l_sSepString;
 		/******** evalute variables in the rate function without [] *******/
 		//by george
-		wxStringTokenizer tokenizer(l_sColoredRateFunction, "+*(),-/%^ ");
+		wxStringTokenizer tokenizer(l_sColoredRateFunction, "+*(),-/%^<>= ");
 		std::vector<wxString> l_vRateFunTermsVector;
 		bool l_bContainVar = false;
 
@@ -3090,7 +3092,7 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::GenerateUnfoledRateFunction(map<wxStri
 			
 			if (l_itFound != m_mVar2Val.end())
 			{
-				l_sSepString.Replace(l_vRateFunTermsVector[i], l_itFound->second);
+				SubStituteVariable(l_sSepString, l_vRateFunTermsVector[i], l_itFound->second, l_sSepString);
 				l_bContainVar = true;
 			}
 		}
@@ -3103,6 +3105,136 @@ void SP_DS_ColPN_Unfolding::UnfoldThread::GenerateUnfoledRateFunction(map<wxStri
 	}
  
 	 
+}
+
+bool SP_DS_ColPN_Unfolding::UnfoldThread::SubStituteVariable(const wxString& p_sRateFun,const wxString& p_sVar,const wxString& p_sVal, wxString& p_sSubstituted)
+{
+	std::string var = p_sVar.ToStdString();
+	std::string f_i = p_sRateFun.ToStdString();
+	std::string l_sval = p_sVal.ToStdString();
+		std::stringstream expr_stream;
+		std::stringstream f;
+		std::stringstream rf;
+		bool mode = false;
+		unsigned int pos_found = 0;
+		bool ignore = false;
+		std::string ident;
+		for (unsigned pos = 0; pos < f_i.length(); ++pos)
+		{
+			auto c = f_i[pos];
+			if (c == '[')
+			{
+				pos_found = pos;
+				if (!mode)
+				{
+					mode = true;
+				}
+				else
+				{
+
+					return false;
+				}
+			}
+			else if (c == ']')
+			{
+				if (mode)
+				{
+					mode = false;
+					colExpr colorExpr;
+					//must be a guard
+					if (pos_found == 0)
+					{
+						std::string tmp = "[";
+						tmp += expr_stream.str();
+						tmp += "]";
+
+
+					}
+					else if (!ignore)
+					{
+
+						if (!ident.empty())
+						{
+							f << ident;// << res.node_.linearise();
+							ident.clear();
+						}
+						else
+						{
+							//f << res.node_.toString();
+						}
+					}
+
+				}
+				expr_stream.str("");
+			}
+			else
+			{
+				if (mode)
+				{
+					expr_stream << c;
+				}
+				else if (!ignore)
+				{
+					if ((std::isalnum(c) || c == '_') &&
+						(!ident.empty() || !std::isdigit(c)))
+					{
+						ident += c;
+						if ((pos + 1 == f_i.length()) ||
+							(!(std::isalnum(f_i[pos + 1]) || f_i[pos + 1]=='_')&& f_i[pos + 1] != '['))
+						{
+							//check if ident is pre-place, if so build sum
+
+							unsigned count = 0;
+							std::set<std::string> used;
+							std::string sum;
+
+
+							if (count == 0)
+							{
+								f << ident;
+							}
+							else if (count == 1)
+							{
+							 	f << sum;
+							}
+							else
+							{
+								f << '(' << sum << ')';
+							}
+
+							if (ident.size()>=0)
+							{
+								if (ident == var)
+								{
+									rf << l_sval;
+									ident.clear();
+
+								}
+								else
+								{
+									rf << ident;
+									ident.clear();
+								}
+							}
+							else
+							{
+
+							}
+
+						}
+					}
+					else
+					{
+						f << c;
+						rf << c;
+					//	ident.clear();
+					}
+				}
+			}
+		}
+		p_sSubstituted = rf.str();
+		return true;
+
 }
 
 void SP_DS_ColPN_Unfolding::UnfoldThread::ProcessArcs()
