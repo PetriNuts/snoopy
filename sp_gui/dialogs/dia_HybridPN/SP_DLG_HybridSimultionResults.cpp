@@ -1125,7 +1125,7 @@ bool SP_DLG_HybridSimulationResults::InitializeSimulator()
 	double l_nOutputStartPoint;
 	long l_nLong0;
 
-	//added by george, to creae the imulator object, insure reset all the vectors before re-initialising
+	//added by george, to create the simulator object, insure reset all the vectors before re-initialising
 	LoadSimulatorProperties();
 	ChangeODESolver();
 	SetSynchroType();
