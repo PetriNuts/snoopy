@@ -855,6 +855,22 @@ bool SP_IddUnFoldExpr::CheckTransRateFunction(SP_DS_Node* p_pcTr, wxString& p_sR
 		}
 		 
 	}
+
+	//manual check for old-way eval variables
+	if (p_sRateFun.Contains(wxT("[")) && p_sRateFun.Contains(wxT("]")))
+	{
+		wxString l_sBeforBracket = p_sRateFun.BeforeFirst(wxChar(']'));
+		wxString l_sAfterBracket = l_sBeforBracket.AfterFirst(wxChar('['));
+		std::string l_sExpr = l_sAfterBracket.ToStdString();
+		if (ISValidIdientifer(l_sExpr, colDefinitions_))
+		{
+			wxString l_sError = wxT("syntax error in rate function; evaluation is done without using [ ]  | error position:")  + l_sTransName;
+			SP_LOGERROR(l_sError);
+			return false;
+		}
+
+	}
+
 	std::string func = p_sRateFun.ToStdString();
 	func.erase(std::remove_if(func.begin(), func.end(),
 		std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), func.end());
@@ -1162,11 +1178,11 @@ unsigned SP_IddUnFoldExpr::createPlaces1(solution_space &sol,
 bool  SP_IddUnFoldExpr::ISValidIdientifer(std::string& p_SId, colEnv &env)
 {
 	std::vector<std::string> l_vFunctions = { "massaction","MassAction","ceil","cos",
-			"floor","log","log10","sin","sqr","tan","abs","LigandBindingPotentia","BinomialCoefficient",
+			"floor","log","log10","sin","sqr","sqrt","tan","abs","LigandBindingPotentia","BinomialCoefficient",
 			"nlinlog","linlog","geq","or","eq","and","neq","leq","lt","gt","min","max","pow","CountXY",
 			"linlog","nlinlog","BinomialCoefficient","LigandBindingPotential","acos","asin","ceil","exp",
-			"Move2DGrid"
-	};
+			"Move2DGrid","Rate"
+		};
 	//is it pre-defined function?
 	for (auto id : l_vFunctions)
 	{
@@ -1182,7 +1198,7 @@ bool  SP_IddUnFoldExpr::ISValidIdientifer(std::string& p_SId, colEnv &env)
 	//is it place name?
 	for (auto place : m_vPlaceNames)
 	{
-		if (place == p_SId)
+		if (place == p_SId || p_SId.find(place) != std::string::npos)//colored or unfolded place
 			return true;
 	}
 
