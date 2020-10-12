@@ -1495,11 +1495,18 @@ bool SP_ImportCANDL::CreateColorsets(const dssd::andl::Colorsets& p_Colorsets)
 			type = wxT("product");
 			colors = colors.AfterFirst('(').BeforeLast(')');
 		}
+		else if (colors.Contains(wxT("+")))
+		{
+		    l_bSimple = false;
+			type = wxT("union");
+			colors.Replace(wxT("+"), wxT(","));
+		}
 		else
 		{
 			colors.Replace(wxT(".."), wxT("-"));
 			colors.Replace(wxT("{"), wxT(""));
 			colors.Replace(wxT("}"), wxT(""));
+			colors.Replace(wxT("\""), wxT(""));//string colour sets case
 			//bugfix by george, importing subsets
 			if (colors.Contains(wxT("[")) && colors.Contains(wxT("]")))
 			{
