@@ -131,7 +131,7 @@ bool SP_WDG_Guard::AddToDialog(
 			+ wxID_HIGHEST, wxT("Edit guard") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
 
 	l_pcSizer->Add(new wxButton(l_pcPage, SP_ID_BUTTON_CHECK + m_nDialogID
-			+ wxID_HIGHEST, wxT("Check guard") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
+			+ wxID_HIGHEST, wxT("Apply and check guard") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
 
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
@@ -383,6 +383,7 @@ void SP_WDG_Guard::OnAssistent(wxCommandEvent& p_cEvent)
 
 void SP_WDG_Guard::OnCheck( wxCommandEvent& p_cEvent )
 {
+	SaveData();//do apply before check, by george
 	
 	SP_DS_Attribute* l_pcAttr = (*m_tlAttributes.begin());	
 	wxString l_sColorSetName;
@@ -401,7 +402,13 @@ void SP_WDG_Guard::OnCheck( wxCommandEvent& p_cEvent )
 			return;
 
 	if( ! l_cSyntaxChecking.CheckGuard(l_pcNode) )
+	 {//showing the tip, by george
+		wxString l_sTip = wxT("");
+		l_sTip = wxT("The guard ");
+		l_sTip += wxT(" is not correct.");
+		new wxTipWindow(m_pcDlg, l_sTip, 1000);
 		return;
+	 }
 
 	wxString l_sVariables = wxT("");
 	l_sVariables = wxT("The guard ");	

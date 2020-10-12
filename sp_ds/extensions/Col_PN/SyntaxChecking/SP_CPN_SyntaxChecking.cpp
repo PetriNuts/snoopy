@@ -1176,7 +1176,7 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 					{
 						if (l_pcColorSet->GetDataType() == CPN_PRODUCT && l_sTupeExpression.IsEmpty())
 						{
-							m_sErrorPosition = wxT("the product coloumn of marking expression is missing!. Error Position: ") + l_sColourExpBeforSubstitueConstants + wxT(" | ") + l_sPlaceName;
+							m_sErrorPosition = wxT("The product column of marking expression is missing!. Error Position: ") + l_sColourExpBeforSubstitueConstants + wxT(" | ") + l_sPlaceName;
 						}
 						else
 						{

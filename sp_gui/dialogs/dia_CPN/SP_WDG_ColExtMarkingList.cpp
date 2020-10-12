@@ -152,7 +152,7 @@ bool SP_WDG_ColExtMarkingList::AddToDialog(
 	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
 	
 	l_pcSizer->Add(new wxButton(l_pcPage, SP_ID_BUTTON_CHECK + m_nDialogID
-			+ wxID_HIGHEST, wxT("Check marking") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
+			+ wxID_HIGHEST, wxT("Apply and check marking") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
 
 	l_pcSizer->Add(new wxButton(l_pcPage, SP_ID_BUTTON_IMPORT + m_nDialogID
 			+ wxID_HIGHEST, wxT("Colorset overview") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);
@@ -781,6 +781,7 @@ SP_DS_TextAttribute* SP_WDG_ColExtMarkingList::GetNameAttibute()
 
 void SP_WDG_ColExtMarkingList::OnCheck( wxCommandEvent& p_cEvent )
 {
+	SaveData();//do apply before check
 	
 	SP_DS_Attribute* l_pcAttr = (*m_tlAttributes.begin());	
 	wxString l_sColorSetName;
@@ -795,12 +796,18 @@ void SP_WDG_ColExtMarkingList::OnCheck( wxCommandEvent& p_cEvent )
 	/////////////////
 	SP_CPN_SyntaxChecking l_cSyntaxChecking;
 	if( !l_cSyntaxChecking.Initialize())
-			return;
+	  return;
 	
 	//new marking solving 
 	map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
 	if( ! l_cSyntaxChecking.ComputeInitialMarking(l_pcNode,l_mColorToMarkingMap) )
+	{
+		wxString l_sTip = wxT("");
+		l_sTip = wxT("The marking definition");
+		l_sTip += wxT(" is not correct.");
+		new wxTipWindow(m_pcDlg, l_sTip, 1000);
 		return;
+	}
 	//end 
 
 

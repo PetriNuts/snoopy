@@ -146,7 +146,7 @@ bool SP_WDG_ArcInscription::AddToDialog(
 			+ wxID_HIGHEST, wxT("Edit expression") ), 1, wxLEFT | wxRIGHT | wxTOP, 5);	
 
 	l_pcSizer->Add(new wxButton(l_pcPage, SP_ID_BUTTON_CHECK + m_nDialogID
-			+ wxID_HIGHEST, wxT("Check expression ") ), 1, wxALL, 5);
+			+ wxID_HIGHEST, wxT("Apply and check expression") ), 1, wxALL, 5);
 
 
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
@@ -413,6 +413,7 @@ void SP_WDG_ArcInscription::OnAssistent(wxCommandEvent& p_cEvent)
 void SP_WDG_ArcInscription::OnCheck(wxCommandEvent& p_cEvent)
 {
 
+	SaveData();//do Apply before check, by george
 	SP_DS_Attribute* l_pcAttr = (*m_tlAttributes.begin());	
 	wxString l_sColorSet;
 	SP_DS_Edge* l_pcEdge = NULL;
@@ -455,7 +456,13 @@ void SP_WDG_ArcInscription::OnCheck(wxCommandEvent& p_cEvent)
 			return;
 
 	if( !l_cSyntaxChecking.CheckArcExpression(l_pcPlaceNode,l_pcEdge,l_pcTransitionNode) )
+	   {//showing the tip by george
+		wxString l_sTip = wxT("");
+		l_sTip = wxT("The arc expression definition");
+		l_sTip += wxT(" is not correct.");
+		new wxTipWindow(m_pcDlg, l_sTip, 1000);
 		return;
+	}
 
 
 

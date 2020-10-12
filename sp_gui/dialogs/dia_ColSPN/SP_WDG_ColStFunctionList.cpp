@@ -139,10 +139,10 @@ bool SP_WDG_ColStFunctionList::AddToDialog(
 	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	l_pcSizer->Add(new wxButton(l_pcPage, SP_ID_BUTTON_CHECKPREDICATE + m_nDialogID
-			+ wxID_HIGHEST, wxT("Check predicate") ), 1, wxALL, 5);
+			+ wxID_HIGHEST, wxT("Apply and check predicate") ), 1, wxALL, 5);
 
 	l_pcSizer->Add(new wxButton(l_pcPage, SP_ID_BUTTON_CHECK + m_nDialogID
-			+ wxID_HIGHEST, wxT("Check ") + GetName() ), 1, wxALL, 5);  //wxT("Check function")
+			+ wxID_HIGHEST, wxT("Apply and Check ") + GetName() ), 1, wxALL, 5);  //wxT("Check function")
 
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
@@ -373,6 +373,7 @@ bool SP_WDG_ColStFunctionList::SaveData()
 
 void SP_WDG_ColStFunctionList::OnCheck(wxCommandEvent& p_cEvent)
 {
+	SaveData();//do apply before by george
 
 	if (m_pcFunctionGrid->GetNumberRows() == 0)
 	{
@@ -695,6 +696,8 @@ void SP_WDG_ColStFunctionList::OnDelete( wxCommandEvent& p_cEvent )
 
 void SP_WDG_ColStFunctionList::OnCheckPredicate(wxCommandEvent& p_cEvent)
 {
+	SaveData();//do apply before, by george
+
 	if (m_pcFunctionGrid->GetNumberRows() == 0)
 	{
 		return;
