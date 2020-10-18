@@ -37,7 +37,9 @@ enum
 	SP_ID_CHOICE_SETS, //by george
 	SP_ID_BUTTON_MODIFY_CONSTANT_SETS, //by george
 	SP_ID_STATIC_TEXT_OUTPUT_LABEL,//by george
-	SP_ID_DESTROY_ANIM
+	SP_ID_DESTROY_ANIM,
+	SP_ID_PEDEXPORT,//by george 10.2020
+	SP_ID_PEDIMPORT//by george  10.2020
 };
 
 BEGIN_EVENT_TABLE(SP_DS_CPN_Animation, SP_DS_Animation)
@@ -46,7 +48,10 @@ EVT_UPDATE_UI(SP_ID_PEDSET, SP_DS_CPN_Animation::OnUpdateUI)
 EVT_UPDATE_UI(SP_ID_PEDKEEP, SP_DS_CPN_Animation::OnUpdateUI)
 EVT_CHOICE(SP_ID_CHOICE_SETS, SP_DS_CPN_Animation::OnColConstantSetsChanged)// by george
 EVT_BUTTON(SP_ID_BUTTON_MODIFY_CONSTANT_SETS, SP_DS_CPN_Animation::OnModifyConstants) //by george
-//EVT_CLOSE(SP_DS_CPN_Animation::OnClose)
+EVT_UPDATE_UI(SP_ID_PEDIMPORT, SP_DS_CPN_Animation::OnUpdateUI)//george on 10.2020
+EVT_UPDATE_UI(SP_ID_PEDEXPORT, SP_DS_CPN_Animation::OnUpdateUI)//george on 10.2020
+EVT_BUTTON(SP_ID_PEDEXPORT, SP_DS_CPN_Animation::OnExport)//george on 10.2020
+EVT_BUTTON(SP_ID_PEDIMPORT, SP_DS_CPN_Animation::OnImport)//george on 10.2020
 END_EVENT_TABLE()
 
 SP_DS_CPN_Animation::SP_DS_CPN_Animation(unsigned int p_nRefresh, unsigned int p_nDuration, SP_ANIM_STEP_T p_eStepping):
@@ -60,7 +65,17 @@ SP_DS_CPN_Animation::SP_DS_CPN_Animation(unsigned int p_nRefresh, unsigned int p
 	{	 
 	m_IsDestructor = false;//by george
 	m_nIsClose = 0;
- 
+	m_IsDestructor = false;
+	m_nIsClose = 0;
+	m_bIsKeepClicked = false;
+	m_nStart=0;
+	m_nEvery=0;
+	m_nStop=0;
+	m_nMarkingOption=0;
+	m_bAutoConcurrency = false;
+	m_nStepCount=0; //Keeps a count of step number
+	m_bImport=false;
+    m_bInvalid = false;
 
 	}
 
@@ -68,113 +83,195 @@ SP_DS_CPN_Animation::SP_DS_CPN_Animation(unsigned int p_nRefresh, unsigned int p
 SP_DS_CPN_Animation::~SP_DS_CPN_Animation()
 {
 
-	/***********************by george*******************/
-	if (m_nIsClose == SP_ID_DESTROY_ANIM)
-	{
-		m_IsDestructor = true;
-		LoadDefaultConstantsGroups();//reset default constants groups
-
-	    //reset initial marking of places,
-		//because the current marking will be in an unfolding style!!
-		list<SP_DS_CPN_PlaceAnimator*>::iterator l_Iter;
-		for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
-			(*l_Iter)->ResetMarking();
- 
-		 
-		SP_DS_ColListAttribute* l_pcColList;
-		SP_ListNode::const_iterator l_itElem;
-		vector<SP_DS_Node*> l_vPlaceNodes;
-		SP_DS_Nodeclass* l_pcNodeclass;
-
-
-		//go through all places located on the Ped and update its initial marking
-		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
-		if (l_pcNodeclass)
-		{
-			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
-			{
-				l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+	bool l_bIsKeep = m_bIsKeepClicked;
+		if (m_cbKeep) {
+			if (m_cbKeep->IsChecked()) {
+				KeepMarking();
+				l_bIsKeep = true;
 			}
+			else if(!l_bIsKeep){
+				list<SP_DS_CPN_PlaceAnimator*>::iterator l_Iter;
+				for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
+					(*l_Iter)->ResetMarking();
+				Refresh();
+			}
+			wxGetApp().GetAnimationPrefs()->SetKeepMarking(m_cbKeep->IsChecked());
+			wxDELETE((m_cbKeep));
 		}
-		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
-		if (l_pcNodeclass)
+		if (l_bIsKeep)
 		{
-			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
-			{
-				l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
-			}
-		}
-
-
-
-		int l_nGridRowNumber = 0;
-		for (unsigned int l_nPos = 0; l_nPos < l_vPlaceNodes.size(); l_nPos++)
+			UpdateMarkingPlaces();
+	    }
+		/***********************by george*******************/
+		if (m_nIsClose == SP_ID_DESTROY_ANIM && !l_bIsKeep)
 		{
-			//obtain the initial marking
-			l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
-			int l_nBegin = l_nGridRowNumber;
-			wxString l_sMainMarking;
-			l_vPlaceNodes[l_nPos]->Update(TRUE);
+			m_IsDestructor = true;
+			LoadDefaultConstantsGroups();//reset default constants groups
 
-			//re-check: update constants values
-			SP_CPN_SyntaxChecking l_cSyntaxChecking;
-			if (!l_cSyntaxChecking.Initialize())
-				return;
-
-			//re-computation of the initial marking after updating the constants values
-			l_sMainMarking = wxT("");
-			map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
-			if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false))
-				return;
-			map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
-			wxString l_sNodeClass = l_vPlaceNodes[l_nPos]->GetNodeclass()->GetName();
-
-			if (l_sNodeClass == SP_DS_CONTINUOUS_PLACE)
-			{
-				double l_dMarking = 0;
-				for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
-				{
-					l_dMarking = l_dMarking + itMap->second[0].m_DoubleMultiplicity;
-				}
-				l_sMainMarking << l_dMarking;
-			}
-			else
-			{
-				long l_nMarking = 0;
-				for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
-				{
-					l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
-				}
-				l_sMainMarking << l_nMarking;
-			}
-
-
-			SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast<SP_DS_Attribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(wxT("Marking")));
-			if (l_pcMarkingAttr)
-				l_pcMarkingAttr->SetValueString(l_sMainMarking);
-
-			l_vPlaceNodes[l_nPos]->Update(TRUE);
-		}
-
-		//set modify flag and refresh the Canvas 
-		SP_Core::Instance()->GetRootDocument()->Modify(true);
-		Refresh();
-		m_nIsClose = 0;
-	}
-
-	/******************************************/
- 
-	if (m_cbKeep) {
-		if (m_cbKeep->IsChecked()) {
-			KeepMarking();
-		} else {
+		    //reset initial marking of places,
+			//because the current marking will be in an unfolding style!!
 			list<SP_DS_CPN_PlaceAnimator*>::iterator l_Iter;
 			for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
 				(*l_Iter)->ResetMarking();
+
+
+			SP_DS_ColListAttribute* l_pcColList;
+			SP_ListNode::const_iterator l_itElem;
+			vector<SP_DS_Node*> l_vPlaceNodes;
+			SP_DS_Nodeclass* l_pcNodeclass;
+
+
+			//go through all places located on the Ped and update its initial marking
+			l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+			if (l_pcNodeclass)
+			{
+				for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+				{
+					l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+				}
+			}
+			l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+			if (l_pcNodeclass)
+			{
+				for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+				{
+					l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+				}
+			}
+
+
+
+			int l_nGridRowNumber = 0;
+			for (unsigned int l_nPos = 0; l_nPos < l_vPlaceNodes.size(); l_nPos++)
+			{
+				//obtain the initial marking
+				l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
+				int l_nBegin = l_nGridRowNumber;
+				wxString l_sMainMarking;
+				l_vPlaceNodes[l_nPos]->Update(TRUE);
+
+				//re-check: update constants values
+				SP_CPN_SyntaxChecking l_cSyntaxChecking;
+				if (!l_cSyntaxChecking.Initialize())
+					return;
+
+				//re-computation of the initial marking after updating the constants values
+				l_sMainMarking = wxT("");
+				map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
+				if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false))
+					return;
+				map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
+				wxString l_sNodeClass = l_vPlaceNodes[l_nPos]->GetNodeclass()->GetName();
+
+				if (l_sNodeClass == SP_DS_CONTINUOUS_PLACE)
+				{
+					double l_dMarking = 0;
+					for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+					{
+						l_dMarking = l_dMarking + itMap->second[0].m_DoubleMultiplicity;
+					}
+					l_sMainMarking << l_dMarking;
+				}
+				else
+				{
+					long l_nMarking = 0;
+					for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+					{
+						l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
+					}
+					l_sMainMarking << l_nMarking;
+				}
+
+
+				SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast<SP_DS_Attribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(wxT("Marking")));
+				if (l_pcMarkingAttr)
+					l_pcMarkingAttr->SetValueString(l_sMainMarking);
+
+				l_vPlaceNodes[l_nPos]->Update(TRUE);
+			}
+
+			//set modify flag and refresh the Canvas
+			SP_Core::Instance()->GetRootDocument()->Modify(true);
 			Refresh();
+			m_nIsClose = 0;
 		}
-		wxGetApp().GetAnimationPrefs()->SetKeepMarking(m_cbKeep->IsChecked());
+
+		if(m_cbKeep)
 		wxDELETE((m_cbKeep));
+
+}
+
+void SP_DS_CPN_Animation::UpdateMarkingPlaces()
+{
+	//update marking and the canvas layout of the places after they get updated
+	SP_DS_ColListAttribute* l_pcColList1;
+	SP_ListNode::const_iterator l_itElement;
+	vector<SP_DS_Node*> l_vPlaceNodesinPed;
+	SP_DS_Nodeclass* l_pcNodeclass;
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElement = l_pcNodeclass->GetElements()->begin(); l_itElement != l_pcNodeclass->GetElements()->end(); ++l_itElement)
+		{
+			l_vPlaceNodesinPed.push_back(dynamic_cast<SP_DS_Node*>(*l_itElement));
+		}
+	}
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElement = l_pcNodeclass->GetElements()->begin(); l_itElement != l_pcNodeclass->GetElements()->end(); ++l_itElement)
+		{
+			l_vPlaceNodesinPed.push_back(dynamic_cast<SP_DS_Node*>(*l_itElement));
+		}
+	}
+	for (unsigned int l_nPos = 0; l_nPos < l_vPlaceNodesinPed.size(); l_nPos++)
+	{
+
+		l_pcColList1 = dynamic_cast<SP_DS_ColListAttribute*>(l_vPlaceNodesinPed[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
+		l_vPlaceNodesinPed[l_nPos]->Update(TRUE);
+
+
+		SP_CPN_SyntaxChecking l_cSyntaxChecking;
+		if (!l_cSyntaxChecking.Initialize())
+			continue;
+
+
+		////////////////////////////////////////////////////////
+		wxString l_sMainMarking;
+		l_sMainMarking = wxT("");
+		map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
+		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodesinPed[l_nPos], l_mColorToMarkingMap, false))
+			continue;
+		map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
+
+		wxString l_sNodeClass = l_vPlaceNodesinPed[l_nPos]->GetNodeclass()->GetName();
+
+		if (l_sNodeClass == SP_DS_CONTINUOUS_PLACE)
+		{
+			double l_dMarking = 0;
+			for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+			{
+				l_dMarking = l_dMarking + itMap->second[0].m_DoubleMultiplicity;
+			}
+			l_sMainMarking << l_dMarking;
+		}
+		else
+		{
+			long l_nMarking = 0;
+			for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+			{
+				l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
+			}
+			l_sMainMarking << l_nMarking;
+		}
+		////////////////////////////////////////////////////////////////
+
+		SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast<SP_DS_Attribute*>(l_vPlaceNodesinPed[l_nPos]->GetAttribute(wxT("Marking")));
+		if (l_pcMarkingAttr)
+			l_pcMarkingAttr->SetValueString(l_sMainMarking);
+
+		l_vPlaceNodesinPed[l_nPos]->Update(TRUE);
+
 	}
 }
 
@@ -231,7 +328,14 @@ SP_DS_CPN_Animation::PreStep()
 	list<SP_DS_CPN_PlaceAnimator*>::iterator l_itPlace;
 	unsigned int l_nSteps = m_nSteps / 2;
 
+
+	if (m_bExport == true)
+		ExportMarkings();
+
 	m_lPossibleTransAnimators.clear();
+	if (m_bImport == false)
+	{
+
 	//selecting transitions (candidates) to fire ...
 	if (dynamic_cast<SP_DS_CPN_TransAnimator*>(m_pcSingleStep)) {
 		//...for steps that are triggered by clicking directly on a transition
@@ -265,6 +369,11 @@ SP_DS_CPN_Animation::PreStep()
 			m_lPossibleTransAnimators.push_back(*l_itTrans);
 		}
 	}
+
+	}
+
+	else if (m_bImport == true)//by george
+		ImportStepSequences();
 
 	//running the usual tests and preparing everything
 	for (l_itTrans = m_lPossibleTransAnimators.begin(); l_itTrans != m_lPossibleTransAnimators.end(); ++l_itTrans)
@@ -323,6 +432,15 @@ SP_DS_CPN_Animation::PreStep()
 		m_nActStep++;
 	}
 
+	if (GetDirection() == FORWARD)
+			m_nStepCount++; //Increment the step count
+
+		if (GetDirection() == BACKWARD && m_nStepCount > 0)
+		{
+			m_nStepCount--; //Decrement the step count
+			m_bExport = false; //If user interrupts the animation,export should be stopped
+		}
+
 	bool l_bReturn = (m_lStepPlaceAnimators.size() + m_lStepTransAnimators.size() > 0);
 
 	if (!l_bReturn) {
@@ -331,10 +449,19 @@ SP_DS_CPN_Animation::PreStep()
 		if (m_bOneShot) {
 			if (GetSingleStep()) {
 				msg = wxT("This transition is not enabled!");
+				if (m_nStepCount > 0)
+									m_nStepCount--; //Dead state, thus decrement the m_nStepCount
 			} else {
+
+				if (m_nStepCount > 0)
+					m_nStepCount--; //This transition was counted as a step, which is actually not possible
+
 				msg =wxT("Dead state: there are no enabled transitions");
 			}
 		} else {
+			if (m_nStepCount > 0)
+							m_nStepCount--; //This transition was counted as a step, which is actually not possible
+
 			msg =wxT("Dead state: there are no more enabled transitions");
 		}
 		msg = msg + wxT("\n \n * Not enough tokens in preplaces; \n Or \n * Color is out of range in postplaces.");
@@ -345,6 +472,14 @@ SP_DS_CPN_Animation::PreStep()
 		}
 	} else {
 	}
+
+	if (m_bExport == true)
+			ExportStepSequences();
+
+	if (GetDirection() == BACKWARD)
+		m_bExport = false; //If user interrupts the animation,export should be stopped
+
+		SetStepCounter();
 
 	return l_bReturn;
 }
@@ -603,45 +738,64 @@ SP_DS_CPN_Animation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSizer
 	m_pcDialog = p_pcCtrl;
 
 	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-	p_pcSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDSET, wxT("Keep Marking")), 1, wxALL | wxEXPAND, 5);
-	m_cbKeep = new wxCheckBox(p_pcCtrl, SP_ID_PEDKEEP, wxT("Always keep marking when closing."));
-	m_cbKeep->SetValue(wxGetApp().GetAnimationPrefs()->GetKeepMarking());
-	p_pcSizer->Add(m_cbKeep, 0, wxALL, 5);
+		p_pcSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDSET, wxT("Keep Marking")), 1, wxALL | wxEXPAND, 5);
+		m_cbKeep = new wxCheckBox(p_pcCtrl, SP_ID_PEDKEEP, wxT("Always keep marking when closing."));
+		m_cbKeep->SetValue(wxGetApp().GetAnimationPrefs()->GetKeepMarking());
+		p_pcSizer->Add(m_cbKeep, 0, wxALL, 5);
+		//------------------------------------------
+		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+		wxSizer* m_pcExportImportSizer = new wxBoxSizer(wxHORIZONTAL);
+		m_pcExportImportSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDEXPORT, wxT("Export")), 1, wxALL | wxEXPAND, 5);
+		m_pcExportImportSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDIMPORT, wxT("Import")), 1, wxALL | wxEXPAND, 5);
+		p_pcSizer->Add(m_pcExportImportSizer, 0, wxALL, 5);
+		//------------------------------------------
+		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+		wxString l_tmp;
+		l_tmp << m_nStepCount;
+	    m_pcStepCounter = new wxBoxSizer(wxHORIZONTAL);
+		m_pcStepCounterText = new wxStaticText(p_pcCtrl, wxID_ANY, wxT("Step Counter"));
+		m_pcStepCounterValue = new wxStaticText(p_pcCtrl, wxID_ANY, l_tmp);
 
-	p_pcCtrl->PushEventHandler(this);
+		m_pcStepCounter->Add(m_pcStepCounterText, 1, wxEXPAND | wxALL, 5);
+		m_pcStepCounter->Add(m_pcStepCounterValue, 1, wxEXPAND | wxALL, 5);
 
-	//allow backstepping
-	m_pcDialog->EnableBackStepping(true);
+		p_pcSizer->Add(m_pcStepCounter, 0, wxEXPAND);
+
+		//-------------------------------------------
+		p_pcCtrl->PushEventHandler(this);
+
+		//allow backstepping
+		m_pcDialog->EnableBackStepping(true);
 
 
-	/*****************george*********************/
-	wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxSizer* l_pcSetsSizer = new wxBoxSizer(wxVERTICAL);
-	wxSizer* l_pcOutputLabelSizer = new wxBoxSizer(wxVERTICAL);
+		/*****************george*********************/
+		wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		wxSizer* l_pcSetsSizer = new wxBoxSizer(wxVERTICAL);
+		wxSizer* l_pcOutputLabelSizer = new wxBoxSizer(wxVERTICAL);
 
-	m_pcOutputLabelStaticText = new wxStaticText(p_pcCtrl, SP_ID_STATIC_TEXT_OUTPUT_LABEL, wxT("Start ..."), wxDefaultPosition, wxDefaultSize);
+		//m_pcOutputLabelStaticText = new wxStaticText(p_pcCtrl, SP_ID_STATIC_TEXT_OUTPUT_LABEL, wxT("Start ..."), wxDefaultPosition, wxDefaultSize);
 
-	
-	UpdateChoices();
-	SP_SetString::iterator l_itChoice;
-	for (l_itChoice = m_choices.begin(); l_itChoice != m_choices.end(); ++l_itChoice)
-	{
-		wxString l_sGroup = *l_itChoice;
-		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, l_sGroup + wxT(':')), 1, wxALL | wxEXPAND, 5);
-		m_apcComboBoxes1.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_SETS, wxDefaultPosition, wxSize(100, -1), 0, NULL, 0, wxDefaultValidator, l_sGroup));
-		l_pcRowSizer->Add(m_apcComboBoxes1[m_apcComboBoxes1.size() - 1], 0, wxALL, 5);
-		l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify")), 0, wxALL, 5);
-		l_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
-	}
-	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-	p_pcSizer->Add(m_pcOutputLabelStaticText, 1, wxALL, 5);
-	p_pcSizer->Add(l_pcOutputLabelSizer, 0, wxALL, 5);
-	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-	p_pcSizer->Add(l_pcSetsSizer, 0, wxALL, 5);
-	 
-	LoadSets();
-	/**************************************/
+
+		UpdateChoices();
+		SP_SetString::iterator l_itChoice;
+		for (l_itChoice = m_choices.begin(); l_itChoice != m_choices.end(); ++l_itChoice)
+		{
+			wxString l_sGroup = *l_itChoice;
+			l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+			l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, l_sGroup + wxT(':')), 1, wxALL | wxEXPAND, 5);
+			m_apcComboBoxes1.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_SETS, wxDefaultPosition, wxSize(100, -1), 0, NULL, 0, wxDefaultValidator, l_sGroup));
+			l_pcRowSizer->Add(m_apcComboBoxes1[m_apcComboBoxes1.size() - 1], 0, wxALL, 5);
+			l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify")), 0, wxALL, 5);
+			l_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+		}
+		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+		//p_pcSizer->Add(m_pcOutputLabelStaticText, 1, wxALL, 5);
+	///	p_pcSizer->Add(l_pcOutputLabelSizer, 0, wxALL, 5);
+		///p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+		p_pcSizer->Add(l_pcSetsSizer, 0, wxALL, 5);
+
+		LoadSets();
+		/**************************************/
 	
 	return TRUE;
 }
@@ -672,12 +826,16 @@ SP_DS_CPN_Animation::OnReset()
 
 	m_llHistoryTransAnimators.clear();
 
+	//by george
+	m_nStepCount = 0;
+	SetStepCounter();
 	Refresh();
 }
 
 void
 SP_DS_CPN_Animation::OnSet(wxCommandEvent& p_cEvent)
 {
+	m_bIsKeepClicked = true;
 	KeepMarking();
 }
 
@@ -690,6 +848,8 @@ SP_DS_CPN_Animation::KeepMarking()
 	SP_Core::Instance()->GetRootDocument()->Modify(TRUE);
 
 }
+
+
 
 void
 SP_DS_CPN_Animation::OnUpdateUI(wxUpdateUIEvent& p_cEvent)
@@ -705,6 +865,12 @@ SP_DS_CPN_Animation::OnUpdateUI(wxUpdateUIEvent& p_cEvent)
 }
 
 
+void SP_DS_CPN_Animation::OnExport(wxCommandEvent &p_pc_Event)//george
+{
+	ExportCPN *export_frame = new ExportCPN(wxT("Export Details"),this);
+
+	 export_frame->Show(true);
+}
 
 void  SP_DS_CPN_Animation::UpdateChoices()//george
 {
@@ -776,7 +942,7 @@ void SP_DS_CPN_Animation::LoadSets()
 
 	/**********************************/
 
-	m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
+	//m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
 	//m_bRestartAnimationFlag = true;
 }
 
@@ -933,4 +1099,543 @@ void SP_DS_CPN_Animation::LoadDefaultConstantsGroups()
 		}
 	}
 //	UpdateColMarking();
+}
+
+void SP_DS_CPN_Animation::ExportDetailsCPN(ExportCPN *export_frame)
+{
+	wxString l_start_str = export_frame->m_pc_StartText->GetLineText(0);
+	wxString l_every_str = export_frame->m_pc_EveryText->GetLineText(0);
+	wxString l_stop_str = export_frame->m_pc_StopText->GetLineText(0);
+	wxString l_temp;
+	list<SP_DS_CPN_PlaceAnimator*>::iterator l_itPlace;
+	list<SP_DS_CPN_TransAnimator*>::iterator l_itTrans;
+
+	m_ExportFilename = export_frame->m_pc_Browse->GetPath();
+	m_bExport = true;
+	m_bExportComplete = false;
+
+	bool l_bError = 0;
+
+	if (!l_start_str.ToLong(&m_nStart))
+		l_bError = true;
+
+	if (!l_stop_str.ToLong(&m_nStop))
+		l_bError = true;
+
+	if (!l_every_str.ToLong(&m_nEvery))
+		l_bError = true;
+
+	if (l_bError == true)
+	{
+		SP_MESSAGEBOX(wxT("Only integer values are accepted."), wxT("Error"), wxOK | wxICON_ERROR);
+	}
+
+	if (export_frame->m_pc_RadioChoice->GetSelection() == 0)
+		m_nMarkingOption = 0;
+
+	else
+		if (export_frame->m_pc_RadioChoice->GetSelection() == 1)
+			m_nMarkingOption = 1;
+
+	if (m_nMarkingOption == 0)
+	{
+		l_temp = wxT(".mseq");
+		m_ExportFilename = m_ExportFilename + l_temp;
+	}
+
+	else
+		if (m_nMarkingOption == 1)
+		{
+			l_temp = wxT(".tseq");
+			m_ExportFilename = m_ExportFilename + l_temp;
+		}
+
+	if (l_bError == false)
+	{
+
+		if (wxFileExists(m_ExportFilename) == true)
+		{
+			int l_Answer = SP_MESSAGEBOX(wxT("File already exists. Do you want to overwrite it?"), wxT("Overwrite"), wxYES_NO);
+			if (l_Answer == wxYES || l_Answer == wxID_YES)
+			{
+				if (m_ExportTextfile.Open(m_ExportFilename))
+				{
+					m_ExportTextfile.Clear();
+				}
+				else
+				{
+					SP_MESSAGEBOX(wxT("Error in opening file."), wxT("Error"), wxOK | wxICON_ERROR);
+				}
+			}
+			else
+			{
+				SP_MESSAGEBOX(wxT("Export failed"), wxT("Error"), wxOK | wxICON_ERROR);
+			}
+		}
+
+		else
+		{
+			if (m_ExportTextfile.Create(m_ExportFilename) == false)
+			{
+				SP_MESSAGEBOX(wxT("Error in creating file."), wxT("Error"), wxOK | wxICON_ERROR);
+			}
+		}
+
+		if (m_nMarkingOption == 0)
+		{
+			l_temp = wxT("Time,");
+
+			for (l_itPlace = m_lAllPlaceAnimators.begin(); l_itPlace != m_lAllPlaceAnimators.end(); ++l_itPlace)
+			{
+				if (l_itPlace != m_lAllPlaceAnimators.begin())
+				{
+					l_temp << wxT(",");
+				}
+
+				SP_DS_Node* l_pcNode = (*l_itPlace)->GetNode();
+				SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("Name"));
+
+				SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
+
+				wxString l_sName = l_pcNameAttr->GetValue();
+				l_temp << l_sName;
+			}
+		}
+
+		if (m_nMarkingOption == 1)
+		{
+			if (m_pcChoice != NULL)
+			{
+				if (m_nStepState == 1)
+				{
+					l_temp = wxT("Stepping:Maximum,");
+				}
+				else if (m_nStepState == 2)
+				{
+					l_temp = wxT("Stepping:Intermediate,");
+				}
+				else if (m_nStepState == 3)
+				{
+					l_temp = wxT("Stepping:Single,");
+				}
+			}
+			else
+			{
+				l_temp = wxT("Stepping:Intermediate ");
+			}
+
+			if (m_bAutoConcurrency)
+			{
+				l_temp = l_temp + wxT("AC:Enabled,transition=");
+			}
+			else
+			{
+				l_temp = l_temp + wxT("AC:Disabled,transition=");
+			}
+		}
+
+		m_ExportTextfile.AddLine(l_temp);
+		m_ExportTextfile.Write();
+		m_ExportTextfile.Close();
+
+	}
+}
+
+void SP_DS_CPN_Animation::ExportMarkings()
+{
+	list<SP_DS_CPN_PlaceAnimator*>::iterator l_itPlace;
+
+	if (m_ExportFilename.Cmp(wxT("")) != 0)
+	{
+		m_ExportTextfile.Open(m_ExportFilename);
+		long l_n_token_value;
+
+		if (m_nMarkingOption == 0)
+		{
+			if (m_nStepCount >= m_nStart && m_nStepCount <= m_nStop && m_bRunning == true && ((m_nStepCount - m_nStart) % m_nEvery == 0))
+			{
+
+				wxString l_temp(wxT(""));
+				l_temp << m_nStepCount << wxT(",");
+
+				for (l_itPlace = (m_lAllPlaceAnimators).begin(); l_itPlace != (m_lAllPlaceAnimators).end(); ++l_itPlace)
+				{
+					l_n_token_value = (*l_itPlace)->GetMarking();
+					SP_DS_Node*  itNode = (*l_itPlace)->GetNode();
+					SP_DS_ColListAttribute* l_pcCollis = dynamic_cast<SP_DS_ColListAttribute*>((itNode)->GetAttribute(SP_DS_CPN_MARKINGLIST));
+					wxString l_sMulti;
+					if (l_pcCollis)
+					{
+						for (unsigned int i = 0; i < l_pcCollis->GetRowCount(); i++)
+						{
+							l_sMulti << l_pcCollis->GetCell(i, 1) << wxT("`") << l_pcCollis->GetCell(i, 0) << wxT("++");
+
+						}
+
+						if (l_sMulti.IsEmpty())
+						{
+							l_sMulti << wxT("0`all()");
+						}
+					}
+					if (!l_sMulti.Contains(wxT("all")))
+					{
+					l_sMulti = l_sMulti.BeforeLast('+');
+					l_sMulti = l_sMulti.BeforeLast('+');
+			     	}
+					//wxString l_sMulti;
+					//if ((*l_itPlace)->GetPlaceMultiSet())
+					//{
+					//	l_sMulti=(*l_itPlace)->GetPlaceMultiSet()->GetMultiSetMap()->begin()->first;
+					//}
+					wxString l_sMark;
+					if (!l_sMulti.IsEmpty())
+					{
+						l_sMark << l_sMulti;// l_sMulti << wxT("`") << l_n_token_value;
+					}
+					if (++l_itPlace == m_lAllPlaceAnimators.end())
+					{
+						l_temp << l_sMulti;// l_sMark;
+					}
+
+					else
+					{
+						l_temp << l_sMark << wxT(",");
+					}
+
+					--l_itPlace;
+				}
+
+				m_ExportTextfile.AddLine(l_temp);
+			}
+
+			if (m_nStepCount == m_nStop + 1)
+				m_bExportComplete = true;
+
+			if (m_bExportComplete == true)
+			{
+				SP_MESSAGEBOX(wxT("Export completed."), wxT("Notification"), wxOK | wxICON_INFORMATION);
+				m_bExportComplete = false; //This is required otherwise message dialog keeps poping till the dead state
+			}
+		}
+
+		m_ExportTextfile.Write();
+		m_ExportTextfile.Close();
+	}
+}
+
+void SP_DS_CPN_Animation::ExportStepSequences()
+{
+	list<SP_DS_CPN_TransAnimator*>::iterator l_itTrans;
+
+	if (m_ExportFilename.Cmp(wxT("")) != 0)
+	{
+		m_ExportTextfile.Open(m_ExportFilename);
+
+		if (m_nMarkingOption == 1)
+		{
+			if (m_nStepCount >= m_nStart && m_nStepCount <= m_nStop && m_bRunning == true && ((m_nStepCount - m_nStart) % m_nEvery == 0))
+			{
+
+				wxString l_temp(wxT(""));
+
+				if (m_lStepTransAnimators.begin() != m_lStepTransAnimators.end())
+					l_temp << m_nStepCount;
+
+				for (l_itTrans = (m_lStepTransAnimators).begin(); l_itTrans != (m_lStepTransAnimators).end(); ++l_itTrans)
+				{
+					SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+
+					if (!l_pcNode) continue;
+					std::vector<wxString>* l_vBindingColor = (*l_itTrans)->GetSelBindings();
+					wxString l_sBinding;
+					if (l_vBindingColor)
+					{
+						if (l_vBindingColor->size() >= 1)
+						{
+
+							for (auto itBinding = l_vBindingColor->begin(); itBinding != l_vBindingColor->end();++itBinding)
+							{
+								wxString l_sChosenBiding = *itBinding;
+								l_sChosenBiding = l_sChosenBiding.AfterFirst(wxChar('='));
+								l_sChosenBiding.Replace(wxT(";"), wxT(""));
+								l_sChosenBiding.Replace(wxT(" "), wxT(""));
+								l_sBinding << wxT("_")<< l_sChosenBiding;
+							}
+						}
+					}
+
+					SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("Name"));
+					SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
+					wxString l_sName = l_pcNameAttr->GetValue();
+					if (!l_sBinding.IsEmpty())
+					{
+
+						l_sName  << l_sBinding;
+					}
+
+					l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+					SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+					long int l_sId = l_pcIdAttr->GetValue();
+
+					if (l_itTrans == m_lStepTransAnimators.begin())
+					{
+						l_temp << wxT(" | ");
+					}
+
+					else
+					{
+						l_temp << wxT("\n  | ");
+					}
+
+					l_temp << l_sId << wxT(".") << l_sName;
+
+					if (++l_itTrans != m_lStepTransAnimators.end())
+					{
+						l_temp << wxT(" :1,");
+					}
+
+					else
+					{
+						l_temp << wxT(" :1");
+					}
+
+					--l_itTrans;
+				}
+
+				m_ExportTextfile.AddLine(l_temp);
+			}
+
+			if (m_nStepCount == m_nStop + 1)
+				m_bExportComplete = true;
+
+			if (m_bExportComplete == true)
+			{
+				SP_MESSAGEBOX(wxT("Export completed."), wxT("Notification"), wxOK | wxICON_INFORMATION);
+				m_bExportComplete = false; //This is required otherwise message dialog keeps poping till the dead state
+			}
+		}
+
+		m_ExportTextfile.Write();
+		m_ExportTextfile.Close();
+	}
+}
+
+void SP_DS_CPN_Animation::SetStepCounter()
+{
+	m_pcStepCounterValue->SetLabel(wxString::Format(wxT("%ld"), m_nStepCount));
+}
+
+void SP_DS_CPN_Animation::OnImport(wxCommandEvent &event)
+{
+	ImportColAnim *import_frame = new ImportColAnim(wxT("Import Details"), this);
+
+	import_frame->Show(true);
+}
+
+void SP_DS_CPN_Animation::ImportDetails(ImportColAnim *import_frame)
+{
+
+	list<SP_DS_CPN_TransAnimator *>::iterator l_itTrans;
+	m_bImport = true;
+	m_bInvalid = false;
+	m_nLineCount = 1;
+	m_ImportFilename = import_frame->m_pc_Browse->GetPath();
+
+	//It is important to get the last token to check the file format
+	//For eg filename.abc.tseq is a valid file format, thus we need the last token
+
+	if (m_ImportFilename.AfterLast('.') != wxT("tseq"))
+	{
+		SP_MESSAGEBOX(wxT("Invalid file format."), wxT("Error"), wxOK | wxICON_ERROR);
+	}
+	else
+	{
+		if (m_ImportTextfile.Open(m_ImportFilename) == false)
+		{
+			SP_MESSAGEBOX(wxT("File does not exist."), wxT("Error"), wxOK | wxICON_ERROR);
+		}
+		else
+		{
+			wxStringTokenizer l_tkz(m_ImportTextfile.GetFirstLine(), wxT(","));
+
+			wxString l_StepDetails = l_tkz.GetNextToken();
+			wxString l_AutoConcurrency = l_tkz.GetNextToken();
+
+			if (l_StepDetails.Cmp("Stepping:Maximum") == 0)
+				m_nStepState = 1;
+			else if (l_StepDetails.Cmp("Stepping:Intermediate") == 0)
+				m_nStepState = 2;
+			else if (l_StepDetails.Cmp("Stepping:Single") == 0)
+				m_nStepState = 3;
+
+			if (l_AutoConcurrency.Cmp("AC:Enabled") == 0)
+				m_bAutoConcurrency = true;
+			else if (l_AutoConcurrency.Cmp("AC:Disabled") == 0)
+				m_bAutoConcurrency = false;
+
+			unsigned int l_nLineCount = m_nLineCount;
+
+			long l_trans_id;
+
+			while (l_nLineCount < m_ImportTextfile.GetLineCount())
+			{
+				//Get the line and tokenize it with " " as delimiter
+				wxStringTokenizer l_pc_tkz(m_ImportTextfile.GetLine(l_nLineCount++), wxT(" "));
+
+				l_pc_tkz.GetNextToken();
+				l_pc_tkz.GetNextToken();
+
+				//Get the third token, tokenize it with "." as delimiter and take the first token from it
+				wxStringTokenizer l_pc_trans(l_pc_tkz.GetNextToken(), wxT("."));
+				if (!l_pc_trans.GetNextToken().ToLong(&l_trans_id))
+					;
+
+				for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
+				{
+					SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+					SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+					SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+					long int l_sId = l_pcIdAttr->GetValue();
+
+					if (l_sId == l_trans_id)
+						break;
+				}
+
+				if (l_itTrans == m_lAllTransAnimators.end())
+					m_bInvalid = true;
+
+				while (l_nLineCount < m_ImportTextfile.GetLineCount())
+				{
+					//Get the line and tokenize it with " " as delimiter
+					wxStringTokenizer l_tkz(m_ImportTextfile.GetLine(l_nLineCount++), wxT(" "));
+
+					//Copy the first token into a buffer
+					wxString l_buf = l_tkz.GetNextToken();
+
+					if (l_buf.Cmp("|") != 0)
+					{
+						l_nLineCount--;
+						break;
+					}
+
+					//Get the second token, tokenize it with "." as delimiter and take the first token from it
+					wxStringTokenizer l_trans(l_tkz.GetNextToken(), wxT("."));
+					if (!l_trans.GetNextToken().ToLong(&l_trans_id))
+						;
+
+					for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
+					{
+						SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+						SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+						SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+						long int l_sId = l_pcIdAttr->GetValue();
+
+						if (l_sId == l_trans_id)
+							break;
+					}
+
+					if (l_itTrans == m_lAllTransAnimators.end())
+						m_bInvalid = true;
+				}
+			}
+
+			m_ImportTextfile.Close();
+
+			if (m_bInvalid == true)
+			{
+				m_bImport = false; //No import is possible because the file is invalid
+				SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
+			}
+			else
+			{
+				SP_LOGMESSAGE(wxT("Import file '") + m_ImportFilename + wxT("' successfully."));
+			}
+		}
+	}
+
+}
+
+void SP_DS_CPN_Animation::ImportStepSequences()
+{
+	if (m_bInvalid || m_ImportTextfile.Open(m_ImportFilename) == false)
+	{
+		m_lPossibleTransAnimators.clear();
+		SP_MESSAGEBOX(wxT("Error in opening file ") + m_ImportFilename, wxT("Notification"), wxOK | wxICON_ERROR);
+	}
+	else
+	{
+		list<SP_DS_CPN_TransAnimator *>::iterator l_itTrans;
+		long l_trans_id;
+
+		if (m_nLineCount < m_ImportTextfile.GetLineCount())
+		{
+			m_lPossibleTransAnimators.clear();
+
+			SP_LOGDEBUG(wxString::Format("Line Count = %u - ", m_nLineCount));
+
+			//Get the line and tokenize it with " " as delimiter
+			wxStringTokenizer l_pc_tkz(m_ImportTextfile.GetLine(m_nLineCount++), wxT(" "));
+
+			wxString l_temp = l_pc_tkz.GetNextToken();
+
+			SP_LOGDEBUG(wxString::Format("Step Number = %s\n", l_temp.c_str()));
+
+			l_pc_tkz.GetNextToken();
+
+			//Get the third token, tokenize it with "." as delimiter and take the first token from it
+			wxStringTokenizer l_pc_trans(l_pc_tkz.GetNextToken(), wxT("."));
+			if (!l_pc_trans.GetNextToken().ToLong(&l_trans_id))
+				;
+
+			SP_LOGDEBUG(wxString::Format("Transition ID: %ld\n", l_trans_id));
+
+			for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
+			{
+				SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+				SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+				SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+				long int l_sId = l_pcIdAttr->GetValue();
+
+				if (l_sId == l_trans_id)
+					m_lPossibleTransAnimators.push_back(*l_itTrans);
+			}
+
+			while (m_nLineCount < m_ImportTextfile.GetLineCount())
+			{
+				//Get the line and tokenize it with " " as delimiter
+				wxStringTokenizer l_tkz(m_ImportTextfile.GetLine(m_nLineCount++), wxT(" "));
+
+				//Copy the first token into a buffer
+				wxString l_buf = l_tkz.GetNextToken();
+
+				if (l_buf.Cmp("|") != 0)
+				{
+					m_nLineCount--;
+					break;
+				}
+
+				//Get the second token, tokenize it with "." as delimiter and take the first token from it
+				wxStringTokenizer l_trans(l_tkz.GetNextToken(), wxT("."));
+				if (!l_trans.GetNextToken().ToLong(&l_trans_id))
+					;
+
+				for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
+				{
+					SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+					SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+					SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+					long int l_sId = l_pcIdAttr->GetValue();
+
+					if (l_sId == l_trans_id)
+						m_lPossibleTransAnimators.push_back(*l_itTrans);
+				}
+
+				SP_LOGDEBUG(wxString::Format("Transition ID: %ld\n", l_trans_id));
+
+			}
+		}
+
+		m_ImportTextfile.Close();
+
+	}
 }

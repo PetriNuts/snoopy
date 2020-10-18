@@ -75,7 +75,9 @@ enum
 	SP_ID_RANDOMCOLOR,
 	SP_ID_CHOICE_SETS, //by george on 1.2.20
 	SP_ID_BUTTON_MODIFY_CONSTANT_SETS,  //by george on 1.2.20
-	SP_ID_DESTROY_ANIM
+	SP_ID_DESTROY_ANIM,
+	SP_ID_PEDEXPORT,//by george 10.2020
+	SP_ID_PEDIMPORT//by george  10.2020
 };
 
 BEGIN_EVENT_TABLE(SP_DS_ColStAnimation, SP_DS_Animation)
@@ -102,6 +104,12 @@ EVT_BUTTON(SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, SP_DS_ColStAnimation::OnModifySche
 
 EVT_CHOICE(SP_ID_CHOICE_SETS, SP_DS_ColStAnimation::OnColConstantSetsChanged)// by george
 EVT_BUTTON(SP_ID_BUTTON_MODIFY_CONSTANT_SETS, SP_DS_ColStAnimation:: SP_DS_ColStAnimation::OnModifyConstants) //by george
+
+EVT_UPDATE_UI(SP_ID_PEDIMPORT, SP_DS_ColStAnimation::OnUpdateUI)//george on 10.2020
+EVT_UPDATE_UI(SP_ID_PEDEXPORT, SP_DS_ColStAnimation::OnUpdateUI)//george on 10.2020
+EVT_BUTTON(SP_ID_PEDEXPORT, SP_DS_ColStAnimation::OnExport)//george on 10.2020
+EVT_BUTTON(SP_ID_PEDIMPORT, SP_DS_ColStAnimation::OnImport)//george on 10.2020
+
 END_EVENT_TABLE()
 
 SP_DS_ColStAnimation::SP_DS_ColStAnimation(unsigned int p_nRefresh, unsigned int p_nDuration, SP_ANIM_STEP_T p_eStepping) :
@@ -116,273 +124,228 @@ SP_DS_ColStAnimation::SP_DS_ColStAnimation(unsigned int p_nRefresh, unsigned int
 	m_bFirstFolding(true)
 {
 	m_IsDestructor = false;//by george
+	m_apcColListAttrForConstants.clear();
+	m_bIsKeepClicked = false;
+
+	m_nStart = 0;
+	m_nEvery = 0;
+	m_nStop = 0;
+	m_nMarkingOption = 0;
+	m_bAutoConcurrency = false;
+	m_nStepCount = 0; //Keeps a count of step number
+	m_bImport=false;
+	m_bInvalid=false;
+    m_sTriggiredUnfoldedTrans = wxT("");
+    m_mGroup2Pos.clear();
+
  
 }
 
 SP_DS_ColStAnimation::~SP_DS_ColStAnimation()
 {
-
-	if (m_nIsClose == SP_ID_DESTROY_ANIM)
-	{
-		m_IsDestructor = true;
-		LoadDefaultConstantsGroups();//by george
-		list<SP_DS_ColStPlaceAnimator*>::iterator l_Iter;
-
-		/**
-		SP_CPN_SyntaxChecking l_cSyntaxChecking;
-		if (!l_cSyntaxChecking.Initialize())
-			return;
-
-	   //UpdateColMarking();//by george
-	   // list<SP_DS_ColStPlaceAnimator*>::iterator l_Iter;
-
-		//for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
-		   // (*l_Iter)->ResetMarking();
-
-		SP_Core::Instance()->GetRootDocument()->Modify(TRUE);
-
-		//////////////////////////////////////////////////
-		//update marking here
-
-		SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
-		if (!l_pcGraph)
-			return;
-		SP_DS_ColListAttribute* l_pcColList;
-
-		SP_ListNode::const_iterator l_itElem;
-		vector<SP_DS_Node*> l_vPlaceNodes;
-		SP_DS_Nodeclass* l_pcNodeclass;
-		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
-		if (l_pcNodeclass)
-		{
-			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
-			{
-				l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+	bool l_bIsKeep = m_bIsKeepClicked;
+		if (m_cbKeep) {
+			if (m_cbKeep->IsChecked()) {
+				KeepMarking();
+				l_bIsKeep = true;
 			}
-		}
-		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
-		if (l_pcNodeclass)
-		{
-			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
-			{
-				l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+			else if (!l_bIsKeep) {
+				list<SP_DS_ColStPlaceAnimator*>::iterator l_Iter;
+				for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
+					(*l_Iter)->ResetMarking();
+				Refresh();
 			}
+			wxGetApp().GetAnimationPrefs()->SetKeepMarking(m_cbKeep->IsChecked());
+			wxDELETE((m_cbKeep));
 		}
 
-
-
-		int l_nGridRowNumber = 0;
-
-
-		for (unsigned int l_nPos = 0; l_nPos < l_vPlaceNodes.size(); l_nPos++)
+		if (l_bIsKeep)
 		{
-
-			l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
-
-			//update it the first time
-			l_vPlaceNodes[l_nPos]->Update(TRUE);
-
-
-
-
-			////////////////////////////////////////////////////////
-			wxString l_sMainMarking = wxT("");
-			map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
-			if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false))
-				return;
-			map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
-
-			wxString l_sNodeClass = l_vPlaceNodes[l_nPos]->GetNodeclass()->GetName();
-
-			if (l_sNodeClass == SP_DS_CONTINUOUS_PLACE)
-			{
-				double l_dMarking = 0;
-				for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
-				{
-					l_dMarking = l_dMarking + itMap->second[0].m_DoubleMultiplicity;
-				}
-				l_sMainMarking << l_dMarking;
-			}
-			else
-			{
-				long l_nMarking = 0;
-				for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
-				{
-					l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
-				}
-				l_sMainMarking << l_nMarking;
-			}
-			////////////////////////////////////////////////////////////////
-
-			SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast< SP_DS_Attribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(wxT("Marking")));
-			if (l_pcMarkingAttr)
-				l_pcMarkingAttr->SetValueString(l_sMainMarking);
-
-			l_vPlaceNodes[l_nPos]->Update(TRUE);
-		}
-
-
-		SP_Core::Instance()->GetRootDocument()->Modify(true);
-
-		////////////////////////////////////////////////////////
-
-
-	   // if (m_pcUnfolding)
-	   //	 wxDELETE(m_pcUnfolding);
-
-	   // if (!LoadUnfoldingInformation())
-	   // {
-	   //	 SP_MESSAGEBOX(wxT("Unfolding error"), wxT("Unfolding checking"), wxOK | wxICON_ERROR);
-	   //	 m_bRestartAnimationFlag = false;  // let it not animate
-	   //	 return;
-	   // }
-
-
-		//////////////////////////////////////////////////////////////////
-
-
-		list<SP_DS_ColStPlaceAnimator*>::iterator l_Iter;
-			for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
-			{
-				(*l_Iter)->UpdateDefaultMarking();
-			}
-
-
-	   // SP_CPN_SyntaxChecking l_cSyntaxChecking;
-		//if (!l_cSyntaxChecking.SyntaxChecking())
-	   //	 return ;
-
-	   */
-		for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
-			(*l_Iter)->ResetMarking();
-
-		/*******************************/
-
-		//SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
-		//if (!l_pcGraph)
-		//	return;
-		SP_DS_ColListAttribute* l_pcColList;
-
-		SP_ListNode::const_iterator l_itElem;
-		vector<SP_DS_Node*> l_vPlaceNodes;
-		SP_DS_Nodeclass* l_pcNodeclass;
-		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
-		if (l_pcNodeclass)
-		{
-			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
-			{
-				l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
-			}
-		}
-		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
-		if (l_pcNodeclass)
-		{
-			for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
-			{
-				l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
-			}
-		}
-
-
-
-		int l_nGridRowNumber = 0;
-
-
-		for (unsigned int l_nPos = 0; l_nPos < l_vPlaceNodes.size(); l_nPos++)
-		{
-
-			l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
-
-			//l_pcColList->Clear();
-			//l_pcColList->RemoveAllColumns();
-
-			int l_nBegin = l_nGridRowNumber;
-
-			//for (int i = 0; i < m_pcMarkingGrid->GetNumberCols(); i++)
-			//{
-			//	l_pcColList->AppendEmptyColum();
-			//	l_pcColList->SetColLabel(i, m_pcMarkingGrid->GetColLabelValue(i));
-			//}
-
-			//l_pcColList->AppendEmptyRow();
-
-			wxString l_sMainMarking;
-
-			//	for (int j = l_nBegin; j < m_pcMarkingGrid->GetNumberRows(); j++)
-				//{
-				//	l_nGridRowNumber++;
-
-				//	for (int i = 0; i < m_pcMarkingGrid->GetNumberCols(); i++)
-				///	{
-				//		wxString l_sValue = m_pcMarkingGrid->GetCellValue(j, i);
-				//		l_pcColList->SetCell(j - l_nBegin, i, l_sValue);
-				//	}
-
-				//	if (j < m_pcMarkingGrid->GetNumberRows() - 1)
-				//	{
-				//		wxString l_sRowLabelValue = m_pcMarkingGrid->GetRowLabelValue(j + 1);
-				//		if (l_sRowLabelValue == wxT(""))
-				//			l_pcColList->AppendEmptyRow();
-				//		else
-				//			break;
-				//	}
-
-				//}
-				//update it the first time
-			l_vPlaceNodes[l_nPos]->Update(TRUE);
-
-
-			SP_CPN_SyntaxChecking l_cSyntaxChecking;
-			if (!l_cSyntaxChecking.Initialize())
-				return;
-
-
-			////////////////////////////////////////////////////////
-			l_sMainMarking = wxT("");
-			map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
-			if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false))
-				return;
-			map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
-
-			wxString l_sNodeClass = l_vPlaceNodes[l_nPos]->GetNodeclass()->GetName();
-
-			if (l_sNodeClass == SP_DS_CONTINUOUS_PLACE)
-			{
-				double l_dMarking = 0;
-				for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
-				{
-					l_dMarking = l_dMarking + itMap->second[0].m_DoubleMultiplicity;
-				}
-				l_sMainMarking << l_dMarking;
-			}
-			else
-			{
-				long l_nMarking = 0;
-				for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
-				{
-					l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
-				}
-				l_sMainMarking << l_nMarking;
-			}
-			////////////////////////////////////////////////////////////////
-
-			SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast<SP_DS_Attribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(wxT("Marking")));
-			if (l_pcMarkingAttr)
-				l_pcMarkingAttr->SetValueString(l_sMainMarking);
-
-			l_vPlaceNodes[l_nPos]->Update(TRUE);
-		}
-
-
-		SP_Core::Instance()->GetRootDocument()->Modify(true);
-
-
-		/*******************************/
+		UpdateMarkingPlaces();
 		Refresh();
 
 		//if (m_pcUnfolding)
 		wxDELETE(m_pcUnfolding);
+		}
+
+		if (m_nIsClose == SP_ID_DESTROY_ANIM&& !l_bIsKeep)
+		{
+			m_IsDestructor = true;
+			LoadDefaultConstantsGroups();//by george
+			list<SP_DS_ColStPlaceAnimator*>::iterator l_Iter;
+
+			for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
+					(*l_Iter)->ResetMarking();
+
+			SP_DS_ColListAttribute* l_pcColList;
+
+					SP_ListNode::const_iterator l_itElem;
+					vector<SP_DS_Node*> l_vPlaceNodes;
+					SP_DS_Nodeclass* l_pcNodeclass;
+					l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+					if (l_pcNodeclass)
+					{
+						for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+						{
+							l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+						}
+					}
+					l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+					if (l_pcNodeclass)
+					{
+						for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+						{
+							l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+						}
+					}
+
+
+
+					int l_nGridRowNumber = 0;
+
+
+					for (unsigned int l_nPos = 0; l_nPos < l_vPlaceNodes.size(); l_nPos++)
+					{
+
+						l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
+
+						//l_pcColList->Clear();
+						//l_pcColList->RemoveAllColumns();
+
+						int l_nBegin = l_nGridRowNumber;
+						wxString l_sMainMarking;
+
+						l_vPlaceNodes[l_nPos]->Update(TRUE);
+
+
+						SP_CPN_SyntaxChecking l_cSyntaxChecking;
+						if (!l_cSyntaxChecking.Initialize())
+							continue;
+				////////////////////////////////////////////////////////
+					l_sMainMarking = wxT("");
+					map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
+					if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false))
+					continue;
+					map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
+
+					wxString l_sNodeClass = l_vPlaceNodes[l_nPos]->GetNodeclass()->GetName();
+
+					if (l_sNodeClass == SP_DS_CONTINUOUS_PLACE)
+					{
+							double l_dMarking = 0;
+							for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+							{
+								l_dMarking = l_dMarking + itMap->second[0].m_DoubleMultiplicity;
+							}
+							l_sMainMarking << l_dMarking;
+					}
+					else
+					{
+						long l_nMarking = 0;
+						for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+						{
+							l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
+						}
+							l_sMainMarking << l_nMarking;
+					}
+					////////////////////////////////////////////////////////////////
+
+					SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast<SP_DS_Attribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(wxT("Marking")));
+					if (l_pcMarkingAttr)
+						l_pcMarkingAttr->SetValueString(l_sMainMarking);
+
+					l_vPlaceNodes[l_nPos]->Update(TRUE);
+					}
+
+
+				  SP_Core::Instance()->GetRootDocument()->Modify(true);
+
+
+					/*******************************/
+					Refresh();
+
+				//if (m_pcUnfolding)
+				wxDELETE(m_pcUnfolding);
+				}
+
+		if (m_cbKeep)
+			wxDELETE(m_cbKeep);
+
+}
+
+void SP_DS_ColStAnimation::UpdateMarkingPlaces()
+{
+	//update marking and the canvas layout of the places after they get updated
+	SP_DS_ColListAttribute* l_pcColList1;
+	SP_ListNode::const_iterator l_itElement;
+	vector<SP_DS_Node*> l_vPlaceNodesinPed;
+	SP_DS_Nodeclass* l_pcNodeclass;
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElement = l_pcNodeclass->GetElements()->begin(); l_itElement != l_pcNodeclass->GetElements()->end(); ++l_itElement)
+		{
+			l_vPlaceNodesinPed.push_back(dynamic_cast<SP_DS_Node*>(*l_itElement));
+		}
 	}
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElement = l_pcNodeclass->GetElements()->begin(); l_itElement != l_pcNodeclass->GetElements()->end(); ++l_itElement)
+		{
+			l_vPlaceNodesinPed.push_back(dynamic_cast<SP_DS_Node*>(*l_itElement));
+		}
+	}
+	for (unsigned int l_nPos = 0; l_nPos < l_vPlaceNodesinPed.size(); l_nPos++)
+	{
+
+		l_pcColList1 = dynamic_cast<SP_DS_ColListAttribute*>(l_vPlaceNodesinPed[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
+		l_vPlaceNodesinPed[l_nPos]->Update(TRUE);
+
+
+		SP_CPN_SyntaxChecking l_cSyntaxChecking;
+		if (!l_cSyntaxChecking.Initialize())
+			continue;
+
+
+		////////////////////////////////////////////////////////
+		wxString l_sMainMarking;
+		l_sMainMarking = wxT("");
+		map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
+		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodesinPed[l_nPos], l_mColorToMarkingMap, false))
+			continue;
+		map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
+
+		wxString l_sNodeClass = l_vPlaceNodesinPed[l_nPos]->GetNodeclass()->GetName();
+
+		if (l_sNodeClass == SP_DS_CONTINUOUS_PLACE)
+		{
+			double l_dMarking = 0;
+			for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+			{
+				l_dMarking = l_dMarking + itMap->second[0].m_DoubleMultiplicity;
+			}
+			l_sMainMarking << l_dMarking;
+		}
+		else
+		{
+			long l_nMarking = 0;
+			for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+			{
+				l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
+			}
+			l_sMainMarking << l_nMarking;
+		}
+		////////////////////////////////////////////////////////////////
+
+		SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast<SP_DS_Attribute*>(l_vPlaceNodesinPed[l_nPos]->GetAttribute(wxT("Marking")));
+		if (l_pcMarkingAttr)
+			l_pcMarkingAttr->SetValueString(l_sMainMarking);
+
+		l_vPlaceNodesinPed[l_nPos]->Update(TRUE);
+
+	}
+
 }
 
 SP_DS_Animation*
@@ -456,6 +419,18 @@ SP_DS_ColStAnimation::PreStep()
 	unsigned int l_nSteps = m_nSteps / 2;
 
 	m_lPossibleTransAnimators.clear();
+
+	if (m_bExport == true)
+			ExportMarkings();
+
+		if (GetDirection() == FORWARD)
+			m_nStepCount++; //Increment the step count
+
+		else if (GetDirection() == BACKWARD)
+			m_bExport = false; //If user interrupts the animation,export should be stopped
+
+		if (m_bImport == false)
+		{
 	//selecting transitions (candidates) to fire ...
 	if (dynamic_cast<SP_DS_ColStTransAnimator*>(m_pcSingleStep))
 	{
@@ -500,7 +475,10 @@ SP_DS_ColStAnimation::PreStep()
 								 }
 								 */
 	}
+		}
 
+		else if (m_bImport == true)//take the possible trans from the input trace,by george
+			ImportStepSequences();
 	//running the usual tests and preparing everything
 	for (l_itTrans = m_lPossibleTransAnimators.begin(); l_itTrans != m_lPossibleTransAnimators.end(); ++l_itTrans)
 	{
@@ -580,13 +558,26 @@ SP_DS_ColStAnimation::PreStep()
 		if (m_bOneShot) {
 			if (GetSingleStep()) {
 				msg = wxT("This transition is not enabled!");
+				if (m_nStepCount > 0)
+					{
+						m_nStepCount--; //Dead state, thus decrement the m_nStepCount
+					}
 			}
 			else {
 				msg = wxT("Dead state: there are no enabled transitions.");
+
+				if (m_nStepCount > 0)
+								{
+									m_nStepCount--; //Dead state, thus decrement the m_nStepCount
+								}
 			}
 		}
 		else {
 			msg = wxT("Dead state: there are no more enabled transitions.");
+			if (m_nStepCount > 0)
+						{
+							m_nStepCount--; //Dead state, thus decrement the m_nStepCount
+						}
 		}
 		msg = msg + wxT("\n \n * Not enough tokens in preplaces; \n Or \n * Color is out of range in postplaces.");
 		SP_MESSAGEBOX(msg, wxT("Notification"), wxOK | wxICON_INFORMATION);
@@ -597,6 +588,18 @@ SP_DS_ColStAnimation::PreStep()
 	}
 	else {
 	}
+
+	if (GetDirection() == BACKWARD && m_nStepCount > 0)
+	{
+			m_nStepCount--; //Decrease the step count
+			m_bExport = false; //If user interrupts the animation,export should be stopped
+	}
+
+	if (m_bExport == true)
+			ExportStepSequences();
+
+
+	SetStepCounter();
 
 	return l_bReturn;
 }
@@ -810,150 +813,184 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 
 	m_pcDialog = p_pcCtrl;
 
-	/*
-	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-	p_pcSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDSET, wxT("Keep Marking")), 1, wxALL | wxEXPAND, 5);
-	m_cbKeep = new wxCheckBox(p_pcCtrl, SP_ID_PEDKEEP, wxT("Always keep marking when closing."));
-	m_cbKeep->SetValue(wxGetApp().GetAnimationPrefs()->GetKeepMarking());
-	p_pcSizer->Add(m_cbKeep, 0, wxALL, 5);
+	/*********by george**********/
+		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+		p_pcSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDSET, wxT("Keep Marking")), 1, wxALL | wxEXPAND, 5);
+		m_cbKeep = new wxCheckBox(p_pcCtrl, SP_ID_PEDKEEP, wxT("Always keep marking when closing."));
+		m_cbKeep->SetValue(wxGetApp().GetAnimationPrefs()->GetKeepMarking());
+		p_pcSizer->Add(m_cbKeep, 0, wxALL, 5);
 
-	p_pcSizer->Add( new wxButton( p_pcCtrl, SP_ID_BUTTON_OPEN_SIMULATION, wxT("Stochastic simulation"),
-	wxDefaultPosition, wxDefaultSize, 0 ), 0, wxALL, 5 );
-	*/
-	wxSizer* l_pcOutputLabelSizer = new wxBoxSizer(wxVERTICAL);
+		//------------------------------------------
+		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+		wxSizer* m_pcExportImportSizer = new wxBoxSizer(wxHORIZONTAL);
+		m_pcExportImportSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDEXPORT, wxT("Export")), 1, wxALL | wxEXPAND, 5);
+		m_pcExportImportSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDIMPORT, wxT("Import")), 1, wxALL | wxEXPAND, 5);
+		p_pcSizer->Add(m_pcExportImportSizer, 0, wxALL, 5);
+		//------------------------------------------
+		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+		wxString l_tmp;
+		l_tmp << m_nStepCount;
+		m_pcStepCounter = new wxBoxSizer(wxHORIZONTAL);
+		m_pcStepCounterText = new wxStaticText(p_pcCtrl, wxID_ANY, wxT("Step Counter"));
+		m_pcStepCounterValue = new wxStaticText(p_pcCtrl, wxID_ANY, l_tmp);
 
-	wxSizer* l_pcSetsSizer = new wxBoxSizer(wxVERTICAL);
+		m_pcStepCounter->Add(m_pcStepCounterText, 1, wxEXPAND | wxALL, 5);
+		m_pcStepCounter->Add(m_pcStepCounterValue, 1, wxEXPAND | wxALL, 5);
 
+		p_pcSizer->Add(m_pcStepCounter, 0, wxEXPAND);
+		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+		//-------------------------------------------
+		//p_pcSizer->Add( new wxButton( p_pcCtrl, SP_ID_BUTTON_OPEN_SIMULATION, wxT("Stochastic simulation"),
+		//wxDefaultPosition, wxDefaultSize, 0 ), 0, wxALL, 5 );
+		/////////////////////////////
+		//wxSizer* l_pcOutputLabelSizer = new wxBoxSizer(wxVERTICAL);
 
-	wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-
-	m_pcOutputLabelStaticText = new wxStaticText(p_pcCtrl, SP_ID_STATIC_TEXT_OUTPUT_LABEL, wxT("Start ..."), wxDefaultPosition, wxDefaultSize);
-
-	l_pcRowSizer->Add(m_pcOutputLabelStaticText, 1, wxALL, 5);
-
-	l_pcOutputLabelSizer->Add(l_pcRowSizer, 0, wxEXPAND);
-
-
-
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-
-	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Marking set:")), 1, wxALL | wxEXPAND, 5);
-
-	m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_MARKING_SETS, wxDefaultPosition, wxSize(100, -1)));
-
-	l_pcRowSizer->Add(m_apcComboBoxes[0], 0, wxALL, 5);
-
-	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
-
-	l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+		wxSizer* l_pcSetsSizer = new wxBoxSizer(wxVERTICAL);
 
 
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		wxSizer* l_pcRowSizer;// = new wxBoxSizer(wxHORIZONTAL);
 
-	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Function set:")), 1, wxALL | wxEXPAND, 5);
+		//m_pcOutputLabelStaticText = new wxStaticText(p_pcCtrl, SP_ID_STATIC_TEXT_OUTPUT_LABEL, wxT("Start ..."), wxDefaultPosition, wxDefaultSize);
 
-	m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_FUNCTION_SETS, wxDefaultPosition, wxSize(100, -1)));
+		///l_pcRowSizer->Add(m_pcOutputLabelStaticText, 1, wxALL, 5);
 
-	l_pcRowSizer->Add(m_apcComboBoxes[1], 0, wxALL, 5);
-
-	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify")), 0, wxALL, 5);
-
-	l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+		//l_pcOutputLabelSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
 
-	//Weight
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		if (m_pcGraph->GetNodeclass(wxT("Place"))->GetElements()->size() > 0)//by george, preventing of occuring empty v-sets
+		{
 
-	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Weight set:")), 1, wxALL | wxEXPAND, 5);
+			    l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_WEIGHT_SETS, wxDefaultPosition, wxSize(100, -1)));
+			    l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Marking set:")), 1, wxALL | wxEXPAND, 5);
 
-	l_pcRowSizer->Add(m_apcComboBoxes[2], 0, wxALL, 5);
+			    m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_MARKING_SETS, wxDefaultPosition, wxSize(100, -1)));
 
-	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_WEIGHT_SETS, wxT("Modify")), 0, wxALL, 5);
+			    l_pcRowSizer->Add(m_apcComboBoxes[0], 0, wxALL, 5);
 
-	l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+			    l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
 
+			    l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
-	//Delay
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+			    m_mGroup2Pos[wxT("Marking")] = m_apcComboBoxes.size()-1;
+		}
 
-	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Delay set:")), 1, wxALL | wxEXPAND, 5);
+		if (m_pcGraph->GetNodeclass(wxT("Transition"))->GetElements()->size())
+		{
 
-	m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_DELAY_SETS, wxDefaultPosition, wxSize(100, -1)));
+				l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	l_pcRowSizer->Add(m_apcComboBoxes[3], 0, wxALL, 5);
+				l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Function set:")), 1, wxALL | wxEXPAND, 5);
 
-	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify")), 0, wxALL, 5);
+				m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_FUNCTION_SETS, wxDefaultPosition, wxSize(100, -1)));
 
-	l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+				l_pcRowSizer->Add(m_apcComboBoxes[1], 0, wxALL, 5);
 
+				l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify")), 0, wxALL, 5);
 
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+				l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
-	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Schedule set:")), 1, wxALL | wxEXPAND, 5);
+				m_mGroup2Pos[wxT("Rate")] = m_apcComboBoxes.size() - 1;
 
-	m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_SCHEDULE_SETS, wxDefaultPosition, wxSize(100, -1)));
-
-	l_pcRowSizer->Add(m_apcComboBoxes[4], 0, wxALL, 5);
-
-	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("Modify")), 0, wxALL, 5);
-
-	l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+		}
 
 
-/*
-	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		if (m_pcGraph->GetNodeclass(wxT("Immediate Transition"))->GetElements()->size() > 0)
+		{
+				//Weight
+				l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Parameter set:")), 1, wxALL | wxEXPAND, 5);
+				l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Weight set:")), 1, wxALL | wxEXPAND, 5);
 
-	m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_PARAMETER_SETS, wxDefaultPosition, wxSize(100, -1)));
+				m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_WEIGHT_SETS, wxDefaultPosition, wxSize(100, -1)));
 
-	l_pcRowSizer->Add(m_apcComboBoxes[5], 0, wxALL, 5);
+				l_pcRowSizer->Add(m_apcComboBoxes[2], 0, wxALL, 5);
 
-	l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify")), 0, wxALL, 5);
+				l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_WEIGHT_SETS, wxT("Modify")), 0, wxALL, 5);
 
-	l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+				l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
-	*/
-	//l_pcSimulationControlSizer->Add( new wxButton( p_pcCtrl, SP_ID_BUTTON_OPEN_SIMULATION, wxT("Stochastic simulation"),wxDefaultPosition, wxDefaultSize, 0 ), 0, wxALL, 5 );
+				m_mGroup2Pos[wxT("Weight")] = m_apcComboBoxes.size() - 1;
 
-	/**************george**************/
-	UpdateChoices();
-	SP_SetString::iterator l_itChoice;
-	for (l_itChoice = m_choices.begin(); l_itChoice != m_choices.end(); ++l_itChoice)
-	{
-		wxString l_sGroup = *l_itChoice;
-		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, l_sGroup + wxT(':')), 1, wxALL | wxEXPAND, 5);
-		m_apcComboBoxes1.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_SETS, wxDefaultPosition, wxSize(100, -1), 0, NULL, 0, wxDefaultValidator, l_sGroup));
-		l_pcRowSizer->Add(m_apcComboBoxes1[m_apcComboBoxes1.size() - 1], 0, wxALL, 5);
-		l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify")), 0, wxALL, 5);
-		l_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+		}
 
 
-	}
+		if (m_pcGraph->GetNodeclass(wxT("Deterministic Transition"))->GetElements()->size() > 0)
+		{
+				//Delay
+				l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	//m_msMarkingSets
-		
-	/*****************************/
+				l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Delay set:")), 1, wxALL | wxEXPAND, 5);
 
-	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-	p_pcSizer->Add(l_pcOutputLabelSizer, 0, wxALL, 5);
-	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-	p_pcSizer->Add(l_pcSetsSizer, 0, wxALL, 5);
-	//p_pcSizer->Add( new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL ), 0, wxEXPAND);
-	//p_pcSizer->Add( l_pcSimulationControlSizer, 0, wxALL, 5 );
+				m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_DELAY_SETS, wxDefaultPosition, wxSize(100, -1)));
+
+				l_pcRowSizer->Add(m_apcComboBoxes[3], 0, wxALL, 5);
+
+				l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify")), 0, wxALL, 5);
+
+				l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+
+				m_mGroup2Pos[wxT("Delay")] = m_apcComboBoxes.size() - 1;
 
 
-	LoadSets();
+		}
 
-	p_pcCtrl->PushEventHandler(this);
 
-	//allow backstepping
-	m_pcDialog->EnableBackStepping(true);
+		if (m_pcGraph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->size() > 0)
+		{
+				l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	return TRUE;
+				l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, wxT("Schedule set:")), 1, wxALL | wxEXPAND, 5);
+
+				m_apcComboBoxes.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_SCHEDULE_SETS, wxDefaultPosition, wxSize(100, -1)));
+
+				l_pcRowSizer->Add(m_apcComboBoxes[4], 0, wxALL, 5);
+
+				l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("Modify")), 0, wxALL, 5);
+
+				l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+
+				m_mGroup2Pos[wxT("Schedule")] = m_apcComboBoxes.size() - 1;
+
+		}
+
+
+		/**************george**************/
+		UpdateChoices();
+		SP_SetString::iterator l_itChoice;
+		for (l_itChoice = m_choices.begin(); l_itChoice != m_choices.end(); ++l_itChoice)
+		{
+			wxString l_sGroup = *l_itChoice;
+			l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+			l_pcRowSizer->Add(new wxStaticText(p_pcCtrl, -1, l_sGroup + wxT(':')), 1, wxALL | wxEXPAND, 5);
+			m_apcComboBoxes1.push_back(new wxChoice(p_pcCtrl, SP_ID_CHOICE_SETS, wxDefaultPosition, wxSize(100, -1), 0, NULL, 0, wxDefaultValidator, l_sGroup));
+			l_pcRowSizer->Add(m_apcComboBoxes1[m_apcComboBoxes1.size() - 1], 0, wxALL, 5);
+			l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify")), 0, wxALL, 5);
+			l_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+
+
+		}
+
+		//m_msMarkingSets
+
+		/*****************************/
+
+		//p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+		//p_pcSizer->Add(l_pcOutputLabelSizer, 0, wxALL, 5);
+		//p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+		p_pcSizer->Add(l_pcSetsSizer, 0, wxALL, 5);
+		p_pcSizer->Add( new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL ), 0, wxEXPAND);
+		//p_pcSizer->Add( l_pcSimulationControlSizer, 0, wxALL, 5 );
+
+
+		LoadSets();
+
+		p_pcCtrl->PushEventHandler(this);
+
+		//allow backstepping
+		m_pcDialog->EnableBackStepping(true);
+
+		return TRUE;
 }
 
 void
@@ -968,13 +1005,16 @@ SP_DS_ColStAnimation::OnReset()
 
 
 	m_llHistoryTransAnimators.clear();
-
+	//by george
+	m_nStepCount = 0;
+	SetStepCounter();
 	Refresh();
 }
 
 void
 SP_DS_ColStAnimation::OnSet(wxCommandEvent& p_cEvent)
 {
+	m_bIsKeepClicked = true;
 	KeepMarking();
 }
 
@@ -1168,7 +1208,7 @@ void
 SP_DS_ColStAnimation::OnSetsChanged(wxCommandEvent& p_cEvent)
 {
 
-	m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
+	//m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
 	m_bRestartAnimationFlag = true;
 
 	m_apcColListAttr[5]->SetActiveList(m_apcComboBoxes[5]->GetSelection());
@@ -1180,10 +1220,15 @@ void
 SP_DS_ColStAnimation::OnMarkingSetChanged(wxCommandEvent& p_cEvent)
 {
 
-	m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
+	//m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
 	m_bRestartAnimationFlag = true;
 
-	m_apcColListAttr[0]->SetActiveColumn(m_apcComboBoxes[0]->GetSelection());
+	auto itFind = m_mGroup2Pos.find(wxT("Marking"));
+
+    if (itFind != m_mGroup2Pos.end())
+	{
+	  m_apcColListAttr[itFind->second]->SetActiveColumn(m_apcComboBoxes[itFind->second]->GetSelection());
+	}
 
 }
 
@@ -1192,10 +1237,15 @@ void
 SP_DS_ColStAnimation::OnFunctionSetChanged(wxCommandEvent& p_cEvent)
 {
 
-	m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
+	//m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
 	m_bRestartAnimationFlag = true;
 
-	m_apcColListAttr[1]->SetActiveColumn(m_apcComboBoxes[1]->GetSelection());
+	auto itFind = m_mGroup2Pos.find(wxT("Rate"));
+
+	if (itFind != m_mGroup2Pos.end())
+	{
+	  m_apcColListAttr[itFind->second]->SetActiveColumn(m_apcComboBoxes[itFind->second]->GetSelection());
+	}
 
 }
 
@@ -1203,10 +1253,15 @@ void
 SP_DS_ColStAnimation::OnWeightSetChanged(wxCommandEvent& p_cEvent)
 {
 
-	m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
+	///m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
 	m_bRestartAnimationFlag = true;
 
-	m_apcColListAttr[2]->SetActiveColumn(m_apcComboBoxes[2]->GetSelection());
+	auto itFind = m_mGroup2Pos.find(wxT("Weight"));
+
+	if (itFind != m_mGroup2Pos.end())
+	{
+		m_apcColListAttr[itFind->second]->SetActiveColumn(m_apcComboBoxes[itFind->second]->GetSelection());
+	}
 
 }
 
@@ -1214,10 +1269,15 @@ void
 SP_DS_ColStAnimation::OnDelaySetChanged(wxCommandEvent& p_cEvent)
 {
 
-	m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
+	//m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
 	m_bRestartAnimationFlag = true;
 
-	m_apcColListAttr[3]->SetActiveColumn(m_apcComboBoxes[3]->GetSelection());
+	auto itFind = m_mGroup2Pos.find(wxT("Delay"));
+
+	if (itFind != m_mGroup2Pos.end())
+	{
+	  m_apcColListAttr[itFind->second]->SetActiveColumn(m_apcComboBoxes[itFind->second]->GetSelection());
+	}
 
 }
 
@@ -1225,10 +1285,15 @@ void
 SP_DS_ColStAnimation::OnScheduleSetChanged(wxCommandEvent& p_cEvent)
 {
 
-	m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
+	//m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
 	m_bRestartAnimationFlag = true;
 
-	m_apcColListAttr[4]->SetActiveColumn(m_apcComboBoxes[4]->GetSelection());
+	auto itFind = m_mGroup2Pos.find(wxT("Schedule"));
+
+	if (itFind != m_mGroup2Pos.end())
+	{
+	  m_apcColListAttr[itFind->second]->SetActiveColumn(m_apcComboBoxes[itFind->second]->GetSelection());
+	}
 
 }
 
@@ -1238,59 +1303,71 @@ void SP_DS_ColStAnimation::LoadSets()
 {
 	if (m_apcColListAttr.empty())
 	{
+
 		m_apcColListAttr.resize(m_apcComboBoxes.size());
+
+		auto itFind = m_mGroup2Pos.find(wxT("Marking"));
+
 		SP_DS_Node* l_pcNode = NULL;
-		if (m_pcGraph->GetNodeclass(wxT("Place"))->GetElements()->size() > 0)
+		if (m_pcGraph->GetNodeclass(wxT("Place"))->GetElements()->size() > 0 && itFind !=m_mGroup2Pos.end())
 		{
 			l_pcNode = m_pcGraph->GetNodeclass(wxT("Place"))->GetElements()->front();
-			m_apcColListAttr[0] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
+			m_apcColListAttr[itFind->second] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
 
 		}
-		if (m_pcGraph->GetNodeclass(wxT("Transition"))->GetElements()->size() > 0)
+
+		itFind = m_mGroup2Pos.find(wxT("Rate"));
+
+		if (m_pcGraph->GetNodeclass(wxT("Transition"))->GetElements()->size() > 0 && itFind !=m_mGroup2Pos.end())
 		{
 			l_pcNode = m_pcGraph->GetNodeclass(wxT("Transition"))->GetElements()->front();
-			m_apcColListAttr[1] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
+			m_apcColListAttr[itFind->second] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
 
 		}
 
-		if (m_pcGraph->GetNodeclass(wxT("Immediate Transition"))->GetElements()->size() > 0)
+		itFind = m_mGroup2Pos.find(wxT("Weight"));
+
+		if (m_pcGraph->GetNodeclass(wxT("Immediate Transition"))->GetElements()->size() > 0 && itFind != m_mGroup2Pos.end())
 		{
 			l_pcNode = m_pcGraph->GetNodeclass(wxT("Immediate Transition"))->GetElements()->front();
-			m_apcColListAttr[2] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
+			m_apcColListAttr[itFind->second] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
 			//to be added
 		}
 
-		if (m_pcGraph->GetNodeclass(wxT("Deterministic Transition"))->GetElements()->size() > 0)
+		itFind = m_mGroup2Pos.find(wxT("Delay"));
+
+		if (m_pcGraph->GetNodeclass(wxT("Deterministic Transition"))->GetElements()->size() > 0 && itFind != m_mGroup2Pos.end())
 		{
 			l_pcNode = m_pcGraph->GetNodeclass(wxT("Deterministic Transition"))->GetElements()->front();
-			m_apcColListAttr[3] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("DelayList")));
+			m_apcColListAttr[itFind->second] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("DelayList")));
 		}
-		if (m_pcGraph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->size() > 0)
+
+		itFind = m_mGroup2Pos.find(wxT("Scheduled"));
+
+		if (m_pcGraph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->size() > 0 && itFind != m_mGroup2Pos.end())
 		{
 			l_pcNode = m_pcGraph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->front();
-			m_apcColListAttr[4] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("PeriodicList")));
+			m_apcColListAttr[itFind->second] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("PeriodicList")));
 		}
-		/*
-		if (m_pcGraph->GetNodeclass(wxT("Parameter"))->GetElements()->size() > 0)
-		{
-			l_pcNode = m_pcGraph->GetNodeclass(wxT("Parameter"))->GetElements()->front();
-			m_apcColListAttr[5] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("ParameterList")));
-		}
-		*/
+
 	}
 
 
-	//////////////////////////////////////////////////////////////////////////////
-	for (unsigned j = 0; j <= 3; j++)
-	{
-		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
-		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
-		if(l_pcCombobox)
-		l_pcCombobox->Clear();
-
-		if (l_pcAttr && l_pcCombobox)
+	 //assign value sets of each group
+	for (auto itMap = m_mGroup2Pos.begin(); itMap != m_mGroup2Pos.end(); ++itMap)
 		{
-			if (j == 0)
+			SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[itMap->second];
+
+			if (!l_pcAttr) continue;
+
+			wxChoice* l_pcCombobox = m_apcComboBoxes[itMap->second];
+
+			if (!l_pcCombobox) continue;
+
+			l_pcCombobox->Clear();
+
+			//add value sets of marking group
+			if (itMap->first == wxT("Marking"))
 			{
 				for (unsigned int i = 0; i < l_pcAttr->GetColCount(); i++)
 				{
@@ -1299,38 +1376,55 @@ void SP_DS_ColStAnimation::LoadSets()
 					{
 						l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
 						if (l_pcCombobox)
-						 l_pcCombobox->Append(l_sSetName);
+							l_pcCombobox->Append(l_sSetName);
 					}
-				 i = i + 2;
+					i = i + 2;
+
 				}
 			}
 
-			if (j >0 && j<3)
+			//add value sets of stoch rates
+			if (itMap->first == wxT("Rate") || itMap->first == wxT("Weight"))
 			{
 				for (unsigned int i = 1; i < l_pcAttr->GetColCount(); i++)
 				{
 					wxString l_sSetName = l_pcAttr->GetColLabel(i);
 					l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
-					if (l_pcCombobox)
-					l_pcCombobox->Append(l_sSetName);
 
+					if (l_pcCombobox)
+						l_pcCombobox->Append(l_sSetName);
 				}
 			}
 
-			//deal with the case: Scheduled Transition
-			if (j == 3)
+			if (itMap->first == wxT("Delay"))
 			{
 				for (unsigned i = 1; i < l_pcAttr->GetColCount(); i++)
 				{
 					wxString l_sSetName = l_pcAttr->GetColLabel(i);
 					l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
-					l_pcCombobox->Append(l_sSetName);
+
+					if (l_pcCombobox)
+						l_pcCombobox->Append(l_sSetName);
+
 					i++;
 					i++;
 				}
 			}
-			//end
 
+			if (itMap->first == wxT("Schedule"))
+			{
+				for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
+				{
+					wxString l_sSetName = l_pcAttr->GetCell(i, 0);
+
+					if (l_pcCombobox)
+						l_pcCombobox->Append(l_sSetName);
+				}
+				if (l_pcCombobox)
+					l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
+			}
+
+			//set the active sets
 			if (l_pcCombobox->GetCount() <= l_pcAttr->GetActiveColumn())
 			{
 				l_pcCombobox->SetSelection(0);
@@ -1340,28 +1434,8 @@ void SP_DS_ColStAnimation::LoadSets()
 				l_pcCombobox->SetSelection(l_pcAttr->GetActiveColumn());
 		}
 
-	}
 
-
-	for (size_t j = 4; j < m_apcColListAttr.size(); j++)
-	{
-		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
-		wxChoice* l_pcCombobox = m_apcComboBoxes[j];
-		l_pcCombobox->Clear();
-		if (l_pcAttr && l_pcCombobox)
-		{
-			for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
-			{
-				wxString l_sSetName = l_pcAttr->GetCell(i, 0);
-				if(l_sSetName.IsEmpty()) continue;
-				l_pcCombobox->Append(l_sSetName);
-			}
-			l_pcCombobox->SetSelection(l_pcAttr->GetActiveList());
-		}
-	}
-	/************george *******************/
-
-
+//assign constant groups and their v-sets
 	m_apcColListAttrForConstants.clear();
 	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
 
@@ -1411,7 +1485,7 @@ void SP_DS_ColStAnimation::LoadSets()
 	 
 	/**********************************/
 
-	m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
+	//m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
 	m_bRestartAnimationFlag = true;
 }
 
@@ -1422,7 +1496,7 @@ SP_DS_ColStAnimation::StartTimer()
 	if (m_bRestartAnimationFlag)
 	{
 
-		m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
+		//m_pcOutputLabelStaticText->SetLabel(wxT("Start new animation ..."));
 		m_bRestartAnimationFlag = false;
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1494,7 +1568,7 @@ SP_DS_ColStAnimation::ChooseTransition()
 		l_sOutputLabel << wxString::Format(wxT("%f"), l_pcRunElem->timepoint) << wxT("  :  ") <<
 			*l_pcRunElem->actionDescription->begin();
 
-		m_pcOutputLabelStaticText->SetLabel(l_sOutputLabel);
+		//m_pcOutputLabelStaticText->SetLabel(l_sOutputLabel);
 
 		int l_nReturn = l_pcRunElem->transitionArrayPos;
 
@@ -2395,4 +2469,529 @@ void SP_DS_ColStAnimation::UpdateColMarking()
 	
 		SP_Core::Instance()->GetRootDocument()->Refresh();
 		Refresh();
+}
+
+void SP_DS_ColStAnimation::SetStepCounter()
+{
+	m_pcStepCounterValue->SetLabel(wxString::Format(wxT("%ld"), m_nStepCount));
+}
+
+void SP_DS_ColStAnimation::ExportDetailsCPN(ExportStochCPN *export_frame)
+{
+	wxString l_start_str = export_frame->m_pc_StartText->GetLineText(0);
+	wxString l_every_str = export_frame->m_pc_EveryText->GetLineText(0);
+	wxString l_stop_str = export_frame->m_pc_StopText->GetLineText(0);
+	wxString l_temp;
+	list<SP_DS_ColStPlaceAnimator*>::iterator l_itPlace;
+	list<SP_DS_ColStTransAnimator*>::iterator l_itTrans;
+
+	m_ExportFilename = export_frame->m_pc_Browse->GetPath();
+	m_bExport = true;
+	m_bExportComplete = false;
+
+	bool l_bError = 0;
+
+	if (!l_start_str.ToLong(&m_nStart))
+		l_bError = true;
+
+	if (!l_stop_str.ToLong(&m_nStop))
+		l_bError = true;
+
+	if (!l_every_str.ToLong(&m_nEvery))
+		l_bError = true;
+
+	if (l_bError == true)
+	{
+		SP_MESSAGEBOX(wxT("Only integer values are accepted."), wxT("Error"), wxOK | wxICON_ERROR);
+	}
+
+	if (export_frame->m_pc_RadioChoice->GetSelection() == 0)
+		m_nMarkingOption = 0;
+
+	else
+		if (export_frame->m_pc_RadioChoice->GetSelection() == 1)
+			m_nMarkingOption = 1;
+
+	if (m_nMarkingOption == 0)
+	{
+		l_temp = wxT(".mseq");
+		m_ExportFilename = m_ExportFilename + l_temp;
+	}
+
+	else
+		if (m_nMarkingOption == 1)
+		{
+			l_temp = wxT(".tseq");
+			m_ExportFilename = m_ExportFilename + l_temp;
+		}
+
+	if (l_bError == false)
+	{
+
+		if (wxFileExists(m_ExportFilename) == true)
+		{
+			int l_Answer = SP_MESSAGEBOX(wxT("File already exists. Do you want to overwrite it?"), wxT("Overwrite"), wxYES_NO);
+			if (l_Answer == wxYES || l_Answer == wxID_YES)
+			{
+				if (m_ExportTextfile.Open(m_ExportFilename))
+				{
+					m_ExportTextfile.Clear();
+				}
+				else
+				{
+					SP_MESSAGEBOX(wxT("Error in opening file."), wxT("Error"), wxOK | wxICON_ERROR);
+				}
+			}
+			else
+			{
+				SP_MESSAGEBOX(wxT("Export failed"), wxT("Error"), wxOK | wxICON_ERROR);
+			}
+		}
+
+		else
+		{
+			if (m_ExportTextfile.Create(m_ExportFilename) == false)
+			{
+				SP_MESSAGEBOX(wxT("Error in creating file."), wxT("Error"), wxOK | wxICON_ERROR);
+			}
+		}
+
+		if (m_nMarkingOption == 0)
+		{
+			l_temp = wxT("Time,");
+
+			for (l_itPlace = m_lAllPlaceAnimators.begin(); l_itPlace != m_lAllPlaceAnimators.end(); ++l_itPlace)
+			{
+				if (l_itPlace != m_lAllPlaceAnimators.begin())
+				{
+					l_temp << wxT(",");
+				}
+
+				SP_DS_Node* l_pcNode = (*l_itPlace)->GetNode();
+				SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("Name"));
+
+				SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
+
+				wxString l_sName = l_pcNameAttr->GetValue();
+				l_temp << l_sName;
+			}
+		}
+
+		if (m_nMarkingOption == 1)
+		{
+			if (m_pcChoice != NULL)
+			{
+				if (m_nStepState == 1)
+				{
+					l_temp = wxT("Stepping:Maximum,");
+				}
+				else if (m_nStepState == 2)
+				{
+					l_temp = wxT("Stepping:Intermediate,");
+				}
+				else if (m_nStepState == 3)
+				{
+					l_temp = wxT("Stepping:Single,");
+				}
+			}
+			else
+			{
+				l_temp = wxT("Stepping:Intermediate ");
+			}
+
+			if (m_bAutoConcurrency)
+			{
+				l_temp = l_temp + wxT("AC:Enabled,transition=");
+			}
+			else
+			{
+				l_temp = l_temp + wxT("AC:Disabled,transition=");
+			}
+		}
+
+		m_ExportTextfile.AddLine(l_temp);
+		m_ExportTextfile.Write();
+		m_ExportTextfile.Close();
+
+	}
+}
+
+void SP_DS_ColStAnimation::OnExport(wxCommandEvent &p_pc_Event)
+{
+	ExportStochCPN *export_frame = new ExportStochCPN(wxT("Export Details"), this);
+
+	export_frame->Show(true);
+}
+
+void SP_DS_ColStAnimation::ExportMarkings()
+{
+	list<SP_DS_ColStPlaceAnimator*>::iterator l_itPlace;
+	//list<SP_DS_CPN_PlaceAnimator*>::iterator l_itPlace;
+
+	if (m_ExportFilename.Cmp(wxT("")) != 0)
+	{
+		m_ExportTextfile.Open(m_ExportFilename);
+		long l_n_token_value;
+
+		if (m_nMarkingOption == 0)
+		{
+			if (m_nStepCount >= m_nStart && m_nStepCount <= m_nStop && m_bRunning == true && ((m_nStepCount - m_nStart) % m_nEvery == 0))
+			{
+
+				wxString l_temp(wxT(""));
+				l_temp << m_nStepCount << wxT(",");
+
+				for (l_itPlace = (m_lAllPlaceAnimators).begin(); l_itPlace != (m_lAllPlaceAnimators).end(); ++l_itPlace)
+				{
+					l_n_token_value = (*l_itPlace)->GetMarking();
+					SP_DS_Node*  itNode = (*l_itPlace)->GetNode();
+					SP_DS_ColListAttribute* l_pcCollis = dynamic_cast<SP_DS_ColListAttribute*>((itNode)->GetAttribute(SP_DS_CPN_MARKINGLIST));
+					wxString l_sMulti;
+					if (l_pcCollis)
+					{
+						for (unsigned int i = 0; i < l_pcCollis->GetRowCount(); i++)
+						{
+							l_sMulti << l_pcCollis->GetCell(i, 1) << wxT("`") << l_pcCollis->GetCell(i, 0) << wxT("++");
+
+						}
+
+						if (l_sMulti.IsEmpty())
+						{
+							l_sMulti << wxT("0`all()");
+						}
+					}
+					if (!l_sMulti.Contains(wxT("all")))
+					{
+						l_sMulti = l_sMulti.BeforeLast('+');
+						l_sMulti = l_sMulti.BeforeLast('+');
+					}
+					//wxString l_sMulti;
+					//if ((*l_itPlace)->GetPlaceMultiSet())
+					//{
+					//	l_sMulti=(*l_itPlace)->GetPlaceMultiSet()->GetMultiSetMap()->begin()->first;
+					//}
+					wxString l_sMark;
+					if (!l_sMulti.IsEmpty())
+					{
+						l_sMark << l_sMulti;// l_sMulti << wxT("`") << l_n_token_value;
+					}
+					if (++l_itPlace == m_lAllPlaceAnimators.end())
+					{
+						l_temp << l_sMulti;// l_sMark;
+					}
+
+					else
+					{
+						l_temp << l_sMark << wxT(",");
+					}
+
+					--l_itPlace;
+				}
+
+				m_ExportTextfile.AddLine(l_temp);
+			}
+
+			if (m_nStepCount == m_nStop + 1)
+				m_bExportComplete = true;
+
+			if (m_bExportComplete == true)
+			{
+				SP_MESSAGEBOX(wxT("Export completed."), wxT("Notification"), wxOK | wxICON_INFORMATION);
+				m_bExportComplete = false; //This is required otherwise message dialog keeps poping till the dead state
+			}
+		}
+
+		m_ExportTextfile.Write();
+		m_ExportTextfile.Close();
+	}
+}
+
+void SP_DS_ColStAnimation::ExportStepSequences()
+{
+	list<SP_DS_ColStTransAnimator*>::iterator l_itTrans;
+
+	if (m_ExportFilename.Cmp(wxT("")) != 0)
+	{
+		m_ExportTextfile.Open(m_ExportFilename);
+
+		if (m_nMarkingOption == 1)
+		{
+			if (m_nStepCount >= m_nStart && m_nStepCount <= m_nStop && m_bRunning == true && ((m_nStepCount - m_nStart) % m_nEvery == 0))
+			{
+
+				wxString l_temp(wxT(""));
+
+				if (m_lStepTransAnimators.begin() != m_lStepTransAnimators.end())
+					l_temp << m_nStepCount;
+
+				for (l_itTrans = (m_lStepTransAnimators).begin(); l_itTrans != (m_lStepTransAnimators).end(); ++l_itTrans)
+				{
+					SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+
+					if (!l_pcNode) continue;
+
+					SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("Name"));
+					SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
+					wxString l_sName;//l_pcNameAttr->GetValue();
+					l_sName = m_sTriggiredUnfoldedTrans;
+					l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+					SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+					long int l_sId = l_pcIdAttr->GetValue();
+
+					if (l_itTrans == m_lStepTransAnimators.begin())
+					{
+						l_temp << wxT(" | ");
+					}
+
+					else
+					{
+						l_temp << wxT("\n  | ");
+					}
+
+					l_temp << l_sId << wxT(".") << l_sName;
+
+					if (++l_itTrans != m_lStepTransAnimators.end())
+					{
+						l_temp << wxT(" :1,");
+					}
+
+					else
+					{
+						l_temp << wxT(" :1");
+					}
+
+					--l_itTrans;
+				}
+
+				m_ExportTextfile.AddLine(l_temp);
+			}
+
+			if (m_nStepCount == m_nStop + 1)
+				m_bExportComplete = true;
+
+			if (m_bExportComplete == true)
+			{
+				SP_MESSAGEBOX(wxT("Export completed."), wxT("Notification"), wxOK | wxICON_INFORMATION);
+				m_bExportComplete = false; //This is required otherwise message dialog keeps poping till the dead state
+			}
+		}
+
+		m_ExportTextfile.Write();
+		m_ExportTextfile.Close();
+	}
+}
+
+void SP_DS_ColStAnimation::OnImport(wxCommandEvent &event)
+{
+	ImportColAnim *import_frame = new ImportColAnim(wxT("Import Details"), this);
+
+	import_frame->Show(true);
+}
+
+void SP_DS_ColStAnimation::ImportDetails(ImportColAnim *import_frame)
+{
+
+	list<SP_DS_ColStTransAnimator *>::iterator l_itTrans;
+	m_bImport = true;
+	m_bInvalid = false;
+	m_nLineCount = 1;
+	m_ImportFilename = import_frame->m_pc_Browse->GetPath();
+
+	//It is important to get the last token to check the file format
+	//For eg filename.abc.tseq is a valid file format, thus we need the last token
+
+	if (m_ImportFilename.AfterLast('.') != wxT("tseq"))
+	{
+		SP_MESSAGEBOX(wxT("Invalid file format."), wxT("Error"), wxOK | wxICON_ERROR);
+	}
+	else
+	{
+		if (m_ImportTextfile.Open(m_ImportFilename) == false)
+		{
+			SP_MESSAGEBOX(wxT("File does not exist."), wxT("Error"), wxOK | wxICON_ERROR);
+		}
+		else
+		{
+			wxStringTokenizer l_tkz(m_ImportTextfile.GetFirstLine(), wxT(","));
+
+			wxString l_StepDetails = l_tkz.GetNextToken();
+			wxString l_AutoConcurrency = l_tkz.GetNextToken();
+
+			if (l_StepDetails.Cmp("Stepping:Maximum") == 0)
+				m_nStepState = 1;
+			else if (l_StepDetails.Cmp("Stepping:Intermediate") == 0)
+				m_nStepState = 2;
+			else if (l_StepDetails.Cmp("Stepping:Single") == 0)
+				m_nStepState = 3;
+
+			if (l_AutoConcurrency.Cmp("AC:Enabled") == 0)
+				m_bAutoConcurrency = true;
+			else if (l_AutoConcurrency.Cmp("AC:Disabled") == 0)
+				m_bAutoConcurrency = false;
+
+			unsigned int l_nLineCount = m_nLineCount;
+
+			long l_trans_id;
+
+			while (l_nLineCount < m_ImportTextfile.GetLineCount())
+			{
+				//Get the line and tokenize it with " " as delimiter
+				wxStringTokenizer l_pc_tkz(m_ImportTextfile.GetLine(l_nLineCount++), wxT(" "));
+
+				l_pc_tkz.GetNextToken();
+				l_pc_tkz.GetNextToken();
+
+				//Get the third token, tokenize it with "." as delimiter and take the first token from it
+				wxStringTokenizer l_pc_trans(l_pc_tkz.GetNextToken(), wxT("."));
+				if (!l_pc_trans.GetNextToken().ToLong(&l_trans_id))
+					;
+
+				for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
+				{
+					SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+					SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+					SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+					long int l_sId = l_pcIdAttr->GetValue();
+
+					if (l_sId == l_trans_id)
+						break;
+				}
+
+				if (l_itTrans == m_lAllTransAnimators.end())
+					m_bInvalid = true;
+
+				while (l_nLineCount < m_ImportTextfile.GetLineCount())
+				{
+					//Get the line and tokenize it with " " as delimiter
+					wxStringTokenizer l_tkz(m_ImportTextfile.GetLine(l_nLineCount++), wxT(" "));
+
+					//Copy the first token into a buffer
+					wxString l_buf = l_tkz.GetNextToken();
+
+					if (l_buf.Cmp("|") != 0)
+					{
+						l_nLineCount--;
+						break;
+					}
+
+					//Get the second token, tokenize it with "." as delimiter and take the first token from it
+					wxStringTokenizer l_trans(l_tkz.GetNextToken(), wxT("."));
+					if (!l_trans.GetNextToken().ToLong(&l_trans_id))
+						;
+
+					for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
+					{
+						SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+						SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+						SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+						long int l_sId = l_pcIdAttr->GetValue();
+
+						if (l_sId == l_trans_id)
+							break;
+					}
+
+					if (l_itTrans == m_lAllTransAnimators.end())
+						m_bInvalid = true;
+				}
+			}
+
+			m_ImportTextfile.Close();
+
+			if (m_bInvalid == true)
+			{
+				m_bImport = false; //No import is possible because the file is invalid
+				SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
+			}
+			else
+			{
+				SP_LOGMESSAGE(wxT("Import file '") + m_ImportFilename + wxT("' successfully."));
+			}
+		}
+	}
+
+}
+
+void SP_DS_ColStAnimation::ImportStepSequences()
+{
+	if (m_bInvalid || m_ImportTextfile.Open(m_ImportFilename) == false)
+	{
+		m_lPossibleTransAnimators.clear();
+		SP_MESSAGEBOX(wxT("Error in opening file ") + m_ImportFilename, wxT("Notification"), wxOK | wxICON_ERROR);
+	}
+	else
+	{
+		list<SP_DS_ColStTransAnimator*>::iterator l_itTrans;
+		long l_trans_id;
+
+		if (m_nLineCount < m_ImportTextfile.GetLineCount())
+		{
+			m_lPossibleTransAnimators.clear();
+
+			SP_LOGDEBUG(wxString::Format("Line Count = %u - ", m_nLineCount));
+
+			//Get the line and tokenize it with " " as delimiter
+			wxStringTokenizer l_pc_tkz(m_ImportTextfile.GetLine(m_nLineCount++), wxT(" "));
+
+			wxString l_temp = l_pc_tkz.GetNextToken();
+
+			SP_LOGDEBUG(wxString::Format("Step Number = %s\n", l_temp.c_str()));
+
+			l_pc_tkz.GetNextToken();
+
+			//Get the third token, tokenize it with "." as delimiter and take the first token from it
+			wxStringTokenizer l_pc_trans(l_pc_tkz.GetNextToken(), wxT("."));
+			if (!l_pc_trans.GetNextToken().ToLong(&l_trans_id))
+				;
+
+			SP_LOGDEBUG(wxString::Format("Transition ID: %ld\n", l_trans_id));
+
+			for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
+			{
+				SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+				SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+				SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+				long int l_sId = l_pcIdAttr->GetValue();
+
+				if (l_sId == l_trans_id)
+					m_lPossibleTransAnimators.push_back(*l_itTrans);
+			}
+
+			while (m_nLineCount < m_ImportTextfile.GetLineCount())
+			{
+				//Get the line and tokenize it with " " as delimiter
+				wxStringTokenizer l_tkz(m_ImportTextfile.GetLine(m_nLineCount++), wxT(" "));
+
+				//Copy the first token into a buffer
+				wxString l_buf = l_tkz.GetNextToken();
+
+				if (l_buf.Cmp("|") != 0)
+				{
+					m_nLineCount--;
+					break;
+				}
+
+				//Get the second token, tokenize it with "." as delimiter and take the first token from it
+				wxStringTokenizer l_trans(l_tkz.GetNextToken(), wxT("."));
+				if (!l_trans.GetNextToken().ToLong(&l_trans_id))
+					;
+
+				for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
+				{
+					SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+					SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+					SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+					long int l_sId = l_pcIdAttr->GetValue();
+
+					if (l_sId == l_trans_id)
+						m_lPossibleTransAnimators.push_back(*l_itTrans);
+				}
+
+				SP_LOGDEBUG(wxString::Format("Transition ID: %ld\n", l_trans_id));
+
+			}
+		}
+
+		m_ImportTextfile.Close();
+
+	}
 }

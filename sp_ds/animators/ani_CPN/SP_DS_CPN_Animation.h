@@ -25,7 +25,10 @@
 #include "sp_ds/extensions/SP_DS_FunctionEvaluator.h"
 #include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 #include "sp_gui/dialogs/dia_CPN/SP_DLG_ConstantDefinition.h"
-
+#include "sp_ds/extensions/SP_DS_CPN_AnimExport.h"//by george
+#include "sp_ds/extensions/SP_DLG_ColStAnim_Import.h"//by george
+class ImportColAnim;
+class ExportCPN;
 
 class SP_DS_CPN_Animation: public SP_DS_Animation
 {
@@ -55,7 +58,30 @@ private:
 	vector<wxChoice*> m_apcComboBoxes1;// by george
 	vector<SP_DS_ColListAttribute*> m_apcColListAttrForConstants;// by george
 	wxStaticText* m_pcOutputLabelStaticText;//by george
+	wxStaticText *m_pcStepCounterText; //For counter
+	wxStaticText *m_pcStepCounterValue; //For counter
+	wxSizer* m_pcStepCounter;//by george
 	int m_nIsClose;
+	bool m_bIsKeepClicked;// by george
+
+	wxString m_ExportFilename;// by george
+	bool m_bExport; // by george
+	bool m_bExportComplete;// by george
+	long m_nStart; //Marking start
+	long m_nEvery; //Marking step
+	long m_nStop; //Marking stop
+	int m_nMarkingOption;
+	wxTextFile m_ExportTextfile;
+	bool m_bAutoConcurrency;
+	int m_nStepCount;
+
+	//For import feature
+	bool m_bImport;
+	bool m_bInvalid;
+	wxString m_ImportFilename;
+	unsigned int m_nLineCount;
+	wxTextFile m_ImportTextfile;
+
 
 private:
 	void UpdateChoices();//by george
@@ -97,7 +123,10 @@ public:
 	void OnReset();
 	void OnSet(wxCommandEvent& p_cEvent);
 	void OnUpdateUI(wxUpdateUIEvent& p_cEvent);
-	//void OnClose(wxCloseEvent& event);//george
+	void OnExport(wxCommandEvent &p_pc_Event);//george
+	void ExportDetailsCPN(ExportCPN *export_frame);//george
+	void ImportDetails(ImportColAnim *);//george
+	void OnImport(wxCommandEvent &p_pcEvent);//george
 
 	void SetSingleStep(SP_DS_Animator* p_pcVal) { m_pcSingleStep = p_pcVal; }
 	SP_DS_Animator* GetSingleStep() const { return m_pcSingleStep; }
@@ -113,6 +142,12 @@ public:
 
 	int GetBindingDialogueShowFlag(){return m_nBindingChoice;}
 	bool GetChooseRandomColorFlag(){return m_bChooseRandomColor;}
+
+	void UpdateMarkingPlaces();//by george
+	void ExportMarkings();//by george
+	void ExportStepSequences();
+	void SetStepCounter();//by george
+	void ImportStepSequences();//by george
 
 };
 

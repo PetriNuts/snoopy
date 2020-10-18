@@ -16,6 +16,11 @@
 
 
 #include "spsim/spsim.h"
+#include "sp_ds/extensions/SP_DS_SPN_ExportAnim.h"
+#include "sp_ds/extensions/SP_DS_Anim_SPN_Import.h"//by george
+
+class ExportSPN;
+class ImportSPN;
 
 class SP_DS_StAnimation: public SP_DS_PedAnimation
 {
@@ -35,6 +40,9 @@ class SP_DS_StAnimation: public SP_DS_PedAnimation
 
     //bysl
     SP_SetString  m_choices;
+    SP_MapString2Int m_mGroup2Position;
+
+    long int m_nStepCount; //Keeps a count of step number//by george
 
     void LoadSets();
     void UpdateChoices();
@@ -96,6 +104,15 @@ class SP_DS_StAnimation: public SP_DS_PedAnimation
     virtual bool OnDialogOk();
 
 	virtual void OnReset();
+
+	void SetStepCounter();//by george
+	void OnExport(wxCommandEvent &p_pc_Event);//by george
+	void OnImport(wxCommandEvent &p_pcEvent);//by george
+	void ExportDetails(ExportSPN *);//by george
+	void ExportMarkings();//by george
+	void ImportDetails(ImportSPN *);//by george
+	void ImportStepSequences();//by george
+	void ExportStepSequences();//by george
 
 
 };

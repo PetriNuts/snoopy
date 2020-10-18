@@ -21,9 +21,13 @@
 #include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ColorSetClass.h"
 #include "sp_ds/extensions/ext_SPN/SP_DS_StSimGillespie.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
-
+#include <wx/textfile.h>//by george
 
 #include"spsim/spsim.h"
+#include "sp_ds/extensions/SP_DS_CPN_StAnimExport.h"//by george
+#include "sp_ds/extensions/SP_DLG_ColStAnim_Import.h"//by george
+class ExportStochCPN;
+class ImportColAnim;
  
 class SP_DS_ColStAnimation: public SP_DS_Animation
 {
@@ -36,8 +40,33 @@ private:
 	wxCheckBox *m_cbKeep;
 	SP_DS_Animator* m_pcSingleStep;
 	bool m_IsDestructor;//by george
+	bool m_bIsKeepClicked;
 	int m_nIsClose;
-	 
+
+	wxStaticText* m_pcOutputLabelStaticText;//by george
+	wxStaticText *m_pcStepCounterText; //For counter
+	wxStaticText *m_pcStepCounterValue; //For counter
+	wxSizer* m_pcStepCounter;//by george
+
+
+	wxString m_ExportFilename;// by george
+	bool m_bExport; // by george
+	bool m_bExportComplete;// by george
+	long m_nStart; //Marking start
+	long m_nEvery; //Marking step
+	long m_nStop; //Marking stop
+	int m_nMarkingOption;
+	wxTextFile m_ExportTextfile;
+	bool m_bAutoConcurrency;
+	int m_nStepCount;
+	wxString m_sTriggiredUnfoldedTrans;
+
+	//For import feature
+	bool m_bImport;
+	bool m_bInvalid;
+	wxString m_ImportFilename;
+	unsigned int m_nLineCount;
+	wxTextFile m_ImportTextfile;
 	list<list<SP_DS_ColStTransAnimator*> > m_llHistoryTransAnimators;
 
 	SP_DLG_Animation *m_pcDialog;
@@ -58,11 +87,11 @@ private:
 	vector<wxChoice*> m_apcComboBoxes;
 	
 
-    wxStaticText* m_pcOutputLabelStaticText;
+   // wxStaticText* m_pcOutputLabelStaticText;
 	SP_SetString  m_choices;//by george
 	vector<wxChoice*> m_apcComboBoxes1;// by george
 	vector<SP_DS_ColListAttribute*> m_apcColListAttrForConstants;// by george
-	
+	SP_MapString2Int m_mGroup2Pos;//by george
 
 	map<long, SP_CPN_CountInterval> m_pnsTransitionCountById ;
 	map<long, SP_CPN_CountInterval> m_nsPlaceCountById;
@@ -131,6 +160,13 @@ private:
 
     spsim::ConnectionType GetConnectionType(const wxString& p_sConnectionType);
 
+    void SetStepCounter();//by george
+    void OnExport(wxCommandEvent &p_pc_Event);//george
+    void ExportMarkings();//by george
+    void ExportStepSequences();//by george
+    void OnImport(wxCommandEvent &event);//by george
+    void ImportStepSequences();//by george
+
 protected:
 	bool PreStep();
 	bool Step();
@@ -184,6 +220,10 @@ public:
 
 	int GetBindingDialogueShowFlag(){return m_nBindingChoice;}
 	bool GetChooseRandomColorFlag(){return m_bChooseRandomColor;}
+
+	void UpdateMarkingPlaces();//by george
+	void ExportDetailsCPN(ExportStochCPN *export_frame);//george
+	void ImportDetails(ImportColAnim *import_frame);//george
 
 };
 
