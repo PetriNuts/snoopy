@@ -1051,6 +1051,15 @@ void SP_DS_PedAnimation::KeepMarking()
 	for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
 	{
 		(*l_Iter)->SetMarking();
+
+		//by george
+		auto itN = (*l_Iter)->GetNode();
+		wxString l_SMarkingVal;
+		l_SMarkingVal << (*l_Iter)->GetMarking();
+		if (itN)
+		 {
+			itN->GetAttribute(wxT("Marking"))->SetValueString(l_SMarkingVal);
+		 }
 	}
 	SP_Core::Instance()->GetRootDocument()->Modify(TRUE);
 
