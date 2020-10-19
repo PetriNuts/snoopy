@@ -122,6 +122,8 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 	//Add special UI element for Continuous class
 	wxSizer* l_pcRowSizer = NULL;
 
+	m_mGroup2Position.clear();
+
 	if (!m_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")))
 	{
 		//Function set
@@ -131,21 +133,36 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
+		if (m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements()->size() > 0)
+		{
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Continuous rate:")), 1, wxALL | wxEXPAND, 5);
 		m_pcFunctionSetComboBox = new wxChoice(m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_FUNCTION_SETS, wxDefaultPosition, wxSize(100, -1));
 		l_pcRowSizer->Add(m_pcFunctionSetComboBox, 1, wxALL, 5);
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+		}
+		else
+		{
+			m_pcFunctionSetComboBox = NULL;
+		}
 
-		//Rate set
+		if (m_pcGraph->GetNodeclass(SP_DS_STOCHASTIC_TRANS)->GetElements()->size() > 0)
+		{//Rate set
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Stochastic  rate:")), 1, wxALL | wxEXPAND, 5);
 		m_pcStochasticRateSetComboBox = new wxChoice(m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_STOCHASTIC_RATE_SETS, wxDefaultPosition, wxSize(100, -1));
 		l_pcRowSizer->Add(m_pcStochasticRateSetComboBox, 1, wxALL, 5);
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_STOCHASTIC_RATE_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+		}
+		else
+		{
+			m_pcStochasticRateSetComboBox = NULL;
+		}
 
+		if (m_pcGraph->GetNodeclass(SP_DS_IMMEDIATE_TRANS)->GetElements()->size()>0)
+		{
 		//immediate Set
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Immediate set:")), 1, wxALL | wxEXPAND, 5);
@@ -153,7 +170,14 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 		l_pcRowSizer->Add(m_pcImmediateSetComboBox, 1, wxALL, 5);
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_IMMDIATE_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+		}
+		else
+		{
+			m_pcImmediateSetComboBox = NULL;
+		}
 
+		if (m_pcGraph->GetNodeclass(SP_DS_DETERMINISTIC_TRANS)->GetElements()->size()>0)
+		{
 		//delay Set
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Delay set:")), 1, wxALL | wxEXPAND, 5);
@@ -161,7 +185,14 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 		l_pcRowSizer->Add(m_pcDelaySetComboBox, 1, wxALL, 5);
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+		}
+		else
+		{
+			m_pcDelaySetComboBox =NULL;
+		}
 
+		if (m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS)->GetElements()->size()>0)
+		{
 		//scheduled Set
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Scheduled set:")), 1, wxALL | wxEXPAND, 5);
@@ -169,8 +200,14 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 		l_pcRowSizer->Add(m_pcScheduledSetComboBox, 1, wxALL, 5);
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULED_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
-
+		}
+		else
+		{
+			m_pcScheduledSetComboBox=NULL;
+		}
 		UpdateChoices();
+
+		int i = 0;
 		SP_SetString::iterator l_itChoice;
 		for (l_itChoice = m_choices.begin(); l_itChoice != m_choices.end(); ++l_itChoice)
 		{
@@ -181,6 +218,9 @@ SP_DLG_HybridSimulationResults::SP_DLG_HybridSimulationResults(SP_DS_Graph* p_pc
 			l_pcRowSizer->Add(m_apcComboBoxes[m_apcComboBoxes.size() - 1], 1, wxALL, 5);
 			l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify")), 0, wxALL, 5);
 			m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
+
+			m_mGroup2Position[l_sGroup] = i;
+			i++;
 		}
 	}
 
@@ -611,18 +651,38 @@ void SP_DLG_HybridSimulationResults::OnModifyScheduledSets(wxCommandEvent& p_cEv
 //=============================================================================================
 void SP_DLG_HybridSimulationResults::LoadSets()
 {
-	m_pcFunctionSetComboBox->Clear();
-	m_pcFunctionSetComboBox->Clear();
-	m_pcStochasticRateSetComboBox->Clear();
-	m_pcImmediateSetComboBox->Clear();
-	m_pcDelaySetComboBox->Clear();
-	m_pcScheduledSetComboBox->Clear();
-	const SP_ListNode *l_pcNodesList;
-	SP_DS_Node *l_pcFstNode;
-	SP_DS_Attribute *l_pcAttr;
-	SP_DS_ColListAttribute* l_pcColListAttr;
+	if(m_pcFunctionSetComboBox)
+		m_pcFunctionSetComboBox->Clear();
+
+		if(m_pcFunctionSetComboBox)
+		m_pcFunctionSetComboBox->Clear();
+
+		if(m_pcStochasticRateSetComboBox)
+		m_pcStochasticRateSetComboBox->Clear();
+
+		if(m_pcImmediateSetComboBox)
+		m_pcImmediateSetComboBox->Clear();
+
+		if(m_pcDelaySetComboBox)
+		m_pcDelaySetComboBox->Clear();
+
+		if(m_pcScheduledSetComboBox)
+		m_pcScheduledSetComboBox->Clear();
+
+		const SP_ListNode *l_pcNodesList;
+		SP_DS_Node *l_pcFstNode;
+		SP_DS_Attribute *l_pcAttr;
+		SP_DS_ColListAttribute* l_pcColListAttr;
+
+		if (m_apcColListAttr.empty())
+		{
+			m_apcColListAttr.resize(m_choices.size());//vector of colList constant groups only
+		}
 
 	//load function set
+
+	if (m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements()->size() > 0)
+	{
 	l_pcNodesList = (m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements());
 	if (!l_pcNodesList->empty())
 	{
@@ -634,7 +694,9 @@ void SP_DLG_HybridSimulationResults::LoadSets()
 		//select the first function
 		m_pcFunctionSetComboBox->SetSelection(l_pcColListAttr->GetActiveList());
 	}
-
+	}
+	if (m_pcGraph->GetNodeclass(SP_DS_STOCHASTIC_TRANS)->GetElements()->size() > 0)
+	{
 	//Load stochastic rate set
 	m_pcStochasticRateSetComboBox->Clear();
 	l_pcNodesList = (m_pcGraph->GetNodeclass(SP_DS_STOCHASTIC_TRANS)->GetElements());
@@ -648,7 +710,10 @@ void SP_DLG_HybridSimulationResults::LoadSets()
 		//select the first function
 		m_pcStochasticRateSetComboBox->SetSelection(l_pcColListAttr->GetActiveList());
 	}
+	}
 
+	if (m_pcGraph->GetNodeclass(SP_DS_IMMEDIATE_TRANS)->GetElements()->size() > 0)
+	{
 	//Load immediate rate set
 	m_pcImmediateSetComboBox->Clear();
 	l_pcNodesList = (m_pcGraph->GetNodeclass(SP_DS_IMMEDIATE_TRANS)->GetElements());
@@ -662,7 +727,10 @@ void SP_DLG_HybridSimulationResults::LoadSets()
 		//select the first function
 		m_pcImmediateSetComboBox->SetSelection(l_pcColListAttr->GetActiveList());
 	}
+	}
 
+	if (m_pcGraph->GetNodeclass(SP_DS_DETERMINISTIC_TRANS)->GetElements()->size() > 0)
+	{
 	//Load Delay set
 	m_pcDelaySetComboBox->Clear();
 	l_pcNodesList = (m_pcGraph->GetNodeclass(SP_DS_DETERMINISTIC_TRANS)->GetElements());
@@ -676,7 +744,10 @@ void SP_DLG_HybridSimulationResults::LoadSets()
 		//select the first function
 		m_pcDelaySetComboBox->SetSelection(l_pcColListAttr->GetActiveList());
 	}
+	}
 
+	if (m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS)->GetElements()->size() > 0)
+	{
 	//Load scheduled set
 	m_pcDelaySetComboBox->Clear();
 	l_pcNodesList = (m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS)->GetElements());
@@ -690,9 +761,8 @@ void SP_DLG_HybridSimulationResults::LoadSets()
 		//select the first function
 		m_pcDelaySetComboBox->SetSelection(l_pcColListAttr->GetActiveList());
 	}
-
+	}
 	//Load all other sets
-	m_apcColListAttr.clear();
 	SP_DLG_Simulation::LoadSets();
 }
 

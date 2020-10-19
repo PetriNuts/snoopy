@@ -107,6 +107,8 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 
 	wxSizer* l_pcRowSizer = NULL;
 
+	m_mGroup2Position.clear();
+
 	if(!m_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")))
 	{
 		//function set
@@ -116,6 +118,8 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
 		m_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
+		if (m_pcGraph->GetNodeclass(wxT("Transition"))->GetElements()->size() > 0)
+		 {
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 		l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("function set:") ), wxSizerFlags(1).Expand().Border(wxALL, 2));
 		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, -1, wxDefaultPosition, wxSize(100, -1)));
@@ -123,6 +127,10 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 		l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("modify") ), wxSizerFlags(0).Expand().Border(wxALL, 2));
 		m_pcSetsSizer->Add( l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
+		m_mGroup2Position[wxT("Rate")] = m_apcComboBoxes.size() - 1;
+		}
+		if (m_pcGraph->GetNodeclass(wxT("Immediate Transition"))->GetElements()->size() > 0)
+		{
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("weight set:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
 		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, -1, wxDefaultPosition, wxSize(100, -1)));
@@ -130,6 +138,11 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_WEIGHT_SETS, wxT("modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
 		m_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
+		m_mGroup2Position[wxT("Weight")] = m_apcComboBoxes.size() - 1;
+		}
+
+		if (m_pcGraph->GetNodeclass(wxT("Deterministic Transition"))->GetElements()->size() > 0)
+		{
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("delay set:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
 		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, -1, wxDefaultPosition, wxSize(100, -1)));
@@ -137,6 +150,10 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
 		m_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
+		m_mGroup2Position[wxT("Delay")] = m_apcComboBoxes.size() - 1;
+		}
+		if (m_pcGraph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->size() > 0)
+		{
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("schedule set:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
 		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, -1, wxDefaultPosition, wxSize(100, -1)));
@@ -144,7 +161,10 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULE_SETS, wxT("modify")), wxSizerFlags(0).Expand().Border(wxALL, 2));
 		m_pcSetsSizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 
+		m_mGroup2Position[wxT("Scheduled")] = m_apcComboBoxes.size() - 1;
+		}
 		UpdateChoices();
+
 		SP_SetString::iterator l_itChoice;
 		for(l_itChoice = m_choices.begin(); l_itChoice != m_choices.end(); ++l_itChoice)
 		{
@@ -155,6 +175,8 @@ SP_DLG_StSimulationResults::SP_DLG_StSimulationResults(SP_DS_Graph* p_pcGraph, w
 			l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], wxSizerFlags(1).Expand().Border(wxALL, 2));
 			l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("modify") ), wxSizerFlags(0).Expand().Border(wxALL, 2));
 			m_pcSetsSizer->Add( l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
+			m_mGroup2Position[l_sGroup] = m_apcComboBoxes.size() - 1;
 		}
 	}
 
@@ -419,48 +441,49 @@ void SP_DLG_StSimulationResults::LoadSets()
 {
 	SP_DS_Node* l_pcNode = NULL;
 
-	m_apcColListAttr.clear();
+	if (m_apcColListAttr.empty())
+	{
 
-	if (m_pcGraph->GetNodeclass(wxT("Transition"))->GetElements()->size() > 0)
+	m_apcColListAttr.resize(m_apcComboBoxes.size());
+
+	auto itFind = m_mGroup2Position.find(wxT("Rate"));
+
+	if (m_pcGraph->GetNodeclass(wxT("Transition"))->GetElements()->size() > 0  && itFind != m_mGroup2Position.end())
 	{
 		l_pcNode = m_pcGraph->GetNodeclass(wxT("Transition"))->GetElements()->front();
-		m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList"))));
-	}
-	else
-	{
-		m_apcColListAttr.push_back(NULL);
+		//m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList"))));
+		m_apcColListAttr[itFind->second] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
+
 	}
 
-	if (m_pcGraph->GetNodeclass(wxT("Immediate Transition"))->GetElements()->size() > 0)
+	itFind = m_mGroup2Position.find(wxT("Weight"));
+
+	if (m_pcGraph->GetNodeclass(wxT("Immediate Transition"))->GetElements()->size() > 0  && itFind != m_mGroup2Position.end())
 	{
 		l_pcNode = m_pcGraph->GetNodeclass(wxT("Immediate Transition"))->GetElements()->front();
-		m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList"))));
-	}
-	else
-	{
-		m_apcColListAttr.push_back(NULL);
+		//m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList"))));
+		m_apcColListAttr[itFind->second] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
 	}
 
-	if (m_pcGraph->GetNodeclass(wxT("Deterministic Transition"))->GetElements()->size() > 0)
+	itFind = m_mGroup2Position.find(wxT("Delay"));
+
+	if (m_pcGraph->GetNodeclass(wxT("Deterministic Transition"))->GetElements()->size() > 0  && itFind != m_mGroup2Position.end())
 	{
 		l_pcNode = m_pcGraph->GetNodeclass(wxT("Deterministic Transition"))->GetElements()->front();
-		m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("DelayList"))));
-	}
-	else
-	{
-		m_apcColListAttr.push_back(NULL);
+		//m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("DelayList"))));
+		m_apcColListAttr[itFind->second] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("DelayList")));
 	}
 
-	if (m_pcGraph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->size() > 0)
+	itFind = m_mGroup2Position.find(wxT("Scheduled"));
+
+	if (m_pcGraph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->size() > 0  && itFind != m_mGroup2Position.end())
 	{
 		l_pcNode = m_pcGraph->GetNodeclass(wxT("Scheduled Transition"))->GetElements()->front();
-		m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("PeriodicList"))));
-	}
-	else
-	{
-		m_apcColListAttr.push_back(NULL);
+		//m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("PeriodicList"))));
+		m_apcColListAttr[itFind->second] = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("PeriodicList")));
 	}
 
+	}
 	SP_DLG_Simulation::LoadSets();
 }
 
@@ -1887,8 +1910,13 @@ void SP_DLG_StSimulationResults::OnConstantsSetChanged(wxCommandEvent& p_cEvent)
 	unsigned i = 4;
 	for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
 	{
-		(it)->second = m_apcComboBoxes[i]->GetSelection();
-		i++;
+		auto itFind = m_mGroup2Position.find(it->first);
+
+		if (itFind != m_mGroup2Position.end())
+		{
+			(it)->second = m_apcComboBoxes[itFind->second]->GetSelection();
+
+		}
 	}
  
 }

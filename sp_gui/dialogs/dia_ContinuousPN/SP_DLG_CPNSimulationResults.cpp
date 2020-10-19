@@ -96,6 +96,8 @@ int l_nSimulatorIndex =
 
 	wxSizer* l_pcRowSizer = NULL;
 
+	m_mGroup2Position.clear();
+
 	if(!m_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")))
 	{
 		//function set
@@ -105,12 +107,17 @@ int l_nSimulatorIndex =
 		l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify")), 0, wxALL, 5);
 		m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
+		if (m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements()->size() > 0)
+		{
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 		l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Function set:") ), 1, wxALL | wxEXPAND, 5 );
 		m_apcComboBoxes.push_back(new wxChoice(m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_FUNCTION_SETS, wxDefaultPosition, wxSize(100, -1)));
 		l_pcRowSizer->Add( m_apcComboBoxes[0], 1, wxALL, 5 );
 		l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify") ), 0, wxALL, 5 );
 		m_pcSetsSizer->Add( l_pcRowSizer , 1, wxEXPAND);
+
+		m_mGroup2Position[wxT("ContRate")] = m_apcComboBoxes.size() - 1;
+		}
 
 		UpdateChoices();
 		SP_SetString::iterator l_itChoice;
@@ -123,6 +130,8 @@ int l_nSimulatorIndex =
 			l_pcRowSizer->Add( m_apcComboBoxes[m_apcComboBoxes.size()-1], 1, wxALL, 5 );
 			l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify") ), 0, wxALL, 5 );
 			m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND);
+
+			m_mGroup2Position[l_sGroup] = m_apcComboBoxes.size() - 1;
 		}
 	}
 
@@ -507,15 +516,18 @@ void SP_DLG_CPNSimulationResults::LoadSets()
 
 	m_apcColListAttr.clear();
 
-	if(m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements()->size() > 0)
+	m_apcColListAttr.resize(m_apcComboBoxes.size());
+
+	auto itFind = m_mGroup2Position.find(wxT("ContRate"));
+
+	if(m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements()->size() > 0 && itFind!= m_mGroup2Position.end())
 	{
 		l_pcNode = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements()->front();
-		m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList"))));
+
+		m_apcColListAttr[itFind->second]= dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
+
 	}
-	else
-	{
-		m_apcColListAttr.push_back(NULL);
-	}
+
 
 	SP_DLG_Simulation::LoadSets();
 }

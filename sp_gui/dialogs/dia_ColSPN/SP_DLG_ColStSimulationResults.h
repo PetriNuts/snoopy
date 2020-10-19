@@ -28,7 +28,9 @@ class  SP_DLG_ColStSimulationResults : public SP_DS_ColoredPNSimulation, public 
 		  SP_SetString m_choicesForColPNs;//by george
 		  int m_iModifyCount;//by george, this data member prevents load doublicate two identical CollistAttributes
 		  int m_nGroupCounts;//by george, this member counts the extra comboboxes (extra constants groups)
-private:
+		  int m_nStartingConst;//by george, to identify at which position the constant groups start with
+		  SP_MapString2Int m_mGroup2Position;
+ private:
 	
 	   virtual void AddNewMarkingSet(const wxString& p_sMarkingSetName,const int& p_nRow);
 	   virtual bool IsMarkingSetNameExist(const wxString& p_sName);

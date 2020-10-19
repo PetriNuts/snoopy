@@ -1077,9 +1077,14 @@ void SP_DLG_Simulation::LoadSets()
             wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
             if (l_sChoice == l_sGroup)
             {
-                m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
-               
+                //m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
+            	auto itFind = m_mGroup2Position.find(l_sGroup);
+
+            	if(itFind!= m_mGroup2Position.end())
+            	{
+
 				SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));//george, remember the chosen sets
+				m_apcColListAttr[itFind->second] = l_pcColList;
 				
 				auto it = m_mGroup2Selction.find(l_sGroup);
 
@@ -1087,6 +1092,7 @@ void SP_DLG_Simulation::LoadSets()
 				m_mGroup2Selction[l_sGroup] = l_pcColList->GetActiveColumn();
 
 				break;
+            	}
             }
         }
     }
@@ -1705,8 +1711,12 @@ void SP_DLG_Simulation::OnModifyConstantSets(wxCommandEvent& p_cEvent)
 
 				for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
 				{
-					m_apcComboBoxes[i]->SetSelection((it)->second);
-					i++;
+					auto itFind = m_mGroup2Position.find(it->first);
+
+					if (itFind != m_mGroup2Position.end())
+					{
+					  m_apcComboBoxes[itFind->second]->SetSelection((it)->second);
+					}
 				}
 
 				for (size_t j = 0; j < m_apcColListAttr.size(); j++)

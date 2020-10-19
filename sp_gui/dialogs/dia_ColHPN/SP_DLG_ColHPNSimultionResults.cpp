@@ -130,6 +130,9 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 
 	wxSizer* l_pcRowSizer = NULL;
 
+	if (SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_CONTINUOUS_PLACE)->GetElements()->size() > 0 ||
+			SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_DISCRETE_PLACE)->GetElements()->size() > 0)
+	{
 	//Marking Set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Marking set:") ), 1, wxALL | wxEXPAND, 5 );
@@ -137,7 +140,15 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	l_pcRowSizer->Add( m_pcMarkingSetComboBox, 0, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_MARKING_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
+	}
+	else
+	{
+		m_pcMarkingSetComboBox=NULL;
 
+	}
+
+	if (SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements()->size() > 0)
+	{
 	//Function set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Continuous rate:") ), 1, wxALL | wxEXPAND, 5 );
@@ -145,7 +156,14 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	l_pcRowSizer->Add( m_pcFunctionSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_FUNCTION_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
+	}
+	else
+	{
+		m_pcFunctionSetComboBox = NULL;
+	}
 
+	if (SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_STOCHASTIC_TRANS)->GetElements()->size() > 0)
+	{
 	//Rate set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Stochastic  rate:") ), 1, wxALL | wxEXPAND, 5 );
@@ -153,39 +171,53 @@ SP_DLG_HybridSimulationResults( p_pcGraph,p_pcParent,p_sHelpText,p_sTitle,p_nSty
 	l_pcRowSizer->Add( m_pcStochasticRateSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_STOCHASTIC_RATE_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
+	}
+	else
+	{
+		m_pcStochasticRateSetComboBox = NULL;
+	}
 
-	//immediate Set
+	if (SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_IMMEDIATE_TRANS)->GetElements()->size()>0)
+	{//immediate Set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Immediate set:") ), 1, wxALL | wxEXPAND, 5 );
 	m_pcImmediateSetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_IMMEDIATE_SETS, wxDefaultPosition, wxSize(100,-1));
 	l_pcRowSizer->Add( m_pcImmediateSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_IMMDIATE_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
+	}
+	else
+	{
+		m_pcImmediateSetComboBox=NULL;
+	}
 
-	//delay Set
+	if(SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_DETERMINISTIC_TRANS)->GetElements()->size()>0)
+	{//delay Set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Delay set:") ), 1, wxALL | wxEXPAND, 5 );
 	m_pcDelaySetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_DELAY_SETS, wxDefaultPosition, wxSize(100,-1));
 	l_pcRowSizer->Add( m_pcDelaySetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_DELAY_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
-
-
-	//scheduled Set
+	}
+	else
+	{
+		m_pcDelaySetComboBox = NULL;
+	}
+	if (SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_SCHEDULED_TRANS)->GetElements()->size() > 0)
+	{//scheduled Set
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 	l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Scheduled set:") ), 1, wxALL | wxEXPAND, 5 );
 	m_pcScheduledSetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_SCHEDULED_SETS, wxDefaultPosition, wxSize(100,-1));
 	l_pcRowSizer->Add( m_pcScheduledSetComboBox, 1, wxALL, 5 );
 	l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_SCHEDULED_SETS, wxT("Modify") ), 0, wxALL, 5 );
 	m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
-	//commented by george for constants harmonizing
-	//Parameter Set
-	//l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
-	//l_pcRowSizer->Add( new wxStaticText( m_pcPropertyWindowSetsSizer, -1, wxT("Parameter set:") ), 1, wxALL | wxEXPAND, 5 );
-	//m_pcParameterSetComboBox = new wxChoice( m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_PARAMETER_SETS, wxDefaultPosition, wxSize(100,-1));
-	//l_pcRowSizer->Add( m_pcParameterSetComboBox, 1, wxALL, 5 );
-	//l_pcRowSizer->Add( new wxButton( m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify") ), 0, wxALL, 5 );
-	//m_pcSetsSizer->Add( l_pcRowSizer, 1, wxEXPAND );
+	}
+	else
+	{
+		m_pcScheduledSetComboBox=NULL;
+	}
+
 
 	//by george for constants harmonizing
 	UpdateChoices();
@@ -814,14 +846,23 @@ void SP_DLG_ColHPNSimultionResults::OnModifyParameterSets(wxCommandEvent& p_cEve
 //=============================================================================================
 void SP_DLG_ColHPNSimultionResults::LoadSets()
 {
-	m_pcMarkingSetComboBox->Clear();
-	//m_pcParameterSetComboBox->Clear();//commented by george
-	m_pcFunctionSetComboBox->Clear();
-	m_pcStochasticRateSetComboBox->Clear();
-	m_pcImmediateSetComboBox->Clear();
-	m_pcDelaySetComboBox->Clear();
-	m_pcScheduledSetComboBox->Clear();
+	if(m_pcMarkingSetComboBox)
+		m_pcMarkingSetComboBox->Clear();
 
+	if(m_pcFunctionSetComboBox)
+		m_pcFunctionSetComboBox->Clear();
+
+	if(m_pcStochasticRateSetComboBox)
+		m_pcStochasticRateSetComboBox->Clear();
+
+	if(m_pcImmediateSetComboBox)
+	  m_pcImmediateSetComboBox->Clear();
+
+	if(m_pcDelaySetComboBox)
+	  m_pcDelaySetComboBox->Clear();
+
+	if(m_pcScheduledSetComboBox)
+	  m_pcScheduledSetComboBox->Clear();
 
 	const SP_ListNode *l_pcNodesList;
 	SP_DS_Node *l_pcFstNode;
@@ -836,9 +877,17 @@ void SP_DLG_ColHPNSimultionResults::LoadSets()
 		l_pcAttr=l_pcFstNode->GetAttribute(wxT("MarkingList"));
 		l_pcColListAttr=dynamic_cast<SP_DS_ColListAttribute *>(l_pcAttr);
 
-		for (unsigned int i = 1; i < l_pcColListAttr->GetColCount(); i++)
+		for (unsigned int i = 0; i < l_pcColListAttr->GetColCount(); i++)
 		{
 			wxString l_sSetName = l_pcColListAttr->GetColLabel(i);
+
+			if (l_sSetName == wxT("Color"))//old snoopy version has no : seprator in the color column
+			{
+					m_pcMarkingSetComboBox->Append(wxT("Main"));
+					i = i + 2;
+					continue;
+			}
+
 			if (l_sSetName.Contains(wxT(":")))//by george
 			{
 				l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
@@ -853,23 +902,6 @@ void SP_DLG_ColHPNSimultionResults::LoadSets()
 		else
 			m_pcMarkingSetComboBox->SetSelection(l_pcColListAttr->GetActiveColumn());			
     }
-
-    /*
-	//load parameter set
-	l_pcNodesList=(SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_PARAM)->GetElements());
-    if(!l_pcNodesList->empty())
-    {
-		 l_pcFstNode=l_pcNodesList->front();
-		 l_pcAttr=l_pcFstNode->GetAttribute(wxT("ParameterList"));
-		 l_pcColListAttr=dynamic_cast<SP_DS_ColListAttribute *>(l_pcAttr);
-		 for(unsigned int i=0;i<l_pcColListAttr->GetRowCount();i++)
-		 {
-			//m_pcParameterSetComboBox->Append(l_pcColListAttr->GetCell(i,0));//commented by george
-		 }
-		 //Select the first Parameter
-		// m_pcParameterSetComboBox->SetSelection(l_pcColListAttr->GetActiveList());//commented by george
-    }
-    */
 
 	//load continusou function set
 	l_pcNodesList=(SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(SP_DS_CONTINUOUS_TRANS)->GetElements());
@@ -1707,7 +1739,7 @@ void SP_DLG_ColHPNSimultionResults::LoadConstantsSetsForColPN()
 		{
 			SP_DS_Metadata* l_pcConstant = *l_itElem;
 			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
-			if (l_sChoice == l_sGroup && m_iModifyCount == 0)
+			if (l_sChoice == l_sGroup && m_iModifyCount == 0 && m_mGroup2Selction.find(l_sGroup)== m_mGroup2Selction.end())
 			{
 				m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
 				SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
@@ -1758,7 +1790,7 @@ void SP_DLG_ColHPNSimultionResults::OnModifyConstants(wxCommandEvent& p_cEvent)
 		if (m_choicesForColPNs.size() != m_nGroupCounts)
 		{//special case, when a user add a new group during simulation
 			m_iModifyCount = 0;
-			m_apcColListAttr.clear();
+			//m_apcColListAttr.clear();
 
 			m_nGroupCounts = m_choicesForColPNs.size();//update groups size 
 			LoadSets();

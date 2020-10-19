@@ -25,6 +25,7 @@ private:
 	SP_SetString m_choicesForColPNs;//by george
 	int m_iModifyCount;//by george, this data member prevents load doublicate two identical CollistAttributes
 	int m_nGroupCounts;//by george, this member counts the extra comboboxes (extra constants groups)
+	SP_MapString2Int m_mGroup2Position;
 private:
 
 	virtual void AddNewMarkingSet(const wxString& p_sMarkingSetName, const int& p_nRow);
@@ -51,7 +52,7 @@ protected:
 
 	virtual void LoadSets();
 
-	virtual void LoadConstantsSetsForColPN();//by george for constants harmo
+
 	void OnModifyConstants(wxCommandEvent& p_cEvent);//by george
 
 
