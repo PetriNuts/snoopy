@@ -757,7 +757,7 @@ void SP_DS_PlotViewer::ExportToImageFile(wxString &p_sFileName, const int &p_nFi
 
     CHECK_POINTER(m_pcChartPanel, return);
 
-    if (p_sFileName.BeforeLast(wxT('.')) != wxT("")) {
+    if (p_sFileName.Freq(wxChar('.')) >1) {
         p_sFileName = p_sFileName.BeforeLast(wxT('.'));
     }
 

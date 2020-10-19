@@ -350,10 +350,6 @@ void SP_DLG_ShowAllModelView::OnExportClick(wxCommandEvent& event)
 				wxString l_sFileName = l_pcSaveDlg->GetPath();
 				int l_nExportType = l_pcSaveDlg->GetFilterIndex();
 
-				if (l_sFileName.BeforeLast(wxT('.')) != wxT(""))
-				{
-					l_sFileName = l_sFileName.BeforeLast(wxT('.'));
-				}
 
 				dynamic_cast<SP_DS_PlotViewer*>(m_pcResultViewer)->ExportToImageFile(l_sFileName, l_nExportType);
 
