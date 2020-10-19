@@ -302,6 +302,13 @@ void SP_DS_ColStAnimation::UpdateMarkingPlaces()
 		l_pcColList1 = dynamic_cast<SP_DS_ColListAttribute*>(l_vPlaceNodesinPed[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
 		l_vPlaceNodesinPed[l_nPos]->Update(TRUE);
 
+		if (l_pcColList1->GetRowCount() == 0)
+		{
+			l_pcColList1->AppendEmptyRow();
+			l_pcColList1->SetCell(0, 0, _T("all()"));
+			l_pcColList1->SetCell(0, 1, _T("0"));
+			l_pcColList1->SetCell(0, 2, _T("()"));
+		}
 
 		SP_CPN_SyntaxChecking l_cSyntaxChecking;
 		if (!l_cSyntaxChecking.Initialize())
@@ -2558,7 +2565,7 @@ void SP_DS_ColStAnimation::ExportDetailsCPN(ExportStochCPN *export_frame)
 
 		if (m_nMarkingOption == 0)
 		{
-			l_temp = wxT("Time,");
+			l_temp = wxT("Step Counter,");
 
 			for (l_itPlace = m_lAllPlaceAnimators.begin(); l_itPlace != m_lAllPlaceAnimators.end(); ++l_itPlace)
 			{

@@ -1173,7 +1173,7 @@ void SP_DS_PedAnimation::ExportDetails(Export *export_frame)
 
 		if (m_nMarkingOption == 0)
 		{
-			l_temp = wxT("Time,");
+			l_temp = wxT("Step Counter,");
 
 			for (l_itPlace = m_lAllPlaceAnimators.begin(); l_itPlace != m_lAllPlaceAnimators.end(); ++l_itPlace)
 			{
