@@ -383,7 +383,49 @@ SP_DS_CPN_Animation::PreStep()
 
 	//running the usual tests and preparing everything
 	for (l_itTrans = m_lPossibleTransAnimators.begin(); l_itTrans != m_lPossibleTransAnimators.end(); ++l_itTrans)
-		(*l_itTrans)->InformPrePlaces();
+	{
+		if (m_bImport)
+		{
+			SP_DS_Attribute* l_sNodeNAme = (*l_itTrans)->GetParentNode()->GetAttribute(wxT("Name"));
+			int l_nCount = l_sNodeNAme->GetValueString().Freq(wxChar('_'));
+
+
+			++l_nCount;
+
+
+			auto itFind = m_mTransID2Color.find(m_nStepCount + 1);
+			if (itFind != m_mTransID2Color.end())
+			{
+
+				wxString l_sChosenColor;
+				if (itFind->second.Freq(wxChar('_')) == l_nCount)
+				{
+					l_sChosenColor = itFind->second.AfterLast(wxChar('_'));
+				}
+				else
+				{
+					wxString l_srawColor = wxT("");
+					l_srawColor = itFind->second.AfterFirst(wxChar('_'));
+					l_srawColor.Replace(wxT("_"), wxT(","));
+					l_sChosenColor = wxT("(") + l_srawColor + wxT(")");
+				}
+
+				(*l_itTrans)->InformPrePlaces(l_sChosenColor);
+			//	wxString l_sChosenColor = itFind->second.AfterLast(wxChar('_'));
+
+
+			}
+			else
+			{
+				(*l_itTrans)->InformPrePlaces();
+			}
+		}
+		else
+		{
+			(*l_itTrans)->InformPrePlaces();
+		}
+
+	}
 	for (l_itPlace = m_lAllPlaceAnimators.begin(); l_itPlace != m_lAllPlaceAnimators.end(); ++l_itPlace)
 		(*l_itPlace)->TestMarking();
 	//for (l_itTrans = m_lPossibleTransAnimators.begin(); l_itTrans != m_lPossibleTransAnimators.end(); ++l_itTrans)
@@ -834,6 +876,11 @@ SP_DS_CPN_Animation::OnReset()
 
 	//by george
 	m_nStepCount = 0;
+	m_nLineCount =1;//read from file switch to the begining of the file
+	if (m_bExport)
+	{
+	ResetTransSequenceFile();//reset exported trans seq file
+	}
 	SetStepCounter();
 	Refresh();
 }
@@ -1333,97 +1380,108 @@ void SP_DS_CPN_Animation::ExportStepSequences()
 {
 	list<SP_DS_CPN_TransAnimator*>::iterator l_itTrans;
 
-	if (m_ExportFilename.Cmp(wxT("")) != 0)
-	{
-		m_ExportTextfile.Open(m_ExportFilename);
-
-		if (m_nMarkingOption == 1)
+		if (m_ExportFilename.Cmp(wxT("")) != 0)
 		{
-			if (m_nStepCount >= m_nStart && m_nStepCount <= m_nStop && m_bRunning == true && ((m_nStepCount - m_nStart) % m_nEvery == 0))
+			m_ExportTextfile.Open(m_ExportFilename);
+
+			if (m_nMarkingOption == 1)
 			{
-
-				wxString l_temp(wxT(""));
-
-				if (m_lStepTransAnimators.begin() != m_lStepTransAnimators.end())
-					l_temp << m_nStepCount;
-
-				for (l_itTrans = (m_lStepTransAnimators).begin(); l_itTrans != (m_lStepTransAnimators).end(); ++l_itTrans)
+				if (m_nStepCount >= m_nStart && m_nStepCount <= m_nStop && m_bRunning == true && ((m_nStepCount - m_nStart) % m_nEvery == 0))
 				{
-					SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
 
-					if (!l_pcNode) continue;
-					std::vector<wxString>* l_vBindingColor = (*l_itTrans)->GetSelBindings();
-					wxString l_sBinding;
-					if (l_vBindingColor)
+					wxString l_temp(wxT(""));
+
+					if (m_lStepTransAnimators.begin() != m_lStepTransAnimators.end())
+						l_temp << m_nStepCount;
+
+					for (l_itTrans = (m_lStepTransAnimators).begin(); l_itTrans != (m_lStepTransAnimators).end(); ++l_itTrans)
 					{
-						if (l_vBindingColor->size() >= 1)
-						{
+						SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
 
-							for (auto itBinding = l_vBindingColor->begin(); itBinding != l_vBindingColor->end();++itBinding)
+						if (!l_pcNode) continue;
+						std::vector<wxString>* l_vBindingColor = (*l_itTrans)->GetSelBindings();
+						wxString l_sBinding;
+						if (l_vBindingColor)
+						{
+							if (l_vBindingColor->size() >= 1)
 							{
-								wxString l_sChosenBiding = *itBinding;
-								l_sChosenBiding = l_sChosenBiding.AfterFirst(wxChar('='));
-								l_sChosenBiding.Replace(wxT(";"), wxT(""));
-								l_sChosenBiding.Replace(wxT(" "), wxT(""));
-								l_sBinding << wxT("_")<< l_sChosenBiding;
+
+									for (auto itBinding = l_vBindingColor->begin(); itBinding != l_vBindingColor->end(); ++itBinding)
+									{
+										wxString l_sChosenBiding = *itBinding;
+										SP_VectorString l_vColors;
+										while (l_sChosenBiding.Freq(wxChar(';')) > 0)
+										{
+											wxString l_sPop = l_sChosenBiding.BeforeFirst(wxChar(';'));
+											wxString l_scol = l_sPop;
+											l_scol.Replace(wxT(" "), wxT(""));
+
+											l_vColors.push_back(l_scol.AfterFirst(wxChar('=')));
+											l_sPop << wxT(";");
+											l_sChosenBiding.Replace(l_sPop, wxT(""));
+										}
+										for (int i = 0; i < l_vColors.size(); i++)
+										{
+											l_sBinding << wxT("_") << l_vColors[i];
+										}
+								}
 							}
 						}
+
+						SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("Name"));
+						SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
+						wxString l_sName = l_pcNameAttr->GetValue();
+						if (!l_sBinding.IsEmpty())
+						{
+
+							l_sName  << l_sBinding;
+						}
+
+						l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+						SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+						long int l_sId = l_pcIdAttr->GetValue();
+
+						if (l_itTrans == m_lStepTransAnimators.begin())
+						{
+							l_temp << wxT(" | ");
+						}
+
+						else
+						{
+							l_temp << wxT("\n  | ");
+						}
+
+						l_temp << l_sId << wxT(".") << l_sName;
+
+						if (++l_itTrans != m_lStepTransAnimators.end())
+						{
+							l_temp << wxT(" :1,");
+						}
+
+						else
+						{
+							l_temp << wxT(" :1");
+						}
+
+						--l_itTrans;
 					}
 
-					SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("Name"));
-					SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
-					wxString l_sName = l_pcNameAttr->GetValue();
-					if (!l_sBinding.IsEmpty())
-					{
-
-						l_sName  << l_sBinding;
-					}
-
-					l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
-					SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
-					long int l_sId = l_pcIdAttr->GetValue();
-
-					if (l_itTrans == m_lStepTransAnimators.begin())
-					{
-						l_temp << wxT(" | ");
-					}
-
-					else
-					{
-						l_temp << wxT("\n  | ");
-					}
-
-					l_temp << l_sId << wxT(".") << l_sName;
-
-					if (++l_itTrans != m_lStepTransAnimators.end())
-					{
-						l_temp << wxT(" :1,");
-					}
-
-					else
-					{
-						l_temp << wxT(" :1");
-					}
-
-					--l_itTrans;
+					m_ExportTextfile.AddLine(l_temp);
 				}
 
-				m_ExportTextfile.AddLine(l_temp);
+				if (m_nStepCount == m_nStop + 1)
+					m_bExportComplete = true;
+
+				if (m_bExportComplete == true)
+				{
+					SP_MESSAGEBOX(wxT("Export completed."), wxT("Notification"), wxOK | wxICON_INFORMATION);
+					m_bExportComplete = false; //This is required otherwise message dialog keeps poping till the dead state
+				}
 			}
 
-			if (m_nStepCount == m_nStop + 1)
-				m_bExportComplete = true;
-
-			if (m_bExportComplete == true)
-			{
-				SP_MESSAGEBOX(wxT("Export completed."), wxT("Notification"), wxOK | wxICON_INFORMATION);
-				m_bExportComplete = false; //This is required otherwise message dialog keeps poping till the dead state
-			}
+			m_ExportTextfile.Write();
+			m_ExportTextfile.Close();
 		}
-
-		m_ExportTextfile.Write();
-		m_ExportTextfile.Close();
-	}
 }
 
 void SP_DS_CPN_Animation::SetStepCounter()
@@ -1491,8 +1549,12 @@ void SP_DS_CPN_Animation::ImportDetails(ImportColAnim *import_frame)
 				l_pc_tkz.GetNextToken();
 				l_pc_tkz.GetNextToken();
 
+				wxString l_sToken;
+				l_sToken = l_pc_tkz.GetNextToken();
+				m_mTransID2Color[l_nLineCount - 1] = l_sToken;
+				wxString l_sTName = l_sToken;
 				//Get the third token, tokenize it with "." as delimiter and take the first token from it
-				wxStringTokenizer l_pc_trans(l_pc_tkz.GetNextToken(), wxT("."));
+				wxStringTokenizer l_pc_trans(l_sToken, wxT("."));
 				if (!l_pc_trans.GetNextToken().ToLong(&l_trans_id))
 					;
 
@@ -1502,6 +1564,46 @@ void SP_DS_CPN_Animation::ImportDetails(ImportColAnim *import_frame)
 					SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
 					SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
 					long int l_sId = l_pcIdAttr->GetValue();
+
+					SP_DS_Attribute* l_pcAtt = l_pcNode->GetAttribute(wxT("Name"));
+					wxString l_sNameVal = l_pcAtt->GetValueString();
+					int l_nCount = l_sNameVal.Freq(wxChar('_'));
+					++l_nCount;
+					wxString l_sColor;
+					if (l_sId == l_trans_id)
+					{
+						wxString l_sPre = l_sTName.AfterFirst(wxChar('.'));
+
+						l_sPre.Replace(l_sNameVal, wxT(""));
+
+						if(l_sPre.StartsWith(wxT("_")))
+						{
+							l_sColor = l_sPre.AfterFirst(wxChar('_'));
+							if (l_sColor.Freq(wxChar('_')) > 0)
+							{
+								wxString l_sStr = wxT("(") + l_sColor + wxT(")");
+								l_sStr.Replace(wxChar('_'), wxChar(','));
+								l_sColor = l_sStr;
+							}
+						}
+						else
+						{
+							m_bInvalid = true;
+							SP_LOGMESSAGE(wxT("the unfolded name of the colored transition is not correct: ") + l_sTName);
+							SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
+							return;
+						}
+						if (!(*l_itTrans)->CheckColor(l_sColor) && l_sColor!=wxT(""))
+						{
+								m_bInvalid = true;
+								SP_LOGMESSAGE(wxT("the unfolded name of the colored transition is not correct: ") + l_sTName);
+								SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
+												return;
+						}
+					}
+
+
+
 
 					if (l_sId == l_trans_id)
 						break;
@@ -1535,6 +1637,33 @@ void SP_DS_CPN_Animation::ImportDetails(ImportColAnim *import_frame)
 						SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
 						SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
 						long int l_sId = l_pcIdAttr->GetValue();
+
+						int l_nCount = l_pcNode->GetAttribute(wxT("Name"))->GetValueString().Freq(wxChar('_'));
+						++l_nCount;
+						wxString l_sColor;
+						if (l_sId == l_trans_id)
+						{
+							if (l_sTName.Freq(wxChar('_')) == l_nCount)
+							{
+								l_sColor = l_sTName.AfterLast(wxChar('_'));
+							}
+							else
+							{
+								l_sColor = wxT("(");
+								l_sColor << l_sTName.AfterFirst(wxChar('_'));
+								l_sColor << wxT(")");
+								l_sColor.Replace(wxT("_"), wxT(","));
+
+							}
+						}
+
+						if (!(*l_itTrans)->CheckColor(l_sColor))
+						{
+							m_bInvalid = true;
+							SP_LOGMESSAGE(wxT("the unfolded name of the colored transition is not correct: ") + l_sTName);
+							SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
+							return;
+						}
 
 						if (l_sId == l_trans_id)
 							break;
@@ -1645,3 +1774,38 @@ void SP_DS_CPN_Animation::ImportStepSequences()
 
 	}
 }
+
+
+
+void SP_DS_CPN_Animation::ResetTransSequenceFile()
+{
+	int l_nCounter = 0;
+	bool l_bIsReset = false;
+
+	if(m_ExportFilename==wxT("")){return;}
+
+	if (m_ExportTextfile.Open(m_ExportFilename))
+	{
+		while (l_nCounter <= m_ExportTextfile.GetLineCount() && m_ExportTextfile.GetLineCount()!=1)
+		{
+
+			if (l_nCounter > 1)
+			{
+				m_ExportTextfile.RemoveLine(l_nCounter-1);
+				m_ExportTextfile.Write();
+				m_ExportTextfile.Close();
+				l_bIsReset = true;
+				l_nCounter = 0;
+				if (!m_ExportTextfile.Open(m_ExportFilename))
+				{
+					break;
+				}
+			}
+
+			l_nCounter++;
+		}
+	}
+	if(l_bIsReset)
+	m_ExportTextfile.Close();
+}
+

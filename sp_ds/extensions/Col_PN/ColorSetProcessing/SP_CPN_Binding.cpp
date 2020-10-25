@@ -93,6 +93,7 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 				return false;
 
 			l_sBinding = l_sBinding + itMap->first + wxT(" = ") + l_CompleteBinding[i][itMap->second] + wxT(";");
+
 		}
 		//Then begin to parse
 		if(Parsing())
@@ -196,6 +197,8 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 			if (l_pcDlg->ShowModal() == wxID_OK)
 			{
 				l_nChose = (int)(l_pcDlg->GetReturnSelection());
+				m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());
+				m_OutputVector = l_CompleteBinding[l_nChose];//by george
 			}
 			else
 			{
@@ -211,16 +214,25 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 		{
 			//Randomly select one binding to enable
 			l_nChose = SP_RandomLong(l_EnabledChoiceList.size());
+			m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());//george
+			m_OutputVector = l_CompleteBinding[l_nChose];//by george
 		}
 	}
 	else
 	{
 		//Randomly select one binding to enable
 		l_nChose = SP_RandomLong(l_EnabledChoiceList.size());
+		m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());//george
+		m_OutputVector = l_CompleteBinding[l_nChose];//by george
 	}
 	if(l_nChose > (int)(l_EnabledChoiceList.size())-1)
 	{
 		l_nChose = 0;
+	}
+	if (l_CompleteBinding.size()>0 && m_OutputVector.size()==0)
+	{
+		m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());//george
+		m_OutputVector = l_CompleteBinding[0];//by george
 	}
 	writecolors(&(l_EnabledChoiceList[l_nChose]),p_pcExprInfoVector);
 	return true;
@@ -722,6 +734,24 @@ bool SP_CPN_Binding::BindingInference(SP_MapString2UInt &p_IndexMap, vector<vect
 			{
 				l_MultiSetMap = dynamic_cast<SP_DS_ColStPlaceAnimator*>(itList->m_pcPlAnimator)->GetPlaceMultiSet()->GetMultiSetMap();
 			}
+
+			for (SP_MapString2Int::iterator itMap1 = l_MultiSetMap->begin(); itMap1 != l_MultiSetMap->end(); ++itMap1)
+			{//idd bug fix, by george
+				if (itMap1->first.Contains("_") && !itMap1->first.Contains(wxT("(")))
+					{
+					    wxString l_sColor = wxT("(") + itMap1->first + wxT(")");
+						l_sColor.Replace(wxT("_"), wxT(","));
+						int l_sSecond = itMap1->second;
+						std::pair<wxString, int> l_pair;
+						l_pair.first = l_sColor;
+						l_pair.second = l_sSecond;
+						l_MultiSetMap->insert( l_pair);
+						l_MultiSetMap->erase(itMap1);
+						itMap1= l_MultiSetMap->begin();
+
+						}
+				}
+
 			if(l_MultiSetMap->size() == 0)
 			{
 				return false;	// tell that this transition cannot be enabled if the initial marking is empty	
@@ -1258,6 +1288,7 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 
 	bool l_bBinding = BindingInference(l_IndexMap,l_CompleteBinding);
 	
+	m_vvCompleteBinding = l_CompleteBinding;
 	if(!l_bBinding )
 		return false;
 

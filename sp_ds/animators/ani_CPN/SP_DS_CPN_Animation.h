@@ -50,6 +50,7 @@ private:
 
 	SP_DLG_Animation *m_pcDialog;
 
+	SP_MapInt2String m_mTransID2Color;
 	//speical to colored petir nets
 	SP_CPN_ValueAssign m_cValueAssign;	
 	SP_CPN_ColorSetClass m_cColorSetClass;
@@ -148,6 +149,7 @@ public:
 	void ExportStepSequences();
 	void SetStepCounter();//by george
 	void ImportStepSequences();//by george
+	void ResetTransSequenceFile();//by george
 
 };
 

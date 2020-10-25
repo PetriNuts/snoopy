@@ -50,7 +50,8 @@ public:
 
     virtual SP_DS_Animator* Clone(SP_Data* p_pcParent, SP_DS_Animation* p_pcAnim);
     // special to transitions
-    virtual bool InformPrePlaces();
+    virtual bool InformPrePlaces(const wxString& p_sColor=wxT(""));
+    virtual bool CheckColor(const wxString& p_sColor);//by george
     void Enable(SP_DS_CPN_PlaceAnimator* p_pcAnimator);
     bool TestConcession();
     bool Reset();

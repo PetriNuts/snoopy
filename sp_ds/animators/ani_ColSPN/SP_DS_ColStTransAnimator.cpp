@@ -277,384 +277,127 @@ SP_DS_ColStTransAnimator::Enable(SP_DS_ColStPlaceAnimator* p_pcAnimator)
 }
 
 
-/*
 bool
-SP_DS_ColStTransAnimator::InformStPrePlaces()
+SP_DS_ColStTransAnimator::InformStPrePlaces(const wxString& p_sColor)
 {
-    Reset();
-    if (!m_pcNode || !m_pcAnimation)
-        return FALSE;	
+	  Reset();
 
-	vector<SP_CPN_ExpressionInfo> m_StExprInfoVector;
-	SP_CPN_ExpressionInfo m_cStExprInfo;
+	    if (!m_pcNode || !m_pcAnimation)
+	        return FALSE;
 
-    // i inform all nodes at my incoming edges of wanting their markings
-    SP_ListEdge::const_iterator l_itEdges;
-    SP_DS_ColStPlaceAnimator* l_pcAnim;
-		if (m_pcAnimation->GetDirection() == FORWARD) 
-		{
-			
-			//////////////////////
-			// Colored Petri nets
-			//push back the preplace and edges
-			
-			m_StExprInfoVector.clear();
+		vector<SP_CPN_ExpressionInfo> m_StExprInfoVector;
+		SP_CPN_ExpressionInfo m_cStExprInfo;
 
-			//push back the preplace and edges
-			for (l_itEdges = m_pcNode->GetTargetEdges()->begin(); l_itEdges != m_pcNode->GetTargetEdges()->end(); ++l_itEdges)
+	    // i inform all nodes at my incoming edges of wanting their markings
+	    SP_ListEdge::const_iterator l_itEdges;
+	    SP_DS_ColStPlaceAnimator* l_pcAnim;
+			if (m_pcAnimation->GetDirection() == FORWARD)
 			{
-					if ((*l_itEdges)->GetSource())
-					{
-						l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetSource(), SP_DS_ANIMATOR_PLACE));
-						if (l_pcAnim)
-						{
-							m_mlPrePlaces[l_pcAnim].push_back((*l_itEdges));
 
-							m_cStExprInfo.m_eExprType = CPN_INPUT_EXPR;
-							m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
-							m_cStExprInfo.m_pcEdge = *l_itEdges;							
-							m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION) );
-							if( ! m_pcColList)
-								return false;
-							if(m_pcColList->GetCell(0, 1) == wxT(""))
-							{
-								wxString l_sError;					
-								l_sError = wxT("Arc exprssion should not be empty");
-								SP_MESSAGEBOX(l_sError, wxT("Expression checking"), wxOK | wxICON_ERROR);
-								return false;
-							}
-							
-							m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);								
-							m_StExprInfoVector.push_back(m_cStExprInfo);
-						}
-					}
-			}
-
-			//push back the postplace and edges
-			for (l_itEdges = m_pcNode->GetSourceEdges()->begin(); l_itEdges != m_pcNode->GetSourceEdges()->end(); ++l_itEdges)
-			{
-					if ((*l_itEdges)->GetTarget())
-					{
-						l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetTarget(), SP_DS_ANIMATOR_PLACE));
-						if (l_pcAnim)
-						{
-							m_cStExprInfo.m_eExprType = CPN_OUTPUT_EXPR;
-							m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
-							m_cStExprInfo.m_pcEdge = *l_itEdges;							
-							m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION) );
-							if( ! m_pcColList)
-								return false;
-							if(m_pcColList->GetCell(0, 1) == wxT(""))
-								return false;
-							m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);	
-
-							m_StExprInfoVector.push_back(m_cStExprInfo);
-						}
-					}
-			}
-
-			//push back the guard
-			m_cStExprInfo.m_eExprType = CPN_GUARD_EXPR;				
-			m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(m_pcNode->GetAttribute(SP_DS_CPN_GUARDLIST) );
-			if(m_pcColList)
-				m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);	
-
-			if(m_cStExprInfo.m_sExpression != wxT(""))
-				m_StExprInfoVector.push_back(m_cStExprInfo);
-
-			//begin to binding and enable test
-			map<wxString,wxString> l_msBindingsToTransition;
-
-			SP_CPN_Binding l_cBinding;			
-			bool l_bEnableTest = l_cBinding.EnableTest(&m_StExprInfoVector,m_bSingleClick,this,m_pcNode,l_msBindingsToTransition);
-			if(!l_bEnableTest)
-				return false;
-
-
-
-			//single-step
-
-			vector<SP_CPN_ExpressionInfo>::iterator itExprList;
-			vector<wxString> l_EnabledBindings;
-			vector<wxString> l_EnabledTransitions;
-
-			if( m_bSingleClick ) 
-			{
-				m_bSingleClick = false;
-
-
-				if( l_msBindingsToTransition.size() == 0)
-					return false;
-
-				map<wxString,wxString>::iterator itBTMap;
-				for(itBTMap = l_msBindingsToTransition.begin(); itBTMap != l_msBindingsToTransition.end(); itBTMap++)
-				{
-					l_EnabledBindings.push_back( itBTMap->first);
-				}
+				//////////////////////
+				// Colored Petri nets
+				//push back the preplace and edges
 				
-				//
-				int l_nChose = 0;
-				SP_DLG_BindingSelection* l_pcDlg = new SP_DLG_BindingSelection(l_EnabledBindings, NULL);
-				if (l_pcDlg->ShowModal() == wxID_OK)
-				{
-					l_nChose = (int)(l_pcDlg->GetReturnSelection());
-				}
-				else
-				{
-					l_nChose = 0;
-				}
-				l_pcDlg->Destroy();
+				m_StExprInfoVector.clear();
 
-				//write colors
-				wxString l_nChosentransition = l_msBindingsToTransition[l_EnabledBindings[l_nChose]];
-
-				for(itExprList = m_StExprInfoVector.begin(); itExprList != m_StExprInfoVector.end(); itExprList++)
+				//push back the preplace and edges
+				for (l_itEdges = m_pcNode->GetTargetEdges()->begin(); l_itEdges != m_pcNode->GetTargetEdges()->end(); ++l_itEdges)
 				{
-					if( itExprList->m_eExprType == CPN_INPUT_EXPR || itExprList->m_eExprType == CPN_OUTPUT_EXPR)
-					{
-						m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(itExprList->m_pcEdge->GetAttribute( SP_DS_CPN_INSCRIPTION));
-						if(m_pcColList)
+						if ((*l_itEdges)->GetSource())
 						{
-							if(m_pcColList->GetRowCount() > 0 )
-							{
-								wxString l_sColor = m_pcColList->GetCell(0,0);
-								wxString l_sAppearance = m_pcColList->GetCell(0,1);
-								m_pcColList->Clear();
-								unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
-								m_pcColList->SetCell(l_nNewRow, 0, l_sColor);
-								m_pcColList->SetCell(l_nNewRow, 1, l_sAppearance);					
-							}
-						}
-
-						//Then write the colors to each corresponding edge
-
-						vector<SP_CPN_ParsedColors> l_ParsedColorsVector = itExprList->m_mvParsedColors[l_nChosentransition];
-						for(unsigned i = 0; i < l_ParsedColorsVector.size(); i++)
-						{
-							unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
-							wxString l_sColor = l_ParsedColorsVector[i].m_sColorValue;
-							wxString l_sAppearance = wxString::Format(wxT("%d"),l_ParsedColorsVector[i].m_nMultiplicity);
-							m_pcColList->SetCell(l_nNewRow, 0, l_sColor);
-							m_pcColList->SetCell(l_nNewRow, 1, l_sAppearance);
-						}
-						
-					}
-				}
-
-			}
-
-
-
-			//begin to write the colors to each corresponding edge
-
-			else
-			
-			for(itExprList = m_StExprInfoVector.begin(); itExprList != m_StExprInfoVector.end(); itExprList++)
-			{
-				if( itExprList->m_eExprType == CPN_INPUT_EXPR || itExprList->m_eExprType == CPN_OUTPUT_EXPR)
-				{
-					//first clear the m_pcColList only one line is left.
-					m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(itExprList->m_pcEdge->GetAttribute( SP_DS_CPN_INSCRIPTION));
-					if(m_pcColList)
-					{
-						if(m_pcColList->GetRowCount() > 0 )
-						{
-							wxString l_sColor = m_pcColList->GetCell(0,0);
-							wxString l_sAppearance = m_pcColList->GetCell(0,1);
-							m_pcColList->Clear();
-							unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
-							m_pcColList->SetCell(l_nNewRow, 0, l_sColor);
-							m_pcColList->SetCell(l_nNewRow, 1, l_sAppearance);					
-						}
-					}
-
-					//Then write the colors to each corresponding edge
-					map< wxString,vector<SP_CPN_ParsedColors> >::iterator itColorMap;
-					for(itColorMap = itExprList->m_mvParsedColors.begin();
-						itColorMap != itExprList->m_mvParsedColors.end(); 
-						itColorMap++)
-					{
-						unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
-						wxString l_sColor = itColorMap->first;															//store the transition name
-						wxString l_sAppearance = wxString::Format(wxT("%d"),itColorMap->second.size());					//store the number of multiplicity-color
-						m_pcColList->SetCell(l_nNewRow, 0, l_sColor);
-						m_pcColList->SetCell(l_nNewRow, 1, l_sAppearance);
-						for(unsigned i = 0; i < itColorMap->second.size(); i++)
-						{
-							unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
-							wxString l_sColor = itColorMap->second[i].m_sColorValue;
-							wxString l_sAppearance = wxString::Format(wxT("%d"),itColorMap->second[i].m_nMultiplicity);
-							m_pcColList->SetCell(l_nNewRow, 0, l_sColor);
-							m_pcColList->SetCell(l_nNewRow, 1, l_sAppearance);
-						}
-					}
-
-				}
-			}
-
-			//call AddCandidate
-			//list<SP_CPN_ExprInfo>::iterator itExprList;
-			for(itExprList = m_StExprInfoVector.begin(); itExprList != m_StExprInfoVector.end(); itExprList++)
-			{
-				if( itExprList->m_eExprType == CPN_INPUT_EXPR )
-				{
-					dynamic_cast<SP_DS_ColStPlaceAnimator*>(itExprList->m_pcPlAnimator)->AddCandidate(itExprList->m_pcEdge, this);
-				}
-			}
-
-			m_bEnabled = TRUE;   // Let it enable
-			return TRUE;     
-				
-
-
-
-
-			//////////////////////
-			for (l_itEdges = m_pcNode->GetTargetEdges()->begin(); l_itEdges != m_pcNode->GetTargetEdges()->end(); ++l_itEdges)
-			{
-				if ((*l_itEdges)->GetSource())
-					{
 							l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetSource(), SP_DS_ANIMATOR_PLACE));
 							if (l_pcAnim)
 							{
-									//l_pcAnim->AddCandidate((*l_itEdges), this);
-									//m_mlPrePlaces[l_pcAnim].push_back((*l_itEdges));
+								m_mlPrePlaces[l_pcAnim].push_back((*l_itEdges));
+
+								m_cStExprInfo.m_eExprType = CPN_INPUT_EXPR;
+								m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
+								m_cStExprInfo.m_pcEdge = *l_itEdges;
+								m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION) );
+								if( ! m_pcColList)
+									return false;
+								if(m_pcColList->GetCell(0, 1) == wxT(""))
+								{
+									wxString l_sError;
+									l_sError = wxT("Arc exprssion should not be empty");
+									SP_MESSAGEBOX(l_sError, wxT("Expression checking"), wxOK | wxICON_ERROR);
+									return false;
+								}
+
+								m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
+								m_StExprInfoVector.push_back(m_cStExprInfo);
 							}
-					}
-			}
-		} 
-		
+						}
+				}
 
-		// backwards animation
-		else 
-		{
-			if (m_pcNode->GetSourceEdges()->size() == 0)
-			{
-					m_bEnabled = TRUE;
-					return TRUE;
-			}
-
-						//////////////////////
-			// Colored Petri nets
-			//push back the preplace and edges
-			
-			m_StExprInfoVector.clear();
-
-			//push back the preplace and edges
-			for (l_itEdges = m_pcNode->GetSourceEdges()->begin(); l_itEdges != m_pcNode->GetSourceEdges()->end(); ++l_itEdges)
-			{
-					if ((*l_itEdges)->GetTarget())
-					{
-						l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetTarget(), SP_DS_ANIMATOR_PLACE));
-						if (l_pcAnim)
+				//push back the postplace and edges
+				for (l_itEdges = m_pcNode->GetSourceEdges()->begin(); l_itEdges != m_pcNode->GetSourceEdges()->end(); ++l_itEdges)
+				{
+						if ((*l_itEdges)->GetTarget())
 						{
-							m_mlPrePlaces[l_pcAnim].push_back((*l_itEdges));
-
-							m_cStExprInfo.m_eExprType = CPN_INPUT_EXPR;
-							m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
-							m_cStExprInfo.m_pcEdge = *l_itEdges;							
-							m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION) );
-							if( ! m_pcColList)
-								return false;
-							if(m_pcColList->GetCell(0, 1) == wxT(""))
+							l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetTarget(), SP_DS_ANIMATOR_PLACE));
+							if (l_pcAnim)
 							{
-								wxString l_sError;					
-								l_sError = wxT("Arc exprssion should not be empty");
-								SP_MESSAGEBOX(l_sError, wxT("Expression checking"), wxOK | wxICON_ERROR);
-								return false;
+								m_cStExprInfo.m_eExprType = CPN_OUTPUT_EXPR;
+								m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
+								m_cStExprInfo.m_pcEdge = *l_itEdges;
+								m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION) );
+								if( ! m_pcColList)
+									return false;
+								if(m_pcColList->GetCell(0, 1) == wxT(""))
+									return false;
+								m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
+
+								m_StExprInfoVector.push_back(m_cStExprInfo);
 							}
-							
-							m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);								
-							m_StExprInfoVector.push_back(m_cStExprInfo);
 						}
-					}
-			}
-
-			//push back the postplace and edges
-			for (l_itEdges = m_pcNode->GetTargetEdges()->begin(); l_itEdges != m_pcNode->GetTargetEdges()->end(); ++l_itEdges)
-			{
-					if ((*l_itEdges)->GetSource())
-					{
-						l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetSource(), SP_DS_ANIMATOR_PLACE));
-						if (l_pcAnim)
-						{
-							m_cStExprInfo.m_eExprType = CPN_OUTPUT_EXPR;
-							m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
-							m_cStExprInfo.m_pcEdge = *l_itEdges;							
-							m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION) );
-							if( ! m_pcColList)
-								return false;
-							if(m_pcColList->GetCell(0, 1) == wxT(""))
-								return false;
-							m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);	
-
-							m_StExprInfoVector.push_back(m_cStExprInfo);
-						}
-					}
-			}
-
-			//push back the guard
-			m_cStExprInfo.m_eExprType = CPN_GUARD_EXPR;				
-			m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(m_pcNode->GetAttribute(SP_DS_CPN_GUARDLIST) );
-			if(m_pcColList)
-				m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);	
-
-			if(m_cStExprInfo.m_sExpression != wxT(""))
-				m_StExprInfoVector.push_back(m_cStExprInfo);
-
-			//begin to binding and enable test
-			map<wxString,wxString> l_msBindingsToTransition;
-
-			SP_CPN_Binding l_cBinding;			
-			bool l_bEnableTest = l_cBinding.EnableTest(&m_StExprInfoVector,m_bSingleClick,this,m_pcNode,l_msBindingsToTransition);
-			if(!l_bEnableTest)
-				return false;
-
-
-
-			//single-step
-
-			vector<SP_CPN_ExpressionInfo>::iterator itExprList;
-			vector<wxString> l_EnabledBindings;
-			vector<wxString> l_EnabledTransitions;
-
-			if( m_bSingleClick ) 
-			{
-				m_bSingleClick = false;
-
-
-				map<wxString,wxString>::iterator itBTMap;
-				for(itBTMap = l_msBindingsToTransition.begin(); itBTMap != l_msBindingsToTransition.end(); itBTMap++)
-				{
-					l_EnabledBindings.push_back( itBTMap->first);
 				}
+
+				//push back the guard
+				m_cStExprInfo.m_eExprType = CPN_GUARD_EXPR;
+				m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(m_pcNode->GetAttribute(SP_DS_CPN_GUARDLIST) );
+				if(m_pcColList)
+					m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
+
+				if(m_cStExprInfo.m_sExpression != wxT(""))
+					m_StExprInfoVector.push_back(m_cStExprInfo);
+
+				//begin to binding and enable test
+				SP_CPN_Binding l_cBinding;
+				SP_DS_Animator* l_pcAnimator = dynamic_cast<SP_DS_ColStTransAnimator*>(this);
+				map<wxString, map<SP_DS_Edge*, map<wxString, int> > > l_mmmBind2Edge2Mult2Color;
+				bool l_bEnableTest = l_cBinding.EnableTest(&m_StExprInfoVector,m_bSingleClick,l_pcAnimator,m_nBindingChoice,l_mmmBind2Edge2Mult2Color);
 				
-				//
-				int l_nChose = 0;
-				SP_DLG_BindingSelection* l_pcDlg = new SP_DLG_BindingSelection(l_EnabledBindings, NULL);
-				if (l_pcDlg->ShowModal() == wxID_OK)
-				{
-					l_nChose = (int)(l_pcDlg->GetReturnSelection());
-				}
-				else
-				{
-					l_nChose = 0;
-				}
-				l_pcDlg->Destroy();
 
-				//write colors
-				wxString l_nChosentransition = l_msBindingsToTransition[l_EnabledBindings[l_nChose]];
+				if(!l_bEnableTest)
+					return false;
 
+				//if(m_bSingleClick)//by george
+				m_vChosenBinding = l_cBinding.GetBindingSelection();
+
+				//begin to write the colors to each corresponding edge
+				vector<SP_CPN_ExpressionInfo>::iterator itExprList;
 				for(itExprList = m_StExprInfoVector.begin(); itExprList != m_StExprInfoVector.end(); itExprList++)
 				{
 					if( itExprList->m_eExprType == CPN_INPUT_EXPR || itExprList->m_eExprType == CPN_OUTPUT_EXPR)
 					{
+						//first clear the m_pcColList only one line is left.
 						m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(itExprList->m_pcEdge->GetAttribute( SP_DS_CPN_INSCRIPTION));
 						if(m_pcColList)
 						{
 							if(m_pcColList->GetRowCount() > 1 )
 							{
-								wxString l_sColor = m_pcColList->GetCell(0,0);
+
+								wxString l_sColor;
+								if (p_sColor != wxT(""))
+								{
+									l_sColor = p_sColor;
+								}
+								else
+								{
+									l_sColor = m_pcColList->GetCell(0, 0);
+								}
+
 								wxString l_sAppearance = m_pcColList->GetCell(0,1);
 								m_pcColList->Clear();
 								unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
@@ -664,13 +407,24 @@ SP_DS_ColStTransAnimator::InformStPrePlaces()
 						}
 
 						//Then write the colors to each corresponding edge
+						vector<SP_CPN_ParsedColors>::iterator itColorList;
 
-						vector<SP_CPN_ParsedColors> l_ParsedColorsVector = itExprList->m_mvParsedColors[l_nChosentransition];
-						for(unsigned i = 0; i < l_ParsedColorsVector.size(); i++)
+						for (itColorList = itExprList->m_ParsedColorsList.begin();
+							itColorList != itExprList->m_ParsedColorsList.end();
+							itColorList++)
 						{
 							unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
-							wxString l_sColor = l_ParsedColorsVector[i].m_sColorValue;
-							wxString l_sAppearance = wxString::Format(wxT("%d"),l_ParsedColorsVector[i].m_nMultiplicity);
+							wxString l_sColor;
+							if (p_sColor != wxT(""))
+							{
+								l_sColor = p_sColor;
+							}
+							else
+							{
+								l_sColor = itColorList->m_sColorValue;
+							}
+
+							wxString l_sAppearance = wxString::Format(wxT("%d"),itColorList->m_nMultiplicity);
 							m_pcColList->SetCell(l_nNewRow, 0, l_sColor);
 							m_pcColList->SetCell(l_nNewRow, 1, l_sAppearance);
 						}
@@ -678,245 +432,178 @@ SP_DS_ColStTransAnimator::InformStPrePlaces()
 					}
 				}
 
+				//call AddCandidate
+				for(itExprList = m_StExprInfoVector.begin(); itExprList != m_StExprInfoVector.end(); itExprList++)
+				{
+					if( itExprList->m_eExprType == CPN_INPUT_EXPR )
+					{
+						dynamic_cast<SP_DS_ColStPlaceAnimator*>(itExprList->m_pcPlAnimator)->AddCandidate(itExprList->m_pcEdge, this);
+					}
+				}
+
+				m_bEnabled = TRUE;   // Let it enable
+				return TRUE;
+
+
 			}
-
-
-
-			//begin to write the colors to each corresponding edge
-
-			else
 			
-			for(itExprList = m_StExprInfoVector.begin(); itExprList != m_StExprInfoVector.end(); itExprList++)
+
+			// backwards animation
+			else
 			{
-				if( itExprList->m_eExprType == CPN_INPUT_EXPR || itExprList->m_eExprType == CPN_OUTPUT_EXPR)
-				{
-					//first clear the m_pcColList only one line is left.
-					m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(itExprList->m_pcEdge->GetAttribute( SP_DS_CPN_INSCRIPTION));
-					if(m_pcColList)
-					{
-						if(m_pcColList->GetRowCount() > 1 )
-						{
-							wxString l_sColor = m_pcColList->GetCell(0,0);
-							wxString l_sAppearance = m_pcColList->GetCell(0,1);
-							m_pcColList->Clear();
-							unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
-							m_pcColList->SetCell(l_nNewRow, 0, l_sColor);
-							m_pcColList->SetCell(l_nNewRow, 1, l_sAppearance);					
-						}
-					}
-
-					//Then write the colors to each corresponding edge
-					map< wxString,vector<SP_CPN_ParsedColors> >::iterator itColorMap;
-					for(itColorMap = itExprList->m_mvParsedColors.begin();
-						itColorMap != itExprList->m_mvParsedColors.end(); 
-						itColorMap++)
-					{
-						unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
-						wxString l_sColor = itColorMap->first;															//store the transition name
-						wxString l_sAppearance = wxString::Format(wxT("%d"),itColorMap->second.size());					//store the number of multiplicity-color
-						m_pcColList->SetCell(l_nNewRow, 0, l_sColor);
-						m_pcColList->SetCell(l_nNewRow, 1, l_sAppearance);
-						for(unsigned i = 0; i < itColorMap->second.size(); i++)
-						{
-							unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
-							wxString l_sColor = itColorMap->second[i].m_sColorValue;
-							wxString l_sAppearance = wxString::Format(wxT("%d"),itColorMap->second[i].m_nMultiplicity);
-							m_pcColList->SetCell(l_nNewRow, 0, l_sColor);
-							m_pcColList->SetCell(l_nNewRow, 1, l_sAppearance);
-						}
-					}
-
-				}
 			}
 
-			//call AddCandidate
-			//list<SP_CPN_ExprInfo>::iterator itExprList;
-			for(itExprList = m_StExprInfoVector.begin(); itExprList != m_StExprInfoVector.end(); itExprList++)
-			{
-				if( itExprList->m_eExprType == CPN_INPUT_EXPR )
-				{
-					dynamic_cast<SP_DS_ColStPlaceAnimator*>(itExprList->m_pcPlAnimator)->AddCandidate(itExprList->m_pcEdge, this);
-				}
-			}
 
-			m_bEnabled = TRUE;   // Let it enable
-			return TRUE;   
-		}
-
-
-    return TRUE;
+	    return TRUE;
 }
-*/
-
 
 
 bool
-SP_DS_ColStTransAnimator::InformStPrePlaces()
+SP_DS_ColStTransAnimator::CheckColour(const wxString& p_sColor)
 {
-    Reset();
+	Reset();
 
-    if (!m_pcNode || !m_pcAnimation)
-        return FALSE;	
+	if (!m_pcNode || !m_pcAnimation)
+		return FALSE;
 
 	vector<SP_CPN_ExpressionInfo> m_StExprInfoVector;
 	SP_CPN_ExpressionInfo m_cStExprInfo;
 
-    // i inform all nodes at my incoming edges of wanting their markings
-    SP_ListEdge::const_iterator l_itEdges;
-    SP_DS_ColStPlaceAnimator* l_pcAnim;
-		if (m_pcAnimation->GetDirection() == FORWARD) 
-		{		
 
-			//////////////////////
-			// Colored Petri nets
-			//push back the preplace and edges
-			
-			m_StExprInfoVector.clear();
+	SP_ListEdge::const_iterator l_itEdges;
+	SP_DS_ColStPlaceAnimator* l_pcAnim;
 
-			//push back the preplace and edges
-			for (l_itEdges = m_pcNode->GetTargetEdges()->begin(); l_itEdges != m_pcNode->GetTargetEdges()->end(); ++l_itEdges)
+
+		m_StExprInfoVector.clear();
+
+		//push back the preplace and edges
+		for (l_itEdges = m_pcNode->GetTargetEdges()->begin(); l_itEdges != m_pcNode->GetTargetEdges()->end(); ++l_itEdges)
+		{
+			if ((*l_itEdges)->GetSource())
 			{
-					if ((*l_itEdges)->GetSource())
-					{
-						l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetSource(), SP_DS_ANIMATOR_PLACE));
-						if (l_pcAnim)
-						{
-							m_mlPrePlaces[l_pcAnim].push_back((*l_itEdges));
-
-							m_cStExprInfo.m_eExprType = CPN_INPUT_EXPR;
-							m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
-							m_cStExprInfo.m_pcEdge = *l_itEdges;							
-							m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION) );
-							if( ! m_pcColList)
-								return false;
-							if(m_pcColList->GetCell(0, 1) == wxT(""))
-							{
-								wxString l_sError;					
-								l_sError = wxT("Arc exprssion should not be empty");
-								SP_MESSAGEBOX(l_sError, wxT("Expression checking"), wxOK | wxICON_ERROR);
-								return false;
-							}
-							
-							m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);								
-							m_StExprInfoVector.push_back(m_cStExprInfo);
-						}
-					}
-			}
-
-			//push back the postplace and edges
-			for (l_itEdges = m_pcNode->GetSourceEdges()->begin(); l_itEdges != m_pcNode->GetSourceEdges()->end(); ++l_itEdges)
-			{
-					if ((*l_itEdges)->GetTarget())
-					{
-						l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetTarget(), SP_DS_ANIMATOR_PLACE));
-						if (l_pcAnim)
-						{
-							m_cStExprInfo.m_eExprType = CPN_OUTPUT_EXPR;
-							m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
-							m_cStExprInfo.m_pcEdge = *l_itEdges;							
-							m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION) );
-							if( ! m_pcColList)
-								return false;
-							if(m_pcColList->GetCell(0, 1) == wxT(""))
-								return false;
-							m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);	
-
-							m_StExprInfoVector.push_back(m_cStExprInfo);
-						}
-					}
-			}
-
-			//push back the guard
-			m_cStExprInfo.m_eExprType = CPN_GUARD_EXPR;				
-			m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(m_pcNode->GetAttribute(SP_DS_CPN_GUARDLIST) );
-			if(m_pcColList)
-				m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);	
-
-			if(m_cStExprInfo.m_sExpression != wxT(""))
-				m_StExprInfoVector.push_back(m_cStExprInfo);
-			
-			//begin to binding and enable test	
-			SP_CPN_Binding l_cBinding;	
-			SP_DS_Animator* l_pcAnimator = dynamic_cast<SP_DS_ColStTransAnimator*>(this);
-			map<wxString, map<SP_DS_Edge*, map<wxString, int> > > l_mmmBind2Edge2Mult2Color;
-			bool l_bEnableTest = l_cBinding.EnableTest(&m_StExprInfoVector,m_bSingleClick,l_pcAnimator,m_nBindingChoice,l_mmmBind2Edge2Mult2Color);
-			if(!l_bEnableTest)
-				return false;
-
-			//begin to write the colors to each corresponding edge
-			vector<SP_CPN_ExpressionInfo>::iterator itExprList;
-			for(itExprList = m_StExprInfoVector.begin(); itExprList != m_StExprInfoVector.end(); itExprList++)
-			{
-				if( itExprList->m_eExprType == CPN_INPUT_EXPR || itExprList->m_eExprType == CPN_OUTPUT_EXPR)
+				l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetSource(), SP_DS_ANIMATOR_PLACE));
+				if (l_pcAnim)
 				{
-					//first clear the m_pcColList only one line is left.
-					m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(itExprList->m_pcEdge->GetAttribute( SP_DS_CPN_INSCRIPTION));
-					if(m_pcColList)
+					m_mlPrePlaces[l_pcAnim].push_back((*l_itEdges));
+
+					m_cStExprInfo.m_eExprType = CPN_INPUT_EXPR;
+					m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
+					m_cStExprInfo.m_pcEdge = *l_itEdges;
+					m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION));
+					if (!m_pcColList)
+						return false;
+					if (m_pcColList->GetCell(0, 1) == wxT(""))
 					{
-						if(m_pcColList->GetRowCount() > 1 )
-						{
-							wxString l_sColor = m_pcColList->GetCell(0,0);
-							wxString l_sAppearance = m_pcColList->GetCell(0,1);
-							m_pcColList->Clear();
-							unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
-							m_pcColList->SetCell(l_nNewRow, 0, l_sColor);
-							m_pcColList->SetCell(l_nNewRow, 1, l_sAppearance);					
-						}
+						wxString l_sError;
+						l_sError = wxT("Arc exprssion should not be empty");
+						SP_MESSAGEBOX(l_sError, wxT("Expression checking"), wxOK | wxICON_ERROR);
+						return false;
 					}
 
-					//Then write the colors to each corresponding edge					
-					vector<SP_CPN_ParsedColors>::iterator itColorList;
+					m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
 
-					for (itColorList = itExprList->m_ParsedColorsList.begin();
-						itColorList != itExprList->m_ParsedColorsList.end();
-						itColorList++)
+
+					wxString l_sExpression = m_pcColList->GetCell(0, 1);
+
+					if (l_sExpression.Freq(',') != p_sColor.Freq(','))
 					{
-						unsigned int l_nNewRow = m_pcColList->AppendEmptyRow();
-						wxString l_sColor = itColorList->m_sColorValue;
-						wxString l_sAppearance = wxString::Format(wxT("%d"),itColorList->m_nMultiplicity);
-						m_pcColList->SetCell(l_nNewRow, 0, l_sColor);
-						m_pcColList->SetCell(l_nNewRow, 1, l_sAppearance);			
+						return false;
 					}
-					
+
+				}
+			}
+		}
+
+		//push back the postplace and edges
+		for (l_itEdges = m_pcNode->GetSourceEdges()->begin(); l_itEdges != m_pcNode->GetSourceEdges()->end(); ++l_itEdges)
+		{
+			if ((*l_itEdges)->GetTarget())
+			{
+				l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetTarget(), SP_DS_ANIMATOR_PLACE));
+				if (l_pcAnim)
+				{
+					m_cStExprInfo.m_eExprType = CPN_OUTPUT_EXPR;
+					m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
+					m_cStExprInfo.m_pcEdge = *l_itEdges;
+					m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION));
+					if (!m_pcColList)
+						return false;
+					if (m_pcColList->GetCell(0, 1) == wxT(""))
+						return false;
+					m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
+
+					m_StExprInfoVector.push_back(m_cStExprInfo);
+
+					wxString l_sExpression =m_pcColList->GetCell(0, 1);
+
+					if (l_sExpression.Freq(',') != p_sColor.Freq(','))
+					{
+						return false;
+					}
+				}
+			}
+		}
+
+		//push back the guard
+		m_cStExprInfo.m_eExprType = CPN_GUARD_EXPR;
+		m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(m_pcNode->GetAttribute(SP_DS_CPN_GUARDLIST));
+		if (m_pcColList)
+			m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
+
+		if (m_cStExprInfo.m_sExpression != wxT(""))
+			m_StExprInfoVector.push_back(m_cStExprInfo);
+
+		//begin to binding and enable test
+		SP_CPN_Binding l_cBinding;
+		SP_DS_Animator* l_pcAnimator = dynamic_cast<SP_DS_ColStTransAnimator*>(this);
+		map<wxString, map<SP_DS_Edge*, map<wxString, int> > > l_mmmBind2Edge2Mult2Color;
+		bool l_bEnableTest = l_cBinding.EnableTest(&m_StExprInfoVector, m_bSingleClick, l_pcAnimator, m_nBindingChoice, l_mmmBind2Edge2Mult2Color);
+
+		std::vector<SP_VectorString> l_vvPosibleValues= l_cBinding.GetColmpleteBinding();
+		if (!l_bEnableTest ||l_vvPosibleValues.size()==0)
+			return true;;
+
+		SP_VectorString l_vParsedColors;
+		if (p_sColor.Freq(wxChar(',') )> 0)
+		{
+			wxString l_sColor = p_sColor;
+			l_sColor.Replace(wxT("("), wxT(""));
+			l_sColor.Replace(wxT(")"), wxT(""));
+			while (l_sColor.Freq(wxChar(',')) > 0)
+			{
+				wxString l_sPre = l_sColor.BeforeFirst(wxChar(','));
+				l_vParsedColors.push_back(l_sPre);
+				l_sPre << wxT(",");
+				l_sColor.Replace(l_sPre, wxT(""));
+				if (l_sColor.Freq(wxChar(',')) == 0)
+				{
+					l_vParsedColors.push_back(l_sColor);
 				}
 			}
 
-			//call AddCandidate		
-			for(itExprList = m_StExprInfoVector.begin(); itExprList != m_StExprInfoVector.end(); itExprList++)
-			{
-				if( itExprList->m_eExprType == CPN_INPUT_EXPR )
-				{
-					dynamic_cast<SP_DS_ColStPlaceAnimator*>(itExprList->m_pcPlAnimator)->AddCandidate(itExprList->m_pcEdge, this);
-				}
-			}
-
-			m_bEnabled = TRUE;   // Let it enable
-			return TRUE;     
-				
-
-			//////////////////////
-			/*
-			for (l_itEdges = m_pcNode->GetTargetEdges()->begin(); l_itEdges != m_pcNode->GetTargetEdges()->end(); ++l_itEdges)
-			{
-				if ((*l_itEdges)->GetSource())
-					{
-							l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetSource(), SP_DS_ANIMATOR_PLACE));
-							if (l_pcAnim)
-							{
-									//l_pcAnim->AddCandidate((*l_itEdges), this);
-									//m_mlPrePlaces[l_pcAnim].push_back((*l_itEdges));
-							}
-					}
-			}
-			*/
-		} 
-		
-
-		// backwards animation
-		else 
-		{			
 		}
 
 
-    return TRUE;
+		for (unsigned i = 0; i < l_vvPosibleValues.size(); i++)
+		{
+			for (unsigned j = 0; j < l_vvPosibleValues[i].size(); j++)
+			{
+				 if(p_sColor== l_vvPosibleValues[i][j]&& p_sColor.Freq(wxChar(','))==0)
+				 {
+					 return true;
+				 }
+				 else if (p_sColor.Freq(wxChar(',')) > 0 && l_vParsedColors.size()== l_vvPosibleValues[i].size())
+				 {
+					 if (l_vvPosibleValues[i] == l_vParsedColors)
+					 {
+						 return true;
+					 }
+				 }
+			}
+		}
+
+
+
+	return FALSE;
 }
+

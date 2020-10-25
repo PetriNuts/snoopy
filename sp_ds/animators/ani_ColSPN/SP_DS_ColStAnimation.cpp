@@ -490,9 +490,36 @@ SP_DS_ColStAnimation::PreStep()
 	for (l_itTrans = m_lPossibleTransAnimators.begin(); l_itTrans != m_lPossibleTransAnimators.end(); ++l_itTrans)
 	{
 		SP_DS_ColStTransAnimator* l_pcColStTransAnimator = (SP_DS_ColStTransAnimator*)(*l_itTrans);
-		l_pcColStTransAnimator->InformStPrePlaces();
+		SP_DS_Attribute* l_sNodeNAme = (*l_itTrans)->GetParentNode()->GetAttribute(wxT("Name"));
+		int l_nCount = l_sNodeNAme->GetValueString().Freq(wxChar('_'));
+
+	    ++l_nCount;
+
+	   auto itFind = m_mTransID2Color.find(m_nStepCount);
+		if (itFind != m_mTransID2Color.end() && m_bImport)
+		{
+			wxString l_sChosenColor;
+			if (itFind->second.Freq(wxChar('_')) == l_nCount)
+		    {
+				l_sChosenColor = itFind->second.AfterLast(wxChar('_'));
+			}
+			else
+			{
+				wxString l_srawColor=wxT("");
+				l_srawColor = itFind->second.AfterFirst(wxChar('_'));
+				l_srawColor.Replace(wxT("_"), wxT(","));
+			   l_sChosenColor = wxT("(") + l_srawColor + wxT(")");
+			}
+
+			l_pcColStTransAnimator->InformStPrePlaces(l_sChosenColor);
+
+		}
+		else
+		{
+			l_pcColStTransAnimator->InformStPrePlaces();
+		}
 	}
-	//(*l_itTrans)->InformPrePlaces();
+
 
 	for (l_itPlace = m_lAllPlaceAnimators.begin(); l_itPlace != m_lAllPlaceAnimators.end(); ++l_itPlace)
 		(*l_itPlace)->TestMarking();
@@ -509,11 +536,26 @@ SP_DS_ColStAnimation::PreStep()
 		if ((*l_itTrans)->PreStep(l_nSteps, GetDirection()))
 		{
 			m_lStepTransAnimators.push_back((*l_itTrans));
+
+					if ((*l_itTrans)->GetChosenBinding().size() > 0&& m_sTriggiredUnfoldedTrans==wxT(""))
+					{
+						SP_DS_Attribute* l_pcAttr = (*l_itTrans)->GetParentNode()->GetAttribute(wxT("Name"));
+						SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
+						if ((*l_itTrans)->GetChosenBinding()[0].Contains("?"))
+						{
+							m_sTriggiredUnfoldedTrans = l_pcNameAttr->GetValue() + wxT("_") + (*l_itTrans)->GetChosenBinding()[0].BeforeFirst(wxChar('?'));
+						}
+						else
+						m_sTriggiredUnfoldedTrans=l_pcNameAttr->GetValue()+wxT("_")+(*l_itTrans)->GetChosenBinding()[0];
+					}
 		}
 	}
 
 	// all transitions with concession are resolved, now test the stepping option
 	//ReduceTransitions();
+
+	if (m_bExport == true)
+		ExportStepSequences();
 
 	//	ReduceColTransitions();
 
@@ -602,8 +644,6 @@ SP_DS_ColStAnimation::PreStep()
 			m_bExport = false; //If user interrupts the animation,export should be stopped
 	}
 
-	if (m_bExport == true)
-			ExportStepSequences();
 
 
 	SetStepCounter();
@@ -1014,6 +1054,12 @@ SP_DS_ColStAnimation::OnReset()
 	m_llHistoryTransAnimators.clear();
 	//by george
 	m_nStepCount = 0;
+	m_nLineCount = 1;//read from tseq file, reset to the begining
+	if (m_bExport)
+	{
+		ResetTransSequenceFile();//reset exported trans seq file
+	}
+
 	SetStepCounter();
 	Refresh();
 }
@@ -2717,75 +2763,121 @@ void SP_DS_ColStAnimation::ExportStepSequences()
 {
 	list<SP_DS_ColStTransAnimator*>::iterator l_itTrans;
 
-	if (m_ExportFilename.Cmp(wxT("")) != 0)
-	{
-		m_ExportTextfile.Open(m_ExportFilename);
-
-		if (m_nMarkingOption == 1)
+		if (m_ExportFilename.Cmp(wxT("")) != 0)
 		{
-			if (m_nStepCount >= m_nStart && m_nStepCount <= m_nStop && m_bRunning == true && ((m_nStepCount - m_nStart) % m_nEvery == 0))
+			m_ExportTextfile.Open(m_ExportFilename);
+
+			if (m_nMarkingOption == 1)
 			{
-
-				wxString l_temp(wxT(""));
-
-				if (m_lStepTransAnimators.begin() != m_lStepTransAnimators.end())
-					l_temp << m_nStepCount;
-
-				for (l_itTrans = (m_lStepTransAnimators).begin(); l_itTrans != (m_lStepTransAnimators).end(); ++l_itTrans)
+				if (m_nStepCount >= m_nStart && m_nStepCount <= m_nStop && m_bRunning == true && ((m_nStepCount - m_nStart) % m_nEvery == 0))
 				{
-					SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
 
-					if (!l_pcNode) continue;
+					wxString l_temp(wxT(""));
 
-					SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("Name"));
-					SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
-					wxString l_sName;//l_pcNameAttr->GetValue();
-					l_sName = m_sTriggiredUnfoldedTrans;
-					l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
-					SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
-					long int l_sId = l_pcIdAttr->GetValue();
+					if (m_lStepTransAnimators.begin() != m_lStepTransAnimators.end())
+						l_temp << m_nStepCount;
 
-					if (l_itTrans == m_lStepTransAnimators.begin())
+					for (l_itTrans = (m_lStepTransAnimators).begin(); l_itTrans != (m_lStepTransAnimators).end(); ++l_itTrans)
 					{
-						l_temp << wxT(" | ");
+						SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+
+						if (!l_pcNode) continue;
+
+						SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("Name"));
+						SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
+						wxString l_sName;//l_pcNameAttr->GetValue();
+
+						if (!m_sTriggiredUnfoldedTrans.Contains(wxT("Fire"))&& (*l_itTrans)->GetChosenBinding().size() > 1)
+						{
+							l_sName = l_pcNameAttr->GetValue();
+						}
+						else
+						{
+							if ((*l_itTrans)->GetChosenBinding().size() == 1)
+							{
+								l_sName=l_pcNameAttr->GetValue();
+								l_sName << wxT("_") << (*l_itTrans)->GetChosenBinding()[0];
+							}
+							else
+							{
+								l_sName = m_sTriggiredUnfoldedTrans;
+							}
+
+						}
+
+						l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+
+						SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+						long int l_sId = l_pcIdAttr->GetValue();
+
+						if ((*l_itTrans)->GetChosenBinding().size() ==1 && m_sTriggiredUnfoldedTrans==wxT(""))
+							l_sName = wxT("Fire transition : ") + l_pcNameAttr->GetValueString() + wxT("_") + (*l_itTrans)->GetChosenBinding()[0];
+
+
+						if ((*l_itTrans)->GetChosenBinding().size() > 1 && m_sTriggiredUnfoldedTrans.Freq(wxChar('_')) == 1)
+							l_sName = wxT("Fire transition : ")+l_pcNameAttr->GetValueString() + wxT("_") + (*l_itTrans)->GetChosenBinding()[0];
+
+
+
+						if ((*l_itTrans)->GetChosenBinding().size() > 1 && m_sTriggiredUnfoldedTrans.Freq(wxChar('_'))==1)
+						{//tupel colors
+							for (unsigned int i = 1; i < (*l_itTrans)->GetChosenBinding().size(); i++)
+							{
+								l_sName << wxT("_") << (*l_itTrans)->GetChosenBinding()[i];
+							}
+
+						}
+
+						(*l_itTrans)->GetChosenBinding().clear();
+						if (l_itTrans == m_lStepTransAnimators.begin())
+						{
+							l_temp << wxT(" | ");
+						}
+
+						else
+						{
+							l_temp << wxT("\n  | ");
+						}
+
+
+						wxString l_sTemp = l_temp;
+						l_temp << l_sId << wxT(".") << l_sName;
+
+						if (!l_temp.Contains(wxT("Fire")))
+						{
+							l_temp = wxT("");
+							l_temp<< l_sTemp  << l_sId << wxT(".Fire Transition : ") << l_sName;
+						}
+
+						if (++l_itTrans != m_lStepTransAnimators.end())
+						{
+							l_temp << wxT(" :1,");
+						}
+
+						else
+						{
+							l_temp << wxT(" :1");
+						}
+
+						--l_itTrans;
 					}
 
-					else
-					{
-						l_temp << wxT("\n  | ");
-					}
-
-					l_temp << l_sId << wxT(".") << l_sName;
-
-					if (++l_itTrans != m_lStepTransAnimators.end())
-					{
-						l_temp << wxT(" :1,");
-					}
-
-					else
-					{
-						l_temp << wxT(" :1");
-					}
-
-					--l_itTrans;
+					m_ExportTextfile.AddLine(l_temp);
 				}
 
-				m_ExportTextfile.AddLine(l_temp);
-			}
+				if (m_nStepCount == m_nStop + 1)
+					m_bExportComplete = true;
 
-			if (m_nStepCount == m_nStop + 1)
-				m_bExportComplete = true;
-
-			if (m_bExportComplete == true)
-			{
-				SP_MESSAGEBOX(wxT("Export completed."), wxT("Notification"), wxOK | wxICON_INFORMATION);
-				m_bExportComplete = false; //This is required otherwise message dialog keeps poping till the dead state
+				if (m_bExportComplete == true)
+				{
+					SP_MESSAGEBOX(wxT("Export completed."), wxT("Notification"), wxOK | wxICON_INFORMATION);
+					m_bExportComplete = false; //This is required otherwise message dialog keeps poping till the dead state
+				}
 			}
+			m_sTriggiredUnfoldedTrans = wxT("");
+			m_ExportTextfile.Write();
+			m_ExportTextfile.Close();
 		}
-
-		m_ExportTextfile.Write();
-		m_ExportTextfile.Close();
-	}
 }
 
 void SP_DS_ColStAnimation::OnImport(wxCommandEvent &event)
@@ -2797,61 +2889,213 @@ void SP_DS_ColStAnimation::OnImport(wxCommandEvent &event)
 
 void SP_DS_ColStAnimation::ImportDetails(ImportColAnim *import_frame)
 {
-
 	list<SP_DS_ColStTransAnimator *>::iterator l_itTrans;
-	m_bImport = true;
-	m_bInvalid = false;
-	m_nLineCount = 1;
-	m_ImportFilename = import_frame->m_pc_Browse->GetPath();
+		m_bImport = true;
+		m_bInvalid = false;
+		m_nLineCount = 1;
+		m_ImportFilename = import_frame->m_pc_Browse->GetPath();
 
-	//It is important to get the last token to check the file format
-	//For eg filename.abc.tseq is a valid file format, thus we need the last token
+		//It is important to get the last token to check the file format
+		//For eg filename.abc.tseq is a valid file format, thus we need the last token
 
-	if (m_ImportFilename.AfterLast('.') != wxT("tseq"))
-	{
-		SP_MESSAGEBOX(wxT("Invalid file format."), wxT("Error"), wxOK | wxICON_ERROR);
-	}
-	else
-	{
-		if (m_ImportTextfile.Open(m_ImportFilename) == false)
+		if (m_ImportFilename.AfterLast('.') != wxT("tseq"))
 		{
-			SP_MESSAGEBOX(wxT("File does not exist."), wxT("Error"), wxOK | wxICON_ERROR);
+			SP_MESSAGEBOX(wxT("Invalid file format."), wxT("Error"), wxOK | wxICON_ERROR);
 		}
 		else
 		{
-			wxStringTokenizer l_tkz(m_ImportTextfile.GetFirstLine(), wxT(","));
-
-			wxString l_StepDetails = l_tkz.GetNextToken();
-			wxString l_AutoConcurrency = l_tkz.GetNextToken();
-
-			if (l_StepDetails.Cmp("Stepping:Maximum") == 0)
-				m_nStepState = 1;
-			else if (l_StepDetails.Cmp("Stepping:Intermediate") == 0)
-				m_nStepState = 2;
-			else if (l_StepDetails.Cmp("Stepping:Single") == 0)
-				m_nStepState = 3;
-
-			if (l_AutoConcurrency.Cmp("AC:Enabled") == 0)
-				m_bAutoConcurrency = true;
-			else if (l_AutoConcurrency.Cmp("AC:Disabled") == 0)
-				m_bAutoConcurrency = false;
-
-			unsigned int l_nLineCount = m_nLineCount;
-
-			long l_trans_id;
-
-			while (l_nLineCount < m_ImportTextfile.GetLineCount())
+			if (m_ImportTextfile.Open(m_ImportFilename) == false)
 			{
-				//Get the line and tokenize it with " " as delimiter
-				wxStringTokenizer l_pc_tkz(m_ImportTextfile.GetLine(l_nLineCount++), wxT(" "));
+				SP_MESSAGEBOX(wxT("File does not exist."), wxT("Error"), wxOK | wxICON_ERROR);
+			}
+			else
+			{
+				wxStringTokenizer l_tkz(m_ImportTextfile.GetFirstLine(), wxT(","));
 
-				l_pc_tkz.GetNextToken();
+				wxString l_StepDetails = l_tkz.GetNextToken();
+				wxString l_AutoConcurrency = l_tkz.GetNextToken();
+
+				if (l_StepDetails.Cmp("Stepping:Maximum") == 0)
+					m_nStepState = 1;
+				else if (l_StepDetails.Cmp("Stepping:Intermediate") == 0)
+					m_nStepState = 2;
+				else if (l_StepDetails.Cmp("Stepping:Single") == 0)
+					m_nStepState = 3;
+
+				if (l_AutoConcurrency.Cmp("AC:Enabled") == 0)
+					m_bAutoConcurrency = true;
+				else if (l_AutoConcurrency.Cmp("AC:Disabled") == 0)
+					m_bAutoConcurrency = false;
+
+				unsigned int l_nLineCount = m_nLineCount;
+
+				long l_trans_id;
+
+				while (l_nLineCount < m_ImportTextfile.GetLineCount())
+				{
+					//Get the line and tokenize it with " " as delimiter
+					wxStringTokenizer l_pc_tkz(m_ImportTextfile.GetLine(l_nLineCount++), wxT(" "));
+
+					wxString l_sToken,l_sIdToken;
+					l_sToken=	l_pc_tkz.GetNextToken();
+					l_sToken=l_pc_tkz.GetNextToken();
+					l_sToken = l_pc_tkz.GetNextToken();
+					if (l_sToken.Contains(wxT("Fire")))
+					{
+						l_sIdToken = l_sToken.BeforeFirst(wxChar('.'));
+					}
+
+					l_sToken = l_pc_tkz.GetNextToken();
+					l_sToken = l_pc_tkz.GetNextToken();
+					l_sToken = l_pc_tkz.GetNextToken();
+					//Get the third token, tokenize it with "." as delimiter and take the first token from it
+					//wxStringTokenizer l_pc_trans(l_pc_tkz.GetNextToken(), wxT("."));
+					//wxStringTokenizer l_pc_trans(l_pc_tkz.GetNextToken(), wxT("."));
+					if (l_sToken == wxT(""))
+					{
+						m_bInvalid = true;
+					}
+
+					m_mTransID2Color[l_nLineCount - 1] = l_sToken;
+
+					wxString l_sTName = l_sToken;
+
+					if (!l_sIdToken.ToLong(&l_trans_id))
+						;
+
+					for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
+					{
+						SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+						SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+						SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+						long int l_sId = l_pcIdAttr->GetValue();
+
+						int l_nCount = l_pcNode->GetAttribute(wxT("Name"))->GetValueString().Freq(wxChar('_'));
+						++l_nCount;
+						wxString l_sColor;
+
+
+						if (l_sId == l_trans_id)
+						{
+						if (l_sTName.Freq(wxChar('_')) == l_nCount)
+						{
+							l_sColor = l_sTName.AfterLast(wxChar('_'));
+						}
+						else
+						{
+							l_sColor = wxT("(");
+							l_sColor << l_sTName.AfterFirst(wxChar('_'));
+							l_sColor << wxT(")");
+							l_sColor.Replace(wxT("_"), wxT(","));
+
+						}
+
+
+					  }
+
+						if( l_sColor!=wxT(""))
+						{
+						if (!(*l_itTrans)->CheckColour(l_sColor))
+							{
+								m_bInvalid = true;
+								SP_LOGMESSAGE(wxT("the unfolded name of the colored transition is not correct: ")+ l_sColor);
+								SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
+								return;
+							}
+					}
+						if (l_sId == l_trans_id)
+							break;
+					}
+
+					if (l_itTrans == m_lAllTransAnimators.end())
+						m_bInvalid = true;
+
+					while (l_nLineCount < m_ImportTextfile.GetLineCount())
+					{
+						//Get the line and tokenize it with " " as delimiter
+						wxStringTokenizer l_tkz(m_ImportTextfile.GetLine(l_nLineCount++), wxT(" "));
+
+						//Copy the first token into a buffer
+						wxString l_buf = l_tkz.GetNextToken();
+
+						if (l_buf.Cmp("|") != 0)
+						{
+							l_nLineCount--;
+							break;
+						}
+
+						//Get the second token, tokenize it with "." as delimiter and take the first token from it
+						wxStringTokenizer l_trans(l_tkz.GetNextToken(), wxT("."));
+						if (!l_trans.GetNextToken().ToLong(&l_trans_id))
+							;
+
+						for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
+						{
+							SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
+							SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
+							SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
+							long int l_sId = l_pcIdAttr->GetValue();
+
+							if (l_sId == l_trans_id)
+								break;
+						}
+
+						if (l_itTrans == m_lAllTransAnimators.end())
+							m_bInvalid = true;
+					}
+				}
+
+				m_ImportTextfile.Close();
+
+				if (m_bInvalid == true)
+				{
+					m_bImport = false; //No import is possible because the file is invalid
+					SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
+				}
+				else
+				{
+					SP_LOGMESSAGE(wxT("Import file '") + m_ImportFilename + wxT("' successfully."));
+				}
+			}
+		}
+
+
+}
+
+void SP_DS_ColStAnimation::ImportStepSequences()
+{
+	if (m_bInvalid || m_ImportTextfile.Open(m_ImportFilename) == false)
+		{
+			m_lPossibleTransAnimators.clear();
+			SP_MESSAGEBOX(wxT("Error in opening file ") + m_ImportFilename, wxT("Notification"), wxOK | wxICON_ERROR);
+		}
+		else
+		{
+			list<SP_DS_ColStTransAnimator*>::iterator l_itTrans;
+			long l_trans_id;
+			wxString l_stransName;
+
+			if (m_nLineCount < m_ImportTextfile.GetLineCount())
+			{
+				m_lPossibleTransAnimators.clear();
+
+				SP_LOGDEBUG(wxString::Format("Line Count = %u - ", m_nLineCount));
+
+				//Get the line and tokenize it with " " as delimiter
+				wxStringTokenizer l_pc_tkz(m_ImportTextfile.GetLine(m_nLineCount++), wxT(" "));
+
+				wxString l_temp = l_pc_tkz.GetNextToken();
+
+				SP_LOGDEBUG(wxString::Format("Step Number = %s\n", l_temp.c_str()));
+
 				l_pc_tkz.GetNextToken();
 
 				//Get the third token, tokenize it with "." as delimiter and take the first token from it
 				wxStringTokenizer l_pc_trans(l_pc_tkz.GetNextToken(), wxT("."));
 				if (!l_pc_trans.GetNextToken().ToLong(&l_trans_id))
 					;
+
+				SP_LOGDEBUG(wxString::Format("Transition ID: %ld\n", l_trans_id));
 
 				for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
 				{
@@ -2861,23 +3105,20 @@ void SP_DS_ColStAnimation::ImportDetails(ImportColAnim *import_frame)
 					long int l_sId = l_pcIdAttr->GetValue();
 
 					if (l_sId == l_trans_id)
-						break;
+						m_lPossibleTransAnimators.push_back(*l_itTrans);
 				}
 
-				if (l_itTrans == m_lAllTransAnimators.end())
-					m_bInvalid = true;
-
-				while (l_nLineCount < m_ImportTextfile.GetLineCount())
+				while (m_nLineCount < m_ImportTextfile.GetLineCount())
 				{
 					//Get the line and tokenize it with " " as delimiter
-					wxStringTokenizer l_tkz(m_ImportTextfile.GetLine(l_nLineCount++), wxT(" "));
+					wxStringTokenizer l_tkz(m_ImportTextfile.GetLine(m_nLineCount++), wxT(" "));
 
 					//Copy the first token into a buffer
 					wxString l_buf = l_tkz.GetNextToken();
 
 					if (l_buf.Cmp("|") != 0)
 					{
-						l_nLineCount--;
+						m_nLineCount--;
 						break;
 					}
 
@@ -2894,111 +3135,50 @@ void SP_DS_ColStAnimation::ImportDetails(ImportColAnim *import_frame)
 						long int l_sId = l_pcIdAttr->GetValue();
 
 						if (l_sId == l_trans_id)
-							break;
+							m_lPossibleTransAnimators.push_back(*l_itTrans);
 					}
 
-					if (l_itTrans == m_lAllTransAnimators.end())
-						m_bInvalid = true;
+					SP_LOGDEBUG(wxString::Format("Transition ID: %ld\n", l_trans_id));
+
 				}
 			}
 
 			m_ImportTextfile.Close();
 
-			if (m_bInvalid == true)
-			{
-				m_bImport = false; //No import is possible because the file is invalid
-				SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
-			}
-			else
-			{
-				SP_LOGMESSAGE(wxT("Import file '") + m_ImportFilename + wxT("' successfully."));
-			}
 		}
-	}
-
 }
 
-void SP_DS_ColStAnimation::ImportStepSequences()
+void SP_DS_ColStAnimation::ResetTransSequenceFile()
 {
-	if (m_bInvalid || m_ImportTextfile.Open(m_ImportFilename) == false)
-	{
-		m_lPossibleTransAnimators.clear();
-		SP_MESSAGEBOX(wxT("Error in opening file ") + m_ImportFilename, wxT("Notification"), wxOK | wxICON_ERROR);
-	}
-	else
-	{
-		list<SP_DS_ColStTransAnimator*>::iterator l_itTrans;
-		long l_trans_id;
+	int l_nCounter = 0;
+	bool l_bIsReset = false;
 
-		if (m_nLineCount < m_ImportTextfile.GetLineCount())
+	if(m_ExportFilename==wxT("")){return;}
+
+	if (m_ExportTextfile.Open(m_ExportFilename))
+	{
+		while (l_nCounter <= m_ExportTextfile.GetLineCount() && m_ExportTextfile.GetLineCount() != 1)
 		{
-			m_lPossibleTransAnimators.clear();
 
-			SP_LOGDEBUG(wxString::Format("Line Count = %u - ", m_nLineCount));
-
-			//Get the line and tokenize it with " " as delimiter
-			wxStringTokenizer l_pc_tkz(m_ImportTextfile.GetLine(m_nLineCount++), wxT(" "));
-
-			wxString l_temp = l_pc_tkz.GetNextToken();
-
-			SP_LOGDEBUG(wxString::Format("Step Number = %s\n", l_temp.c_str()));
-
-			l_pc_tkz.GetNextToken();
-
-			//Get the third token, tokenize it with "." as delimiter and take the first token from it
-			wxStringTokenizer l_pc_trans(l_pc_tkz.GetNextToken(), wxT("."));
-			if (!l_pc_trans.GetNextToken().ToLong(&l_trans_id))
-				;
-
-			SP_LOGDEBUG(wxString::Format("Transition ID: %ld\n", l_trans_id));
-
-			for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
+			if (l_nCounter > 1)
 			{
-				SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
-				SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
-				SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
-				long int l_sId = l_pcIdAttr->GetValue();
-
-				if (l_sId == l_trans_id)
-					m_lPossibleTransAnimators.push_back(*l_itTrans);
-			}
-
-			while (m_nLineCount < m_ImportTextfile.GetLineCount())
-			{
-				//Get the line and tokenize it with " " as delimiter
-				wxStringTokenizer l_tkz(m_ImportTextfile.GetLine(m_nLineCount++), wxT(" "));
-
-				//Copy the first token into a buffer
-				wxString l_buf = l_tkz.GetNextToken();
-
-				if (l_buf.Cmp("|") != 0)
+				m_ExportTextfile.RemoveLine(l_nCounter - 1);
+				m_ExportTextfile.Write();
+				m_ExportTextfile.Close();
+				l_bIsReset = true;
+				l_nCounter = 0;
+				if (!m_ExportTextfile.Open(m_ExportFilename))
 				{
-					m_nLineCount--;
 					break;
 				}
 
-				//Get the second token, tokenize it with "." as delimiter and take the first token from it
-				wxStringTokenizer l_trans(l_tkz.GetNextToken(), wxT("."));
-				if (!l_trans.GetNextToken().ToLong(&l_trans_id))
-					;
-
-				for (l_itTrans = m_lAllTransAnimators.begin(); l_itTrans != m_lAllTransAnimators.end(); ++l_itTrans)
-				{
-					SP_DS_Node* l_pcNode = (*l_itTrans)->GetParentNode();
-					SP_DS_Attribute* l_pcAttr = l_pcNode->GetAttribute(wxT("ID"));
-					SP_DS_IdAttribute* l_pcIdAttr = dynamic_cast<SP_DS_IdAttribute*>(l_pcAttr);
-					long int l_sId = l_pcIdAttr->GetValue();
-
-					if (l_sId == l_trans_id)
-						m_lPossibleTransAnimators.push_back(*l_itTrans);
-				}
-
-				SP_LOGDEBUG(wxString::Format("Transition ID: %ld\n", l_trans_id));
 
 			}
+
+			l_nCounter++;
+
 		}
-
-		m_ImportTextfile.Close();
-
 	}
+	if (l_bIsReset)
+		m_ExportTextfile.Close();
 }

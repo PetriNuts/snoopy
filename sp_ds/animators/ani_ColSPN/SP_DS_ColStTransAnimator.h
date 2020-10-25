@@ -39,6 +39,9 @@ protected:
     list<SP_DS_ColStPlaceAnimator*> m_lCandidates;
     map<SP_DS_ColStPlaceAnimator*, SP_ListEdge > m_mlPrePlaces;	
 
+private:
+	SP_VectorString m_vChosenBinding;
+
 public:
     SP_DS_ColStTransAnimator(SP_DS_Animation* p_pcAnim = NULL, SP_DS_Node* p_pcParent = NULL);
     virtual ~SP_DS_ColStTransAnimator();
@@ -54,7 +57,8 @@ public:
     bool TestConcession();
     bool Reset();
 
-	bool InformStPrePlaces();
+    bool InformStPrePlaces(const wxString& p_sColor=wxT("") );
+    bool CheckColour(const wxString& p_sColor);
 
     virtual bool OnLeftClick();
 	virtual bool OnRightClick();
@@ -62,6 +66,8 @@ public:
 
 	SP_DS_Node* GetParentNode(){return m_pcNode;}
 	
+	SP_VectorString GetChosenBinding() { return m_vChosenBinding; }//by george
+
 };
 
 #endif // __SP_DS_ColStTransAnimator_H__

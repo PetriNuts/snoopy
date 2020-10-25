@@ -67,6 +67,7 @@ private:
 	wxString m_ImportFilename;
 	unsigned int m_nLineCount;
 	wxTextFile m_ImportTextfile;
+	SP_MapInt2String m_mTransID2Color;
 	list<list<SP_DS_ColStTransAnimator*> > m_llHistoryTransAnimators;
 
 	SP_DLG_Animation *m_pcDialog;
@@ -166,6 +167,7 @@ private:
     void ExportStepSequences();//by george
     void OnImport(wxCommandEvent &event);//by george
     void ImportStepSequences();//by george
+    void ResetTransSequenceFile();//by george
 
 protected:
 	bool PreStep();
