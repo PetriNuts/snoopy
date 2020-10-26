@@ -82,7 +82,7 @@ private:
 	wxString m_ImportFilename;
 	unsigned int m_nLineCount;
 	wxTextFile m_ImportTextfile;
-
+	int m_ncoloringChoiceValue;
 
 private:
 	void UpdateChoices();//by george

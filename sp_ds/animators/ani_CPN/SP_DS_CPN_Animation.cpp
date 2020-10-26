@@ -76,7 +76,7 @@ SP_DS_CPN_Animation::SP_DS_CPN_Animation(unsigned int p_nRefresh, unsigned int p
 	m_nStepCount=0; //Keeps a count of step number
 	m_bImport=false;
     m_bInvalid = false;
-
+    m_ncoloringChoiceValue = 0;
 	}
 
  
@@ -915,6 +915,23 @@ SP_DS_CPN_Animation::OnUpdateUI(wxUpdateUIEvent& p_cEvent)
 	{
 		p_cEvent.Enable(!m_bRunning);
 	}
+
+	int l_nColoringGroup = 0;
+	bool l_bFound=false;
+	for (auto it = m_choices.begin(); it != m_choices.end(); ++it)
+	{
+		if ((*it) == wxT("coloring"))
+		{
+			l_bFound=true;
+			break;
+		}
+		l_nColoringGroup++;
+	}
+
+	if(l_bFound)
+	{
+		m_ncoloringChoiceValue = m_apcComboBoxes1[l_nColoringGroup]->GetSelection();
+	}
 }
 
 
@@ -1012,19 +1029,45 @@ void SP_DS_CPN_Animation::OnModifyConstants(wxCommandEvent& p_cEvent)
 
 void SP_DS_CPN_Animation::OnColConstantSetsChanged(wxCommandEvent& p_cEvent)
 {
-	for (size_t i = 0; i < m_apcColListAttrForConstants.size(); i++)
-	{
-		if (m_apcColListAttrForConstants[i])
+	bool l_bIsColoringGroupChanged = false;
+		int l_nColoringGroup = 0;
+		bool l_bFound=false;
+		for (auto it = m_choices.begin(); it != m_choices.end(); ++it)
 		{
-			int vsel = m_apcComboBoxes1[i]->GetSelection();
-
-			m_apcColListAttrForConstants[i]->SetActiveList(vsel);
-
+			if ((*it) == wxT("coloring"))
+			{
+				l_bFound=true;
+				break;
+			}
+			l_nColoringGroup++;
 		}
-	}
 
-	UpdateColMarking();
-	 
+
+		for (size_t i = 0; i < m_apcColListAttrForConstants.size(); i++)
+		{
+			if (m_apcColListAttrForConstants[i])
+			{
+
+				int vsel = m_apcComboBoxes1[i]->GetSelection();
+
+				m_apcColListAttrForConstants[i]->SetActiveList(vsel);
+
+
+				if (l_nColoringGroup == i && l_bFound)
+				{
+					if (vsel != m_ncoloringChoiceValue)
+					{
+						l_bIsColoringGroupChanged = true;
+					}
+				}
+
+			}
+		}
+
+		if (l_bIsColoringGroupChanged)//only modify the model if the coloring group has been changed
+		{
+			UpdateColMarking();
+		}
 }
 
 void SP_DS_CPN_Animation::UpdateColMarking()

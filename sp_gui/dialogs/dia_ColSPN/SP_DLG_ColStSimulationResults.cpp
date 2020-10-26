@@ -1789,12 +1789,37 @@ void SP_DLG_ColStSimulationResults::OnModifyConstants(wxCommandEvent& p_cEvent)
 
 void SP_DLG_ColStSimulationResults::OnConstantsSetChanged(wxCommandEvent& p_cEvent)
 {
-	//remember the selected sets of constants groups
-	    unsigned i =  m_nStartingConst+1;
+	    int l_nColoringGroup = 0;
+		bool l_bColoringGroup = false;
+		if (m_mGroup2Selction.find(wxT("coloring")) != m_mGroup2Selction.end())
+		{
+			l_nColoringGroup = m_mGroup2Selction.find(wxT("coloring"))->second;
+		}
+		//remember the selected sets of constants groups
+		 unsigned i = m_nStartingConst+1 ;//begining of constants group
 		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
 		{
-			(it)->second = m_apcComboBoxes[i]->GetSelection();
-			i++;
+				if (!m_apcComboBoxes[i]) continue;
+				(it)->second = m_apcComboBoxes[i]->GetSelection();
+
+				if (it->first == wxT("coloring"))
+				{
+					if (l_nColoringGroup != it->second)
+					{
+						l_bColoringGroup = true;
+					}
+				}
+				i++;
 		}
+
+	if (l_bColoringGroup)//only do unfolding when the coloring group has been chosen//by george
+	{
+		LoadSimulatorData();
+		if (!LoadUnfoldedPlaces())
+		{
+		   SP_MESSAGEBOX(wxT("Unfolding error"), wxT("Unfolding checking"), wxOK | wxICON_ERROR);
+			return;
+		}
+	}
 
 }

@@ -30,6 +30,7 @@ class  SP_DLG_ColStSimulationResults : public SP_DS_ColoredPNSimulation, public 
 		  int m_nGroupCounts;//by george, this member counts the extra comboboxes (extra constants groups)
 		  int m_nStartingConst;//by george, to identify at which position the constant groups start with
 		  SP_MapString2Int m_mGroup2Position;
+
  private:
 	
 	   virtual void AddNewMarkingSet(const wxString& p_sMarkingSetName,const int& p_nRow);

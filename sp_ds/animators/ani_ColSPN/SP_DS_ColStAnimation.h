@@ -60,6 +60,7 @@ private:
 	bool m_bAutoConcurrency;
 	int m_nStepCount;
 	wxString m_sTriggiredUnfoldedTrans;
+	int m_nColoringGroupCurrentSelectedValue;
 
 	//For import feature
 	bool m_bImport;
