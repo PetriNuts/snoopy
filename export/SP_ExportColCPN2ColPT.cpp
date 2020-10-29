@@ -165,11 +165,22 @@ SP_ExportColCPN2ColPT :: WriteStochPlace( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRo
 	{
 		l_nActiveColumn = 0;
 	}
+
+	 //append product column if not exist//by george
+	for (unsigned i = 0; i < l_pcColList->GetRowCount(); i++)
+	{
+	  if (l_pcColList->GetCell(i, 2) == wxT(""))
+	  {
+		 l_pcColList->AppendEmptyColum();
+		 l_pcColList->SetCell(i, 2, wxT("()"));
+	  }
+	}
+
 	vector<wxString> l_vFirstColumn;
 	for(unsigned i = 0; i < l_pcColList->GetRowCount(); i++)
 	{	
 		l_vFirstColumn.push_back(l_pcColList->GetCell(i,1));		
-		l_pcColList->SetCell(i, 1,  l_pcColList->GetCell(i,l_nActiveColumn));
+		l_pcColList->SetCell(i, 1,  l_pcColList->GetCell(i,l_nActiveColumn+1));//+1 by george
 	}
 	WriteAttribute( l_pcColList, l_pcElem );
 
@@ -180,7 +191,7 @@ SP_ExportColCPN2ColPT :: WriteStochPlace( SP_DS_Node* p_pcVal, wxXmlNode* p_pcRo
 	}
 
 	wxString l_sMarking = l_pcMarking->GetValueString();
-    l_pcMarking->SetValueString( l_pcColList->GetCell(0,l_nActiveColumn) );
+    l_pcMarking->SetValueString( l_pcColList->GetCell(0,l_nActiveColumn+1) );//+1 by george
 	WriteAttribute( l_pcMarking, l_pcElem );
 	l_pcMarking->SetValueString(l_sMarking );	
 

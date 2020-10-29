@@ -151,6 +151,17 @@ bool SP_ExportColStPN2ColPT::WritePlace(SP_DS_Node* p_pcVal,
 	{
 		l_nActiveColumn = 1;
 	}
+
+	//append product column if not exist//by george
+	for (unsigned i = 0; i < l_pcColList->GetRowCount(); i++)
+	{
+		if (l_pcColList->GetCell(i, 2) == wxT(""))
+		{
+			l_pcColList->AppendEmptyColum();
+			l_pcColList->SetCell(i, 2, wxT("()"));
+		}
+	}
+
 	vector<wxString> l_vFirstColumn;
 	for(unsigned i = 0; i < l_pcColList->GetRowCount(); i++)
 	{	
@@ -166,7 +177,7 @@ bool SP_ExportColStPN2ColPT::WritePlace(SP_DS_Node* p_pcVal,
 	}
 
 	wxString l_sMarking = l_pcMarking->GetValueString();
-    l_pcMarking->SetValueString( l_pcColList->GetCell(0,l_nActiveColumn) );
+    l_pcMarking->SetValueString( l_pcColList->GetCell(0,l_nActiveColumn+1) );//+1 by george, because the marking column will be col%3=1
 	WriteAttribute( l_pcMarking, l_pcElem );
 	l_pcMarking->SetValueString(l_sMarking );	
 
