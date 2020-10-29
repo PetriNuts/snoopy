@@ -117,7 +117,12 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 	pos.x += size.GetX() + 10;
 	SetPosition(pos);
 
-	//by george, for loading default variables of the view
+	wxString l_sViewerName = m_pcModelView->GetAttribute(wxT("Name"))->GetValueString();
+	//if the selected view is the defuat view, then we initialise it with reg exp "."
+	if (l_sViewerName.IsSameAs(wxT("Default View"))||
+	l_sViewerName.IsSameAs(wxT("Main Plot"))||l_sViewerName.IsSameAs(wxT("MainPlot")))
+	{
+	//by george, for loading default variables of the default result viewer
 	wxString l_TempClassName = m_pcGraph->GetNetclass()->GetName();
 
 		if (l_TempClassName == SP_DS_COLSPN_CLASS
@@ -157,6 +162,7 @@ SP_DLG_ShowAllModelView::SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_
 			}
 			l_pcDlg->Destroy();
 		}
+	}
 }
 void SP_DLG_ShowAllModelView::OnChangeThumbPage( wxScrollEvent&  event)//wxCommandEvent&
 {
