@@ -134,17 +134,7 @@ SP_DLG_ColCPNSimulationResults::SP_DLG_ColCPNSimulationResults(SP_DS_Graph* p_pc
 
 	m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
-	//l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	//l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowSetsSizer, -1, wxT("Parameter set:")), 1, wxALL | wxEXPAND, 5);
-
-	//m_pcParameterSetComboBox = new wxChoice(m_pcPropertyWindowSetsSizer, SP_ID_CHOICE_PARAMETER_SETS, wxDefaultPosition, wxSize(100, -1));
-
-	//l_pcRowSizer->Add(m_pcParameterSetComboBox, 1, wxALL, 5);
-
-	//l_pcRowSizer->Add(new wxButton(m_pcPropertyWindowSetsSizer, SP_ID_BUTTON_MODIFY_PARAMETER_SETS, wxT("Modify")), 0, wxALL, 5);
-
-	//m_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
 	UpdateChoices();
 	m_nGroupCounts = 0;
@@ -366,15 +356,55 @@ void SP_DLG_ColCPNSimulationResults::OnParameterSetChanged(wxCommandEvent& p_cEv
 
 void SP_DLG_ColCPNSimulationResults::OnConstantsSetChanged(wxCommandEvent& p_cEvent)
 {
-	//remember the selected sets
-	unsigned i = 0;
-	if(m_mGroup2Selction.size()==m_apcComboBoxes.size())
-	for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
-	{
-		(it)->second = m_apcComboBoxes[i]->GetSelection();
-		i++;
-	}
+	int l_nColoringGroup = 0;
+		bool l_bColoringGroup = false;
+		if (m_mGroup2Selction.find(wxT("coloring")) != m_mGroup2Selction.end())
+		{
+			l_nColoringGroup = m_mGroup2Selction.find(wxT("coloring"))->second;
+		}
+		//remember the selected sets
+		unsigned i = 0;
+		if(m_mGroup2Selction.size()==m_apcComboBoxes.size())
+		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+		{
+			(it)->second = m_apcComboBoxes[i]->GetSelection();
+
+			if (it->first == wxT("coloring"))
+			{
+				if (l_nColoringGroup != it->second)
+				{
+					l_bColoringGroup = true;
+				}
+			}
+			i++;
+		}
+
 	 
+
+		if (l_bColoringGroup)//only do unfolding when the coloring group has been chosen//by george
+		{
+			SP_SetString::iterator l_itChoice;
+			int l_ncoloringGroupPosition = 0;
+
+			for (l_itChoice = m_choicesForColPNs.begin(); l_itChoice != m_choicesForColPNs.end(); ++l_itChoice)
+			{
+				if (*l_itChoice == wxT("coloring"))
+				{
+					break;
+				}
+				++l_ncoloringGroupPosition;
+			}
+
+			m_apcColListAttr[l_ncoloringGroupPosition]->SetActiveList(m_apcComboBoxes[l_ncoloringGroupPosition]->GetSelection());
+
+			if (!LoadUnfoldedPlaces())
+			{
+				SP_MESSAGEBOX(wxT("Unfolding error"), wxT("Unfolding checking"), wxOK | wxICON_ERROR);
+				return;
+			}
+		}
+
+
 }
 
 
@@ -471,7 +501,7 @@ void SP_DLG_ColCPNSimulationResults::LoadSets()
 		l_pcAttr = l_pcFstNode->GetAttribute(wxT("MarkingList"));
 		l_pcColListAttr = dynamic_cast<SP_DS_ColListAttribute *>(l_pcAttr);
 
-		for (unsigned int i = 1; i < l_pcColListAttr->GetColCount(); i++)
+		for (unsigned int i = 0; i < l_pcColListAttr->GetColCount(); i++)
 		{
 			wxString l_sSetName = l_pcColListAttr->GetColLabel(i);
 			if (l_sSetName.Contains(wxT(":")))//by george
@@ -1274,7 +1304,7 @@ void SP_DLG_ColCPNSimulationResults::LoadConstantsSetsForColPN()
 		{
 			SP_DS_Metadata* l_pcConstant = *l_itElem;
 			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
-			if (l_sChoice == l_sGroup && m_iModifyCount == 0)
+			if (l_sChoice == l_sGroup && m_iModifyCount == 0 && m_mGroup2Selction.find(l_sGroup)== m_mGroup2Selction.end())
 			{
 				m_apcColListAttr.push_back(dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList"))));
 				SP_DS_ColListAttribute* l_pcColList=dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
@@ -1286,7 +1316,7 @@ void SP_DLG_ColCPNSimulationResults::LoadConstantsSetsForColPN()
 
 
 	//int start = m_apcColListAttr.size() - ss;
-	for (size_t j = ss; j < m_apcColListAttr.size(); j++)
+	for (size_t j = 0; j < m_apcColListAttr.size(); j++)
 	{
 		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
 		//int l_Index = j - m_nGroupCounts;

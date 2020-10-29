@@ -1751,7 +1751,7 @@ void SP_DLG_ColHPNSimultionResults::LoadConstantsSetsForColPN()
 
 
 	//int start = m_apcColListAttr.size() - ss;
-	for (size_t j = ss; j < m_apcColListAttr.size(); j++)
+	for (size_t j =0; j < m_apcColListAttr.size(); j++)
 	{
 		SP_DS_ColListAttribute* l_pcAttr = m_apcColListAttr[j];
 		//int l_Index = j - m_nGroupCounts;
@@ -1772,12 +1772,52 @@ void SP_DLG_ColHPNSimultionResults::LoadConstantsSetsForColPN()
 
 void SP_DLG_ColHPNSimultionResults::OnConstantsSetsChanged(wxCommandEvent& p_cEvent)
 {
-	unsigned i = 0;
-	for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
-	{
-		(it)->second = m_apcComboBoxes[i]->GetSelection();
-		i++;
-	}
+	int l_nColoringGroup = 0;
+		bool l_bColoringGroup = false;
+		if (m_mGroup2Selction.find(wxT("coloring")) != m_mGroup2Selction.end())
+		{
+			l_nColoringGroup = m_mGroup2Selction.find(wxT("coloring"))->second;
+		}
+
+
+		unsigned i = 0;
+		for (auto it = m_mGroup2Selction.begin(); it != m_mGroup2Selction.end(); ++it)
+		{
+			(it)->second = m_apcComboBoxes[i]->GetSelection();
+
+			if (it->first == wxT("coloring") )
+			{
+				if (l_nColoringGroup != it->second)
+				{
+					l_bColoringGroup = true;
+				}
+			}
+
+			i++;
+		}
+
+		if (l_bColoringGroup)
+		{
+			SP_SetString::iterator l_itChoice;
+			int l_ncoloringGroupPosition = 0;
+
+			for (l_itChoice = m_choicesForColPNs.begin(); l_itChoice != m_choicesForColPNs.end(); ++l_itChoice)
+			{
+				if (*l_itChoice == wxT("coloring"))
+				{
+					break;
+				}
+				++l_ncoloringGroupPosition;
+			}
+
+			m_apcColListAttr[l_ncoloringGroupPosition]->SetActiveList(m_apcComboBoxes[l_ncoloringGroupPosition]->GetSelection());
+
+			if (!LoadUnfoldedPlaces())
+			{
+				SP_MESSAGEBOX(wxT("Unfolding error"), wxT("Unfolding checking"), wxOK | wxICON_ERROR);
+				return;
+			}
+		}
 }
 
 void SP_DLG_ColHPNSimultionResults::OnModifyConstants(wxCommandEvent& p_cEvent)
