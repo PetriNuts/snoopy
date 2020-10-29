@@ -316,7 +316,7 @@ DECLARE_EVENT_TABLE()
 	virtual void OnOpenAllViewsSeparately(wxCommandEvent& p_cEvent);
 
 	virtual void OnExportToCSV();
-
+	virtual void OnSelectedGraphView(wxCommandEvent& p_cEvent);//by George Assaf on 27.10.2020
 	virtual void OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent);
 	virtual void OnAddingNewModalView(wxCommandEvent& p_cEvent);
 	virtual void OnRemovingModalViews(wxCommandEvent& p_cEvent);
@@ -388,7 +388,7 @@ protected:
 	virtual void RefreshCurrentExternalView(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle);
 
 	//open one window for a view
-	virtual void OpenViewInSeparateWindow(SP_DS_Metadata* p_pcModelView);
+	virtual void OpenViewInSeparateWindow(SP_DS_Metadata* p_pcModelView,const bool& p_bHide=false);//the second arg added by george
 
 	//add general GUI options to all simulator
 	virtual void AddGuiOption2Simulator();

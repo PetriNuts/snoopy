@@ -149,6 +149,7 @@ EVT_BUTTON( SP_ID_BUTTON_ADD_NEW_VIEW, SP_DLG_Simulation :: OnAddingNewModalView
 EVT_BUTTON( SP_ID_BUTTON_REMOVE_VIEWS, SP_DLG_Simulation :: OnRemovingModalViews)
 EVT_BUTTON( SP_ID_BUTTON_RENAME_VIEW, SP_DLG_Simulation :: OnRenameModalView)
 EVT_LISTBOX_DCLICK(SP_ID_LISTBOX_VIEWS, SP_DLG_Simulation :: OnOpenSelectedGraphViews)
+EVT_LISTBOX(SP_ID_LISTBOX_VIEWS, SP_DLG_Simulation::OnSelectedGraphView)//george, this is required for direct export of the viewe variables without having to open the selected view
 
 END_EVENT_TABLE()
 
@@ -458,6 +459,24 @@ void SP_DLG_Simulation :: OnCollapseDirectExportSizer(wxCollapsiblePaneEvent& ev
 	Layout();
 }
 
+
+void SP_DLG_Simulation::OnSelectedGraphView(wxCommandEvent& p_cEvent) {
+
+	wxArrayInt currentSelections;
+	currentSelections.Clear();
+	m_pcListboxShowAllGraphViewName->GetSelections(currentSelections);
+	size_t tmp = currentSelections.GetCount();
+
+	SP_DS_Metadata* l_pcView;
+
+	for (size_t i = 0; i < tmp; ++i) {
+		// get a pointer to the view
+		l_pcView = FindView(m_pcListboxShowAllGraphViewName->GetString(currentSelections[i]));
+		OpenViewInSeparateWindow(l_pcView,true);
+		ChangeCurrentView(l_pcView);
+	}
+
+}
 
 void SP_DLG_Simulation :: OnOpenSelectedGraphViews(wxCommandEvent& p_cEvent) {
 	wxArrayInt currentSelections;
@@ -2058,6 +2077,27 @@ void SP_DLG_Simulation::OpenExportFile()
 	wxString sNetClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();
     SP_DS_ColListAttribute* l_pcPlaceIdList = dynamic_cast<SP_DS_ColListAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo")));
 
+    if(l_pcPlaceIdList)// by george
+    {
+    if (l_pcPlaceIdList->GetRowCount() == 0)
+    	{
+    		wxArrayInt currentSelections;
+    		currentSelections.Clear();
+    		m_pcListboxShowAllGraphViewName->GetSelections(currentSelections);
+    		size_t tmp = currentSelections.GetCount();
+
+    		SP_DS_Metadata* l_pcView;
+
+    		for (size_t i = 0; i < 1; ++i)
+    		{//take the default viewe only
+    			// get a pointer to the view
+    			l_pcView = FindView(m_pcListboxShowAllGraphViewName->GetString(currentSelections[i]));
+    			OpenViewInSeparateWindow(l_pcView, true);
+    			ChangeCurrentView(l_pcView);
+    		}
+    	}
+    }
+
     for (unsigned long i = 0; i < l_pcPlaceIdList->GetRowCount(); i++)
     {
         wxString l_sCheckState = l_pcPlaceIdList->GetCell(i, 2);
@@ -2071,6 +2111,7 @@ void SP_DLG_Simulation::OpenExportFile()
 		    }
         }
     }
+
 	if (!sNetClass.Contains(wxT("Fuzzy")))// Added by G.A
 	{
 		(*m_pcExport) << l_sOutput << endl;
@@ -2465,7 +2506,7 @@ void SP_DLG_Simulation::InitializeViews()
     }
 }
 
-void SP_DLG_Simulation::OpenViewInSeparateWindow(SP_DS_Metadata* p_pcModelView)
+void SP_DLG_Simulation::OpenViewInSeparateWindow(SP_DS_Metadata* p_pcModelView,const bool& p_bHide)
 {
     //check if a view with the same name is already opened
 	for (auto l_itWindow : m_pcExternalWindows)
@@ -2485,7 +2526,17 @@ void SP_DLG_Simulation::OpenViewInSeparateWindow(SP_DS_Metadata* p_pcModelView)
     {
         m_pcExternalWindows.push_back(l_pcShowModelViewsDlg);
 
-        l_pcShowModelViewsDlg->Show(true);
+        if(!p_bHide)
+        {
+
+        	l_pcShowModelViewsDlg->Show(true);
+        }
+        else//by george
+        {
+        	l_pcShowModelViewsDlg->Show(false);
+
+        	l_pcShowModelViewsDlg->Close();
+        }
     }
 
 }
