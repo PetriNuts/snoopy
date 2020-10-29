@@ -416,7 +416,14 @@ void SP_MDI_View::OnLayout(wxCommandEvent& p_cEvent)
 	{
 		SP_DLG_LayoutProperties* l_pcDlg = new SP_DLG_LayoutProperties(NULL, l_pcDoc);
 		l_pcDlg->ShowModal();
+		if (l_pcDlg->ShowModal() == wxID_OK)
+		{
+		  //by george, bugfix: trigger the document to enable Save icon because the model has been changed
+		  SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->Modify(true);
+		  SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->Refresh();
+		}
 		l_pcDlg->Destroy();
+
 	}
 
 }
