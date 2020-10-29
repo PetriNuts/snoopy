@@ -58,7 +58,7 @@ public:
     bool Reset();
 
     bool InformStPrePlaces(const wxString& p_sColor=wxT("") );
-    bool CheckColour(const wxString& p_sColor);
+    SP_IMPORT_STATE CheckColour(const wxString& p_sColor);
 
     virtual bool OnLeftClick();
 	virtual bool OnRightClick();

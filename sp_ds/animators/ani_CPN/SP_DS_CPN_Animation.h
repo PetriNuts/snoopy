@@ -3,6 +3,8 @@
 // $Author: fei liu $
 // $Version: 0.0 $
 // $Revision: 1.00 $
+// @ Updated: George Assaf
+// @ Date:02/02/2020
 // $Date: 2009/09/28 10:20:00 $
 // Short Description: colored PN animation class
 //////////////////////////////////////////////////////////////////////
@@ -148,7 +150,7 @@ public:
 	void ExportMarkings();//by george
 	void ExportStepSequences();
 	void SetStepCounter();//by george
-	void ImportStepSequences();//by george
+	bool ImportStepSequences();//by george
 	void ResetTransSequenceFile();//by george
 
 };

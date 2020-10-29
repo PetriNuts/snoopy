@@ -167,7 +167,7 @@ private:
     void ExportMarkings();//by george
     void ExportStepSequences();//by george
     void OnImport(wxCommandEvent &event);//by george
-    void ImportStepSequences();//by george
+    bool ImportStepSequences();//by george
     void ResetTransSequenceFile();//by george
 
 protected:

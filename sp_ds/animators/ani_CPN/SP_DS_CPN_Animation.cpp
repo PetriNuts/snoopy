@@ -379,7 +379,23 @@ SP_DS_CPN_Animation::PreStep()
 	}
 
 	else if (m_bImport == true)//by george
-		ImportStepSequences();
+		if(!ImportStepSequences())
+			{
+				SP_MESSAGEBOX(wxT("No more entries in the file"), wxT("Notification"), wxOK | wxICON_INFORMATION);
+				if (!m_cFiredTransitions.empty()) {
+					SP_DS_Graph *graph = m_cFiredTransitions.front()->GetClassObject()->GetParentGraph();
+					if (wxGetApp().GetIAManager() && wxGetApp().GetIAManager()->IAModeEnabled(graph)) {
+						if (GetDirection() == FORWARD) {
+							wxGetApp().GetIAManager()->SubmitEvent(new SP_IA_Event(&m_cFiredTransitions, SP_IA_EVT_PEDANIMPRESTEP_FWD));
+						}
+					}
+				}
+				if (m_pcDialog) {
+					m_pcDialog->ResetPlayButtons();
+				}
+				return false;
+
+			}
 
 	//running the usual tests and preparing everything
 	for (l_itTrans = m_lPossibleTransAnimators.begin(); l_itTrans != m_lPossibleTransAnimators.end(); ++l_itTrans)
@@ -1636,17 +1652,27 @@ void SP_DS_CPN_Animation::ImportDetails(ImportColAnim *import_frame)
 							SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
 							return;
 						}
-						if (!(*l_itTrans)->CheckColor(l_sColor) && l_sColor!=wxT(""))
+
+
+					}
+					if (l_sColor != wxT(""))
+					{
+						SP_IMPORT_STATE l_state = (*l_itTrans)->CheckColor(l_sColor);
+						if (l_state == SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID)
 						{
-								m_bInvalid = true;
-								SP_LOGMESSAGE(wxT("the unfolded name of the colored transition is not correct: ") + l_sTName);
-								SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
-												return;
+							m_bInvalid = true;
+							SP_LOGMESSAGE(wxT("the unfolded name of the colored transition is not correct: ") + l_sTName);
+							SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
+							return;
+						}
+						else if (l_state == SP_IMPORT_STATE::SP_IMPORT_ANIM_NOT_MATCHING_STATE)
+						{
+							m_bInvalid = true;
+							//SP_LOGMESSAGE(wxT("the unfolded name of the colored transition is not correct: ") + l_sTName);
+							SP_MESSAGEBOX(wxT("The current state of the model does not match the recorded trace"), wxT("Error"), wxOK | wxICON_ERROR);
+							return;
 						}
 					}
-
-
-
 
 					if (l_sId == l_trans_id)
 						break;
@@ -1733,12 +1759,14 @@ void SP_DS_CPN_Animation::ImportDetails(ImportColAnim *import_frame)
 
 }
 
-void SP_DS_CPN_Animation::ImportStepSequences()
+bool SP_DS_CPN_Animation::ImportStepSequences()
 {
+	bool l_bIsOk = true;
 	if (m_bInvalid || m_ImportTextfile.Open(m_ImportFilename) == false)
 	{
 		m_lPossibleTransAnimators.clear();
 		SP_MESSAGEBOX(wxT("Error in opening file ") + m_ImportFilename, wxT("Notification"), wxOK | wxICON_ERROR);
+		return false;
 	}
 	else
 	{
@@ -1775,7 +1803,10 @@ void SP_DS_CPN_Animation::ImportStepSequences()
 				long int l_sId = l_pcIdAttr->GetValue();
 
 				if (l_sId == l_trans_id)
-					m_lPossibleTransAnimators.push_back(*l_itTrans);
+				{
+				m_lPossibleTransAnimators.push_back(*l_itTrans);
+				l_bIsOk = true;
+				}
 			}
 
 			while (m_nLineCount < m_ImportTextfile.GetLineCount())
@@ -1805,17 +1836,23 @@ void SP_DS_CPN_Animation::ImportStepSequences()
 					long int l_sId = l_pcIdAttr->GetValue();
 
 					if (l_sId == l_trans_id)
-						m_lPossibleTransAnimators.push_back(*l_itTrans);
+					{	m_lPossibleTransAnimators.push_back(*l_itTrans);
+					    l_bIsOk = true;
+				     }
 				}
 
 				SP_LOGDEBUG(wxString::Format("Transition ID: %ld\n", l_trans_id));
 
 			}
 		}
-
+		else
+		{
+			l_bIsOk = false;
+		}
 		m_ImportTextfile.Close();
 
 	}
+	return l_bIsOk;
 }
 
 

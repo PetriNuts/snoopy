@@ -458,13 +458,13 @@ SP_DS_ColStTransAnimator::InformStPrePlaces(const wxString& p_sColor)
 }
 
 
-bool
+SP_IMPORT_STATE
 SP_DS_ColStTransAnimator::CheckColour(const wxString& p_sColor)
 {
 	Reset();
 
 	if (!m_pcNode || !m_pcAnimation)
-		return FALSE;
+		return SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 
 	vector<SP_CPN_ExpressionInfo> m_StExprInfoVector;
 	SP_CPN_ExpressionInfo m_cStExprInfo;
@@ -491,13 +491,13 @@ SP_DS_ColStTransAnimator::CheckColour(const wxString& p_sColor)
 					m_cStExprInfo.m_pcEdge = *l_itEdges;
 					m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION));
 					if (!m_pcColList)
-						return false;
+						return SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 					if (m_pcColList->GetCell(0, 1) == wxT(""))
 					{
 						wxString l_sError;
 						l_sError = wxT("Arc exprssion should not be empty");
 						SP_MESSAGEBOX(l_sError, wxT("Expression checking"), wxOK | wxICON_ERROR);
-						return false;
+						return SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 					}
 
 					m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
@@ -507,7 +507,7 @@ SP_DS_ColStTransAnimator::CheckColour(const wxString& p_sColor)
 
 					if (l_sExpression.Freq(',') != p_sColor.Freq(','))
 					{
-						return false;
+						return SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 					}
 
 				}
@@ -527,9 +527,9 @@ SP_DS_ColStTransAnimator::CheckColour(const wxString& p_sColor)
 					m_cStExprInfo.m_pcEdge = *l_itEdges;
 					m_pcColList = dynamic_cast< SP_DS_ColListAttribute* >((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION));
 					if (!m_pcColList)
-						return false;
+						return SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 					if (m_pcColList->GetCell(0, 1) == wxT(""))
-						return false;
+						return SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 					m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
 
 					m_StExprInfoVector.push_back(m_cStExprInfo);
@@ -538,7 +538,7 @@ SP_DS_ColStTransAnimator::CheckColour(const wxString& p_sColor)
 
 					if (l_sExpression.Freq(',') != p_sColor.Freq(','))
 					{
-						return false;
+						return SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 					}
 				}
 			}
@@ -559,9 +559,16 @@ SP_DS_ColStTransAnimator::CheckColour(const wxString& p_sColor)
 		map<wxString, map<SP_DS_Edge*, map<wxString, int> > > l_mmmBind2Edge2Mult2Color;
 		bool l_bEnableTest = l_cBinding.EnableTest(&m_StExprInfoVector, m_bSingleClick, l_pcAnimator, m_nBindingChoice, l_mmmBind2Edge2Mult2Color);
 
-		std::vector<SP_VectorString> l_vvPosibleValues= l_cBinding.GetColmpleteBinding();
-		if (!l_bEnableTest ||l_vvPosibleValues.size()==0)
-			return true;;
+		std::vector<SP_VectorString> l_vvPosibleValues = l_cBinding.GetColmpleteBinding();
+
+		if (!l_bEnableTest  || l_vvPosibleValues.size() == 0)
+			return SP_IMPORT_STATE::SP_IMPORT_ANIM_VALID;
+
+		if (l_vvPosibleValues.size() == 1)
+		{
+			if (p_sColor != l_vvPosibleValues[0][0])
+				return SP_IMPORT_STATE::SP_IMPORT_ANIM_NOT_MATCHING_STATE;
+		}
 
 		SP_VectorString l_vParsedColors;
 		if (p_sColor.Freq(wxChar(',') )> 0)
@@ -590,13 +597,13 @@ SP_DS_ColStTransAnimator::CheckColour(const wxString& p_sColor)
 			{
 				 if(p_sColor== l_vvPosibleValues[i][j]&& p_sColor.Freq(wxChar(','))==0)
 				 {
-					 return true;
+					 return SP_IMPORT_STATE::SP_IMPORT_ANIM_VALID;
 				 }
 				 else if (p_sColor.Freq(wxChar(',')) > 0 && l_vParsedColors.size()== l_vvPosibleValues[i].size())
 				 {
 					 if (l_vvPosibleValues[i] == l_vParsedColors)
 					 {
-						 return true;
+						 return SP_IMPORT_STATE::SP_IMPORT_ANIM_VALID;
 					 }
 				 }
 			}
@@ -604,6 +611,6 @@ SP_DS_ColStTransAnimator::CheckColour(const wxString& p_sColor)
 
 
 
-	return FALSE;
+		return SP_IMPORT_STATE::SP_IMPORT_ANIM_NOT_MATCHING_STATE;
 }
 

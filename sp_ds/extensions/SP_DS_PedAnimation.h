@@ -128,7 +128,8 @@ public:
 	void ExportMarkings();
 	void ExportStepSequences();
 	void ImportDetails(Import *);
-	void ImportStepSequences();
+	bool ImportStepSequences();
+	void ResetTransSequenceFile();
 
 };
 

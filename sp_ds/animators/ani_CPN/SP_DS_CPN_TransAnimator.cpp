@@ -484,14 +484,14 @@ SP_DS_CPN_TransAnimator::InformPrePlaces(const wxString& p_sColor)
 	    return TRUE;
 }
 
-bool
+SP_IMPORT_STATE
 SP_DS_CPN_TransAnimator::CheckColor(const wxString& p_sColor)
 {
 
 
 	Reset();
 	if (!m_pcNode || !m_pcAnimation)
-		return FALSE;
+		return SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 
 	// i inform all nodes at my incoming edges of wanting their markings
 	SP_ListEdge::const_iterator l_itEdges;
@@ -519,13 +519,13 @@ SP_DS_CPN_TransAnimator::CheckColor(const wxString& p_sColor)
 					m_cExprInfo.m_pcEdge = *l_itEdges;
 					m_pcColList = dynamic_cast<SP_DS_ColListAttribute*>((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION));
 					if (!m_pcColList)
-						return false;
+						SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 					if (m_pcColList->GetCell(0, 1) == wxT(""))
 					{
 						wxString l_sError;
 						l_sError = wxT("Arc exprssion should not be empty");
 						SP_MESSAGEBOX(l_sError, wxT("Expression checking"), wxOK | wxICON_ERROR);
-						return false;
+						return SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 					}
 
 						m_cExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
@@ -535,7 +535,7 @@ SP_DS_CPN_TransAnimator::CheckColor(const wxString& p_sColor)
 					//m_ExprInfoList.push_back(m_cExprInfo);
 					if (ArcExpr.Freq(',') != p_sColor.Freq(','))
 					{
-						return false;
+						return SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 					}
 
 				}
@@ -555,15 +555,15 @@ SP_DS_CPN_TransAnimator::CheckColor(const wxString& p_sColor)
 					m_cExprInfo.m_pcEdge = *l_itEdges;
 					m_pcColList = dynamic_cast<SP_DS_ColListAttribute*>((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION));
 					if (!m_pcColList)
-						return false;
+						SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 					if (m_pcColList->GetCell(0, 1) == wxT(""))
-						return false;
+						SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 						m_cExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
 					wxString l_sArcExpr = m_pcColList->GetCell(0, 1);
 
 					if (l_sArcExpr.Freq(',') != p_sColor.Freq(','))
 					{
-						return false;
+						return SP_IMPORT_STATE::SP_IMPORT_ANIM_INVALID;
 					}
 					m_ExprInfoList.push_back(m_cExprInfo);
 				}
@@ -592,9 +592,14 @@ SP_DS_CPN_TransAnimator::CheckColor(const wxString& p_sColor)
 
 	if (!l_bEnableTest || l_vvPosibleValues.size()==0)
 	{
-		return TRUE;
+		return SP_IMPORT_STATE::SP_IMPORT_ANIM_VALID;
 	}
 
+	if (  l_vvPosibleValues.size() == 1)
+	{
+		if (p_sColor != l_vvPosibleValues[0][0])
+			return SP_IMPORT_STATE::SP_IMPORT_ANIM_NOT_MATCHING_STATE;
+	}
 
 
 	SP_VectorString l_vParsedColors;
@@ -624,20 +629,20 @@ SP_DS_CPN_TransAnimator::CheckColor(const wxString& p_sColor)
 		{
 			if (p_sColor == l_vvPosibleValues[i][j] && p_sColor.Freq(wxChar(',')) == 0)
 			{
-				return true;
+				return SP_IMPORT_STATE::SP_IMPORT_ANIM_VALID;
 			}
 			else if (p_sColor.Freq(wxChar(',')) > 0 && l_vParsedColors.size() == l_vvPosibleValues[i].size())
 			{
 				if (l_vvPosibleValues[i] == l_vParsedColors)
 				{
-					return true;
+					return SP_IMPORT_STATE::SP_IMPORT_ANIM_VALID;
 				}
 			}
 		}
 	}
 
 
-return FALSE;
+return SP_IMPORT_STATE::SP_IMPORT_ANIM_NOT_MATCHING_STATE;
 }
 
 

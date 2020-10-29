@@ -236,7 +236,22 @@ bool SP_DS_PedAnimation::PreStep()
 	}
 
 	else if (m_bImport == true)
-		ImportStepSequences();
+		if (!ImportStepSequences())
+				{
+					SP_MESSAGEBOX(wxT("No more entries in the file"), wxT("Notification"), wxOK | wxICON_INFORMATION);
+					if (!m_cFiredTransitions.empty()) {
+						SP_DS_Graph *graph = m_cFiredTransitions.front()->GetClassObject()->GetParentGraph();
+						if (wxGetApp().GetIAManager() && wxGetApp().GetIAManager()->IAModeEnabled(graph)) {
+							if (GetDirection() == FORWARD) {
+								wxGetApp().GetIAManager()->SubmitEvent(new SP_IA_Event(&m_cFiredTransitions, SP_IA_EVT_PEDANIMPRESTEP_FWD));
+							}
+						}
+					}
+					if (m_pcDialog) {
+						m_pcDialog->ResetPlayButtons();
+					}
+					return false;
+				}
 
 	//running the usual tests and preparing everything
 	for (l_itTrans = m_lPossibleTransAnimators.begin(); l_itTrans != m_lPossibleTransAnimators.end(); ++l_itTrans)
@@ -1034,7 +1049,8 @@ void SP_DS_PedAnimation::OnReset()
 	//by sl
 	LoadCurrentMarking();
 	Refresh();
-
+	m_nLineCount = 1;
+	ResetTransSequenceFile();
 	//Set the step count to zero
 	m_nStepCount = 0;
 	SetStepCounter();
@@ -1476,12 +1492,13 @@ void SP_DS_PedAnimation::ImportDetails(Import *import_frame)
 	}
 }
 
-void SP_DS_PedAnimation::ImportStepSequences()
+bool SP_DS_PedAnimation::ImportStepSequences()
 {
 	if (m_bInvalid || m_ImportTextfile.Open(m_ImportFilename) == false)
 	{
 		m_lPossibleTransAnimators.clear();
 		SP_MESSAGEBOX(wxT("Error in opening file ") + m_ImportFilename, wxT("Notification"), wxOK | wxICON_ERROR);
+	    return false;
 	}
 	else
 	{
@@ -1555,13 +1572,53 @@ void SP_DS_PedAnimation::ImportStepSequences()
 
 			}
 		}
-
+		else
+		{
+			return false;
+		}
 		m_ImportTextfile.Close();
 
 	}
+	return true;
 }
 
 void SP_DS_PedAnimation::SetStepCounter()
 {
 	m_pcStepCounterValue->SetLabel(wxString::Format(wxT("%ld"), m_nStepCount));
 }
+
+void SP_DS_PedAnimation::ResetTransSequenceFile()
+{
+	if (m_ExportFilename == wxT("")) return;
+	int l_nCounter = 0;
+	bool l_bIsReset = false;
+	if (m_ExportTextfile.Open(m_ExportFilename))
+	{
+		while (l_nCounter <= m_ExportTextfile.GetLineCount() && m_ExportTextfile.GetLineCount() != 1)
+		{
+
+			if (l_nCounter > 1)
+			{
+				m_ExportTextfile.RemoveLine(l_nCounter - 1);
+				m_ExportTextfile.Write();
+				m_ExportTextfile.Close();
+				l_bIsReset = true;
+				l_nCounter = 0;
+				if (!m_ExportTextfile.Open(m_ExportFilename))
+				{
+					break;
+				}
+
+
+			}
+
+			l_nCounter++;
+
+		}
+	}
+	if (l_bIsReset)
+		m_ExportTextfile.Close();
+}
+
+
+

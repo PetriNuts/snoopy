@@ -111,9 +111,9 @@ class SP_DS_StAnimation: public SP_DS_PedAnimation
 	void ExportDetails(ExportSPN *);//by george
 	void ExportMarkings();//by george
 	void ImportDetails(ImportSPN *);//by george
-	void ImportStepSequences();//by george
+	bool ImportStepSequences();//by george
 	void ExportStepSequences();//by george
-
+	void ResetTransSequenceFile();//by george
 
 };
 
