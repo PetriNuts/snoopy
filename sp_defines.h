@@ -492,4 +492,10 @@ extern const wxString SP_DS_RESET_EDGE;
 //Modifier Edge
 extern const wxString SP_DS_MODIFIER_EDGE;
 
+enum SP_IMPORT_STATE {//by george
+	SP_IMPORT_ANIM_VALID,
+	SP_IMPORT_ANIM_INVALID,
+	SP_IMPORT_ANIM_NOT_MATCHING_STATE
+};
+
 #endif // __SP_DEFINES_H__

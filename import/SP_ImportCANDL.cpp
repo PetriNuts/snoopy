@@ -2055,26 +2055,152 @@ SP_ImportCANDL::AddToDialog(SP_DLG_ImportProperties* p_pcDlg,  dssd::andl::Net_p
 }
 
 void SP_ImportCANDL::ONselectAll(wxCommandEvent& p_cEvent)
-{
+{//select/unselect all declarations of the foucesd tab only taking dependencies into consideration
 	if (m_pcCheckAll->IsChecked())
 	{
+		if (m_pcNotebookPageConstants)
+		{
+			if (m_pcNotebookPageConstants->IsFocusable())
+			{
+				set<wxString> l_setDec;
 
-		for (int i = 0; i < m_Options_constants_order.size(); i++)
-		{
-			m_pcRearrangelist_constants->Check(m_Options_constants_order[i], true);
+				for (auto& constant : *p_pcDoc->constants_)
+				{
+					wxString l_selectedConstant = constant->name_.c_str();
+					m_CheckDec.ComputeBackwardDependency(l_selectedConstant, NODE_TYPE::CONSTANT, l_setDec);
+
+					for (auto itSet = l_setDec.begin(); itSet != l_setDec.end(); ++itSet)
+					{
+						if (m_Options_constants.Index(*itSet) != wxNOT_FOUND)
+						{
+							int index = m_Options_constants.Index(*itSet);
+							m_pcRearrangelist_constants->Check(index, true);
+
+						}
+						else
+						{
+							if (m_Options_funs.Index(*itSet) != wxNOT_FOUND)
+							{
+								int index = m_Options_funs.Index(*itSet);
+								m_pcRearrangelist_function->Check(index, true);
+							}
+						}
+					}
+				}
+
+	     	}
 		}
-		for (int i = 0; i < m_Options_cs_order.size(); i++)
+
+		if (m_pcNotebookPagecolorsets)
 		{
-			m_pcRearrangelist_colorsets->Check(m_Options_cs_order[i], true);
+			if (m_pcNotebookPagecolorsets->IsFocusable())
+			{
+				for (auto& cs : *p_pcDoc->colorsets_)
+				{
+					wxString l_selectedCs = cs->name_.c_str();
+
+					set<wxString> l_setDec;
+
+					m_CheckDec.ComputeBackwardDependency(l_selectedCs, NODE_TYPE::COLOR_SET, l_setDec);
+
+					for (auto itSet = l_setDec.begin(); itSet != l_setDec.end(); ++itSet)
+					{
+						if (m_Options_constants.Index(*itSet) != wxNOT_FOUND)
+						{
+							int index = m_Options_constants.Index(*itSet);
+							m_pcRearrangelist_constants->Check(index, true);
+						}
+
+						if (m_Options_cs.Index(*itSet) != wxNOT_FOUND)
+						{
+							int index = m_Options_cs.Index(*itSet);
+							m_pcRearrangelist_colorsets->Check(index, true);
+						}
+
+						if (m_Options_vars.Index(*itSet) != wxNOT_FOUND)
+						{
+							int index = m_Options_vars.Index(*itSet);
+							m_pcRearrangelist_variables->Check(index, true);
+						}
+					}
+				}
+			}
 		}
-		for (int i = 0; i < m_Options_funs_order.size(); i++)
+
+
+		if (m_pcNotebookPagevariables)
 		{
-			m_pcRearrangelist_function->Check(m_Options_funs_order[i], true);
+			if (m_pcNotebookPagevariables->IsFocusable())
+			{
+				for (auto& var : *p_pcDoc->variables_)
+				{
+					wxString l_selectedVar = var->name_.c_str();
+
+
+					if (m_Options_vars.Index(l_selectedVar) != wxNOT_FOUND)
+					{
+						int index = m_Options_vars.Index(l_selectedVar);
+						m_pcRearrangelist_variables->Check(index, true);
+					}
+
+					set<wxString> l_setDec;
+					m_CheckDec.ComputeBackwardDependency(l_selectedVar, NODE_TYPE::VAR, l_setDec);
+
+					for (auto itSet = l_setDec.begin(); itSet != l_setDec.end(); ++itSet)
+					{
+						if (m_Options_constants.Index(*itSet) != wxNOT_FOUND)
+						{
+							int index = m_Options_constants.Index(*itSet);
+							m_pcRearrangelist_constants->Check(index, true);
+
+						}
+
+						if (m_Options_cs.Index(*itSet) != wxNOT_FOUND)
+						{
+							int index = m_Options_cs.Index(*itSet);
+							m_pcRearrangelist_colorsets->Check(index, true);
+						}
+
+
+					}
+				}
+			}
 		}
-		for (int i = 0; i < m_Options_vars_order.size(); i++)
+
+		if (m_pcNotebookPageFunctions)
 		{
-			m_pcRearrangelist_variables->Check(m_Options_vars_order[i], true);
+			if (m_pcNotebookPageFunctions->IsFocusable())
+			{
+				for (auto& fun : *p_pcDoc->color_functions_)
+				{
+					wxString l_selectedfun = fun->name_.c_str();
+					set<wxString> l_setDec;
+					m_CheckDec.ComputeBackwardDependency(l_selectedfun, NODE_TYPE::FUN_COLOOR, l_setDec);
+
+					for (auto itSet = l_setDec.begin(); itSet != l_setDec.end(); ++itSet)
+					{
+						if (m_Options_constants.Index(*itSet) != wxNOT_FOUND)
+						{
+							int index = m_Options_constants.Index(*itSet);
+							m_pcRearrangelist_constants->Check(index, true);
+						}
+						else if (m_Options_funs.Index(*itSet) != wxNOT_FOUND)
+						{
+							int index = m_Options_funs.Index(*itSet);
+							m_pcRearrangelist_function->Check(index, true);
+
+						}
+						else if(m_Options_cs.Index(*itSet) != wxNOT_FOUND)
+						{
+							int index = m_Options_cs.Index(*itSet);
+							m_pcRearrangelist_colorsets->Check(index, true);
+						}
+
+					}
+				}
+			}
 		}
+
 		PrintChosenConstants();
 		PrintChosenColorSets();
 		PrintColorFunctions();
@@ -2083,22 +2209,246 @@ void SP_ImportCANDL::ONselectAll(wxCommandEvent& p_cEvent)
 	}
 	else
 	{
+		if (m_pcNotebookPageConstants)
+		{
+			if (m_pcNotebookPageConstants->IsFocusable())
+			{
+				for (int j = 0; j < m_vConstDependenciesVector.size(); j++)
+				{
+					for (auto& constant : *p_pcDoc->constants_)
+					{
+						wxString l_selectedConstant = constant->name_.c_str();
+						int index = m_Options_constants.Index(l_selectedConstant);
+						if (index != wxNOT_FOUND)
+						{
+							m_pcRearrangelist_constants->Check(index, false);
+						}
 
-		for (int i = 0; i < m_Options_constants_order.size(); i++)
-		{
-			m_pcRearrangelist_constants->Check(m_Options_constants_order[i], false);
+						if (m_vConstDependenciesVector[j]->key == l_selectedConstant)
+						{
+							std::map<NODE_TYPE, set<wxString>> l_DepMap;
+
+							LevelOrderTraversal(m_vConstDependenciesVector[j], l_DepMap);
+
+							if (l_DepMap.size() > 0)
+							{
+								for (auto itMap = l_DepMap.begin(); itMap != l_DepMap.end(); ++itMap)
+								{
+									if (itMap->first == NODE_TYPE::COLOR_SET)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_cs.Index(*itSet);
+											m_pcRearrangelist_colorsets->Check(index, false);
+
+										}
+
+									}
+									else if (itMap->first == NODE_TYPE::VAR)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_vars.Index(*itSet);
+											m_pcRearrangelist_variables->Check(index, false);
+										}
+									}
+									else if (itMap->first == NODE_TYPE::FUN_COLOOR)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_funs.Index(*itSet);
+											m_pcRearrangelist_function->Check(index, false);
+										}
+									}
+									else if (itMap->first == NODE_TYPE::CONSTANT)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_constants.Index(*itSet);
+											m_pcRearrangelist_constants->Check(index, false);
+
+										}
+									}
+									else if (itMap->first == NODE_TYPE::OBSERVER)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_observers.Index(*itSet);
+											m_pcRearrangelist_observers->Check(index, false);
+
+										}
+									}
+									else
+									{
+
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
-		for (int i = 0; i < m_Options_cs_order.size(); i++)
+
+		if (m_pcNotebookPagecolorsets)
 		{
-			m_pcRearrangelist_colorsets->Check(m_Options_cs_order[i], false);
+			if (m_pcNotebookPagecolorsets->IsFocusable())
+			{
+				for (auto& cs : *p_pcDoc->colorsets_)
+				{
+					wxString l_selectedCs = cs->name_.c_str();
+
+					int index = m_Options_cs.Index(l_selectedCs);
+					if (index != wxNOT_FOUND)
+					{
+						m_pcRearrangelist_colorsets->Check(index, false);
+					}
+
+					for (int j = 0; j < m_vColorsetDependecncyTrees.size(); j++)
+					{
+						if (m_vColorsetDependecncyTrees[j]->key == l_selectedCs)
+						{
+							std::map<NODE_TYPE, set<wxString>> l_DepMap;
+
+							LevelOrderTraversal(m_vColorsetDependecncyTrees[j], l_DepMap);
+
+							if (l_DepMap.size() > 0)
+							{
+								for (auto itMap = l_DepMap.begin(); itMap != l_DepMap.end(); ++itMap)
+								{
+									if (itMap->first == NODE_TYPE::FUN_COLOOR)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_funs.Index(*itSet);
+											m_pcRearrangelist_function->Check(index, false);
+										}
+									}
+									else if (itMap->first == NODE_TYPE::VAR)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_vars.Index(*itSet);
+											m_pcRearrangelist_variables->Check(index, false);
+										}
+
+									}
+									else if (itMap->first == NODE_TYPE::COLOR_SET)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_cs.Index(*itSet);
+											m_pcRearrangelist_colorsets->Check(index, false);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
-		for (int i = 0; i < m_Options_funs_order.size(); i++)
+
+		if (m_pcNotebookPagevariables)
 		{
-			m_pcRearrangelist_function->Check(m_Options_funs_order[i], false);
+			if (m_pcNotebookPagevariables->IsFocusable())
+			{
+				for (auto& var : *p_pcDoc->variables_)
+				{
+					wxString l_selectedVar = var->name_.c_str();
+
+
+					int index = m_Options_vars.Index(l_selectedVar);
+					if (index != wxNOT_FOUND)
+					{
+						m_pcRearrangelist_variables->Check(index, false);
+					}
+
+					for (int j = 0; j < m_vVariablesDependecncyTrees.size(); j++)
+					{
+						if (m_vVariablesDependecncyTrees[j]->key == l_selectedVar)
+						{
+							std::map<NODE_TYPE, set<wxString>> l_DepMap;
+
+							LevelOrderTraversal(m_vVariablesDependecncyTrees[j], l_DepMap);
+
+							if (l_DepMap.size() > 0)
+							{
+								for (auto itMap = l_DepMap.begin(); itMap != l_DepMap.end(); ++itMap)
+								{
+									if (itMap->first == NODE_TYPE::COLOR_SET)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_cs.Index(*itSet);
+											m_pcRearrangelist_colorsets->Check(index, false);
+										}
+									}
+
+									if (itMap->first == NODE_TYPE::CONSTANT)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_constants.Index(*itSet);
+											m_pcRearrangelist_constants->Check(index, false);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
-		for (int i = 0; i < m_Options_vars_order.size(); i++)
+
+		if (m_pcNotebookPageFunctions)
 		{
-			m_pcRearrangelist_variables->Check(m_Options_vars_order[i], false);
+			if (m_pcNotebookPageFunctions->IsFocusable())
+			{
+				for (auto& fun : *p_pcDoc->color_functions_)
+				{
+					wxString l_selectedfun = fun->name_.c_str();
+
+					int index = m_Options_funs.Index(l_selectedfun);
+					if (index != wxNOT_FOUND)
+					{
+						m_pcRearrangelist_function->Check(index, false);
+					}
+
+					for (int j = 0; j < m_vColFunDependenciesVector.size(); j++)
+					{
+						if (m_vColFunDependenciesVector[j]->key == l_selectedfun)
+						{
+							std::map<NODE_TYPE, set<wxString>> l_DepMap;
+
+							LevelOrderTraversal(m_vColFunDependenciesVector[j], l_DepMap);
+
+							if (l_DepMap.size() > 0)
+							{
+								for (auto itMap = l_DepMap.begin(); itMap != l_DepMap.end(); ++itMap)
+								{
+									if (itMap->first == NODE_TYPE::FUN_COLOOR)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_funs.Index(*itSet);
+											m_pcRearrangelist_function->Check(index, false);
+										}
+									}
+									else if (itMap->first == NODE_TYPE::CONSTANT)
+									{
+										for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+										{
+											int index = m_Options_constants.Index(*itSet);
+											m_pcRearrangelist_constants->Check(index, false);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		PrintChosenConstants();
@@ -3092,6 +3442,11 @@ void SP_ImportCANDL::OnSelChange_funs(wxCommandEvent& p_cEvent)
 				int index = m_Options_funs.Index(*itSet);
 				m_pcRearrangelist_function->Check(index, true);
 
+			}
+			else if (m_Options_cs.Index(*itSet) != wxNOT_FOUND)//31.10.20
+			{
+				int index = m_Options_cs.Index(*itSet);
+				m_pcRearrangelist_colorsets->Check(index, true);
 			}
 			else
 			{//observers are not use colored functions

@@ -52,7 +52,7 @@ public:
 		wxWindow* p_pcParent,
 		dssd::andl::Net_ptr p_Net,
 		const wxString& p_sFilename,
-		const wxString& p_sTitle = wxT("Import Properties"),
+		const wxString& p_sTitle = wxT("Import Definitions"),
 		long p_nStyle = wxDEFAULT_DIALOG_STYLE);
 
 	SP_WDG_NotebookPage* AddPage(const wxString& p_sLabel = wxT(""));

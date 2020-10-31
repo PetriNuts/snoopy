@@ -1932,55 +1932,293 @@ void  SP_ImportANDL::AddFunctions_Att()
 	}
 	m_pcTextfunctions->SetValue(l_sFunctions);
 }
+
 void SP_ImportANDL::ONselectAll(wxCommandEvent& p_cEvent)
 {
 	if (m_pcCheckAll->IsChecked())
-	{
-
-		for (int i = 0; i < m_Options_constants_order.size(); i++)
 		{
-			m_pcRearrangelist_constants->Check(m_Options_constants_order[i], true);
-		}
+			if (m_pcNotebookPageConstants)
+			{
+				if (m_pcNotebookPageConstants->IsFocusable())
+				{
+					for (auto& constant : *p_pcDoc->constants_)
+					{
+						wxString l_selectedConstant = constant->name_.c_str();
 
-		for (int i = 0; i < m_Options_funs_order.size(); i++)
+						if (m_Options_constants.Index(l_selectedConstant) != wxNOT_FOUND)
+						{
+							int index = m_Options_constants.Index(l_selectedConstant);
+							m_pcRearrangelist_constants->Check(index, true);
+						}
+
+
+						set<wxString> l_setDec;
+						m_CheckDec.ComputeBackwardDependency(l_selectedConstant, NODE_TYPE::CONSTANT, l_setDec);
+
+						for (auto itSet = l_setDec.begin(); itSet != l_setDec.end(); ++itSet)
+						{
+							if (m_Options_constants.Index(*itSet) != wxNOT_FOUND)
+							{
+								int index = m_Options_constants.Index(*itSet);
+								m_pcRearrangelist_constants->Check(index, true);
+
+							}
+							else
+							{
+								if (m_Options_funs.Index(*itSet) != wxNOT_FOUND)
+								{
+									int index = m_Options_funs.Index(*itSet);
+									m_pcRearrangelist_function->Check(index, true);
+								}
+							}
+
+						}
+					}
+				}
+			}
+
+			if (m_pcNotebookPageFunctions)
+			{
+				if (m_pcNotebookPageFunctions->IsFocusable())
+				{
+					for (auto& fun : *p_pcDoc->functions_)
+					{
+
+						wxString funName = fun->name_.c_str();
+
+						if (m_Options_funs.Index(funName) != wxNOT_FOUND)
+						{
+							int index = m_Options_funs.Index(funName);
+							m_pcRearrangelist_function->Check(index, true);
+						}
+
+						set<wxString> l_setDec;
+						m_CheckDec.ComputeBackwardDependency(funName, NODE_TYPE::FUN_COLOOR, l_setDec);
+
+						for (auto itSet = l_setDec.begin(); itSet != l_setDec.end(); ++itSet)
+						{
+							if (m_Options_constants.Index(*itSet) != wxNOT_FOUND)
+							{
+								int index = m_Options_constants.Index(*itSet);
+								m_pcRearrangelist_constants->Check(index, true);
+
+							}
+							else if (m_Options_funs.Index(*itSet) != wxNOT_FOUND)
+							{
+								int index = m_Options_funs.Index(*itSet);
+								m_pcRearrangelist_function->Check(index, true);
+
+							}
+							else
+							{
+								if (m_Options_observers.Index(*itSet) != wxNOT_FOUND)
+								{
+									int index = m_Options_observers.Index(*itSet);
+									m_pcRearrangelist_observers->Check(index, true);
+
+								}
+							}
+
+						}
+					}
+				}
+			}
+
+			if (m_pcNotebookPageObservers)
+			{
+				if (m_pcNotebookPageObservers->IsFocusable())
+				{
+					for (auto& obs : *p_pcDoc->observers_)
+					{
+						wxString l_sCheckedObserverName = obs->name_.c_str();
+						if (m_Options_observers.Index(l_sCheckedObserverName) != wxNOT_FOUND)
+						{
+							int index = m_Options_observers.Index(l_sCheckedObserverName);
+							m_pcRearrangelist_observers->Check(index, true);
+						}
+
+						set<wxString> l_setDec;
+						m_CheckDec.ComputeBackwardDependency(l_sCheckedObserverName, NODE_TYPE::OBSERVER, l_setDec);
+						for (auto itSet = l_setDec.begin(); itSet != l_setDec.end(); ++itSet)
+						{
+							if (m_Options_constants.Index(*itSet) != wxNOT_FOUND)
+							{
+								int index = m_Options_constants.Index(*itSet);
+								m_pcRearrangelist_constants->Check(index, true);
+
+							}
+							else if (m_Options_funs.Index(*itSet) != wxNOT_FOUND)
+							{
+								int index = m_Options_funs.Index(*itSet);
+								m_pcRearrangelist_function->Check(index, true);
+							}
+
+						}
+					}
+				}
+			}
+
+			PrintChosenConstants();
+
+			PrintChosenFunctions();
+			PrintChosenObservers();
+
+		}
+		else
 		{
-			m_pcRearrangelist_function->Check(m_Options_funs_order[i], true);
+			if (m_pcNotebookPageConstants)
+			{
+				if (m_pcNotebookPageConstants->IsFocusable())
+				{
+					for (auto& con : *p_pcDoc->constants_)
+					{
+						wxString l_selectedConstant = con->name_.c_str();
+
+						if (m_Options_constants.Index(l_selectedConstant) != wxNOT_FOUND)
+						{
+							int index = m_Options_constants.Index(l_selectedConstant);
+							m_pcRearrangelist_constants->Check(index, false);
+						}
+
+						for (int j = 0; j < m_vConstDependenciesVector.size(); j++)
+						{
+							if (m_vConstDependenciesVector[j]->key == l_selectedConstant)
+							{
+								std::map<NODE_TYPE, set<wxString>> l_DepMap;
+
+								LevelOrderTraversal(m_vConstDependenciesVector[j], l_DepMap);
+
+								if (l_DepMap.size() > 0)
+								{
+									for (auto itMap = l_DepMap.begin(); itMap != l_DepMap.end(); ++itMap)
+									{
+
+
+										if (itMap->first == NODE_TYPE::FUN_COLOOR)
+										{
+											for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+											{
+												int index = m_Options_funs.Index(*itSet);
+												m_pcRearrangelist_function->Check(index, false);
+											}
+										}
+										else if (itMap->first == NODE_TYPE::CONSTANT)
+										{
+											for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+											{
+												int index = m_Options_constants.Index(*itSet);
+												m_pcRearrangelist_constants->Check(index, false);
+												//CheckConstant(*itSet, false);
+											}
+										}
+										else
+										{
+											if (itMap->first == NODE_TYPE::OBSERVER)
+											{
+												for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+												{
+													int index = m_Options_observers.Index(*itSet);
+													m_pcRearrangelist_observers->Check(index, false);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (m_pcNotebookPageFunctions)
+			{
+				if (m_pcNotebookPageFunctions->IsFocusable())
+				{
+					for (auto& fun : *p_pcDoc->functions_)
+					{
+						wxString funName = fun->name_.c_str();
+
+						if (m_Options_funs.Index(funName) != wxNOT_FOUND)
+						{
+							int index = m_Options_funs.Index(funName);
+							m_pcRearrangelist_function->Check(index, false);
+						}
+
+						for (int j = 0; j < m_vFunDependenciesVector.size(); j++)
+						{
+							if (m_vFunDependenciesVector[j]->key == funName)
+							{
+								std::map<NODE_TYPE, set<wxString>> l_DepMap;
+
+								LevelOrderTraversal(m_vFunDependenciesVector[j], l_DepMap);
+
+								if (l_DepMap.size() > 0)
+								{
+									for (auto itMap = l_DepMap.begin(); itMap != l_DepMap.end(); ++itMap)
+									{
+
+
+										if (itMap->first == NODE_TYPE::FUN_COLOOR)
+										{
+											for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+											{
+												int index = m_Options_funs.Index(*itSet);
+												m_pcRearrangelist_function->Check(index, false);
+											}
+										}
+										else if (itMap->first == NODE_TYPE::CONSTANT)
+										{
+											for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+											{
+												int index = m_Options_constants.Index(*itSet);
+												m_pcRearrangelist_constants->Check(index, false);
+
+											}
+										}
+										else
+										{
+											if (itMap->first == NODE_TYPE::OBSERVER)
+											{
+												for (auto itSet = itMap->second.begin(); itSet != itMap->second.end(); ++itSet)
+												{
+													int index = m_Options_observers.Index(*itSet);
+													m_pcRearrangelist_observers->Check(index, false);
+
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (m_pcNotebookPageObservers)
+			{
+				if (m_pcNotebookPageObservers->IsFocusable())
+				{
+					for (auto& obs : *p_pcDoc->observers_)
+					{
+
+					}
+				}
+			}
+
+			for (int i = 0; i < m_Options_observers_order.size(); i++)
+			{
+				m_pcRearrangelist_observers->Check(m_Options_observers_order[i], false);
+			}
+
+			PrintChosenConstants();
+
+			PrintChosenFunctions();
+
+			PrintChosenObservers();
+
+			m_pcTextconstants->SetValue(wxT(""));
 		}
-		for (int i = 0; i < m_Options_observers_order.size(); i++)
-		{
-			m_pcRearrangelist_observers->Check(m_Options_observers_order[i], true);
-		}
-		PrintChosenConstants();
-
-		PrintChosenFunctions();
-		PrintChosenObservers();
-
-	}
-	else
-	{
-
-		for (int i = 0; i < m_Options_constants_order.size(); i++)
-		{
-			m_pcRearrangelist_constants->Check(m_Options_constants_order[i], false);
-		}
-
-		for (int i = 0; i < m_Options_funs_order.size(); i++)
-		{
-			m_pcRearrangelist_function->Check(m_Options_funs_order[i], false);
-		}
-		for (int i = 0; i < m_Options_observers_order.size(); i++)
-		{
-			m_pcRearrangelist_observers->Check(m_Options_observers_order[i], false);
-		}
-
-		PrintChosenConstants();
-
-		PrintChosenFunctions();
-
-		PrintChosenObservers();
-
-		m_pcTextconstants->SetValue(wxT(""));
-	}
 }
 
 
