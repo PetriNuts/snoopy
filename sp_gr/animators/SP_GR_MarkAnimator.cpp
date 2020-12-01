@@ -45,6 +45,7 @@ SP_GR_MarkAnimator::SetPath(SP_Graphic* p_pcPath, unsigned int p_nSteps, SP_DIRE
 	if(l_bReturn)
 	    l_bReturn &= CalculatePath(dynamic_cast<SP_GR_Edge*>(p_pcPath), p_nSteps, p_nDir);
 	if(l_bReturn)
+		if ((m_lWaypoints.size()) == 0)  return l_bReturn;//george bugfix
 	    l_bReturn &= SetPosXY((*m_lWaypoints.begin())->x, (*m_lWaypoints.begin())->y);
     return l_bReturn;
 }
