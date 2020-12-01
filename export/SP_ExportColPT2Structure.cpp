@@ -73,6 +73,11 @@ bool SP_ExportColPT2Structure::WriteNetclass(SP_DS_Netclass* p_pcVal, wxXmlNode*
 	return true;
 }
 
+ bool SP_ExportColPT2Structure::WriteMetadataclass(SP_DS_Metadataclass* p_pcVal, wxXmlNode* p_pcRoot)
+{
+	 return true;
+}
+
 bool SP_ExportColPT2Structure::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pcRoot )
 {
 	CHECK_POINTER( p_pcVal, return FALSE );
