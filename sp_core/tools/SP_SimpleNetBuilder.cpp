@@ -1092,6 +1092,18 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 						//l_pcFR->registerFunction(l_sName, to_string(l_dval));
 					}
 
+					else if (l_sType == wxT("bool"))
+					{
+						auto type = dssd::andl::ConstType::BOOL_T;
+						std::vector<std::string> values = l_sVsets;// { l_sConstVal };
+						auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);//l_sGroup was "all"
+						b.addConstant(c);
+					}
+					else
+					{
+						//for more color set types
+					}
+
 				}
 
 				if (l_sType == wxT("int"))
@@ -1108,7 +1120,16 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 					auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);//l_sGroup was "param"
 					b.addConstant(c);
 				}
-				if (l_sType != wxT("double") && l_sType != wxT("int"))
+
+			    if (l_sType == wxT("bool"))
+				{
+				     auto type = dssd::andl::ConstType::BOOL_T;
+					std::vector<std::string> values = l_sVsets;
+					auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);
+					b.addConstant(c);
+				}
+
+			    if (!(l_sType == wxT("double") || l_sType == wxT("int") || l_sType == wxT("bool")))
 				{
 					continue;
 				}
@@ -1188,11 +1209,27 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 				{
 					type = dssd::andl::ConstType::DOUBLE_T;
 				}
-				else if (l_sType != "int")
+				else if (l_sType == "bool")
 				{
-					continue;
+						type = dssd::andl::ConstType::BOOL_T;
+				}
+				else if( !(l_sType == "int" || l_sType == "bool"|| l_sType == "double"))
+				{
+						continue;
 				}
 				std::string l_sVal = l_sConstVal.ToStdString();
+				if (l_sType == "bool")
+				{
+					if (l_sVal == wxT("1"))
+						{
+							l_sVal = "true";
+						}
+						else
+						{
+							l_sVal = "false";
+						}
+				}
+				//std::string l_sVal = l_sConstVal.ToStdString();
 				std::vector<std::string> values = { l_sVal };
 				auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, "all", values);
 				b.addConstant(c);
