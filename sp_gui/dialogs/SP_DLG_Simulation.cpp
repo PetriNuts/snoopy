@@ -2564,13 +2564,13 @@ void SP_DLG_Simulation::OnOpenAllViewsSeparately(wxCommandEvent& p_cEvent)
     }
 
 }
-void SP_DLG_Simulation::RefreshExternalWindows()
+void SP_DLG_Simulation::RefreshExternalWindows(const bool& p_bUpdate)
 {
     for (auto l_itWindow : m_pcExternalWindows)
     {
         if (l_itWindow != NULL)
         {
-            l_itWindow->RefreshWindow();
+            l_itWindow->RefreshWindow(p_bUpdate);
         }
     }
 }

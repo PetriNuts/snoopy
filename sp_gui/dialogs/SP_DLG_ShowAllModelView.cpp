@@ -420,10 +420,39 @@ void SP_DLG_ShowAllModelView::OnEditNodeList(wxCommandEvent& event)
 }
 
 
-bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_DS_Metadata* p_pcModelView)
+bool SP_DLG_ShowAllModelView::LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_DS_Metadata* p_pcModelView,const bool& p_bUpdate)
 {
 
 	CHECK_POINTER(m_pcParentWnd, return false);
+
+	   if (p_bUpdate)
+		{//load all variables to the result viewer, after chaning the size of unfolded model, by chanig coloring group
+			wxString l_TempClassName = m_pcGraph->GetNetclass()->GetName();
+
+			if (l_TempClassName == SP_DS_COLSPN_CLASS
+				|| l_TempClassName == SP_DS_COLCPN_CLASS
+				|| l_TempClassName == SP_DS_COLHPN_CLASS
+				|| l_TempClassName == SP_DS_FUZZY_ColCPN_CLASS//by george
+				|| l_TempClassName == SP_DS_FUZZY_ColSPN_CLASS//by george
+				|| l_TempClassName == SP_DS_FUZZY_ColHPN_CLASS)//by george
+			{
+				//m_pcParentWnd->SaveCurrentView();
+
+				SP_DLG_ColPlacesSelection* l_pcDlg = new SP_DLG_ColPlacesSelection(m_pcParentWnd, m_pcModelView, this);
+
+				if (l_pcDlg)
+				{
+					l_pcDlg->DoSave();
+					//m_pcParentWnd->InitializeViews();
+					//m_pcParentWnd->LoadData(true);
+					//RefreshWindow();
+					SP_Core::Instance()->GetRootDocument()->Modify(true);
+				}
+
+				l_pcDlg->Destroy();
+			}
+		}
+		//////////////////////////////////
 
 	m_pcParentWnd->LoadData(p_pcResultViewer, p_pcModelView);
 	//Update the current viewer
@@ -554,7 +583,7 @@ void SP_DLG_ShowAllModelView::RemoveExternalWindowsPointer()
 	//no current view
 	m_pcModelView = NULL;
 }
-void SP_DLG_ShowAllModelView::RefreshWindow()
+void SP_DLG_ShowAllModelView::RefreshWindow(const bool& p_bUpdate)
 {
 	if (m_bIsDisconnected)
 	{
@@ -569,7 +598,7 @@ void SP_DLG_ShowAllModelView::RefreshWindow()
 
 	CreateResultViewer(l_sViewerType);
 
-	LoadView(m_pcResultViewer, m_pcModelView);
+	LoadView(m_pcResultViewer, m_pcModelView, p_bUpdate);
 
 }
 

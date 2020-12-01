@@ -382,7 +382,7 @@ protected:
 	virtual wxString GetViewAttributeValue(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName);
 
 	//Refresh currently opened window
-	virtual void RefreshExternalWindows();
+	virtual void RefreshExternalWindows(const bool& p_bUpdate=false);//modified by george
 
 	//Refresh currnet external window
 	virtual void RefreshCurrentExternalView(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle);

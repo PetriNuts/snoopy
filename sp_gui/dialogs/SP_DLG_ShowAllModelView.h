@@ -43,7 +43,7 @@ protected:
 protected:
 	wxString GetViewAttributeValue(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName);
 
-	bool LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_DS_Metadata* p_pcModelView);
+	bool LoadView(SP_DS_ResultViewer* p_pcResultViewer, SP_DS_Metadata* p_pcModelView,const bool& p_bUpdate=false);
 	void LoadCurveSetting(SP_DS_ResultViewer* p_pcViewer, SP_DS_ColListAttribute* p_pcCurveInfoList, const unsigned int& p_nRow);
 
 	//get the viewer type
@@ -54,7 +54,7 @@ public:
 	SP_DLG_ShowAllModelView(SP_DLG_Simulation* p_pcWnd, SP_DS_Metadata* p_pcModelView, SP_DS_Graph* p_pcGraph);
 	virtual ~SP_DLG_ShowAllModelView();
 
-	virtual void RefreshWindow();
+	virtual void RefreshWindow(const bool& p_bUpdate=false);
 	virtual void RefreshCurrentWindow(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle);
 	virtual void RemoveExternalWindowsPointer();
 

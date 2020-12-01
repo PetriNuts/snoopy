@@ -50,7 +50,7 @@ protected:
 
 		wxString GetViewerType(const int& p_nViewerIndex);
 public:
-		virtual void RefreshWindow(){}
+		virtual void RefreshWindow(const bool& p_bUpdate){}
 	    virtual void RefreshCurrentWindow(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle){}
 		virtual void RemoveExternalWindowsPointer(){}
 public:

@@ -90,7 +90,7 @@ protected:
 protected:
 		virtual void CreateResultViewer(const wxString& p_sViewerType);
 public:
-		virtual void RefreshWindow()=0;
+		virtual void RefreshWindow(const bool& p_bUpdate=false)=0;
 		virtual void RefreshCurrentWindow(int p_nCurveIndex, wxString p_nColor, int p_nLineWidth, int p_nLineStyle)=0;
 		virtual void RemoveExternalWindowsPointer()=0;
 		virtual wxScrollBar* GetScrollBar() { return m_pscrollBar; }
