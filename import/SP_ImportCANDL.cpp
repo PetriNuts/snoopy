@@ -1059,6 +1059,7 @@ for (auto& constant : p_Constants)
 		}
 		*/
 		if (constant->type_ == dssd::andl::ConstType::DOUBLE_T || constant->type_ == dssd::andl::ConstType::INT_T
+				|| constant->type_ == dssd::andl::ConstType::BOOL_T
 			&& (m_eNetType == dssd::andl::NetType::COL_SPN_T
 				|| m_eNetType == dssd::andl::NetType::COL_CPN_T
 				|| m_eNetType == dssd::andl::NetType::COL_HPN_T
@@ -1075,6 +1076,10 @@ for (auto& constant : p_Constants)
 			if (constant->type_ == dssd::andl::ConstType::DOUBLE_T)
 			{
 				bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
+			}
+			else if (constant->type_ == dssd::andl::ConstType::BOOL_T)
+			{
+				bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(wxT("bool"));
 			}
 			else {
 				bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(wxT("int"));
@@ -1527,6 +1532,11 @@ bool SP_ImportCANDL::CreateColorsets(const dssd::andl::Colorsets& p_Colorsets)
 		if(l_bSimple)
 		{
 			unsigned int l_nNewRow = l_pcColListSimple->AppendEmptyRow();
+
+			if (colors.Contains(wxT("true")) || colors.Contains(wxT("false")))
+		    {
+							type = wxT("bool");
+		     }
 
 			l_pcColListSimple->SetCell(l_nNewRow,0,name);
 			l_pcColListSimple->SetCell(l_nNewRow,1,type);
