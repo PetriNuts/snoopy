@@ -245,6 +245,7 @@ SP_WDG_DialogGraphic::OnDlgOk()
 			//(*itG)->SetPen(wxThePenList->FindOrCreatePen(m_pcButtonPen->GetColour(), (*itG)->GetPen()->GetWidth(), (*itG)->GetPen()->GetStyle()));
 			//(*itG)->SetPenColour(m_pcButtonPen->GetColour());
 			if((*itG)->GetGraphicType()==SP_GRAPHIC_METADATA) continue;
+			if (m_scThickness->GetValue()>1)
 			(*itG)->SetThickness(m_scThickness->GetValue());
 		}
 		
