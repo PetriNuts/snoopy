@@ -160,7 +160,7 @@ private:
 
 public:
 	//marking check
-	bool ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map<wxString, vector<SP_CPN_TokenNum> >& p_mColorToMarkingMap,bool p_bMarkingCheck = true);   //used
+	bool ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map<wxString, vector<SP_CPN_TokenNum> >& p_mColorToMarkingMap,bool p_bMarkingCheck = true,const bool& p_bIsfromAnim=false);   //used
 
 	bool CheckPredicateInRateFunction(wxString p_sPredicate, wxString p_sErrorPosition);																//used
 
@@ -174,7 +174,7 @@ public:
 
 private:
 	//marking check
-	bool GetTokenNumber(wxString p_sTokenNumber, SP_CPN_TokenNum &p_uNumber, wxString p_sErrorPosition, wxString p_sPlaceType);						//used
+	bool GetTokenNumber(wxString p_sTokenNumber, SP_CPN_TokenNum &p_uNumber, wxString p_sErrorPosition, wxString p_sPlaceType,bool& p_bIsDouble);						//used
 	bool GetPlaceColorSet(SP_DS_Node* p_pcPlaceNode, SP_CPN_ColorSet &p_cColorSet);																	//used
 	bool ComputeInitialMarkingStep2(wxString p_sColorExpr, vector<wxString> p_vColorVector, SP_CPN_ColorSet* p_pcColorSet, vector<wxString> &p_vParsedColors); //used
 	bool ComputeSinglePredicate(wxString p_sColorExpr, SP_CPN_ColorSet* p_pcColorSet, vector<wxString> &p_vParsedColors,bool p_bIsElemOf=false);							//used

@@ -28,24 +28,6 @@
 #include "sp_ds/extensions/Col_PN/Preprocessing/SP_ColPN_ProcessRateFunction.h"
 #include <wx/busyinfo.h> 
  
-//#include <dssd/functions/parser/function_parse.h>
-//#include <dssd/andl/andl_builder.h>
-//#include <dssd/auxi/logger.h>
-//#include <dssd/colexpr/builder.h>
-//#include <dssd/colexpr/colexpr_parser.h>
-//#include <dssd/colexpr/environment.h>
-//#include <dssd/colexpr/eval.h>
-//#include <dssd/colexpr/modify.h>
-//#include <dssd/extern/alphanum.hpp>
-//#include <dssd/misc/net_evaluation.h>
-//#include <dssd/andl/andl_writer.h>
-//#include <dssd/auxi/timer.h>
-//#include <dssd/candl/candl_writer.h>
-//#include <dssd/misc/net_reader.h>
-//#include <dssd/misc/net_writer.h>
-//#include <dssd/unfolding/gecode_representation.h>
-//#include <dssd/unfolding/idd_representation.h>
-//#include <dssd/unfolding/net_unfolding.icc>
 #include "sp_ds/attributes/SP_DS_TypeAttribute.h"
 #include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_IddUnFoldExpr.h"
 
@@ -973,6 +955,8 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarkingWithoutDssdUtil(SP_DS_Node* p_p
 	//if there is no marking defined
 	if (l_pcColList->GetRowCount() == 0)
 	{
+
+
 		int l_nCount = l_pcColList->GetColCount() / 2;
 		l_ColorVector = l_cColorSet.GetStringValue();
 		SP_CPN_TokenNum l_nNum;
@@ -1000,9 +984,36 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarkingWithoutDssdUtil(SP_DS_Node* p_p
 			m_sErrorPosition = wxT("Error Position: ") + l_sColorExpr + wxT(" | ") + l_sPlaceName;
 
 			SP_CPN_TokenNum l_uTokenNumber;
-			if (!GetTokenNumber(l_sTokenNum, l_uTokenNumber, m_sErrorPosition, l_sPlaceType))
+			bool l_bIsDoubleConstant;
+			if (!GetTokenNumber(l_sTokenNum, l_uTokenNumber, m_sErrorPosition, l_sPlaceType,l_bIsDoubleConstant))
 				return false;
+			if (l_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+			{
+					l_sTokenNum = "";
+					if (l_bIsDoubleConstant)
+					{
+						l_sTokenNum << l_uTokenNumber.m_DoubleMultiplicity;
+					}
+					else
+					{
+						l_sTokenNum << l_uTokenNumber.m_intMultiplicity;
+						l_uTokenNumber.m_DoubleMultiplicity = (double)l_uTokenNumber.m_intMultiplicity;
 
+					}
+				}
+				else {
+					l_sTokenNum = "";
+
+					if (!l_bIsDoubleConstant)
+					{
+					  l_sTokenNum << l_uTokenNumber.m_intMultiplicity;
+					}
+					else
+					{
+						SP_LOGERROR(m_sErrorPosition);
+						return false;
+					}
+				}
 			vector<wxString> l_vParsedColors;
 			if (!ComputeInitialMarkingStep2(l_sColorExpr, l_ColorVector, &l_cColorSet, l_vParsedColors))
 				return false;
@@ -1053,7 +1064,7 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarkingWithoutDssdUtil(SP_DS_Node* p_p
 
 //new functions
 
-bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map<wxString, vector<SP_CPN_TokenNum> >& p_mColorToMarkingMap, bool p_bMarkingCheck )
+bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map<wxString, vector<SP_CPN_TokenNum> >& p_mColorToMarkingMap, bool p_bMarkingCheck,const bool& p_bIsFromAnim )
 {
 	bool l_bIsContainDuplicatedNodes=CheckDuplicateNodes();
 
@@ -1094,10 +1105,15 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 	//if there is no marking defined
 	if (l_pcColList->GetRowCount() == 0)
 	{
-		wxString l_sError = wxT("there is no initial marking: |") + m_sPlaceName;
-		SP_LOGERROR(l_sError);
-		return false;
-		/*
+
+
+
+		if (!p_bIsFromAnim)
+		{
+			wxString l_sError = wxT("there is no initial marking: |") + m_sPlaceName;
+			SP_LOGERROR(l_sError);
+			return false;
+		}
 		int l_nCount = l_pcColList->GetColCount() / 2;
 		l_ColorVector = l_cColorSet.GetStringValue();
 		SP_CPN_TokenNum l_nNum;
@@ -1109,7 +1125,6 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 			p_mColorToMarkingMap[l_ColorVector[i]] = l_nColTokens;
 		}
 		return true;
-		*/
 	}
 	 
 
@@ -1134,16 +1149,35 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 			vector<wxString> l_vParsedColors;
 		 
 			SP_CPN_TokenNum l_uTokenNumber;
-			if (!GetTokenNumber(l_sTokenNum, l_uTokenNumber, m_sErrorPosition, l_sPlaceType))
+			bool l_bIsDoubleConstant;
+			m_sErrorPosition = wxT("Error: initial marking  p| ") + l_sPlaceName;
+			if (!GetTokenNumber(l_sTokenNum, l_uTokenNumber, m_sErrorPosition, l_sPlaceType,l_bIsDoubleConstant))
 				return false;
 			if (l_sPlaceType == SP_DS_CONTINUOUS_PLACE)
 			{
-				l_sTokenNum = "";
-				l_sTokenNum <<l_uTokenNumber.m_DoubleMultiplicity;
+				if (l_bIsDoubleConstant)
+				{
+						l_sTokenNum << l_uTokenNumber.m_DoubleMultiplicity;
+				}
+				else
+				{
+					l_sTokenNum << l_uTokenNumber.m_intMultiplicity;
+					l_uTokenNumber.m_DoubleMultiplicity = (double)l_uTokenNumber.m_intMultiplicity;
+
+				}
 			}
 			else {
 				l_sTokenNum = "";
-				l_sTokenNum << l_uTokenNumber.m_intMultiplicity;
+
+				if (!l_bIsDoubleConstant)
+				{
+						l_sTokenNum << l_uTokenNumber.m_intMultiplicity;
+				}
+				else
+				{
+						SP_LOGERROR(m_sErrorPosition);
+						return false;
+				}
 			}
 			l_sColorExpr = SubstituteConstants(l_sColorExpr);
 			if (l_sColorExpr.IsEmpty())
@@ -1942,20 +1976,20 @@ bool SP_CPN_SyntaxChecking::ComputeOtherCase(wxString p_sColorExpr, wxString p_s
 	return true;
 }
 
-bool SP_CPN_SyntaxChecking::GetTokenNumber(wxString p_sTokenNumber, SP_CPN_TokenNum &p_uNumber, wxString p_sErrorPosition, wxString p_sPlaceType)
+bool SP_CPN_SyntaxChecking::GetTokenNumber(wxString p_sTokenNumber, SP_CPN_TokenNum &p_uNumber, wxString p_sErrorPosition, wxString p_sPlaceType,bool& p_bIsDoubleConst)
 {
 	wxString l_sTokenNumber = p_sTokenNumber;
 	double l_doubleMarking;  //colored continuous Petri nets
 	long    l_longMarking;     //other colored netclasses
-
+	bool l_bIsDouble = false;
 	if (p_sPlaceType == SP_DS_CONTINUOUS_PLACE && l_sTokenNumber.ToDouble(&l_doubleMarking))
 	{
-
+		l_bIsDouble = true;
 	}
 	//for other colored PN
 	else if (p_sPlaceType == SP_DS_DISCRETE_PLACE && l_sTokenNumber.ToLong(&l_longMarking))
 	{
-
+		l_bIsDouble = false;
 	}
 	else
 	{
@@ -1988,9 +2022,13 @@ bool SP_CPN_SyntaxChecking::GetTokenNumber(wxString p_sTokenNumber, SP_CPN_Token
 			{
 				l_nMarking = m_cColorSetClass.GetConstantMap()->find(l_sConstant)->second.m_IntegerValue;
 			    l_longMarking = l_nMarking;
+			    l_bIsDouble = false;
 			}
-			else
+			else if(l_DataType == CPN_DOUBLE)
+			{
 				l_dMarking = m_cColorSetClass.GetConstantMap()->find(l_sConstant)->second.m_DoubleValue;
+				l_bIsDouble = true;
+			}
 
 			if (p_sPlaceType == SP_DS_CONTINUOUS_PLACE)
 			{
@@ -2010,16 +2048,75 @@ bool SP_CPN_SyntaxChecking::GetTokenNumber(wxString p_sTokenNumber, SP_CPN_Token
 		}
 		else
 		{
-			wxString l_sError = wxT(": Constant undefined: ") + l_sConstant + wxT(" | ") + p_sErrorPosition;
-			SP_LOGERROR(l_sError);
-			return false;
+			/////////////////////////////////////////////////////
+			SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+			SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sConstant));
+			if (!l_pcFunction)
+			{
+							return false;
+			}
+
+			SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
+
+			std::set<std::string> l_Vars;
+			l_pcExpanded->getVariables(l_Vars);
+
+			if (!l_Vars.empty())
+			{
+				wxString l_sError = wxT(": Constant undefined: ") + l_sConstant + wxT(" | ") + p_sErrorPosition;
+				SP_LOGERROR(l_sError);
+				return false;
+			 }
+
+			if (l_sConstant.Contains(wxT(".")))//expression having decimal values
+			{
+				double val = 0;
+				val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, val }();
+				if (val >= 0)
+				{
+
+					p_uNumber.m_DoubleMultiplicity = val;
+					p_bIsDoubleConst = true;
+
+					return true;
+				}
+			}
+
+			long val = 0;
+			val = SP_DS_FunctionEvaluatorLong{ l_pcFR, l_pcFunction, val }();
+			if (val >= 0)
+			{
+				p_uNumber.m_intMultiplicity = (int)val;
+				p_bIsDoubleConst = false;
+				l_longMarking = val;
+				return true;
+			}
+			else
+			{
+				wxString l_sError = wxT(": Constant undefined: ") + l_sConstant + wxT(" | ") + p_sErrorPosition;
+				SP_LOGERROR(l_sError);
+				return false;
+			}
+						/////////////////////////////////////////////////////
 		}
 	}
 
-	if (p_sPlaceType == SP_DS_CONTINUOUS_PLACE)
+	if(!l_bIsDouble )
+	{
+		long value;
+
+		if (l_sTokenNumber.ToLong(&value))
+		{
+			l_bIsDouble = false; l_longMarking = value;
+		}
+	}
+
+	if (p_sPlaceType == SP_DS_CONTINUOUS_PLACE && l_bIsDouble)
 		p_uNumber.m_DoubleMultiplicity = l_doubleMarking;
 	else
 		p_uNumber.m_intMultiplicity = (int)l_longMarking;
+
+	p_bIsDoubleConst = l_bIsDouble;
 
 	return true;
 }
@@ -2297,8 +2394,15 @@ bool SP_CPN_SyntaxChecking::ComputeRandomMarking(wxString p_sColorSetName, vecto
 			m_sErrorPosition = wxT("Error Position: ") + l_sColorExpr + wxT(" | Random marking.");
 
 			SP_CPN_TokenNum l_uTokenNumber;
-			if (!GetTokenNumber(l_sTokenNum, l_uTokenNumber, m_sErrorPosition, wxT("Place"))) // only allowed for stochastic net
+			bool l_bISDoubleConst;
+			if (!GetTokenNumber(l_sTokenNum, l_uTokenNumber, m_sErrorPosition, wxT("Place"),l_bISDoubleConst)) // only allowed for stochastic net
 				return false;
+
+			if (l_bISDoubleConst)//11.20.20
+			{
+					SP_LOGERROR_(m_sErrorPosition);
+					return false;
+			}
 
 			vector<wxString> l_vParsedColors;
 			if (!ComputeInitialMarkingStep2(l_sColorExpr, l_ColorVector, l_pcColorSet, l_vParsedColors))
