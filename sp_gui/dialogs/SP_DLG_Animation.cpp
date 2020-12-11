@@ -30,6 +30,8 @@
 #include "bitmaps/anim_step_bwd.xpm"
 #include "bitmaps/anim_step_fwd.xpm"
 //#include "bitmaps/anim_step.xpm"
+
+
 #endif
 
 
@@ -177,6 +179,14 @@ SP_DLG_Animation::OnOptions(wxCommandEvent& p_cEvent)
 
         l_pcDlg->ShowModal();
         l_pcDlg->Destroy();
+
+        //by george
+        //required to notify all animator, that this animator is the  last one, whose option changed
+        SP_MDI_Doc* l_pcMyDoc = SP_Core::Instance()->GetRootDocument();
+        CHECK_POINTER(l_pcMyDoc, return);
+        SP_DS_Graph* l_pcMyGraph = l_pcMyDoc->GetGraph();
+        SP_Core::Instance()->ActivateAnimBAsedOnOptionSet(l_pcMyGraph, m_pcAnimation->GetRefreshFrequ(), m_pcAnimation->GetStepDuration());
+
     }
 }
 
