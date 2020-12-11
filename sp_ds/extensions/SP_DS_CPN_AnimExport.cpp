@@ -44,12 +44,36 @@ ExportCPN::ExportCPN(const wxString &title, SP_DS_CPN_Animation *temp/*, SP_DS_C
 	m_choices[0] = wxT("Markings");
 	m_choices[1] = wxT("Step sequences");
 
+
 	m_pc_Filename = new wxStaticText(m_pc_Panel, wxID_ANY, wxT("File Name"));
 	m_pc_HBox1->Add(m_pc_Filename, 0, wxRIGHT, 30);
 
-	wxString l_file_path(wxGetCwd() + wxT("/export"));
+	wxString l_sExportFilename;
+	if (SP_Core::Instance()->GetRootDocument()->GetGraph())
+	{
+		l_sExportFilename = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->GetFilename().BeforeLast('.');
 
-	m_pc_Browse = new wxFilePickerCtrl(m_pc_Panel, wxID_BROWSE_FILE, l_file_path, wxT(""), wxT("*.*"),
+		if (l_sExportFilename.IsEmpty())
+		{
+			l_sExportFilename = wxT("unnamed");
+		}
+
+		wxString l_sTimeDate(wxDateTime::Now().Format(wxT("%Y-%m-%dT%H-%M-%S%Z")));
+
+		l_sExportFilename << wxT("-")
+			<< l_sTimeDate;
+
+		l_sExportFilename.Replace(wxT("."), wxT("-"));
+
+		l_sExportFilename.Replace(wxT(" "), wxT(""));
+	}
+	wxString l_file_path;
+	if (l_sExportFilename != wxT(""))
+		l_file_path = (wxGetCwd() + wxT("/") + l_sExportFilename);
+	else
+		l_file_path = (wxGetCwd() + wxT("/export"));
+
+	m_pc_Browse = new wxFilePickerCtrl(m_pc_Panel, wxID_BROWSE_FILE, l_sExportFilename, wxT(""), wxT("*.*"),
 		wxDefaultPosition, wxDefaultSize, wxFLP_USE_TEXTCTRL | wxFLP_SAVE | wxFLP_OVERWRITE_PROMPT);
 	m_pc_HBox1->Add(m_pc_Browse, 0, wxRIGHT, 30);
 
