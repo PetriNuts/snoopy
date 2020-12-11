@@ -85,6 +85,8 @@ protected:
 	map<wxString, SP_MapString2String >* m_msParameterSets;
 	map<double, SP_MapString2String >* m_mnResultsMap;
 
+	bool m_bIsActiveAnimator;//by george
+
 public:
     SP_DS_Animation(unsigned int p_nRefresh, unsigned int p_nDuration);
     virtual ~SP_DS_Animation();
@@ -111,6 +113,8 @@ public:
     inline void SetRefreshFrequ(unsigned int p_nVal) { m_nRefreshFrequ = p_nVal; }
     inline unsigned int GetStepDuration() const { return m_nStepDuration; }
     inline void SetStepDuration(unsigned int p_nVal) { m_nStepDuration = p_nVal; }
+    inline void SetActiveAnim(const bool& p_bActive) { m_bIsActiveAnimator = p_bActive; }//george
+    inline bool  IsActiveAnimator()  { return m_bIsActiveAnimator; }//george
 
 	inline void SetDirection(SP_DIRECTION_T p_nDir) { m_nDir = p_nDir; }
 	inline SP_DIRECTION_T GetDirection() { return m_nDir; }

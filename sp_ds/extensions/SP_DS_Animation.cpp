@@ -37,6 +37,7 @@ SP_DS_Animation::SP_DS_Animation(unsigned int p_nRefresh, unsigned int p_nDurati
 	m_msParameterSets(0),
 	m_mnResultsMap(0)
 {
+	m_bIsActiveAnimator = false;
     ConnectEvent();
 }
 

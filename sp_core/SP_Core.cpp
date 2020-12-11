@@ -800,6 +800,47 @@ SP_Core::RegisterAnimation(const wxString& p_sKey, SP_DS_Animation* p_pcAnimatio
     return TRUE;
 }
 
+/*Get the option values: refresh rate and duration of the last activated animator, by george*/
+wxString SP_Core::GetActivatedRefreshDurationanim()
+{
+	wxString l_sOptions=wxT("");
+	SP_MapString2Animation::iterator l_itAnim = m_mAnimations.begin();
+	while (l_itAnim != m_mAnimations.end())
+	{
+		if (l_itAnim->second->IsActiveAnimator())
+		{
+			l_sOptions << l_itAnim->second->GetRefreshFrequ() << wxT("|") << l_itAnim->second->GetStepDuration();
+			break;
+		}
+
+		++l_itAnim;
+	}
+	return l_sOptions;
+}
+
+/*assign the active animator options e.g., refresh rate and duration, by george*/
+void SP_Core::ActivateAnimBAsedOnOptionSet(SP_DS_Graph* p_pcGraph, const int& p_nRef, const int&p_nDur)
+{
+	if (!p_pcGraph || !p_pcGraph->GetNetclass())
+		return ;
+	SP_MapString2Animation::iterator l_itAnim = m_mAnimations.begin();
+	while (l_itAnim != m_mAnimations.end())
+	{
+		if (l_itAnim->first != p_pcGraph->GetNetclass()->GetName())
+		{
+
+			l_itAnim->second->SetActiveAnim(false);
+		}
+		else
+		{
+			l_itAnim->second->SetActiveAnim(true);
+			l_itAnim->second->SetRefreshFrequ(p_nRef);
+			l_itAnim->second->SetStepDuration(p_nDur);
+		}
+		++l_itAnim;
+	}
+}
+
 SP_DS_Animation*
 SP_Core::GetAnimation(SP_DS_Graph* p_pcGraph)
 {
