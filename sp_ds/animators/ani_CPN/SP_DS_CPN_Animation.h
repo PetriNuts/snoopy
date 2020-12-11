@@ -69,6 +69,7 @@ private:
 
 	wxString m_ExportFilename;// by george
 	bool m_bExport; // by george
+	bool m_bExportFlag;
 	bool m_bExportComplete;// by george
 	long m_nStart; //Marking start
 	long m_nEvery; //Marking step
@@ -81,11 +82,13 @@ private:
 	//For import feature
 	bool m_bImport;
 	bool m_bInvalid;
+	bool m_bImportFlag;
 	wxString m_ImportFilename;
 	unsigned int m_nLineCount;
 	wxTextFile m_ImportTextfile;
 	int m_ncoloringChoiceValue;
-
+	wxBitmap m_bitmapicons[3];
+	wxBitmapButton *m_buRecord, *m_buReplay;
 private:
 	void UpdateChoices();//by george
 	void LoadSets();//by george
@@ -93,6 +96,10 @@ private:
 	void OnColConstantSetsChanged(wxCommandEvent& p_cEvent);//george
 	void UpdateColMarking();//by george
 	void LoadDefaultConstantsGroups();//by george
+	void OnRecord(wxCommandEvent &p_pcEvent);//george
+	void OnReplay(wxCommandEvent& p_cEvent);//george
+	void ResetRecordButton();//george
+	void ResetReplayButton();//george
 protected:
 	bool PreStep();
 	bool Step();

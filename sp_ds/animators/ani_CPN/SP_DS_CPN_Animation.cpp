@@ -27,6 +27,13 @@
 
 #include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_CPN_SyntaxChecking.h"
 
+
+#ifndef __WXMSW__
+#include "bitmaps/play_export_icon.xpm"
+#include "bitmaps/pause_export_icon.xpm"
+#include "bitmaps/recording_export_icon.xpm"
+#endif
+
 enum
 {
 	SP_ID_PEDRESET = SP_ID_LAST_ID + 1,
@@ -39,7 +46,9 @@ enum
 	SP_ID_STATIC_TEXT_OUTPUT_LABEL,//by george
 	SP_ID_DESTROY_ANIM,
 	SP_ID_PEDEXPORT,//by george 10.2020
-	SP_ID_PEDIMPORT//by george  10.2020
+	SP_ID_PEDIMPORT,//by george  10.2020
+	SP_ID_RADIO_BUTTON_RECORD,
+	SP_ID_RADIO_BUTTON_REPLAY
 };
 
 BEGIN_EVENT_TABLE(SP_DS_CPN_Animation, SP_DS_Animation)
@@ -52,6 +61,10 @@ EVT_UPDATE_UI(SP_ID_PEDIMPORT, SP_DS_CPN_Animation::OnUpdateUI)//george on 10.20
 EVT_UPDATE_UI(SP_ID_PEDEXPORT, SP_DS_CPN_Animation::OnUpdateUI)//george on 10.2020
 EVT_BUTTON(SP_ID_PEDEXPORT, SP_DS_CPN_Animation::OnExport)//george on 10.2020
 EVT_BUTTON(SP_ID_PEDIMPORT, SP_DS_CPN_Animation::OnImport)//george on 10.2020
+EVT_UPDATE_UI(SP_ID_RADIO_BUTTON_RECORD, SP_DS_CPN_Animation::OnUpdateUI)//george on 10.2020
+EVT_UPDATE_UI(SP_ID_RADIO_BUTTON_REPLAY, SP_DS_CPN_Animation::OnUpdateUI)//george on 10.2020
+EVT_BUTTON(SP_ID_RADIO_BUTTON_RECORD, SP_DS_CPN_Animation::OnRecord)//george on 10.2020
+EVT_BUTTON(SP_ID_RADIO_BUTTON_REPLAY, SP_DS_CPN_Animation::OnReplay)//george on 10.2020
 END_EVENT_TABLE()
 
 SP_DS_CPN_Animation::SP_DS_CPN_Animation(unsigned int p_nRefresh, unsigned int p_nDuration, SP_ANIM_STEP_T p_eStepping):
@@ -77,6 +90,9 @@ SP_DS_CPN_Animation::SP_DS_CPN_Animation(unsigned int p_nRefresh, unsigned int p
 	m_bImport=false;
     m_bInvalid = false;
     m_ncoloringChoiceValue = 0;
+    m_bExport=false;
+    m_bExportFlag=false;
+    m_bImportFlag=false;
 	}
 
  
@@ -158,7 +174,7 @@ SP_DS_CPN_Animation::~SP_DS_CPN_Animation()
 				//re-computation of the initial marking after updating the constants values
 				l_sMainMarking = wxT("");
 				map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
-				if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false))
+				if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false,true))
 					return;
 				map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
 				wxString l_sNodeClass = l_vPlaceNodes[l_nPos]->GetNodeclass()->GetName();
@@ -246,7 +262,7 @@ void SP_DS_CPN_Animation::UpdateMarkingPlaces()
 		wxString l_sMainMarking;
 		l_sMainMarking = wxT("");
 		map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
-		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodesinPed[l_nPos], l_mColorToMarkingMap, false))
+		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodesinPed[l_nPos], l_mColorToMarkingMap, false,true))
 			continue;
 		map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
 
@@ -284,7 +300,25 @@ void SP_DS_CPN_Animation::UpdateMarkingPlaces()
 SP_DS_Animation*
 SP_DS_CPN_Animation::Clone()
 {
-	return dynamic_cast<SP_DS_Animation*>(new SP_DS_CPN_Animation(m_nRefreshFrequ, m_nStepDuration, SP_ANIM_STEP_T(m_nStepState)));
+	wxString l_sOptions = SP_Core::Instance()->GetActivatedRefreshDurationanim();
+		if (l_sOptions != wxT(""))
+		{//by george to recall the refresh rate and duration values
+			long l_nRefres, l_nDuration;
+			wxString l_sRef = l_sOptions.BeforeFirst(wxChar('|'));
+			wxString l_sDuration = l_sOptions.AfterFirst(wxChar('|'));
+			if (!l_sRef.ToLong(&l_nRefres))
+			{
+				l_nRefres = m_nRefreshFrequ;
+			}
+			if (!l_sDuration.ToLong(&l_nDuration))
+			{
+				l_nDuration = m_nStepDuration;
+			}
+
+			return dynamic_cast<SP_DS_Animation*>(new SP_DS_CPN_Animation(l_nRefres, l_nDuration, SP_ANIM_STEP_T(m_nStepState)));
+		}
+
+		return dynamic_cast<SP_DS_Animation*>(new SP_DS_CPN_Animation(m_nRefreshFrequ, m_nStepDuration, SP_ANIM_STEP_T(m_nStepState)));
 }
 
 bool
@@ -335,11 +369,11 @@ SP_DS_CPN_Animation::PreStep()
 	unsigned int l_nSteps = m_nSteps / 2;
 
 
-	if (m_bExport == true)
+	if (m_bExport == true && m_bExportFlag)
 		ExportMarkings();
 
 	m_lPossibleTransAnimators.clear();
-	if (m_bImport == false)
+	if (!m_bImportFlag)
 	{
 
 	//selecting transitions (candidates) to fire ...
@@ -378,23 +412,40 @@ SP_DS_CPN_Animation::PreStep()
 
 	}
 
-	else if (m_bImport == true)//by george
+	else if (m_bImportFlag)//by george
 		if(!ImportStepSequences())
 			{
-				SP_MESSAGEBOX(wxT("No more entries in the file"), wxT("Notification"), wxOK | wxICON_INFORMATION);
-				if (!m_cFiredTransitions.empty()) {
-					SP_DS_Graph *graph = m_cFiredTransitions.front()->GetClassObject()->GetParentGraph();
-					if (wxGetApp().GetIAManager() && wxGetApp().GetIAManager()->IAModeEnabled(graph)) {
-						if (GetDirection() == FORWARD) {
-							wxGetApp().GetIAManager()->SubmitEvent(new SP_IA_Event(&m_cFiredTransitions, SP_IA_EVT_PEDANIMPRESTEP_FWD));
-						}
-					}
-				}
-				if (m_pcDialog) {
-					m_pcDialog->ResetPlayButtons();
-				}
-				return false;
+			//SP_MESSAGEBOX(wxT("No more entries in the file"), wxT("Notification"), wxOK | wxICON_INFORMATION);
+					ResetReplayButton();
+					int choose = SP_MESSAGEBOX(wxT("No more entries in the file. Close the imported file?"), wxT("Notification"), wxOK | wxNO | wxICON_INFORMATION);
+					if (choose == 2)
+					{
+						m_bImport = false;
 
+						// m_pcRadioBox->Enable(1, false);
+					}
+					m_bImportFlag = false;
+
+					m_bRunning = true;
+					if (m_pcDialog)
+					{
+						m_pcDialog->ResetPlayButtons();
+						//m_pcDialog->EnablePlayButton();
+
+						m_bOneShot = false;
+						SetDirection(FORWARD);
+						m_bRunning = true;
+						wxNotifyEvent();
+						wxSleep(1);
+						m_pcDialog->EnableBackStepping(true);
+
+						m_bRunning = false;
+						wxNotifyEvent();
+
+					}
+
+
+					return false;
 			}
 
 	//running the usual tests and preparing everything
@@ -537,7 +588,7 @@ SP_DS_CPN_Animation::PreStep()
 	} else {
 	}
 
-	if (m_bExport == true)
+	if (m_bExport == true && m_bExportFlag)
 			ExportStepSequences();
 
 	if (GetDirection() == BACKWARD)
@@ -813,6 +864,36 @@ SP_DS_CPN_Animation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSizer
 		m_pcExportImportSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDIMPORT, wxT("Import")), 1, wxALL | wxEXPAND, 5);
 		p_pcSizer->Add(m_pcExportImportSizer, 0, wxALL, 5);
 		//------------------------------------------
+#if defined(__WXMSW__)
+	m_bitmapicons[0] = wxBitmap(wxT("BITMAP_ANIM_RECORD_TRACE"), wxBITMAP_TYPE_BMP_RESOURCE);
+	m_bitmapicons[1] = wxBitmap(wxT("BITMAP_ANIM_PAUSE_RECORD"), wxBITMAP_TYPE_BMP_RESOURCE);
+	m_bitmapicons[2] = wxBitmap(wxT("BITMAP_ANIM_REPLAY_TRACE"), wxBITMAP_TYPE_BMP_RESOURCE);
+#else // !WIN
+m_bitmapicons[0] = wxBitmap(recording_icon);
+m_bitmapicons[1] = wxBitmap(pause_icon);
+m_bitmapicons[2] = wxBitmap(play_icon);
+#endif // !WIN
+
+			m_buRecord = new wxBitmapButton(p_pcCtrl, SP_ID_RADIO_BUTTON_RECORD,
+				m_bitmapicons[0], wxDefaultPosition, wxDefaultSize);
+			m_buRecord->SetToolTip(wxT("Record the trace to an external file"));
+			m_buRecord->Enable(true);
+			m_buReplay = new wxBitmapButton(p_pcCtrl, SP_ID_RADIO_BUTTON_REPLAY,
+				m_bitmapicons[2], wxDefaultPosition, wxDefaultSize);
+			m_buReplay->SetToolTip(wxT("Replay the animation from an external trace file"));
+			m_buReplay->Enable(true);
+			wxArrayString l_aChoices; //= new wxArrayString;
+			l_aChoices.Add("Record");
+			l_aChoices.Add("Replay");
+
+
+			wxSizer* 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+
+			l_pcRowSizer->Add(m_buRecord, wxSizerFlags(0).Border(wxALL, 10));
+			l_pcRowSizer->Add(m_buReplay, wxSizerFlags(0).Border(wxALL, 10));
+			p_pcSizer->Add(l_pcRowSizer);
+
+
 		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
 		wxString l_tmp;
 		l_tmp << m_nStepCount;
@@ -833,7 +914,7 @@ SP_DS_CPN_Animation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSizer
 
 
 		/*****************george*********************/
-		wxSizer* l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+	    l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 		wxSizer* l_pcSetsSizer = new wxBoxSizer(wxVERTICAL);
 		wxSizer* l_pcOutputLabelSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -893,10 +974,9 @@ SP_DS_CPN_Animation::OnReset()
 	//by george
 	m_nStepCount = 0;
 	m_nLineCount =1;//read from file switch to the begining of the file
-	if (m_bExport)
-	{
+
 	ResetTransSequenceFile();//reset exported trans seq file
-	}
+
 	SetStepCounter();
 	Refresh();
 }
@@ -927,10 +1007,41 @@ SP_DS_CPN_Animation::OnUpdateUI(wxUpdateUIEvent& p_cEvent)
 	{
 		p_cEvent.Enable(!m_bRunning && !m_cbKeep->IsChecked());
 	}
-	else
+	else if(p_cEvent.GetId() != SP_ID_RADIO_BUTTON_RECORD && p_cEvent.GetId() != SP_ID_RADIO_BUTTON_REPLAY)
 	{
 		p_cEvent.Enable(!m_bRunning);
 	}
+
+	switch (p_cEvent.GetId())
+		{
+		case SP_ID_RADIO_BUTTON_RECORD:
+
+			if (m_bExport == false)
+			{
+				p_cEvent.Enable(false);
+			}
+			else
+			{
+				if (m_bExport)
+				{
+					p_cEvent.Enable(true);
+				}
+
+
+			}
+			break;
+		case SP_ID_RADIO_BUTTON_REPLAY:
+			if (m_bImport == false)
+			{
+				p_cEvent.Enable(false);
+			}
+			else
+			{
+				p_cEvent.Enable(true);
+			}
+			break;
+		}
+
 
 	int l_nColoringGroup = 0;
 	bool l_bFound=false;
@@ -1146,7 +1257,7 @@ void SP_DS_CPN_Animation::UpdateColMarking()
 		////////////////////////////////////////////////////////
 		wxString l_sMainMarking = wxT("");
 		map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
-		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false))
+		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false,true))
 			return;
 		map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
 
@@ -1224,6 +1335,7 @@ void SP_DS_CPN_Animation::ExportDetailsCPN(ExportCPN *export_frame)
 
 	m_ExportFilename = export_frame->m_pc_Browse->GetPath();
 	m_bExport = true;
+	m_bExportFlag=false;
 	m_bExportComplete = false;
 
 	bool l_bError = 0;
@@ -1350,6 +1462,13 @@ void SP_DS_CPN_Animation::ExportDetailsCPN(ExportCPN *export_frame)
 		m_ExportTextfile.Write();
 		m_ExportTextfile.Close();
 
+	}
+
+	if (m_bExport && !l_bError)
+	{
+		m_bImport = false;
+		m_bImportFlag = false;
+		m_ImportFilename = wxT("");
 	}
 }
 
@@ -1562,6 +1681,7 @@ void SP_DS_CPN_Animation::ImportDetails(ImportColAnim *import_frame)
 	m_bImport = true;
 	m_bInvalid = false;
 	m_nLineCount = 1;
+	m_nStepCount  = 0;
 	m_ImportFilename = import_frame->m_pc_Browse->GetPath();
 
 	//It is important to get the last token to check the file format
@@ -1748,11 +1868,21 @@ void SP_DS_CPN_Animation::ImportDetails(ImportColAnim *import_frame)
 			if (m_bInvalid == true)
 			{
 				m_bImport = false; //No import is possible because the file is invalid
+				m_bImportFlag=false;
 				SP_MESSAGEBOX(wxT("Import file does not match with the given petri net."), wxT("Error"), wxOK | wxICON_ERROR);
 			}
 			else
 			{
 				SP_LOGMESSAGE(wxT("Import file '") + m_ImportFilename + wxT("' successfully."));
+
+				if (m_bExport)
+				{
+					m_bExport = false;
+					m_bExportFlag = false;
+					ResetRecordButton();
+					m_ExportFilename = wxT("");
+				}
+
 			}
 		}
 	}
@@ -1862,10 +1992,16 @@ void SP_DS_CPN_Animation::ResetTransSequenceFile()
 	int l_nCounter = 0;
 	bool l_bIsReset = false;
 
-	if(m_ExportFilename==wxT("")){return;}
+
+	if(m_ExportFilename==wxT("")|| !m_bExport){return;}
 
 	if (m_ExportTextfile.Open(m_ExportFilename))
 	{
+		int choose = SP_MESSAGEBOX(wxT("The recorded file will be Overwritten, Do you want to overwitten?"), wxT("Overwrite"), wxOK | wxNO | wxICON_INFORMATION);
+		if (choose == 8)
+		{
+					return;
+		}
 		while (l_nCounter <= m_ExportTextfile.GetLineCount() && m_ExportTextfile.GetLineCount()!=1)
 		{
 
@@ -1888,4 +2024,61 @@ void SP_DS_CPN_Animation::ResetTransSequenceFile()
 	if(l_bIsReset)
 	m_ExportTextfile.Close();
 }
+
+void SP_DS_CPN_Animation::ResetRecordButton()
+{
+	m_buRecord->SetBitmapLabel(m_bitmapicons[0]);
+	m_buRecord->Refresh();
+	m_bExportFlag = false;
+}
+
+void SP_DS_CPN_Animation::ResetReplayButton()
+{
+	m_buReplay->SetBitmapLabel(m_bitmapicons[2]);
+	m_buReplay->Refresh();
+	m_bImportFlag = false;
+}
+
+void SP_DS_CPN_Animation::OnReplay(wxCommandEvent& p_cEvent)
+{
+	if (m_bImport)
+	{
+		m_bImportFlag = !m_bImportFlag;
+		if (m_bImportFlag)
+		{
+			m_buReplay->SetBitmapLabel(m_bitmapicons[1]);
+			m_buReplay->SetToolTip(wxT("Pause Animation from the external file"));
+			m_buReplay->Refresh();
+		}
+		else
+		{
+			m_buReplay->SetBitmapLabel(m_bitmapicons[2]);
+			m_buReplay->SetToolTip(wxT("Replay Animation from the external file"));
+			m_buReplay->Refresh();
+		}
+	}
+}
+
+
+void SP_DS_CPN_Animation::OnRecord(wxCommandEvent &p_pc_Event)
+{
+	if (m_bExport)
+	{
+		m_bExportFlag = !m_bExportFlag;
+		if (m_bExportFlag)
+		{
+			m_buRecord->SetBitmapLabel(m_bitmapicons[1]);
+			m_buRecord->SetToolTip(wxT("Pause trace recording"));
+			m_buRecord->Refresh();
+		}
+		else
+		{
+			m_buRecord->SetBitmapLabel(m_bitmapicons[0]);
+			m_buRecord->SetToolTip(wxT("Start trace recording"));
+			m_buRecord->Refresh();
+		}
+	}
+}
+
+
 
