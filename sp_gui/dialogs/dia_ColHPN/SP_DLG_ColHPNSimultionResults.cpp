@@ -1817,6 +1817,7 @@ void SP_DLG_ColHPNSimultionResults::OnConstantsSetsChanged(wxCommandEvent& p_cEv
 				SP_MESSAGEBOX(wxT("Unfolding error"), wxT("Unfolding checking"), wxOK | wxICON_ERROR);
 				return;
 			}
+			RefreshExternalWindows(true);
 		}
 }
 

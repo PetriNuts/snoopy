@@ -402,6 +402,7 @@ void SP_DLG_ColCPNSimulationResults::OnConstantsSetChanged(wxCommandEvent& p_cEv
 				SP_MESSAGEBOX(wxT("Unfolding error"), wxT("Unfolding checking"), wxOK | wxICON_ERROR);
 				return;
 			}
+			RefreshExternalWindows(true);
 		}
 
 
