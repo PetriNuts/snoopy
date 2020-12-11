@@ -4,6 +4,8 @@
 // $Version: 0.0 $
 // $Revision: 1.30 $
 // $Date: 2003/09/12 11:55:00 $
+// $Modified: George Assaf$
+// $Date:Oct/2020$
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 #ifndef __SP_DS_PEDANIMATION_H__
@@ -56,6 +58,10 @@ private:
 	list<list<SP_DS_TransAnimator*> > m_llHistoryTransAnimators;
 
 	SP_DLG_Animation *m_pcDialog;
+	wxBitmap m_bitmapicons[3];
+	wxBitmapButton *m_buRecord, *m_buReplay;
+	bool m_bExportFlag;
+	bool m_bImportFlag;
 
 	//bysl
 	vector<wxChoice*> m_apcChoices;
@@ -130,6 +136,10 @@ public:
 	void ImportDetails(Import *);
 	bool ImportStepSequences();
 	void ResetTransSequenceFile();
+	void OnRecord(wxCommandEvent& p_cEvent);
+	void OnReplay(wxCommandEvent& p_cEvent);
+	void ResetRecordButton();
+	void ResetReplayButton();
 
 };
 
