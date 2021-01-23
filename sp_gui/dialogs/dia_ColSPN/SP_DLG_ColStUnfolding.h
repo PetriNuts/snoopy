@@ -29,11 +29,11 @@ private:
     wxBoxSizer* m_pcSizer;
 
 
-	wxRadioButton* m_pcUnfoldRadioBut;
-	wxRadioButton* m_pcLoadRadioBut;
-	wxFilePickerCtrl* m_pcLoadFilePickerCtrl;
-	wxFilePickerCtrl* m_pcSaveFilePickerCtrl;
-	wxCheckBox* m_pcWriteCheckBox;
+	//wxRadioButton* m_pcUnfoldRadioBut;
+	//wxRadioButton* m_pcLoadRadioBut;
+	//wxFilePickerCtrl* m_pcLoadFilePickerCtrl;
+	//wxFilePickerCtrl* m_pcSaveFilePickerCtrl;
+	//wxCheckBox* m_pcWriteCheckBox;
 	wxRadioBox* m_pcUnfolderRadioBox;
 	//wxCheckBox* m_pcCSPCheckBox;
 	wxButton* m_pcStartButton;
@@ -47,7 +47,13 @@ private:
 	SP_DS_ColPN_Unfolding* m_pcColPN_Unfolding;
 	std::set<wxString> m_SetChoices;//by george
 	std::vector<wxChoice*> m_apcComboBoxes;
+	wxChoice* m_pcFunctionSetComboBox;
+	wxChoice* m_pcFunctionStochSetComboBox;
+	wxChoice* m_pcMarkingSetComboBox;
 	vector<SP_DS_ColListAttribute*> m_apcColListAttr;
+	SP_DS_ColListAttribute* m_apcColListAttrMarking;
+	SP_DS_ColListAttribute* m_apcColListAttrFunctions;
+	SP_DS_ColListAttribute* m_apcColListAttrFunctionsStoch;
   public:
 	
 
@@ -59,14 +65,25 @@ private:
     void OnDlgCancel( wxCommandEvent& p_cEvent );
 	void OnPause( wxCommandEvent& p_cEvent );	
 
-	void OnUnfoldRadioButton( wxCommandEvent& p_cEvent );
-	void OnUnLoadRadioButton( wxCommandEvent& p_cEvent );
+	//void OnUnfoldRadioButton( wxCommandEvent& p_cEvent );
+	//void OnUnLoadRadioButton( wxCommandEvent& p_cEvent );
 	
-	void  LoadColringGroupChoices();
+
 	void OnColoringSetChanged(wxCommandEvent& p_cEvent);
 	void OnModyfyingConstants(wxCommandEvent& p_cEvent);
 	void OnClose(wxCloseEvent& event);
 
+	bool  IsExistColoringGroup();
+	void  LoadColringGroupChoices();
+	void  LoadOtherSets();
+
+
+	void OnModyfyingMarkingGroup(wxCommandEvent& p_cEvent);
+	void OnModyfyingFunStochGroup(wxCommandEvent& p_cEvent);
+	void OnModyfyingFunContSetGroup(wxCommandEvent& p_cEvent);
+	void OnMarkingsetChanged(wxCommandEvent& p_cEvent);
+	void OnFunctionChanged(wxCommandEvent& p_cEvent);
+	void OnFunctionStochChanged(wxCommandEvent& p_cEvent);
 
 	void SetUnfoldingStopWatch(long p_nTime) 
 	{ 

@@ -4,6 +4,8 @@
 // $Version: 0.0 $
 // $Revision: 1.30 $
 // $Date: 2009/03/30 11:55:00 $
+// $Modified: by George Assaf$
+// $Modification date: 2020/12/11$
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 #ifndef __SP_DLG_EXPORTPROPERTIES__
@@ -72,6 +74,9 @@ public:
 
     /*const wxString& m_sFilename; */
     wxString GetCurrentFileName() { return  m_pcFilePickerCtrl->GetPath(); }
+
+    std::map<wxString, std::set<wxString>>  GetGroup2ValueSets();
+
 
 };
 

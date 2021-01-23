@@ -4,6 +4,8 @@
  * $Version: 0.0 $
  * $Revision: 0.0 $
  * $Date: 12.8.2010
+ * $Modified: George Assaf$
+ * $Modification date:20.11.2020$
  * Short Description:
  */
  //==============================================================================
@@ -12,6 +14,8 @@
 #define SP_EXPORTCONTODE2TEXT_H_
 
 #include "export/SP_ExportPT.h"
+#include "sp_ds/attributes/SP_DS_DoubleMarkingAttribute.h"
+#include "spsim/spsim.h"
 
 /*
  * Export the continuous Petri Net's ODE to a text file
@@ -37,6 +41,23 @@ class SP_ExportContODE2Text : public SP_ExportPT
 
 	        SP_ExportContODE2Text();
 		    virtual ~SP_ExportContODE2Text();
+
+//george
+private:
+      spsim::Simulator* m_pcMainSimulator;
+	  SP_VectorString m_asPlaceNames;
+	  SP_MapString2Long m_mPlaceName2Position;
+	  SP_VectorString m_asTransitionNames;
+	  SP_MapString2Long m_mTransitionName2Position;
+	  SP_MapString2Double m_msParameterName2Value;
+private:
+      void LoadContPlaces();
+	  void LoadConTrans();
+	  void LoadConnections();
+	  void LoadConnectionOfType(const wxString& p_sArcType, const spsim::ConnectionType& p_ArcType);
+	  bool IsEvaluatedArcWeight(const wxString& p_sArcWeight, double& p_dVal);
+	  void LoadParams();
+	  bool InitialiseContSim();
 
 };
 

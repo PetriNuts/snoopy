@@ -4,6 +4,8 @@
 // $Version: 0.0 $
 // $Revision: 1.30 $
 // $Date: 2009/03/30 11:55:00 $
+// $Modified: George Assaf$
+// $Date: 01.12.2020$
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 #include "export/SP_ExportRoutine.h"
@@ -57,6 +59,8 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 			wxDefaultPosition, wxDefaultSize, wxFLP_SAVE | wxFLP_USE_TEXTCTRL);
 	m_pcFilePickerCtrl->SetPath(l_sPath);
 
+	std::map<wxString, std::set<wxString>> l_mGroups2Vsets = GetGroup2ValueSets();
+
 	l_pcRowSizer->Add(m_pcFilePickerCtrl, 1, wxALL | wxEXPAND, 5);
 
 	l_pcNotebookPage->AddControl(l_pcRowSizer, 0, wxALL | wxEXPAND, 5);
@@ -69,193 +73,212 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 	//search for collist attributes
 	for (SP_ListNodeclass::const_iterator itNC = m_pcDoc->GetGraph()->GetNodeclasses()->begin(); itNC != m_pcDoc->GetGraph()->GetNodeclasses()->end(); itNC++)
 	{
-		if(!(*itNC)->GetElements()->empty() && (*itNC)->GetShowInElementTree())
+		if (!(*itNC)->GetElements()->empty() && (*itNC)->GetShowInElementTree())
 		{
-			SP_DS_Node* l_pcProtoNode = (*itNC)->GetPrototype();
-			SP_DS_Node* l_pcNode = (*itNC)->GetElements()->front();
-			SP_ListAttribute::const_iterator itAttr = l_pcNode->GetAttributes()->begin();
-			SP_ListAttribute::const_iterator itProtoAttr = l_pcProtoNode->GetAttributes()->begin();
-			for(;itAttr != l_pcNode->GetAttributes()->end(); itAttr++, itProtoAttr++)
+			if (!l_sNetClassName.Contains(wxT("Colored")) && (*itNC)->GetDisplayName().Contains(wxT("Transition"))
+				&& m_pcExport->GetExtension() != wxT("andl"))
 			{
-				SP_DS_Attribute* l_pcAttr = *itAttr;
-				SP_DS_Attribute* l_pcProtoAttr = *itProtoAttr;
-				if (l_pcAttr->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST)
-				{
-					vector<wxString> l_vSetNames;
-					SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttr);					
-					SP_DS_ColListAttribute* l_pcProtoColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcProtoAttr);
-					
-					if(l_pcProtoColAttr->GetColLabel(1).Find(wxT(":")) != wxNOT_FOUND)
-					{
-						 unsigned i = 1;
-						if (l_pcColAttr->GetName() == wxT("MarkingList"))
-						 {
-						  i = 0;
-						 }
-						 else
-					     {
-						  i = 1;
-						 }
-						for(; i < l_pcColAttr->GetColCount(); i++)
-						{
-							wxString l_sSetName = l_pcColAttr->GetColLabel(i);
+				continue;
+				/*export rate funs from uncolored net to all other net classes should not allow a user to choose a certain v-set to be exported,
+				because all vsets has to be kept in the target net class
+				*/
+			}
 
-							if (l_sSetName == wxT("Color"))
-							{//old snoopy versions sometimes have coloumns without set names
-								if (SP_Find(l_vSetNames, wxT("Main")) == l_vSetNames.end())
+			if (l_sNetClassName.Contains(wxT("Colored")) && ((*itNC)->GetDisplayName().Contains(wxT("Transition")) || (*itNC)->GetDisplayName().Contains(wxT("Place")))
+				&& ((m_pcExport->GetExtension() == wxT("andl") || m_pcExport->GetExtension() == wxT("spn") || m_pcExport->GetExtension() == wxT("cpn")
+					|| m_pcExport->GetExtension() == wxT("hpn") || m_pcExport->GetExtension() == wxT("xpn") || m_pcExport->GetExtension() == wxT("pn"))))
+			{
+				//for exporting to net class requiring unfolding of the coloured model, we give a user to choose the rate funs and marking from unfolding window.
+				continue;
+			}
+
+			if (l_sNetClassName.Contains(wxT("Colored")) && (*itNC)->GetDisplayName().Contains(wxT("Transition"))
+				&& !((m_pcExport->GetExtension() == wxT("andl") || m_pcExport->GetExtension() == wxT("candl")
+					 || m_pcExport->GetExtension() == wxT("spn") || m_pcExport->GetExtension() == wxT("cpn")
+					|| m_pcExport->GetExtension() == wxT("hpn") || m_pcExport->GetExtension() == wxT("xpn") ||
+					m_pcExport->GetExtension() == wxT("pn"))))
+			{
+				continue;
+				/*export rate funs from colored net to all other coloured net classes should not allow a user to choose a certain v-set to be exported,
+				because all vsets has to be kept in the target net class
+				The exception includes, uncoloured nets and candl/andl format as there must be choice for which rate fun we should do unfold
+				*/
+			}
+
+			if (!l_sNetClassName.Contains(wxT("Colored")) && (*itNC)->GetDisplayName().Contains(wxT("Place")))
+			{
+				continue;
+				/*in uncolored nets, there is only one marking set, no choices to choose,
+				so we do not make it occur in the export properties window
+				*/
+			}
+
+			if (l_sNetClassName.Contains(wxT("Colored")) && (*itNC)->GetDisplayName().Contains(wxT("Place"))
+				&& (m_pcExport->GetExtension() == wxT("colspn") || m_pcExport->GetExtension() == wxT("colcpn")
+					|| m_pcExport->GetExtension() == wxT("colhpn") || m_pcExport->GetExtension() == wxT("colfspn")
+					|| m_pcExport->GetExtension() == wxT("colfcpn") || m_pcExport->GetExtension() == wxT("colfhpn"))
+				)
+			{
+				continue;
+				/*in coloured quantative pns, marking value sets have to be exported to their quantative coloured nets as such
+				there should be no choice, with exptions including ANDL/CANDL/Uncolored nets as there is no multi VSETS for marking
+				*/
+			}
+
+
+			if (l_sNetClassName.Contains(wxT("Colored")) && (*itNC)->GetDisplayName().Contains(wxT("Transition")) &&((*itNC)->GetDisplayName().Contains("Immediate")|| (*itNC)->GetDisplayName().Contains("Scheduled")
+				|| (*itNC)->GetDisplayName().Contains("Determenstic") || (*itNC)->GetDisplayName().Contains("Delay"))
+				&& (m_pcExport->GetExtension() == wxT("colspn")     || m_pcExport->GetExtension() == wxT("colcpn")
+					|| m_pcExport->GetExtension() == wxT("colhpn")  || m_pcExport->GetExtension() == wxT("colfspn")
+					|| m_pcExport->GetExtension() == wxT("colfcpn") || m_pcExport->GetExtension() == wxT("colfhpn")
+					|| m_pcExport->GetExtension() == wxT("colpn"))  || m_pcExport->GetExtension() == wxT("colxpn")
+				)
+			{
+				continue;
+				/*in coloured quantative pns, marking value sets have to be exported to their quantative coloured nets as such
+				there should be no choice, with exptions including ANDL/CANDL/Uncolored nets as there is no multi VSETS for marking
+				*/
+			}
+
+
+			for (SP_ListNodeclass::const_iterator itNC = m_pcDoc->GetGraph()->GetNodeclasses()->begin(); itNC != m_pcDoc->GetGraph()->GetNodeclasses()->end(); itNC++)
+			{
+				if (!(*itNC)->GetElements()->empty() && (*itNC)->GetShowInElementTree())
+				{
+					SP_DS_Node* l_pcProtoNode = (*itNC)->GetPrototype();
+					SP_DS_Node* l_pcNode = (*itNC)->GetElements()->front();
+					SP_ListAttribute::const_iterator itAttr = l_pcNode->GetAttributes()->begin();
+					SP_ListAttribute::const_iterator itProtoAttr = l_pcProtoNode->GetAttributes()->begin();
+
+					for (; itAttr != l_pcNode->GetAttributes()->end(); itAttr++, itProtoAttr++)
+					{
+						SP_DS_Attribute* l_pcProtoAttr = *itProtoAttr;
+						SP_DS_Attribute* l_pcAttr = *itAttr;
+						if (l_pcAttr->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST)
+						{
+							if (l_pcAttr->GetName() == wxT("MarkingList") && (dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttr)->GetColCount()) <= 3)
+							{
+								continue;
+							}
+
+							std::set<wxString> l_vSetNames;
+
+							SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttr);
+
+							if (l_pcColAttr)
+							{
+								for (unsigned i = 0; i < l_pcColAttr->GetColCount(); i++)
+								{
+									wxString l_sSetName = l_pcColAttr->GetColLabel(i);
+									if (!l_sSetName.Contains(wxT(":"))) continue;
+									if (l_sSetName == wxT("dot")) l_sSetName = wxT("Main");//on 19.11.20
+									if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && l_sSetName != wxT("Product Color"))
 									{
-										l_vSetNames.push_back(wxT("Main"));
+										l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+
+									}
+
+								}
+								if (l_pcAttr->GetName() != wxT("MarkingList") && !l_sNetClassName.Contains(_T("Colored")))
+								{
+									for (unsigned i = 0; i < l_pcColAttr->GetRowCount(); i++)
+									{
+										wxString l_sSetName = l_pcColAttr->GetCell(i, 0);
+
+										if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && l_sSetName != wxT("true"))
+										{
+											if (l_sSetName.Contains(wxChar(':')))
+											{
+												l_sSetName.BeforeFirst(wxChar(':'));
+											}
+
+											l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+
+										}
+
+									}
+
+								}
+
+								if (l_pcAttr->GetName() != wxT("MarkingList") && l_sNetClassName.Contains(_T("Colored")))
+								{
+									for (unsigned i = 0; i < l_pcColAttr->GetColCount(); i++)
+									{
+										wxString l_sSetName = l_pcColAttr->GetColLabel(i);
+
+										if (!l_sSetName.Contains(wxT(":"))) continue;
+
+										if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && !(l_sSetName == wxT("true") || l_sSetName == wxT("Predicate")))
+										{
+											l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+
+										}
+
+									}
+								}
+								SP_DS_ColListAttribute* l_pcProtoColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcProtoAttr);
+
+								wxString l_sName;
+								if (l_pcProtoColAttr)
+								{
+
+									l_sName << l_pcProtoColAttr->GetDisplayName() << wxT(":");
+									if (l_sName == wxT("GuardList:")) 	continue;//there is only one guard always , so no choices to be occurd
+
+								}
+
+								auto itFindGroup = l_mGroups2Vsets.find(l_sName);
+								if (itFindGroup != l_mGroups2Vsets.end())
+								{
+									if (itFindGroup->second.size() <= 1)
+									{
+
+										//if a group has only one value set, then there is no multi-choices to be chosen from
+
 										continue;
 									}
+								}
+
+								if (SP_Find(l_vGroupNames, l_sName) == l_vGroupNames.end())
+								{
+									l_vGroupNames.push_back(l_sName);
+								}
+								else
+								{
+									continue;
+								}
+
+
+								l_pcSetsSizer->Add(new wxStaticText(l_pcNotebookPage, wxID_ANY, l_sName), wxGBPosition{ row,0 });
+
+								auto l_pcComboBox = new wxChoice(l_pcNotebookPage, wxID_ANY);
+
+								for (auto itSet = l_vSetNames.begin(); itSet != l_vSetNames.end(); ++itSet)
+								{
+									l_pcComboBox->Append(*itSet);
+								}
+
+
+								l_pcComboBox->SetSelection(l_pcColAttr->GetActiveList());
+
+								m_mColListComboBoxes[l_pcColAttr] = l_pcComboBox;
+
+								l_pcSetsSizer->Add(l_pcComboBox, wxGBPosition{ row,1 }, wxDefaultSpan, wxEXPAND);
+								++row;
+
+
 							}
 
-							if (l_pcColAttr->GetName() == wxT("MarkingList") && !l_sSetName.Contains(":")) continue;//by george
-
-							if (l_sSetName.Contains( wxT("Product Color"))&& !l_sSetName.Contains(":"))  continue;//by george
-
-						   if (l_sSetName.Contains(wxT("Product Color")))
-							{
-									l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
-							}
-							if (l_pcColAttr->GetName() == wxT("MarkingList"))
-							{
-								l_sSetName = l_sSetName.BeforeFirst(wxT(':'));
-							}
-
-							if(SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end())
-							{
-								l_vSetNames.push_back(l_sSetName);
-							}
 						}
 					}
-					else
-					{
-						for(unsigned i = 0; i < l_pcColAttr->GetRowCount(); i++)
-						{
-							wxString l_sSetName = l_pcColAttr->GetCell(i,0);
-							if(SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end())
-							{
-								l_vSetNames.push_back(l_sSetName);
-							}
-						}
-					}
-
-					wxString l_sName;
-				    l_sName << l_pcProtoColAttr->GetDisplayName() << wxT(":");
-                    //preventing repetion of group names
-					if (SP_Find(l_vGroupNames, l_sName) == l_vGroupNames.end())
-					{
-				  	   l_vGroupNames.push_back(l_sName);
-					}
-					else
-				    {
-						continue;
-					}
-					l_pcSetsSizer->Add(new wxStaticText( l_pcNotebookPage, wxID_ANY, l_sName ), wxGBPosition{row,0});
-
-					auto l_pcComboBox = new wxChoice( l_pcNotebookPage, wxID_ANY );
-					for (unsigned int i = 0; i < l_vSetNames.size(); i++)
-					{
-						l_pcComboBox->Append( l_vSetNames[i]);
-					}					
-					l_pcComboBox->SetSelection(l_pcColAttr->GetActiveList());
-
-					m_mColListComboBoxes[l_pcColAttr] = l_pcComboBox;
-
-					l_pcSetsSizer->Add(l_pcComboBox, wxGBPosition{row,1}, wxDefaultSpan,  wxEXPAND);
-					++row;
 				}
 			}
 		}
 	}
 
-
-	/*
-	 * comboboxes for constants
-	 */
-	SP_DS_Graph* l_pcGraph = m_pcDoc->GetGraph();
-	/*george new consatnts for col pn*/
-	SP_DS_Metadataclass* mc1 = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
-	if (mc1 && !mc1->GetElements()->empty() && l_pcGraph->GetName().Contains(wxT("Colored")))
-	{
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		// load groups
-		////////////////////////////////////////////////////////////////////////
-		SP_ListMetadata::const_iterator it;
-		SP_DS_Metadata* l_pcMetadata;
-
-		wxArrayString m_choices;
-		for (it = mc1->GetElements()->begin(); it != mc1->GetElements()->end(); ++it)
-		{
-			l_pcMetadata = *it;
-			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Group")))->GetValue();
-			SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*> (l_pcMetadata->GetAttribute(wxT("ValueList")));
-			if (SP_Find(m_choices, l_sGroup) == m_choices.end())
-			{
-				m_choices.Add(l_sGroup);
-				l_pcSetsSizer->Add(new wxStaticText(l_pcNotebookPage, wxID_ANY, m_choices.Last() + wxT(':')), wxGBPosition{ row,0 });
-				auto l_pcComboBox = new wxChoice(l_pcNotebookPage, wxID_ANY);
-
-				for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
-				{
-					wxString l_sSetName = l_pcAttr->GetCell(i, 0);
-					l_pcComboBox->Append(l_sSetName);
-				}
-
-				l_pcComboBox->SetSelection(l_pcAttr->GetActiveList());
-				m_mColListComboBoxes[l_pcAttr] = l_pcComboBox;
-				l_pcSetsSizer->Add(l_pcComboBox, wxGBPosition{ row,1 }, wxDefaultSpan, wxEXPAND);
-				++row;
-			}
-		}
-	}
-	//l_pcSetsSizer->AddGrowableCol(1);
-	//l_pcNotebookPage->AddControl(l_pcSetsSizer, 1, wxALL | wxEXPAND, 5);
-
-
-	/*****************************************/
-
-
-
-	SP_DS_Metadataclass* mc = l_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
-	if (mc && !mc->GetElements()->empty() && !l_pcGraph->GetName().Contains(wxT("Colored")) )
-	{
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		// load groups
-		////////////////////////////////////////////////////////////////////////
-		SP_ListMetadata::const_iterator it;
-		SP_DS_Metadata* l_pcMetadata;
-
-		wxArrayString m_choices;
-		for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
-		{
-			l_pcMetadata = *it;
-			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Group")))->GetValue();
-			SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*> (l_pcMetadata->GetAttribute(wxT("ValueList")));
-			if (SP_Find(m_choices, l_sGroup) == m_choices.end())
-			{
-				m_choices.Add(l_sGroup);
-				l_pcSetsSizer->Add( new wxStaticText( l_pcNotebookPage, wxID_ANY, m_choices.Last() + wxT(':') ), wxGBPosition{row,0} );
-				auto l_pcComboBox = new wxChoice( l_pcNotebookPage, wxID_ANY);
-
-				for(unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++ )
-				{
-					wxString l_sSetName = l_pcAttr->GetCell(i,0);
-					l_pcComboBox->Append(l_sSetName);
-				}
-
-				l_pcComboBox->SetSelection(l_pcAttr->GetActiveList());
-				m_mColListComboBoxes[l_pcAttr] = l_pcComboBox;
-				l_pcSetsSizer->Add(l_pcComboBox, wxGBPosition{row,1}, wxDefaultSpan, wxEXPAND );
-				++row;
-			}
-		}
-	}
+/////////////////////////////////////////////////////////
 	l_pcSetsSizer->AddGrowableCol(1);
 	l_pcNotebookPage->AddControl(l_pcSetsSizer, 1, wxALL | wxEXPAND, 5);
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////
 
     /* Buttons in the lower right hand corner */
 	m_pcSizer->Add(this->CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND | wxALL, 5);
@@ -368,4 +391,132 @@ void
 SP_DLG_ExportProperties::SetNotebookSize(int width, int height)
 {
 	m_pcNotebook->SetInitialSize( wxSize(width, height) );
+}
+
+
+
+std::map<wxString, std::set<wxString>> SP_DLG_ExportProperties::GetGroup2ValueSets()
+{
+
+	std::map<wxString, std::set<wxString>> l_mGroup2Sets;
+	wxString l_sNetClassName = m_pcDoc->GetGraph()->GetNetclass()->GetName();
+	vector<wxString> l_vGroupNames;
+
+	//search for collist attributes
+	for (SP_ListNodeclass::const_iterator itNC = m_pcDoc->GetGraph()->GetNodeclasses()->begin(); itNC != m_pcDoc->GetGraph()->GetNodeclasses()->end(); itNC++)
+	{
+		if (!(*itNC)->GetElements()->empty() && (*itNC)->GetShowInElementTree())
+		{
+			SP_DS_Node* l_pcProtoNode = (*itNC)->GetPrototype();
+			SP_DS_Node* l_pcNode = (*itNC)->GetElements()->front();
+			SP_ListAttribute::const_iterator itAttr = l_pcNode->GetAttributes()->begin();
+			SP_ListAttribute::const_iterator itProtoAttr = l_pcProtoNode->GetAttributes()->begin();
+
+			for (; itAttr != l_pcNode->GetAttributes()->end(); itAttr++, itProtoAttr++)
+			{
+				SP_DS_Attribute* l_pcProtoAttr = *itProtoAttr;
+				SP_DS_Attribute* l_pcAttr = *itAttr;
+				if (l_pcAttr->GetAttributeType() == SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_COLLIST)
+				{
+					if (l_pcAttr->GetName() == wxT("MarkingList") && (dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttr)->GetColCount()) <= 3)
+					{
+						continue;
+					}
+
+					std::set<wxString> l_vSetNames;
+
+					SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttr);
+
+					if (l_pcColAttr)
+					{
+						if(l_pcAttr->GetName() != wxT("MarkingList"))
+						{
+					    	 for (unsigned i = 0; i < l_pcColAttr->GetColCount(); i++)
+						     {
+							   wxString l_sSetName = l_pcColAttr->GetColLabel(i);
+
+							  if (!l_sSetName.Contains(wxT(":"))) continue;
+
+							  if (l_sSetName == wxT("dot")) l_sSetName = wxT("Main");//on 19.11.20
+
+							  if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && l_sSetName != wxT("Product Color"))
+							  {
+							 	l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+
+							  }
+						    }
+
+						}
+
+						if (l_pcAttr->GetName() != wxT("MarkingList")&& !l_sNetClassName.Contains(_T("Colored")))
+						{
+							for (unsigned i = 0; i < l_pcColAttr->GetRowCount(); i++)
+							{
+								wxString l_sSetName = l_pcColAttr->GetCell(i,0);
+
+								if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && l_sSetName !=wxT("true") )
+								{
+									if (l_sSetName.Contains(wxChar(':')))
+									{
+										l_sSetName.BeforeFirst(wxChar(':'));
+									}
+									l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+
+								}
+
+							}
+
+						}
+
+						if (l_pcAttr->GetName() != wxT("MarkingList") && l_sNetClassName.Contains(_T("Colored")))
+						{
+							for (unsigned i = 0; i < l_pcColAttr->GetColCount(); i++)
+							{
+								wxString l_sSetName = l_pcColAttr->GetColLabel(i);
+
+								if (!l_sSetName.Contains(wxT(":"))) continue;
+
+								if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && !( l_sSetName == wxT("true")|| l_sSetName == wxT("Predicate")))
+								{
+									l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+
+								}
+
+							}
+						}
+
+						if (l_pcAttr->GetName() == wxT("MarkingList") && l_sNetClassName.Contains(_T("Colored")))
+						{
+						   for (unsigned i = 0; i < l_pcColAttr->GetColCount(); i++)
+								{
+									wxString l_sSetName = l_pcColAttr->GetColLabel(i);
+
+									if (!l_sSetName.Contains(wxT(":"))) continue;
+
+									if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && !(l_sSetName == wxT("true") || l_sSetName == wxT("Predicate")))
+									{
+											l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+
+									}
+
+								}
+						}
+
+						SP_DS_ColListAttribute* l_pcProtoColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcProtoAttr);
+						if (l_pcProtoColAttr)
+						{
+							wxString l_sName;
+							l_sName << l_pcProtoColAttr->GetDisplayName() << wxT(":");
+							l_mGroup2Sets[l_sName] = l_vSetNames;
+						}
+					}
+					//SP_DS_ColListAttribute* l_pcProtoColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcProtoAttr);
+
+
+				}
+			}
+		}
+	}
+	return l_mGroup2Sets;
+
 }

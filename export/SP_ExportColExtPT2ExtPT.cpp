@@ -185,8 +185,21 @@ bool SP_ExportColExtPT2ExtPT::WriteMetadataclass( SP_DS_Metadataclass* p_pcVal, 
 		SP_DS_Metadataclass* l_pcCOnstants = p_pcVal;
 		SP_ListMetadata::const_iterator l_itElem;
 		l_itElem = l_pcCOnstants->GetElements()->begin();
+		bool l_bIScolouringGroup = false;
 		for (size_t l_nCon = 0; l_nCon < l_pcCOnstants->GetElements()->size(); l_nCon++)
 		{
+			if ((*l_itElem)->GetAttribute(wxT("Group"))->GetValueString() == wxT("coloring"))
+				{//12.2020, constants belonging to the colouring group should not be exported to the uncolored net
+							++l_itElem;
+							if (!l_bIScolouringGroup)
+							{
+								l_bIScolouringGroup = true;
+								SP_LOGWARNING(wxT("Constants belonging to the coloring group will not be exported."));
+
+							}
+					continue;
+				}
+
 			SP_DS_Metadata* l_pcConstant = l_pcMC->NewElement(1);
 			///l_pcConstant = *l_itElem;
 			SP_DS_Metadata* l_pcConst;
