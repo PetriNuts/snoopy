@@ -182,6 +182,10 @@ void SP_DS_PlotViewer::Create() {
 			 panel2=new wxChartPanel(m_pcParent, SP_ID_PLOT_WINDOW_ID+1, NULL, wxDefaultPosition, wxSize(100, 200));
 			m_pcSizer->Add(panel2, 1, wxEXPAND | wxALL, 5);
 		}
+		else
+		{
+			panel2=nullptr;
+		}
 
 		/////////
         m_pcSizer->Layout();
@@ -757,8 +761,16 @@ void SP_DS_PlotViewer::ExportToImageFile(wxString &p_sFileName, const int &p_nFi
 
     CHECK_POINTER(m_pcChartPanel, return);
 
+    wxString l_sTfnPanel;
+
     if (p_sFileName.Freq(wxChar('.')) >=1) {//bugfix:george2020
         p_sFileName = p_sFileName.BeforeLast(wxT('.'));
+        l_sTfnPanel = p_sFileName+wxT("_TFN");
+    }
+
+    if (l_sTfnPanel.IsEmpty())
+    {
+    	l_sTfnPanel = p_sFileName + wxT("_TFN");
     }
 
     wxSize temp = m_pcChartPanel->GetSize();
@@ -778,18 +790,22 @@ void SP_DS_PlotViewer::ExportToImageFile(wxString &p_sFileName, const int &p_nFi
         case 0:
             l_nExportType = wxBITMAP_TYPE_BMP;
             p_sFileName = p_sFileName + wxT(".bmp");
+        	l_sTfnPanel = l_sTfnPanel + wxT(".bmp");
             break;
         case 1:
             l_nExportType = wxBITMAP_TYPE_GIF;
             p_sFileName = p_sFileName + wxT(".gif");
+            l_sTfnPanel = l_sTfnPanel + wxT(".gif");
             break;
         case 2:
             l_nExportType = wxBITMAP_TYPE_PNG;
             p_sFileName = p_sFileName + wxT(".png");
+            l_sTfnPanel = l_sTfnPanel + wxT(".png");
             break;
         case 3:
             l_nExportType = wxBITMAP_TYPE_JPEG;
             p_sFileName = p_sFileName + wxT(".jpg");
+            l_sTfnPanel = l_sTfnPanel + wxT(".jpg");
             break;
         case 4:
             SP_LOGERROR(wxT("This function has not been implemented"));
@@ -797,10 +813,20 @@ void SP_DS_PlotViewer::ExportToImageFile(wxString &p_sFileName, const int &p_nFi
         default:
             l_nExportType = wxBITMAP_TYPE_BMP;
             p_sFileName = p_sFileName + wxT(".bmp");
+            l_sTfnPanel = l_sTfnPanel + wxT(".bmp");
             break;
     }
 
     bitmap.SaveFile(p_sFileName, l_nExportType);
     m_pcChartPanel->SetSize(temp);
+
+    if (panel2)//export TFN MMF as well 10.01.21
+    {
+    	CHECK_POINTER(panel2, return);
+    	wxBitmap bitmaptfn = panel2->CopyBackbuffer();
+
+    	 bitmaptfn.SaveFile(l_sTfnPanel, l_nExportType);
+    	 panel2->SetSize(temp);
+    }
 }
 
