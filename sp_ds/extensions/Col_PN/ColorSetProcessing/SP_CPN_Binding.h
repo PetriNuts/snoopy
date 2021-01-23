@@ -120,8 +120,7 @@ private:
 public:
 	bool Diffusion(wxString p_sColorSet, wxString &p_sArcExpr, SP_CPN_ColorSetClass* p_pcColorSetClass);
 	wxString GetEdgeName(SP_DS_Edge* p_pcEdge);
-
-
+	bool IsbalanceParentheses(const wxString& p_sColExp);//by george2020
 private:
 	wxString m_sTransitionName;
 	vector<wxString> m_TransitionInstancesVector;

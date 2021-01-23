@@ -225,7 +225,7 @@ SP_DS_ColStAnimation::~SP_DS_ColStAnimation()
 				////////////////////////////////////////////////////////
 					l_sMainMarking = wxT("");
 					map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
-					if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false))
+					if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false,true))
 					continue;
 					map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
 
@@ -320,7 +320,7 @@ void SP_DS_ColStAnimation::UpdateMarkingPlaces()
 		wxString l_sMainMarking;
 		l_sMainMarking = wxT("");
 		map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
-		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodesinPed[l_nPos], l_mColorToMarkingMap, false))
+		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodesinPed[l_nPos], l_mColorToMarkingMap, false,true))
 			continue;
 		map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
 
@@ -359,7 +359,24 @@ void SP_DS_ColStAnimation::UpdateMarkingPlaces()
 SP_DS_Animation*
 SP_DS_ColStAnimation::Clone()
 {
-	return dynamic_cast<SP_DS_Animation*>(new SP_DS_ColStAnimation(m_nRefreshFrequ, m_nStepDuration, SP_ANIM_STEP_T(m_nStepState)));
+	wxString l_sOptions = SP_Core::Instance()->GetActivatedRefreshDurationanim();
+		if (l_sOptions != wxT(""))
+		{
+			long l_nRefres, l_nDuration;
+			wxString l_sRef = l_sOptions.BeforeFirst(wxChar('|'));
+			wxString l_sDuration = l_sOptions.AfterFirst(wxChar('|'));
+			if (!l_sRef.ToLong(&l_nRefres))
+			{
+				l_nRefres = m_nRefreshFrequ;
+			}
+			if (!l_sDuration.ToLong(&l_nDuration))
+			{
+				l_nDuration = m_nStepDuration;
+			}
+			return dynamic_cast<SP_DS_Animation*>(new SP_DS_ColStAnimation(l_nRefres, l_nDuration, SP_ANIM_STEP_T(m_nStepState)));
+		}
+
+		return dynamic_cast<SP_DS_Animation*>(new SP_DS_ColStAnimation(m_nRefreshFrequ, m_nStepDuration, SP_ANIM_STEP_T(m_nStepState)));
 }
 
 bool
@@ -2400,7 +2417,7 @@ void SP_DS_ColStAnimation::UpdateColMarking()
 		////////////////////////////////////////////////////////
 		wxString l_sMainMarking = wxT("");
 		map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
-		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false))
+		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false,true))
 			return;
 		map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
 

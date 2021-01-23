@@ -15,7 +15,8 @@
 #include "sp_ds/animators/ani_CPN/SP_DS_CPN_TransAnimator.h"
 #include "sp_ds/animators/ani_ColSPN/SP_DS_ColStTransAnimator.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
-
+#include <stack>
+#include <cctype>
 
 SP_CPN_Binding::SP_CPN_Binding()
 {	
@@ -1063,6 +1064,29 @@ bool SP_CPN_Binding::Match(wxString p_VariableString, wxString p_ValueString, ve
     unsigned l_iChar = 0;
     int l_nLevel =0;    
 
+	/*by george*/
+	if (p_VariableString.Contains("`"))
+	{
+		wxString l_BeforeSep = p_VariableString.BeforeFirst('`');
+		if(l_BeforeSep.Contains(wxT("(")))
+		{
+			wxString l_sAfterSep = p_VariableString.AfterFirst('`');
+			l_BeforeSep.Replace(wxT("("), wxT(""));
+			l_BeforeSep.Replace(wxT(")"), wxT(""));
+			p_VariableString = l_BeforeSep + wxT("`") + l_sAfterSep;
+		}
+
+	}
+
+	if (p_VariableString.Freq('(') == p_VariableString.Freq(')') && p_VariableString.Freq(')') > 2)
+	{
+		while (p_VariableString.Freq('(') != 2)
+		{
+			p_VariableString.Replace(wxT("("), wxT(""),false);
+			p_VariableString.Replace(wxT(")"), wxT(""),false);
+		}
+	}
+
     //remove the the first '(' and the last ')'
 	p_VariableString  = p_VariableString.AfterFirst(wxT('('));
 	p_VariableString  = p_VariableString.BeforeLast(wxT(')'));
@@ -1833,6 +1857,20 @@ bool SP_CPN_Binding::PreProcession()
 bool SP_CPN_Binding::Diffusion(wxString p_sColorSet, wxString &p_sArcExpr, SP_CPN_ColorSetClass* p_pcColorSetClass)
 {
 	wxString l_sExpression = p_sArcExpr;
+	l_sExpression.Replace(wxT(" "), wxT(""));//george
+
+	if (l_sExpression.Contains(wxT("all()")) && l_sExpression.Contains(wxChar(',')))//george temp
+		return true;//this case will be checked by the parser
+
+	if (!IsbalanceParentheses(l_sExpression))
+	{
+	//	SP_MESSAGEBOX("Arc expresion is not correct, check bracket structue please");
+		wxString l_sError = wxT("The arc expression: all() function error, bracket structure is not correct ()");
+		SP_MESSAGEBOX(l_sError, wxT("Arc Expression checking"), wxOK | wxICON_ERROR);
+		SP_LOGERROR(l_sError);
+		return false;
+	}
+
 	if( l_sExpression.Find( wxT("all"))!= wxNOT_FOUND )
 	{
 		int l_nEndIndex = 3 + l_sExpression.Find( wxT("all"));
@@ -1937,3 +1975,53 @@ wxString SP_CPN_Binding::RemoveRedundantTransInstances()
 	}	
 	return 	l_sArc2Color2Num;
 }
+
+
+bool SP_CPN_Binding::IsbalanceParentheses(const wxString& p_sColExp)
+{
+	stack<char> a;
+
+	string exp = p_sColExp.ToStdString();
+
+	for (int i = 0; i < exp.length(); i++)
+	{
+		if (!(exp[i] == '(' || exp[i] == ')' || exp[i] == '[' || exp[i] == ']'))
+		{
+			exp[i] = ' ';
+		}
+	}
+	exp.erase(remove_if(exp.begin(), exp.end(), ::isspace), exp.end());
+
+	stack<char> stk;
+	char x;
+	for (int i = 0; i<exp.length(); i++) {
+		if (exp[i] == '(' || exp[i] == '[' || exp[i] == '{') {
+			stk.push(exp[i]);
+			continue;
+		}
+		if (stk.empty())
+			return false;
+		switch (exp[i]) {
+		case ')':
+			x = stk.top();
+			stk.pop();
+			if (x == '{' || x == '[')
+				return false;
+			break;
+		case '}':
+			x = stk.top();
+			stk.pop();
+			if (x == '(' || x == '[')
+				return false;
+			break;
+		case ']':
+			x = stk.top();
+			stk.pop();
+			if (x == '(' || x == '{')
+				return false;
+			break;
+		}
+	}
+	return (stk.empty());
+}
+

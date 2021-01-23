@@ -141,6 +141,8 @@ SP_DS_CPN_TransAnimator::InformPrePlaces(const wxString& p_sColor)
 
 				m_mmmBind2Edge2Mult2Color = l_mmmBind2Edge2Mult2Color;
 
+				//SP_MESSAGEBOX(m_mmmBind2Edge2Mult2Color.begin()->first);
+
 				vector<wxString> l_EnabledBindings;
 				map<wxString, map<SP_DS_Edge*, map<wxString, int> > >::iterator itMap3;
 				for(itMap3 = m_mmmBind2Edge2Mult2Color.begin(); itMap3 != m_mmmBind2Edge2Mult2Color.end(); itMap3++)
