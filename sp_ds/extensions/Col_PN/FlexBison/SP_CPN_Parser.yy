@@ -59,9 +59,10 @@
     class SP_CPN_ParseNode*		calcnode;
 }
 
-%token LE_OP GE_OP ELEM_OP NE_OP IF INDEX CNN 
+%token LE_OP GE_OP ELEM_OP NE_OP IF INDEX CNN CDD
 
-%left CNN
+%left CNN 
+%left CDD
 %left '`'
 %left ','
 %left '&' '|' 
@@ -318,6 +319,7 @@ CPN_Addexpr : CPN_Mulexpr
           {
 	      $$ = new SP_CPN_Parse_Substract_Node($1, $3);
 	  }
+	   
 
 
 CPN_Relexpr
@@ -399,6 +401,10 @@ CPN_Commaexpr
 	{
 		$$ = new SP_CPN_Parse_Comma_Node($1, $3);
 	}
+	| CPN_Connectorexpr ',' CPN_Normalexpr /*19.12.2020 */
+	{
+		$$ = new SP_CPN_Parse_Comma_Node($1, $3);
+	}
 
 
 CPN_Normalexpr 
@@ -453,7 +459,11 @@ CPN_Connectorexpr
 	{
 		$$ = new SP_CPN_Parse_CNN_Node($1, $3);
 	}
-
+    | CPN_Connectorexpr CDD CPN_Predicateexpr
+	{
+		$$ = new SP_CPN_Parse_CDD_Node($1, $3);
+	}
+	 
 	
 	  
 CPN_expr

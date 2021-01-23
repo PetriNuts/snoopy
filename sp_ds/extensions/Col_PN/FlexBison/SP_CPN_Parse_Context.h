@@ -24,7 +24,7 @@
 //#include <wx/tokenzr.h>//by george
 //#include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
 ////////////define the structs for parser//////////
-
+ 
 // Define the node types of parse trees
 enum SP_CPN_NODETYPE
 {
@@ -166,7 +166,10 @@ struct SP_CPN_ParseNode_Info
 			  double		m_DoubleMultiplicity;
 			  wxString		m_stringMultiplicity;	//for marking-dependent arcs, added by Fei, 09.2015
 			  bool m_bIsElemOf;//by george.20.2020
-
+			  bool m_bIscuncolorfun;//by george.20.2020
+			  int l_nAllPos;//by george.20.2020
+			  wxString l_sAllPatern;//by george.20.2020
+			  
 	  union
       {
 		int					m_IntegerValue;		
@@ -177,7 +180,7 @@ struct SP_CPN_ParseNode_Info
 
 	  vector<SP_CPN_EvaluatedSingleValue> m_EvalResults;   //only for collecting the final results  
 
-	  std::vector<IntVar>*  m_vIntconstraintVector= new std::vector<IntVar>();//by george
+	  std::vector<IntVar>*  m_vIntconstraintVector= new std::vector<IntVar>();//by george 
 	  IntVar                m_IntConstraintExpr;
 	  BoolVar               m_BoolConstraintExpr;
  };
@@ -204,6 +207,7 @@ protected:
 
 public:
 	void SetColorSetName(wxString p_ColorSetName){m_ColorSetName = p_ColorSetName;}
+	wxString GetColorSetName() {return m_ColorSetName;}//by george
 	void SetColorSetClass( SP_CPN_ColorSetClass* p_pColorSetClass ){m_pColorSetClass = p_pColorSetClass;}
 	void SetErrorPosition(wxString p_sErrorPosition){m_sErrorPosition = p_sErrorPosition;}
 	void SetNetClassName(wxString p_sNetClassName){m_sNetClassName = p_sNetClassName;}	
@@ -230,6 +234,8 @@ public:
 		
 	}
 
+ 
+
 	virtual ~SP_CPN_ParseNode() { } 	
 
 	/// evaluate the parse tree
@@ -248,6 +254,31 @@ public:
 	SP_CPN_ParseNode* GetLeftNode()	{ return m_pLeft; }	
 	SP_CPN_ParseNode* GetRightNode(){ return m_pRight; }
 	SP_CPN_ParseNode_Info* GetParseNodeInfo() { return &m_ParseNode_Info; }
+
+	void   IsAllNodeExists(SP_CPN_ParseNode* p_nodeRoot, bool & P_isFound)
+	{
+		if (!p_nodeRoot)
+			return;
+
+		// if node is leaf node, print its data    
+		if (!p_nodeRoot->GetLeftNode() && !p_nodeRoot->GetRightNode())
+		{
+			if (p_nodeRoot->GetParseNodeInfo()->m_NodeType == CPN_ALLFUNC)
+			{
+				P_isFound = true;
+				return;
+
+			}
+		}
+
+		if (p_nodeRoot->GetLeftNode())
+			IsAllNodeExists(p_nodeRoot->GetLeftNode(), P_isFound);
+
+		
+		// recursively
+		if (p_nodeRoot->GetRightNode())
+			IsAllNodeExists(p_nodeRoot->GetRightNode(), P_isFound);
+	}
 
 };
 
@@ -290,7 +321,7 @@ public:
 		return true;
 	}
 
-
+	 
 };
 
 
@@ -515,16 +546,17 @@ public:
 		m_pLeft = 0;
 		m_pRight = 0;
 		m_sFuncName = wxString( p_sFuncName.c_str(), wxConvUTF8);	
-		m_ParseNode_Info.m_CheckedString = m_sFuncName;			
+		m_ParseNode_Info.m_CheckedString = m_sFuncName;	
+		m_ParseNode_Info.m_NodeType = CPN_ALLFUNC;//george 19.12
     }
 
    
 	bool GetValue();
-
+	 
 	virtual SP_CPN_ParseNode_Info evaluate() 
     {
 		GetValue();
-		//CollectResult();
+	 
 		return m_ParseNode_Info;
     }
 
@@ -2103,7 +2135,7 @@ public:
 
 		m_ParseNode_Info.m_sColorSetList = wxT("");
 		m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
-
+		 
 	}
 
 	virtual ~SP_CPN_Parse_Element_Of_Node()
@@ -2125,7 +2157,7 @@ public:
 
 		if (l_LeftNodeInfo.m_DataType != CPN_PRODUCT /*&& l_RightNodeInfo.m_DataType == CPN_ENUM*/)
 		{
-
+			
 			bool l_bResult = false;
 			wxString l_sRightOperand = *(l_RightNodeInfo.m_StringValue);
 			l_sRightOperand.Replace(wxT(" "), wxT(""));
@@ -2142,8 +2174,8 @@ public:
 				int val = l_LeftNodeInfo.m_IntegerValue;
 				l_sLeftOperand << val;
 			}
-
-
+				 
+		
 
 			std::vector<wxString> l_sVColors;
 
@@ -2172,7 +2204,7 @@ public:
 			bool l_bResult = true;
 			wxString l_sRightOperand = *(l_RightNodeInfo.m_StringValue);
 			l_bResult= l_LeftNodeInfo.m_StringValue->IsSameAs(l_sRightOperand);
-
+		 
 			wxString l_sLeftOperand = *(l_LeftNodeInfo.m_StringValue);
 			l_sRightOperand.Replace(wxT(" "), wxT(""));
 			l_sRightOperand=l_sRightOperand.Trim();
@@ -2186,7 +2218,7 @@ public:
 				m_ParseNode_Info.m_BooleanValue = false;
 				return m_ParseNode_Info;
 			}
-
+			 
 			//check the membership
 			for (auto color : l_sVColors)
 			{
@@ -2202,7 +2234,7 @@ public:
 			std::vector<wxString> l_vRightVector;
 			std::vector<wxString> l_vLeftVector;
 
-
+			
 			wxStringTokenizer tokenizer(l_sRightOperand, "(,)");
 			while (tokenizer.HasMoreTokens())
 			{
@@ -2241,7 +2273,7 @@ public:
 			bool uniqueElt = true;
 			if (l_vLeftVector.size() == l_vRightVector.size())
 			{
-
+				 
 				wxString firstItem = *l_vLeftVector.begin();
 				for (std::vector<wxString>::const_iterator it = l_vLeftVector.begin() + 1; it != l_vLeftVector.end(); ++it) {
 					if (*it != firstItem) {
@@ -2274,7 +2306,7 @@ public:
 		return m_ParseNode_Info;
     }
 	bool DoEval(wxString p_sColorSet, std::vector<wxString>& p_vColors);
-
+  
 	virtual wxString GenerateExpression()
 	{
 		return wxT("");
@@ -2283,7 +2315,7 @@ public:
 	virtual bool check();
 
 	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver);
-
+ 
 
 };
 
@@ -2578,9 +2610,133 @@ public:
     {
 		SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
 		SP_CPN_ParseNode_Info l_RightNodeInfo = m_pRight->evaluate();
-
+		m_ParseNode_Info.m_EvalResults.clear();
 		wxString l_sLeftString;
 		wxString l_sRightString;
+		wxString l_sTotal;
+		bool l_bIsAllExist = false;
+		IsAllNodeExists(m_pLeft, l_bIsAllExist);
+		if (!l_bIsAllExist)
+		{
+			IsAllNodeExists(m_pRight, l_bIsAllExist);
+		}
+		if (l_LeftNodeInfo.m_NodeType == CPN_CONNECTOR_NODE|| l_LeftNodeInfo.m_NodeType == CPN_ALLFUNC)//by george
+		{//george
+			 vector<SP_CPN_EvaluatedSingleValue> l_vRes;
+			for (auto it = l_RightNodeInfo.m_EvalResults.begin(); it != l_RightNodeInfo.m_EvalResults.end(); ++it)
+			{
+				l_sRightString = (*it).m_ColorValue;
+			}
+			for (auto it = l_LeftNodeInfo.m_EvalResults.begin(); it != l_LeftNodeInfo.m_EvalResults.end(); ++it)
+			{
+				SP_CPN_EvaluatedSingleValue l_colour;
+				wxString l_sTupel;
+				l_sLeftString = (*it).m_ColorValue;
+				if ((it)->m_Multiplicity == 0) continue;
+				l_sTotal << wxT("(") << l_sLeftString << wxT(",") << l_sRightString << wxT(")")<<wxT("|");
+				
+				l_sTupel = l_sTotal.BeforeLast(wxChar('|'));
+				wxString color;
+				color<<wxT("(") << l_sLeftString << wxT(",") << l_sRightString << wxT(")");
+				l_colour.m_ColorValue = color;
+				l_colour.m_Multiplicity = (*it).m_Multiplicity;
+				l_colour.m_DoubleMultiplicity = (*it).m_DoubleMultiplicity;
+			//	l_colour.m_Multiplicity = (*it).m_stringMultiplicity;
+				l_colour.m_bPlaceFlag = (*it).m_bPlaceFlag;
+				l_colour.m_stringMultiplicity = (*it).m_stringMultiplicity;
+				l_colour.m_Predicate = true;
+				m_ParseNode_Info.m_EvalResults.push_back(l_colour);
+			}
+			//l_sTotal= l_sTotal.BeforeLA
+			m_String = l_sTotal.BeforeLast(wxChar('|'));
+			//m_ParseNode_Info.m_StringValue = &m_String.BeforeLast(wxChar('|'));
+			m_ParseNode_Info.m_StringValue = &m_String;
+			return m_ParseNode_Info;
+		}
+
+		if (l_bIsAllExist)//by george
+		{
+			bool l_bAllLeft = false;
+			if (m_pLeft->GetLeftNode())
+			{
+				if(m_pLeft->GetLeftNode()->GetParseNodeInfo()->m_NodeType==CPN_ALLFUNC)
+				{
+					l_bAllLeft = true;
+				}
+			}
+			if (l_LeftNodeInfo.m_NodeType == CPN_COMMA_NODE && l_RightNodeInfo.m_NodeType != CPN_ALLFUNC)
+			{
+
+				vector<SP_CPN_EvaluatedSingleValue> l_vRes;
+				for (auto it = l_RightNodeInfo.m_EvalResults.begin(); it != l_RightNodeInfo.m_EvalResults.end(); ++it)
+				{
+					l_sRightString = (*it).m_ColorValue;
+				}
+
+				if (l_sRightString.IsEmpty())
+				{
+					l_sRightString = *(l_RightNodeInfo.m_StringValue);
+				}
+				for (auto it = l_LeftNodeInfo.m_EvalResults.begin(); it != l_LeftNodeInfo.m_EvalResults.end(); ++it)
+				{
+					SP_CPN_EvaluatedSingleValue l_colour;
+					wxString l_sTupel;
+					l_sLeftString = (*it).m_ColorValue;
+					if ((it)->m_Multiplicity == 0) continue;
+					l_sTotal  << l_sLeftString << wxT(",") << l_sRightString  << wxT("|");
+
+					l_sTupel = l_sTotal.BeforeLast(wxChar('|'));
+					wxString color;
+					color  << wxT("(")<<l_sLeftString << wxT(",") << l_sRightString <<wxT(")");
+					l_colour.m_ColorValue = color;
+					l_colour.m_Multiplicity = (*it).m_Multiplicity;
+					l_colour.m_DoubleMultiplicity = (*it).m_DoubleMultiplicity;
+					//	l_colour.m_Multiplicity = (*it).m_stringMultiplicity;
+					l_colour.m_bPlaceFlag = (*it).m_bPlaceFlag;
+					l_colour.m_stringMultiplicity = (*it).m_stringMultiplicity;
+					l_colour.m_Predicate = true;
+					m_ParseNode_Info.m_EvalResults.push_back(l_colour);
+				}
+			}
+			else if (l_LeftNodeInfo.m_NodeType != CPN_ALLFUNC&&l_bIsAllExist&& l_RightNodeInfo.m_NodeType == CPN_ALLFUNC)
+			{
+				vector<SP_CPN_EvaluatedSingleValue> l_vRes;
+				for (auto it = l_LeftNodeInfo.m_EvalResults.begin(); it != l_LeftNodeInfo.m_EvalResults.end(); ++it)
+				{
+					l_sLeftString = (*it).m_ColorValue;
+				}
+				if (l_sLeftString.IsEmpty())
+				{
+					l_sLeftString = *(l_LeftNodeInfo.m_StringValue);
+				}
+
+				for (auto it = l_RightNodeInfo.m_EvalResults.begin(); it != l_RightNodeInfo.m_EvalResults.end(); ++it)
+				{
+					SP_CPN_EvaluatedSingleValue l_colour;
+					wxString l_sTupel;
+					l_sRightString = (*it).m_ColorValue;
+					if ((it)->m_Multiplicity == 0) continue;
+					l_sTotal << l_sLeftString << wxT(",") << l_sRightString << wxT("|");
+
+					l_sTupel = l_sTotal.BeforeLast(wxChar('|'));
+					wxString color;
+					color << wxT("(")<<l_sLeftString << wxT(",") << l_sRightString<<wxT(")");
+					l_colour.m_ColorValue = color;
+					l_colour.m_Multiplicity = (*it).m_Multiplicity;
+					l_colour.m_DoubleMultiplicity = (*it).m_DoubleMultiplicity;
+					//	l_colour.m_Multiplicity = (*it).m_stringMultiplicity;
+					l_colour.m_bPlaceFlag = (*it).m_bPlaceFlag;
+					l_colour.m_stringMultiplicity = (*it).m_stringMultiplicity;
+					l_colour.m_Predicate = true;
+					m_ParseNode_Info.m_EvalResults.push_back(l_colour);
+				}
+			}
+			m_String = l_sTotal.BeforeLast(wxChar('|'));;
+			//m_ParseNode_Info.m_StringValue = &m_String.BeforeLast(wxChar('|'));
+			m_ParseNode_Info.m_StringValue = &m_String;
+			return m_ParseNode_Info;
+		}
+		 
 
 		if(l_LeftNodeInfo.m_DataType == CPN_INTEGER)
 		{
@@ -2629,7 +2785,7 @@ public:
 	virtual bool check();
 
 	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver) 
-	{
+	{		
 		if (!this->GetParseNodeInfo()->m_bIsElemOf)
 			return false;
 
@@ -2641,7 +2797,7 @@ public:
 			return false;
 		SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-
+		 
 		m_ParseNode_Info.m_vIntconstraintVector->push_back(l_LeftNodeInfo->m_IntConstraintExpr);
 		m_ParseNode_Info.m_vIntconstraintVector->push_back(l_RightNodeInfo->m_IntConstraintExpr);
 		return true;
@@ -2672,12 +2828,31 @@ public:
 		delete m_pLeft;
     } 
 
-	virtual SP_CPN_ParseNode_Info evaluate() 
-    {		
-		SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
-		m_String = wxT("(") + *(l_LeftNodeInfo.m_StringValue) + wxT(")");
-		m_ParseNode_Info.m_StringValue =  &m_String ;
+	virtual SP_CPN_ParseNode_Info evaluate()
+	{
+	 
+	  if (m_pLeft->GetLeftNode())//george 19.12
+	  {
+		  if (m_pLeft->GetLeftNode()->GetParseNodeInfo()->m_NodeType == CPN_CONNECTOR_NODE
+			  || m_pLeft->GetLeftNode()->GetParseNodeInfo()->m_NodeType == CPN_ALLFUNC)//george 19.12
 
+		  {
+			  SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
+			  //m_ParseNode_Info.m_EvalResults = l_LeftNodeInfo.m_EvalResults;
+			  //m_String = wxT("(") + *(l_LeftNodeInfo.m_StringValue) + wxT(")");
+			  //m_ParseNode_Info.m_StringValue = &m_String;
+			  CollectResult();
+
+			  return m_ParseNode_Info;
+		  }
+	  }
+
+	  SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
+	 
+	   
+		m_String = wxT("(") + *(l_LeftNodeInfo.m_StringValue) + wxT(")");
+		m_ParseNode_Info.m_StringValue = &m_String;
+	   
 		CollectResult();
 
 		return m_ParseNode_Info;
@@ -2690,6 +2865,10 @@ public:
 
 	virtual bool check();
 
+	bool  IsAllExist(SP_CPN_ParseNode* p_node, wxString p_cs);
+	void  TraversAll(SP_CPN_ParseNode* p_node, SP_VectorString l_vComponents, std::vector<int>& p_vIndex);
+	void  IsAllExistsInBrackets(SP_CPN_ParseNode* p_node,bool & P_isFound);
+	//bool IsAllExist(SP_CPN_ParseNode*,SP_VectorString p_vComponentcs, int pos, unsigned int& pos1);
 	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver) 
 	{			
 		if (!this->GetParseNodeInfo()->m_bIsElemOf)
@@ -2702,6 +2881,13 @@ public:
 		m_ParseNode_Info.m_vIntconstraintVector->push_back(m_pLeft->GetParseNodeInfo()->m_vIntconstraintVector->at(1));
 
 		return true;
+	}
+
+	SP_VectorString  ComputeTupeles()
+	{
+		SP_VectorString l_vTupels;
+		return l_vTupels;
+
 	}
 
 };
@@ -2865,6 +3051,82 @@ public:
 
 };
 
+
+
+
+
+/** parse node calculating CDD of two operand nodes on 12.2020 by george. */
+
+class SP_CPN_Parse_CDD_Node : public SP_CPN_ParseNode
+{
+
+public:
+	explicit SP_CPN_Parse_CDD_Node(SP_CPN_ParseNode* p_pcLeft, SP_CPN_ParseNode* p_pcRight)
+		: SP_CPN_ParseNode()
+	{
+		m_pLeft = p_pcLeft;
+		m_pRight = p_pcRight;
+
+		m_ParseNode_Info.m_NodeType = CPN_CONNECTOR_NODE;
+	}
+
+	virtual ~SP_CPN_Parse_CDD_Node()
+	{
+		delete m_pLeft;
+		delete m_pRight;
+	}
+
+	void SetEvalResult(SP_CPN_EvaluatedSingleValue p_SingleEvalResult, const bool& p_bIsRight=false);
+
+	virtual SP_CPN_ParseNode_Info evaluate()
+	{
+		SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
+		SP_CPN_ParseNode_Info l_RightNodeInfo = m_pRight->evaluate();
+
+		m_ParseNode_Info.m_EvalResults.clear();
+
+		for (unsigned i = 0; i < l_LeftNodeInfo.m_EvalResults.size(); i++)
+		{
+			SetEvalResult(l_LeftNodeInfo.m_EvalResults[i]);
+		}
+		for (unsigned i = 0; i < l_RightNodeInfo.m_EvalResults.size(); i++)
+		{
+			SetEvalResult(l_RightNodeInfo.m_EvalResults[i],true);
+		}
+
+		return m_ParseNode_Info;
+	}
+
+	virtual wxString GenerateExpression()
+	{
+		return  wxT("");
+	}
+
+	virtual bool check()
+	{
+		if (!m_pLeft->check())
+			return false;
+		if (!m_pRight->check())
+			return false;
+
+		SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
+		SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
+
+		if (l_LeftNodeInfo->m_bPlaceFlag == true || l_RightNodeInfo->m_bPlaceFlag == true)
+		{
+			m_ParseNode_Info.m_bPlaceFlag = true;
+		}
+
+		return true;
+	}
+
+	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver)
+	{
+		return false;
+	}
+
+
+};
 
 
 
