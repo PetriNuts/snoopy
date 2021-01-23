@@ -1473,6 +1473,15 @@ bool SP_CPN_ValueAssign::CollectAllDeclarations()
 	      	    l_scDeclaration.m_sType = l_sType;
 				l_scDeclaration.m_sConstantvalue = l_sConstVal;
 	  		    l_vDeclarations.push_back(l_scDeclaration);
+
+	  		  if (l_sType == wxT("bool"))
+	  		  	{
+	  		  		if(l_nValue==1)
+	  		  			l_scDeclaration.m_sConstantvalue = wxT("true");
+	  		  		else
+	  		  		  l_scDeclaration.m_sConstantvalue = wxT("false");
+	  		  	}
+	  		  	  l_vDeclarations.push_back(l_scDeclaration);
 	      }
 			else
 			{
