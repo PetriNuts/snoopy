@@ -1090,7 +1090,7 @@ void SP_DLG_ConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 		if (ExistConstant(l_sCellValue, row))
 		{
 			SP_MESSAGEBOX(wxT("the constant '") + l_sCellValue + wxT("' already exists !"), wxT("Error"), wxOK | wxICON_ERROR);
-			//SP_LOG(wxLOG_Error, wxT("constant already exists"));
+
 
 			m_pcColorSetGrid->SetCellValue(row, col, m_sOldCellValue);
 			return;
@@ -1099,7 +1099,7 @@ void SP_DLG_ConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 		if (m_Places.find(l_sCellValue) != m_Places.end())
 		{
 			SP_MESSAGEBOX(wxT("the constant '") + l_sCellValue + wxT("' already exists as place!"), wxT("Error"), wxOK | wxICON_ERROR);
-			//SP_LOG(wxLOG_Error, wxT("constant name already exists as place"));
+
 
 			m_pcColorSetGrid->SetCellValue(row, col, m_sOldCellValue);
 			return;
@@ -1156,28 +1156,12 @@ void SP_DLG_ConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 		double d;
 		if (!l_sCellValue.ToDouble(&d))
 		{
-			//if (l_sCellValue.Contains(l_sConstName))
-			//{
-		//		SP_MESSAGEBOX(wxT("the constant '") + l_sConstName + wxT("' is not allowed in the expression: ") + l_sCellValue, wxT("Error"), wxOK | wxICON_ERROR);
-		//		m_pcColorSetGrid->SetCellValue(row, col, m_sOldCellValue);
-		//		return;
-			//}
 
-		//	if (FindCycle())
-		//	{
-		//		SP_MESSAGEBOX(wxT("cycle in definition detected"), wxT("Error"), wxOK | wxICON_ERROR);
-		//		m_pcColorSetGrid->SetCellValue(row, col, m_sOldCellValue);
-			//	return;
-		//	}
 		}
 
 		wxString l_sConstType = m_pcColorSetGrid->GetCellValue(row, TYPE);
 
-		///if (!DoCheckFunction(l_sConstName, l_sConstType, l_sCellValue))
-		///{
-		///	m_pcColorSetGrid->SetCellValue(row, col, m_sOldCellValue);
-		//}
-		if (!DoCheckUserInput())
+		if (!DoCheckUserInput(row))
 		{
 			//SP_MESSAGEBOX(wxT("the constant '") + l_sConstName + wxT("' is not allowed in the expression: ") + l_sCellValue, wxT("Error"), wxOK | wxICON_ERROR);
 			m_pcColorSetGrid->SetCellValue(row, col, m_sOldCellValue);
@@ -1186,41 +1170,7 @@ void SP_DLG_ConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 			new wxTipWindow(this, wxT("the constant ") + l_sConstName + wxT(" with value ") + l_sCellValue + wxT(" is correct"), 1000);
 		}
 	}
-	/**
-	int l_nRow = p_gEvent.GetRow();
 
-	wxGrid* l_pcGrid = dynamic_cast<wxGrid*>(p_gEvent.GetEventObject());	
-
-	wxString l_sDataType = l_pcGrid->GetCellValue(l_nRow,1);	
-	
-	if(l_sDataType == wxT("----Basic types----") || l_sDataType == wxT("----Structured types----") || l_sDataType == wxT("----User-defined colorsets----"))
-	{
-		SP_MESSAGEBOX(wxT("Please select data type"), wxT("Constant definition checking"), wxOK | wxICON_ERROR);
-		return;
-	}
-	int col = p_gEvent.GetCol();
-	int row = p_gEvent.GetRow();
-
-	wxString colLabel = m_pcColorSetGrid->GetColLabelValue(col);
-
-	wxString l_sCellValue = m_pcColorSetGrid->GetCellValue(row, col);
-
-	if (colLabel == wxT("Name"))
-	{
-
-		if (ExistConstant(l_sCellValue, row))
-		{
-			SP_MESSAGEBOX(wxT("the constant '") + l_sCellValue + wxT("' already exists !"), wxT("Error"), wxOK | wxICON_ERROR);
-			 
-
-			m_pcColorSetGrid->SetCellValue(row, col, m_sOldCellValue);
-			return;
-		}
-
-	 
-		
-	}
-	*/
 	return;
 }
 
@@ -1526,12 +1476,14 @@ void SP_DLG_ConstantDefinition::OnDeleteValueSet(wxCommandEvent& p_cEvent)
 	}
 	m_pcColorSetGrid->DeleteCols(l_cSelCols.Item(0), l_cSelCols.Count(), false);
 }
-bool SP_DLG_ConstantDefinition::DoCheckUserInput()
+bool SP_DLG_ConstantDefinition::DoCheckUserInput(const int& p_nRow)
 {
 	//map<std::string, std::string> l_mID2Val;
 	//check user input values for parameters
 	for (int l_nRow = 0; l_nRow < m_pcColorSetGrid->GetNumberRows(); l_nRow++)
 	{
+		if (l_nRow != p_nRow) continue;
+
 		for (int l_nValPos = 4; l_nValPos < m_pcColorSetGrid->GetNumberCols(); l_nValPos++)
 		{
 			bool l_bOk = false;

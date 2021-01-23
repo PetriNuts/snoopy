@@ -72,7 +72,7 @@ class SP_DLG_ConstantDefinition : public wxDialog
 	void LoadPlaces();
 	bool  ExistSetName(const wxString& p_sName);
 	bool GetIntConstantValue(wxString p_sConstExpr, double& p_nValue);
-    bool DoCheckUserInput();
+    bool DoCheckUserInput(const int& p_nRow);
 
 	void  OnGridLabelLeftClick(wxGridEvent& event);
 
