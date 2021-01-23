@@ -21,7 +21,7 @@
 #include <sp_gui/dialogs/dia_ColSPN/SP_DLG_ColStUnfolding.h>
 #include <sp_ds/attributes/SP_DS_BoolAttribute.h>
 
-#include "sp_ds/extensions/Col_SPN/SP_DS_ColUnfoldFile.h"
+//#include "sp_ds/extensions/Col_SPN/SP_DS_ColUnfoldFile.h"
 
 #include "sp_core/tools/SP_NetUnfolder.h"
 
@@ -175,7 +175,7 @@ bool SP_DS_ColPN_Unfolding::Start()
 	m_bFlagPause = false;
 	m_pcUnfoldDlg->SetUnfoldingProgressGauge(0);
 	m_cUnfoldingStopWatch.Start(0);
-
+/*
 	if(m_sUnfoldSource == wxT("Load"))
 	{
 		//Load unfolding information from file
@@ -183,7 +183,9 @@ bool SP_DS_ColPN_Unfolding::Start()
 		if( ! l_cColUnfoldFile.DoRead(m_sLoadFilename))
 			return false;
 	}
-	else if(m_bIddDsszUtilSolve)
+	else
+		*/
+	if(m_bIddDsszUtilSolve)
 	{
 		SP_IddNetUnfolder unfolder;
 		if(unfolder(m_pcGraph, true, true))
@@ -249,14 +251,14 @@ bool SP_DS_ColPN_Unfolding::Start()
 	m_pcUnfoldDlg->GetStartButton()->SetLabel(wxT("Start"));
 
 	m_cUnfoldingStopWatch.Resume();	
-
+/*
 	//write unfolding info to a file
 	if(m_bWriteFlag)
 	{
 		SP_DS_ColUnfoldFile l_cColUnfoldFile(this);
 		l_cColUnfoldFile.DoWrite(m_sSaveFilename);
 	}
-	
+	*/
 	m_cUnfoldingStopWatch.Pause();
 
 	return true;
@@ -2386,7 +2388,15 @@ bool SP_DS_ColPN_Unfolding::UnfoldThread::BuildParserTree()
 						p_sOutPut.Replace(l_sValue, l_sStringVal, true);
 						itVector->m_sExpression = p_sOutPut;
 
-						}
+					}
+					else if (l_DataType == CPN_INTEGER)//on 20.11.20
+					 {
+						int l_dVal = it->second.m_IntegerValue;
+						wxString l_sStringVal;
+						l_sStringVal << l_dVal;
+						p_sOutPut.Replace(l_sValue, l_sStringVal, true);
+						itVector->m_sExpression = p_sOutPut;
+					 }
 					}
 
 				}
