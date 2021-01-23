@@ -61,7 +61,7 @@ SP_DLG_ExpressionAssistent::SP_DLG_ExpressionAssistent(SP_CPN_ExprAssistType p_E
 	m_sColorsetName = p_psColorsetName;
 	m_sPlaceType = p_sPlaceType;
 	m_pcColorSetClass = &p_pcColorSetClass;
-	SetTitle(wxT("Expression assistent"));	
+	SetTitle(wxT("Expression assistant"));
 
 	m_ExprAssistType = p_ExprAssistType;
 
