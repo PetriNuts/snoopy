@@ -4,6 +4,8 @@
 // $Version: 0.0 $
 // $Revision: 1.30 $
 // $Date: 2007/11/03 11:55:00 $
+// $Modified:George Assaf$
+// $Date:Oct2020$
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 #ifndef __SP_DS_STANIMATION_H__
@@ -44,6 +46,9 @@ class SP_DS_StAnimation: public SP_DS_PedAnimation
 
     long int m_nStepCount; //Keeps a count of step number//by george
 
+    wxBitmap m_bitmapicons1[3];
+    wxBitmapButton *m_buRecord1, *m_buReplay1;
+    bool m_bExportFlag;
     void LoadSets();
     void UpdateChoices();
 
@@ -104,7 +109,7 @@ class SP_DS_StAnimation: public SP_DS_PedAnimation
     virtual bool OnDialogOk();
 
 	virtual void OnReset();
-
+	void OnUpdateRecordReply(wxUpdateUIEvent& p_cEvent);
 	void SetStepCounter();//by george
 	void OnExport(wxCommandEvent &p_pc_Event);//by george
 	void OnImport(wxCommandEvent &p_pcEvent);//by george
@@ -114,7 +119,10 @@ class SP_DS_StAnimation: public SP_DS_PedAnimation
 	bool ImportStepSequences();//by george
 	void ExportStepSequences();//by george
 	void ResetTransSequenceFile();//by george
-
+	void OnReplay(wxCommandEvent& p_cEvent);
+	void OnRecord(wxCommandEvent& p_cEvent);
+	void ResetRecordButton();
+	void ResetReplayButton();
 };
 
 #endif // __SP_DS_PEDANIMATION_H__
