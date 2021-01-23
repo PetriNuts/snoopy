@@ -2000,6 +2000,14 @@ SP_ImportCANDL::CreateEdge(SP_DS_Node* source, SP_DS_Node* target, const wxStrin
 void
 SP_ImportCANDL::AdaptColorExpression(wxString& p_ColorExpression)
 {
+
+	if (!p_ColorExpression.Contains(wxT(",")) && p_ColorExpression.Contains("(")&& p_ColorExpression.Contains(wxT("all")) && p_ColorExpression.Contains(wxT(")")))
+     {
+			p_ColorExpression.Replace(wxT("("), wxT(""));
+			p_ColorExpression.Replace(wxT(")"), wxT(""));
+			p_ColorExpression.Replace(wxT("1`"), wxT(""));
+	}
+
 	p_ColorExpression.Replace("all", "all()");
 	p_ColorExpression.Replace("auto", "auto()");
 	p_ColorExpression.Replace("!=", "<>");
