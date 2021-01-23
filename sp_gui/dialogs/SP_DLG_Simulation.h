@@ -83,7 +83,8 @@ protected:
 	wxTextOutputStream* m_pcExport;
 	wxString m_sLastResultExport;
 	int m_nExportSpacer;
-
+	bool m_bIsCompressChosen;//by george12.2020
+	wxString m_sDirectExportName;
 	double m_nPlotYMax;
 
 	SP_DS_Metadata* m_pcCurrentTablePlot;
@@ -321,6 +322,8 @@ DECLARE_EVENT_TABLE()
 	virtual void OnAddingNewModalView(wxCommandEvent& p_cEvent);
 	virtual void OnRemovingModalViews(wxCommandEvent& p_cEvent);
 	virtual void OnRenameModalView(wxCommandEvent& p_cEvent);
+
+	virtual bool CompressFile(const wxString& p_sFileName);//by george 12.2020
 
 	//overwrite this function in child class to give periodic update
 	virtual void OnTimer(wxTimerEvent& event){  }

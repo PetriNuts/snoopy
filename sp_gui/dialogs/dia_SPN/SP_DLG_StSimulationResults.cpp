@@ -1511,6 +1511,23 @@ void SP_DLG_StSimulationResults::OnSimulatorThreadEvent(SP_DS_ThreadEvent& event
 		if (m_ExportType == SP_SIM_DIRECT_EXPORT || m_ExportType == SP_SIM_DIRECT_SINGLE_EXPORT || m_ExportType == SP_SIM_DIRECT_SINGLE_EXACT_EXPORT)
 		{
 			CloseExportFile();
+
+			if (m_bIsCompressChosen)//george12.2020
+					{
+						if (m_bIsCompressChosen)//by george 12.2020
+						{
+
+							if (CompressFile(m_sDirectExportName))
+							{
+								SP_LOGMESSAGE(wxT("Direct trace has been compressed successfully"));
+								wxRemoveFile(m_sDirectExportName);
+							}
+							else
+							{
+								SP_LOGMESSAGE(wxT("Something wrong happend while compressing!"));
+							}
+						}
+					}
 		}
 
 		Update();

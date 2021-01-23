@@ -82,17 +82,17 @@ SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 
 	m_pcPropertiesSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND);
 
-	if (m_eDlgType == SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT)
-	{
+	//if (m_eDlgType == SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT)
+	///{
 		l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 
-		m_pcCompressCheckBox = new wxCheckBox( this, -1, wxT("Compress Exact Output") );
+		m_pcCompressCheckBox = new wxCheckBox( this, -1, wxT("Compress Output") );
 
 		l_pcRowSizer->Add( m_pcCompressCheckBox, 1, wxALL | wxEXPAND, 5 );
 
 		m_pcPropertiesSizer->Add( l_pcRowSizer, 1, wxALL | wxEXPAND );
 
-	}
+	///}
 
 	l_pcRowSizer = new wxBoxSizer( wxHORIZONTAL );
 

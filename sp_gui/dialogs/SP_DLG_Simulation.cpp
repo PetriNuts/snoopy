@@ -50,6 +50,9 @@
 #include "sp_gui/dialogs/SP_DLG_BaseSimulation.h"
 #include "sp_gui/dialogs/dia_FPN/SP_DLG_FpnConstantDefinition.h"//Added by G.A
 #include <wx/busyinfo.h>
+#include <wx/fs_zip.h>
+#include <wx/zipstrm.h>
+
 #if !defined(__WXMSW__) && !defined(__WXPM__)
 #include "sp_gui/widgets/sp_plot/plot_enl.xpm"
 #include "sp_gui/widgets/sp_plot/plot_shr.xpm"
@@ -2050,12 +2053,24 @@ void SP_DLG_Simulation::OpenExportFile()
 {
     wxString l_sExportFilename = m_sExportFilename.BeforeLast('.');
 
-    if (l_sExportFilename == m_pcGraph->GetParentDoc()->GetFilename().BeforeLast('.'))
-    {
-        l_sExportFilename << wxT("(")
-        << wxDateTime::Now().Format(wxT("%Y-%m-%dT%H:%M:%S%Z")) << wxT(")");
-    }
+    //if (l_sExportFilename == m_pcGraph->GetParentDoc()->GetFilename().BeforeLast('.'))
+   // {
+      //  l_sExportFilename << wxT("(")
+      //  << wxDateTime::Now().Format(wxT("%Y-%m-%dT%H:%M:%S%Z")) << wxT(")");
+   // }
+
+    if (m_bIsCompressChosen)
+    	{//by george12.2020
+    		//l_sExportFilename.Replace(_T(":"), _T("-"));
+    		l_sExportFilename.Replace(_T("("), _T(""));
+    		l_sExportFilename.Replace(_T(")"), _T(""));
+    		l_sExportFilename.Replace(_T(" "), _T(""));
+    		l_sExportFilename.Replace(_T(".EuropeStandardTime"), _T(""));
+    		l_sExportFilename.Replace(_T("."), _T(""));
+    		m_sExportFilename = l_sExportFilename;
+    	}
     l_sExportFilename << wxT(".csv");
+    m_sDirectExportName = l_sExportFilename;//george12.2020
 
     m_pcExportFileOutputStream = new wxFileOutputStream(l_sExportFilename);
     if (!m_pcExportFileOutputStream->IsOk())
@@ -2157,15 +2172,72 @@ void SP_DLG_Simulation::OnExportToCSV()
         wxString l_sBackupFilename = m_sExportFilename;
         m_sExportFilename = l_sFilename;
 
+        if (m_sExportFilename == m_pcGraph->GetParentDoc()->GetFilename().BeforeLast('.')
+        	&& !l_pcDlg->IsCompressChecked())
+         {
+        		m_sExportFilename << wxT("(")
+        		 << wxDateTime::Now().Format(wxT("%Y-%m-%dT%H-%M-%S%Z")) << wxT(")");
+         }
+
         OpenExportFile();
         DirectExportToCSV();
         CloseExportFile();
 
         m_sExportFilename = l_sBackupFilename;
+
+   	   /***********compression if required****/
+   		if (l_pcDlg->IsCompressChecked())
+   		{
+   			if (CompressFile(l_sFilename))
+   			{
+   				SP_LOGMESSAGE(wxT("the output trace has been comprissed successfully"));
+   				wxRemoveFile(l_sFilename);
+   			}
+   			else
+   			{
+   				SP_LOGMESSAGE(wxT("Something wrong happend while compression!"));
+   			}
+
+   		}
+   		/**********************/
     }
 
     l_pcDlg->Destroy();
 }
+
+bool SP_DLG_Simulation::CompressFile(const wxString& p_sFileName)
+{
+	try {
+		wxString l_sZip = p_sFileName + _T(".zip");
+		l_sZip.Replace(wxT(".csv"), wxT(""));
+		wxFileName wfnZipFile(l_sZip);
+
+		wxString wsT1 = wfnZipFile.GetFullPath();
+		wxFFileOutputStream out(wsT1);
+
+		if (!out.IsOk()) return false;
+
+		wxZipOutputStream zip(out);
+
+		if (!zip.IsOk()) return false;
+
+
+		wxFileName wfnSource(p_sFileName);
+
+
+		wxFileInputStream in(p_sFileName);
+
+		zip.PutNextEntry(wfnSource.GetFullName());
+		zip.Write(in);
+		zip.CloseEntry();
+		zip.Close();
+
+	}catch(exception e) {
+		SP_LOGERROR_(e.what()); return false;
+	}
+	return true;
+}
+
 
 void SP_DLG_Simulation::LoadResults()
 {

@@ -174,6 +174,8 @@ bool SP_DS_PlaceODE::FillInPreConnection(SP_DS_Node* p_pcPlaceNode)
 
     	  SP_DS_Attribute* l_pcMultAttr=GetEdgeAttribute((*l_itEdge));
 
+    	  if (l_Trans.ConType == SP_MODIFIER_ARC) continue;//george
+
 		  CHECK_POINTER(l_pcMultAttr,return false);
 
 		  wxString l_sMult=l_pcMultAttr->GetValueString();
@@ -223,6 +225,8 @@ bool SP_DS_PlaceODE::FillInPostConnection(SP_DS_Node* p_pcPlaceNode)
 			  l_Trans.nTransPos=l_nTransPos;
 
 			  SP_DS_Attribute* l_pcMultAttr=GetEdgeAttribute((*l_itEdge));
+
+			  if (l_Trans.ConType == SP_MODIFIER_ARC)   continue;//george
 
 			  CHECK_POINTER(l_pcMultAttr,return false);
 

@@ -61,6 +61,8 @@ class SP_DLG_StDirectExportProperties : public wxDialog
     void OnDlgOk( wxCommandEvent& p_cEvent );
     void OnDlgCancel( wxCommandEvent& p_cEvent );
 
+    bool IsCompressChecked() { return m_pcCompressCheckBox->GetValue(); }//george 12.2020
+
     DECLARE_CLASS( SP_DLG_StDirectExportProperties )
     DECLARE_EVENT_TABLE()
 };

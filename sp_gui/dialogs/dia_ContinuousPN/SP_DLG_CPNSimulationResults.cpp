@@ -581,6 +581,23 @@ void SP_DLG_CPNSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cEven
 
 			//close the export
 			CloseExportFile();
+
+			if (m_bIsCompressChosen)//by george 12.2020
+			{
+			 m_sDirectExportName.Replace(_T("("), _T(""));
+			 m_sDirectExportName.Replace(_T(")"), _T(""));
+			 m_sDirectExportName.Replace(_T(" "), _T(""));
+			 m_sDirectExportName.Replace(_T(".EuropeStandardTime"), _T(""));
+			 if (CompressFile(m_sDirectExportName))
+				{
+					SP_LOGMESSAGE(wxT("Direct trace has been compressed successfully"));
+					wxRemoveFile(m_sDirectExportName);
+				}
+			else
+			  {
+				SP_LOGMESSAGE(wxT("Something wrong happened while compressing!"));
+			  }
+		  }
 		}
 	}
 	else
@@ -1370,6 +1387,19 @@ OnExportToCSV()
 	        m_bReplaceValue=l_pcDlg->GetReplaceValue();
 
 	        m_nReplacedVaue=l_pcDlg->GetReplacedValues();
+
+			if (l_pcDlg->IsCompressChecked())//by george@12.2020
+			{
+				if (CompressFile(l_sFilename))
+				{
+					SP_LOGMESSAGE(wxT("the output trace has been comprissed successfully"));
+					wxRemoveFile(l_sFilename);
+				}
+				else
+				{
+					SP_LOGMESSAGE(wxT("Something wrong happend while compression!"));
+				}
+			}
 	    }
 
 	    l_pcDlg->Destroy();
