@@ -137,6 +137,14 @@ SP_DS_PedAnimation( p_nRefresh, p_nDuration, p_eStepping), m_pcSimulator (NULL)
 	m_mGroup2Position.clear();
 	m_bExportFlag = false;
 	m_bImportFlag=false;
+	 m_buRecord1=NULL;
+	 m_buReplay1=NULL;
+	// m_cbKeep=NULL;
+	// m_pcSimulator=NULL;
+	 m_pcOutputLabelStaticText=NULL;
+
+
+
 }
 
 SP_DS_StAnimation::~SP_DS_StAnimation()
@@ -153,7 +161,7 @@ SP_DS_StAnimation::~SP_DS_StAnimation()
 		 Refresh();
 		 }
 		 wxGetApp().GetAnimationPrefs()->SetKeepMarking(m_cbKeep->IsChecked());
-		 wxDELETE((m_cbKeep));
+		// wxDELETE((m_cbKeep));
 		 }
 		 else {
 
@@ -167,15 +175,25 @@ SP_DS_StAnimation::~SP_DS_StAnimation()
 				 (*l_Iter)->MarkingTargetEdges();
 			 }
 
+			  if(m_pcSimulator)
 			 wxDELETE(m_pcSimulator);
 		 }
+
+
+		if(m_buRecord1)
 		 wxDELETE(m_buRecord1);
+
+		if(m_buReplay1)
 		 wxDELETE(m_buReplay1);
+
          if(m_cbKeep)
           wxDELETE((m_cbKeep));
-		Refresh();
 
-	 wxDELETE(m_pcSimulator);
+         if(m_pcOutputLabelStaticText)
+         	wxDELETE(m_pcOutputLabelStaticText);
+
+
+ 	Refresh();
 
 }
 
@@ -277,7 +295,7 @@ void SP_DS_StAnimation::LoadConnectionOfType(const wxString& p_sArcType, const s
 	wxString l_sSourceNodeName, l_sDestNodeName;
 
 	SP_DS_Node* l_pcSourceNode, *l_pcTargetNode;
-	;
+
 
 	SP_DS_NameAttribute* l_pcNameAttribute;
 
@@ -570,7 +588,7 @@ bool SP_DS_StAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSi
 	m_cbKeep = new wxCheckBox(p_pcCtrl, SP_ID_PEDKEEP, wxT("Always keep marking when closing."));
 	m_cbKeep->SetValue(wxGetApp().GetAnimationPrefs()->GetKeepMarking());
 	p_pcSizer->Add(m_cbKeep, 0, wxALL, 5);
-	////////////////////
+	////////////s////////
 	//by george
 	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
 	wxString l_tmp;
@@ -587,12 +605,12 @@ bool SP_DS_StAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSi
 
 	///p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
 	///////////////////
-    m_pcOutputLabelStaticText = new wxStaticText(p_pcCtrl, SP_ID_STATIC_TEXT_OUTPUT_LABEL, wxT("Start ..."), wxDefaultPosition, wxDefaultSize);
+	  m_pcOutputLabelStaticText = new wxStaticText(p_pcCtrl, SP_ID_STATIC_TEXT_OUTPUT_LABEL, wxT("Start ..."), wxDefaultPosition, wxDefaultSize);
 
 	l_pcRowSizer->Add(m_pcOutputLabelStaticText, 1, wxALL, 5);
 	l_pcOutputLabelSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-	wxSizer* m_pcExportImportSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxSizer*  m_pcExportImportSizer = new wxBoxSizer(wxHORIZONTAL);
 	m_pcExportImportSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDEXPORT, wxT("Export")), 1, wxALL | wxEXPAND, 5);
 	m_pcExportImportSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDIMPORT, wxT("Import")), 1, wxALL | wxEXPAND, 5);
 	p_pcSizer->Add(m_pcExportImportSizer, 0, wxALL, 5);
@@ -625,7 +643,7 @@ bool SP_DS_StAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSi
 
 	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
 	//-------------------------------------------
-	p_pcSizer->Add(m_pcStepCounter, 0, wxEXPAND);
+
 	p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
 	/////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////

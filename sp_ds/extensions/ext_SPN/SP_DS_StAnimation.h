@@ -39,7 +39,11 @@ class SP_DS_StAnimation: public SP_DS_PedAnimation
 	vector<wxChoice*> m_apcComboBoxes;
 
     wxStaticText* m_pcOutputLabelStaticText;
-
+    //wxSizer* l_pcOutputLabelSizer;
+   // wxSizer* l_pcSetsSizer ;
+   // wxSizer* l_pcSimulationControlSizer ;
+   // wxSizer* l_pcRowSizer ;
+    //wxSizer* m_pcExportImportSizer ;
     //bysl
     SP_SetString  m_choices;
     SP_MapString2Int m_mGroup2Position;
