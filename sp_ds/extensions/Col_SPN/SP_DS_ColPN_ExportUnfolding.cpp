@@ -262,8 +262,11 @@ bool SP_DS_ColPN_ExportUnfolding::CreateDuplicatePlaceNodeType( SP_CPN_UnfoldedP
 				SP_Graphic* l_pcOldGr = *l_itOldGr;
 				SP_Graphic* l_pcNewGr = *l_itNewGr;
 
-				l_pcNewGr->SetPosX(l_pcOldGr->GetPosX()+l_nInstCount*(m_nNetSize+50.0)); // it should be reasonablely set.
-				l_pcNewGr->SetPosY(l_pcOldGr->GetPosY());				
+				//l_pcNewGr->SetPosX(l_pcOldGr->GetPosX()+l_nInstCount*(m_nNetSize+50.0)); // it should be reasonablely set.
+				//l_pcNewGr->SetPosY(l_pcOldGr->GetPosY());
+				//bugfix:by george
+				l_pcNewGr->SetPosX(350.0 ); // it should be reasonablely set.
+				l_pcNewGr->SetPosY(250.0);
 
 				m_mGraphic2PlaceNode[l_pcNewGr] = l_pcNewNode;
 			}
