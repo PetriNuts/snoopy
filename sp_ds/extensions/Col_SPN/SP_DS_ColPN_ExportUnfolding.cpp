@@ -458,8 +458,11 @@ bool SP_DS_ColPN_ExportUnfolding::CreateDuplicateTransNodeType( SP_CPN_UnfoldedT
 				SP_Graphic* l_pcOldGr = *l_itOldGr;
 				SP_Graphic* l_pcNewGr = *l_itNewGr;
 
-				l_pcNewGr->SetPosX(l_pcOldGr->GetPosX()+l_nInstCount*(m_nNetSize+50.0)); // it should be reasonablely set.
-				l_pcNewGr->SetPosY(l_pcOldGr->GetPosY());
+				//commented by george, here causes crash, the big unfolded net will cause tresspassing the canvas
+				///l_pcNewGr->SetPosX(l_pcOldGr->GetPosX()+l_nInstCount*(m_nNetSize+50.0)); // it should be reasonablely set.
+				//l_pcNewGr->SetPosY(l_pcOldGr->GetPosY());
+				l_pcNewGr->SetPosX(300);//george
+				l_pcNewGr->SetPosX( 200);//george
 
 				m_mGraphic2TransNode[l_pcNewGr] = l_pcNewNode;
 			}
