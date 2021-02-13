@@ -32,6 +32,7 @@
 #include <wx/busyinfo.h> 
 
 #include <wx/colordlg.h>
+#include "sp_gui/dialogs/dia_CPN/SP_DLG_FunctionAssistent.h"//by george 2021
 
 IMPLEMENT_CLASS( SP_DLG_ColorSetSetting, wxDialog )
 
@@ -50,7 +51,9 @@ enum SP_CPN_ID
 	SP_ID_GRID_STRUCTUREDCOLORSET,
 	SP_ID_GRID_SUBSETCOLORSET,
 	SP_ID_GRID_ALIASCOLORSET,
-	SP_ID_BUTTON_EXPORTDECLARATION
+	SP_ID_BUTTON_EXPORTDECLARATION,
+	SP_ID_BUTTON_SIMPLE_CS_ASSISTANT,//george 2021
+	SP_ID_BUTTON_COMP_CS_ASSISTANT
 };
 
 BEGIN_EVENT_TABLE( SP_DLG_ColorSetSetting, wxDialog )
@@ -67,7 +70,8 @@ EVT_BUTTON( SP_ID_BUTTON_ADD3, SP_DLG_ColorSetSetting::OnAddColorSet )
 EVT_BUTTON( SP_ID_BUTTON_DELETE3, SP_DLG_ColorSetSetting::OnDeleteColorSet )
 EVT_BUTTON( SP_ID_BUTTON_ADD4, SP_DLG_ColorSetSetting::OnAddColorSet )
 EVT_BUTTON( SP_ID_BUTTON_DELETE4, SP_DLG_ColorSetSetting::OnDeleteColorSet )
-
+EVT_BUTTON(SP_ID_BUTTON_COMP_CS_ASSISTANT, SP_DLG_ColorSetSetting::OnCSAssistant)
+EVT_BUTTON(SP_ID_BUTTON_SIMPLE_CS_ASSISTANT, SP_DLG_ColorSetSetting::OnCSAssistant)
 //EVT_BUTTON( SP_ID_BUTTON_EXPORTDECLARATION, SP_DLG_ColorSetSetting::OnExportDeclaration )
 
 EVT_NOTEBOOK_PAGE_CHANGED(wxID_ANY, SP_DLG_ColorSetSetting::OnPageChanged)
@@ -181,7 +185,7 @@ SP_DLG_ColorSetSetting::SP_DLG_ColorSetSetting( wxWindow* p_pcParent,SP_CPN_Grid
 	l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_ADD, wxT("Add colorset") ), 1, wxALL, 5);
 	l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_DELETE, wxT("Delete colorset") ), 1, wxALL, 5);
 	l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_CHECK, wxT("Check colorsets") ), 1, wxALL, 5);
-
+	l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_SIMPLE_CS_ASSISTANT, wxT("Colorset assistant")), 1, wxALL, 5);//george
 	//l_pcButtonSizer->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_EXPORTDECLARATION, wxT("Export declaration") ), 1, wxALL, 5);
 
     l_pcNotebookPage->AddControl(l_pcButtonSizer, 0, wxALL | wxEXPAND, 5);
@@ -249,7 +253,7 @@ SP_DLG_ColorSetSetting::SP_DLG_ColorSetSetting( wxWindow* p_pcParent,SP_CPN_Grid
 	l_pcButtonSizer2->Add(new wxButton(l_pcNotebookPage2, SP_ID_BUTTON_ADD2, wxT("Add colorset") ), 1, wxALL, 5);
 	l_pcButtonSizer2->Add(new wxButton(l_pcNotebookPage2, SP_ID_BUTTON_DELETE2, wxT("Delete colorset") ), 1, wxALL, 5);
 	l_pcButtonSizer2->Add(new wxButton(l_pcNotebookPage2, SP_ID_BUTTON_CHECK, wxT("Check colorset") ), 1, wxALL, 5);
-	
+	l_pcButtonSizer2->Add(new wxButton(l_pcNotebookPage2, SP_ID_BUTTON_COMP_CS_ASSISTANT, wxT("Colorset assistant")), 1, wxALL, 5);//by george
     l_pcNotebookPage2->AddControl(l_pcButtonSizer2, 0, wxALL | wxEXPAND, 5);
 
 	//The end of Page 2
@@ -298,7 +302,7 @@ SP_DLG_ColorSetSetting::SP_DLG_ColorSetSetting( wxWindow* p_pcParent,SP_CPN_Grid
 	l_pcButtonSizer4->Add(new wxButton(l_pcNotebookPage4, SP_ID_BUTTON_ADD4, wxT("Add colorset") ), 1, wxALL, 5);
 	l_pcButtonSizer4->Add(new wxButton(l_pcNotebookPage4, SP_ID_BUTTON_DELETE4, wxT("Delete colorset") ), 1, wxALL, 5);
 	l_pcButtonSizer4->Add(new wxButton(l_pcNotebookPage4, SP_ID_BUTTON_CHECK, wxT("Check colorset") ), 1, wxALL, 5);
-	
+	l_pcButtonSizer4->Add(new wxButton(l_pcNotebookPage, SP_ID_BUTTON_SIMPLE_CS_ASSISTANT, wxT("Colorset assistant")), 1, wxALL, 5);//by george
     l_pcNotebookPage4->AddControl(l_pcButtonSizer4, 0, wxALL | wxEXPAND, 5);
 
 	//The end of Page 4
@@ -1145,3 +1149,68 @@ void SP_DLG_ColorSetSetting::OnExportDeclaration( wxCommandEvent& p_cEvent )
 {
 }
 
+
+void SP_DLG_ColorSetSetting::OnCSAssistant(wxCommandEvent& p_cEvent)//george 2021
+{
+	int l_nEditRowPos = m_pcBasicColorSetGrid->GetGridCursorRow();
+
+	if (m_pcNotebook->GetSelection()==0)
+	{
+
+		wxString l_pcReturnText = m_pcBasicColorSetGrid->GetCellValue(l_nEditRowPos, 2);
+
+
+		vector<wxString> l_vParameter;
+
+
+		SP_CPN_ColorSetClass l_cColorSetClass;
+		SP_CPN_ValueAssign l_cValueAssign;
+		l_cValueAssign.InitializeColorset(l_cColorSetClass);
+
+		for (auto itMap = l_cColorSetClass.GetVariableMap()->begin(); itMap != l_cColorSetClass.GetVariableMap()->end(); ++itMap)
+		{
+			if (itMap->first.Contains(_T("_AUX_"))) continue;//these are implicit vars which will be added if ElemOf Op is used, so we skip them as they are not-user defined vars
+			l_vParameter.push_back(itMap->second.m_ColorSet);
+			l_vParameter.push_back(itMap->first);
+
+		}
+
+		SP_DLG_FunctionAssistent* l_pcDlg = new SP_DLG_FunctionAssistent(l_vParameter, wxT(""), l_cColorSetClass, l_pcReturnText, this);
+
+		if (l_pcDlg->ShowModal() == wxID_OK)
+		{
+			m_pcBasicColorSetGrid->SetCellValue(l_nEditRowPos, 2, l_pcDlg->GetReturnText());
+		}
+
+		l_pcDlg->Destroy();
+	}
+	else if(m_pcNotebook->GetSelection() == 1)
+	{
+		l_nEditRowPos = m_pcStructuredColorSetGrid->GetGridCursorRow();
+		wxString l_pcReturnText = m_pcStructuredColorSetGrid->GetCellValue(l_nEditRowPos, 2);
+
+
+		vector<wxString> l_vParameter;
+
+
+		SP_CPN_ColorSetClass l_cColorSetClass;
+		SP_CPN_ValueAssign l_cValueAssign;
+		l_cValueAssign.InitializeColorset(l_cColorSetClass);
+
+		for (auto itMap = l_cColorSetClass.GetVariableMap()->begin(); itMap != l_cColorSetClass.GetVariableMap()->end(); ++itMap)
+		{
+			if (itMap->first.Contains(_T("_AUX_"))) continue;//these are implicit vars which will be added if ElemOf Op is used, so we skip them as they are not-user defined vars
+			l_vParameter.push_back(itMap->second.m_ColorSet);
+			l_vParameter.push_back(itMap->first);
+
+		}
+		SP_DLG_FunctionAssistent* l_pcDlg = new SP_DLG_FunctionAssistent(l_vParameter, wxT(""), l_cColorSetClass, l_pcReturnText, this);
+
+		if (l_pcDlg->ShowModal() == wxID_OK)
+		{
+			m_pcStructuredColorSetGrid->SetCellValue(l_nEditRowPos, 2, l_pcDlg->GetReturnText());
+		}
+
+		l_pcDlg->Destroy();
+	}
+}

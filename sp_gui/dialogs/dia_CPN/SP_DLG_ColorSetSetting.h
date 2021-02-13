@@ -128,7 +128,7 @@ class SP_DLG_ColorSetSetting : public wxDialog
 	void OnCellValueChanged(wxGridEvent& p_gEvent);
 	void OnEditorShown( wxGridEvent& ev );
 	void OnCheckFunction( wxCommandEvent& p_cEvent );
-
+	void OnCSAssistant(wxCommandEvent& p_cEvent);//george 2021
 	
 
 	void OnExportDeclaration( wxCommandEvent& p_cEvent );
