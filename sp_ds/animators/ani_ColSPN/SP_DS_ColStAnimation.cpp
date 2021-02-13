@@ -210,9 +210,6 @@ SP_DS_ColStAnimation::~SP_DS_ColStAnimation()
 
 						l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
 
-						//l_pcColList->Clear();
-						//l_pcColList->RemoveAllColumns();
-
 						int l_nBegin = l_nGridRowNumber;
 						wxString l_sMainMarking;
 
@@ -222,7 +219,7 @@ SP_DS_ColStAnimation::~SP_DS_ColStAnimation()
 						SP_CPN_SyntaxChecking l_cSyntaxChecking;
 						if (!l_cSyntaxChecking.Initialize())
 							continue;
-				////////////////////////////////////////////////////////
+
 					l_sMainMarking = wxT("");
 					map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
 					if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false,true))
@@ -249,7 +246,7 @@ SP_DS_ColStAnimation::~SP_DS_ColStAnimation()
 						}
 							l_sMainMarking << l_nMarking;
 					}
-					////////////////////////////////////////////////////////////////
+
 
 					SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast<SP_DS_Attribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(wxT("Marking")));
 					if (l_pcMarkingAttr)
@@ -261,16 +258,14 @@ SP_DS_ColStAnimation::~SP_DS_ColStAnimation()
 
 				  SP_Core::Instance()->GetRootDocument()->Modify(true);
 
-
-					/*******************************/
-					Refresh();
-
-				//if (m_pcUnfolding)
 				wxDELETE(m_pcUnfolding);
 				}
 
 		if (m_cbKeep)
 			wxDELETE(m_cbKeep);
+
+
+	    Refresh();
 
 }
 
@@ -921,21 +916,12 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 		p_pcSizer->Add(m_pcStepCounter, 0, wxEXPAND);
 		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
 		//-------------------------------------------
-		//p_pcSizer->Add( new wxButton( p_pcCtrl, SP_ID_BUTTON_OPEN_SIMULATION, wxT("Stochastic simulation"),
-		//wxDefaultPosition, wxDefaultSize, 0 ), 0, wxALL, 5 );
-		/////////////////////////////
-		//wxSizer* l_pcOutputLabelSizer = new wxBoxSizer(wxVERTICAL);
+
 
 		wxSizer* l_pcSetsSizer = new wxBoxSizer(wxVERTICAL);
 
 
 		wxSizer* l_pcRowSizer;// = new wxBoxSizer(wxHORIZONTAL);
-
-		//m_pcOutputLabelStaticText = new wxStaticText(p_pcCtrl, SP_ID_STATIC_TEXT_OUTPUT_LABEL, wxT("Start ..."), wxDefaultPosition, wxDefaultSize);
-
-		///l_pcRowSizer->Add(m_pcOutputLabelStaticText, 1, wxALL, 5);
-
-		//l_pcOutputLabelSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
 
 		if (m_pcGraph->GetNodeclass(wxT("Place"))->GetElements()->size() > 0)//by george, preventing of occuring empty v-sets

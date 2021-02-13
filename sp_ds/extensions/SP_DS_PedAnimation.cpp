@@ -126,8 +126,11 @@ SP_DS_PedAnimation::~SP_DS_PedAnimation()
 				(*l_Iter)->MarkingTargetEdges();
 			}
 		}
+		if(m_cbKeep)
+		{
 		wxGetApp().GetAnimationPrefs()->SetKeepMarking(m_cbKeep->IsChecked());
 		wxDELETE((m_cbKeep));
+		}
 	}
 
 	//m_pcGraph->GetParentDoc()->DrawAllElements(false,true);
