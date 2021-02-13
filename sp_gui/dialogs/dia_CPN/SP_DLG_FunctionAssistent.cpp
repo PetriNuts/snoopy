@@ -102,6 +102,20 @@ void SP_DLG_FunctionAssistent::LoadFunctions()
 	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
 	m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("Multiset addition"));
 
+	//by george 2020
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("--");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Multiset difference"));
+
+	//by george 2020
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("ElemOf");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Element of Operator"));
+
 	l_cItem.m_itemId = l_nPos++;
 	l_cItem.m_text = wxT("");
 	l_cItem.m_text << wxT("[ ]");
@@ -183,11 +197,26 @@ void SP_DLG_FunctionAssistent::LoadFunctions()
 	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
 	m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("And"));
 
+
+	//george
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("&&");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("And"));
+
 	l_cItem.m_itemId = l_nPos++;
 	l_cItem.m_text = wxT("");
 	l_cItem.m_text << wxT("|");
 	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
 	m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("Or"));
+
+	//george
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("||");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Or"));
 
 	l_cItem.m_itemId = l_nPos++;
 	l_cItem.m_text = wxT("");
@@ -226,12 +255,26 @@ void SP_DLG_FunctionAssistent::LoadFunctions()
 	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
 	m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("Unequal to"));
 
+	//george
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("!=");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Unequal to"));
+
 
 	l_cItem.m_itemId = l_nPos++;
 	l_cItem.m_text = wxT("");
 	l_cItem.m_text << wxT("=");
 	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
 	m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("Equal to"));
+
+	//george
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("==");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Equal to"));
 
 
 	m_pcFunctionListCtrl->SetColumnWidth(0, 50);

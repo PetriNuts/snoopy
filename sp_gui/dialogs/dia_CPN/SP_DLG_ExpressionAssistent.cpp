@@ -29,7 +29,8 @@ enum
 	SP_ID_BUTTON_CHECK,
 	SP_ID_LISTCTRL_VARIABLE,
 	SP_ID_LISTCTRL_CONSTANT,
-	SP_ID_LISTCTRL_FUNCTION
+	SP_ID_LISTCTRL_FUNCTION,
+	SP_ID_LISTCTRL_COLORSET//2021
 
 };
 
@@ -47,6 +48,7 @@ BEGIN_EVENT_TABLE( SP_DLG_ExpressionAssistent_ListCtrl, wxListCtrl )
 EVT_LIST_ITEM_ACTIVATED( SP_ID_LISTCTRL_VARIABLE, SP_DLG_ExpressionAssistent_ListCtrl::OnDblClick )
 EVT_LIST_ITEM_ACTIVATED( SP_ID_LISTCTRL_CONSTANT, SP_DLG_ExpressionAssistent_ListCtrl::OnDblClick )
 EVT_LIST_ITEM_ACTIVATED( SP_ID_LISTCTRL_FUNCTION, SP_DLG_ExpressionAssistent_ListCtrl::OnDblClick )
+EVT_LIST_ITEM_ACTIVATED(SP_ID_LISTCTRL_COLORSET, SP_DLG_ExpressionAssistent_ListCtrl::OnDblClick)//george 2021
 
 END_EVENT_TABLE()
 
@@ -94,6 +96,14 @@ SP_DLG_ExpressionAssistent::SP_DLG_ExpressionAssistent(SP_CPN_ExprAssistType p_E
 								wxSize(200, 200), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
 	l_pcParameterListBoxSizer->Add(m_pcConstantListCtrl, 1, wxALL| wxEXPAND, 2);
 	l_pcListBoxesSizer->Add(l_pcParameterListBoxSizer, 1, wxALL| wxEXPAND, 2);
+
+
+	//color sets
+	wxStaticBoxSizer* l_pcSimpleCSListBoxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Color sets")), wxHORIZONTAL);
+	m_pcSimpleCSListCtrl = new SP_DLG_ExpressionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_COLORSET, wxDefaultPosition,
+		wxSize(150, 200), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
+	l_pcSimpleCSListBoxSizer->Add(m_pcSimpleCSListCtrl, 1, wxALL | wxEXPAND, 2);
+	l_pcListBoxesSizer->Add(l_pcSimpleCSListBoxSizer, 1, wxALL | wxEXPAND, 2);
 
 	wxStaticBoxSizer* l_pcFunctionListBoxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Functions / Operators")), wxHORIZONTAL);
 	m_pcFunctionListCtrl = new SP_DLG_ExpressionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_FUNCTION, wxDefaultPosition,
@@ -262,6 +272,21 @@ void SP_DLG_ExpressionAssistent::LoadFunctions()
 		m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("Return the number of neighbors for a cell"));
 	}
 
+	    //by george 2021
+		l_cItem.m_itemId = l_nPos++;
+		l_cItem.m_text = wxT("");
+		l_cItem.m_text << wxT("--");
+		l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+		m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Multiset difference"));
+
+		//by george 2021
+		l_cItem.m_itemId = l_nPos++;
+		l_cItem.m_text = wxT("");
+		l_cItem.m_text << wxT("ElemOf");
+		l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+		m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Element of Operator"));
+
+
 	l_cItem.m_itemId = l_nPos++;
 	l_cItem.m_text = wxT("");
 	l_cItem.m_text << wxT("abs(.)");
@@ -350,6 +375,19 @@ void SP_DLG_ExpressionAssistent::LoadFunctions()
 	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
 	m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("And"));
 
+	//george
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("&&");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("And"));
+
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("|");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("Or"));
+
 	l_cItem.m_itemId = l_nPos++;
 	l_cItem.m_text = wxT("");
 	l_cItem.m_text << wxT("|");
@@ -392,12 +430,26 @@ void SP_DLG_ExpressionAssistent::LoadFunctions()
 	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
 	m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("Unequal to"));
 
+	//george
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("!=");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Unequal to"));
+
 
 	l_cItem.m_itemId = l_nPos++;
 	l_cItem.m_text = wxT("");
 	l_cItem.m_text << wxT("=");
 	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
 	m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("Equal to"));
+
+	//george
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("==");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Equal to"));
 
 	m_pcFunctionListCtrl->SetColumnWidth(0, 80);
 	m_pcFunctionListCtrl->SetColumnWidth(1, 120);
@@ -446,6 +498,7 @@ void SP_DLG_ExpressionAssistent::LoadData()
 
 	LoadConstant();
     LoadVariable();
+    LoadSimpleColorSets();//by george
 	LoadFunctions();
 
 }
@@ -515,4 +568,48 @@ void SP_DLG_ExpressionAssistent_ListCtrl::OnDblClick(wxListEvent& event)
 	
 
 }
+
+
+void SP_DLG_ExpressionAssistent::LoadSimpleColorSets()
+{
+	if (!m_pcColorSetClass)
+		return;
+
+	wxListItem l_cItem;
+	int l_nPos = 0;
+
+	if (m_pcSimpleCSListCtrl->GetItemCount() > 0) { return; }
+
+	//Load cs
+	m_pcSimpleCSListCtrl->InsertColumn(0, wxT("Colorset"), wxLIST_FORMAT_LEFT);
+	m_pcSimpleCSListCtrl->InsertColumn(1, wxT("Simple/Compound"), wxLIST_FORMAT_LEFT);
+
+
+	l_cItem.SetBackgroundColour(*wxWHITE);
+	l_cItem.m_mask = wxLIST_MASK_TEXT;
+
+	vector< SP_CPN_ColorSet*>::iterator itV;
+	for (itV = m_pcColorSetClass->GetColorSetVector()->begin(); itV != m_pcColorSetClass->GetColorSetVector()->end(); itV++)
+	{
+		l_cItem.m_col = 0;
+		l_cItem.m_itemId = l_nPos++;
+		l_cItem.m_text = wxT("");
+		l_cItem.m_text << (*itV)->GetName();
+		long l_nIndex = m_pcSimpleCSListCtrl->InsertItem(l_cItem);
+
+		l_cItem.m_text = wxT("");
+		if ((*itV)->GetComponentName().size() > 1)
+		{
+			l_cItem.m_text << wxT("Compound");
+
+		}
+		else
+		{
+			l_cItem.m_text << wxT("Simple");
+		}
+		m_pcSimpleCSListCtrl->SetItem(l_nIndex, 1, l_cItem.m_text);
+
+	}
+}
+
 

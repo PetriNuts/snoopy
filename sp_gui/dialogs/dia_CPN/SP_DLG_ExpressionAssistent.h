@@ -75,11 +75,13 @@ class SP_DLG_ExpressionAssistent : public wxDialog
     SP_DLG_ExpressionAssistent_ListCtrl* m_pcVariableListCtrl;
     SP_DLG_ExpressionAssistent_ListCtrl* m_pcConstantListCtrl;
     SP_DLG_ExpressionAssistent_ListCtrl* m_pcFunctionListCtrl;
+    SP_DLG_ExpressionAssistent_ListCtrl* m_pcSimpleCSListCtrl;//by george
 
     virtual void LoadData();
     virtual void LoadConstant();
     virtual void LoadVariable();
     virtual void LoadFunctions();
+    virtual void LoadSimpleColorSets();//by george
 
     DECLARE_CLASS( SP_DLG_ExpressionAssistent )
 
