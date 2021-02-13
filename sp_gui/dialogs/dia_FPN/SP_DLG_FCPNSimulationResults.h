@@ -22,9 +22,10 @@
 #include "SP_DS_FcpnSimulThread.h"
 #include "SP_DS_FuzzyResult_Thread.h"
 #include<wx/busyinfo.h>
-//#include"sp_ds/extensions/SP_DS_ThreadEvent.h"
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_SamplingProperties.h"
+
 typedef std::vector<TriangularFN> TFN_List;
-//class SP_DS_ThreadEvent;
+
 class SP_DLG_FCPNSimulationResults : public SP_DLG_CPNSimulationResults
 {
 protected:
@@ -36,6 +37,7 @@ protected:
 	bool         m_initialRun;
 	wxBusyInfo* m_info;
 	long m_lruncounter;
+	SP_DS_Metadata* m_pcFuzzySimProp;//fuzzy properties
 
 protected:
 	SP_Vector2DDouble           m_paramMatrix;
@@ -45,7 +47,7 @@ protected:
 	std::vector<int>         m_fuzzyParamPositions;
 	std::vector<double>      m_vCurrentSample;
 	ResultFuzzyBand          m_vResultFBand;
-	FuzzyReasoning *          m_fr;
+	fuzzification::FuzzyReasoning *        m_fr;
 	long                     m_lSamplingStrategyselection;
 	long                     m_lSimTim;
 	bool                     m_bIsAbort;
@@ -84,22 +86,34 @@ protected:
 
 	std::vector<double> GetCombinationVectorForTopLevel();
 
-	virtual void LoadUsedParams();
+	virtual void   LoadUsedParams();
 
-	virtual void* RunBasicSamplingFcpnThreadSim();
+	virtual void*  RunBasicSamplingFcpnThreadSim();
 
-	virtual void* RunReducedSamplingFCPNThreadSim();
+	virtual void*  RunReducedSamplingFCPNThreadSim();
 
 	virtual wxString GetKParameter(const wxString& strfunc);
 
-	virtual void SetSimulationProgressText(long& p_nValue);
+	virtual void  SetSimulationProgressText(long& p_nValue);
 
 	virtual void  SetSimulationProgressGauge(long p_nValue);
 
-	virtual void SetSimulationProgressGaugeRange(long p_nRangeValue);
+	virtual void  SetSimulationProgressGaugeRange(long p_nRangeValue);
 
-	virtual void     OnSimulatorThreadEvent(SP_DS_ThreadEvent& event);
+	virtual void   OnSimulatorThreadEvent(SP_DS_ThreadEvent& event);
 
+
+	virtual void   OnDlgCancel(wxCommandEvent& p_cEvent);
+
+	virtual wxString  GetFuzzySettingAttribute(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName);
+
+	virtual void  SaveFuzzySimulatorProperties();
+
+	virtual void OnSamplingProperties(wxCommandEvent& p_cEvent);//1/2021
+
+	virtual void OnSamplingAlgoChanged(wxCommandEvent& p_cEvent);
+
+	virtual fuzzification::SAMPLING_TYPE GetSelectedSamplingMethod();
 
 	void onIdle(wxIdleEvent& evt);
 public:

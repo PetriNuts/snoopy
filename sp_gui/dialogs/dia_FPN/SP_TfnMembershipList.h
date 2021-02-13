@@ -29,6 +29,10 @@ class SP_TfnMembershipList {
 	   virtual vector<vector<double>> GetMembershipAtTimePoint(const long& timepointconst,const long& dataCol);
 	   virtual bool StoreTFNMembership(const long dataColumn, const long timePoint, vector<vector<double>> membership);
 
+	   virtual void ClearData()
+	  	 {
+	  		   m_tfnList.clear();
+	  	 }
 };
 
 #endif //_SP_TFN_LIST_H_

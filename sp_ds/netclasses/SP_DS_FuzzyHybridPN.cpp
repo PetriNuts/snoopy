@@ -127,13 +127,18 @@ SP_DS_Graph* SP_DS_FuzzyHybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 	//l_pcType->AddPossibleValue(wxT("BFN"));
 	//l_pcType->AddPossibleValue(wxT("TZN"));
 
+	//where we keep fuzzy settings
+	l_pcMC = p_pcGraph->AddMetadataclass(new SP_DS_Metadataclass(p_pcGraph, wxT("FuzzySettings")));
 
+	l_pcMC->SetShowInElementTree(false);
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NumberAttribute(wxT("AlphaLevels"), 10));
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NumberAttribute(wxT("SamplingPoints"), 10));
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TextAttribute(wxT("Comment"), wxT("")));
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NumberAttribute(wxT("SamplingAlgo"), 0));
 
 	//////////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 
 	//Set Animator
@@ -157,8 +162,12 @@ bool SP_DS_FuzzyHybridPN::EdgeRequirement(SP_DS_Edgeclass* p_pcClass, SP_Data* p
 bool SP_DS_FuzzyHybridPN::CreateInitialElements(SP_DS_Graph* p_pcGraph)
 {
 
-return	SP_DS_HybridPN::CreateInitialElements(p_pcGraph);
-	//create main table and plot
+	bool l_bISOk=	SP_DS_HybridPN::CreateInitialElements(p_pcGraph);
+
+	SP_DS_Metadataclass* l_pcMC;
+	l_pcMC = p_pcGraph->GetMetadataclass(wxT("FuzzySettings"));
+	l_pcMC->NewElement(1);
+	return l_bISOk;
 }
 
 bool

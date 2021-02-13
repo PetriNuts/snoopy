@@ -13,10 +13,12 @@
 #include "FuzzyReasoning.h"
 #include "TriangularFN.h"
 #include "SP_DS_FspnSimulThread.h"
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_SamplingProperties.h"
 
 typedef std::vector<TriangularFN>  TFN_List;
 class SP_DS_ThreadEvent;
 class SP_DS_SimulatorThreadStochastic;
+
 
 
 class SP_DLG_FspnSimResult : public SP_DLG_StSimulationResults
@@ -36,16 +38,16 @@ protected:
 protected:
 	SP_Vector2DDouble            m_paramMatrix;
 	std::map<wxString, wxString> m_mTransParamNames;
-	FuzzyReasoning *              m_fr;
+	fuzzification::FuzzyReasoning *              m_fr;
 	std::vector<int>             m_fuzzyParamPositions;
 	std::vector<double>          m_vdCurrentSample;
 	ResultFuzzyBand              m_ResultFBand;
 	std::map<wxString, int>      m_mFuzzyParam2Position;
 	std::vector<wxString>        m_fuzzyParams;
 	bool                         m_bIsAbort;
-	//std::clock_t             m_clock;
 	wxStopWatch m_stopWatch;
 	std::vector<SP_DS_FspnSimulThread*> m_fspnThreadVector;
+	SP_DS_Metadata* m_pcFuzzySimProp;//fuzzy properties
 protected:
 
 
@@ -63,7 +65,6 @@ protected:
 
 	virtual void  ConvertTFNListToParamMatrix(std::vector<TriangularFN> asTFNParams);
 
-	//virtual spsim::Simulator*  CreateSimulator(const int& p_nSimulatorType);
 
 	virtual void  OnSimulatorSelect(wxCommandEvent& p_cEvent);
 
@@ -73,27 +74,22 @@ protected:
 
 	virtual void InitializeParamMatrix();
 
-	//	virtual void* DoFspnSimulation();
-
-	//	virtual spsim::Matrix2DDouble DoNormalFSPN();
-
-	//virtual void* DoFSPwithNormalSampling();
 	virtual void* DoBasicSamplingFspnSimulThread();
 
 	virtual void * DoReducedSamplingFspnSimulThread();
 
-	//virtual spsim::Matrix2DDouble DOneSpnSimulation(unsigned long iteration, double alpha);
 
 	virtual void OnStartAbortSimulation(wxCommandEvent& p_cEvent);
-	//virtual void OnStartAbortSimulation1(wxCommandEvent& p_cEvent);
+
 	virtual wxString  GetKParameter(const wxString& func);
 
 
 	virtual void OnModifyConstantSets(wxCommandEvent& p_cEvent);
 
+
 	virtual void SetSimulationProgressText(long& p_nValue);
 
-	//virtual void  InitProgress();
+
 
 	virtual void  SetSimulationProgressGaugeRange(long p_nRangeValue);
 
@@ -113,6 +109,18 @@ protected:
 		return vset;
 	}
 
+	virtual void   OnDlgCancel(wxCommandEvent& p_cEvent);
+
+	virtual wxString  GetFuzzySettingAttribute(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName);
+
+	void  SaveFuzzySimulatorProperties();
+
+	virtual void OnSamplingAlgoChanged(wxCommandEvent& p_evt);
+
+	virtual fuzzification::SAMPLING_TYPE GetSelectedSamplingMethod();
+
+	virtual  void OnSamplingProperties(wxCommandEvent& p_cEvent);
+
 public:
 	DECLARE_CLASS(SP_DLG_FspnSimResult)
 	SP_DLG_FspnSimResult(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""), const wxString& p_sTitle = wxT("Fuzzy Stochastic Simulation"), long p_nStyle =
@@ -120,6 +128,8 @@ public:
 
 	virtual ~SP_DLG_FspnSimResult();
 	virtual void DirectExportToCSV();
+
+	wxDECLARE_EVENT_TABLE();
 
 };
 

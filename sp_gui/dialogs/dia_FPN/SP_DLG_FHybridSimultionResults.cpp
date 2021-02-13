@@ -54,12 +54,14 @@
 IMPLEMENT_CLASS(SP_DLG_FHybridSimulationResults, SP_DLG_Simulation)
 enum
 {
-	SAMPLING_CHOICES_ID2
+	SAMPLING_CHOICES_ID2,
+	SP_ID_BUTTON_SAMPLING_PROP
 
 };
 BEGIN_EVENT_TABLE(SP_DLG_FHybridSimulationResults, SP_DLG_HybridSimulationResults)
 EVT_SIMTHREAD(SP_SIMULATION_THREAD_EVENT, SP_DLG_FHybridSimulationResults::OnSimulatorThreadEvent)
-
+EVT_CHOICE(SAMPLING_CHOICES_ID2, SP_DLG_FHybridSimulationResults::OnSamplingAlgoChanged)
+EVT_BUTTON(SP_ID_BUTTON_SAMPLING_PROP, SP_DLG_FHybridSimulationResults::OnSamplingProperties)
 END_EVENT_TABLE()
 SP_DLG_FHybridSimulationResults::SP_DLG_FHybridSimulationResults(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText, wxString p_sTitle, long p_nStyle) :
 	SP_DLG_HybridSimulationResults(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle)
@@ -71,13 +73,55 @@ SP_DLG_FHybridSimulationResults::SP_DLG_FHybridSimulationResults(SP_DS_Graph* p_
 	wxSizer* l_pcRowSizer3 = NULL;
 	m_pcCompressedBand = new SP_Compressed_Fuzzy_Band();
 	m_samplingStrategyselection = 0;
+	wxString l_sAlphaLevels;
+	wxString l_sSamplingPoints;
+
 	m_bIsAbort = false;
+	m_fr = nullptr;
 	m_lTotalSimRuns = 0;
 	m_samplingchoices = new wxChoice(m_pcPropertyWindowPropertySizer, SAMPLING_CHOICES_ID2, wxDefaultPosition, wxSize(100, -1));
 
-	//	m_samplingchoices->Clear();
-	m_samplingchoices->Append(wxT("Basic Sampling"));
-	m_samplingchoices->Append(wxT("Reduced Sampling"));
+	m_samplingchoices->Append(wxT("Basic"));
+	m_samplingchoices->Append(wxT("Reduced"));
+	m_samplingchoices->Append(wxT("Random LHS"));
+	m_samplingchoices->Append(wxT("Improved LHS"));
+	m_samplingchoices->Append(wxT("Optimum LHS"));
+	m_samplingchoices->Append(wxT("Genetic LHS"));
+	m_samplingchoices->Append(wxT("Maximin LHS"));
+
+	m_pcFuzzySimProp = *(m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin());
+	if (m_pcFuzzySimProp)
+	{
+		SP_DS_Attribute* l_pcAttr = m_pcFuzzySimProp->GetAttribute(wxT("SamplingAlgo"));
+		if (l_pcAttr)
+		{
+			SP_DS_NumberAttribute* l_pcAttr = dynamic_cast<SP_DS_NumberAttribute*>(m_pcFuzzySimProp->GetAttribute(wxT("SamplingAlgo")));
+			if (l_pcAttr)
+			{
+				if (l_pcAttr->GetValue() >= 0 && l_pcAttr->GetValue() <= 2)
+				{
+					m_samplingStrategyselection = l_pcAttr->GetValue();
+				}
+			}
+		}
+
+		//SP_DS_Attribute* l_pcAttrAlpha = l_pcSimProp->GetAttribute(wxT("AlphaLevels"));
+		l_sAlphaLevels = GetFuzzySettingAttribute(*m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin(), wxT("AlphaLevels"));
+
+		if (l_sAlphaLevels.IsEmpty())
+		{
+			l_sAlphaLevels = wxT("10");
+		}
+
+		l_sSamplingPoints = GetFuzzySettingAttribute(*m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin(), wxT("SamplingPoints"));
+
+		if (l_sSamplingPoints.IsEmpty())
+		{
+			l_sSamplingPoints = wxT("10");
+		}
+	}
+
+
 	m_samplingchoices->SetSelection(m_samplingStrategyselection);
 
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -87,12 +131,12 @@ SP_DLG_FHybridSimulationResults::SP_DLG_FHybridSimulationResults(SP_DS_Graph* p_
 	l_pcRowSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer2 = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer1->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("alpha levels")), wxSizerFlags(1).Expand().Border(wxALL, 2));
-	m_lalphaLevels = new  wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, "10", wxDefaultPosition, wxDefaultSize, 0);
+	m_lalphaLevels = new  wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, l_sAlphaLevels, wxDefaultPosition, wxDefaultSize, 0);
 	l_pcRowSizer1->Add(m_lalphaLevels, wxSizerFlags(1).Expand().Border(wxALL, 2));
 	/////////////////////
 	l_pcRowSizer2->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("discretisation points")), wxSizerFlags(1).Expand().Border(wxALL, 2));
 
-	m_lSamplePoints = new  wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, "10", wxDefaultPosition, wxDefaultSize, 0);
+	m_lSamplePoints = new  wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, l_sSamplingPoints, wxDefaultPosition, wxDefaultSize, 0);
 
 
 	l_pcRowSizer2->Add(m_lSamplePoints, wxSizerFlags(1).Expand().Border(wxALL, 2));
@@ -102,6 +146,16 @@ SP_DLG_FHybridSimulationResults::SP_DLG_FHybridSimulationResults(SP_DS_Graph* p_
 	l_pcRowSizer3->Add(m_samplingchoices, 1, wxALL, 5);
 
 	m_samplingchoices->SetSelection(m_samplingStrategyselection);
+
+	wxButton* m_pcSamplingProp = new wxButton(m_pcPropertyWindowPropertySizer, SP_ID_BUTTON_SAMPLING_PROP, wxT("Properties"));
+	l_pcRowSizer3->Add(m_pcSamplingProp, 0, wxALL
+#if wxCHECK_VERSION(2,8,8)
+		| wxRESERVE_SPACE_EVEN_IF_HIDDEN
+#endif
+		, 5);
+
+	l_pcRowSizer3->Add(m_pcSamplingProp);
+
 
 	m_pcPropertySizer->Add(l_pcRowSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
 	m_pcPropertySizer->Add(l_pcRowSizer1, wxSizerFlags(0).Expand().Border(wxALL, 2));
@@ -113,12 +167,17 @@ SP_DLG_FHybridSimulationResults::SP_DLG_FHybridSimulationResults(SP_DS_Graph* p_
 	m_lpCount += l_pcNodeclass->GetElements()->size();
 	m_binitialRun = false;
 	m_lnFuzzyNum = 0;
-	//At the end call this function for alignment
+
 	SetSizerAndFit(m_pcMainSizer);
 	m_bIsSimulatorInitialized = false;
 	Layout();
 }
-SP_DLG_FHybridSimulationResults::~SP_DLG_FHybridSimulationResults() {}
+SP_DLG_FHybridSimulationResults::~SP_DLG_FHybridSimulationResults()
+{
+	SaveFuzzySimulatorProperties();
+	wxDELETE(m_fr);
+	m_pcGraph->GetParentDoc()->Modify(true);
+}
 
 void SP_DLG_FHybridSimulationResults::InitializeParamMatrix()
 {
@@ -286,8 +345,27 @@ bool SP_DLG_FHybridSimulationResults::InitializeFuzzySetting()
 		{
 
 			LoadUsedParams();
+
 			ConvertTFNListToParamMatrix(LoadParams());
-			m_fr = new FuzzyReasoning(m_lAlphaLevels, m_lnDiscPoints, m_paramMatrix, m_lnFuzzyNum, m_lpCount);
+
+			fuzzification::SAMPLING_TYPE l_tSamplingType;
+
+			l_tSamplingType = GetSelectedSamplingMethod();
+
+			if (m_fr == nullptr)
+			{
+				m_fr = new FuzzyReasoning(m_lAlphaLevels, m_lnDiscPoints, m_paramMatrix, m_lnFuzzyNum, m_lpCount);
+
+			}
+			else
+			{
+				m_fr->SetAlphaLevels(m_lAlphaLevels);
+				m_fr->SetDiscretisingPoints(m_lnDiscPoints);
+				m_fr->SetParamMatrix(m_paramMatrix);
+				m_fr->SetNumberFuzzyParams(m_lnFuzzyNum);
+				m_fr->SetPlaceNum(m_lpCount);
+				m_fr->InitialiseCombinationMatrix();
+			}
 			return true;
 		}
 		else {
@@ -314,18 +392,11 @@ void SP_DLG_FHybridSimulationResults::LoadUsedParams()
 
 	SP_DS_ColListAttribute* l_pcColList;
 	unsigned long m_lTransCount = l_pcNodeclass->GetElements()->size();
-	//l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_STOCHASTIC_TRANS);
 
-	//m_lTransCount += l_pcNodeclass->GetElements()->size();
-
-	//m_pcMainSimulator->SetTransitionCount(m_lTransCount);
 
 	unsigned long l_nPosition = 0;
 
-	//clear old transitions
-	//m_pcMainSimulator->ClearTransitions();
 
-	//SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
 
 	//Go through all the continuous transition nodes
 	for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); l_itElem++)
@@ -339,23 +410,6 @@ void SP_DLG_FHybridSimulationResults::LoadUsedParams()
 
 		wxString m_sParamName = GetKParameter(l_sTransitionFunction);
 
-		/***/
-		//this step is important to let the simulator's parser evalute the 
-		//rate expression when the last contains at least one kinetic parameter as a fuzzy number
-		/*
-		string l_str = m_sParamName.ToStdString();
-		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-		boost::char_separator<char> sep("(+-/%*) ");
-		tokenizer tokens(l_str, sep);
-
-		for (tokenizer::iterator beg = tokens.begin(); beg != tokens.end(); ++beg) {
-
-			wxString result = *beg;
-			m_mTransParamNames[result] = l_sName;
-
-
-		}
-		*/
 
 		wxString l_sTobeTokenized=m_sParamName;
 		wxStringTokenizer tokenize(l_sTobeTokenized,"(+-/%*) ");
@@ -365,12 +419,7 @@ void SP_DLG_FHybridSimulationResults::LoadUsedParams()
 		 m_mTransParamNames[l_sToken] = l_sName;
 
 		}
-		/***/
 
-		//if (m_sParamName != wxT("1"))
-		//{
-		//	m_mTransParamNames[m_sParamName] = l_sName;
-		//}
 	}
 
 	//scan Stoch Transitions
@@ -386,22 +435,7 @@ void SP_DLG_FHybridSimulationResults::LoadUsedParams()
 		const wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue(1);
 
 		wxString m_sParamName = GetKParameter(l_sTransitionFunction);
-		//this step is important to let the simulator's parser evalute the 
-		//rate expression when the last contains at least one kinetic parameter as a fuzzy number
-		/*
-		string l_str = m_sParamName.ToStdString();
-		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-		boost::char_separator<char> sep("(+-/%*) ");
-		tokenizer tokens(l_str, sep);
 
-		for (tokenizer::iterator beg = tokens.begin(); beg != tokens.end(); ++beg)
-		{
-
-			wxString result = *beg;
-			m_mTransParamNames[result] = l_sName;
-
-		}
-		*/
 		wxString l_sTobeTokenized=m_sParamName;
 		wxStringTokenizer tokenize(l_sTobeTokenized,"(+-/%*) ");
 		while(tokenize.HasMoreTokens())
@@ -626,13 +660,16 @@ void SP_DLG_FHybridSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_c
 			m_ExportType = SP_SIM_DIRECT_EXPORT;
 		else
 			m_ExportType = SP_SIM_NO_EXPORT;
-		long selectedSimulation = m_samplingchoices->GetSelection();
-		if (selectedSimulation != 1) {//basic sampling
 
-			DoBasicSamplingFhpnSimulThread();
+		fuzzification::SAMPLING_TYPE l_typeSampling = GetSelectedSamplingMethod();
+
+		if (l_typeSampling == fuzzification::SAMPLING_TYPE::REDUCED)
+		{
+				DoReducedSamplingFhpnSimulThread();
 		}
-		else {//reduced sampling
-			DoReducedSamplingFhpnSimulThread();
+		else
+		{
+					DoBasicSamplingFhpnSimulThread();
 		}
 	}
 }
@@ -655,7 +692,16 @@ void* SP_DLG_FHybridSimulationResults::DoBasicSamplingFhpnSimulThread()
 	long lnumofLevels = m_fr->GetNumFuzzyLevels();
 	long lnumofSamples = m_fr->GetNumSamplePoints();
 	long lnumFN = m_fr->GetNumFuzzyNum();
-	long lRunningtimes = pow(lnumofSamples, lnumFN)* lnumofLevels + 1;
+	long lRunningtimes;// = pow(lnumofSamples, lnumFN)* lnumofLevels + 1;
+
+	if (m_fr->GetSamplingType() == fuzzification::SAMPLING_TYPE::BASIC)
+	{
+		lRunningtimes = pow(lnumofSamples, lnumFN) * (lnumofLevels)+1;
+	}
+	else
+	{//one of LHS algos
+		lRunningtimes = (lnumofSamples * lnumofLevels) + 1;
+	}
 
 	const std::string sWarnMesag = "The total number of Simulation Runs is : ";
 	std::string strmsg = sWarnMesag + std::to_string(lRunningtimes);
@@ -685,7 +731,17 @@ void* SP_DLG_FHybridSimulationResults::DoBasicSamplingFhpnSimulThread()
 			}
 			m_fr->DoSamplePointsCombination(m_fr->GetAlphaSet()[iAlpha]);
 
-			long m_lNumCombinedPoints = pow(m_fr->GetNumSamplePoints(), m_fr->GetNumFuzzyNum());
+			//long m_lNumCombinedPoints = pow(m_fr->GetNumSamplePoints(), m_fr->GetNumFuzzyNum());
+			long m_lNumCombinedPoints;// = pow(m_fr->GetNumSamplePoints(), m_fr->GetNumFuzzyNum());
+
+			if (m_fr->GetSamplingType() == fuzzification::SAMPLING_TYPE::BASIC)
+			{
+					m_lNumCombinedPoints = pow(m_fr->GetNumSamplePoints(), m_fr->GetNumFuzzyNum());
+			}
+			else
+			{
+					m_lNumCombinedPoints = m_fr->GetNumSamplePoints();
+			}
 
 			for (long literation = 0; literation < m_lNumCombinedPoints; literation++)
 			{
@@ -1217,7 +1273,8 @@ void    SP_DLG_FHybridSimulationResults::OnSimulatorThreadEvent(SP_DS_ThreadEven
 		m_ResultFBand.clear();
 		LoadResults();
 		m_bIsAbort = false;
-		wxDELETE(m_fr);
+		//wxDELETE(m_fr);
+		m_fr->ClearData();
 		break;
 	}
 	case 10: {
@@ -1227,7 +1284,8 @@ void    SP_DLG_FHybridSimulationResults::OnSimulatorThreadEvent(SP_DS_ThreadEven
 		m_pcSimulationProgressGauge->SetValue(0);
 		m_bIsAbort = false;
 		wxDELETE(m_info);
-		wxDELETE(m_fr);
+		//wxDELETE(m_fr);
+		m_fr->ClearData();
 		m_pcMainSimulator->AbortSimulation();
 		RefreshExternalWindows();
 		Update();
@@ -1469,5 +1527,186 @@ void SP_DLG_FHybridSimulationResults::LoadTransitions()
 		m_mTransitionName2Position[l_sTransitionName] = l_nTransitionPosition++;
 
 		m_pcMainSimulator->AddTransition(l_sTransitionName, l_sExpanded, spsim::TRANSITION_TYPE_SCHEDULED);
+	}
+}
+
+
+void   SP_DLG_FHybridSimulationResults::OnDlgCancel(wxCommandEvent& p_cEvent)
+{
+	for (auto itVthread = m_fhpnThreadVector.begin(); itVthread != m_fhpnThreadVector.end(); ++itVthread)
+	{
+		if (*itVthread)
+		{//check thread states
+			if ((*itVthread)->IsRunning())
+			{
+				return;
+			}
+		}
+	}
+	//to be sure, maybe the result simulation thread calculating the fuzzy bands and membership functions is working
+	//button label gives us also an indication
+	if (m_pcStartButton->GetLabel() != wxT("Start Simulation"))
+	{
+
+		return;
+	}
+
+	//end the dialog
+	if (IsModal())
+	{
+		EndModal(wxID_CANCEL);
+	}
+	else
+	{
+		SetReturnCode(wxID_CANCEL);
+		Show(FALSE);
+		Destroy();
+	}
+}
+
+wxString SP_DLG_FHybridSimulationResults::GetFuzzySettingAttribute(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName)
+{
+	CHECK_POINTER(p_pcView, return wxT(""));
+	SP_DS_Attribute* l_pcAttribute = p_pcView->GetAttribute(p_sAttributeName);
+
+	CHECK_POINTER(l_pcAttribute, return wxT(""));
+
+	return l_pcAttribute->GetValueString();
+}
+
+void  SP_DLG_FHybridSimulationResults::SaveFuzzySimulatorProperties()
+{
+	long l_nAlphaLevels;
+	long l_nSamplingPoints;
+
+
+
+	if (m_lalphaLevels->GetValue().ToLong(&l_nAlphaLevels))
+	{
+		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin());
+
+		SP_DS_Attribute* l_pcAttr = NULL;
+
+		if (l_pcSimProp != NULL) {
+			l_pcAttr = l_pcSimProp->GetAttribute(wxT("AlphaLevels"));
+			l_pcAttr->SetValueString(m_lalphaLevels->GetValue());
+		}
+
+	}
+	if (m_lSamplePoints->GetValue().ToLong(&l_nSamplingPoints))
+	{
+		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin());
+
+		SP_DS_Attribute* l_pcAttr = NULL;
+
+		if (l_pcSimProp != NULL) {
+			l_pcAttr = l_pcSimProp->GetAttribute(wxT("SamplingPoints"));
+			l_pcAttr->SetValueString(m_lSamplePoints->GetValue());
+		}
+	}
+	long l_nselectedSimulation = m_samplingchoices->GetSelection();
+	if (l_nselectedSimulation >= 0)
+	{
+		wxString l_sAlgo;
+		l_sAlgo << l_nselectedSimulation;
+		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin());
+
+		SP_DS_Attribute* l_pcAttr = NULL;
+
+		if (l_pcSimProp != NULL) {
+			l_pcAttr = l_pcSimProp->GetAttribute(wxT("SamplingAlgo"));
+			l_pcAttr->SetValueString(l_sAlgo);
+		}
+	}
+
+}
+
+void SP_DLG_FHybridSimulationResults::OnSamplingProperties(wxCommandEvent& p_cEvent)
+{
+
+	if (m_pcStartButton->GetLabel() != wxT("Start Simulation"))
+	{
+
+		return;
+	}
+	fuzzification::SAMPLING_TYPE l_typeSampling = GetSelectedSamplingMethod();
+
+	if (l_typeSampling == fuzzification::SAMPLING_TYPE::BASIC || l_typeSampling == fuzzification::SAMPLING_TYPE::REDUCED)//no proporties for basic and reduced samplings
+	{
+		return;
+	}
+
+
+	if (m_fr == nullptr)
+	{
+		InitializeFuzzySetting();
+	}
+
+
+	SP_DLG_SamplingProperties* l_pcDlg;
+
+	l_pcDlg = new SP_DLG_SamplingProperties(this, m_fr, m_samplingchoices->GetSelection());
+
+	l_pcDlg->ShowModal();
+
+	l_pcDlg->Destroy();
+
+	SetFocus();
+
+
+	SP_Core::Instance()->GetRootDocument()->Modify(true);
+
+}
+
+fuzzification::SAMPLING_TYPE SP_DLG_FHybridSimulationResults::GetSelectedSamplingMethod()
+{
+	if (!m_samplingchoices) fuzzification::SAMPLING_TYPE::INVALID;
+
+	long l_nselectedSimulation = m_samplingchoices->GetSelection();
+
+	if (l_nselectedSimulation == 0)
+	{
+		return fuzzification::SAMPLING_TYPE::BASIC;
+	}
+	else if (l_nselectedSimulation == 1)
+	{
+		return  fuzzification::SAMPLING_TYPE::REDUCED;
+	}
+	else if (l_nselectedSimulation == 2)
+	{
+		return   fuzzification::SAMPLING_TYPE::RANDOM_LHS;
+	}
+	else if (l_nselectedSimulation == 3)
+	{
+		return fuzzification::SAMPLING_TYPE::IMPROVED_LHS;
+	}
+	else if (l_nselectedSimulation == 4)
+	{
+		return fuzzification::SAMPLING_TYPE::OPTIMUM_LHS;
+	}
+	else if (l_nselectedSimulation == 5)
+	{
+		return fuzzification::SAMPLING_TYPE::GENETIC_LHS;
+
+	}
+	else if (l_nselectedSimulation == 6)
+	{
+		return fuzzification::SAMPLING_TYPE::MAXIMINI_LHS;
+	}
+	else
+	{
+		return fuzzification::SAMPLING_TYPE::INVALID;
+	}
+}
+
+void SP_DLG_FHybridSimulationResults::OnSamplingAlgoChanged(wxCommandEvent& p_evt)
+{
+	if (m_fr == nullptr)
+	{
+		InitializeFuzzySetting();
+	}
+	else
+	{
+		m_fr->SetSamplingMethod(GetSelectedSamplingMethod());
 	}
 }

@@ -25,6 +25,12 @@ public:
 	virtual void SetAlphaLevels(vector<double>& levels) { m_alphaLevels = levels; }
 	virtual vector<double> GetAlphaLevels() { return m_alphaLevels; }
 
+	virtual void ClearData()
+	{
+		m_minCurve.clear();
+		m_maxCurve.clear();
+	}
+
 	
 };
 #endif //_SP_COMPRESSED_FUZZY_BAND_H_

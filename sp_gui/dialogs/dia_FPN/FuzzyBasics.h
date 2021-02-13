@@ -1,15 +1,16 @@
 
-/////////////////
-//$author: G.A
-//
-//
-//
-///////////////
+/*/////////////////////////////////
+*$Header file: $
+*$Author: George Assaf $
+*$Date: 2018$
+*@Description: manuplating Fuzzy numbers e.g., obtain alpha cuts
+*/
+///////////////////////////////////
 #ifndef SP_DLG_FUZZYBASICS_H_
 #define SP_DLG_FUZZYBASICS_H_
 #include <vector>
 typedef std::vector<double>  VectorDouble;
-//typedef std::vector<vector<TimedTFN>> TFNVector;
+
 typedef std::vector< VectorDouble >  DoubleMatrix;
 typedef  std::vector<double> AlphaCutSet;
 enum Ftype {
@@ -29,7 +30,7 @@ class FuzzyBasics
 protected:
 	double m_dPointleft, m_dPointright;//interval of the number[a,d]
 	Ftype  m_type;
-	//SP_VectorDouble FZ_AlphaCutSet;
+
 public:
 	FuzzyBasics() { };
 	FuzzyBasics(double dPleft1, double dPright1) :m_dPointleft(dPleft1), m_dPointright(dPright1)

@@ -119,6 +119,18 @@ SP_DS_Graph* SP_DS_FuzzyCPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	p_pcGraph->SetAnimation(new SP_DS_ContinuousPedAnimation(1, 2, 50, 1.0));
 
+	//where we keep fuzzy settings
+		l_pcMC = p_pcGraph->AddMetadataclass(new SP_DS_Metadataclass(p_pcGraph, wxT("FuzzySettings")));
+
+		l_pcMC->SetShowInElementTree(false);
+
+		l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NumberAttribute(wxT("AlphaLevels"), 10));
+		l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NumberAttribute(wxT("SamplingPoints"),10));
+		l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TextAttribute(wxT("Comment"), wxT("")));
+
+		l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NumberAttribute(wxT("SamplingAlgo"), 0));
+
+
 	return p_pcGraph;
 
 }
@@ -128,15 +140,12 @@ bool
 SP_DS_FuzzyCPN::CreateInitialElements(SP_DS_Graph* p_pcGraph)
 {
 	SP_DS_ContinuousPed::CreateInitialElements(p_pcGraph);
-	/*
+
 	SP_DS_Metadataclass* l_pcMC;
 
-	l_pcMC = p_pcGraph->GetMetadataclass(wxT("Simulation Properties"));
+	l_pcMC = p_pcGraph->GetMetadataclass(wxT("FuzzySettings"));
 	l_pcMC->NewElement(1);
 
-	l_pcMC = p_pcGraph->GetMetadataclass(wxT("Simulation Results"));
-	l_pcMC->NewElement(1);
-	*/
 	return true;
 }
 
@@ -147,14 +156,7 @@ SP_DS_FuzzyCPN::MetadataRequirement(SP_DS_Metadata* p_pcMetadata)
 	{
 		return false;
 	}
-	/*
-	wxString l_sName = p_pcMetadata->GetClassName();
-	if ((l_sName == wxT("Simulation Properties") || l_sName == wxT("Simulation Results"))
-		&& !p_pcMetadata->GetMetadataclass()->GetElements()->empty())
-	{
-		return false;
-	}
-	*/
+
 	return true;
 }
 
@@ -169,72 +171,6 @@ bool SP_DS_FuzzyCPN::EdgeRequirement(SP_DS_Edgeclass* p_pcClass, SP_Data* p_pcSr
 	if (!SP_DS_ContinuousPed::EdgeRequirement(p_pcClass, p_pcSrc, p_pcTrg))
 		return FALSE;
 
-	/*
-	if (p_pcSrc->GetElementType() != SP_ELEMENT_NODE || p_pcTrg->GetElementType() != SP_ELEMENT_NODE)
-		return FALSE;
 
-	if (p_pcSrc->GetClassName() == wxT("Comment"))
-		return FALSE;
-	if (p_pcTrg->GetClassName() == wxT("Comment"))
-		return FALSE;
-
-	SP_DS_Node* l_pcSrc = dynamic_cast<SP_DS_Node*> (p_pcSrc);
-	SP_DS_Node* l_pcTrg = dynamic_cast<SP_DS_Node*> (p_pcTrg);
-	if (l_pcSrc->GetNodeclass() == l_pcTrg->GetNodeclass())
-		return FALSE;
-
-	// Test and Inhibitor Edge only from Place to Transition
-	if ((p_pcClass->GetName() == SP_DS_INHIBITOR_EDGE) || (p_pcClass->GetName() == SP_DS_READ_EDGE))
-	{
-		if (l_pcSrc->GetNodeclass()->GetName() == SP_DS_CONTINUOUS_TRANS)
-			return FALSE;
-		if (l_pcTrg->GetNodeclass()->GetName() == SP_DS_CONTINUOUS_PLACE)
-			return FALSE;
-		if (l_pcSrc->GetNodeclass()->GetName() == SP_DS_PARAM)
-			return FALSE;
-		if (l_pcTrg->GetNodeclass()->GetName() == SP_DS_PARAM)
-			return FALSE;
-	}
-
-	// Egde only from Place to Transition or Transition to Place
-	if (((l_pcSrc->GetNodeclass()->GetName() == SP_DS_PARAM) ||
-		(l_pcTrg->GetNodeclass()->GetName() == SP_DS_PARAM)))
-	{
-		return FALSE;
-	}
-
-	if (l_pcSrc->GetCoarse() && l_pcTrg->GetCoarse())
-		return FALSE;
-	if (l_pcSrc->GetCoarse())
-		return (l_pcSrc->GetCoarse()->GetInnerClass() != l_pcTrg->GetNodeclass()->GetName());
-
-	if (l_pcTrg->GetCoarse())
-		return (l_pcTrg->GetCoarse()->GetInnerClass() != l_pcSrc->GetNodeclass()->GetName());
-
-	SP_ListEdge::const_iterator eIt;
-	const SP_ListEdge* edges;
-	edges = (dynamic_cast<SP_DS_Node*> (p_pcSrc))->GetSourceEdges();
-
-	//check if there are another arc of the same type between these nodes
-	for (eIt = edges->begin(); eIt != edges->end(); ++eIt)
-	{
-		SP_LOGDEBUG(wxString::Format(wxT("%p->%p (%p), %s"), (*eIt)->GetSource(), (*eIt)->GetTarget(), p_pcTrg, (*eIt)->GetClassName().c_str()));
-
-		if ((*eIt)->GetTarget() == p_pcTrg && (*eIt)->GetClassName() == p_pcClass->GetName())
-		{
-			SP_MESSAGEBOX(wxString::Format(wxT("Only one edge of the type \"%s\" ")
-				wxT("is allowed between these nodes"), (*eIt)->GetClassName().c_str()), wxT("Error"), wxOK | wxICON_ERROR);
-			return false;
-		}
-	}
-
-	//Modifier arc
-	if (p_pcClass->GetName() == SP_DS_MODIFIER_EDGE)
-	{
-		if (p_pcSrc->GetClassName().Contains(wxT("Transition")))
-			return false;
-	}
-
-	*/
 	return TRUE;
 }

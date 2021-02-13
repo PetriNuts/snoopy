@@ -147,32 +147,24 @@ SP_DS_Fuzzy_ColHPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 	/***********george constants harmonizing************/
 	SP_DS_Metadataclass*	l_pcMC = p_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 
-	//	l_pcMC->SetDisplayName(wxT("Constants"));
 
-	//l_pcMC->SetShowInElementTree(false);
-	//l_pcMC->SetShowInDeclarationTreeOther(true);
-
-	//l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NameAttribute(wxT("Name")));
-	//l_pcAttr = l_pcMC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
-	//l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TextAttribute(wxT("Group")));
-	//l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TypeAttribute(wxT("Type"), wxT("int")));
 	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TypeAttribute(wxT("Type"), wxT("int")));
 	l_pcAttr = l_pcMC->GetPrototype()->GetAttribute(wxT("Type"));
 	SP_DS_TypeAttribute* l_pcType = dynamic_cast< SP_DS_TypeAttribute* >(l_pcAttr);
 	//l_pcType->AddPossibleValue(wxT("double"));
 	l_pcType->AddPossibleValue(wxT("TFN"));
 
-	//l_pcAttr = l_pcMC->AddAttribute(new SP_DS_ColListAttribute(wxT("ValueList"), SP_COLLIST_STRING, 2, wxT("Group")));
-	//l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcAttr);
-	//l_pcColList->SetColLabel(0, wxT("Value set"));
-	//l_pcColList->SetColLabel(1, wxT("Value"));
-	//unsigned int l_nRow = l_pcColList->AppendEmptyRow();
-	//l_pcColList->SetCell(l_nRow, 0, wxT("Main"));
-	//l_pcColList->SetCell(l_nRow, 1, wxT(""));
 
-	//l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TextAttribute(wxT("Comment")));
+	//where we keep fuzzy settings
+	l_pcMC = p_pcGraph->AddMetadataclass(new SP_DS_Metadataclass(p_pcGraph, wxT("FuzzySettings")));
 
-	/**********************/
+	l_pcMC->SetShowInElementTree(false);
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NumberAttribute(wxT("AlphaLevels"), 10));
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NumberAttribute(wxT("SamplingPoints"), 10));
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TextAttribute(wxT("Comment"), wxT("")));
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_NumberAttribute(wxT("SamplingAlgo"), 0));
 
 	/////////////////////////////////////////////////////////////////////////////
 
@@ -217,12 +209,7 @@ SP_DS_Fuzzy_ColHPN::CreateInitialElements(SP_DS_Graph* p_pcGraph)
 		//l_pcAliasColorset->GetAttribute( wxT("Name") )->SetValueString( wxT("NewColorset") );
 	}
 
-	//l_pcMC = p_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
-	//SP_DS_Metadata* l_pcConstant = l_pcMC->NewElement(1);
-	//if (l_pcConstant)
-	//{
-	//l_pcConstant->GetAttribute( wxT("Name") )->SetValueString( wxT("NewConstant") );
-	//}
+
 
 	l_pcMC = p_pcGraph->GetMetadataclass(SP_DS_CPN_VARIABLECLASS);
 	SP_DS_Metadata* l_pcVariable = l_pcMC->NewElement(1);
@@ -244,6 +231,11 @@ SP_DS_Fuzzy_ColHPN::CreateInitialElements(SP_DS_Graph* p_pcGraph)
 	{
 		//l_pcAuxiVar->GetAttribute( wxT("Name") )->SetValueString( wxT("NewAuxiliaryVariable") );
 	}
+
+	//SP_DS_Metadataclass* l_pcMC;
+	l_pcMC = p_pcGraph->GetMetadataclass(wxT("FuzzySettings"));
+	l_pcMC->NewElement(1);
+
 	return true;
 }
 

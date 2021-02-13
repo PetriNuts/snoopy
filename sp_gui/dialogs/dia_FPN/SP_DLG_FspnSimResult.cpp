@@ -46,10 +46,18 @@
 #include "sp_gui/widgets/sp_plot/plot_zin.xpm"
 #include "sp_gui/widgets/sp_plot/plot_zot.xpm"
 #endif
+
 IMPLEMENT_CLASS(SP_DLG_FspnSimResult, SP_DLG_StSimulationResults)
 enum {
-	SAMPLING_CHOICES_FSPN_ID2
+	SAMPLING_CHOICES_FSPN_ID2,
+	SP_ID_BUTTON_SAMPLING_PROP,
 };
+
+BEGIN_EVENT_TABLE(SP_DLG_FspnSimResult, SP_DLG_StSimulationResults)
+ EVT_CHOICE(SAMPLING_CHOICES_FSPN_ID2, SP_DLG_FspnSimResult::OnSamplingAlgoChanged)
+EVT_BUTTON(SP_ID_BUTTON_SAMPLING_PROP, SP_DLG_FspnSimResult::OnSamplingProperties)
+EVT_BUTTON(wxID_CANCEL, SP_DLG_Simulation::OnDlgCancel)
+END_EVENT_TABLE()
 
 SP_DLG_FspnSimResult::SP_DLG_FspnSimResult(SP_DS_Graph* p_pcGraph, wxWindow* p_pcParent, wxString p_sHelpText, const wxString& p_sTitle, long p_nStyle)
 	: SP_DLG_StSimulationResults(p_pcGraph, p_pcParent, p_sHelpText, p_sTitle, p_nStyle)
@@ -61,11 +69,55 @@ SP_DLG_FspnSimResult::SP_DLG_FspnSimResult(SP_DS_Graph* p_pcGraph, wxWindow* p_p
 	wxSizer* l_pcRowSizer2 = NULL;
 	wxSizer* l_pcRowSizer3 = NULL;
 	m_lSamplingStrategyselection = 0;
-	m_bIsAbort = false;
+	wxString l_sAlphaLevels;
+	wxString l_sSamplingPoints;
 
+	m_bIsAbort = false;
+	m_fr = nullptr;
 	m_pcSamplingchoices = new wxChoice(m_pcPropertyWindowPropertySizer, SAMPLING_CHOICES_FSPN_ID2, wxDefaultPosition, wxSize(100, -1));
-	m_pcSamplingchoices->Append(wxT("Basic Sampling"));
-	m_pcSamplingchoices->Append(wxT("Reduced Sampling"));
+	m_pcSamplingchoices->Append(wxT("Basic"));
+	m_pcSamplingchoices->Append(wxT("Reduced"));
+	m_pcSamplingchoices->Append(wxT("Random LHS"));
+	m_pcSamplingchoices->Append(wxT("Improved LHS"));
+	m_pcSamplingchoices->Append(wxT("Optimum LHS"));
+	m_pcSamplingchoices->Append(wxT("Genetic LHS"));
+	m_pcSamplingchoices->Append(wxT("Maximin LHS"));
+
+
+		m_pcFuzzySimProp = *(m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin());
+		if (m_pcFuzzySimProp)
+		{
+			SP_DS_Attribute* l_pcAttr = m_pcFuzzySimProp->GetAttribute(wxT("SamplingAlgo"));
+			if (l_pcAttr)
+			{
+				SP_DS_NumberAttribute* l_pcAttr = dynamic_cast<SP_DS_NumberAttribute*>(m_pcFuzzySimProp->GetAttribute(wxT("SamplingAlgo")));
+				if (l_pcAttr)
+				{
+					if (l_pcAttr->GetValue() >= 0 && l_pcAttr->GetValue() <= 2)
+					{
+						m_lSamplingStrategyselection = l_pcAttr->GetValue();
+					}
+				}
+			}
+
+			//SP_DS_Attribute* l_pcAttrAlpha = l_pcSimProp->GetAttribute(wxT("AlphaLevels"));
+			l_sAlphaLevels = GetFuzzySettingAttribute(*m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin(), wxT("AlphaLevels"));
+
+			if (l_sAlphaLevels.IsEmpty())
+			{
+				l_sAlphaLevels = wxT("10");
+			}
+
+			l_sSamplingPoints = GetFuzzySettingAttribute(*m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin(), wxT("SamplingPoints"));
+
+			if (l_sSamplingPoints.IsEmpty())
+			{
+				l_sSamplingPoints = wxT("10");
+			}
+		}
+
+
+
 	m_pcSamplingchoices->SetSelection(m_lSamplingStrategyselection);
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("Fuzzy Setting:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
@@ -73,12 +125,12 @@ SP_DLG_FspnSimResult::SP_DLG_FspnSimResult(SP_DS_Graph* p_pcGraph, wxWindow* p_p
 	l_pcRowSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer2 = new wxBoxSizer(wxHORIZONTAL);
 	l_pcRowSizer1->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("alpha levels")), wxSizerFlags(1).Expand().Border(wxALL, 2));
-	m_alphaLevels1 = new  wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, "10", wxDefaultPosition, wxDefaultSize, 0);
+	m_alphaLevels1 = new  wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, l_sAlphaLevels, wxDefaultPosition, wxDefaultSize, 0);
 	l_pcRowSizer1->Add(m_alphaLevels1, wxSizerFlags(1).Expand().Border(wxALL, 2));
 	/////////////////////
 	l_pcRowSizer2->Add(new wxStaticText(m_pcPropertyWindowPropertySizer, -1, wxT("discretisation points")), wxSizerFlags(1).Expand().Border(wxALL, 2));
 
-	m_pSamplePints = new  wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, "10", wxDefaultPosition, wxDefaultSize, 0);
+	m_pSamplePints = new  wxTextCtrl(m_pcPropertyWindowPropertySizer, -1, l_sSamplingPoints, wxDefaultPosition, wxDefaultSize, 0);
 
 
 	l_pcRowSizer2->Add(m_pSamplePints, wxSizerFlags(1).Expand().Border(wxALL, 2));
@@ -104,7 +156,12 @@ SP_DLG_FspnSimResult::SP_DLG_FspnSimResult(SP_DS_Graph* p_pcGraph, wxWindow* p_p
 
 }
 
-SP_DLG_FspnSimResult::~SP_DLG_FspnSimResult() {}
+SP_DLG_FspnSimResult::~SP_DLG_FspnSimResult()
+{
+	SaveFuzzySimulatorProperties();
+	wxDELETE(m_fr);
+	m_pcGraph->GetParentDoc()->Modify(true);
+}
 
 
 
@@ -216,8 +273,28 @@ bool SP_DLG_FspnSimResult::InitializeFuzzySetting()
 		{
 
 			LoadUsedParams();
+
 			ConvertTFNListToParamMatrix(LoadParams());
-			m_fr = new FuzzyReasoning(m_lAlphaLevels, m_lnDiscPoints, m_paramMatrix, m_lnFuzzyNum, m_lpCount);
+
+			fuzzification::SAMPLING_TYPE l_tSamplingType;
+
+			l_tSamplingType = GetSelectedSamplingMethod();
+
+			if (m_fr == nullptr)
+		    {
+				m_fr = new FuzzyReasoning(m_lAlphaLevels, m_lnDiscPoints, m_paramMatrix, m_lnFuzzyNum, m_lpCount, l_tSamplingType);
+
+			}
+			else
+				{
+				m_fr->SetAlphaLevels(m_lAlphaLevels);
+				m_fr->SetDiscretisingPoints(m_lnDiscPoints);
+				m_fr->SetParamMatrix(m_paramMatrix);
+				m_fr->SetNumberFuzzyParams(m_lnFuzzyNum);
+				m_fr->SetPlaceNum(m_lpCount);
+				m_fr->InitialiseCombinationMatrix();
+
+					}
 			return true;
 		}
 		else {
@@ -314,14 +391,17 @@ void SP_DLG_FspnSimResult::OnStartAbortSimulation(wxCommandEvent& p_cEvent)
 		}
 	}
 	else {
-		int selctedStrategy = m_pcSamplingchoices->GetSelection();
-		if (selctedStrategy != 1) {
-			DoBasicSamplingFspnSimulThread();
-		}
-		else
+
+		fuzzification::SAMPLING_TYPE l_typeSampling = GetSelectedSamplingMethod();//
+		if (l_typeSampling == fuzzification::SAMPLING_TYPE::REDUCED)
 		{
 			DoReducedSamplingFspnSimulThread();
 		}
+		else
+		{
+			DoBasicSamplingFspnSimulThread();
+		}
+
 	}
 }
 
@@ -548,15 +628,28 @@ void* SP_DLG_FspnSimResult::DoBasicSamplingFspnSimulThread()
 	bool bisInitialised = InitializeFuzzySetting();
 	if (!bisInitialised)
 	{
+		SP_LOGERROR(wxT("Simulation could not be started!"));
 		return 0;
 	}
 	m_ResultFBand.clear();
 	m_fspnThreadVector.clear();
+
 	/*inform the user to the  simulation running times*/
 	long l_numofLevels = m_fr->GetNumFuzzyLevels();
 	long l_numofSamples = m_fr->GetNumSamplePoints();
 	long l_numFN = m_fr->GetNumFuzzyNum();
-	long l_nRunningTimes = pow(l_numofSamples, l_numFN) * (l_numofLevels)+1;// pow(numofSamples, lnumFN)* numofLevels + 1;
+
+
+	long l_nRunningTimes;// = pow(l_numofSamples, l_numFN) * (l_numofLevels)+1;// pow(numofSamples, lnumFN)* numofLevels + 1;
+
+	if (m_fr->GetSamplingType() == fuzzification::SAMPLING_TYPE::BASIC)
+	{
+		l_nRunningTimes = pow(l_numofSamples, l_numFN) * (l_numofLevels)+1;
+	}
+	else
+	{//one of LHS algos
+		l_nRunningTimes = (l_numofSamples * l_numofLevels) + 1;
+	}
 
 	m_lTotalSimRuns = l_nRunningTimes;
 	m_lruncounter = 0;
@@ -582,6 +675,7 @@ void* SP_DLG_FspnSimResult::DoBasicSamplingFspnSimulThread()
 		m_pcStartButton->Refresh();
 		m_stopWatch.Start();
 		Update();
+
 		/*calculate alpha levels, default levels=10 ,0->9 */
 		m_fr->CalculateAlphaLevels();
 
@@ -596,7 +690,16 @@ void* SP_DLG_FspnSimResult::DoBasicSamplingFspnSimulThread()
 			m_fr->DoSamplePointsCombination(m_fr->GetAlphaSet()[iAlpha]);
 
 			/*calculate number of simulation at current alpha levels*/
-			long m_lNumCombinedPoints = pow(m_fr->GetNumSamplePoints(), m_fr->GetNumFuzzyNum());
+			long m_lNumCombinedPoints;// = pow(m_fr->GetNumSamplePoints(), m_fr->GetNumFuzzyNum());
+
+			if (m_fr->GetSamplingType() == fuzzification::SAMPLING_TYPE::BASIC)
+			{
+					m_lNumCombinedPoints = pow(m_fr->GetNumSamplePoints(), m_fr->GetNumFuzzyNum());
+			}
+			else
+			{
+					m_lNumCombinedPoints = m_fr->GetNumSamplePoints();
+			}
 
 			for (long lIteration = 0; lIteration < m_lNumCombinedPoints; lIteration++)
 			{
@@ -1268,7 +1371,8 @@ void     SP_DLG_FspnSimResult::OnSimulatorThreadEvent(SP_DS_ThreadEvent& event)
 		m_ResultFBand.clear();
 		LoadResults();
 		m_bIsAbort = false;
-		wxDELETE(m_fr);
+		//wxDELETE(m_fr);
+		m_fr->ClearData();
 		break;
 	}
 	case 10: {
@@ -1280,7 +1384,8 @@ void     SP_DLG_FspnSimResult::OnSimulatorThreadEvent(SP_DS_ThreadEvent& event)
 		m_pcSimulationProgressGauge->SetValue(0);
 		m_bIsAbort = false;
 		wxDELETE(m_info);
-		wxDELETE(m_fr);
+		//wxDELETE(m_fr);
+		m_fr->ClearData();
 		m_pcMainSimulator->AbortSimulation();
 		RefreshExternalWindows();
 		Update();
@@ -1489,5 +1594,187 @@ void SP_DLG_FspnSimResult::LoadTransitions()
 		m_mTransitionName2Position[l_sTransitionName] = l_nTransitionPosition++;
 
 		m_pcMainSimulator->AddTransition(l_sTransitionName, l_sExpanded, spsim::TRANSITION_TYPE_SCHEDULED);
+	}
+}
+
+
+void   SP_DLG_FspnSimResult::OnDlgCancel(wxCommandEvent& p_cEvent)
+{
+	for (auto itVthread = m_fspnThreadVector.begin(); itVthread != m_fspnThreadVector.end(); ++itVthread)
+	{
+		if (*itVthread)
+		{//check thread states
+			if ((*itVthread)->IsRunning())
+			{
+				return;
+			}
+		}
+	}
+	//to be sure, maybe the result simulation thread calculating the fuzzy bands and membership functions is working
+	//button label gives us also an indication
+	if (m_pcStartButton->GetLabel() != wxT("Start Simulation"))
+	{
+
+		return;
+	}
+
+	//end the dialog
+	if (IsModal())
+	{
+		EndModal(wxID_CANCEL);
+	}
+	else
+	{
+		SetReturnCode(wxID_CANCEL);
+		Show(FALSE);
+		Destroy();
+	}
+}
+
+wxString SP_DLG_FspnSimResult::GetFuzzySettingAttribute(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName)
+{
+	CHECK_POINTER(p_pcView, return wxT(""));
+	SP_DS_Attribute* l_pcAttribute = p_pcView->GetAttribute(p_sAttributeName);
+
+	CHECK_POINTER(l_pcAttribute, return wxT(""));
+
+	return l_pcAttribute->GetValueString();
+}
+
+void  SP_DLG_FspnSimResult::SaveFuzzySimulatorProperties()
+{
+	long l_nAlphaLevels;
+	long l_nSamplingPoints;
+
+
+
+	if (m_alphaLevels1->GetValue().ToLong(&l_nAlphaLevels))
+	{
+		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin());
+
+		SP_DS_Attribute* l_pcAttr = NULL;
+
+		if (l_pcSimProp != NULL) {
+			l_pcAttr = l_pcSimProp->GetAttribute(wxT("AlphaLevels"));
+			l_pcAttr->SetValueString(m_alphaLevels1->GetValue());
+		}
+
+	}
+	if (m_pSamplePints->GetValue().ToLong(&l_nSamplingPoints))
+	{
+		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin());
+
+		SP_DS_Attribute* l_pcAttr = NULL;
+
+		if (l_pcSimProp != NULL) {
+			l_pcAttr = l_pcSimProp->GetAttribute(wxT("SamplingPoints"));
+			l_pcAttr->SetValueString(m_pSamplePints->GetValue());
+		}
+	}
+	long l_nselectedSimulation = m_pcSamplingchoices->GetSelection();
+	if (l_nselectedSimulation >= 0)
+	{
+		wxString l_sAlgo;
+		l_sAlgo << l_nselectedSimulation;
+		SP_DS_Metadata* l_pcSimProp = *(m_pcGraph->GetMetadataclass(wxT("FuzzySettings"))->GetElements()->begin());
+
+		SP_DS_Attribute* l_pcAttr = NULL;
+
+		if (l_pcSimProp != NULL) {
+			l_pcAttr = l_pcSimProp->GetAttribute(wxT("SamplingAlgo"));
+			l_pcAttr->SetValueString(l_sAlgo);
+		}
+	}
+
+}
+
+
+void SP_DLG_FspnSimResult::OnSamplingProperties(wxCommandEvent& p_cEvent)
+{
+
+	if (m_pcStartButton->GetLabel() != wxT("Start Simulation"))
+	{
+
+		return;
+	}
+	fuzzification::SAMPLING_TYPE l_typeSampling = GetSelectedSamplingMethod();
+
+	if (l_typeSampling == fuzzification::SAMPLING_TYPE::BASIC || l_typeSampling == fuzzification::SAMPLING_TYPE::REDUCED)//no proporties for basic and reduced samplings
+	{
+		return;
+	}
+
+
+	if (m_fr == nullptr)
+	{
+		InitializeFuzzySetting();
+	}
+
+
+	SP_DLG_SamplingProperties* l_pcDlg;
+
+	l_pcDlg = new SP_DLG_SamplingProperties(this, m_fr, m_pcSamplingchoices->GetSelection());
+
+	l_pcDlg->ShowModal();
+
+	l_pcDlg->Destroy();
+
+	SetFocus();
+
+
+	SP_Core::Instance()->GetRootDocument()->Modify(true);
+
+}
+
+fuzzification::SAMPLING_TYPE SP_DLG_FspnSimResult::GetSelectedSamplingMethod()
+{
+	if (!m_pcSamplingchoices) fuzzification::SAMPLING_TYPE::INVALID;
+
+	long l_nselectedSimulation = m_pcSamplingchoices->GetSelection();
+
+	if (l_nselectedSimulation == 0)
+	{
+		return fuzzification::SAMPLING_TYPE::BASIC;
+	}
+	else if (l_nselectedSimulation == 1)
+	{
+		return  fuzzification::SAMPLING_TYPE::REDUCED;
+	}
+	else if (l_nselectedSimulation == 2)
+	{
+		return   fuzzification::SAMPLING_TYPE::RANDOM_LHS;
+	}
+	else if (l_nselectedSimulation == 3)
+	{
+		return fuzzification::SAMPLING_TYPE::IMPROVED_LHS;
+	}
+	else if (l_nselectedSimulation == 4)
+	{
+		return fuzzification::SAMPLING_TYPE::OPTIMUM_LHS;
+	}
+	else if (l_nselectedSimulation == 5)
+	{
+		return fuzzification::SAMPLING_TYPE::GENETIC_LHS;
+
+	}
+	else if (l_nselectedSimulation == 6)
+	{
+		return fuzzification::SAMPLING_TYPE::MAXIMINI_LHS;
+	}
+	else
+	{
+		return fuzzification::SAMPLING_TYPE::INVALID;
+	}
+}
+
+void SP_DLG_FspnSimResult::OnSamplingAlgoChanged(wxCommandEvent& p_evt)
+{
+	if (m_fr == nullptr)
+	{
+		InitializeFuzzySetting();
+	}
+	else
+	{
+		m_fr->SetSamplingMethod(GetSelectedSamplingMethod());
 	}
 }

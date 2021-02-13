@@ -6,7 +6,7 @@
 #include "sp_gui/dialogs/dia_FPN/SP_Compressed_Fuzzy_Band.h"
 #include "FuzzyReasoning.h"
 #include "sp_ds/extensions/SP_DS_SimulatorThread.h"
-
+using namespace fuzzification;
 class SP_DS_ThreadEvent;
 class SP_DS_FuzzyResult_Thread : public wxThread
 {
@@ -20,7 +20,7 @@ protected:
 private:
 	wxWindow*        m_parentWin;
 	ResultFuzzyBand m_fuzzyBand;
-	FuzzyReasoning*  m_fuzzyReasoning;
+	fuzzification::FuzzyReasoning*  m_fuzzyReasoning;
 
 };
 

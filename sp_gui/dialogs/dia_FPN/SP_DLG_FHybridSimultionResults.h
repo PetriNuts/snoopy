@@ -9,17 +9,18 @@
 //==============================================================================
 #ifndef SP_DLG_FUZZYHYBRIDSIMULTIONRESULTS_H_
 #define SP_DLG_FUZZYHYBRIDSIMULTIONRESULTS_H_
-#include<ctime>
+
 /*
 * This class implements the simulation dialog for Fuzzy Hybrid PN
 */
+#include<ctime>
 #include "sp_gui/dialogs/SP_DLG_Simulation.h"
 #include "sp_gui/dialogs/dia_HybridPN/SP_DLG_HybridSimultionResults.h"
 #include "FuzzyReasoning.h"
 #include"SP_DS_FhpnSimulThread.h"
 #include "SP_DS_FuzzyResult_Thread.h"
 #include "wx/busyinfo.h"
-//class SP_DS_ThreadEvent;
+#include "sp_gui/dialogs/dia_FPN/SP_DLG_SamplingProperties.h"
 
 typedef std::vector<TriangularFN> TFN_List;
 class SP_DS_ThreadEvent;
@@ -43,13 +44,14 @@ protected:
 	std::vector<double>         m_vdCurrentSample;
 	std::map<wxString, wxString> m_mTransParamNames;
 	ResultFuzzyBand              m_ResultFBand;
-	FuzzyReasoning *              m_fr;
+	fuzzification::FuzzyReasoning *              m_fr;
 	long                         m_samplingStrategyselection;
 	long                         m_lTotalSimRuns;
 	long                         m_lruncounter;
 	wxBusyInfo*                  m_info;
 	wxStopWatch                  m_simStopWatch;
 	std::vector<SP_DS_FhpnSimulThread*> m_fhpnThreadVector;
+	SP_DS_Metadata* m_pcFuzzySimProp;//fuzzy properties
 protected:
 
 
@@ -64,6 +66,7 @@ protected:
 	virtual void     OnSimulatorThreadEvent(SP_DS_ThreadEvent& event);
 
 	virtual void        LoadUsedParams();
+
 	virtual void LoadTransitions();
 
 	virtual std::vector<TriangularFN> LoadParams();
@@ -92,6 +95,18 @@ protected:
 	virtual void SetSimulationProgressGauge(long p_nValue);
 
 	virtual void SetSimulationProgressGaugeRange(long p_nRangeValue);
+
+	virtual void    OnDlgCancel(wxCommandEvent& p_cEvent);
+
+	virtual wxString  GetFuzzySettingAttribute(SP_DS_Metadata* p_pcView, const wxString& p_sAttributeName);
+
+	virtual void   SaveFuzzySimulatorProperties();
+
+	virtual void OnSamplingAlgoChanged(wxCommandEvent& p_evt);
+
+	virtual fuzzification::SAMPLING_TYPE GetSelectedSamplingMethod();
+
+	virtual  void OnSamplingProperties(wxCommandEvent& p_cEvent);
 
 public:
 
