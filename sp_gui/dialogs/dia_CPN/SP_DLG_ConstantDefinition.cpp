@@ -622,12 +622,13 @@ bool SP_DLG_ConstantDefinition::SaveNewDate()
 		wxDELETE(l_pcConst);
 	}
 	SP_DS_Graph* l_pcGraph;
-	//size_t ss = m_pcConstants->GetElements()->size();
+
+	if (m_pcColorSetGrid->GetNumberRows() == 0) return true;
  
 	while (m_pcConstants->GetElements()->size() < m_pcColorSetGrid->GetNumberRows())
 	{
 		m_pcConstants->NewElement(1);
-		//size_t ss = m_pcConstants->GetElements()->size();
+
 	}
 
 	SP_ListMetadata::const_iterator l_itElem;
