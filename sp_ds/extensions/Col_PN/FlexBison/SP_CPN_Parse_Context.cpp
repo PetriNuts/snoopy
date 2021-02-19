@@ -2220,6 +2220,23 @@ bool SP_CPN_Parse_Comma_Node::check()
 	wxString l_sLCS = l_LeftNodeInfo->m_sColorSetList;
 	wxString l_sRCS = l_RightNodeInfo->m_sColorSetList;
 
+
+	if (l_sRCS.IsEmpty())//george 11.2.21 which allows a function to be used in the tupel e.g., (x,fun(x,y))
+	{
+			if (l_RightNodeInfo->m_NodeType == CPN_FUNCTION_NODE)
+			{
+				l_sRCS = l_RightNodeInfo->m_ColorSet;
+			}
+	}
+
+	if (l_sLCS.IsEmpty())//george 11.2.21 which allows a function to be used in the tupel e.g., (fun(x,y),z)
+	{
+			if (l_LeftNodeInfo->m_NodeType == CPN_FUNCTION_NODE)
+			{
+				l_sLCS = l_LeftNodeInfo->m_ColorSet;
+			}
+	}
+
 	
 	m_ParseNode_Info.m_sColorSetList = l_sLCS + wxT(",") + l_sRCS;
 
