@@ -134,6 +134,7 @@ private:
 	bool  CheckDuplicateNodes();
 	/*we need this checking because dssd_util does not support union color sets*/
 	bool IsContainUnionColorSet();
+	bool DoCheckEmptyMarking(wxString p_sPlaceNCName);//by george
 public:
 	bool SyntaxChecking();
 	bool CheckArcExpression(SP_DS_Node* p_pcPlaceNode, SP_DS_Edge* p_pcEdge, SP_DS_Node* p_pcTransNode);							//used

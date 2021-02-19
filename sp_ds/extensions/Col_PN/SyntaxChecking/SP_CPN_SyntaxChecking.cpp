@@ -63,7 +63,21 @@ bool SP_CPN_SyntaxChecking::SyntaxChecking()
 
 	if (!Initialize())
 		return false;
-	//m_bIsNotUniqueNet = p_bIsDoublicated;
+
+	//by georfe, checking for empty marking for all node classes at once
+	bool l_bIsEmptyMarkingContClassNode = false;
+	bool l_bIsEmptyMarkingStochClassNode = false;
+
+	//check for empty marking first
+	l_bIsEmptyMarkingContClassNode=DoCheckEmptyMarking(SP_DS_CONTINUOUS_PLACE);
+
+	l_bIsEmptyMarkingStochClassNode=DoCheckEmptyMarking(SP_DS_DISCRETE_PLACE);
+
+	if (l_bIsEmptyMarkingContClassNode || l_bIsEmptyMarkingStochClassNode)
+	{
+			return false;
+	}
+
 	//check places
 	if (!CheckPlaceClass(SP_DS_CONTINUOUS_PLACE))
 		return false;
@@ -83,6 +97,43 @@ bool SP_CPN_SyntaxChecking::SyntaxChecking()
 		return false;
 
 	return true;
+}
+
+
+bool SP_CPN_SyntaxChecking::DoCheckEmptyMarking(wxString p_sPlaceNCName)
+{
+	SP_ListNode::const_iterator l_itElem;
+	SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(p_sPlaceNCName);
+	bool l_bIsExistPlaceWithEmptyMarking = false;
+	if (l_pcNodeclass)
+	{
+		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		{
+			SP_DS_Node* l_pcPlaceNode = (*l_itElem);
+
+
+			wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+			wxString l_sPlaceType = l_pcPlaceNode->GetNodeclass()->GetName();
+			m_sPlaceName = l_sPlaceName;
+			//check the color set
+			SP_CPN_ColorSet l_cColorSet;
+			if (!GetPlaceColorSet(l_pcPlaceNode, l_cColorSet))
+				continue;
+
+			SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcPlaceNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
+			if (!l_pcColList)
+				return false;
+
+			//if there is no marking defined
+			if (l_pcColList->GetRowCount() == 0)
+			{
+				l_bIsExistPlaceWithEmptyMarking = true;
+				wxString l_sError = wxT("there is no initial marking: |") + m_sPlaceName;
+				SP_LOGERROR(l_sError);
+			}
+		}
+	}
+	return l_bIsExistPlaceWithEmptyMarking;
 }
 
 bool SP_CPN_SyntaxChecking::CheckPlaceClass(wxString p_sPlaceNCName)
