@@ -41,6 +41,7 @@ class SP_WDG_ColExtMarkingList: public SP_WDG_DialogBase
     void OnImport( wxCommandEvent& p_cEvent );
     void OnDelete( wxCommandEvent& p_cEvent );
 	void OnCheck( wxCommandEvent& p_cEvent );
+	void OnAssistant(wxCommandEvent& p_cEvent);//by george
 
     void ConnectEvents();
     void DisconnectEvents();

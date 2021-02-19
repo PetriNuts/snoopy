@@ -28,6 +28,8 @@
 
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogText.h"
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogChoice.h"
+#include "sp_gui/dialogs/dia_CPN/SP_DLG_ExpressionAssistent.h"//by george
+#include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ColorSetClass.h"//by george
 
 
 enum
@@ -38,7 +40,8 @@ enum
 	SP_ID_GRID_MARKING,
 	SP_ID_BUTTON_OVERVIEW,
 	SP_ID_BUTTON_CHECK,
-	SP_ID_BUTTON_SHOWMARKING
+	SP_ID_BUTTON_SHOWMARKING,
+	SP_ID_BUTTON_ASSISTANT//by george
 	
 
 };
@@ -161,9 +164,13 @@ bool SP_WDG_ColStMarkingList::AddToDialog(
 
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
-//	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
+	//by george
+		wxBoxSizer* l_pcSizerAsis = new wxBoxSizer(wxHORIZONTAL);
+		l_pcSizerAsis->Add(new wxButton(l_pcPage, SP_ID_BUTTON_ASSISTANT + m_nDialogID
+			+ wxID_HIGHEST, wxT("Marking Assistant")), 1, wxALL, 5);
+		l_pcPage->AddControl(l_pcSizerAsis, 0, wxEXPAND);
 
-//	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
+
 
 	ConnectEvents();
 	p_pcDlg->PushEventHandler(this);
@@ -648,6 +655,10 @@ void SP_WDG_ColStMarkingList::ConnectEvents()
 			SP_ID_BUTTON_SHOWMARKING + m_nDialogID + wxID_HIGHEST,
 			wxEVT_COMMAND_BUTTON_CLICKED,
 			(wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction) &SP_WDG_ColStMarkingList::OnShowMarking);
+	Connect(
+			SP_ID_BUTTON_ASSISTANT + m_nDialogID + wxID_HIGHEST,
+			wxEVT_COMMAND_BUTTON_CLICKED,
+			(wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&SP_WDG_ColStMarkingList::OnAsisstant);
 }
 
 void SP_WDG_ColStMarkingList::DisconnectEvents()
@@ -1019,4 +1030,44 @@ void SP_WDG_ColStMarkingList::OnShowMarking(wxCommandEvent& p_cEvent)
 
 	SP_LOGMESSAGE(wxT("There are ")+ l_sMainMarkingNumber + wxT(" tokens, which are as follows:\n") + l_sMarkingDetails);
 
+}
+
+
+void SP_WDG_ColStMarkingList::OnAsisstant(wxCommandEvent& p_cEvent)
+{
+	m_pcMarkingGrid->SaveEditControlValue();
+
+	if (m_pcMarkingGrid->GetNumberRows() == 0)
+	{
+		return;
+	}
+	wxString l_pcReturnText = m_pcMarkingGrid->GetCellValue(0, 1);
+
+	SP_CPN_ValueAssign l_cValueAssign;
+	SP_CPN_ColorSetClass l_cColorSetClass;
+	l_cValueAssign.InitializeColorset(l_cColorSetClass);
+
+	SP_DS_Attribute* l_pcAttr = (*m_tlAttributes.begin());
+
+	SP_DS_Node* l_pcNode;
+
+	if (!l_pcAttr)
+		return;
+	l_pcNode = dynamic_cast<SP_DS_Node*> (l_pcAttr->GetParent());
+
+	if (!l_pcNode)
+		return;
+
+	wxString l_sType=l_pcNode->GetClassName();
+
+	SP_DLG_ExpressionAssistent* l_pcDlg = new SP_DLG_ExpressionAssistent(EXPRESSION_COLORMARKING, wxT(""), l_sType, l_cColorSetClass, l_pcReturnText, m_pcDlg);
+
+	if (l_pcDlg->ShowModal() == wxID_OK)
+		{
+
+			m_pcMarkingGrid->SetCellValue(m_pcMarkingGrid->GetGridCursorRow(), m_pcMarkingGrid->GetGridCursorCol(),
+				l_pcDlg->GetReturnText());
+		}
+
+	l_pcDlg->Destroy();
 }

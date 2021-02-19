@@ -30,13 +30,16 @@
 
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogText.h"
 #include "sp_gui/widgets/dialogs/SP_WDG_DialogChoice.h"
+#include "sp_gui/dialogs/dia_CPN/SP_DLG_ExpressionAssistent.h"//by george
+#include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ColorSetClass.h"//by george
 enum
 {
 	SP_ID_BUTTON_ADD,
 	SP_ID_BUTTON_DELETE,
 	SP_ID_BUTTON_IMPORT,
 	SP_ID_GRID_MARKING,
-	SP_ID_BUTTON_CHECK
+	SP_ID_BUTTON_CHECK,
+	SP_ID_BUTTON_ASSISTANT//by george
 
 };
 BEGIN_EVENT_TABLE( SP_WDG_ColExtMarkingList, SP_WDG_DialogBase )
@@ -94,11 +97,7 @@ bool SP_WDG_ColExtMarkingList::AddToDialog(
     SP_WDG_NotebookPage* l_pcPage = p_pcDlg->AddPage(l_sPage, GetDialogOrdering());
 	CHECK_POINTER( l_pcPage, return FALSE );
 	
-	//wxStaticText* l_StaticText=new wxStaticText(l_pcPage, -1, wxT("ColorSet:"));
-	//m_pcColorSetTextCtrl= new wxTextCtrl(l_pcPage, -1, wxT("0"), wxDefaultPosition, wxDefaultSize, 0);
-	//l_pcSizer->Add(l_StaticText, 1, wxALL , 5);
-	//l_pcSizer->Add(m_pcColorSetTextCtrl, 1, wxALL , 5);
-	//l_pcSizer->Add(new wxStaticText(l_pcPage, -1, wxT("") ), 1, wxALL , 5);
+
 	l_pcSizer->Add(new wxStaticText(l_pcPage, -1, l_pcAttr->GetName()), 1, wxALL , 5);
 	AddShowFlag(l_pcPage, l_pcSizer, l_pcAttr);
 
@@ -160,6 +159,13 @@ bool SP_WDG_ColExtMarkingList::AddToDialog(
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
 	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
+
+	//by george
+	l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
+	l_pcSizer->Add(new wxButton(l_pcPage, SP_ID_BUTTON_ASSISTANT + m_nDialogID
+			+ wxID_HIGHEST, wxT("Marking Assistant")), 1, wxALL, 5);
 
 	l_pcPage->AddControl(l_pcSizer, 0, wxEXPAND);
 
@@ -559,6 +565,11 @@ void SP_WDG_ColExtMarkingList::ConnectEvents()
 			SP_ID_BUTTON_CHECK + m_nDialogID + wxID_HIGHEST,
 			wxEVT_COMMAND_BUTTON_CLICKED,
 			(wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction) &SP_WDG_ColExtMarkingList::OnCheck);
+
+	Connect(
+			SP_ID_BUTTON_ASSISTANT+ m_nDialogID + wxID_HIGHEST,
+			wxEVT_COMMAND_BUTTON_CLICKED,
+			(wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&SP_WDG_ColExtMarkingList::OnAssistant);
 }
 
 void SP_WDG_ColExtMarkingList::DisconnectEvents()
@@ -583,6 +594,10 @@ void SP_WDG_ColExtMarkingList::DisconnectEvents()
 			SP_ID_BUTTON_CHECK + m_nDialogID + wxID_HIGHEST,
 			wxEVT_COMMAND_BUTTON_CLICKED,
 			(wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction) &SP_WDG_ColExtMarkingList::OnCheck);
+	Disconnect(
+				SP_ID_BUTTON_ASSISTANT+ m_nDialogID + wxID_HIGHEST,
+				wxEVT_COMMAND_BUTTON_CLICKED,
+				(wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&SP_WDG_ColExtMarkingList::OnAssistant);
 }
 
 void SP_WDG_ColExtMarkingList::OnGridCellSelected(wxGridEvent& ev)
@@ -824,6 +839,45 @@ void SP_WDG_ColExtMarkingList::OnCheck( wxCommandEvent& p_cEvent )
 	l_sVariables += wxT(" is correct.");
 	new wxTipWindow(m_pcDlg, l_sVariables, 1000);
 
+}
+
+void SP_WDG_ColExtMarkingList::OnAssistant(wxCommandEvent& p_cEvent)
+{
+	m_pcMarkingGrid->SaveEditControlValue();
+
+	if (m_pcMarkingGrid->GetNumberRows() == 0)
+	{
+		return;
+	}
+	wxString l_pcReturnText = m_pcMarkingGrid->GetCellValue(0, 1);
+
+	SP_CPN_ValueAssign l_cValueAssign;
+	SP_CPN_ColorSetClass l_cColorSetClass;
+	l_cValueAssign.InitializeColorset(l_cColorSetClass);
+
+	SP_DS_Attribute* l_pcAttr = (*m_tlAttributes.begin());
+
+	SP_DS_Node* l_pcNode;
+
+	if (!l_pcAttr)
+		return;
+	l_pcNode = dynamic_cast<SP_DS_Node*> (l_pcAttr->GetParent());
+
+	if (!l_pcNode)
+		return;
+
+	wxString l_sType = l_pcNode->GetClassName();
+
+	SP_DLG_ExpressionAssistent* l_pcDlg = new SP_DLG_ExpressionAssistent(EXPRESSION_COLORMARKING, wxT(""), l_sType, l_cColorSetClass, l_pcReturnText, m_pcDlg);
+
+	if (l_pcDlg->ShowModal() == wxID_OK)
+	{
+
+		m_pcMarkingGrid->SetCellValue(m_pcMarkingGrid->GetGridCursorRow(), m_pcMarkingGrid->GetGridCursorCol(),
+			l_pcDlg->GetReturnText());
+	}
+
+	l_pcDlg->Destroy();
 }
 
 void SP_WDG_ColExtMarkingList::UpdatePlaceColor()

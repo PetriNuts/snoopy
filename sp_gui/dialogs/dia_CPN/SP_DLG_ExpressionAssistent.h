@@ -22,7 +22,9 @@
 enum SP_CPN_ExprAssistType
 {
 	EXPRESSION_ARCGUARD,
-	EXPRESSION_TRACEANALYSIS
+	EXPRESSION_TRACEANALYSIS,
+	EXPRESSION_COLORSET_DEFINITION,//2020,by george
+	EXPRESSION_COLORMARKING//2021,by george
 };
 
 class SP_DLG_ExpressionAssistent;
@@ -76,12 +78,14 @@ class SP_DLG_ExpressionAssistent : public wxDialog
     SP_DLG_ExpressionAssistent_ListCtrl* m_pcConstantListCtrl;
     SP_DLG_ExpressionAssistent_ListCtrl* m_pcFunctionListCtrl;
     SP_DLG_ExpressionAssistent_ListCtrl* m_pcSimpleCSListCtrl;//by george
+	SP_DLG_ExpressionAssistent_ListCtrl* m_pcColorFunctions;//by george
 
     virtual void LoadData();
     virtual void LoadConstant();
     virtual void LoadVariable();
     virtual void LoadFunctions();
     virtual void LoadSimpleColorSets();//by george
+    virtual void LoadColorFuns();//george
 
     DECLARE_CLASS( SP_DLG_ExpressionAssistent )
 

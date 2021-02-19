@@ -4,6 +4,7 @@
 // $Version: 0.0 $
 // $Revision: 1.0 $
 // $Date: 2009/10/11 11:20:00 $
+// $Updated: by George Assaf, adding Marking and color sets assistant$
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 
@@ -30,7 +31,8 @@ enum
 	SP_ID_LISTCTRL_VARIABLE,
 	SP_ID_LISTCTRL_CONSTANT,
 	SP_ID_LISTCTRL_FUNCTION,
-	SP_ID_LISTCTRL_COLORSET//2021
+	SP_ID_LISTCTRL_COLORSET,//2021
+	SP_ID_LISTCTRL_COLORFUNS//2021
 
 };
 
@@ -49,6 +51,7 @@ EVT_LIST_ITEM_ACTIVATED( SP_ID_LISTCTRL_VARIABLE, SP_DLG_ExpressionAssistent_Lis
 EVT_LIST_ITEM_ACTIVATED( SP_ID_LISTCTRL_CONSTANT, SP_DLG_ExpressionAssistent_ListCtrl::OnDblClick )
 EVT_LIST_ITEM_ACTIVATED( SP_ID_LISTCTRL_FUNCTION, SP_DLG_ExpressionAssistent_ListCtrl::OnDblClick )
 EVT_LIST_ITEM_ACTIVATED(SP_ID_LISTCTRL_COLORSET, SP_DLG_ExpressionAssistent_ListCtrl::OnDblClick)//george 2021
+EVT_LIST_ITEM_ACTIVATED(SP_ID_LISTCTRL_COLORFUNS, SP_DLG_ExpressionAssistent_ListCtrl::OnDblClick)//george 2020
 
 END_EVENT_TABLE()
 
@@ -98,13 +101,25 @@ SP_DLG_ExpressionAssistent::SP_DLG_ExpressionAssistent(SP_CPN_ExprAssistType p_E
 	l_pcListBoxesSizer->Add(l_pcParameterListBoxSizer, 1, wxALL| wxEXPAND, 2);
 
 
+	if (m_ExprAssistType != EXPRESSION_COLORMARKING)
+	{
 	//color sets
 	wxStaticBoxSizer* l_pcSimpleCSListBoxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Color sets")), wxHORIZONTAL);
 	m_pcSimpleCSListCtrl = new SP_DLG_ExpressionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_COLORSET, wxDefaultPosition,
 		wxSize(150, 200), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
 	l_pcSimpleCSListBoxSizer->Add(m_pcSimpleCSListCtrl, 1, wxALL | wxEXPAND, 2);
 	l_pcListBoxesSizer->Add(l_pcSimpleCSListBoxSizer, 1, wxALL | wxEXPAND, 2);
+	}
+	else
+	{
 
+		wxStaticBoxSizer* l_pccolorFuncs = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Color functions")), wxHORIZONTAL);
+		m_pcColorFunctions = new SP_DLG_ExpressionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_COLORFUNS, wxDefaultPosition,
+			wxSize(150, 200), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
+		l_pccolorFuncs->Add(m_pcColorFunctions, 1, wxALL | wxEXPAND, 2);
+		l_pcListBoxesSizer->Add(l_pccolorFuncs, 1, wxALL | wxEXPAND, 2);
+
+	}
 	wxStaticBoxSizer* l_pcFunctionListBoxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Functions / Operators")), wxHORIZONTAL);
 	m_pcFunctionListCtrl = new SP_DLG_ExpressionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_FUNCTION, wxDefaultPosition,
 								wxSize(200, 200), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
@@ -175,7 +190,7 @@ void SP_DLG_ExpressionAssistent::LoadConstant()
 	
 	//Load constants
 	m_pcConstantListCtrl->InsertColumn(0, wxT("Constant"), wxLIST_FORMAT_LEFT);
-	m_pcConstantListCtrl->InsertColumn(1, wxT("Colorset"), wxLIST_FORMAT_LEFT);
+	m_pcConstantListCtrl->InsertColumn(1, wxT("Type"), wxLIST_FORMAT_LEFT);
 	m_pcConstantListCtrl->InsertColumn(2, wxT("Value"), wxLIST_FORMAT_LEFT);
 
 	l_cItem.SetBackgroundColour(*wxWHITE);	
@@ -188,6 +203,12 @@ void SP_DLG_ExpressionAssistent::LoadConstant()
 		l_cItem.m_itemId = l_nPos++;
 		l_cItem.m_text = wxT("");
 		l_cItem.m_text << itMap->first;
+
+		if (itMap->second.m_DataType == 9 && m_sPlaceType != SP_DS_CONTINUOUS_PLACE)
+		{
+					continue;
+		}
+
 		long l_nIndex = m_pcConstantListCtrl->InsertItem(l_cItem);
 
 		l_cItem.m_text = wxT("");	
@@ -210,6 +231,10 @@ void SP_DLG_ExpressionAssistent::LoadConstant()
 				l_cItem.m_text << wxT("index");
 			else if(l_DataType == 6)
 				l_cItem.m_text << wxT("product");
+			else if (l_DataType == 9 && m_sPlaceType == SP_DS_CONTINUOUS_PLACE)//by george
+				{
+					l_cItem.m_text << wxT("double");
+			  }
 			else
 			{}
 		}
@@ -221,6 +246,8 @@ void SP_DLG_ExpressionAssistent::LoadConstant()
 			l_cItem.m_text << itMap->second.m_IntegerValue;
 		else if(itMap->second.m_DataType == CPN_BOOLEAN)
 			l_cItem.m_text << itMap->second.m_BooeanValue;
+		else if(itMap->second.m_DataType == CPN_DOUBLE)//by george
+			l_cItem.m_text << itMap->second.m_DoubleValue;
 		else
 			l_cItem.m_text << itMap->second.m_StringValue;
 		
@@ -455,6 +482,61 @@ void SP_DLG_ExpressionAssistent::LoadFunctions()
 	m_pcFunctionListCtrl->SetColumnWidth(1, 120);
 }
 
+void SP_DLG_ExpressionAssistent::LoadColorFuns()
+{
+	if (!m_pcColorSetClass)
+		return;
+
+	wxListItem l_cItem;
+	int l_nPos = 0;
+
+	if (m_pcColorFunctions->GetItemCount() > 0) { return; }
+
+	//Load cs
+	m_pcColorFunctions->InsertColumn(0, wxT("Color functions"), wxLIST_FORMAT_LEFT);
+	m_pcColorFunctions->InsertColumn(1, wxT("Return type"), wxLIST_FORMAT_LEFT);
+	m_pcColorFunctions->InsertColumn(2, wxT("Body"), wxLIST_FORMAT_LEFT);
+
+
+
+	l_cItem.SetBackgroundColour(*wxWHITE);
+	l_cItem.m_mask = wxLIST_MASK_TEXT;
+
+	//vector< SP_CPN_ColorSet*>::iterator itV;
+	for (auto itm = m_pcColorSetClass->GetFunctionMap()->begin(); itm != m_pcColorSetClass->GetFunctionMap()->end(); itm++)
+	{
+		l_cItem.m_col = 0;
+		l_cItem.m_itemId = l_nPos++;
+		l_cItem.m_text = wxT("");
+		l_cItem.m_text << (itm)->first;
+		long l_nIndex = m_pcColorFunctions->InsertItem(l_cItem);
+		l_cItem.m_text = wxT("");
+		l_cItem.m_text << (itm)->second.m_sFunctionBody;
+
+		if ((itm)->second.m_sReturnColorSet == wxT(""))
+		{
+			if((itm)->second.m_ReturnDataType==CPN_BOOLEAN)
+			m_pcColorFunctions->SetItem(l_nIndex, 1,wxT("bool") );
+			else if ((itm)->second.m_ReturnDataType == CPN_INTEGER)
+			{
+				m_pcColorFunctions->SetItem(l_nIndex, 1, wxT("int"));
+			}
+			else if ((itm)->second.m_ReturnDataType == CPN_DOT)
+			{
+				m_pcColorFunctions->SetItem(l_nIndex, 1, wxT("Dot"));
+			}
+		}
+		else
+		{
+			m_pcColorFunctions->SetItem(l_nIndex, 1, (itm)->second.m_sReturnColorSet);
+		}
+
+		m_pcColorFunctions->SetItem(l_nIndex, 2, l_cItem.m_text);
+
+
+	}
+}
+
 void SP_DLG_ExpressionAssistent::LoadVariable()
 {
 
@@ -498,7 +580,14 @@ void SP_DLG_ExpressionAssistent::LoadData()
 
 	LoadConstant();
     LoadVariable();
-    LoadSimpleColorSets();//by george
+
+    if (m_ExprAssistType != EXPRESSION_COLORMARKING)
+    {LoadSimpleColorSets();//by george
+    }
+    else
+    {
+    	LoadColorFuns();
+    }
 	LoadFunctions();
 
 }

@@ -45,6 +45,7 @@ class SP_WDG_ColStMarkingList: public SP_WDG_DialogBase
 	void OnOverview(wxCommandEvent& p_cEvent);
 	void OnCheck(wxCommandEvent& p_cEvent);
 	void OnShowMarking(wxCommandEvent& p_cEvent);
+	void OnAsisstant(wxCommandEvent& p_cEvent);//by george
 
     void ConnectEvents();
     void DisconnectEvents();
