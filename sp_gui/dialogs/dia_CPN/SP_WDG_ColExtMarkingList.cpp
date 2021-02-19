@@ -285,6 +285,13 @@ bool SP_WDG_ColExtMarkingList::LoadData()
 		//check if the color set of the place is not product, then make the tuple column read-olnly
 		wxString l_sColorSetName = l_pcNameAttibute->GetValue();
 		l_pcColorSet = l_cColorSetClass.LookupColorSet(l_sColorSetName);
+
+		if (!l_pcColorSet)//by george:bugfix
+		{
+			SP_LOGERROR_(wxT("The colorset: ") + l_sColorSetName + wxT(" is not defined!"));
+			continue;
+		}
+
 		if (l_pcColorSet->GetDataType() != CPN_PRODUCT)
 		{
 			for (unsigned i = 0; i < m_pcMarkingGrid->GetNumberRows(); i++)
