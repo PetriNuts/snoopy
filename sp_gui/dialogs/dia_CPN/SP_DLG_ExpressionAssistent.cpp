@@ -299,20 +299,23 @@ void SP_DLG_ExpressionAssistent::LoadFunctions()
 		m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("Return the number of neighbors for a cell"));
 	}
 
-	    //by george 2021
-		l_cItem.m_itemId = l_nPos++;
-		l_cItem.m_text = wxT("");
-		l_cItem.m_text << wxT("--");
-		l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
-		m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Multiset difference"));
+	if (m_ExprAssistType != EXPRESSION_COLORMARKING)
+	{
+	  //by george 2021
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("--");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Multiset difference"));
 
-		//by george 2021
-		l_cItem.m_itemId = l_nPos++;
-		l_cItem.m_text = wxT("");
-		l_cItem.m_text << wxT("ElemOf");
-		l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
-		m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Element of Operator"));
 
+	//by george 2021
+	l_cItem.m_itemId = l_nPos++;
+	l_cItem.m_text = wxT("");
+	l_cItem.m_text << wxT("ElemOf");
+	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
+	m_pcFunctionListCtrl->SetItem(l_nIndex, 1, wxT("Element of Operator"));
+	}
 
 	l_cItem.m_itemId = l_nPos++;
 	l_cItem.m_text = wxT("");
@@ -320,7 +323,8 @@ void SP_DLG_ExpressionAssistent::LoadFunctions()
 	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
 	m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("Return the absolute value"));
 
-
+	if (m_ExprAssistType != EXPRESSION_COLORMARKING)
+	{
 	l_cItem.m_itemId = l_nPos++;
 	l_cItem.m_text = wxT("");
 	l_cItem.m_text << wxT("[ ]");
@@ -356,7 +360,7 @@ void SP_DLG_ExpressionAssistent::LoadFunctions()
 	l_cItem.m_text << wxT(":");
 	l_nIndex = m_pcFunctionListCtrl->InsertItem(l_cItem);
 	m_pcFunctionListCtrl->SetItem(l_nIndex,1,wxT("Extract component element from a product color"));
-
+	}
 	l_cItem.m_itemId = l_nPos++;
 	l_cItem.m_text = wxT("");
 	l_cItem.m_text << wxT("+");
