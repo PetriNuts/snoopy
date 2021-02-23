@@ -119,9 +119,10 @@ bool SP_CPN_ColorSetClass::SetVariableValue(wxString p_VariableName, wxString p_
 			}
 			else
 			{
-				wxString l_sError;					
-				l_sError << wxT("Color error");
-				SP_MESSAGEBOX(l_sError, wxT("Variables binding checking"), wxOK | wxICON_ERROR);	
+				//does not make sense to give here an error message, by george
+				//wxString l_sError;
+				//l_sError << wxT("Color error");
+				//SP_MESSAGEBOX(l_sError, wxT("Variables binding checking"), wxOK | wxICON_ERROR);
 				return false;
 			}
 		}
