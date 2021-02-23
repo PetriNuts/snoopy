@@ -321,6 +321,14 @@ bool SP_WDG_ColExtMarkingList::SaveData()
 			{
 				SP_DS_Attribute* l_pcAttr = *it;
 				SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcAttr);
+
+				if (l_pcColList->GetRowCount() == 0)//by george, a case wher a place with empty marking-grid
+				{
+						for (int l_nRow = 0; l_nRow < m_pcMarkingGrid->GetNumberRows(); l_nRow++)
+						{
+							l_pcColList->AppendEmptyRow();
+						}
+				}
 				//for (int l_nRow = 0; l_nRow < m_pcMarkingGrid->GetNumberRows(); l_nRow++)
 				for (unsigned l_nRow = 0; l_nRow < l_pcColList->GetRowCount(); l_nRow++)
 				{
