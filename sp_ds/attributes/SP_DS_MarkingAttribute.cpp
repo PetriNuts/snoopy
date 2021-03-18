@@ -115,7 +115,7 @@ bool SP_DS_MarkingAttribute::CheckIntegrity()
 {
 	long l_Int = 0;
 	double l_Double = 0;
-	if (!m_sValue.ToLong(&l_Int) && m_sValue.ToDouble(&l_Double))
+	if (!m_sValue.ToLong(&l_Int) && m_sValue.ToDouble(&l_Double) &&  !m_sValue.Contains(wxT("e")))
 	{
 		SP_LOGERROR( wxT("\"") + m_sValue + wxT("\" double value not allowed"));
 		return false;

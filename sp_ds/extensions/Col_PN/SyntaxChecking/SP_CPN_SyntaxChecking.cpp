@@ -2119,7 +2119,7 @@ bool SP_CPN_SyntaxChecking::GetTokenNumber(wxString p_sTokenNumber, SP_CPN_Token
 				return false;
 			 }
 
-			if (l_sConstant.Contains(wxT(".")))//expression having decimal values
+			if (l_sConstant.Contains(wxT(".")) && !l_sConstant.Contains(wxT("e")))//expression having decimal values
 			{
 				double val = 0;
 				val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, val }();
