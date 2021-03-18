@@ -71,6 +71,33 @@ bool SP_ExportContODE2Text::DoWrite()
 			}
 			l_nPlacePos++;
 		}
+
+	    wxString l_sParsedString = l_sResult;
+	    wxStringTokenizer tokenizer(l_sParsedString, "+-*/%()=;&|, ");
+
+	    		while (tokenizer.HasMoreTokens())
+	    		{
+	    			wxString token = tokenizer.GetNextToken();
+
+	    			for (auto it = m_msParameterName2Value.begin(); it != m_msParameterName2Value.end(); ++it)
+	    			{
+	    				wxString l_sVal;
+	    				l_sVal << it->second;
+	    				if (l_sVal.Trim() == token)
+	    				{
+	    					wxString l_sEq = wxT("");
+
+	    					DeSubstituteConstants(l_sResult, it->first, token, l_sEq);
+	    					if (l_sEq != wxT(""))
+	    					{
+	    						l_sResult = l_sEq;
+	    					}
+
+	    				}
+	    			}
+	    		}
+
+
 	    m_pcMainSimulator->AbortSimulation();
 		m_file.Write(l_sResult);
 
@@ -418,5 +445,51 @@ void SP_ExportContODE2Text::LoadParams()
 	m_pcMainSimulator->SetParameterValues(l_anParameterValue);
 }
 
+
+void SP_ExportContODE2Text::DeSubstituteConstants(const wxString& p_sOde, const wxString& p_scon, wxString p_sval, wxString& p_sRes)
+{
+	wxString l_sOde = p_sOde;
+	int l_n = 0;
+	wxString l_sNum;
+	while (l_n < p_sOde.Len())
+	{
+		if (::isdigit(p_sOde[l_n]) || p_sOde[l_n] == '.')
+		{
+			bool l_bIsNum = false;
+			while (::isdigit(p_sOde[l_n]) || p_sOde[l_n] == '.')
+			{
+				l_sNum << p_sOde[l_n];
+				l_bIsNum = true;
+				l_n++;
+			}
+
+			if (l_bIsNum)
+			{
+				//l_sNum << p_sOde[l_n];
+				if (l_sNum == p_sval)
+				{
+					p_sRes << p_scon;
+					l_sNum = wxT("");
+					continue;
+				}
+				else
+				{
+					p_sRes << l_sNum;
+					l_sNum = wxT("");
+					continue;
+				}
+			}
+
+			if (!l_bIsNum)
+			{
+				p_sRes << p_sOde[l_n];
+			}
+			l_n++;
+			continue;
+		}
+		p_sRes << p_sOde[l_n];
+		l_n++;
+	}
+}
 
 
