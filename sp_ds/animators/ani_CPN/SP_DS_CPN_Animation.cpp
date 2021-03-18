@@ -1156,45 +1156,22 @@ void SP_DS_CPN_Animation::OnModifyConstants(wxCommandEvent& p_cEvent)
 
 void SP_DS_CPN_Animation::OnColConstantSetsChanged(wxCommandEvent& p_cEvent)
 {
-	bool l_bIsColoringGroupChanged = false;
-		int l_nColoringGroup = 0;
-		bool l_bFound=false;
-		for (auto it = m_choices.begin(); it != m_choices.end(); ++it)
+//re-load VSets of all groups
+	for (size_t i = 0; i < m_apcColListAttrForConstants.size(); i++)
+	{
+		if (m_apcColListAttrForConstants[i])
 		{
-			if ((*it) == wxT("coloring"))
-			{
-				l_bFound=true;
-				break;
-			}
-			l_nColoringGroup++;
+
+			int vsel = m_apcComboBoxes1[i]->GetSelection();
+
+			m_apcColListAttrForConstants[i]->SetActiveList(vsel);
+
+
 		}
+	}
 
 
-		for (size_t i = 0; i < m_apcColListAttrForConstants.size(); i++)
-		{
-			if (m_apcColListAttrForConstants[i])
-			{
-
-				int vsel = m_apcComboBoxes1[i]->GetSelection();
-
-				m_apcColListAttrForConstants[i]->SetActiveList(vsel);
-
-
-				if (l_nColoringGroup == i && l_bFound)
-				{
-					if (vsel != m_ncoloringChoiceValue)
-					{
-						l_bIsColoringGroupChanged = true;
-					}
-				}
-
-			}
-		}
-
-		if (l_bIsColoringGroupChanged)//only modify the model if the coloring group has been changed
-		{
-			UpdateColMarking();
-		}
+		UpdateColMarking();
 }
 
 void SP_DS_CPN_Animation::UpdateColMarking()
