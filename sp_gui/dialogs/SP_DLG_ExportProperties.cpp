@@ -59,13 +59,25 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 			wxDefaultPosition, wxDefaultSize, wxFLP_SAVE | wxFLP_USE_TEXTCTRL);
 	m_pcFilePickerCtrl->SetPath(l_sPath);
 
-	std::map<wxString, std::set<wxString>> l_mGroups2Vsets = GetGroup2ValueSets();
+	std::map<wxString, std::vector<wxString>> l_mGroups2Vsets = GetGroup2ValueSets();
 
 	l_pcRowSizer->Add(m_pcFilePickerCtrl, 1, wxALL | wxEXPAND, 5);
 
 	l_pcNotebookPage->AddControl(l_pcRowSizer, 0, wxALL | wxEXPAND, 5);
 
 	wxString l_sNetClassName = m_pcDoc->GetGraph()->GetNetclass()->GetName();
+
+	bool l_bIsExportfromColpnToAndLUsingDSSD = false;
+
+	wxString l_sExportName = m_pcExport->GetName();
+
+
+	wxString l_sExporttoANDL = wxT("Export to ANDL using dssd_util");
+
+	if (l_sExportName == l_sExporttoANDL)
+	{
+		l_bIsExportfromColpnToAndLUsingDSSD = true;
+	}
 
 	auto l_pcSetsSizer = new wxGridBagSizer(5,5);
 	int row = 0;
@@ -84,7 +96,7 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 				*/
 			}
 
-			if (l_sNetClassName.Contains(wxT("Colored")) && ((*itNC)->GetDisplayName().Contains(wxT("Transition")) || (*itNC)->GetDisplayName().Contains(wxT("Place")))
+			if (!l_bIsExportfromColpnToAndLUsingDSSD && l_sNetClassName.Contains(wxT("Colored")) && ((*itNC)->GetDisplayName().Contains(wxT("Transition")) || (*itNC)->GetDisplayName().Contains(wxT("Place")))
 				&& ((m_pcExport->GetExtension() == wxT("andl") || m_pcExport->GetExtension() == wxT("spn") || m_pcExport->GetExtension() == wxT("cpn")
 					|| m_pcExport->GetExtension() == wxT("hpn") || m_pcExport->GetExtension() == wxT("xpn") || m_pcExport->GetExtension() == wxT("pn"))))
 			{
@@ -96,7 +108,7 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 				&& !((m_pcExport->GetExtension() == wxT("andl") || m_pcExport->GetExtension() == wxT("candl")
 					 || m_pcExport->GetExtension() == wxT("spn") || m_pcExport->GetExtension() == wxT("cpn")
 					|| m_pcExport->GetExtension() == wxT("hpn") || m_pcExport->GetExtension() == wxT("xpn") ||
-					m_pcExport->GetExtension() == wxT("pn"))))
+					m_pcExport->GetExtension() == wxT("pn"))) && !l_bIsExportfromColpnToAndLUsingDSSD)
 			{
 				continue;
 				/*export rate funs from colored net to all other coloured net classes should not allow a user to choose a certain v-set to be exported,
@@ -161,7 +173,7 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 								continue;
 							}
 
-							std::set<wxString> l_vSetNames;
+							std::vector<wxString> l_vSetNames;
 
 							SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttr);
 
@@ -172,9 +184,13 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 									wxString l_sSetName = l_pcColAttr->GetColLabel(i);
 									if (!l_sSetName.Contains(wxT(":"))) continue;
 									if (l_sSetName == wxT("dot")) l_sSetName = wxT("Main");//on 19.11.20
+
+									if (l_sSetName.Contains(wxT(":")))
+									l_sSetName = l_sSetName.BeforeFirst(wxChar(':'));
+
 									if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && l_sSetName != wxT("Product Color"))
 									{
-										l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+										l_vSetNames.push_back(l_sSetName.BeforeFirst(wxChar(':')));
 
 									}
 
@@ -185,6 +201,12 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 									{
 										wxString l_sSetName = l_pcColAttr->GetCell(i, 0);
 
+										{
+											l_sSetName = l_sSetName.BeforeFirst(wxChar(':'));
+										}
+
+										if (l_sSetName.IsEmpty()) break;
+
 										if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && l_sSetName != wxT("true"))
 										{
 											if (l_sSetName.Contains(wxChar(':')))
@@ -192,7 +214,7 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 												l_sSetName.BeforeFirst(wxChar(':'));
 											}
 
-											l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+											l_vSetNames.push_back(l_sSetName.BeforeFirst(wxChar(':')));
 
 										}
 
@@ -208,9 +230,11 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 
 										if (!l_sSetName.Contains(wxT(":"))) continue;
 
+										l_sSetName = l_sSetName.BeforeFirst(wxChar(':'));
+
 										if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && !(l_sSetName == wxT("true") || l_sSetName == wxT("Predicate")))
 										{
-											l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+											l_vSetNames.push_back(l_sSetName.BeforeFirst(wxChar(':')));
 
 										}
 
@@ -248,6 +272,7 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 									continue;
 								}
 
+								if (l_vSetNames.size() <= 1) continue;
 
 								l_pcSetsSizer->Add(new wxStaticText(l_pcNotebookPage, wxID_ANY, l_sName), wxGBPosition{ row,0 });
 
@@ -275,6 +300,48 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 			}
 		}
 	}
+
+	/*
+		 * comboboxes for constants
+		 */
+
+		SP_DS_Graph* l_pcGraph = m_pcDoc->GetGraph();
+
+		//george new consatnts for col pn
+		SP_DS_Metadataclass* mc1 = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		if ( !mc1->GetElements()->empty() && l_pcGraph->GetName().Contains(wxT("Colored"))  && l_sExporttoANDL==m_pcExport->GetName())
+		{
+			////////////////////////////////////////////////////////////////////////////////////////////////////
+			// load groups
+			////////////////////////////////////////////////////////////////////////
+			SP_ListMetadata::const_iterator it;
+			SP_DS_Metadata* l_pcMetadata;
+
+			wxArrayString m_choices;
+			for (it = mc1->GetElements()->begin(); it != mc1->GetElements()->end(); ++it)
+			{
+				l_pcMetadata = *it;
+				wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Group")))->GetValue();
+				SP_DS_ColListAttribute* l_pcAttr = dynamic_cast<SP_DS_ColListAttribute*> (l_pcMetadata->GetAttribute(wxT("ValueList")));
+				if ((SP_Find(m_choices, l_sGroup) == m_choices.end()) && l_sGroup==wxT("coloring")&& l_pcAttr->GetRowCount()>1)
+				{
+					m_choices.Add(l_sGroup);
+					l_pcSetsSizer->Add(new wxStaticText(l_pcNotebookPage, wxID_ANY, m_choices.Last() + wxT(':')), wxGBPosition{ row,0 });
+					auto l_pcComboBox = new wxChoice(l_pcNotebookPage, wxID_ANY);
+
+					for (unsigned int i = 0; i < l_pcAttr->GetRowCount(); i++)
+					{
+						wxString l_sSetName = l_pcAttr->GetCell(i, 0);
+						l_pcComboBox->Append(l_sSetName);
+					}
+
+					l_pcComboBox->SetSelection(l_pcAttr->GetActiveList());
+					m_mColListComboBoxes[l_pcAttr] = l_pcComboBox;
+					l_pcSetsSizer->Add(l_pcComboBox, wxGBPosition{ row,1 }, wxDefaultSpan, wxEXPAND);
+					++row;
+				}
+			}
+		}
 
 /////////////////////////////////////////////////////////
 	l_pcSetsSizer->AddGrowableCol(1);
@@ -395,10 +462,10 @@ SP_DLG_ExportProperties::SetNotebookSize(int width, int height)
 
 
 
-std::map<wxString, std::set<wxString>> SP_DLG_ExportProperties::GetGroup2ValueSets()
+std::map<wxString, std::vector<wxString>> SP_DLG_ExportProperties::GetGroup2ValueSets()
 {
 
-	std::map<wxString, std::set<wxString>> l_mGroup2Sets;
+	std::map<wxString, std::vector<wxString>> l_mGroup2Sets;
 	wxString l_sNetClassName = m_pcDoc->GetGraph()->GetNetclass()->GetName();
 	vector<wxString> l_vGroupNames;
 
@@ -423,7 +490,7 @@ std::map<wxString, std::set<wxString>> SP_DLG_ExportProperties::GetGroup2ValueSe
 						continue;
 					}
 
-					std::set<wxString> l_vSetNames;
+					std::vector<wxString> l_vSetNames;
 
 					SP_DS_ColListAttribute* l_pcColAttr = dynamic_cast<SP_DS_ColListAttribute*>(l_pcAttr);
 
@@ -437,11 +504,16 @@ std::map<wxString, std::set<wxString>> SP_DLG_ExportProperties::GetGroup2ValueSe
 
 							  if (!l_sSetName.Contains(wxT(":"))) continue;
 
+							  if (l_sSetName.Contains(wxChar(':')))
+							  {
+								  l_sSetName.BeforeFirst(wxChar(':'));
+							  }
+
 							  if (l_sSetName == wxT("dot")) l_sSetName = wxT("Main");//on 19.11.20
 
 							  if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && l_sSetName != wxT("Product Color"))
 							  {
-							 	l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+							 	l_vSetNames.push_back(l_sSetName);
 
 							  }
 						    }
@@ -454,13 +526,18 @@ std::map<wxString, std::set<wxString>> SP_DLG_ExportProperties::GetGroup2ValueSe
 							{
 								wxString l_sSetName = l_pcColAttr->GetCell(i,0);
 
+								if (l_sSetName.Contains(wxChar(':')))
+								{
+									l_sSetName.BeforeFirst(wxChar(':'));
+								}
+
 								if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && l_sSetName !=wxT("true") )
 								{
 									if (l_sSetName.Contains(wxChar(':')))
 									{
 										l_sSetName.BeforeFirst(wxChar(':'));
 									}
-									l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+									l_vSetNames.push_back(l_sSetName);
 
 								}
 
@@ -476,9 +553,11 @@ std::map<wxString, std::set<wxString>> SP_DLG_ExportProperties::GetGroup2ValueSe
 
 								if (!l_sSetName.Contains(wxT(":"))) continue;
 
+								l_sSetName = l_sSetName.BeforeFirst(wxChar(':'));
+
 								if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && !( l_sSetName == wxT("true")|| l_sSetName == wxT("Predicate")))
 								{
-									l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+									l_vSetNames.push_back(l_sSetName);
 
 								}
 
@@ -495,7 +574,7 @@ std::map<wxString, std::set<wxString>> SP_DLG_ExportProperties::GetGroup2ValueSe
 
 									if (SP_Find(l_vSetNames, l_sSetName) == l_vSetNames.end() && !(l_sSetName == wxT("true") || l_sSetName == wxT("Predicate")))
 									{
-											l_vSetNames.insert(l_sSetName.BeforeFirst(wxChar(':')));
+											l_vSetNames.push_back(l_sSetName.BeforeFirst(wxChar(':')));
 
 									}
 

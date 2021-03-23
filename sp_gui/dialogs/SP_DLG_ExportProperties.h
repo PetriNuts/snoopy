@@ -75,7 +75,7 @@ public:
     /*const wxString& m_sFilename; */
     wxString GetCurrentFileName() { return  m_pcFilePickerCtrl->GetPath(); }
 
-    std::map<wxString, std::set<wxString>>  GetGroup2ValueSets();
+    std::map<wxString, std::vector<wxString>>  GetGroup2ValueSets();
 
 
 };
