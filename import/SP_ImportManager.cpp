@@ -127,18 +127,39 @@ SP_ImportManager::DoImport()
 							fileName.c_str()),
 						wxT("Finished import in"));
 
-		//res &= impR->ReadFile(fileName);
+		int l_nNumDocsBeforeImort, l_nNumDocsAfterImport = 0;
+
+		bool l_bNoDocs = false;
+
+		if (!SP_Core::Instance()->GetRootDocument())
+		{
+			l_bNoDocs = true;
+		}
+
+		if (!l_bNoDocs)
+		{
+
+			l_nNumDocsBeforeImort = SP_Core::Instance()->GetRootDocument()->GetDocumentManager()->GetDocuments().GetCount();
+		}
 		//by  george
 		SP_ImportRoutine* imprRoutine=GetImportRoutine(choices[sel[n]]);
         res &=impR->ReadFile(fileName,imprRoutine);
+
+		if (!l_bNoDocs)
+		{
+		l_nNumDocsAfterImport = SP_Core::Instance()->GetRootDocument()->GetDocumentManager()->GetDocuments().GetCount();
+		}
 
 		if(res)
 		{
 			SP_MDI_Doc* l_pcDoc = SP_Core::Instance()->GetRootDocument();
 
-			if(!l_pcDoc->GetFilename().IsEmpty())//by george, to avoid overwriting the name of orginal file in case of import to an existing file
+			if(l_nNumDocsAfterImport== l_nNumDocsBeforeImort && l_nNumDocsBeforeImort != 0)//by george
 			{
-				l_pcDoc->SetFilename(fileName + wxT(".") + l_pcDoc->GetGraph()->GetNetclass()->GetExtension(), true);
+				/*
+				*if the number of docs before and after importing is equal, then a chose did selective import
+				* otherwise, import new cand into new doc
+				*/
 				l_pcDoc->Modify(true);
 				SP_DS_Transformer transform;
 				transform.Check(l_pcDoc->GetGraph());
