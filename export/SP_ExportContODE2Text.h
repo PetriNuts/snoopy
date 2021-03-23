@@ -58,7 +58,7 @@ private:
 	  bool IsEvaluatedArcWeight(const wxString& p_sArcWeight, double& p_dVal);
 	  void LoadParams();
 	  bool InitialiseContSim();
-	  void DeSubstituteConstants(const wxString& p_sOde, const wxString& p_scon, wxString p_sval, wxString& p_sRes);
+
 
 
 };
