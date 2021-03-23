@@ -430,6 +430,12 @@ bool SP_ExportContPed2LaTeX::DoWrite()
 
 				wxString l_sPlaceODEstr=l_pcPlaceODE->ConstructODE(l_nPlacePos);
 
+
+				if (l_sPlaceODEstr.Contains(wxT("_")))//by george, fixing the layout of _
+				{
+					l_sPlaceODEstr.Replace(wxT("_"), wxT("\\_"));
+				}
+
 				if (wxT("") == l_sName)
 				{
 					l_pcPlaceStrings[l_sId] = DoWrite(l_sPlaceODEstr, l_sId,
