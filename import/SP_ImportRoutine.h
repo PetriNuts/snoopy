@@ -21,7 +21,7 @@ class SP_ImportRoutine
   
   //virtual bool ReadFile(const wxString& fileName) = 0;
   virtual bool ReadFile(const wxString& fileName, SP_ImportRoutine* p_sIR=NULL) = 0;//by george
-  
+  virtual SP_DS_Graph* ImportToDoc(const wxString& fileName)=0;//by george, for command line usage
   virtual wxString GetName() = 0;
   virtual wxString GetDescr() = 0;
   virtual wxString GetExtension() = 0;

@@ -66,7 +66,8 @@ public:
 
 
 	virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
-
+	inline virtual SP_DS_Graph* ImportToDoc(const wxString& fileName)//by george
+	{return NULL;}
 	inline virtual wxString GetName()
 		{ return wxT("Import SBML to continuous Petri Net");}
 	inline virtual wxString GetDescr()

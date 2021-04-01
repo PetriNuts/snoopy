@@ -22,7 +22,8 @@ class SP_ImportPNML2ColPN: public SP_ImportCANDL
 	virtual ~SP_ImportPNML2ColPN();
 
 	virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
-
+	inline virtual SP_DS_Graph* ImportToDoc(const wxString& fileName)//by george
+	{return NULL;}
 	inline virtual wxString GetName()
 		{ return wxT("Import High-Level Petri Net PNML");}
 	inline virtual wxString GetDescr()

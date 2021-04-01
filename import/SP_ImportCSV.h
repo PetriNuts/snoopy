@@ -46,6 +46,8 @@ public:
 
 	virtual bool ReadFile(const wxString& fileName,SP_ImportRoutine* p_sIR=NULL);
 	virtual bool ReadFile(const wxString& fileName, spsim::Simulator* simulator);
+	inline virtual SP_DS_Graph* ImportToDoc(const wxString& fileName)//by george
+	{return NULL;}
 
 	inline virtual wxString GetName()
 		{ return wxT("Import Simulation Results");}

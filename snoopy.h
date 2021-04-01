@@ -78,6 +78,8 @@ public:
     bool OnInit();
     int OnExit();
 
+	bool ProcessCommandLine(wxArrayString& p_aargs);//by george
+
     // Read/write configuration information
     bool ReadOptions();
     bool ReadHistory();

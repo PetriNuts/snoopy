@@ -71,6 +71,9 @@ public:
 	wxString GetLayout();
 	SP_LAYOUT_VIEWS GetView();
 
+	/*set layout algo by passing algo number, mandatory for the command line layout*/
+	void SetLayoutAlgo(int l_nAlgo);//by george
+
 
 };
 

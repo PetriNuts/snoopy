@@ -158,3 +158,27 @@ SP_DLG_LayoutProperties::OnDlgCancel(wxCommandEvent& p_cEvent)
     p_cEvent.Skip();
 }
 
+void SP_DLG_LayoutProperties::SetLayoutAlgo(int l_nAlgo)
+{
+	switch (l_nAlgo)
+	{
+
+	case 1:
+		m_pcLayoutChoice->SetStringSelection(wxT("FMMM"));
+		break;
+
+	case 2:
+		m_pcLayoutChoice->SetStringSelection(wxT("Sugiyama"));
+		break;
+	case 3:
+		m_pcLayoutChoice->SetStringSelection(wxT("Planarization"));
+		break;
+	default:
+		m_pcLayoutChoice->SetStringSelection(wxT("FMMM"));
+	}
+	SP_LayoutOGDF l_Layout;
+
+	l_Layout.Visualization(this, m_pcDoc);
+}
+
+

@@ -69,6 +69,25 @@ SP_ImportANDL::~SP_ImportANDL()
 	}
 }
 
+//import command for the command line usage
+SP_DS_Graph* SP_ImportANDL::ImportToDoc(const wxString& fileName)
+{
+	m_fileName = fileName;
+	dssd::net::reader p;
+	bool l_Return = false;
+	l_Return = p(fileName.ToStdString());
+
+	if (l_Return)
+	{
+		auto l_Net = p.get();
+
+
+		l_Return = CreateGraph(fileName, *l_Net);
+	}
+	 return m_pcGraph;
+}
+
+
 bool SP_ImportANDL::ReadFile(const wxString& p_sFile, SP_ImportRoutine* p_importRT)
 {
 	m_fileName = p_sFile;

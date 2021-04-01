@@ -180,6 +180,7 @@ private:
 
 	virtual bool ReadFile(const wxString& fileName, SP_ImportRoutine* p_import = NULL);
 	virtual bool AddToDialog(SP_DLG_ImportProperties* p_pcDlg, dssd::andl::Net_ptr);
+	virtual SP_DS_Graph* ImportToDoc(const wxString& fileName);//b george
 	inline virtual wxString GetName()
 		{ return wxT("Import ANDL");}
 	inline virtual wxString GetDescr()

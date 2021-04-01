@@ -204,8 +204,14 @@ bool SP_DLG_NewConstantDefinition::CheckInput()
 				}
 			}
 
-//			SP_DS_ExpEvaluatorDouble e;
-//			if (!e.Check(l_sValue, NULL))
+			if (SP_Find(SP_KEYWORDLIST, m_pcConstantSetGrid->GetCellValue(l_nRow, 0)) != SP_KEYWORDLIST.end())
+			{
+				SP_MESSAGEBOX(wxT(" A Keyword can not be a constant name! "), wxT("Check Constant"), wxOK | wxICON_ERROR);
+				m_pcConstantSetGrid->SetCellValue(l_nRow, 0, m_sOldCellValue);
+				return false;
+			}
+
+
 			if(!m_pcGraph->GetFunctionRegistry()->parseFunctionString(l_sValue))
 			{
 				wxString l_sMsg = wxT("Invalid value for '");
@@ -648,6 +654,14 @@ bool SP_DLG_NewConstantDefinition::DoCheckFunction(const wxString& p_sName, cons
 		SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" has unknown type ") + p_sType, wxT("Check Constant"), wxOK | wxICON_ERROR);
 		return false;
 	}
+
+	if (SP_Find(SP_KEYWORDLIST, p_sName) != SP_KEYWORDLIST.end())
+	{
+		SP_MESSAGEBOX(wxT(" A Keyword can not be a constant name! "), wxT("Check Constant"), wxOK | wxICON_ERROR);
+		//m_pcColorSetGrid->SetCellValue(l_nRow, 0, m_sOldCellValue);
+		return false;
+	}
+
 	bool l_bIsDefinedVar = false;
 	bool l_bOk = false;
 	wxString l_sValue;
@@ -796,6 +810,13 @@ void SP_DLG_NewConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 
 	if (colLabel == wxT("Constant"))
 	{
+
+		if (SP_Find(SP_KEYWORDLIST, l_sCellValue) != SP_KEYWORDLIST.end())
+		{
+			SP_MESSAGEBOX(wxT(" A Keyword can not be a constant name! "), wxT("Check Constant"), wxOK | wxICON_ERROR);
+			m_pcConstantSetGrid->SetCellValue(row, 0, m_sOldCellValue);
+			return;
+		}
 
 		if (ExistConstant(l_sCellValue, row))
 		{

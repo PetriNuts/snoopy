@@ -498,4 +498,6 @@ enum SP_IMPORT_STATE {//by george
 	SP_IMPORT_ANIM_NOT_MATCHING_STATE
 };
 
+extern const std::vector<wxString> SP_KEYWORDLIST; //by george 2021
+
 #endif // __SP_DEFINES_H__

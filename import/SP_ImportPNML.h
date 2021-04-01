@@ -22,7 +22,8 @@ class SP_ImportPNML: public SP_ImportANDL
 	virtual ~SP_ImportPNML();
 
 	virtual bool ReadFile(const wxString& ,SP_ImportRoutine* p_sIR=NULL);
-
+	inline virtual SP_DS_Graph* ImportToDoc(const wxString& fileName)//by george
+	{return NULL;}
 	inline virtual wxString GetName()
 		{ return wxT("Import P/T Net PNML");}
 	inline virtual wxString GetDescr()

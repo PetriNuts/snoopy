@@ -174,3 +174,10 @@ const wxString SP_DS_RESET_EDGE = wxT("Reset Edge");
 
 //Modifier Edge
 const wxString SP_DS_MODIFIER_EDGE = wxT("Modifier Edge");
+
+//reserved keyword List
+const std::vector<wxString> SP_KEYWORDLIST = { wxT("atan"),wxT("tan"),wxT("asin"),wxT("sin"),wxT("cos"),wxT("acos"),wxT("abs"),wxT("sqr"),wxT("sqrt")
+,wxT("floor"),wxT("ceil"),wxT("log"),wxT("log10"),wxT("exp"),wxT("binomial"),wxT("MassAction,"),wxT("min"),wxT("max"),wxT("pn"),wxT("pow")
+,wxT("sum"),wxT("prod"),wxT("hpn"),wxT("spn"),wxT("cpn"),wxT("xpn"),wxT("functions"),wxT("constant"),wxT("constants"),wxT("all"),wxT("All"),wxT("ElemOf"),
+wxT("double"),wxT("string"),wxT("int"),wxT("enum"),wxT("TFN"),wxT("eq"),wxT("lt"),wxT("ge") };
+

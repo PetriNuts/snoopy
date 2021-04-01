@@ -870,10 +870,7 @@ void SP_DLG_ConstantDefinition::OnCheckFunction( wxCommandEvent& p_cEvent )
 
 		
 	}
-	//else
-	//{
-	//	SP_MESSAGEBOX(wxT("Please select a value of a constant!"), wxT("Check Constant"), wxOK | wxICON_INFORMATION);
-	//}
+
 	new wxTipWindow(this, l_sVariables, 1000);
 	return;
 }
@@ -973,11 +970,18 @@ bool SP_DLG_ConstantDefinition::DoCheckFunction(const wxString& p_sName, const w
 		SP_MESSAGEBOX(wxT("the constant ") + p_sName + wxT(" has unknown type ") + p_sType, wxT("Check Constant"), wxOK | wxICON_ERROR);
 		return false;
 	}
+
+	if (SP_Find(SP_KEYWORDLIST, p_sName) != SP_KEYWORDLIST.end())
+	{
+		SP_MESSAGEBOX(wxT(" A Keyword can not be a constant name! "), wxT("Check Constant"), wxOK | wxICON_ERROR);
+		//m_pcColorSetGrid->SetCellValue(row, col, m_sOldCellValue);
+		return false;
+	}
 	 
 	bool l_bOk = false;
 	wxString l_sValue = p_sValue;
 	double l_dVal;
-  //  l_bOk =GetIntConstantValue(l_sValue,l_dVal);
+
 	 
 	  
 	m_pcConstants = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
@@ -1087,6 +1091,12 @@ void SP_DLG_ConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
 
 	if (colLabel == wxT("Name"))
 	{
+		if (SP_Find(SP_KEYWORDLIST, l_sCellValue) != SP_KEYWORDLIST.end())
+		{
+			SP_MESSAGEBOX(wxT(" A Keyword can not be a constant name! "), wxT("Check Constant"), wxOK | wxICON_ERROR);
+			m_pcColorSetGrid->SetCellValue(row, col, m_sOldCellValue);
+			return;
+		}
 
 		if (ExistConstant(l_sCellValue, row))
 		{
@@ -1274,6 +1284,13 @@ bool SP_DLG_ConstantDefinition::CheckInput()
 				{
 					continue;
 				}
+			}
+
+			if (SP_Find(SP_KEYWORDLIST, l_sName) != SP_KEYWORDLIST.end())
+			{
+				SP_MESSAGEBOX(wxT(" A Keyword can not be a constant name! "), wxT("Check Constant"), wxOK | wxICON_ERROR);
+				m_pcColorSetGrid->SetCellValue(l_nRow, 0, m_sOldCellValue);
+				return false;
 			}
 
 			 
@@ -1985,43 +2002,7 @@ void SP_DLG_ConstantDefinition::SortConstants(const bool& p_bIsAscending)
 					m_pcColorSetGrid->SetCellAlignment(l_nPos, i + 4, wxALIGN_CENTER, wxALIGN_TOP);
 					m_pcColorSetGrid->SetCellBackgroundColour(l_nPos, i + 4, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
 				}
-				////////////
-				/**
-				std::multimap<std::string, float> l_mVset2Val;
-				for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
-				{
-					 
-					if (l_pcColList->GetCell(i, 1).ToStdString() == "")
-					{
-						string l_sTemp = "";
-						continue;
 
-					}
-
-					double l_dval;
-					bool l_bIsEvaluated = EvalConstantExpression(l_pcColList->GetCell(i, 1), l_dval);
-
-					if (!l_bIsEvaluated)
-					{
-						continue;
-					}
-					float fval = static_cast<float>(l_dval);
-
-					l_mVset2Val.insert(std::pair<string, float>(l_pcColList->GetCell(i, 1).ToStdString(), fval));
-					 
-
-				}
-				std::vector<string> l_vRes;
-				SortVlaueSets(l_mVset2Val, l_vRes, p_bIsAscending);
-
-				//value of the constant
-				for (unsigned int i = 0; i < l_vRes.size(); i++)
-				{
-					m_pcColorSetGrid->SetCellValue(l_nPos, i + 4, l_vRes[i]);
-					m_pcColorSetGrid->SetCellAlignment(l_nPos, i + 4, wxALIGN_CENTER, wxALIGN_TOP);
-					m_pcColorSetGrid->SetCellBackgroundColour(l_nPos, i + 4, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-				}
-				*/
 				l_nPos++;
 				(l_bWhite ? l_bWhite = false : l_bWhite = true);
 			}
