@@ -253,11 +253,11 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 		| wxCMD_LINE_PARAM_OPTIONAL },
 
 
-		{ wxCMD_LINE_OPTION, "l", "layout algorithm", "\n\t 1: FMMM algorithm,\n\t 2: Planarization algorithm,\n\t 3: Sugiyama algorithm",wxCMD_LINE_VAL_NUMBER },
+		{ wxCMD_LINE_OPTION, "l", "layout", "\n\t 1: FMMM algorithm,\n\t 2: Planarization algorithm,\n\t 3: Sugiyama algorithm",wxCMD_LINE_VAL_NUMBER },
 		{ wxCMD_LINE_OPTION, "p", "export", "1: EPS Export",wxCMD_LINE_VAL_NUMBER },
 		{ wxCMD_LINE_SWITCH, "s", "Save", "save" },
-		{ wxCMD_LINE_SWITCH, "c", "Close", "close" },
-		{ wxCMD_LINE_SWITCH, "v", "Version", "version" },
+		{ wxCMD_LINE_SWITCH, "c", "close", "close" },
+		{ wxCMD_LINE_SWITCH, "v", "version", "version" },
 		{ wxCMD_LINE_SWITCH, "l1", "l1", "layout using FMMM algorithm" },
 		{ wxCMD_LINE_SWITCH, "l2", "l2", "layout using Planarization algorithm" },
 		{ wxCMD_LINE_SWITCH, "l3", "l3", "layout using Sugiyama algorithm" },
@@ -275,9 +275,9 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 
 		{ wxCMD_LINE_OPTION, "l", "layout", "specify layout algorithm",wxCMD_LINE_VAL_NUMBER },
 		{ wxCMD_LINE_OPTION, "p", "export", "1: EPS Export",wxCMD_LINE_VAL_NUMBER },
-		{ wxCMD_LINE_SWITCH, "s", "Save", "save" },
-		{ wxCMD_LINE_SWITCH, "c", "Close", "close" },
-		{ wxCMD_LINE_SWITCH, "v", "Version", "version" },
+		{ wxCMD_LINE_SWITCH, "s", "save", "save" },
+		{ wxCMD_LINE_SWITCH, "c", "close", "close" },
+		{ wxCMD_LINE_SWITCH, "v", "version", "version" },
 		{ wxCMD_LINE_SWITCH, "l1", "l1", "layout using FMMM algorithm" },
 		{ wxCMD_LINE_SWITCH, "l2", "l2", "layout using Planarization algorithm" },
 		{ wxCMD_LINE_SWITCH, "l3", "l3", "layout using Sugiyama algorithm" },
@@ -322,12 +322,12 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 		p_aargs.Add(parser.GetParam(i));
 	}
 
-	long l_nx, l_np;
+	long l_nx, l_np=0;
 	wxString s;
 
 	if (parser.Found(wxT("v")))// Snoopy's version
 	{
-		SP_MESSAGEBOX(SP_APP_REVISION +"\n" + SP_APP_RELEASE);
+		SP_MESSAGEBOX(wxT("Snoopy ") +SP_APP_REVISION +"\n" + SP_APP_RELEASE);
 		return false;
 	}
 
@@ -335,6 +335,25 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 	{
 		return false;
 	}
+
+	if (parser.Found(wxT("p"), &l_np) )
+	{
+	 if ((l_np > 1 || l_np < 1) && l_np!=0)
+	 {
+		SP_MESSAGEBOX(wxT("possible export values: 1"), wxT("Invalid option"), wxOK | wxICON_EXCLAMATION);
+	 }
+     }
+
+	if (parser.Found(wxT("l"), &l_nx) )
+	{
+	   if ((l_nx < 1 || l_nx>3 ) && l_nx!=0)
+	  {
+
+		SP_MESSAGEBOX(wxT("possible layout values: 1, 2 0r 3"), wxT("Invalid option"), wxOK | wxICON_EXCLAMATION);
+
+	   }
+	}
+
 
 	if (parser.Found(wxT("l"), &l_nx) || parser.Found(wxT("c"))||parser.Found(wxT("l1p1"))|| parser.Found(wxT("l2p1"))|| parser.Found(wxT("l3p1")))
 	{
@@ -398,7 +417,7 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 				SP_APP_LONG_NAME,
 				wxPoint(m_nXPos, m_nYPos),
 				wxSize(m_nWidth, m_nHeight));
-			m_pcMainframe->Show(FALSE);
+
 			wxDocument* l_pcDoc;
 
 			if (!l_bISAndl)
@@ -421,6 +440,7 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 					SP_DLG_LayoutProperties *l_pcDlg = new SP_DLG_LayoutProperties(NULL, l_pcMyDoc);
 
 
+
 					if (l_nx == 1 || parser.Found(wxT("l1")))
 					{
 
@@ -432,13 +452,19 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 
 						l_pcDlg->SetLayoutAlgo(2);
 					}
-					else
+					else if (l_nx == 3 || parser.Found(wxT("l3")))
 					{
 						l_pcDlg->SetLayoutAlgo(3);
+					}
+					else
+					{
+						//invalid option
 					}
 
 					l_pcDlg->Destroy();
 					wxString l_sSave = cmdFilename;
+
+
 
 					if (parser.Found(wxT("p"), &l_np) || parser.Found(wxT("p1")))//do export to eps
 					{
@@ -459,6 +485,7 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 			}
 			else
 			{
+
 				SP_DS_Graph* l_pcGraph = l_pcImport->ImportToDoc(cmdFilename);
 
 				if (!l_pcGraph) return false;
@@ -467,12 +494,15 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 
 				SP_DLG_LayoutProperties *l_pcDlg = new SP_DLG_LayoutProperties(NULL, l_pcMyDoc);
 
+
+
 				if (l_nx == 1 || parser.Found(wxT("l1")))
 				{
 
 					l_pcDlg->SetLayoutAlgo(1);
 				}
 				else if (l_nx == 2 || parser.Found(wxT("l2")))
+					//else if (parser.Found(wxT("l2")))
 				{
 
 					l_pcDlg->SetLayoutAlgo(2);
@@ -514,10 +544,7 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 	}
 
 	return true;
-
-
 }
-
 // Initialise this in OnInit, not statically
 bool Snoopy::OnInit()
 {
