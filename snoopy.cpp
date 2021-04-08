@@ -239,7 +239,7 @@ Snoopy::~Snoopy()
 {
 }
 
-bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
+bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)//by george 2021, handle command line
 {
 
 
@@ -366,6 +366,16 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 			wxString cmdFilename = parser.GetParam(0);
 
 			bool l_bISAndl = false;
+
+
+
+			wxFileName *fn = new wxFileName();
+
+			if (!fn->FileExists(cmdFilename))//check if the input file is exist or not
+			{
+
+				return false;
+			}
 
 			if (cmdFilename.AfterLast('.').IsSameAs("andl"))
 			{
@@ -539,6 +549,23 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)
 		else
 		{
 			SP_MESSAGEBOX(wxT("file name is mandatroy"), wxT("Param missing"), wxOK | wxICON_EXCLAMATION);
+			return false;
+		}
+	}
+
+
+    /*check if the input file is exist or not,
+     * there is no options, meaning just open or import(andl/candl) the file
+     * */
+	if (parser.GetParamCount() > 0)
+	{
+
+		wxFileName *fn = new wxFileName();
+		wxString cmdFilename = parser.GetParam(0);
+
+		if (!fn->FileExists(cmdFilename))//check if the input file is exist or not
+		{
+			SP_MESSAGEBOX(wxT("the file: ") + cmdFilename + wxT(" is not exist!"));
 			return false;
 		}
 	}
