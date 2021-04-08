@@ -146,7 +146,7 @@ wxDocument* SP_GM_Docmanager::CreateDocument(const wxString& p_sPath,
 	while (l_pcNode)
 	{
 		l_pcDoc = (wxDocument*)l_pcNode->GetData();
-		if (p_sPath.CmpNoCase(l_pcDoc->GetFilename()) == 0)
+		if (p_sPath.CmpNoCase(l_pcDoc->GetFilename()) == 0 && this->GetDocuments().GetCount()> 1)
 		{
 			SP_MESSAGEBOX(wxT("File already opened."), wxT("Message"),
 					wxOK | wxICON_EXCLAMATION);

@@ -1489,6 +1489,10 @@ bool Snoopy::OnInit()
 
 	for (size_t i = 0; i < l_aargs.Count(); i++)
 	{
+		if (l_aargs[i].AfterLast('.').IsSameAs("andl")|| l_aargs[i].AfterLast('.').IsSameAs("candl"))
+		{
+					continue;
+	    }
 		m_pcDocmanager->CreateDocument(l_aargs[i], wxDOC_SILENT);
 	}
 
@@ -1508,6 +1512,33 @@ bool Snoopy::OnInit()
 	//Check for new version
 	SP_DLG_CheckForUpdate l_cDlg(m_pcMainframe);
 	l_cDlg.CheckForUpdate(false);
+
+	if(l_aargs.Count())
+	{
+		wxString cmdFilename = l_aargs[0];
+
+
+		bool l_bISAndl = false;
+
+		if (cmdFilename.AfterLast('.').IsSameAs("andl"))//import andl
+		{
+
+			l_pcImport=m_pcImportManager->GetImportRoutine(wxT("Import ANDL"));
+
+			l_pcImport->ReadFile(cmdFilename, l_pcImport);
+		}
+
+		if (cmdFilename.AfterLast('.').IsSameAs("candl"))//import candl
+		{
+
+			l_pcImport = m_pcImportManager->GetImportRoutine(wxT("Import CANDL"));
+
+			l_pcImport->ReadFile(cmdFilename, l_pcImport);
+		}
+
+
+	}
+
 
 	// enter mainloop
 	return TRUE;
