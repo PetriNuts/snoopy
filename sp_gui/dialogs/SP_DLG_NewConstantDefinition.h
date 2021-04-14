@@ -79,13 +79,11 @@ class SP_DLG_NewConstantDefinition : public wxDialog
 
 	bool SubstituteConstant(const wxString& p_sName, wxString& p_sValue);//by george to fix bug of constants dependencies
 
-	void  OnRowRightClick(wxGridEvent& event);
+	void  OnRowRightClick(wxGridEvent& event);//by george for re-ordering constants
 
-	void Operate(const unsigned&, const unsigned& r = 0);
+	void MoveRow(long p_nToPos);//by george for re-ordering constants
 
-	void OnPopupClick(wxCommandEvent& evt);
-
-	void OnSortVsets(wxCommandEvent& p_cEvent);
+	void OnSortVsets(wxCommandEvent& p_cEvent);//by george for sorting v-sets
 
   protected:
 	bool FindString(wxArrayString& p_asStrArray,wxString& p_sValue);

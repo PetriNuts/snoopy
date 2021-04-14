@@ -95,18 +95,19 @@ private:
 
 	void OnGridLabelLeftClick(wxGridEvent& event);
 
-	void SortConstants(const bool& p_bIsAscending = true);
+	void SortConstants(const bool& p_bIsAscending = true);//by george for sorting cv-sets
 
 	void SortVlaueSets(std::multimap<std::string, float>&p_mVset2Val, std::vector<std::string>&p_vRes, bool p_bIsAscending);
 
 	bool EvalConstantExpression(const wxString& p_sexp, double& p_dVal);
 
-	void  OnRowRightClick(wxGridEvent& event);
+	void  OnRowRightClick(wxGridEvent& event);//by george for re-ordering constants
 
-	void Operate(const unsigned&, const unsigned& r = 0);
-	void  OnSortVsets(wxCommandEvent& p_cEvent);
+	void MoveRow(long p_nToPos);//by george for re-ordering constants
 
-	void OnPopupClick(wxCommandEvent& evt);
+	void  OnSortVsets(wxCommandEvent& p_cEvent);//by george for sorting v-sets
+
+
 protected:
 	bool FindString(wxArrayString& p_asStrArray, wxString& p_sValue);
 
