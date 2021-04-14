@@ -71,7 +71,7 @@ EVT_BUTTON(SP_ID_BUTTON_RENAMESET, SP_DLG_ConstantDefinition::OnRenameSet)
 EVT_GRID_CMD_LABEL_LEFT_CLICK(SP_ID_GRID_MARKING, SP_DLG_ConstantDefinition::OnGridLabelLeftClick)
 EVT_GRID_CMD_CELL_RIGHT_CLICK(SP_ID_GRID_MARKING, SP_DLG_ConstantDefinition::OnRowRightClick)
 EVT_BUTTON(SP_ID_SORTSETS, SP_DLG_ConstantDefinition::OnSortVsets)
-EVT_BUTTON(SP_ID_MOVE_ROW_BUTTTON, SP_DLG_ConstantDefinition::OnMoveRow)
+
 #if wxABI_VERSION > 30000
     EVT_GRID_CELL_CHANGED( SP_DLG_ConstantDefinition::OnGridCellValueChanged ) 
 #else
@@ -371,9 +371,6 @@ void SP_DLG_ConstantDefinition::LoadSetNames()
 
 	m_pcColorSetGrid->AppendCols(5);
 	
-	//for sorting coloumn appearance
-	//m_pcColorSetGrid->SetUseNativeColLabels();
-//	m_pcColorSetGrid->UseNativeColHeader();//
 
 	m_pcColorSetGrid->SetColLabelValue(0, wxT("Name"));
 	m_pcColorSetGrid->SetColSize(0, 100);
@@ -391,11 +388,7 @@ void SP_DLG_ConstantDefinition::LoadSetNames()
 	m_pcColorSetGrid->SetColLabelValue(3, wxT("Comment"));
 	m_pcColorSetGrid->SetColSize(3, 120);
 
-	
 
-	/*m_pcConstantSetGrid->SetColLabelValue(FNT, wxT("FNT"));// added by G.A
-	m_pcConstantSetGrid->SetColSize(FNT, 70);
-	*/
 	m_pcColorSetGrid->SetColLabelValue(4, wxT("Main"));
 	m_pcColorSetGrid->SetColSize(4, 70);
 
@@ -601,7 +594,7 @@ bool SP_DLG_ConstantDefinition::LoadData()
 		 
 			 
 		}
-		//(l_bWhite ? l_bWhite = false : l_bWhite = true);
+
 	}
 	/*******************************/
   
@@ -611,7 +604,7 @@ bool SP_DLG_ConstantDefinition::LoadData()
 }
 bool SP_DLG_ConstantDefinition::SaveNewDate()
 {
-	//m_pcConstantSetGrid->SaveEditControlValue();
+	m_pcColorSetGrid->SaveEditControlValue();
 
 	SP_DS_Metadata* l_pcConstant;
 
@@ -951,9 +944,7 @@ bool SP_DLG_ConstantDefinition::GetIntConstantValue(wxString p_sConstExpr, doubl
 
 bool SP_DLG_ConstantDefinition::DoCheckFunction(const wxString& p_sName, const wxString& p_sType, const wxString& p_sValue)
 {
-	//wxArrayString m_datatypes = m_choices;
-    
-	//m_datatypes.Remove(wxT("product"));
+
 	
 	if (p_sName.IsEmpty())
 	{
@@ -1221,6 +1212,15 @@ void SP_DLG_ConstantDefinition::AddNewChoice(wxCommandEvent& p_cEvent)
 	//no group with this name has been found
 	if (!FindString(m_asGroups, l_sNewValue))
 	{
+		SP_DS_FunctionRegistry* l_pcFR = l_pcGraph->GetFunctionRegistry();
+
+		SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sNewValue));
+
+		if (!l_pcFunction->isVariable())
+		{
+			SP_MESSAGEBOX(wxT("group name '") + l_sNewValue + wxT("' is not valid"), wxT("Error"), wxOK | wxICON_ERROR);
+			return;
+		}
 		//add this group name to the list
 		m_asGroups.push_back(l_sNewValue);
 
@@ -1238,7 +1238,7 @@ void SP_DLG_ConstantDefinition::AddNewChoice(wxCommandEvent& p_cEvent)
 	else
 	{
 		SP_MESSAGEBOX(wxT("group name '") + l_sNewValue + wxT("' already exists"), wxT("Error"), wxOK | wxICON_ERROR);
-		//SP_LOG(wxLOG_Error, wxT("group name already exists"));
+
 	}
 }
 
@@ -1496,8 +1496,7 @@ void SP_DLG_ConstantDefinition::OnDeleteValueSet(wxCommandEvent& p_cEvent)
 }
 bool SP_DLG_ConstantDefinition::DoCheckUserInput(const int& p_nRow)
 {
-	//map<std::string, std::string> l_mID2Val;
-	//check user input values for parameters
+
 	for (int l_nRow = 0; l_nRow < m_pcColorSetGrid->GetNumberRows(); l_nRow++)
 	{
 		if (l_nRow != p_nRow) continue;
@@ -1624,24 +1623,26 @@ void SP_DLG_ConstantDefinition::OnGridLabelLeftClick(wxGridEvent& event)
 
 }
 
-void SP_DLG_ConstantDefinition::OnPopupClick(wxCommandEvent& evt)
+
+
+
+void SP_DLG_ConstantDefinition::MoveRow(long p_nToPos)
 {
+	if (p_nToPos <=0) return;
+
 	int l_nToRow = 0;
-	l_nToRow=evt.GetId();
-	l_nToRow=l_nToRow - 1;
-	wxString l_Smsg;
-	l_Smsg<<wxT("here is line:");
-	l_Smsg<<l_nToRow;
-	 SP_MESSAGEBOX(l_Smsg);
+	l_nToRow = p_nToPos;
+	l_nToRow = l_nToRow - 1;
+
 	m_RowData.clear();
 	m_RowData.Alloc(m_pcColorSetGrid->GetNumberCols());
 	for (unsigned i = 0; i < m_pcColorSetGrid->GetNumberCols(); i++)
 	{
 		m_RowData.Add(m_pcColorSetGrid->GetCellValue(m_norgRow, i));
-		 
+
 	}
 
-	wxColour l_OrgColour = m_pcColorSetGrid->GetCellBackgroundColour(m_norgRow,1);
+	wxColour l_OrgColour = m_pcColorSetGrid->GetCellBackgroundColour(m_norgRow, 1);
 	wxColour l_ToColour = m_pcColorSetGrid->GetCellBackgroundColour(l_nToRow, 1);
 	m_pcColorSetGrid->DeleteRows(m_norgRow);
 	int l_nfrom;
@@ -1653,20 +1654,20 @@ void SP_DLG_ConstantDefinition::OnPopupClick(wxCommandEvent& evt)
 		l_nfrom = m_norgRow;
 		l_nto = m_pcColorSetGrid->GetNumberRows() - 1;
 	}
-	else if (l_nToRow==0)
+	else if (l_nToRow == 0)
 	{
 		m_pcColorSetGrid->InsertRows(0, 1);
-		 
-		 
+
+
 	}
 	else
 	{
-		m_pcColorSetGrid->InsertRows(l_nToRow-1, 1);
+		m_pcColorSetGrid->InsertRows(l_nToRow - 1, 1);
 		for (unsigned i = 0; i <m_pcColorSetGrid->GetNumberCols(); i++)
 		{
-			m_pcColorSetGrid->SetCellValue(l_nToRow-1, i, m_pcColorSetGrid->GetCellValue(l_nToRow,i));
-			m_pcColorSetGrid->SetCellAlignment(l_nToRow-1, i, wxALIGN_CENTER, wxALIGN_TOP);
-		 
+			m_pcColorSetGrid->SetCellValue(l_nToRow - 1, i, m_pcColorSetGrid->GetCellValue(l_nToRow, i));
+			m_pcColorSetGrid->SetCellAlignment(l_nToRow - 1, i, wxALIGN_CENTER, wxALIGN_TOP);
+
 		}
 	}
 
@@ -1684,95 +1685,10 @@ void SP_DLG_ConstantDefinition::OnPopupClick(wxCommandEvent& evt)
 		for (unsigned j = 0; j < m_pcColorSetGrid->GetNumberCols(); j++)
 		{
 			m_pcColorSetGrid->SetCellBackgroundColour(i, j, (l_bISWhite ? *wxWHITE : *wxLIGHT_GREY));
-			
+
 		}
 		l_bISWhite = !l_bISWhite;
-	 }
-}
-
-void SP_DLG_ConstantDefinition::OnMoveRow(wxCommandEvent& p_cEvent)
-{
- l_pcMenu=new wxMenu;
- l_pcMenu->Append(700,wxT("bbbb"));
- l_pcMenu->AppendSeparator();
-l_pcMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SP_DLG_ConstantDefinition::OnPopupClick), NULL, this);
-PopupMenu(l_pcMenu);
-//Operate(2,3);
-
-}
-
-void SP_DLG_ConstantDefinition::Operate(const unsigned& p_nReason, const unsigned& r)
-{
-
-	if (p_nReason == 1)
-	{
-	wxMenu* menu = new wxMenu;
-	menu->SetTitle("Move this row to:");
-	m_norgRow = r-1;
-	for (unsigned i = 1; i <= m_pcColorSetGrid->GetNumberRows(); i++)
-	{
-		if (i == r) continue;
-
-		wxString l_sOption;
-		l_sOption << wxT("&") << i;
-
-		menu->Append(i, l_sOption);
 	}
-	menu->AppendSeparator();
-	 
-	PopupMenu(menu);
-    }
-	else if (p_nReason == 2)
-	{
-		unsigned l_nfrom;
-		unsigned l_nto;
-		if (m_pcColorSetGrid->GetNumberRows() == r)
-		{
-			//m_pcColorSetGrid->InsertRows(r, 1);//the last row
-			m_pcColorSetGrid->AppendRows(1);
-			l_nfrom = m_norgRow;// -1;
-			l_nto = m_pcColorSetGrid->GetNumberRows()-1;
-		}
-		
-		else
-		{
-			if (r == 1) {
-				
-				m_pcColorSetGrid->InsertRows(0, 1); 
-				l_nfrom = m_norgRow;// -1;
-				l_nto = 0;
-			}
-			else
-			{
-				m_pcColorSetGrid->InsertRows(r, 1);
-				l_nfrom = m_norgRow;// -1;
-				l_nto = r-1;
-			}
-		
-			if (l_nfrom == l_nto)
-				l_nto--;
-		}
-	
-
-		for (unsigned i = 0; i <m_pcColorSetGrid->GetNumberCols(); i++)
-		{
-			m_pcColorSetGrid->SetCellValue(l_nto, i, m_pcColorSetGrid->GetCellValue(l_nfrom, i));
-			int*  horz=new int();
-			int*  vert=new int;
-			m_pcColorSetGrid->GetCellAlignment(l_nfrom, i, horz, vert);
-			m_pcColorSetGrid->SetCellAlignment(l_nto, i,*horz,*vert );
-			wxDELETE(horz);
-			wxDELETE(vert);
-		}
-		 
-	 //	m_pcColorSetGrid->DeleteRows(l_nfrom);
-	}
-	else
-	{
-		return;
-	}
-	 
-	 
 }
 
 
@@ -1784,8 +1700,38 @@ void SP_DLG_ConstantDefinition::OnRowRightClick(wxGridEvent& event)
 	row= event.GetRow();
 	wxString l_sRow;
 	row++;
+
+	wxString l_sMsg = wxT("Please select the target constant position, to which you want to move the current constant.\n");
+
+	wxArrayString l_Choices;
+
 	 
-	//Operate(1,row);
+	m_norgRow = row - 1;
+	for (unsigned i = 1; i <= m_pcColorSetGrid->GetNumberRows(); i++)
+	{
+		if (i == row) continue;
+
+		wxString l_sOption;
+		l_sOption <<i;
+
+		l_Choices.Add(l_sOption);
+	}
+	int l_ReturnChoice = ::wxGetSingleChoiceIndex(l_sMsg, wxT("Move constant."), l_Choices);
+
+	long  l_nIndex;
+
+	if (l_ReturnChoice == -1) return;
+
+	if (l_Choices[l_ReturnChoice].ToLong(&l_nIndex))
+	{
+
+		MoveRow(l_nIndex);
+	}
+	else
+	{
+		return;
+	}
+
 
 }
 

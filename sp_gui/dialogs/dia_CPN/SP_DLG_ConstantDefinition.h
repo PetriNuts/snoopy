@@ -52,7 +52,7 @@ class SP_DLG_ConstantDefinition : public wxDialog
 	bool m_bIsAsc;
 	wxButton* m_pcSortingButton;
 	wxButton* m_pcMovingRowsButton;
-	wxMenu* l_pcMenu;
+
   private:
 
     void LoadSetNames();
@@ -78,9 +78,11 @@ class SP_DLG_ConstantDefinition : public wxDialog
 
 	void  OnRowRightClick(wxGridEvent& event);
 
-	void Operate(const unsigned&,const unsigned& r=0);
+	//void Operate(const unsigned&,const unsigned& r=0);
 
-	void OnPopupClick(wxCommandEvent& evt);
+	//void OnPopupClick(wxCommandEvent& evt);
+
+	void MoveRow(long p_nToPos);
 
 	void SortVlaueSets(std::multimap<std::string, float>&p_mVset2Val, std::vector<std::string>&p_vRes, bool p_bIsAscending);
 
@@ -88,7 +90,7 @@ class SP_DLG_ConstantDefinition : public wxDialog
 
 	bool  EvalConstantExpression(const wxString& p_sArcWeight, double& p_dVal);
 
-	void OnMoveRow(wxCommandEvent& p_cEvent);
+
 
   public:
 	
