@@ -300,7 +300,7 @@ SP_ExportFCPN2FSPN::WriteStochTransition(SP_DS_Node* p_pcVal, wxXmlNode* p_pcRoo
 
 	for (l_Iter = l_plAttributes->begin(); l_Iter != l_plAttributes->end(); ++l_Iter)
 	{
-		if (!((*l_Iter)->GetName() == wxT("Reversible") || (*l_Iter)->GetName() == wxT("FunctionList")))
+		if (!((*l_Iter)->GetName() == wxT("Reversible")))
 		{
 			WriteAttribute((*l_Iter), l_pcElem);
 		}
