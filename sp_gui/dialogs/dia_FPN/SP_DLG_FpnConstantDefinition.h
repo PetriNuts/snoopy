@@ -59,11 +59,11 @@ private:
 	wxString l_sTFNFromDrawingPanel;
 	int m_nRow;
 	int m_nCol;
-	bool m_bSortFlag;
 	unsigned m_norgRow;//for move row
 	wxArrayString m_RowData;
 	bool m_bIsAsc;
 	wxButton* m_pcSortingButton;
+	wxButton* m_pcSortingCol;
 private:
 
 	bool SaveData();
@@ -93,10 +93,6 @@ private:
 	
 	void OnChildDestroy(wxCloseEvent& event);
 
-	void OnGridLabelLeftClick(wxGridEvent& event);
-
-	void SortConstants(const bool& p_bIsAscending = true);//by george for sorting cv-sets
-
 	void SortVlaueSets(std::multimap<std::string, float>&p_mVset2Val, std::vector<std::string>&p_vRes, bool p_bIsAscending);
 
 	bool EvalConstantExpression(const wxString& p_sexp, double& p_dVal);
@@ -107,6 +103,9 @@ private:
 
 	void  OnSortVsets(wxCommandEvent& p_cEvent);//by george for sorting v-sets
 
+	void  OnMultiColSorting(wxCommandEvent&  event);
+
+	void DeleteGroup(wxCommandEvent& p_cEvent);
 
 protected:
 	bool FindString(wxArrayString& p_asStrArray, wxString& p_sValue);

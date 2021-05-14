@@ -53,11 +53,12 @@ class SP_DLG_NewConstantDefinition : public wxDialog
 	bool m_bIsApplyExecuted;
 
 	SP_SetString m_Places;
-	bool m_bSortFlag;
+
 	unsigned m_norgRow;//for move row
 	wxArrayString m_RowData;
 	bool m_bIsAsc;
 	wxButton* m_pcSortingButton;
+	wxButton* m_pcSortingCol;
   private:
 
 	bool SaveData();
@@ -84,14 +85,13 @@ class SP_DLG_NewConstantDefinition : public wxDialog
 	void MoveRow(long p_nToPos);//by george for re-ordering constants
 
 	void OnSortVsets(wxCommandEvent& p_cEvent);//by george for sorting v-sets
-
+	void DeleteGroup(wxCommandEvent& p_cEvent);
+	void  OnMultiColSorting(wxCommandEvent&  event);
   protected:
 	bool FindString(wxArrayString& p_asStrArray,wxString& p_sValue);
 
 	//checks the user inputs
 	bool CheckInput();
-
-	void SortConstants(const bool& p_bIsAscending=true);//by george
 
 	void SortVlaueSets(std::multimap<std::string, float>&, std::vector<std::string>&p_vRes,bool p_bIsAscending = true);//by george
  

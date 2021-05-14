@@ -4,7 +4,7 @@
 // $Version: 0.0 $
 // $Revision: 1.0 $
 // $Date: 2009/10/11 11:20:00 $
-// @Modified: George Assaf
+// @Modified and updated: George Assaf
 // @Date:15/01/2020
 // Short Description:
 //////////////////////////////////////////////////////////////////////
@@ -46,12 +46,13 @@ class SP_DLG_ConstantDefinition : public wxDialog
 	SP_SetString m_Places;
 	SP_DS_Graph* l_pcGraph;
 	map<wxString, wxString> m_mID2Val;
-	bool m_bSortFlag;
 	unsigned m_norgRow;//for move row
 	wxArrayString m_RowData;
 	bool m_bIsAsc;
 	wxButton* m_pcSortingButton;
 	wxButton* m_pcMovingRowsButton;
+	wxButton* m_pcSortingCol;
+
 
   private:
 
@@ -74,20 +75,13 @@ class SP_DLG_ConstantDefinition : public wxDialog
 	bool GetIntConstantValue(wxString p_sConstExpr, double& p_nValue);
     bool DoCheckUserInput(const int& p_nRow);
 
-	void  OnGridLabelLeftClick(wxGridEvent& event);
+	void OnMultiColSorting(wxCommandEvent&  event);//column-based sorting
 
 	void  OnRowRightClick(wxGridEvent& event);
 
-	//void Operate(const unsigned&,const unsigned& r=0);
-
-	//void OnPopupClick(wxCommandEvent& evt);
-
 	void MoveRow(long p_nToPos);
 
-	void SortVlaueSets(std::multimap<std::string, float>&p_mVset2Val, std::vector<std::string>&p_vRes, bool p_bIsAscending);
-
-	void SortConstants(const bool& p_bIsAscending=true);
-
+	void DeleteGroup(wxCommandEvent& p_cEvent);
 	bool  EvalConstantExpression(const wxString& p_sArcWeight, double& p_dVal);
 
 

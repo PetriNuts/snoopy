@@ -32,6 +32,7 @@
 #include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_CPN_SyntaxChecking.h"
 #include <wx/busyinfo.h>
 #include <wx/textdlg.h>
+#include "sp_gui/dialogs/dia_CPN/SP_DLG_SortDialoug.h"
 
 IMPLEMENT_CLASS(SP_DLG_FpnConstantDefinition, wxDialog)
 
@@ -57,7 +58,9 @@ enum
 	SP_ID_VALUESET_DELETE,
 	SP_ID_NEWGROUP,
 	SP_ID_BUTTON_RENAMESET,
-	SP_ID_SORTSETS
+	SP_ID_SORTSETS,
+	SP_ID_MULTICOL_SORT,
+	SP_ID_DELETEGROUP
 };
 BEGIN_EVENT_TABLE(SP_DLG_FpnConstantDefinition, wxDialog)
 EVT_CLOSE(SP_DLG_FpnConstantDefinition::OnChildDestroy)
@@ -71,12 +74,13 @@ EVT_BUTTON(wxID_APPLY, SP_DLG_FpnConstantDefinition::OnDlgApply)
 EVT_BUTTON(SP_ID_BUTTON_DELETE, SP_DLG_FpnConstantDefinition::OnDeleteSet)
 EVT_BUTTON(SP_ID_NEWGROUP, SP_DLG_FpnConstantDefinition::AddNewChoice)
 EVT_BUTTON(SP_ID_BUTTON_RENAMESET, SP_DLG_FpnConstantDefinition::OnRenameSet)
-EVT_GRID_CMD_LABEL_LEFT_CLICK(SP_ID_GRID_MARKING, SP_DLG_FpnConstantDefinition::OnGridLabelLeftClick)
  
 EVT_GRID_CMD_CELL_RIGHT_CLICK(SP_ID_GRID_MARKING, SP_DLG_FpnConstantDefinition::OnRowRightClick)
 EVT_BUTTON(SP_ID_SORTSETS, SP_DLG_FpnConstantDefinition::OnSortVsets)
 #if wxABI_VERSION > 30000
 EVT_GRID_CELL_CHANGED(SP_DLG_FpnConstantDefinition::OnGridCellValueChanged)
+EVT_BUTTON(SP_ID_DELETEGROUP, SP_DLG_FpnConstantDefinition::DeleteGroup)
+EVT_BUTTON(SP_ID_MULTICOL_SORT, SP_DLG_FpnConstantDefinition::OnMultiColSorting)
 #else
 EVT_GRID_CELL_CHANGE(SP_DLG_FpnConstantDefinition::OnGridCellValueChanged)
 #endif
@@ -115,10 +119,8 @@ SP_DLG_FpnConstantDefinition::SP_DLG_FpnConstantDefinition(wxWindow* p_pcParent,
 	l_pcRowSizer->Add(m_pcConstantSetGrid, 1, wxALL | wxEXPAND, 2);
 	l_pcGridSizer->Add(l_pcRowSizer, 1, wxALL | wxEXPAND, 5);
 
-	m_pcConstantSetGrid->EnableEditing(true);
-	//m_pcConstantSetGrid->SetSelectionMode(wxGrid::wxGridSelectCells);
 	
-	m_bSortFlag = false;
+
 	l_bWhite = false;
 	LoadSetNames();
 	LoadData();
@@ -131,14 +133,16 @@ SP_DLG_FpnConstantDefinition::SP_DLG_FpnConstantDefinition(wxWindow* p_pcParent,
 	wxBoxSizer* l_pcButtonSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
 	wxSizer *l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
+	m_pcSortingCol = new wxButton(this, SP_ID_MULTICOL_SORT, wxT("Multi column sorting"));
 	m_pcSortingButton = new wxButton(this, SP_ID_SORTSETS, wxT("Sort Value Sets (Asc)"));
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ADD, wxT("Add constant")), 1, wxALL, 5);
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_DELETE, wxT("Delete constant")), 1, wxALL, 5);
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check constant")), 1, wxALL, 5);
 	l_pcSizer->Add(new wxButton(this, SP_ID_NEWGROUP, wxT("New Group")), 1, wxALL, 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_DELETEGROUP, wxT("Delete Group")), 1, wxALL, 5);
 	l_pcSizer->Add(m_pcSortingButton, 1, wxALL, 5);
 	wxSizer *l_pcSizer2 = new wxBoxSizer(wxHORIZONTAL);
-
+	l_pcSizer2->Add(m_pcSortingCol, 1, wxALL, 5);
 	l_pcSizer2->Add(new wxButton(this, SP_ID_VALUESET_ADD, wxT("New Value Set")), 1, wxALL, 5);
 	l_pcSizer2->Add(new wxButton(this, SP_ID_VALUESET_DELETE, wxT("Delete Value Set")), 1, wxALL, 5);
 	l_pcSizer2->Add(new wxButton(this, SP_ID_BUTTON_RENAMESET, wxT("Rename Value Set")), 1, wxALL, 5);
@@ -1332,8 +1336,6 @@ void SP_DLG_FpnConstantDefinition::LoadSetNames()
 	m_pcConstantSetGrid->SetColSize(NAME, 100);
 
 
-	if (!m_bSortFlag)
-		m_pcConstantSetGrid->SetSortingColumn(NAME, true);
 
 	m_pcConstantSetGrid->SetColLabelValue(GROUP, wxT("Group"));
 	m_pcConstantSetGrid->SetColSize(GROUP, 120);
@@ -1356,15 +1358,7 @@ void SP_DLG_FpnConstantDefinition::LoadSetNames()
  
 	m_pcConstantSetGrid->SetColLabelValue(VALUES, wxT("Main"));
 	m_pcConstantSetGrid->SetColSize(VALUES, 70);
-	///////////// consts columns
-	//m_pcConstantSetGrid->SetColLabelValue(CONSTA, wxT("ConstA"));
-	//m_pcConstantSetGrid->SetColSize(CONSTA, 50);
-	//m_pcConstantSetGrid->SetColLabelValue(CONSTB, wxT("ConstB"));
-	//m_pcConstantSetGrid->SetColSize(CONSTB, 50);
-	//m_pcConstantSetGrid->SetColLabelValue(CONSTC, wxT("ConstC"));
-	//m_pcConstantSetGrid->SetColSize(CONSTC, 50);
-	//m_pcConstantSetGrid->SetColLabelValue(CONSTD, wxT("ConstD"));
-	//m_pcConstantSetGrid->SetColSize(CONSTD, 50);
+
 
 	for (unsigned int i = 1; i < l_nSize; i++)
 	{
@@ -1624,31 +1618,97 @@ void SP_DLG_FpnConstantDefinition::OnChildDestroy(wxCloseEvent& event)
 	}
 }
 
-
-void SP_DLG_FpnConstantDefinition::OnGridLabelLeftClick(wxGridEvent& event)
+void SP_DLG_FpnConstantDefinition::DeleteGroup(wxCommandEvent& p_cEvent)
 {
+	wxString l_sMsg = wxT("Please select a group to be deleted.\n");
 
-	int col = event.GetCol();
+	wxArrayString l_Choices;
 
-	if (col != NAME)
+	for (unsigned i = 0; i < m_asGroups.GetCount(); i++)
 	{
-		event.Skip();
-		return;
+		if (m_asGroups[i] == wxT("all") || m_asGroups[i] == wxT("parameter") ||
+			m_asGroups[i] == wxT("marking") || m_asGroups[i] == wxT("coloring")) continue;
+
+		l_Choices.Add(m_asGroups[i]);
 	}
-	if (m_pcConstantSetGrid->IsSortOrderAscending())
+	int l_ReturnChoice = ::wxGetSingleChoiceIndex(l_sMsg, wxT("Delete constant."), l_Choices);
+
+
+
+	if (l_ReturnChoice == -1 || l_Choices.GetCount()==0) return;
+
+	wxString l_sCohesnGroup = l_Choices[l_ReturnChoice];
+
+	for (int i = 0; i < m_pcConstantSetGrid->GetNumberRows(); i++)
 	{
-		m_bSortFlag = true;
-		SortConstants();
-		m_pcConstantSetGrid->SetSortingColumn(NAME, false);
-	}
-	else {
-		m_bSortFlag = true;
-		SortConstants(false);
-		m_pcConstantSetGrid->SetSortingColumn(NAME, true);
+		if (m_pcConstantSetGrid->GetCellValue(i, GROUP) == l_sCohesnGroup)
+		{
+			SP_MESSAGEBOX(wxT("The selected group cannot be deleted as it is already used"), wxT("Error"), wxOK | wxICON_ERROR);
+			return;
+		}
 	}
 
+	m_asGroups.Remove(l_sCohesnGroup);
+	for (int i = 0; i < m_pcConstantSetGrid->GetNumberRows(); i++)
+	{
+		m_pcConstantSetGrid->SetCellEditor(i, GROUP, new SP_WDG_GridCellChoiceEditor(m_asGroups));
+	}
+	m_pcConstantSetGrid->Refresh();
 
 }
+
+
+void SP_DLG_FpnConstantDefinition::OnMultiColSorting(wxCommandEvent&  event)
+{
+	SP_Vector2DString l_vvGrid;
+	l_vvGrid.resize(m_pcConstantSetGrid->GetNumberRows(), std::vector<wxString>(m_pcConstantSetGrid->GetNumberCols(), wxT("")));
+	for (int i = 0; i < m_pcConstantSetGrid->GetNumberRows(); i++)
+	{
+		SP_VectorString l_vRow;
+		for (int j = 0; j < m_pcConstantSetGrid->GetNumberCols(); j++)
+		{
+			l_vvGrid[i][j] = m_pcConstantSetGrid->GetCellValue(i, j);
+
+		}
+	}
+
+	std::map<wxString, int> l_mKey2Pos;
+
+
+	SP_VectorString l_vColLabels;
+	for (int j = 1; j < 4; j++)
+	{
+
+		l_vColLabels.push_back(m_pcConstantSetGrid->GetColLabelValue(j));
+		l_mKey2Pos[m_pcConstantSetGrid->GetColLabelValue(j)] = j;
+	}
+
+
+	SP_DLG_SortDialoug* l_pcDialog = new SP_DLG_SortDialoug(this, l_vColLabels, l_mKey2Pos, l_vvGrid, m_nMainSet);
+	if (l_pcDialog->ShowModal())
+	{
+		l_vvGrid = l_pcDialog->GetSortedTable();
+
+		if (l_vvGrid.size() == 0)
+		{
+			l_pcDialog->Destroy();
+			return;
+		}
+
+		for (int i = 0; i < m_pcConstantSetGrid->GetNumberRows(); i++)
+		{
+			SP_VectorString l_vRow;
+			for (int j = 0; j < m_pcConstantSetGrid->GetNumberCols(); j++)
+			{
+				m_pcConstantSetGrid->SetCellValue(i, j, l_vvGrid[i][j]);
+
+			}
+		}
+	}
+	l_pcDialog->Destroy();
+
+}
+
 
 
 void SP_DLG_FpnConstantDefinition::SortVlaueSets(std::multimap<std::string, float>&p_mVset2Val, std::vector<std::string>&p_vRes, bool p_bIsAscending)
@@ -1682,140 +1742,6 @@ void SP_DLG_FpnConstantDefinition::SortVlaueSets(std::multimap<std::string, floa
 
 }
 
-void SP_DLG_FpnConstantDefinition::SortConstants(const bool& p_bIsAscending)
-{
-	std::map<unsigned, string> l_mOrder2Name;
-	std::vector<string> l_vNames;
-
-	for (unsigned i = 0; i < m_pcConstantSetGrid->GetNumberRows(); i++)
-	{
-		l_mOrder2Name[i] = m_pcConstantSetGrid->GetCellValue(i, NAME).ToStdString();
-		l_vNames.push_back(m_pcConstantSetGrid->GetCellValue(i, NAME).ToStdString());
-	}
-
-	if (p_bIsAscending)
-	{
-		std::sort(begin(l_vNames), end(l_vNames));
-	}
-	else
-	{
-		std::sort(begin(l_vNames), end(l_vNames));
-		std::reverse(begin(l_vNames), end(l_vNames));
-	}
-	unsigned int l_nPos = 0;
-
-	l_bWhite = false;
-	int Cols = m_pcConstantSetGrid->GetNumberCols();
-	int Rows = m_pcConstantSetGrid->GetNumberRows();
-
-	// Delete all Cols/Rows
-	m_pcConstantSetGrid->DeleteCols(0, Cols, true);
-	m_pcConstantSetGrid->DeleteRows(0, Rows, true);
-
-	LoadSetNames();
-
-	for (auto Const : l_vNames)
-	{
-		for (SP_DS_Metadata* l_pcMetadata : *(m_pcConstants->GetElements()))
-		{
-			wxString l_sMetadataName = dynamic_cast<SP_DS_NameAttribute*>(l_pcMetadata->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-
-			if (l_sMetadataName == Const)
-			{
-				wxString l_sMetadataGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Group")))->GetValue();
-				wxString l_sMetadataType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcMetadata->GetAttribute(wxT("Type")))->GetValue();
-				wxString l_sMetadataComment = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Comment")))->GetValue();
-
-				wxString l_sMetadataShow = l_pcMetadata->GetShow() ? wxT("1") : wxT("0");
-				SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcMetadata->GetAttribute(wxT("ValueList")));
-
-				m_pcConstantSetGrid->AppendRows(1);
-				//show the constant
-				if (!m_pcGraph->GetNetclass()->GetName().Contains(wxT("Colored")))//do not add SHOW Column
-				{
-					auto l_pcBoolEditor = new wxGridCellBoolEditor();
-					l_pcBoolEditor->UseStringValues(wxT("1"), wxT("0"));
-					m_pcConstantSetGrid->SetCellEditor(l_nPos, SHOW, l_pcBoolEditor);
-					m_pcConstantSetGrid->SetCellRenderer(l_nPos, SHOW, new wxGridCellBoolRenderer());
-					m_pcConstantSetGrid->SetCellValue(l_nPos, SHOW, l_sMetadataShow);
-					m_pcConstantSetGrid->SetCellAlignment(l_nPos, SHOW, wxALIGN_CENTER, wxALIGN_TOP);
-					m_pcConstantSetGrid->SetCellBackgroundColour(l_nPos, SHOW, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-				}
-				else
-				{
-					m_pcConstantSetGrid->HideCol(SHOW);
-				}
-				//name of the constant
-				m_pcConstantSetGrid->SetCellValue(l_nPos, NAME, l_sMetadataName);
-				m_pcConstantSetGrid->SetCellAlignment(l_nPos, NAME, wxALIGN_CENTER, wxALIGN_TOP);
-				m_pcConstantSetGrid->SetCellBackgroundColour(l_nPos, NAME, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-				//group of the constant
-				m_pcConstantSetGrid->SetCellEditor(l_nPos, GROUP, new SP_WDG_GridCellChoiceEditor(m_asGroups));
-				m_pcConstantSetGrid->SetCellValue(l_nPos, GROUP, l_sMetadataGroup);
-				m_pcConstantSetGrid->SetCellAlignment(l_nPos, GROUP, wxALIGN_CENTER, wxALIGN_TOP);
-				m_pcConstantSetGrid->SetCellBackgroundColour(l_nPos, GROUP, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-				//type of the constant
-				m_pcConstantSetGrid->SetCellEditor(l_nPos, TYPE, new wxGridCellChoiceEditor(m_datatypes.GetCount(), datatypes));
-				m_pcConstantSetGrid->SetCellValue(l_nPos, TYPE, l_sMetadataType);
-				m_pcConstantSetGrid->SetCellAlignment(l_nPos, TYPE, wxALIGN_CENTER, wxALIGN_TOP);
-				m_pcConstantSetGrid->SetCellBackgroundColour(l_nPos, TYPE, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-				//comment of the constant
-				m_pcConstantSetGrid->SetCellValue(l_nPos, COMMENT, l_sMetadataComment);
-				m_pcConstantSetGrid->SetCellAlignment(l_nPos, COMMENT, wxALIGN_CENTER, wxALIGN_TOP);
-				m_pcConstantSetGrid->SetCellBackgroundColour(l_nPos, COMMENT, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-
-
-
-				for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
-				{
-					m_pcConstantSetGrid->SetCellValue(l_nPos, i +m_nMainSet, l_pcColList->GetCell(i, 1));
-					m_pcConstantSetGrid->SetCellAlignment(l_nPos, i + m_nMainSet, wxALIGN_CENTER, wxALIGN_TOP);
-					m_pcConstantSetGrid->SetCellBackgroundColour(l_nPos, i + m_nMainSet, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-				}
-				////////////
-				/**
-				std::multimap<std::string, float> l_mVset2Val;
-				for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
-				{
-					//TODO:evalute constants/expressions in value sets
-					if (l_pcColList->GetCell(i, 1).ToStdString() == "")
-					{
-						string l_sTemp = "";
-						continue;
-
-					}
-
-					double l_dval;
-					bool l_bIsEvaluated = EvalConstantExpression(l_pcColList->GetCell(i, 1), l_dval);
-
-					if (!l_bIsEvaluated)
-					{
-						continue;
-					}
-					float fval = static_cast<float>(l_dval);
-
-					l_mVset2Val.insert(std::pair<string, float>(l_pcColList->GetCell(i, 1).ToStdString(), fval));
-					//l_mVset2Val.insert(std::pair<string, float>(l_pcColList->GetCell(i, 1).ToStdString(), std::stof(l_pcColList->GetCell(i, 1).ToStdString())));
-					 
-				}
-				std::vector<string> l_vRes;
-				SortVlaueSets(l_mVset2Val, l_vRes, p_bIsAscending);
-
-				//value of the constant
-				for (unsigned int i = 0; i < l_vRes.size(); i++)
-				{
-					m_pcConstantSetGrid->SetCellValue(l_nPos, i + m_nMainSet, l_vRes[i]);
-					m_pcConstantSetGrid->SetCellAlignment(l_nPos, i + m_nMainSet, wxALIGN_CENTER, wxALIGN_TOP);
-					m_pcConstantSetGrid->SetCellBackgroundColour(l_nPos, i + m_nMainSet, (l_bWhite ? *wxWHITE : *wxLIGHT_GREY));
-				}
-				*/
-				l_nPos++;
-				(l_bWhite ? l_bWhite = false : l_bWhite = true);
-			}
-		}
-	}
-
-}
 
 
 
