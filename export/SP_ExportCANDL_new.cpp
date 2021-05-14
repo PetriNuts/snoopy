@@ -30,7 +30,12 @@ bool SP_ExportCANDL_new::AcceptsDoc(SP_MDI_Doc* p_doc)
 			cName == SP_DS_COLEPN_CLASS ||
 			cName == SP_DS_COLSPN_CLASS ||
 			cName == SP_DS_COLCPN_CLASS ||
-			cName == SP_DS_COLHPN_CLASS);
+			cName == SP_DS_COLHPN_CLASS ||
+		    cName == SP_DS_FUZZY_ColSPN_CLASS ||
+		    cName == SP_DS_FUZZY_ColCPN_CLASS ||
+		    cName == SP_DS_FUZZY_ColHPN_CLASS
+		     );
+
 }
 
 bool SP_ExportCANDL_new::Write(SP_MDI_Doc* p_doc, const wxString& p_fileName)
