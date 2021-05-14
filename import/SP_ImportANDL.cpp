@@ -492,30 +492,47 @@ bool SP_ImportANDL::AppendConstants(const dssd::andl::Constants& p_Constants, co
 
 		wxString l_sMainVal = wxT("0");
 		if (l_vConstantsInGraph[i].vsets.size()>0)
-			l_sMainVal = l_vConstantsInGraph[i].vsets[0];
+					l_sMainVal = l_vConstantsInGraph[i].vsets[0];
+				SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+				if (l_sMainVal.IsEmpty() || l_sMainVal == wxT("0") && l_sType == wxT("double"))
+				{
+					l_sMainVal = wxT("0.0");
+				}
+				SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sMainVal));
+				std::set<std::string> l_vIds;
+				l_pcFunction->getVariables(l_vIds);
+				bool l_bIsValid = true;
+				wxString l_sInvalidID;
+				std::vector<string> l_vConstIds;
 
-		SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
-		SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sMainVal));
-		if (l_sType == wxT("double"))
-		{
-			double l_Val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, std::numeric_limits<double>::min() }();
-			wxString l_sDouble;
-			l_sDouble << l_Val;
-			m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, l_sDouble);
-			l_pcColList->UpdateActiveListColumnPtr();
+				for (auto& constant : p_Constants)
+				{
+					l_vConstIds.push_back(constant->name_);
+				}
 
-			l_pcConstant->SetShow(true);
-			l_pcConstant->Update();
+				for (auto l_idConst : l_vIds)
+				{
 
-			++l_itElem;
-			continue;
-		}
+					if (std::find(l_vConstIds.begin(), l_vConstIds.end(), l_idConst) == l_vConstIds.end())
+					{
+
+						l_bIsValid = false;
+						l_sInvalidID = l_idConst;
+						break;
+					}
+				}
+
+				if (!l_bIsValid)
+				{
+					SP_LOGERROR_(wxT("The identiefer: ") + l_sInvalidID + wxT(" in the definition of the constant ") + l_sName);
+					continue;
+				}
 
 		m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, l_sMainVal);
 
 		l_pcColList->UpdateActiveListColumnPtr();
 
-		l_pcConstant->SetShow(true);
+		l_pcConstant->SetShow(false);
 		l_pcConstant->Update();
 
 		++l_itElem;
@@ -703,11 +720,50 @@ bool SP_ImportANDL::OverwriteExistConstant(const wxString& p_sConstant, const ds
 								l_pcMetadata->Update();
 								return true;
 							}
-							else {
-								wxString l_sMessage;
-								l_sMessage << wxT("contant ") << p_sConstant << wxT("cannot be overwritten. ");
-								l_sMessage << wxT("The number of value sets is not equal");
-								SP_LOGMESSAGE_(l_sMessage);
+							else {// number of value sets of the source and target files are not equal
+								if (con->values_.size() > l_pcColList->GetRowCount())
+								{
+									int l_nOldSize = l_pcColList->GetRowCount();
+									int l_nDiff = con->values_.size() - l_pcColList->GetRowCount();
+
+									for (int i = 0; i < l_nDiff; i++)
+									{
+
+										int l_nr = l_pcColList->AppendEmptyRow();
+										auto dd = *p_Net.valuesets_;
+										l_pcColList->SetCell(l_nr, 0, dd[l_nOldSize + i]);
+
+									}
+
+									for (int j = 0; j < con->values_.size(); j++)
+									{
+										wxString l_sVal = con->values_[j].c_str();
+										l_pcColList->SetCell(j, 1, l_sVal);
+									}
+									m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, con->values_[0].c_str());
+									l_pcColList->UpdateActiveListColumnPtr();
+									l_pcMetadata->Update();
+
+									wxString l_sMessage;
+									l_sMessage << wxT("constant ") << p_sConstant << wxT(" has been overwritten. ");
+									l_sMessage << l_nDiff << wxT(" new value sets were added");
+									SP_LOGMESSAGE_(l_sMessage);
+
+									return true;
+
+								}
+								else//number of source v-sets < target v-sets
+								{
+									for (int j = 0; j < con->values_.size(); j++)
+									{
+										wxString l_sVal = con->values_[j].c_str();
+										l_pcColList->SetCell(j, 1, l_sVal);
+									}
+									m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, con->values_[0].c_str());
+									l_pcColList->UpdateActiveListColumnPtr();
+									l_pcMetadata->Update();
+
+								}
 							}
 						}
 					}

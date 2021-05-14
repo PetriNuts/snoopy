@@ -96,6 +96,24 @@ SP_ImportCANDL::~SP_ImportCANDL()
 
 }
 
+SP_DS_Graph* SP_ImportCANDL::ImportToDoc(const wxString& fileName)
+{//for automatic layout using command line
+
+	m_fileName = fileName;
+	dssd::net::reader p;
+	bool l_Return = false;
+	l_Return = p(fileName.ToStdString());
+
+	if (l_Return)
+	{
+		auto l_Net = p.get();
+
+		l_Return = CreateGraph(fileName, *l_Net);
+	}
+	return m_pcGraph;
+
+}
+
 bool
 SP_ImportCANDL::ReadFile(const wxString& p_sFile, SP_ImportRoutine* p_importRT)
 {
@@ -187,9 +205,10 @@ SP_ImportCANDL::ReadFile(const wxString& p_sFile, SP_ImportRoutine* p_importRT)
 
 			l_Return = CreateGraph(p_sFile, *l_Net);
 			if (l_Return)
-                doLayout();
-			//compute initial marking
-			ComputeInitMarking();
+			{    doLayout();
+			    //compute initial marking in order to show expressions over net elements
+			    ComputeInitMarking();
+			}
 		}
 	}
 	catch(const std::exception& e)
@@ -288,13 +307,15 @@ bool SP_ImportCANDL::AddToGraph(const dssd::andl::Net& p_Net)
 		{
 			m_mType2Declaration.clear();
 			m_mType2Declaration = l_pcOverwriteDlg->GetSelectedItems();
+
+			if (m_mType2Declaration.size()>0)
+			{
+				Overwritedeclarations(m_mType2Declaration, p_Net);
+			}
 		}
 	}
 
-	if (m_mType2Declaration.size()>0)
-	{
-		Overwritedeclarations(m_mType2Declaration, p_Net);
-	}
+
 	m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
 
 	return true;
@@ -592,10 +613,51 @@ bool SP_ImportCANDL::OverwriteExistConstant(const wxString& p_sConstant, const d
 								return true;
 							}
 							else {
-								wxString l_sMessage;
-								l_sMessage << wxT("contant ") << p_sConstant << wxT("cannot be overwritten. ");
-								l_sMessage << wxT("The number of value sets is not equal");
-								SP_LOGMESSAGE_(l_sMessage);
+								//number of target  vsets > num vsets of the target filee
+								if (con->values_.size() > l_pcColList->GetRowCount())
+								{
+									int l_nOldSize = l_pcColList->GetRowCount();
+									int l_nDiff = con->values_.size() - l_pcColList->GetRowCount();
+
+									for (int i = 0; i < l_nDiff; i++)
+									{
+
+										int l_nr=l_pcColList->AppendEmptyRow();
+										auto dd = *p_Net.valuesets_;
+										l_pcColList->SetCell(l_nr, 0, dd[l_nOldSize +i]);
+
+									}
+
+									for (int j = 0; j < con->values_.size(); j++)
+									{
+										wxString l_sVal = con->values_[j].c_str();
+										l_pcColList->SetCell(j, 1, l_sVal);
+									}
+									m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, con->values_[0].c_str());
+									l_pcColList->UpdateActiveListColumnPtr();
+									l_pcMetadata->Update();
+
+									wxString l_sMessage;
+									l_sMessage << wxT("constant ") << p_sConstant << wxT(" has been overwritten. ");
+									l_sMessage << l_nDiff << wxT(" new value sets were added");
+									SP_LOGMESSAGE_(l_sMessage);
+
+									return true;
+
+								}
+								else// number of source v-sets < target v-sets
+								{
+
+									for (int j = 0; j < con->values_.size(); j++)
+									{
+										wxString l_sVal = con->values_[j].c_str();
+										l_pcColList->SetCell(j, 1, l_sVal);
+									}
+									m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, con->values_[0].c_str());
+									l_pcColList->UpdateActiveListColumnPtr();
+									l_pcMetadata->Update();
+
+								}
 							}
 						}
 					}
@@ -621,7 +683,8 @@ SP_ImportCANDL::CreateGraph(const wxString& p_sFile, const dssd::andl::Net& p_Ne
 		return false;
 
 	if(p_Net.constants_ && p_Net.valuesets_)
-		CreateConst(*p_Net.constants_, *p_Net.valuesets_);
+		if(!CreateConst(*p_Net.constants_, *p_Net.valuesets_))
+		{return false;}// in case of incorrect constnat defs exist
 
 	if(p_Net.colorsets_)
 		CreateColorsets(*p_Net.colorsets_);
@@ -985,27 +1048,45 @@ bool SP_ImportCANDL::AppendConstants(const dssd::andl::Constants& p_Constants, c
 		if(l_vConstantsInGraph[i].vsets.size()>0)
 			l_sMainVal=l_vConstantsInGraph[i].vsets[0];
 		SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+
 		SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sMainVal));
-		if (l_sType == wxT("double"))
-		{
-			double l_Val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, std::numeric_limits<double>::min() }();
-			wxString l_sDouble;
-			l_sDouble << l_Val;
-			m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, l_sDouble);
-			l_pcColList->UpdateActiveListColumnPtr();
+				std::set<std::string> l_vIds;
+				l_pcFunction->getVariables(l_vIds);
+				bool l_bIsValid = true;
+				wxString l_sInvalidID;
+				std::vector<string> l_vConstIds;
 
-			l_pcConstant->SetShow(true);
-			l_pcConstant->Update();
+				for (auto& constant : p_Constants)
+				{
+					l_vConstIds.push_back(constant->name_);
+				}
 
-			++l_itElem;
-			continue;
-		}
+				for (auto l_idConst : l_vIds)
+				{
+
+					if (std::find(l_vConstIds.begin(), l_vConstIds.end(), l_idConst) == l_vConstIds.end())
+					{
+
+						l_bIsValid = false;
+						l_sInvalidID = l_idConst;
+						break;
+					}
+				}
+
+				if (!l_bIsValid)
+				{
+					SP_LOGERROR_(wxT("The identiefer: ")+ l_sInvalidID +wxT(" in the definition of the constant ")+l_sName);
+					continue;
+				}
+
+
+
 
 		m_pcGraph->GetFunctionRegistry()->registerFunction(l_sName, l_sMainVal);
 
 		l_pcColList->UpdateActiveListColumnPtr();
 
-		l_pcConstant->SetShow(true);
 		l_pcConstant->Update();
 
 		++l_itElem;
@@ -1098,6 +1179,38 @@ for (auto& constant : p_Constants)
 			for (unsigned int i = 0; i < p_Valuesets.size(); i++)
 			{
 				value = constant->values_[i];
+
+				if (!value.IsEmpty())//parse and check the value
+				{
+					SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+					SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(value));
+
+					std::set<string> l_setIDs;
+					l_pcFunction->getVariables(l_setIDs);
+
+					for (auto idCons : l_setIDs)
+					{
+						bool l_bIsValid = false;
+						wxString l_sID;
+
+						for (auto &cons : p_Constants)
+						{
+							if (cons->name_ == idCons)
+							{
+								l_bIsValid = true;
+							}
+						}
+
+						if (!l_bIsValid)
+						{
+							l_sID << idCons;
+							SP_MESSAGEBOX(wxT("the following ids are not correct in the defintion of the constant ") + name + wxT(": ") + l_sID, wxT("Wrong identifier(s) in the constant defintion"), wxOK | wxICON_ERROR);
+							return false;
+						}
+					}
+				}
+
 				int l_nRowCol = l_pcColList1->AppendEmptyRow();
 
 				if(p_Valuesets.size()>0 && i<p_Valuesets.size())
