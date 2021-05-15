@@ -308,7 +308,16 @@ SP_DLG_ExportProperties::SP_DLG_ExportProperties(SP_ExportRoutine* p_pcExport,
 		SP_DS_Graph* l_pcGraph = m_pcDoc->GetGraph();
 
 		//george new consatnts for col pn
-		SP_DS_Metadataclass* mc1 = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		SP_DS_Metadataclass* mc1 = NULL;
+		if (l_pcGraph->GetName().Contains(wxT("Colored")) && l_pcGraph->GetName().Contains(wxT("Fuzzy")))
+		{
+			mc1 = l_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
+		}
+		else
+		{
+			mc1 = l_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+		}
+
 		if ( !mc1->GetElements()->empty() && l_pcGraph->GetName().Contains(wxT("Colored"))  && l_sExporttoANDL==m_pcExport->GetName())
 		{
 			////////////////////////////////////////////////////////////////////////////////////////////////////
