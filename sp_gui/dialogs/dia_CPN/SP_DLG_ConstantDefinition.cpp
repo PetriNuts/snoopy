@@ -1543,6 +1543,7 @@ bool SP_DLG_ConstantDefinition::DoCheckUserInput(const int& p_nRow)
 
 				if (l_Vars.empty())
 				{
+
 					m_mID2Val[l_sName] = l_sValue;
 					l_bOk = true;
 
@@ -1556,7 +1557,8 @@ bool SP_DLG_ConstantDefinition::DoCheckUserInput(const int& p_nRow)
 					{
 						l_bOk = true;
 						string l_s = *it;
-						auto it = m_mID2Val.find(l_s);
+						wxString l_sValString(l_s.c_str(), wxConvUTF8);
+						auto it = m_mID2Val.find(l_sValString);
 						if (it == m_mID2Val.end())
 						{
 							l_bOk = false;
