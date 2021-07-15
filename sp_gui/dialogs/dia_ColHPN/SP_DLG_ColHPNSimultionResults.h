@@ -4,6 +4,7 @@
  * $Version: 0.0 $
  * $Revision: 0.0 $
  * $Date: 6.12.2011
+ * $Updated: by George Assaf: constants harmonizing and supporting observers$
  * Short Description:
  */
  //==============================================================================
@@ -53,7 +54,18 @@ class SP_DLG_ColHPNSimultionResults : public SP_DS_ColoredPNSimulation, public S
 
 		virtual void InitializeEmptyView(SP_DS_Metadata* p_pcView);
 
-		
+		virtual void LoadObservers();//by george
+
+		virtual void  UpdateUnfoldedObservers();//by george
+
+		virtual void  UpdateObservers(const wxString& p_sObsersverType, unsigned int p_nRowCount);//by george
+
+		virtual wxString  SubstituteConstants(const wxString& p_sExpression);
+
+		virtual void ComputeCombinedMatrix(const wxString& p_sObserverBody, std::map<std::string, unsigned int>& p_mapvar2Pos);//by george
+
+		virtual  SP_FunctionPtr RegesterFunctionVariables(const wxString& p_sObserverType, const wxString& p_sObserverName, wxString p_sExpression);//by george
+
 
  protected: 	  
 

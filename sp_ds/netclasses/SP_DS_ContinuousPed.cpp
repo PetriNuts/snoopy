@@ -560,6 +560,15 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcMC->SetGraphic(l_pcGrMeta);
 	l_pcMC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 
+
+	//by george for colored net observers
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TypeAttribute(wxT("ColPNType"), wxT("Col|Place")));
+	l_pcType = dynamic_cast< SP_DS_TypeAttribute* >(l_pcAttr);
+	l_pcType->AddPossibleValue(wxT("Col|Transition"));
+	l_pcType->AddPossibleValue(wxT("Place instance"));
+	l_pcType->AddPossibleValue(wxT("Transition instance"));
+	l_pcType->AddPossibleValue(wxT("Mixed"));
+
     /////////////////////////////////////////////////////////////////////////////////////
 	/***********george constants harmonizing************/
 	//for export to colCPN 

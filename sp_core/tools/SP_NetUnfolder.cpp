@@ -20,7 +20,7 @@
 
 template<typename Repr>
 bool
-SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph, bool evalTokens, bool evalArcInscriptions)
+SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph, bool evalTokens, bool evalArcInscriptions,bool p_bshowLog)
 {
 	if(!p_pcGraph) return false;
 
@@ -45,7 +45,10 @@ SP_AbstractNetUnfolder<Repr>::operator ()(SP_DS_Graph* p_pcGraph, bool evalToken
 			sout << "time for unfolding: " << unfoldTime << "\n";
 			sout << "\nunfolding complete |P|=" << m_UnfoldedNet->nrPlaces() << "|T|=" << m_UnfoldedNet->nrTransitions() << "|A|=" << m_UnfoldedNet->nrArcs() << "\n";
 			wxString l_sMsg = sout.str();
-			SP_LOGMESSAGE(l_sMsg);
+			if (p_bshowLog)//we do not want to show the statistics if the soruce of unfolding is computing observers of unfolded places/trans by george 2021
+			{
+				SP_LOGMESSAGE(l_sMsg);
+			}
 			return true;
 		}
 		catch (const std::exception &exc)

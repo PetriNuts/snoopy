@@ -2,7 +2,8 @@
  * SP_DLG_NewObserverDefinition.h
  *
  *  Created on: 07.05.2017
- *      Author: Patrick Henschel
+ *   Author: Patrick Henschel
+ *   Update : George Assaf
  */
 
 #ifndef SP_DLG_NEWOBSERVERDEFINITION_H_
@@ -46,6 +47,11 @@ class SP_DLG_NewObserverDefinition : public wxDialog
 	std::set<std::string> m_Places;
 	std::set<std::string> m_Transitions;
 
+	std::map<wxString, wxString> m_mObserve2Type;
+	std::set<std::string> m_vUnfoldedTransnames;
+	std::set<std::string>m_vUnfoldedPlacenames;
+	std::set<std::string> m_vAllElements;
+
   private:
 
 	bool SaveData();
@@ -59,13 +65,19 @@ class SP_DLG_NewObserverDefinition : public wxDialog
 	void LoadNodes();
 	void LoadNodeOfType(const wxString& p_sPlaceType, std::set<std::string>& p_names);
 
-	bool DoCheckFunction(const wxString& p_sName, const wxString& p_sType, const wxString& p_sValue);
+	bool DoCheckFunction(const wxString& p_sName, const wxString& p_sType, const wxString& p_sValue,const bool& b_showTip=true);
 
   protected:
 	bool FindString(wxArrayString& p_asStrArray,wxString& p_sValue);
 
 	//checks the user inputs
 	bool CheckInput();
+
+	//by george 2021
+	bool IsConst(const wxString& p_sVar);
+	void UnfoldNet();
+	void OnAssistant(wxCommandEvent& p_cEvent);
+
 
   public:
 

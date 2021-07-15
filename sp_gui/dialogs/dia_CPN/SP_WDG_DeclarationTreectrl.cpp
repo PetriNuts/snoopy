@@ -2881,11 +2881,11 @@ SP_WDG_DeclarationTreectrl::UpdateColorSetTree()
 	GetFirstChild(l_cRootId, l_nCookie);//const
 	wxTreeItemId l_cSecondChild = GetNextChild(l_cRootId, l_nCookie);//color sets
 	wxString itemtext = this->GetItemText(l_cSecondChild);
-	//SP_MESSAGEBOX(itemtext);
+
 	wxTreeItemId l_l_cSecondChild_l_cSecondChild = GetFirstChild(l_cSecondChild, l_nCookie);//simple sets
-	//DeleteChildren(l_cFirstChild);
+
 	wxString itemtext1 = this->GetItemText(l_l_cSecondChild_l_cSecondChild);
-	///SP_MESSAGEBOX(itemtext1);
+
 	DeleteChildren(l_l_cSecondChild_l_cSecondChild);
 
 
@@ -2916,10 +2916,10 @@ SP_WDG_DeclarationTreectrl::UpdateColorSetTree()
 		AppendFileItem(l_l_cSecondChild_l_cSecondChild, l_sName, NULL);
 	}
 
-	//?
+
 	wxTreeItemId l_csecondChild_thirdChild = GetNextChild(l_cSecondChild, l_nCookie);
 	wxString itemtextaprod = this->GetItemText(l_csecondChild_thirdChild);
-	//SP_MESSAGEBOX(itemtextaprod);
+
 	DeleteChildren(l_csecondChild_thirdChild);
 
 	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_STRUCTUREDCOLORSETCLASS);
@@ -2952,7 +2952,7 @@ SP_WDG_DeclarationTreectrl::UpdateColorSetTree()
 
 	wxTreeItemId l_csecondChild_fourth = GetNextChild(l_cSecondChild, l_nCookie);
 	wxString itemtextal= this->GetItemText(l_csecondChild_fourth);
-	//SP_MESSAGEBOX(itemtextal);
+
 	DeleteChildren(l_csecondChild_fourth);
 
 
@@ -2981,14 +2981,10 @@ SP_WDG_DeclarationTreectrl::UpdateColorSetTree()
 
 
 	l_cRootId = GetRootItem();
-	//wxTreeItemId  l_first= GetFirstChild(l_cRootId, l_nCookie);
-	//wxTreeItemId l_cSecondChildfun = GetNextChild(l_first, l_nCookie);
-	//wxTreeItemId l_cSecondChildfun3 = GetNextChild(l_cSecondChildfun, l_nCookie);
 	GetFirstChild(l_cRootId, l_nCookie);
 	GetNextChild(l_cRootId, l_nCookie);
 	wxTreeItemId l_cSecondChildfun3 = GetNextChild(l_cRootId, l_nCookie);
-	//wxString itemtext3 = this->GetItemText(l_cSecondChildfun3);
-	//SP_MESSAGEBOX(itemtext3);
+
 	DeleteChildren(l_cSecondChildfun3);
 	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_FUNCTIONCLASS);
 	if (!l_pcMetadataclass)
@@ -3011,21 +3007,14 @@ SP_WDG_DeclarationTreectrl::UpdateColorSetTree()
 		m_ColorsMap[l_sName] = l_sColors;
 		AppendFileItem(l_cSecondChildfun3, l_sName, NULL);
 	}
-	/////////////////////
+
 	GetFirstChild(l_cRootId,l_nCookie);
 	GetNextChild(l_cRootId,l_nCookie);
 	GetNextChild(l_cRootId,l_nCookie);
 	wxTreeItemId l_cFourthChildvar=GetNextChild(l_cRootId,l_nCookie);
 	DeleteChildren(l_cFourthChildvar);
 
-	////////////////////
-	/*
-	l_cRootId = GetRootItem();
-	wxTreeItemId l_cFourthChildvar = GetNextChild(l_cRootId, l_nCookie);
-	wxString itemtext2= this->GetItemText(l_cFourthChildvar);
-	//SP_MESSAGEBOX(itemtext2);
-	DeleteChildren(l_cFourthChildvar);
-	*/
+
 	l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_CPN_VARIABLECLASS);
 	if (!l_pcMetadataclass)
 		return;
@@ -3047,6 +3036,33 @@ SP_WDG_DeclarationTreectrl::UpdateColorSetTree()
 		AppendFileItem(l_cFourthChildvar, l_sName, NULL);
 	}
 
+    //observers parent node
+
+	    GetFirstChild(l_cRootId,l_nCookie);
+		GetNextChild(l_cRootId,l_nCookie);
+		GetNextChild(l_cRootId,l_nCookie);
+		GetNextChild(l_cRootId,l_nCookie);
+		wxTreeItemId l_cFifthChildobserver1=GetNextChild(l_cRootId,l_nCookie);
+		DeleteChildren(l_cFifthChildobserver1);
+		 //SP_MESSAGEBOX(this->GetItemText(l_cFifthChildobserver1));
+
+
+		l_pcMetadataclass = l_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+		if (l_pcMetadataclass)
+		{
+			SP_ListMetadata::const_iterator l_itElem;
+			for (l_itElem = l_pcMetadataclass->GetElements()->begin();
+				l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+			{
+				SP_DS_Metadata* l_pcMetadata = *l_itElem;
+				wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+				wxString l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
+				m_ColorsMap[l_sName] = l_sName + wxT(": ") + l_sBody;
+				AppendFileItem(l_cFifthChildobserver1, l_sName + wxT(" = ") + l_sBody, NULL);
+			}
+		}
+
+	/*******************************************************/
 
 	//update the real color of a place
 	SP_GUI_Canvas *l_cCanvas = NULL;

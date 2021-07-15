@@ -103,6 +103,8 @@ protected:
 	    //Check if we need to update the simulation dialog
 	    virtual void UpdateSimulationDialog(const unsigned long& p_nGeneratedResultPointCount);
 
+	    virtual void SwitchResultMatrix(const bool& p_bIsRate = true);//by george
+
 	    virtual void LoadColAuxResults(){}
 
 	    virtual void UpdateViewer(SP_DS_Metadata* p_pcView = nullptr);

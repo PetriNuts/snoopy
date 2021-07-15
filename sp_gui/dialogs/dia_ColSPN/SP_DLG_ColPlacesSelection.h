@@ -4,6 +4,8 @@
 // $Version: 0.0 $
 // $Revision: 1.0 $
 // $Date: 2011/08/11 11:20:00 $
+// $Modified by:GEorge Assaf$
+// $Modification Date: 02.02.2021$
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 
@@ -36,9 +38,25 @@ private:
 	vector<wxString>* m_pvUnfoldedTrans;
 	vector<wxString>* m_pvColoredTrans;
 
+
+	//by george
+	vector<wxString>* m_pvUnfoldedPlaceObserver;
+	vector<wxString>* m_pvColoredPlaceObserver;
+	vector<wxString>* m_pvUnfoldedTransObserver;
+	vector<wxString>* m_pvColoredTransObserver;
+	vector<wxString>* m_pvMixedObserver;//observers over anything
+
+
+	//by george for obserevrs
+	vector<wxString> m_bUnfoldedTransObservers;
+	vector<wxString> m_bUnfoldedPlacesObservers;
+
 	map<wxString,long> m_mColPlaceName2ID;
 	map<wxString,long> m_mColTransName2ID;
 
+	//by george 9.2.21
+	map<wxString, long> m_mColPlaceObserverName2ID;
+	map<wxString, long> m_mColTransObserverName2ID;
 
   
 public:

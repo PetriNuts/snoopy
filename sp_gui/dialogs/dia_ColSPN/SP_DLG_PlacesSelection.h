@@ -74,13 +74,31 @@ protected:
 	wxArrayString m_ArrayUnTranstions;
 	wxArrayString m_ArrayColTransitions;
 
+	//both arrays not used anymore todo:delete
 	wxArrayString m_ArrayPlaceAuxVar;
 	wxArrayString m_ArrayTransAuxVar;	
+
+
+	//by george 9.2.21: for observers
+	wxArrayString m_ArrayUnPlacesObserver;
+	wxArrayString m_ArrayColPlacesObserver;
+	wxArrayString m_ArrayUnTransObserver;
+	wxArrayString m_ArrayColTransObserver;
+	wxArrayString m_ArrayMixedObservers;
 
 	map<long, wxString> m_mPlaceID2Name;
 	map<wxString,long> m_mPlaceName2ID;
 	map<long, wxString> m_mTransID2Name;
 	map<wxString,long> m_mTransName2ID;
+
+
+	//by george 9.2.21:for observers
+	map<long, wxString> m_mPlaceObserverID2Name;
+	map<wxString, long> m_mPlaceObserverName2ID;
+	map<long, wxString> m_mTransObserverID2Name;
+	map<wxString, long> m_mTransObserverName2ID;
+	map<wxString, long> m_mMixedObserverName2ID;
+
 
 	wxString m_sNodeType;
 

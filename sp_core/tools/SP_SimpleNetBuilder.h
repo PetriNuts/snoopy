@@ -70,6 +70,7 @@ private:
 	  bool CreateFunctions(dssd::andl::simple_net_builder& b);
 	  bool CreateObservers(dssd::andl::simple_net_builder& b);
 	  void PrePareMarkingString(wxString& p_sMarkingExpression,wxString& p_sOutput);
+	  bool IsConstantName(wxString p_sConstId);
 private:
 	bool m_bIsExport;
 

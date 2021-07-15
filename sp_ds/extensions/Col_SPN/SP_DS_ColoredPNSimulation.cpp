@@ -8,6 +8,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "sp_ds/extensions/SP_DS_Simulation.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColoredPNSimulation.h"
+#include "sp_core/tools/SP_NetUnfolder.h"
 
 SP_DS_ColoredPNSimulation::SP_DS_ColoredPNSimulation(SP_DS_ColPN_Unfolding* p_pcUnfoldedNet)
 :m_pcUnfoldedNet(p_pcUnfoldedNet)
@@ -142,4 +143,20 @@ bool SP_DS_ColoredPNSimulation::LoadUnfoldedPlaces()
 
 	return true;
 
+}
+
+
+dssd::andl::Net_ptr SP_DS_ColoredPNSimulation::CreateANDLNet(SP_DS_Graph* p_pcGraph, bool p_bshowLog)
+{
+	if (p_pcGraph == NULL)
+		return NULL;
+
+//	SP_SimpleNetBuilder builder;
+	SP_IddNetUnfolder unfolder;
+	if (unfolder(p_pcGraph,false,false,p_bshowLog))
+
+	 {
+		return unfolder.GetUnfoldedNet();
+	 }
+	 return NULL;
 }

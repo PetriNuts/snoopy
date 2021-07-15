@@ -96,6 +96,8 @@ protected:
 
 	virtual void UpdateSimulationMatrix(SP_DS_Metadata* p_pcView = nullptr);
 
+	virtual void ObtainSimulationMatrix(const bool& p_bIsUpdateRateMatrix = false);//by george
+
 	virtual void InitializeEmptyView(SP_DS_Metadata* p_pcView);
 
 	virtual void LoadNetInformation();
@@ -117,6 +119,7 @@ protected:
 	virtual void DoStartSimulation();
 
 	virtual wxString GetEdgeWeight(SP_DS_Edge* p_pcEdge);
+
 	virtual bool IsConstantArcWeight(const wxString& p_sWeight, double& p_nReturnValue);
 
 	bool   IsEvaluatedArcWeight(const wxString& p_sArcWeight, double& p_dVal);//bug fix:george
@@ -142,8 +145,7 @@ protected:
     //load fixed flags for continuous places
     virtual void LoadFixedFlag();
 
-    //re-assign the chosen synchroniser, sometimes re-initialising the hpn sim cause snoopy crash, this insure to prevent this case
-    virtual void SetSynchroType();//by george
+
 
 public:
 

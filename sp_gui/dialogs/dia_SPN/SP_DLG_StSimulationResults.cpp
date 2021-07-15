@@ -1155,6 +1155,50 @@ void SP_DLG_StSimulationResults::UpdateSimulationMatrix(SP_DS_Metadata* p_pcView
 }
 
 
+void SP_DLG_StSimulationResults::ObtainSimulationMatrix(const bool& p_bIsUpdateRateMatrix )
+{
+
+	unsigned int l_nColCount = 0;
+
+	if (p_bIsUpdateRateMatrix)
+	{
+		//rate
+		m_anResultMatrix = m_pcMainSimulator->GetRateResultMatrix();
+
+		l_nColCount = m_pcMainSimulator->GetTransitionCount();
+	}
+	else
+	{
+		//marking
+		m_anResultMatrix = m_pcMainSimulator->GetResultMatrix();
+
+		l_nColCount = m_pcMainSimulator->GetPlaceCount();
+	}
+
+	if (m_pcWorkerThread->GetRunCount() > 1)
+	{
+		double l_nRunCount = (double)(m_pcWorkerThread->GetCurrentRunCount());
+
+		//we need to account for the current run
+		if (m_pcMainSimulator->IsSimulationRunning())
+		{
+			l_nRunCount += 1;
+		}
+
+		//get the average values
+		for (unsigned int l_nRow = 0; l_nRow < m_anResultMatrix.size(); l_nRow++)
+			for (unsigned int l_nCol = 0; l_nCol < l_nColCount; l_nCol++)
+			{
+				m_anResultMatrix[l_nRow][l_nCol] /= l_nRunCount;
+			}
+
+	}
+
+
+	UpdateXAxisValues();
+}
+
+
 bool SP_DLG_StSimulationResults::ComputeAuxiliaryVars()
 {
 

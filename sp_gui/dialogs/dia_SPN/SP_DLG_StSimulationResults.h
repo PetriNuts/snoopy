@@ -56,6 +56,8 @@ protected:
 
 	void UpdateSimulationMatrix(SP_DS_Metadata* p_pcView = nullptr);
 
+	void ObtainSimulationMatrix(const bool& p_bIsUpdateRateMatrix = false);//by george for gettin a certain simulation result
+
 	virtual void InitializeEmptyView(SP_DS_Metadata* p_pcView);
 
 	virtual void UpdateXAxisValues();

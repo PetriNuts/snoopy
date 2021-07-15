@@ -436,6 +436,14 @@ SP_DS_SimplePed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr, wxT("//%")));
 	l_pcGrAttr->SetShow(false);
 
+	//by george, for colored net observers
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TypeAttribute(wxT("ColPNType"), wxT("Col|Place")));
+	l_pcType = dynamic_cast< SP_DS_TypeAttribute* >(l_pcAttr);
+	l_pcType->AddPossibleValue(wxT("Col|Transition"));
+	l_pcType->AddPossibleValue(wxT("Place instance"));
+	l_pcType->AddPossibleValue(wxT("Transition instance"));
+	l_pcType->AddPossibleValue(wxT("Mixed"));
+
 	l_pcGrMeta = new SP_GR_MetaComposite(l_pcMC->GetPrototype());
 	l_pcGrMeta->SetFixedSize(true);
 	l_pcGrMeta->SetDefaultPen(wxThePenList->FindOrCreatePen(wxColour(255, 255, 255), 1));

@@ -1461,82 +1461,8 @@ void SP_DLG_ColFHPNSimulationResults::DirectExportToCSV()
 	if (!m_pcExport)
 		return;
 
-	const SP_Vector2DDouble& l_aanPLResults = m_pcMainSimulator->GetResultMatrix();
-	const SP_Vector2DDouble& l_aanTRResults = m_pcMainSimulator->GetRateResultMatrix();
-	wxString l_sSpacer = GetSpacer(m_nExportSpacer);
-	wxString l_sCurrentRow, l_sOutput;
-
-	SP_DS_Attribute* l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("Nodeclass"));
-	CHECK_POINTER(l_pcAttribute, return);
-	wxString l_sElementType = l_pcAttribute->GetValueString();
-
-	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*> (m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo")));
-	CHECK_POINTER(l_pcCurveInfoList, return);
-
-	for (unsigned long l_nRow = 0; l_nRow < m_pcMainSimulator->GetGeneratedResultPointsCount(); l_nRow++)
-	{
-		l_sOutput = wxT("");
-
-		double l_nTime = m_pcMainSimulator->GetOutputStartPoint() + m_pcMainSimulator->GetOutputSampleSize() * l_nRow;
-
-		l_sOutput << dssd::aux::toString(l_nTime);
-		l_sCurrentRow = wxT("");
-
-		for (unsigned int l_n = 0; l_n < l_pcCurveInfoList->GetRowCount(); l_n++)
-		{
-			wxString l_sPos = l_pcCurveInfoList->GetCell(l_n, 0);
-			long l_nPos;
-			if (!l_sPos.ToLong(&l_nPos))
-				return;
-			wxString l_sOutType = l_pcCurveInfoList->GetCell(l_n, 1);
-			wxString l_sCheckState = l_pcCurveInfoList->GetCell(l_n, 2);
-			if (l_sCheckState != wxT("1"))
-				continue;
-			wxString l_sName = l_pcCurveInfoList->GetCell(l_n, 6);
-
-			double l_dResult = 0;
-			if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Place"))) //unfolded place
-			{
-				l_dResult = l_aanPLResults[l_nRow][l_nPos];
-			}
-			else if (l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Place")))//colored  place
-			{
-				l_dResult = m_aanColPlaceResults[l_nRow][l_nPos];
-			}
-			else if (l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Place"))) //unfolded place
-			{
-				l_dResult = m_aanAuxPLVarsResults[l_nRow][l_nPos];
-			}
-
-
-			else if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Transition"))) //unfolded place
-			{
-				l_dResult = l_aanTRResults[l_nRow][l_nPos];
-			}
-
-			else if (l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Transition"))) //unfolded place
-			{
-				l_dResult = m_aanColTransResults[l_nRow][l_nPos];
-			}
-
-			else if (l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Transition"))) //unfolded place
-			{
-				l_dResult = m_aanAuxTRVarsResults[l_nRow][l_nPos];
-			}
-			else
-			{
-				continue;
-			}
-
-			//write 
-			l_sCurrentRow << l_sSpacer;
-			l_sCurrentRow << wxString::Format(wxT("%.16g"), l_dResult);
-		}
-
-		l_sOutput << l_sCurrentRow;
-		(*m_pcExport) << l_sOutput << wxT("\n");
-	}
-
+	SP_DLG_FHybridSimulationResults::DirectExportToCSV();
+		return;
 }
 
 

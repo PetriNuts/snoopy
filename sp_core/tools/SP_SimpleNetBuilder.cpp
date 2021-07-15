@@ -303,6 +303,36 @@ bool SP_SimpleNetBuilder::CreateTransitions(dssd::andl::simple_net_builder& b)
 	return TRUE;
 }
 
+
+bool SP_ColoredNetBuilder::IsConstantName(wxString p_sConstId)
+{
+	if (!m_pcGraph)
+		return false;
+
+	wxString l_sMetaClass;
+	if (m_pcGraph->GetNetclass()->GetName().Contains(wxT("Fuzzy")))
+	{
+	 l_sMetaClass = SP_DS_META_CONSTANT;
+	}
+	else
+	{
+	 l_sMetaClass = SP_DS_CPN_CONSTANT_HARMONIZING;
+	}
+
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(l_sMetaClass);
+	SP_ListMetadata::const_iterator it;
+
+	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+	 {
+
+			SP_DS_Metadata* l_pcConstant = *it;
+			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+			if (l_sName == p_sConstId) return true;
+	 }
+
+	return false;
+}
+
 bool SP_SimpleNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b)
 {
 	// for the new constants
@@ -1025,6 +1055,8 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 			wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();
 			wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
 			SP_DS_ColListAttribute * l_pcSourceColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+
+			wxString l_sVal=l_pcSourceColList->GetCell(0, 1);
 			if (i == 0) {
 
 				for (unsigned i = 0; i < l_pcSourceColList->GetRowCount(); ++i)
@@ -1042,10 +1074,30 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 
 			}
 
+			//on 11.4.21
 			SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
 
-
 			SP_DS_FunctionRegistryEntry l_FE = l_pcFR->lookUpFunction(l_sName);
+
+			SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sVal));
+			std::set<std::string> l_vIds;
+			l_pcFunction->getVariables(l_vIds);
+			wxString l_sinvalidIds;
+			bool l_bIsValid = true;
+			for (auto con : l_vIds)
+			{
+				wxString l_sCons = con;
+				if (!IsConstantName(l_sCons))
+				{
+					l_sinvalidIds << con << wxT(", ");
+					l_bIsValid = false;
+				}
+			}
+			if (!l_bIsValid)
+			{
+				SP_MESSAGEBOX(wxT("the following ids are not correct in the defintion of the constant ")+ l_sName +wxT(": ")+ l_sinvalidIds, wxT("Wrong identifier(s) in the constant defintion"), wxOK | wxICON_ERROR);
+				continue;
+			}
 			if (l_FE.IsOk())
 			{
 				SP_FunctionPtr l_Function = l_FE.getFunction();
@@ -1168,6 +1220,21 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 			wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 			wxString l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcConstant->GetAttribute(wxT("Type")))->GetValue();///Added by G.A
 
+			if (l_sType == wxT("TFN"))// it is not identified by the parser
+			{
+				wxString l_sGroup = dynamic_cast<SP_DS_TextAttribute*>(l_pcConstant->GetAttribute(wxT("Group")))->GetValue();
+				SP_DS_ColListAttribute * l_pcSourceColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcConstant->GetAttribute(wxT("ValueList")));
+
+				wxString l_sVal = l_pcSourceColList->GetCell(0, 1);
+				l_sVal = l_sVal.AfterFirst(',');
+				l_sVal = l_sVal.BeforeLast(',');
+				auto type = dssd::andl::ConstType::DOUBLE_T;
+				std::vector<std::string> values = { l_sVal };// { l_sConstVal };
+				auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);//l_sGroup was "param"
+				b.addConstant(c);
+				continue;
+			}
+
 			SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
 
 			wxString l_sConstVal;
@@ -1176,12 +1243,19 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 			{
 				SP_FunctionPtr l_Function = l_FE.getFunction();
 				long l_nValue = 0;
+				double l_dValue=0.0;
 				if (l_Function->isValue())
 				{
+					if (l_sType == wxT("int"))
+					{
 					l_nValue = l_Function->getValue();
-
-				
 					l_sConstVal << l_nValue;
+					}
+					else if(l_sType == wxT("double"))
+					{
+						l_dValue=l_Function->getValue();
+						l_sConstVal << l_nValue;
+					}
  
 				}
 				else
@@ -1191,17 +1265,17 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 					if (l_sType == wxT("int"))
 					{
 						l_nValue = SP_DS_FunctionEvaluatorLong{ l_pcFR, l_Function }();
-						//wxString l_sConstVal;
 						l_sConstVal << l_nValue;
  
 
 					}
 					else if (l_sType == wxT("double"))
 					{
-						l_nValue = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
-						l_sConstVal << l_nValue;
+						double ld_val;
+						ld_val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
+						l_sConstVal << ld_val;
 					}
-					//l_pcFR->registerFunction(l_sName, to_string(l_nValue));
+
 				}
 
 				auto type = dssd::andl::ConstType::INT_T;
@@ -1237,75 +1311,7 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 		}
 
 	}
-	/***************************************/
 
-	/**
-	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);
-	if(!l_pcMetadataclass)
-		return false;
-
-	if(l_pcMetadataclass->GetElements()->empty())
-		return false;
-
-	SP_DS_Metadata* l_pcNewMetadata = l_pcMetadataclass->GetElements()->front();
-
-	SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*> (l_pcNewMetadata->GetAttribute(wxT("ConstantList")));
-	if(!l_pcColList)
-		return false;
-
-	for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
-	{
-		std::string name = l_pcColList->GetCell(i,0);
-		wxString l_sType = l_pcColList->GetCell(i,1);
-		std::string value = l_pcColList->GetCell(i,2);
-		auto type = dssd::andl::ConstType::INT_T;
-		if(l_sType == wxT("double"))
-		{
-			type = dssd::andl::ConstType::DOUBLE_T;
-		}
-		else if(l_sType != "int")
-		{
-			continue;
-		}
-		std::vector<std::string> values = {value};
-		auto c = std::make_shared<dssd::andl::Constant>(type, name, "all", values);
-		b.addConstant(c);
-	}
-
-
-	SP_DS_Nodeclass* l_pcNC = m_pcGraph->GetNodeclass(SP_DS_PARAM);
-	if(l_pcNC)
-	{
-		if(!l_pcNC->GetElements()->empty())
-		{
-			SP_DS_Node* l_pcNode = l_pcNC->GetElements()->front();
-			SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("ParameterList")));
-			if(l_pcColList->GetRowCount() > 1)
-			{
-				for (unsigned i = 0; i < l_pcColList->GetRowCount(); ++i)
-				{
-					wxString valueSet = SP_NormalizeString(l_pcColList->GetCell(i,0));
-					b.registerValueSet(valueSet.ToStdString());
-				}
-			}
-		}
-		for(SP_DS_Node* l_pcNode : *l_pcNC->GetElements())
-		{
-			auto type = dssd::andl::ConstType::DOUBLE_T;
-			std::string name = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-			SP_DS_ColListAttribute* l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("ParameterList")));
-			std::vector<std::string> values;
-			values.reserve(l_pcColList->GetRowCount());
-			for (unsigned i = 0; i < l_pcColList->GetRowCount(); ++i)
-			{
-				std::string l_sValue = l_pcColList->GetCell(i, 1);
-				values.push_back(l_sValue);
-			}
-			auto c = make_shared<dssd::andl::Constant>(type, name, "param", values);
-			b.addConstant(c);
-		}
-	}
-	*/
 	return TRUE;
 }
 

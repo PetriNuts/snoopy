@@ -38,6 +38,7 @@ class  SP_DLG_ColStSimulationResults : public SP_DS_ColoredPNSimulation, public 
 
 
       virtual void InitializeEmptyView(SP_DS_Metadata* p_pcView);
+      virtual void UpdateUnfoldedObservers();//by george
 
 protected:
 
@@ -49,6 +50,8 @@ protected:
        spsim::ConnectionType GetConnectionType(const wxString& p_sConnectionType);
 
        spsim::TransitionType GetTransitionType(const wxString& p_sTransitionType);
+
+ 	  virtual  SP_FunctionPtr RegesterFunctionVariables(const wxString& p_sObserverType,const wxString& p_sObserverName, wxString p_sExpression);//by george
 
 protected :
 	   DECLARE_EVENT_TABLE()
@@ -84,7 +87,13 @@ protected :
 
 	  virtual void UpdateXAxisValues();
 
-	  bool IsConstantArcWeight(const wxString& p_sWeight, double& p_nReturnValue);
+	  virtual void UpdateObservers(const wxString& p_sType, unsigned int p_nRowCount);//by george
+
+	  virtual void LoadObservers();//by george
+
+	  wxString SubstituteConstants(const wxString& p_sExp);
+
+	  virtual void  ComputeCombinedMatrix(const wxString& p_sObserverBody,std::map<std::string,unsigned int>& p_mapvar2Pos);//by george
 	 
   public:
 	DECLARE_CLASS( SP_DLG_ColStSimulationResults )

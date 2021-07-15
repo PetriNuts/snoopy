@@ -5,6 +5,7 @@
  * $Revision: 0.0 $
  * $Date: 31.5.2010
  * @Description
+ * @Modified George Assaf 25.01.2020 constants harmonizing and supporting observers
  * Simulation result dialog for Continuous PN
  */
  //======================================================================================
@@ -46,6 +47,20 @@ private:
 	    virtual void SaveODE(wxCommandEvent& p_cEvent);
 
 	     virtual void LoadColAuxResults();
+
+	     virtual wxString  SubstituteConstants(const wxString& p_sExpression);
+
+	 	virtual void LoadObservers();//by george
+
+	 	 virtual void LoadResults();//by george
+
+		 virtual void UpdateObservers(const wxString& p_sType, unsigned int p_nRowCount);//by george
+
+		 virtual void  ComputeCombinedMatrix(const wxString& p_sObserverBody, std::map<std::string, unsigned int>& p_mapvar2Pos);//by george
+
+		 virtual void UpdateUnfoldedObservers();//by george
+
+		 virtual  SP_FunctionPtr RegesterFunctionVariables(const wxString& p_sObserverType, const wxString& p_sObserverName, wxString p_sExpression);//by george
 
 	     virtual void InitializeEmptyView(SP_DS_Metadata* p_pcView);
 

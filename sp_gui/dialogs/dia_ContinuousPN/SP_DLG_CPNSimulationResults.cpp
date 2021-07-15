@@ -984,7 +984,14 @@ void SP_DLG_CPNSimulationResults::DirectExportToCSV()
 void SP_DLG_CPNSimulationResults::SaveODE(wxCommandEvent& p_cEvent)
 {
 	wxFFile l_File;
-	wxFileName fn = wxFileName(wxT("parsed-ode.txt"));
+
+	wxString l_sfileName = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetParentDoc()->GetFilename().BeforeLast('.');
+	if(l_sfileName!=wxT(""))
+	   l_sfileName << wxT("-parsed-ode.txt");
+	else
+		l_sfileName << wxT("Unnamed-parsed-ode.txt");
+
+	wxFileName fn = wxFileName(l_sfileName);
 	wxString l_sOutName;
 	wxString l_sSelName;
 	wxString l_sSelDir;
@@ -1033,6 +1040,7 @@ void SP_DLG_CPNSimulationResults::SaveODE(wxCommandEvent& p_cEvent)
 		l_sResult << (dynamic_cast<spsim::ContinuousSimulator*>(m_pcMainSimulator))->GetPlaceODEString(l_nPlacePos) << wxT("\n\n");
 	}
 
+
 	//after the simulator is initialized, it will automatically set running. Therefore we need to stop it here
 	m_pcMainSimulator->AbortSimulation();
 
@@ -1044,6 +1052,8 @@ void SP_DLG_CPNSimulationResults::SaveODE(wxCommandEvent& p_cEvent)
 	if (l_File.Close())
 		return;
 }
+
+
 
 void SP_DLG_CPNSimulationResults::LoadTransitions()
 {
@@ -1330,6 +1340,21 @@ void SP_DLG_CPNSimulationResults::UpdateViewer(SP_DS_Metadata* p_pcView)
 	UpdateSimulationMatrix(p_pcView);
 
 }
+
+void SP_DLG_CPNSimulationResults::SwitchResultMatrix(const bool& p_bIsRate  )
+{
+	if (p_bIsRate)
+	{
+		//rate
+		m_anResultMatrix = m_pcMainSimulator->GetRateResultMatrix();
+	}
+	else
+	{
+		//marking
+		m_anResultMatrix = m_pcMainSimulator->GetResultMatrix();
+	}
+}
+
 
 void SP_DLG_CPNSimulationResults::UpdateSimulationMatrix(SP_DS_Metadata* p_pcView)
 {

@@ -886,37 +886,82 @@ spsim::Simulator* SP_DLG_HybridSimulationResults::CreateSimulator(const int& p_n
 
 void SP_DLG_HybridSimulationResults::OnTimeSyncTypeChanged(wxCommandEvent& p_cEven)
 {
+
 	if (m_pcMainSimulator->IsSimulationRunning())
-	{
-		return;
-	}
+		{
+			return;
+		}
+
 
 	int l_nMethodType = m_pcTimeSyncComboBox->GetSelection();
 
-	//Store properties of the old one
-	spsim::Simulator* l_pcNewSimulator = CreateSimulator(l_nMethodType);
+		//bugfix by george 18.1.21
+		if (l_nMethodType == 4 || l_nMethodType == 0||
+			l_nMethodType == 1|| l_nMethodType == 3||
+			l_nMethodType == 2)
+		{
+			spsim::Simulator* l_pcNewSimulator =CreateSimulator(l_nMethodType);//dynamicCreateSimulator(l_nMethodType);
 
-	m_bIsSimulatorInitialized = false;
 
-	//copy old setting
-	l_pcNewSimulator->CopySettingFrom(m_pcMainSimulator);
+			l_pcNewSimulator->SetOutputEndPoint(m_pcMainSimulator->GetOutputEndPoint());
+			l_pcNewSimulator->SetOutputStartPoint(m_pcMainSimulator->GetOutputStartPoint());
+			l_pcNewSimulator->SetOutputSampleSize(m_pcMainSimulator->GetOutputSampleSize());
+			l_pcNewSimulator->SetPlaceCount(m_pcMainSimulator->GetPlaceCount());
+			l_pcNewSimulator->SetTransitionCount(m_pcMainSimulator->GetTransitionCount());
+			l_pcNewSimulator->SetPlaceNames(*m_pcMainSimulator->GetPlaceNames());
+			wxDELETE(m_pcMainSimulator);
+			m_pcMainSimulator = l_pcNewSimulator;
 
-	wxDELETE(m_pcMainSimulator);
-	m_pcMainSimulator = l_pcNewSimulator;
+			m_pcWorkerThread->SetSimulator(m_pcMainSimulator);
 
-	m_pcWorkerThread->SetSimulator(m_pcMainSimulator);
+			AddGuiOption2Simulator();
 
-	AddGuiOption2Simulator();
+			//change the current ODE solver
+			int l_nSolverIndex = m_pcContinuousSolver->GetSelection();
 
-	//change the current ODE solver
-	int l_nSolverIndex = m_pcContinuousSolver->GetSelection();
+			//change the ODE simulator
+			spsim::HybridSimulator* l_pcHybridSimulator = dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator);
 
-	//change the ODE simulator
-	spsim::HybridSimulator* l_pcHybridSimulator = dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator);
+			CHECK_POINTER(l_pcHybridSimulator, return);
 
-	CHECK_POINTER(l_pcHybridSimulator, return);
+			l_pcHybridSimulator->SetODESolver((spsim::ODESolverType) (l_nSolverIndex));
+			return;
+		}
 
-	l_pcHybridSimulator->SetODESolver((spsim::ODESolverType) (l_nSolverIndex));
+
+
+		//Store properties of the old one
+		spsim::Simulator* l_pcNewSimulator = CreateSimulator(l_nMethodType);
+
+
+
+		m_bIsSimulatorInitialized = false;
+
+		if (l_nMethodType == 5)//george 18.1.21
+		{
+			(dynamic_cast<spsim::StochasticSimulator*>(l_pcNewSimulator))->CopySettingFrom(m_pcMainSimulator);
+		}
+		else
+		{
+		l_pcNewSimulator->CopySettingFrom(m_pcMainSimulator);
+		}
+
+		wxDELETE(m_pcMainSimulator);
+		m_pcMainSimulator = l_pcNewSimulator;
+
+		m_pcWorkerThread->SetSimulator(m_pcMainSimulator);
+
+		AddGuiOption2Simulator();
+
+		//change the current ODE solver
+		int l_nSolverIndex = m_pcContinuousSolver->GetSelection();
+
+		//change the ODE simulator
+		spsim::HybridSimulator* l_pcHybridSimulator = dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator);
+
+		CHECK_POINTER(l_pcHybridSimulator, return);
+
+		l_pcHybridSimulator->SetODESolver((spsim::ODESolverType) (l_nSolverIndex));
 }
 
 void SP_DLG_HybridSimulationResults::ChangeODESolver()
@@ -1189,16 +1234,57 @@ void SP_DLG_HybridSimulationResults::UpdateSimulationMatrix(SP_DS_Metadata* p_pc
 
 	UpdateXAxisValues();
 }
+
+void SP_DLG_HybridSimulationResults::ObtainSimulationMatrix(const bool& p_bIsUpdateRateMatrix )
+{
+	unsigned int l_nColCount = 0;
+
+	if (p_bIsUpdateRateMatrix)
+	{
+		//rate
+		m_anResultMatrix = m_pcMainSimulator->GetRateResultMatrix();
+
+		l_nColCount = m_pcMainSimulator->GetTransitionCount();
+	}
+	else
+	{
+		//marking
+		m_anResultMatrix = m_pcMainSimulator->GetResultMatrix();
+
+		l_nColCount = m_pcMainSimulator->GetPlaceCount();
+	}
+
+	if (m_pcWorkerThread->GetRunCount() > 1)
+	{
+		double l_nRunCount = (double)(m_pcWorkerThread->GetCurrentRunCount());
+
+		//we need to account for the current run
+		if (m_pcMainSimulator->IsSimulationRunning())
+		{
+			l_nRunCount += 1;
+		}
+
+		//get the average values
+		for (unsigned int l_nRow = 0; l_nRow < m_anResultMatrix.size(); l_nRow++)
+			for (unsigned int l_nCol = 0; l_nCol < l_nColCount; l_nCol++)
+			{
+				m_anResultMatrix[l_nRow][l_nCol] /= l_nRunCount;
+			}
+
+	}
+
+
+
+	UpdateXAxisValues();
+}
+
 bool SP_DLG_HybridSimulationResults::InitializeSimulator()
 {
 	double l_nOutputEndPoint = 0;
 	double l_nOutputStartPoint;
 	long l_nLong0;
 
-	//added by george, to create the simulator object, insure reset all the vectors before re-initialising
-	LoadSimulatorProperties();
-	ChangeODESolver();
-	SetSynchroType();
+
 
 	if (m_pcIntervalEndTextCtrl->GetValue().ToDouble(&l_nOutputEndPoint) && l_nOutputEndPoint > 0)
 	{
@@ -1244,7 +1330,7 @@ bool SP_DLG_HybridSimulationResults::InitializeSimulator()
 		return false;
 	}
 
-	if (!m_bIsSimulatorInitialized || m_bIsSimulatorInitialized)//george; re-initialize any way for reloading parameters in COL HPN after chainging the value set of COLHPN
+	if (!m_bIsSimulatorInitialized )
 	{
 		wxBusyInfo l_Info(wxT("Loading data, please wait...."), this);
 		//Parameters
@@ -1906,8 +1992,18 @@ void SP_DLG_HybridSimulationResults::SaveODESolverProperties()
 	    int l_nCount = 0;
 
 	    //get the ODE solver
-		spsim::Simulator* l_pcODESolver = ((dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))
-											 ->GetContinuousSimulator());
+		//spsim::Simulator* l_pcODESolver = ((dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))
+									//		 ->GetContinuousSimulator());
+
+		//bugfix by george 18.1.21
+		spsim::ContinuousSimulator* l_pcODESolver;
+		int l_nMethodType = m_pcTimeSyncComboBox->GetSelection();
+
+		if(l_nMethodType!=5)//not possible to get cont sim from stoch one!
+		l_pcODESolver = ((dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))
+							 ->GetContinuousSimulator());
+
+		CHECK_POINTER(l_pcODESolver, return);
 
 	    //save simulator properties
 	    l_pcAttr = l_pcSimProp->GetAttribute(wxT("ODE Solver properties"));
@@ -1935,37 +2031,4 @@ void SP_DLG_HybridSimulationResults::SaveODESolverProperties()
 	    }
 }
 
-void SP_DLG_HybridSimulationResults::SetSynchroType()
-{
-	if (m_pcMainSimulator->IsSimulationRunning())
-	{
-		return;
-	}
 
-   int l_nMethodType = m_pcTimeSyncComboBox->GetSelection();
-
-   //Store properties of the old one
-   spsim::Simulator* l_pcNewSimulator = CreateSimulator(l_nMethodType);
-
-   m_bIsSimulatorInitialized = false;
-
-   //copy old setting
-   l_pcNewSimulator->CopySettingFrom(m_pcMainSimulator);
-
-  wxDELETE(m_pcMainSimulator);
-  m_pcMainSimulator = l_pcNewSimulator;
-
-  m_pcWorkerThread->SetSimulator(m_pcMainSimulator);
-
-   AddGuiOption2Simulator();
-
-  //change the current ODE solver
-  int l_nSolverIndex = m_pcContinuousSolver->GetSelection();
-
-  //change the ODE simulator
-  spsim::HybridSimulator* l_pcHybridSimulator = dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator);
-
-  CHECK_POINTER(l_pcHybridSimulator, return);
-
-  l_pcHybridSimulator->SetODESolver((spsim::ODESolverType) (l_nSolverIndex));
-}

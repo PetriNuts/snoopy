@@ -34,6 +34,13 @@
 #include <wx/busyinfo.h>
 #include <wx/textdlg.h>
 
+
+//by george
+#include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ColorSetClass.h"
+#include "sp_core/tools/SP_NetUnfolder.h"
+#include "sp_gui/dialogs/dia_SPN/SP_DLG_StFunctionAssistent.h"
+#include "sp_utilities.h"
+
 IMPLEMENT_CLASS( SP_DLG_NewObserverDefinition, wxDialog)
 
 enum
@@ -51,6 +58,8 @@ enum
 	SP_ID_BUTTON_DELETE,
 	SP_ID_BUTTON_CHECK,
 	SP_ID_GRID_MARKING,
+	SP_ID_BUTTON_OBSERVER_ASSISTANT
+
 };
 BEGIN_EVENT_TABLE( SP_DLG_NewObserverDefinition, wxDialog )
 
@@ -60,6 +69,7 @@ EVT_BUTTON( SP_ID_BUTTON_ADD, SP_DLG_NewObserverDefinition::OnAddSet )
 EVT_BUTTON( SP_ID_BUTTON_CHECK, SP_DLG_NewObserverDefinition::OnCheckFunction )
 EVT_BUTTON( wxID_APPLY, SP_DLG_NewObserverDefinition::OnDlgApply )
 EVT_BUTTON( SP_ID_BUTTON_DELETE, SP_DLG_NewObserverDefinition::OnDeleteSet )
+EVT_BUTTON(SP_ID_BUTTON_OBSERVER_ASSISTANT, SP_DLG_NewObserverDefinition::OnAssistant)
 
 #if wxABI_VERSION > 30000
     EVT_GRID_CELL_CHANGED(SP_DLG_NewObserverDefinition::OnGridCellValueChanged )
@@ -101,11 +111,13 @@ SP_DLG_NewObserverDefinition::SP_DLG_NewObserverDefinition(wxWindow* p_pcParent,
 
 	m_pcObserverSetGrid->EnableEditing(true);
 	m_pcObserverSetGrid->SetSelectionMode(wxGrid::wxGridSelectCells);
+	m_mObserve2Type.clear();
 
 	l_bWhite = false;
 	LoadSetNames();
 	LoadData();
 	LoadNodes();
+
 
 	SP_AutoSizeRowLabelSize(m_pcObserverSetGrid);
 
@@ -116,8 +128,9 @@ SP_DLG_NewObserverDefinition::SP_DLG_NewObserverDefinition(wxWindow* p_pcParent,
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_ADD, wxT("Add")), 1, wxALL , 5);
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_DELETE, wxT("Delete")), 1, wxALL , 5);
 	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check")), 1, wxALL , 5);
+	l_pcSizer->Add(new wxButton(this, SP_ID_BUTTON_OBSERVER_ASSISTANT, wxT("Observer assistant")), 1, wxALL, 5);
 
-    wxSizer* l_pcBottomButtonSizer = CreateButtonSizer(wxOK|wxCANCEL|wxAPPLY);
+	wxSizer* l_pcBottomButtonSizer = CreateButtonSizer(wxOK|wxCANCEL|wxAPPLY);
 
 	l_pcButtonSizer->Add(l_pcSizer, 0, wxEXPAND);
 	l_pcButtonSizer->Add(l_pcBottomButtonSizer, 0, wxEXPAND);
@@ -154,7 +167,15 @@ bool SP_DLG_NewObserverDefinition::CheckInput()
 		wxString l_sName = m_pcObserverSetGrid->GetCellValue(l_nRow, NAME);
 		wxString l_sType = m_pcObserverSetGrid->GetCellValue(l_nRow, TYPE);
 
-		if (!DoCheckFunction(l_sName, l_sType, l_sBody)) {
+		if (l_sType == _T("Place instance") || l_sType == _T("Transition instance")|| l_sType == _T("Mixed"))
+		{
+			if (m_vUnfoldedPlacenames.size() == 0)
+			{
+				UnfoldNet();
+			}
+		}
+
+		if (!DoCheckFunction(l_sName, l_sType, l_sBody,false)) {
 			return false;
 		}
 	}
@@ -183,6 +204,14 @@ void SP_DLG_NewObserverDefinition::OnDlgOk(wxCommandEvent& p_cEvent)
 				/*
 				 * todo update for other netclasses to show in declaration tree
 				 */
+				//by george
+				if (m_pcGraph->GetNetclass()->GetName().Contains(_T("Colored")))
+				{
+					m_pcGraph->CreateDeclarationTree()->UpdateColorSetTree();
+					SP_Core::Instance()->GetRootDocument()->Modify(TRUE);
+					EndModal(wxID_OK);
+					return;
+				}
 
 				m_pcGraph->CreateDeclarationTree()->UpdateOtherTree();
 
@@ -289,6 +318,28 @@ bool SP_DLG_NewObserverDefinition::LoadData()
 		wxString l_sMetadataBody = dynamic_cast<SP_DS_EquationAttribute*>(l_pcMetadata->GetAttribute(wxT("Body")))->GetValue();
 		wxString l_sMetadataShow = l_pcMetadata->GetShow() ? wxT("1") : wxT("0");
 
+
+		if (m_pcGraph->GetNetclass()->GetDisplayName().Contains(wxT("Colored")))//george
+			{
+				wxString l_sColType = l_pcMetadata->GetAttribute(wxT("ColPNType"))->GetValueString();
+
+				if (l_sColType == wxT("Place instance")  && l_sMetadataType == wxT("Place"))
+				{
+					l_sMetadataType = wxT("Place instance");
+				}
+				else if (l_sColType == wxT("Transition instance") && l_sMetadataType == wxT("Transition"))
+				{
+					l_sMetadataType = wxT("Transition instance");
+				}
+				else if (l_sColType == _T("Mixed"))
+				{
+					l_sMetadataType = wxT("Mixed");
+				}
+			}
+
+			m_mObserve2Type[l_sMetadataName] = l_sMetadataType;//in order to get pre-defined observers
+
+
 		m_pcObserverSetGrid->AppendRows(1);
 		//show the observer
 		auto l_pcBoolEditor = new wxGridCellBoolEditor();
@@ -354,11 +405,45 @@ bool SP_DLG_NewObserverDefinition::SaveData()
 		wxString l_sType = m_pcObserverSetGrid->GetCellValue(l_nRow, TYPE);
 		wxString l_sComment = m_pcObserverSetGrid->GetCellValue(l_nRow, COMMENT);
 
+		//colored nets case
+		if (l_sType == _T("Place instance")|| l_sType == _T("Mixed"))
+		{
+			l_sType = _T("Place");
+		}
+		if (l_sType == _T("Transition instance"))
+	    {
+			l_sType = _T("Transition");
+		}
+
 		l_pcObserver->GetAttribute(wxT("Name"))->SetValueString(l_sName);
 		l_pcObserver->GetAttribute(wxT("Body"))->SetValueString(l_sBody);
 		l_pcObserver->GetAttribute(wxT("Comment"))->SetValueString(l_sComment);
 
 		bool l_bValue = l_pcObserver->GetAttribute(wxT("Type"))->SetValueString(l_sType);
+
+		auto l_it = m_mObserve2Type.find(l_sName);
+
+		if (l_it != m_mObserve2Type.end())
+		{
+			//SP_MESSAGEBOX(wxT("before"));
+			wxString l_sObserverTupe;
+			l_sObserverTupe<<m_mObserve2Type[l_sName];
+
+
+			SP_DS_Attribute* l_pcAttrib=l_pcObserver->GetAttribute(wxT("ColPNType"));//->SetValueString(l_sObserverTupe);
+
+			if(l_pcAttrib)
+
+			{
+				l_pcAttrib->SetValueString(l_sObserverTupe);
+			}
+			else
+			{
+
+			break;
+			}
+		}
+
 		if (!l_bValue)
 		{
 			SP_MESSAGEBOX(wxT("datatype '") + l_sType + wxT("' for observer '") + l_sName + wxT("' is not allowed (use one of '") + m_sAvailableDatatypes + wxT("')"), wxT("Error"),
@@ -394,85 +479,153 @@ void SP_DLG_NewObserverDefinition::OnCheckFunction(wxCommandEvent& p_cEvent)
 	DoCheckFunction(l_sName, l_sType, l_sBody);
 }
 
-bool SP_DLG_NewObserverDefinition::DoCheckFunction(const wxString& p_sName, const wxString& p_sType, const wxString& p_sBody)
+
+bool SP_DLG_NewObserverDefinition::DoCheckFunction(const wxString& p_sName, const wxString& p_sType, const wxString& p_sBody,const bool& b_showTip)
 {
+
 	if (p_sName.IsEmpty())
-	{
-		SP_MESSAGEBOX(wxT("the observer name is empty"), wxT("Check Observer"), wxOK | wxICON_ERROR);
-		return false;
-	}
-	if (p_sBody.IsEmpty())
-	{
-		SP_MESSAGEBOX(wxT("the observer ") + p_sName + wxT(" is empty "), wxT("Check Observer"), wxOK | wxICON_ERROR);
-		return false;
-	}
-	if (p_sType != wxT("Place") && p_sType != wxT("Transition"))
-	{
-		SP_MESSAGEBOX(wxT("the observer ") + p_sName + wxT(" has unknown type ") + p_sType, wxT("Check Observer"), wxOK | wxICON_ERROR);
-		return false;
-	}
-
-	// check name
-	SP_DS_FunctionRegistry* l_pcFRname = m_pcGraph->GetFunctionRegistry();
-	SP_FunctionPtr l_pcFunctionName(l_pcFRname->parseFunctionString(p_sName));
-	if (!l_pcFunctionName || !l_pcFunctionName->isVariable())
-	{
-		SP_MESSAGEBOX(wxT("the name of observer ") + p_sName + wxT(" is not correct"), wxT("Check Observer"), wxOK | wxICON_ERROR); 
-		return false;
-	}
-
-	// check body
-	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
-	SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(p_sBody));
-	if (!l_pcFunction)
-	{
-		SP_MESSAGEBOX(wxT("the observer ") + p_sName + wxT(" with body ") + p_sBody + wxT(" is not correct"), wxT("Check Observer"), wxOK | wxICON_ERROR);
-		return false;
-	} 
-
-	// check the function in the body
-	SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
-
-	std::set<std::string> l_Vars;
-	l_pcExpanded->getVariables(l_Vars);
-
-	if (!l_Vars.empty())
-	{
-		std::set<std::string> l_Diff;
-
-		if (p_sType == wxT("Place"))
 		{
-			std::set_difference(l_Vars.begin(), l_Vars.end(), m_Places.begin(), m_Places.end(),	std::inserter(l_Diff, l_Diff.begin()));
-		}
-		else {
-			std::set_difference(l_Vars.begin(), l_Vars.end(), m_Transitions.begin(), m_Transitions.end(), std::inserter(l_Diff, l_Diff.begin()));
-		}
-		
-		if (!l_Diff.empty())
-		{
-			wxString l_sFunction(l_pcFunction->toString().c_str(), wxConvUTF8);
-			wxString l_sExpanded(l_pcExpanded->toString().c_str(), wxConvUTF8);
-
-			wxString l_sMsg = wxT("\nThe following identifiers are not valid: ");
-			for (std::set<std::string>::const_iterator it = l_Diff.begin(); it != l_Diff.end(); ++it)
-			{
-				if (it != l_Diff.begin())
-				{
-					l_sMsg << wxT(", ");
-				}
-				l_sMsg << wxString((*it).c_str(), wxConvUTF8);
-			}
-
-			SP_MESSAGEBOX(l_sMsg, wxT("Check Observer \"") + p_sName + wxT("\""), wxOK | wxICON_ERROR);
-
+			SP_MESSAGEBOX(wxT("the observer name is empty"), wxT("Check Observer"), wxOK | wxICON_ERROR);
 			return false;
 		}
-	}
+		if (p_sBody.IsEmpty())
+		{
+			SP_MESSAGEBOX(wxT("the observer ") + p_sName + wxT(" is empty "), wxT("Check Observer"), wxOK | wxICON_ERROR);
+			return false;
+		}
+		if (SP_Find(SP_KEYWORDLIST, p_sName)!= SP_KEYWORDLIST.end())
+		{
+			SP_MESSAGEBOX(wxT("the observer ") + p_sName + wxT(" can not be a keyword "), wxT("Check Observer"), wxOK | wxICON_ERROR);
+			return false;
+		}
+		SP_DS_FunctionRegistry* l_pcFRname = m_pcGraph->GetFunctionRegistry();
+		SP_FunctionPtr l_pcFunctionName(l_pcFRname->parseFunctionString(p_sName));
 
-	// if everything is ok
-	new wxTipWindow(this, wxT("the observer ") + p_sName + wxT(" is correct"), 1000);
+		if (!l_pcFunctionName || !l_pcFunctionName->isVariable())
+		{//check that the observer name is not an existing variable (e.g., place or trans name)
+			SP_MESSAGEBOX(wxT("the name of observer ") + p_sName + wxT(" is not correct"), wxT("Check Observer"), wxOK | wxICON_ERROR);
+			return false;
+		}
 
-	return true;
+		SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+		SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(p_sBody));
+		if (!l_pcFunction)
+		{
+			SP_MESSAGEBOX(wxT("the observer ") + p_sName + wxT(" with body ") + p_sBody + wxT(" is not correct"), wxT("Check Observer"), wxOK | wxICON_ERROR);
+			return false;
+		}
+
+		// check the function in the body
+		SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
+
+		std::set<std::string> l_Vars;
+		l_pcExpanded->getVariables(l_Vars);
+
+
+		if (!l_Vars.empty())
+		{
+			std::set<std::string> l_Diff;
+
+			if (p_sType == wxT("Place"))
+			{
+				std::set_difference(l_Vars.begin(), l_Vars.end(), m_Places.begin(), m_Places.end(), std::inserter(l_Diff, l_Diff.begin()));
+			}
+			else if(p_sType == wxT("Transition")) {
+				std::set_difference(l_Vars.begin(), l_Vars.end(), m_Transitions.begin(), m_Transitions.end(), std::inserter(l_Diff, l_Diff.begin()));
+			}
+			else if (p_sType == wxT("Place instance"))
+			{
+				if (m_vUnfoldedPlacenames.size() == 0)
+				{
+					UnfoldNet();
+				}
+
+				m_mObserve2Type[p_sName] = p_sType;
+
+				std::set_difference(l_Vars.begin(), l_Vars.end(), m_vUnfoldedPlacenames.begin(), m_vUnfoldedPlacenames.end(), std::inserter(l_Diff, l_Diff.begin()));
+
+		   }
+			else if (p_sType == wxT("Transition instance"))
+			{
+				if (m_vUnfoldedTransnames.size() == 0)
+				{
+					UnfoldNet();
+				}
+
+				m_mObserve2Type[p_sName] = p_sType;
+
+				std::set_difference(l_Vars.begin(), l_Vars.end(), m_vUnfoldedTransnames.begin(), m_vUnfoldedTransnames.end(), std::inserter(l_Diff, l_Diff.begin()));
+			}
+			else
+			{//Mixed observers
+				if (m_vUnfoldedTransnames.size() == 0 || m_vUnfoldedPlacenames.size() == 0 || m_vAllElements.size()==0)
+				{
+					UnfoldNet();
+
+					std::merge(m_vUnfoldedTransnames.begin(), m_vUnfoldedTransnames.end(),
+						m_vUnfoldedPlacenames.begin(), m_vUnfoldedPlacenames.end(),
+						std::inserter(m_vAllElements, m_vAllElements.begin()));
+
+					std::merge(m_Places.begin(), m_Places.end(),
+						m_Transitions.begin(), m_Transitions.end(),
+						std::inserter(m_vAllElements, m_vAllElements.begin()));
+				}
+
+				for (auto itMap = m_mObserve2Type.begin(); itMap != m_mObserve2Type.end(); ++itMap)
+				{//append the pre-defined observer names
+					m_vAllElements.insert(itMap->first.ToStdString());
+				}
+
+
+				std::set_difference(l_Vars.begin(), l_Vars.end(), m_vAllElements.begin(), m_vAllElements.end(), std::inserter(l_Diff, l_Diff.begin()));
+
+			}
+
+			if (!l_Diff.empty())
+			{
+				wxString l_sFunction(l_pcFunction->toString().c_str(), wxConvUTF8);
+				wxString l_sExpanded(l_pcExpanded->toString().c_str(), wxConvUTF8);
+
+				wxString l_sMsg = wxT("\nThe following identifiers are not valid: ");
+				for (std::set<std::string>::const_iterator it = l_Diff.begin(); it != l_Diff.end(); ++it)
+				{
+					if (it != l_Diff.begin())
+					{
+						l_sMsg << wxT(", ");
+					}
+					l_sMsg << wxString((*it).c_str(), wxConvUTF8);
+				}
+
+
+				SP_MESSAGEBOX(l_sMsg, wxT("Check Observer \"") + p_sName + wxT("\""), wxOK | wxICON_ERROR);
+
+				return false;
+			}
+		}
+
+		if (m_pcGraph->GetNetclass()->GetDisplayName().Contains(wxT("Colored")))
+		{
+			if (p_sType == wxT("Place"))
+			{
+				m_mObserve2Type[p_sName] = wxT("Col|Place");
+			}
+			else if (p_sType == wxT("Transition"))
+			{
+				m_mObserve2Type[p_sName] = wxT("Col|Transition");
+			}
+			else
+			{
+				m_mObserve2Type[p_sName] = p_sType;
+			}
+
+		}
+		if (b_showTip)
+		{// if everything is ok
+			new wxTipWindow(this, wxT("the observer ") + p_sName + wxT(" is correct"), 1000);
+		}
+		return true;
+
 }
 
 void SP_DLG_NewObserverDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
@@ -585,6 +738,13 @@ void SP_DLG_NewObserverDefinition::InitializeDataTypes()
 
 	set<wxString> l_sType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcMetadata->GetAttribute(wxT("Type")))->GetPossibleValues();
 
+	if (m_pcGraph->GetNetclass()->GetDisplayName().Contains(wxT("Colored")))//george
+	{
+	    l_sType.insert("Place instance");
+		l_sType.insert("Transition instance");
+		l_sType.insert("Mixed");
+	}
+
 	set<wxString>::iterator it;
 
 	m_sAvailableDatatypes = wxT(" ");
@@ -657,4 +817,110 @@ void SP_DLG_NewObserverDefinition::LoadNodeOfType(const wxString& p_sPlaceType, 
 		wxString l_sNodeName = dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 		p_names.insert(l_sNodeName);
 	}
+}
+
+
+void SP_DLG_NewObserverDefinition::UnfoldNet()
+{
+	SP_IddNetUnfolder unfolder;
+	dssd::andl::Net_ptr andl_net;
+
+
+	if (unfolder(m_pcGraph, false, false, false))
+	{
+
+		andl_net = unfolder.GetUnfoldedNet();
+	}
+	else
+	{
+		//unfolding error
+		return;
+	}
+
+	if (andl_net)
+	{
+
+		for (auto& place : *andl_net->places_)
+		{
+			m_vUnfoldedPlacenames.insert(place->name_);
+		}
+		for (auto& trans : *andl_net->transitions_)
+		{
+
+			m_vUnfoldedTransnames.insert(trans->name_);
+		}
+	}
+}
+
+
+void SP_DLG_NewObserverDefinition::OnAssistant(wxCommandEvent& p_cEvent)
+{
+	SP_VectorString* l_vpcUnfoldedPlaces=new SP_VectorString;
+	SP_VectorString* l_vpcUnfoldedTrans=new SP_VectorString;
+	SP_IddNetUnfolder unfolder;
+	dssd::andl::Net_ptr andl_net;
+	if (SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName().Contains(_T("Colored")))
+	{//only for colored nets
+		wxBusyInfo* wait = new wxBusyInfo(wxT("Please wait..."), this);
+		if (unfolder(m_pcGraph, false, false, false))//unfold the net to get the instances
+		{
+			wxDELETE(wait);
+			andl_net = unfolder.GetUnfoldedNet();
+		}
+		else
+		{
+			//unfolding error
+			return;
+		}
+	}
+	if (andl_net)
+	{
+
+		for (auto& place : *andl_net->places_)
+		{
+			wxString l_sPlaceId = place->name_;
+			l_vpcUnfoldedPlaces->push_back(l_sPlaceId);
+
+
+		}
+		for (auto& trans : *andl_net->transitions_)
+		{
+			wxString l_sPlaceId = trans->name_;
+			l_vpcUnfoldedTrans->push_back(l_sPlaceId);
+
+		}
+	}
+
+    //feed the observer assistant with the instances of the unfolded net
+	wxString l_pcReturnText;
+	SP_DLG_StFunctionAssistent* l_pcDlg = new SP_DLG_StFunctionAssistent(SP_ST_PARSER_TYPE_CHECK_FUNCTION,
+		NULL,l_pcReturnText, this,_T(""), wxT("Assistent"),wxDEFAULT_DIALOG_STYLE, l_vpcUnfoldedTrans, l_vpcUnfoldedPlaces);
+
+	if (l_pcDlg->ShowModal() == wxID_OK)
+	{
+
+		m_pcObserverSetGrid->SetCellValue(m_pcObserverSetGrid->GetGridCursorRow(), BODY,
+			l_pcDlg->GetReturnText());
+
+	}
+
+	l_pcDlg->Destroy();
+}
+
+
+bool SP_DLG_NewObserverDefinition::IsConst(const wxString& p_sVar)
+{
+
+	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
+	SP_ListMetadata::const_iterator it;
+
+
+	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
+	{
+		SP_DS_Metadata* l_pcConstant = *it;
+		wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcConstant->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+		if (l_sName == p_sVar) return true;
+
+	}
+	return false;
 }

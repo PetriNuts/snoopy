@@ -216,6 +216,26 @@ protected:
 	SP_Vector2DDouble m_aanAuxPLVarsResults;
 	SP_Vector2DDouble m_aanAuxTRVarsResults;
 
+	//for observers over coloured/uncolored elements,//by george  08.02.2021
+	SP_VectorString m_vUnfoldedPlacesObservers;
+	SP_VectorString m_vUnfoldedTransitionsObservers;
+	SP_VectorString m_vColPlaceObservers;
+	SP_VectorString m_vColTransObservers;
+	SP_VectorString m_vMixedObservers;
+
+
+	//observers for colored nets, by george 08.02.2021
+	SP_Vector2DDouble m_anResultColPlaceObserversMatrix;
+	SP_Vector2DDouble m_anResultUnfoldedPlaceObserversMatrix;
+	SP_Vector2DDouble m_anResultColTransObserversMatrix;
+	SP_Vector2DDouble m_anResultUnfoldedTransitionObserversMatrix;
+	SP_Vector2DDouble m_anCombinedResultMatrix;
+	SP_Vector2DDouble m_anResultMixedObserversMatrix;
+	std::map<wxString, SP_VectorString> m_mObserver2VariabalesMatrix;//for mixed observers
+
+
+
+
 	//uncolored elements
 	SP_Vector2DDouble m_anResultMatrix;
 

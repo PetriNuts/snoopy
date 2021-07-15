@@ -893,13 +893,14 @@ SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	/////////////////////////////////////////////////////////////////////////////
 
-	/*
-	 * remove observers from the net class
-	 * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	 */
+	//by george, observer types for colored HPN
 	l_pcMC = p_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
-	p_pcGraph->RemoveMetadataclass(l_pcMC);
-	wxDELETE(l_pcMC);
+
+	l_pcAttr = l_pcMC->AddAttribute(new SP_DS_TypeAttribute(wxT("ColPNType"), wxT("Col|Place")));
+	l_pcType->AddPossibleValue(wxT("Col|Transition"));
+	l_pcType->AddPossibleValue(wxT("Place instance"));
+	l_pcType->AddPossibleValue(wxT("Transition instance"));
+	l_pcType->AddPossibleValue(wxT("Mixed"));
 
 	/////////////////////////////////////////////////////////////////////////////
 

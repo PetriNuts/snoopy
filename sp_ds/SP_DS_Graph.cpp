@@ -495,26 +495,45 @@ bool SP_DS_Graph::AddToDeclarationTreectrl(SP_WDG_DeclarationTreectrl* p_pcCtrl)
 		}
 
 		
-		
+		for (l_itMC = m_lMetadataclass.begin(); l_itMC != m_lMetadataclass.end(); ++l_itMC)
+			{
+
+			   if ((*l_itMC)->GetShowInDeclarationTreeOther() && (*l_itMC)->GetDisplayName() == (_T("Functions")))
+				 {
+							p_pcCtrl->AppendFolderItem(l_cRootId, (*l_itMC)->GetDisplayName());
+				 }
+
+
+				if ((*l_itMC)->GetShowInDeclarationTreeOther() && (*l_itMC)->GetDisplayName() == (_T("Variables")))
+				{
+					p_pcCtrl->AppendFolderItem(l_cRootId, (*l_itMC)->GetDisplayName());
+				}
+			}
 
 		p_pcCtrl->Expand(l_cIdParent);
 
 	 }
 
-	for (l_itMC = m_lMetadataclass.begin(); l_itMC != m_lMetadataclass.end(); ++l_itMC)
-    {
-		if ((*l_itMC)->GetDisplayName()==(_T("Constants"))&& this->GetNetclass()->GetName().Contains(_T("Colored")))//by george
-		{
-			continue;
-		}
-      if( (*l_itMC)->GetShowInDeclarationTreeOther() )
-      {
-        // adding the entry, by calling the function of the tree control
-        p_pcCtrl->AppendFolderItem(l_cRootId, (*l_itMC)->GetDisplayName());
-      }
-    }
-
  
+
+	for (l_itMC = m_lMetadataclass.begin(); l_itMC != m_lMetadataclass.end(); ++l_itMC)
+	    {
+
+
+		if (((*l_itMC)->GetDisplayName() == (_T("Constants"))
+			|| (*l_itMC)->GetDisplayName() == (_T("Functions"))
+			|| (*l_itMC)->GetDisplayName() == (_T("Variables")))
+			&& this->GetNetclass()->GetName().Contains(_T("Colored")))//by george
+				{
+					continue;
+				}
+
+	      if( (*l_itMC)->GetShowInDeclarationTreeOther() )
+	      {
+	        // adding the entry, by calling the function of the tree control
+	        p_pcCtrl->AppendFolderItem(l_cRootId, (*l_itMC)->GetDisplayName());
+	      }
+	    }
 
     p_pcCtrl->Expand(l_cRootId);
 

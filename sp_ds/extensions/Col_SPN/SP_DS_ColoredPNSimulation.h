@@ -10,7 +10,7 @@
 #define __SP_DS_ColoredPNSimulation_H__
 
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
-
+#include <dssd/andl/andl_builder.h>//by george
 
 class SP_DS_ColoredPNSimulation
 {
@@ -51,6 +51,7 @@ public:
 
 public:
 	SP_DS_ColPN_Unfolding* GetUnfoldedNet() { return m_pcUnfoldedNet; }
+	 dssd::andl::Net_ptr CreateANDLNet(SP_DS_Graph* p_pcGraph, bool p_bshowLog = true);//by george
 	
 
 protected:

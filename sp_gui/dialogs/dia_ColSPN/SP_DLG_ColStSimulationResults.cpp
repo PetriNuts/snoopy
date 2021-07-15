@@ -5,7 +5,7 @@
 // $Revision: 1.30 $
 // $Date: 2007/08/14 11:20:00 $
 // @Change M.Herajy 10.6.2010
-// @Modified George Assaf 25.01.2020 constants harmonizing
+// @Modified George Assaf 25.01.2020 constants harmonizing and supporting observers
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 #include <wx/dcps.h>
@@ -198,7 +198,7 @@ SP_DLG_ColStSimulationResults::SP_DLG_ColStSimulationResults(SP_DS_Graph* p_pcGr
 
 		m_mGroup2Position[l_sGroup] = m_apcComboBoxes.size() - 1;
 	}
-
+	LoadObservers();
 	m_iModifyCount = 0;
 	SetSizerAndFit(m_pcMainSizer);
 }
@@ -232,8 +232,7 @@ bool SP_DLG_ColStSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewe
 	m_ArrayUnTranstions.Clear();
 	m_ArrayColPlaces.Clear();
 	m_ArrayColTranstions.Clear();
-	m_ArrayAuxPlaces.Clear();
-	m_ArrayAuxtranstions.Clear();
+
 
 	for (unsigned int i = 0; i < m_msPlaceNames.size(); i++) {
 		m_ArrayUnPlaces.Add(m_msPlaceNames[i]);
@@ -247,17 +246,7 @@ bool SP_DLG_ColStSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewe
 	for (unsigned int i = 0; i < m_msColoredTransitionNames.size(); i++) {
 		m_ArrayColTranstions.Add(m_msColoredTransitionNames[i]);
 	}
-	for (unsigned int i = 0; i < m_vAuxPLVars.size(); i++) {
-		m_ArrayAuxPlaces.Add(m_vAuxPLVars[i]);
-	}
-	for (unsigned int i = 0; i < m_vAuxTRVars.size(); i++) {
-		m_ArrayAuxtranstions.Add(m_vAuxTRVars[i]);
-	}
 
-/*	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayColPlaces.GetCount()));
-	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayColTranstions.GetCount()));
-	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnPlaces.GetCount()));
-	SP_LOGMESSAGE(wxString::Format(wxT("%d"), m_ArrayUnTranstions.GetCount()));*/
 
 	CreateViewerDataFromRegex(p_pcView);
 
@@ -274,6 +263,8 @@ bool SP_DLG_ColStSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewe
 
 		if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_msPlaceNames.size()) //unfolded place
 		{
+			ObtainSimulationMatrix(false);//marking matrix
+
 			l_sName = m_msPlaceNames[l_nPosition];
 
 			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
@@ -281,6 +272,8 @@ bool SP_DLG_ColStSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewe
 		else
 		if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_msTransitionNames.size()) //unfolded transition
 		{
+			ObtainSimulationMatrix(true);//rate matrix
+
 			l_sName = m_msTransitionNames[l_nPosition];
 
 			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
@@ -300,18 +293,39 @@ bool SP_DLG_ColStSimulationResults::LoadViewerData(SP_DS_ResultViewer* p_pcViewe
 			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_aanColTransResults);
 		}
 		else
-		if (l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_vAuxPLVars.size()) //Auxiliary variables place
+		if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Observer places")) && l_nPosition < m_vUnfoldedPlacesObservers.size())
 		{
-			l_sName = m_vAuxPLVars[l_nPosition];
 
-			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_aanAuxPLVarsResults);
+			l_sName = m_vUnfoldedPlacesObservers[l_nPosition];
+
+			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultUnfoldedPlaceObserversMatrix);
 		}
 		else
-		if (l_sOutType == wxT("Auxiliary variables") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_vAuxTRVars.size()) //Auxiliary variables transition
+		if (l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Observer places")) && l_nPosition < m_vColPlaceObservers.size())
 		{
-			l_sName = m_vAuxTRVars[l_nPosition];
+			l_sName = m_vColPlaceObservers[l_nPosition];
+			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultColPlaceObserversMatrix);
+		}
+		else
+		if (l_sOutType == wxT("Colored") && l_sElementType.IsSameAs(wxT("Observer transitions")) && l_nPosition < m_vColTransObservers.size())
+		{
+			l_sName = m_vColTransObservers[l_nPosition];
 
-			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_aanAuxTRVarsResults);
+			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultColTransObserversMatrix);
+		}
+		else
+		if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Observer transitions")) && l_nPosition < m_vUnfoldedTransitionsObservers.size())
+		{
+			l_sName = m_vUnfoldedTransitionsObservers[l_nPosition];
+
+			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultUnfoldedTransitionObserversMatrix);
+		}
+		else if (l_sElementType.IsSameAs(wxT("Mixed observers")) && l_nPosition < m_vMixedObservers.size())
+		{
+			l_sName = m_vMixedObservers[l_nPosition];
+
+			p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMixedObserversMatrix);
+
 		}
 		else
 		{
@@ -1174,10 +1188,17 @@ void SP_DLG_ColStSimulationResults::LoadColAuxResults()
 				}
 		  }
 
-	if (!m_bComAuxVarSingleRun)
-	{
-		ComputeAuxiliaryVars();
-	}
+		if (m_pcCurrentTablePlot)
+			{
+				SP_DS_Attribute*   l_pcAttribute = m_pcCurrentTablePlot->GetAttribute(wxT("Nodeclass"));
+				if (l_pcAttribute)
+				{
+					wxString l_sElementType = l_pcAttribute->GetValueString();
+					UpdateObservers(wxT("Place"), m_pcMainSimulator->GetGeneratedResultPointsCount());
+					UpdateObservers(wxT("Transition"), m_pcMainSimulator->GetGeneratedResultPointsCount());
+					UpdateObservers(wxT("Mixed"), m_pcMainSimulator->GetGeneratedResultPointsCount());
+				}
+			}
 }
 
 void SP_DLG_ColStSimulationResults::InitializeEmptyView(SP_DS_Metadata* p_pcView)
@@ -1245,12 +1266,11 @@ void SP_DLG_ColStSimulationResults::InitializeEmptyView(SP_DS_Metadata* p_pcView
 
 void SP_DLG_ColStSimulationResults::LoadResults()
 {
-	//Load colored or auxiliary variables
-	LoadColAuxResults();
 
 	UpdateViewer();
-
 	RefreshExternalWindows();
+	UpdateXAxisValues();
+	LoadColAuxResults();
 }
 
 void SP_DLG_ColStSimulationResults::UpdateXAxisValues()
@@ -1510,25 +1530,45 @@ void SP_DLG_ColStSimulationResults::LoadConnections()
 	}
 }
 
-bool SP_DLG_ColStSimulationResults::IsConstantArcWeight(const wxString& p_sWeight, double& p_nReturnValue)
+wxString  SP_DLG_ColStSimulationResults::SubstituteConstants(const wxString& p_sWeight)
 {
-	SP_MapString2Double::iterator l_itConstant;
 
-	//explicit constant value
-	if (p_sWeight.ToDouble(&p_nReturnValue))
+	wxString l_sColorExpr;
+
+	if (m_msParameterName2Value.size()>0)
 	{
-		return true; //constant
+		wxStringTokenizer l_StringTok(p_sWeight, wxT("()+*/^=<>!%&|,- "), wxTOKEN_RET_EMPTY_ALL);
+		while (l_StringTok.HasMoreTokens())
+		{
+			wxString l_sToken = l_StringTok.GetNextToken();
+			l_sToken.Replace(_T(" "), _T(""));
+			if (!l_sToken.IsEmpty())
+			{
+				auto it = m_msParameterName2Value.find(l_sToken);
+
+
+				if (it != m_msParameterName2Value.end())
+				{
+					double l_DataType = it->second;
+					int l_nMarking = it->second;
+					l_sColorExpr << l_nMarking;
+
+				}
+				else
+				{
+					l_sColorExpr << l_sToken;
+				}
+			}
+			wxChar l_chDelim = l_StringTok.GetLastDelimiter();
+			if (l_chDelim != '\0')
+			{
+				l_sColorExpr << l_chDelim;
+			}
+		}
 	}
 
-	//check constant list
-	/*if ((l_itConstant = m_msParameterName2Value.find(p_sWeight)) != m_msParameterName2Value.end())
-	{
-		p_nReturnValue = (*l_itConstant).second;
+	return l_sColorExpr; //not a constant
 
-		return true; //constant
-	}*/
-
-	return false; //not a constant
 }
 
 spsim::ConnectionType SP_DLG_ColStSimulationResults::GetConnectionType(const wxString& p_sConnectionType)
@@ -1622,6 +1662,8 @@ void SP_DLG_ColStSimulationResults::LoadParameters()
 					}
 					wxString l_sConstVal;
 					l_sConstVal << l_nValue;
+
+					m_msParameterName2Value[l_sName] = l_nValue;
 			 
 				}
 				else
@@ -1641,6 +1683,7 @@ void SP_DLG_ColStSimulationResults::LoadParameters()
 						l_nValue = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_Function }();
 					}
 					l_pcFR->registerFunction(l_sName, to_string(l_nValue));
+					m_msParameterName2Value[l_sName] = l_nValue;
 				}
 			}
 		}
@@ -1822,5 +1865,613 @@ void SP_DLG_ColStSimulationResults::OnConstantsSetChanged(wxCommandEvent& p_cEve
 		}
 		RefreshExternalWindows(true);
 	}
+
+}
+
+SP_FunctionPtr SP_DLG_ColStSimulationResults::RegesterFunctionVariables(const wxString& p_sType,const wxString& p_sObserverName,wxString p_sExpression)
+{
+
+            wxString	l_sBody = SubstituteConstants(p_sExpression);
+            SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+            SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sBody));
+
+			if (!l_pcFunction)
+            {
+	         SP_MESSAGEBOX(wxT("the body of observer ") + p_sObserverName + wxT(" is not correct"), wxT("Check Observer"), wxOK | wxICON_ERROR);
+	         return NULL;
+            }
+
+           std::map<std::string, unsigned int> l_mVar2Pos1;
+           std::map<std::string, unsigned int> l_mElementToPosition;
+
+		   if (p_sType == wxT("Place instance"))
+		   {
+			   for (unsigned int i = 0; i < m_msPlaceNames.size(); i++)
+			   {
+				   l_mVar2Pos1[m_msPlaceNames[i].ToStdString()] = i;
+			   }
+		   }
+		   else if (p_sType == wxT("Transition instance"))
+		   {
+			   for (unsigned int i = 0; i < m_msTransitionNames.size(); i++)
+			   {
+				   l_mVar2Pos1[m_msTransitionNames[i].ToStdString()] = i;
+			   }
+		   }
+		   else if (p_sType == wxT("Mixed"))
+		   {
+			   std::map<std::string, unsigned int> l_mapvar2Pos;
+			   ComputeCombinedMatrix(l_sBody, l_mapvar2Pos);
+			   l_mElementToPosition = l_mapvar2Pos;
+		   }
+
+		   SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
+		   if (p_sType != wxT("Mixed"))
+		   {
+			   std::set<std::string> variables;
+			   l_pcExpanded->getVariables(variables);
+
+			   for (auto strVar : variables)
+			   {
+				   std::map<std::string, unsigned int>::iterator l_it;
+				   l_it = l_mVar2Pos1.find(strVar);
+				   if (l_it != l_mVar2Pos1.end())
+				   {
+					   l_mElementToPosition[strVar] = l_it->second;
+				   }
+				   else
+				   {//something wrong
+					   return  NULL;
+				   }
+			   }
+		   }
+
+		   if (l_mElementToPosition.size() > 0)
+		   {
+			   dssd::functions::convertOptions co;
+			   l_pcExpanded->setVariableIds(l_mElementToPosition, co);
+		   }
+
+  return l_pcExpanded;
+}
+
+
+void SP_DLG_ColStSimulationResults::LoadObservers()
+{
+
+	if (!m_pcGraph->GetNetclass()->GetDisplayName().Contains("Colored"))
+	{
+		return;
+	}
+
+	std::map<std::string, unsigned int> l_mPlaceToPosition;
+	std::map<std::string, unsigned int> l_mTransitionToPosition;
+	//14.12
+	SP_VectorString* l_pvsColoredPlaceNames = m_pcUnfoldedNet->GetColoredPlaceNames();
+	SP_VectorString* l_pvsColoredTransNames = m_pcUnfoldedNet->GetColoredTransitionNames();
+
+	for (unsigned i = 0; i < l_pvsColoredPlaceNames->size(); i++)
+	{
+		wxString l_sPlName = (*l_pvsColoredPlaceNames)[i];
+		m_mPlaceName2Position[l_sPlName] = i;
+	}
+
+	for (unsigned i = 0; i < l_pvsColoredTransNames->size(); i++)
+	{
+		wxString l_sTName = (*l_pvsColoredTransNames)[i];
+		m_mTransitionName2Position[l_sTName] = i;
+	}
+
+	for (auto const& elem : m_mPlaceName2Position) {
+		l_mPlaceToPosition[elem.first] = elem.second;
+	}
+
+	for (auto const& elem : m_mTransitionName2Position) {
+		l_mTransitionToPosition[elem.first] = elem.second;
+	}
+
+	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+	if (l_pcMetadataclass)
+	{
+		SP_VectorString l_asParameterNames;
+
+		SP_ListMetadata::const_iterator l_itElem;
+		for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+		{
+			SP_DS_Metadata* l_pcMetadata = *l_itElem;
+			wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+			wxString l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
+			wxString l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
+			wxString l_sColType = l_pcMetadata->GetAttribute(wxT("ColPNType"))->GetValueString();
+			unsigned long l_nPos = 0;
+
+
+			if (l_sColType == wxT("Mixed"))
+			{
+				if (std::find(m_vMixedObservers.begin(), m_vMixedObservers.end(), l_sName) == m_vMixedObservers.end())
+				{
+					m_vMixedObservers.push_back(l_sName);
+					continue;
+				}
+			}
+
+			if (l_sColType == wxT("Place instance") && l_sType == wxT("Place"))
+			{
+				if (std::find(m_vUnfoldedPlacesObservers.begin(), m_vUnfoldedPlacesObservers.end(), l_sName) == m_vUnfoldedPlacesObservers.end())
+
+				{
+					m_vUnfoldedPlacesObservers.push_back(l_sName);
+
+				}
+			}
+
+			if (l_sColType == wxT("Transition instance") && l_sType == wxT("Transition"))
+			{
+				if (std::find(m_vUnfoldedTransitionsObservers.begin(), m_vUnfoldedTransitionsObservers.end(), l_sName) == m_vUnfoldedTransitionsObservers.end())
+
+				{
+					m_vUnfoldedTransitionsObservers
+						.push_back(l_sName);
+				}
+			}
+
+			if ( l_sColType != wxT("Place instance") && l_sType == wxT("Place")&& std::find(m_vColPlaceObservers.begin(), m_vColPlaceObservers.end(), l_sName) == m_vColPlaceObservers.end())
+
+			{
+				m_vColPlaceObservers.push_back(l_sName);
+			}
+			if (l_sColType != wxT("Transition instance") && l_sType == wxT("Transition") &&  std::find(m_vColTransObservers.begin(), m_vColTransObservers.end(), l_sName) == m_vColTransObservers.end())
+			{
+				m_vColTransObservers.push_back(l_sName);
+			}
+			// check the function
+			SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+			SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sBody));
+			if (!l_pcFunction)
+			{
+				SP_MESSAGEBOX(wxT("the body of observer ") + l_sName + wxT(" is not correct"), wxT("Check Observer"), wxOK | wxICON_ERROR);
+				continue;
+			}
+
+			SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
+
+
+			std::set<std::string> variables;
+			l_pcExpanded->getVariables(variables);
+			bool l_bIsValid = true;
+			if (l_sType == wxT("Place"))
+			{
+
+				for (auto v : variables)
+				{
+					if (std::find(m_asPlaceNames.begin(), m_asPlaceNames.end(), v) == m_asPlaceNames.end())
+					{
+						l_bIsValid = false;
+						break;
+					}
+				}
+				if (!l_bIsValid) { continue; }
+
+
+				if (std::find(m_asPlaceNames.begin(), m_asPlaceNames.end(), l_sName) != m_asPlaceNames.end())
+				{
+					continue;
+				}
+				m_asPlaceNames.push_back(l_sName);
+				m_mPlaceName2Position[l_sName] = l_nPos = m_asPlaceNames.size() - 1;
+				m_mObserverPlaceFunctions[l_nPos] = l_pcExpanded;
+
+
+				l_mPlaceToPosition[l_sName] = l_nPos;
+
+				dssd::functions::convertOptions co;
+				l_pcExpanded->setVariableIds(l_mPlaceToPosition, co);
+			}
+			else {
+				if (l_sType != wxT("Place") &&/* l_sColType == wxT("Unfolded|Transition")*/l_sColType == wxT("Transition instance"))
+				{
+					continue;
+					//m_msTransitionNames
+					m_asTransitionNames.push_back(l_sName);
+					m_mTransitionName2Position[l_sName] = l_nPos = m_asTransitionNames.size() - 1;
+					m_mObserverTransitionFunctions[l_nPos] = l_pcExpanded;
+					l_mTransitionToPosition[l_sName] = l_nPos;
+
+					continue;
+				}
+
+				for (auto v : variables)
+				{
+					if (std::find(m_asTransitionNames.begin(), m_asTransitionNames.end(), v) == m_asTransitionNames.end())
+					{
+						l_bIsValid = false;
+						break;
+					}
+				}
+				if (!l_bIsValid) { continue; }
+
+				if (std::find(m_asTransitionNames.begin(), m_asTransitionNames.end(), l_sName) != m_asTransitionNames.end())
+				{
+					continue;
+				}
+				m_asTransitionNames.push_back(l_sName);
+				m_mTransitionName2Position[l_sName] = l_nPos = m_asTransitionNames.size() - 1;
+				m_mObserverTransitionFunctions[l_nPos] = l_pcExpanded;
+
+				l_mTransitionToPosition[l_sName] = l_nPos;
+
+				dssd::functions::convertOptions co;
+				l_pcExpanded->setVariableIds(l_mTransitionToPosition, co);
+			}
+		}
+	}
+}
+
+void SP_DLG_ColStSimulationResults::UpdateUnfoldedObservers()
+{
+
+	 if (m_vUnfoldedPlacesObservers.size() > 0)
+	 {
+		 SP_Vector2DDouble vec(m_pcMainSimulator->GetResultMatrix().size(), SP_VectorDouble(m_vUnfoldedPlacesObservers.size(), 0.0));
+		 m_anResultUnfoldedPlaceObserversMatrix = vec;
+	 }
+
+	 if (m_vUnfoldedTransitionsObservers.size() > 0)
+	 {
+		 SP_Vector2DDouble vec(m_pcMainSimulator->GetResultMatrix().size(), SP_VectorDouble(m_vUnfoldedTransitionsObservers.size(), 0.0));
+		 m_anResultUnfoldedTransitionObserversMatrix = vec;
+	 }
+	 SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+	 if (l_pcMetadataclass)
+	 {
+		 SP_VectorString l_asParameterNames;
+
+		 SP_ListMetadata::const_iterator l_itElem;
+		 int l_nObserverPlacesIndex = 0;
+		 int l_nObserverTranIndex = 0;
+		 for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+		 {
+			 SP_DS_Metadata* l_pcMetadata = *l_itElem;
+			 wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+			 wxString l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
+			 wxString l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
+
+			 wxString l_sColType= l_pcMetadata->GetAttribute(wxT("ColPNType"))->GetValueString();
+			 unsigned long l_nPos = 0;
+			 bool l_bIsValid = true;
+
+
+			 if (l_sType == wxT("Place") && l_sColType == wxT("Place instance"))
+			 {
+				 SP_FunctionPtr funcPtrEvaluator= RegesterFunctionVariables(wxT("Place instance"),l_sName, l_sBody);
+
+				 if (funcPtrEvaluator == NULL) continue;
+
+				 ObtainSimulationMatrix(false);
+
+				 if (m_anResultMatrix.size() > 0)
+				 {
+					 SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+				     for (unsigned int l_nRow = 0; l_nRow < m_anResultMatrix.size(); l_nRow++)
+				     {
+				    	 double l_Val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, funcPtrEvaluator, std::numeric_limits<double>::min() }(
+				    	 		 m_anResultMatrix[l_nRow]);
+
+				    	 m_anResultUnfoldedPlaceObserversMatrix[l_nRow][l_nObserverPlacesIndex] = l_Val;
+				    }
+			   }
+				 l_nObserverPlacesIndex++;
+			 }
+			 else if (l_sType == wxT("Transition") && l_sColType == wxT("Transition instance")/*l_sColType == wxT("Unfolded|Transition")*/)
+			 {
+
+				  SP_FunctionPtr funcPtrEvaluator = RegesterFunctionVariables(wxT("Transition instance"), l_sName, l_sBody);
+
+				  if (funcPtrEvaluator == NULL) continue;
+
+				 ObtainSimulationMatrix(true);//Switch shared result matrix to the rate matrix
+
+				 if (m_anResultMatrix.size() > 0)
+				 {
+					 SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+					 for (unsigned int l_nRow = 0; l_nRow < m_anResultMatrix.size(); l_nRow++)
+					 {
+						 double l_dVal = SP_DS_FunctionEvaluatorDouble{ l_pcFR, funcPtrEvaluator, std::numeric_limits<double>::min() }(
+							 m_anResultMatrix[l_nRow]);
+						 m_anResultUnfoldedTransitionObserversMatrix[l_nRow][l_nObserverTranIndex] = l_dVal;
+					 }
+					 l_nObserverTranIndex++;
+				 }
+			 }
+		 }
+
+	 }
+
+}
+
+void SP_DLG_ColStSimulationResults::UpdateObservers(const wxString& p_sObsersverType, unsigned int p_nRowCount)
+{
+
+	if (m_vUnfoldedTransitionsObservers.size() > 0 || m_vUnfoldedPlacesObservers.size() > 0)
+	{
+		UpdateUnfoldedObservers();
+	}
+	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+	SP_FunctionPtr l_pcFunction;
+
+	if (p_sObsersverType.IsSameAs(wxT("Place"))) {// observer over coloured place
+		int l_nObserverPlacesIndex = 0;
+		if (m_vColPlaceObservers.size() > 0)
+		{
+			SP_Vector2DDouble vec(m_pcMainSimulator->GetResultMatrix().size(), SP_VectorDouble(m_vColPlaceObservers.size(), 0.0));
+			m_anResultColPlaceObserversMatrix = vec;
+		}
+		if(m_aanColPlaceResults.size()>0)
+		for (auto it : m_mObserverPlaceFunctions) {
+			l_pcFunction = it.second;
+
+			for (unsigned int l_nRow = 0; l_nRow < m_aanColPlaceResults.size(); l_nRow++) {
+
+				double l_Val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, std::numeric_limits<double>::min() }(
+					m_aanColPlaceResults[l_nRow]);
+				m_anResultColPlaceObserversMatrix[l_nRow][l_nObserverPlacesIndex]=l_Val;
+			}
+			l_nObserverPlacesIndex++;
+		}
+	}
+	else if (p_sObsersverType.IsSameAs(wxT("Transition"))) {// observer over coloured transition
+
+		int l_nObserverTransIndex = 0;//observers counter
+
+		//init result matrix
+		if (m_vColTransObservers.size() > 0)
+		{
+			SP_Vector2DDouble vec(m_pcMainSimulator->GetResultMatrix().size(), SP_VectorDouble(m_vColTransObservers.size(), 0.0));
+			m_anResultColTransObserversMatrix = vec;
+		}
+
+		for (auto it : m_mObserverTransitionFunctions) {
+			l_pcFunction = it.second;
+
+			for (unsigned int l_nRow = 0; l_nRow < m_aanColTransResults.size(); l_nRow++) {
+				double l_Val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, std::numeric_limits<double>::min() }(
+					m_aanColTransResults[l_nRow]);
+				m_anResultColTransObserversMatrix[l_nRow][l_nObserverTransIndex] = l_Val;
+
+			}
+			l_nObserverTransIndex++;
+		}
+	}
+	else
+	{//mmixed observer
+
+		if (m_vMixedObservers.size() > 0)
+		{
+			SP_Vector2DDouble vec(m_pcMainSimulator->GetResultMatrix().size(), SP_VectorDouble(m_vMixedObservers.size(), 0.0));
+			m_anResultMixedObserversMatrix = vec;
+		}
+
+		SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+		if (l_pcMetadataclass)
+		{
+			SP_VectorString l_asParameterNames;
+
+			SP_ListMetadata::const_iterator l_itElem;
+			int l_nObserverPlacesIndex = 0;
+			for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+			{
+				SP_DS_Metadata* l_pcMetadata = *l_itElem;
+				wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+				wxString l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
+				wxString l_sBody = l_pcMetadata->GetAttribute(wxT("Body"))->GetValueString();
+				wxString l_sColType = l_pcMetadata->GetAttribute(wxT("ColPNType"))->GetValueString();
+
+				if (l_sColType == _T("Mixed"))
+				{
+					SP_FunctionPtr funcPtrEvaluator = RegesterFunctionVariables(wxT("Mixed"), l_sName, l_sBody);
+
+					if (funcPtrEvaluator == NULL) continue;
+
+					 SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+
+					for (unsigned int l_nRow = 0; l_nRow < m_anCombinedResultMatrix.size(); l_nRow++)
+					{
+
+						double l_dVal = SP_DS_FunctionEvaluatorDouble{ l_pcFR, funcPtrEvaluator, std::numeric_limits<double>::min() }(
+										m_anCombinedResultMatrix[l_nRow]);
+						m_anResultMixedObserversMatrix[l_nRow][l_nObserverPlacesIndex] = l_dVal;
+					}
+					l_nObserverPlacesIndex++;
+				}
+			}
+		}
+	}
+}
+
+
+void SP_DLG_ColStSimulationResults::ComputeCombinedMatrix(const wxString& p_sObserverBody, std::map<std::string, unsigned int>& p_mapvar2Pos)
+{
+	SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+	SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(p_sObserverBody));
+	if (!l_pcFunction)
+	{
+		SP_MESSAGEBOX(wxT("the body of observer ") + p_sObserverBody + wxT(" is not correct"), wxT("Check Observer"), wxOK | wxICON_ERROR);
+		return;
+	}
+
+	SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
+	std::set<std::string> variables;
+	l_pcExpanded->getVariables(variables);
+
+	if (variables.size() > 0)
+	{
+		SP_Vector2DDouble vec(m_pcMainSimulator->GetResultMatrix().size(), SP_VectorDouble(0, 0.0));
+		m_anCombinedResultMatrix = vec;
+	}
+	for (auto v : variables)
+	{
+		wxString l_sVarName = v;
+		bool l_bIsFound = false;
+		for (int i = 0; i < m_msColoredPlaceNames.size(); i++)
+		{//col places
+
+			if (m_msColoredPlaceNames[i] == l_sVarName)
+			{
+				l_bIsFound = true;
+				int l_npos = 0;
+				for (int j = 0; j < m_anCombinedResultMatrix.size(); j++)
+				{
+					m_anCombinedResultMatrix[j].push_back(m_aanColPlaceResults[j][i]);
+				}
+				l_npos = m_anCombinedResultMatrix[0].size() - 1;
+				p_mapvar2Pos[v]= l_npos;
+				break;
+			}
+		}
+
+		if (l_bIsFound) continue;
+
+		for (int i = 0; i < m_msColoredTransitionNames.size(); i++)
+		{//col transitions
+
+			if (m_msColoredTransitionNames[i] == l_sVarName)
+			{
+				l_bIsFound = true;
+				int l_npos = 0;
+				for (int j = 0; j < m_anCombinedResultMatrix.size(); j++)
+				{
+				  m_anCombinedResultMatrix[j].push_back(m_aanColTransResults[j][i]);
+				}
+				l_npos = m_anCombinedResultMatrix[0].size() - 1;
+				p_mapvar2Pos[v] = l_npos;
+				break;
+			}
+		}
+
+		if (l_bIsFound) continue;
+
+		for (int i = 0; i < m_msPlaceNames.size(); i++)
+		{//unfolded places
+
+			if (m_msPlaceNames[i] == l_sVarName)
+			{
+				int l_npos = 0;
+				l_bIsFound = true;
+				ObtainSimulationMatrix(false);//switch to unfolded places matrix
+				for (int j = 0; j < m_anCombinedResultMatrix.size(); j++)
+				{
+					m_anCombinedResultMatrix[j].push_back(m_anResultMatrix[j][i]);
+				}
+				l_npos = m_anCombinedResultMatrix[0].size() - 1;
+				p_mapvar2Pos[v] = l_npos;
+				break;
+			}
+		}
+
+
+		if (l_bIsFound) continue;
+
+		for (int i = 0; i < m_msTransitionNames.size(); i++)
+		{//unfolded transitions
+
+			if (m_msTransitionNames[i] == l_sVarName)
+			{
+				int l_npos = 0;
+				l_bIsFound = true;
+				ObtainSimulationMatrix(true);//switch to unfolded trans matrix
+				for (int j = 0; j < m_anCombinedResultMatrix.size(); j++)
+				{
+					m_anCombinedResultMatrix[j].push_back(m_anResultMatrix[j][i]);
+				}
+				l_npos = m_anCombinedResultMatrix[0].size() - 1;
+				p_mapvar2Pos[v] = l_npos;
+				break;;
+			}
+		}
+
+		if (l_bIsFound) continue;
+
+		for (int i = 0; i < m_vUnfoldedPlacesObservers.size(); i++)
+		{//unfolded place observers, observer depends on a pre-defined place inst. obs
+
+			if (m_vUnfoldedPlacesObservers[i] == l_sVarName)
+			{
+				int l_npos = 0;
+				l_bIsFound = true;
+			//	ObtainSimulationMatrix(true);//switch to unfolded trans matrix
+				for (int j = 0; j < m_anCombinedResultMatrix.size(); j++)
+				{
+					m_anCombinedResultMatrix[j].push_back(m_anResultUnfoldedPlaceObserversMatrix[j][i]);
+				}
+				l_npos = m_anCombinedResultMatrix[0].size() - 1;
+				p_mapvar2Pos[v] = l_npos;
+				break;
+			}
+		}
+
+		if (l_bIsFound) continue;
+
+		for (int i = 0; i < m_vUnfoldedTransitionsObservers.size(); i++)
+		{//unfolded trans observers, observer depends on a pre-defined trans inst. obs
+
+			if (m_vUnfoldedTransitionsObservers[i] == l_sVarName)
+			{
+				int l_npos = 0;
+				l_bIsFound = true;
+			//	ObtainSimulationMatrix(true);//switch to unfolded trans matrix
+				for (int j = 0; j < m_anCombinedResultMatrix.size(); j++)
+				{
+					m_anCombinedResultMatrix[j].push_back(m_anResultUnfoldedTransitionObserversMatrix[j][i]);
+				}
+				l_npos = m_anCombinedResultMatrix[0].size() - 1;
+				p_mapvar2Pos[v] = l_npos;
+				break;
+			}
+		}
+
+		if (l_bIsFound) continue;
+
+		for (int i = 0; i < m_vColPlaceObservers.size(); i++)
+		{//colored place observers, observer depends on a pre-defined col place obs
+
+			if (m_vColPlaceObservers[i] == l_sVarName)
+			{
+				int l_npos = 0;
+				l_bIsFound = true;
+
+				for (int j = 0; j < m_anCombinedResultMatrix.size(); j++)
+				{
+					m_anCombinedResultMatrix[j].push_back(m_anResultColPlaceObserversMatrix[j][i]);
+				}
+				l_npos = m_anCombinedResultMatrix[0].size() - 1;
+				p_mapvar2Pos[v] = l_npos;
+				break;
+			}
+		}
+
+		if (l_bIsFound) continue;
+
+		for (int i = 0; i < m_vColTransObservers.size(); i++)
+		{//colored trans observers, observer depends on a pre-defined col trans obs
+
+			if (m_vColTransObservers[i] == l_sVarName)
+			{
+				int l_npos = 0;
+				l_bIsFound = true;
+
+				for (int j = 0; j < m_anCombinedResultMatrix.size(); j++)
+				{
+					m_anCombinedResultMatrix[j].push_back(m_anResultColTransObserversMatrix[j][i]);
+				}
+				l_npos = m_anCombinedResultMatrix[0].size() - 1;
+				p_mapvar2Pos[v] = l_npos;
+				break;
+			}
+		}
+
+	}
+
 
 }

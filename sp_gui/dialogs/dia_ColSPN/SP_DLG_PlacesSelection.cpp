@@ -1,9 +1,10 @@
 //////////////////////////////////////////////////////////////////////
 // $Source: $
-// $Author: fei liu $
+// $Author: fei liu & George assaf $
 // $Version: 0.0 $
 // $Revision: 1.0 $
 // $Date: 2011/08/11 11:20:00 $
+// $Updated: 2021 by observer
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 
@@ -146,19 +147,55 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 
 	//node class
 	l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxString l_asPlaceTransitionChoices[] = { wxT("Place"), wxT("Transition")};
-	m_pcPlaceTransitionRadioBox = new wxRadioBox(this, SP_ID_PLACETRANSITIONRADIOBOX, wxT("Observers"), wxDefaultPosition, wxDefaultSize, 2, l_asPlaceTransitionChoices, 2, wxRA_SPECIFY_ROWS | wxEXPAND);
+
+	if (l_sNetClass.Contains(wxT("Colored")))
+	{//net class
+
+			wxString l_asPlaceTransitionChoices[] = { wxT("Place"), wxT("Transition"),wxT("Observer places"),wxT("Observer transitions"),wxT("Mixed observers") };
+			m_pcPlaceTransitionRadioBox = new wxRadioBox(this, SP_ID_PLACETRANSITIONRADIOBOX, wxT("Observers"), wxDefaultPosition, wxDefaultSize, 5, l_asPlaceTransitionChoices, 5, wxRA_SPECIFY_ROWS | wxEXPAND);
+
+
+	}
+	else
+	{
+			//l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+			wxString l_asPlaceTransitionChoices[] = { wxT("Place"), wxT("Transition")  };
+			m_pcPlaceTransitionRadioBox = new wxRadioBox(this, SP_ID_PLACETRANSITIONRADIOBOX, wxT("Observers"), wxDefaultPosition, wxDefaultSize, 2, l_asPlaceTransitionChoices, 2, wxRA_SPECIFY_ROWS | wxEXPAND);
+	}
+//	wxString l_asPlaceTransitionChoices[] = { wxT("Place"), wxT("Transition")};
+	//m_pcPlaceTransitionRadioBox = new wxRadioBox(this, SP_ID_PLACETRANSITIONRADIOBOX, wxT("Observers"), wxDefaultPosition, wxDefaultSize, 2, l_asPlaceTransitionChoices, 2, wxRA_SPECIFY_ROWS | wxEXPAND);
 	l_pcRowSizer->Add(m_pcPlaceTransitionRadioBox, 1, wxALL | wxEXPAND, 5);
 
 	l_pcLeftContentSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+
+//	if(m_sNodeType == wxT("Place"))
+	//{
+	//	m_pcPlaceTransitionRadioBox->SetSelection(0);
+	//}
+	//else
+	//{
+	//	m_pcPlaceTransitionRadioBox->SetSelection(1);
+	//}
 
 	if(m_sNodeType == wxT("Place"))
 	{
 		m_pcPlaceTransitionRadioBox->SetSelection(0);
 	}
-	else
+	else if(m_sNodeType == wxT("Transition"))
 	{
 		m_pcPlaceTransitionRadioBox->SetSelection(1);
+	}
+	else if (m_sNodeType == wxT("Observer places"))
+	{
+		m_pcPlaceTransitionRadioBox->SetSelection(2);
+	}
+	else if (m_sNodeType == wxT("Observer transitions"))
+	{
+		m_pcPlaceTransitionRadioBox->SetSelection(3);
+	}
+	else
+	{
+		m_pcPlaceTransitionRadioBox->SetSelection(4);
 	}
 
 	l_pcRowSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Colour")), wxHORIZONTAL);
@@ -174,11 +211,12 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 	if(l_sNetClass.Contains(wxT("Colored")))
 	{
 		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		wxString l_asOutputTypeChoices[] = { wxT("Unfolded"), wxT("Colored"), wxT("Auxiliary variables")};
-		m_pcOutputTypeRadioBox = new wxRadioBox(this, SP_ID_OUTPUTTYPERADIOBOX, wxT("OutType"), wxDefaultPosition, wxDefaultSize, 3, l_asOutputTypeChoices, 3, wxRA_SPECIFY_ROWS | wxEXPAND);
+		wxString l_asOutputTypeChoices[] = { wxT("Unfolded"), wxT("Colored")};
+		//wxString l_asOutputTypeChoices[] = { wxT("Unfolded"), wxT("Colored"), wxT("Auxiliary variables")};
+		m_pcOutputTypeRadioBox = new wxRadioBox(this, SP_ID_OUTPUTTYPERADIOBOX, wxT("OutType"), wxDefaultPosition, wxDefaultSize, 2, l_asOutputTypeChoices, 2, wxRA_SPECIFY_ROWS | wxEXPAND);
 		if(m_sNodeType == wxT("Transition"))
 		{
-			m_pcOutputTypeRadioBox->Show(2,false);
+			m_pcOutputTypeRadioBox->Show(1,false);
 		}
 		if(m_sOutputType == wxT("Unfolded"))
 		{
@@ -190,13 +228,13 @@ void SP_DLG_PlacesSelection::SetCommonLayout1()
 		}
 		else
 		{
-			m_pcOutputTypeRadioBox->SetSelection(2);
+			m_pcOutputTypeRadioBox->SetSelection(1);
 		}
 		l_pcRowSizer->Add(m_pcOutputTypeRadioBox, 1, wxALL | wxEXPAND, 5);
 		l_pcLeftContentSizer->Add(l_pcRowSizer, 0, wxEXPAND);
-		l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizer->Add(new wxButton( this, SP_ID_BUTTON_EDITAUXVAR, wxT( "Edit Auxilary" ) ), 0, wxALL | wxEXPAND, 5);
-		l_pcLeftContentSizer->Add(l_pcRowSizer, 0, wxEXPAND);
+		//l_pcRowSizer = new wxBoxSizer(wxHORIZONTAL);
+		//l_pcRowSizer->Add(new wxButton( this, SP_ID_BUTTON_EDITAUXVAR, wxT( "Edit Auxilary" ) ), 0, wxALL | wxEXPAND, 5);
+		//l_pcLeftContentSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 	}
 
 	/**************top row****************/
@@ -679,14 +717,14 @@ void SP_DLG_PlacesSelection::OnChangedPlaceTransition(wxCommandEvent& p_cEvent)
 		m_sNodeType = wxT("Place");
 
 		m_msaCurLBInStrings[wxT("Place:Unfolded")] = m_ArrayUnPlaces;		
-		m_msaCurLBInStrings[wxT("Place:Auxiliary variables")] = m_ArrayPlaceAuxVar;
+		//m_msaCurLBInStrings[wxT("Place:Auxiliary variables")] = m_ArrayPlaceAuxVar;
 	}
 	else
 	{
 		m_sNodeType = wxT("Transition");
 
 		m_msaCurLBInStrings[wxT("Transition:Unfolded")] = m_ArrayUnTranstions;		
-		m_msaCurLBInStrings[wxT("Transition:Auxiliary variables")] = m_ArrayTransAuxVar;
+		//m_msaCurLBInStrings[wxT("Transition:Auxiliary variables")] = m_ArrayTransAuxVar;
 	}
 
 	m_pListBoxOut->Clear();
@@ -720,6 +758,9 @@ void SP_DLG_PlacesSelection::Initialize()
 {
 	m_ArrayUnPlaces.clear();
 	m_ArrayUnTranstions.clear();
+	m_ArrayUnPlacesObserver.clear();//george9.2.21
+    m_ArrayUnTransObserver.clear();//george 9.2.21
+
 	SP_DS_Nodeclass* l_pcNodeclass;
 	SP_ListNode::const_iterator l_itElem;
 
@@ -754,6 +795,31 @@ void SP_DLG_PlacesSelection::Initialize()
 			l_nPos++;
 		}	
 	}
+
+
+	/////18.02
+		SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+		if (l_pcMetadataclass && !(m_pcGraph->GetNetclass()->GetDisplayName().Contains(wxT("Colored"))))
+		{
+			SP_VectorString l_asParameterNames;
+
+			SP_ListMetadata::const_iterator l_itElem;
+			for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+			{
+				SP_DS_Metadata* l_pcMetadata = *l_itElem;
+				wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+				wxString l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
+				if (l_sType == wxT("Place"))
+				{
+					m_mPlaceID2Name[l_nPos] = l_sName;
+					m_mPlaceName2ID[l_sName] = l_nPos;
+					m_ArrayUnPlaces.Add(l_sName);
+					l_nPos++;
+				}
+			}
+		}
+		///
+
 
 	long l_nPosPlaces = l_nPos; // save counter for adding the observers later
 	l_nPos = 0;
@@ -831,6 +897,32 @@ void SP_DLG_PlacesSelection::Initialize()
 		}	
 	}
 
+
+	/////18.02
+		 l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+		if (l_pcMetadataclass && !(m_pcGraph->GetNetclass()->GetDisplayName().Contains(wxT("Colored"))))
+		{
+
+			SP_ListMetadata::const_iterator l_itElem;
+			for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+			{
+				SP_DS_Metadata* l_pcMetadata = *l_itElem;
+				wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+				wxString l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
+				if (l_sType == wxT("Transition"))
+				{
+
+					m_mTransID2Name[l_nPos] = l_sName;
+					m_mTransName2ID[l_sName] = l_nPos;
+					m_ArrayUnTranstions.Add(l_sName);
+					l_nPos++;
+				}
+			}
+		}
+
+		/////
+
+		/*
 	// decide for each observer if place or transition
 	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
 	if (l_pcMetadataclass)
@@ -857,23 +949,47 @@ void SP_DLG_PlacesSelection::Initialize()
 				l_nPos++;
 			}
 		}
-	}
+ }
+	*/
 
 	m_msaCurLBInStrings[wxT("Place:Unfolded")] = m_ArrayUnPlaces;
-	m_msaCurLBInStrings[wxT("Place:Auxiliary variables")] = m_ArrayPlaceAuxVar;
+	m_msaCurLBInStrings[wxT("Observer places:Unfolded")] = m_ArrayUnPlacesObserver;//george9.02.21
 	m_msaCurLBInStrings[wxT("Transition:Unfolded")] = m_ArrayUnTranstions;
-	m_msaCurLBInStrings[wxT("Transition:Auxiliary variables")] = m_ArrayTransAuxVar;
+	m_msaCurLBInStrings[wxT("Observer transitions:Unfolded")] = m_ArrayUnTransObserver;//george
 }
 
 void SP_DLG_PlacesSelection::InitilizeFromMetaData()
 {
+	bool l_bIsDefaultView = false;
+
+	wxString l_sViewerName,l_sTrimedViewName;
+	l_sViewerName<<m_pcEditMetadata->GetAttribute(wxT("Name"))->GetValueString();
+	l_sTrimedViewName=l_sViewerName.Trim();
+	l_sTrimedViewName= l_sTrimedViewName.Trim(false);
+	if (l_sTrimedViewName.IsSameAs(wxT("Default View"))|| l_sTrimedViewName.IsSameAs(wxT("Main Plot"))|| l_sTrimedViewName.IsSameAs(wxT("Main plot")))
+	{
+			l_bIsDefaultView = true;
+	}
+
 	if(m_sNodeType == wxT("Place"))
 	{
 		m_pcPlaceTransitionRadioBox->SetSelection(0);
 	}
-	else
+	else if(m_sNodeType == wxT("Transition"))
 	{
 		m_pcPlaceTransitionRadioBox->SetSelection(1);
+	}
+	else if (m_sNodeType == wxT("Observer places"))
+	{
+		m_pcPlaceTransitionRadioBox->SetSelection(2);
+	}
+	else if (m_sNodeType == wxT("Observer transition"))
+	{
+		m_pcPlaceTransitionRadioBox->SetSelection(3);
+	}
+	else
+	{
+	   m_pcPlaceTransitionRadioBox->SetSelection(4);
 	}
 
 	m_pcPlaceChoiceStaticBox->SetLabel(wxT("The overall ") + m_sNodeType+ wxT("s"));
@@ -1014,6 +1130,37 @@ void SP_DLG_PlacesSelection::InitilizeFromMetaData()
 					}
 				}
 			}
+			else if (m_sNodeType == wxT("Observer places"))//by george
+					{
+						if (m_sOutputType == wxT("Unfolded"))
+						{
+							for (unsigned int i = 0; i < m_ArrayUnPlacesObserver.GetCount(); i++) {
+								l_sPlTrName = m_ArrayUnPlacesObserver[i];
+								bool match = l_RegEx.Matches(l_sPlTrName);
+								if (l_RegExInvert) { match = !match; }
+								if (match) {
+									l_arSelected.Add(l_sPlTrName);
+									if (itMap == m_msaCurLBInStrings.end())
+										continue;
+									itMap->second.Remove(l_sPlTrName);
+								}
+							}
+						}
+						else if (m_sOutputType == wxT("Colored"))
+						{
+							for (unsigned int i = 0; i < m_ArrayColPlacesObserver.GetCount(); i++) {
+								l_sPlTrName = m_ArrayColPlacesObserver[i];
+								bool match = l_RegEx.Matches(l_sPlTrName);
+								if (l_RegExInvert) { match = !match; }
+								if (match) {
+									l_arSelected.Add(l_sPlTrName);
+									if (itMap == m_msaCurLBInStrings.end())
+										continue;
+									itMap->second.Remove(l_sPlTrName);
+								}
+							}
+						}
+					}
 			m_pListBoxOut->Clear();
 			if (!l_arSelected.IsEmpty())
 			{
@@ -1022,7 +1169,12 @@ void SP_DLG_PlacesSelection::InitilizeFromMetaData()
 			}
 		}
 	}
-	m_pcPlaceChoiceOutRegex->SetValue(wxT("."));//default value, by george
+	//m_pcPlaceChoiceOutRegex->SetValue(wxT("."));//default value, by george
+	if (l_bIsDefaultView)//default value, by george
+		{
+			if (m_pcPlaceChoiceOutRegex->GetValue().IsEmpty())
+				m_pcPlaceChoiceOutRegex->SetValue(wxT("."));
+		}
 }
 
 void SP_DLG_PlacesSelection::AddtoCurLBInStrings(wxString p_sName)

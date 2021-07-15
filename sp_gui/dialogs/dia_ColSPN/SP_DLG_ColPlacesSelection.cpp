@@ -138,15 +138,31 @@ void SP_DLG_ColPlacesSelection::Initialize()
 	m_pvUnfoldedTrans = m_pcUnfoldedNet->GetTransitionNames();
 	m_pvColoredTrans = m_pcUnfoldedNet->GetColoredTransitionNames();
 
+	//inistantiate the vectors
+	m_pvUnfoldedPlaceObserver = new vector<wxString>;
+	m_pvColoredPlaceObserver = new vector<wxString>;
+	m_pvUnfoldedTransObserver = new vector<wxString>;
+	m_pvColoredTransObserver = new vector<wxString>;
+	m_pvMixedObserver = new vector<wxString>;
+
 	m_ArrayUnPlaces.clear();
 	m_ArrayColPlaces.clear();
 	m_ArrayUnTranstions.clear();
 	m_ArrayColTransitions.clear();
+	//by george
+	m_ArrayUnPlacesObserver.clear();
+	m_ArrayColPlacesObserver.clear();
+	m_ArrayUnTransObserver.clear();
+	m_ArrayColTransObserver.clear();
+	m_ArrayMixedObservers.clear();
 	
 	m_mPlaceName2ID.clear();
 	m_mTransName2ID.clear();
 	m_mColPlaceName2ID.clear();
 	m_mColTransName2ID.clear();
+	//by george
+	m_mColPlaceObserverName2ID.clear();
+	m_mColTransObserverName2ID.clear();
 
 	for(unsigned int i= 0; i < m_pvUnfoldedPlace->size(); i++)
 	{
@@ -176,12 +192,93 @@ void SP_DLG_ColPlacesSelection::Initialize()
 		m_ArrayColTransitions.Add(l_sTransName);
 		m_mColTransName2ID[l_sTransName] = i;
 	}
+
+	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
+		if (l_pcMetadataclass)
+		{
+			SP_VectorString l_asParameterNames;
+
+			SP_ListMetadata::const_iterator l_itElem;
+			for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
+			{
+				SP_DS_Metadata* l_pcMetadata = *l_itElem;
+				wxString l_sName = l_pcMetadata->GetAttribute(wxT("Name"))->GetValueString();
+				wxString l_sType = l_pcMetadata->GetAttribute(wxT("Type"))->GetValueString();
+				wxString l_sColpnType = l_pcMetadata->GetAttribute(wxT("ColPNType"))->GetValueString();
+				if (l_sColpnType.IsSameAs(wxT("Place instance")) && l_sType.IsSameAs(wxT("Place")) && std::find(m_pvUnfoldedPlace->begin(), m_pvUnfoldedPlace->end(), l_sName) == m_pvUnfoldedPlace->end())
+				{//add observers over unfolded places
+					m_pvUnfoldedPlaceObserver->push_back(l_sName);
+				}
+
+				if (l_sColpnType.IsSameAs(wxT("Col|Place")) && l_sType.IsSameAs(wxT("Place")) && std::find(m_pvColoredPlace->begin(), m_pvColoredPlace->end(), l_sName) == m_pvColoredPlace->end())
+				{//add observers over coloured places
+					m_pvColoredPlaceObserver->push_back(l_sName);
+				}
+				else if (l_sColpnType.IsSameAs(wxT("Col|Transition"))   && l_sType.IsSameAs(wxT("Transition")) && std::find(m_pvColoredTransObserver->begin(), m_pvColoredTransObserver->end(), l_sName) == m_pvColoredTransObserver->end())
+				{//observers over coloured transition
+					m_pvColoredTransObserver->push_back(l_sName);
+				}
+				else if (l_sColpnType.IsSameAs(wxT("Transition instance")) /*l_sColpnType.IsSameAs(wxT("Unfolded|Transition")) */&& l_sType.IsSameAs(wxT("Transition")) && std::find(m_pvUnfoldedTransObserver->begin(), m_pvUnfoldedTransObserver->end(), l_sName) == m_pvUnfoldedTransObserver->end())
+				{
+					m_pvUnfoldedTransObserver->push_back(l_sName);
+				}
+				else if (l_sColpnType==wxT("Mixed"))
+				{
+					m_pvMixedObserver->push_back(l_sName);
+				}
+			}
+		}
+
+
+			for (unsigned int i = 0; i < m_pvUnfoldedPlaceObserver->size(); i++)
+			{
+				wxString l_sObsPlaceName = (*m_pvUnfoldedPlaceObserver)[i];
+				m_ArrayUnPlacesObserver.Add(l_sObsPlaceName);
+				m_mPlaceObserverName2ID[l_sObsPlaceName] = i;
+
+			}
+
+			for (unsigned int i = 0; i < m_pvUnfoldedTransObserver->size(); i++)
+			{
+				wxString l_sObsTransName = (*m_pvUnfoldedTransObserver)[i];
+				m_ArrayUnTransObserver.Add(l_sObsTransName);
+				m_mTransObserverName2ID[l_sObsTransName] = i;
+			}
+
+			for (unsigned int i = 0; i <   m_pvMixedObserver->size(); i++)
+			{
+				wxString l_sObsName = (*m_pvMixedObserver)[i];
+				m_ArrayMixedObservers.Add(l_sObsName);
+				m_mMixedObserverName2ID[l_sObsName] = i;
+			}
+
+		for(unsigned int i= 0; i < m_pvColoredPlaceObserver->size(); i++)
+		{
+			wxString l_sObsPlaceName = (*m_pvColoredPlaceObserver)[i];
+			m_ArrayColPlacesObserver.Add(l_sObsPlaceName);
+			m_mColPlaceObserverName2ID[l_sObsPlaceName] = i;
+		}
+
+		for (unsigned int i = 0; i < m_pvColoredTransObserver->size(); i++)
+		{
+			wxString l_sTransName = (*m_pvColoredTransObserver)[i];
+			m_ArrayColTransObserver.Add(l_sTransName);
+			m_mColTransObserverName2ID[l_sTransName] = i;
+		}
+
+
+
 	m_msaCurLBInStrings[wxT("Place:Unfolded")] = m_ArrayUnPlaces;
 	m_msaCurLBInStrings[wxT("Place:Colored")] = m_ArrayColPlaces;
-	m_msaCurLBInStrings[wxT("Place:Auxiliary variables")] = m_ArrayPlaceAuxVar;
+	m_msaCurLBInStrings[wxT("Observer places:Colored")] = m_ArrayColPlacesObserver;
+	//m_msaCurLBInStrings[wxT("Place:Auxiliary variables")] = m_ArrayPlaceAuxVar;
 	m_msaCurLBInStrings[wxT("Transition:Unfolded")] = m_ArrayUnTranstions;
 	m_msaCurLBInStrings[wxT("Transition:Colored")] = m_ArrayColTransitions;
-	m_msaCurLBInStrings[wxT("Transition:Auxiliary variables")] = m_ArrayTransAuxVar;
+	m_msaCurLBInStrings[wxT("Observer transitions:Colored")] = m_ArrayColTransObserver;//
+	//m_msaCurLBInStrings[wxT("Transition:Auxiliary variables")] = m_ArrayTransAuxVar;
+	m_msaCurLBInStrings[wxT("Observer places:Unfolded")] = m_ArrayUnPlacesObserver;
+	m_msaCurLBInStrings[wxT("Observer transitions:Unfolded")] = m_ArrayUnTransObserver;
+	m_msaCurLBInStrings[wxT("Mixed observers")] = m_ArrayMixedObservers;//
 
 }
 
@@ -358,7 +455,114 @@ void SP_DLG_ColPlacesSelection::GetSelResults()
 					}
 				}
 			}
-		}	
+		}
+
+		if (m_sNodeType == wxT("Observer places"))
+				{//by george
+
+					if (l_bNotFound)
+					{
+						for (unsigned int i = 0; i < m_ArrayColPlacesObserver.size(); i++)
+						{
+							wxString l_sPlace = m_ArrayColPlacesObserver[i];
+							if (l_sPlace == l_SelectionItem)
+							{
+								l_bNotFound = false;
+								l_nPos = (long)i;
+								l_OutType = wxT("Colored");
+								break;
+							}
+						}
+					}
+
+					if (l_bNotFound)
+					{
+						for (unsigned int i = 0; i < m_ArrayUnPlacesObserver.size(); i++)
+						{
+							wxString l_sPlace = m_ArrayUnPlacesObserver[i];
+							if (l_sPlace == l_SelectionItem)
+							{
+								l_bNotFound = false;
+								l_nPos = (long)i;
+								l_OutType = wxT("Unfolded");
+								break;
+							}
+						}
+					}
+
+				}
+
+				if (m_sNodeType == wxT("Observer transitions"))
+				{
+
+					if (l_bNotFound)
+					{
+						for (unsigned int i = 0; i < m_ArrayColTransObserver.size(); i++)
+						{
+							wxString l_sPlace = m_ArrayColTransObserver[i];
+							if (l_sPlace == l_SelectionItem)
+							{
+								l_bNotFound = false;
+								l_nPos = (long)i;
+								l_OutType = wxT("Colored");
+								break;
+							}
+						}
+					}
+
+					if (l_bNotFound)
+					{
+						for (unsigned int i = 0; i < m_ArrayUnTransObserver.size(); i++)
+						{
+							wxString l_sPlace = m_ArrayUnTransObserver[i];
+							if (l_sPlace == l_SelectionItem)
+							{
+								l_bNotFound = false;
+								l_nPos = (long)i;
+								l_OutType = wxT("Unfolded");
+								break;
+							}
+						}
+					}
+
+				}
+
+				if (m_sNodeType == wxT("Mixed observers"))
+				{
+
+					if (l_bNotFound)
+					{
+						for (unsigned int i = 0; i < m_ArrayMixedObservers.size(); i++)
+						{
+							wxString l_sPlace = m_ArrayMixedObservers[i];
+							if (l_sPlace == l_SelectionItem)
+							{
+								l_bNotFound = false;
+								l_nPos = (long)i;
+								l_OutType = wxT("Colored");
+								break;
+							}
+						}
+					}
+
+					if (l_bNotFound)
+					{
+						for (unsigned int i = 0; i < m_ArrayMixedObservers.size(); i++)
+						{
+							wxString l_sPlace = m_ArrayMixedObservers[i];
+							if (l_sPlace == l_SelectionItem)
+							{
+								l_bNotFound = false;
+								l_nPos = (long)i;
+								l_OutType = wxT("Unfolded");
+								break;
+							}
+						}
+					}
+
+				}
+
+
 		l_Pos_Type.m_nPosition = l_nPos;
 		l_Pos_Type.m_OutputType = l_OutType;
 		l_Pos_Type.m_sName=m_pListBoxOut->GetString(Counter);
@@ -384,6 +588,16 @@ void SP_DLG_ColPlacesSelection::OnChangedOutType(wxCommandEvent& p_cEvent)
 		m_sOutputType = wxT("Auxiliary variables");
 	}
 	
+	if (m_sNodeType == wxT("Observer places") || m_sNodeType == wxT("Observer transitions")|| m_sNodeType == wxT("Mixed observers"))
+	{
+			m_msaCurLBInStrings[wxT("Observer places:Unfolded")] = m_ArrayUnPlacesObserver;
+			m_msaCurLBInStrings[wxT("Observer places:Colored")] = m_ArrayColPlacesObserver;
+			m_msaCurLBInStrings[wxT("Observer transitions:Unfolded")] = m_ArrayUnTransObserver;
+			m_msaCurLBInStrings[wxT("Observer transitions:Colored")] = m_ArrayColTransObserver;
+			m_msaCurLBInStrings[wxT("Mixed observers:Colored")] = m_ArrayMixedObservers;
+			m_pListBoxOut->Clear();
+	}
+
 	LoadData();
 
 }
@@ -404,7 +618,7 @@ void SP_DLG_ColPlacesSelection::OnChangedPlaceTransition(wxCommandEvent& p_cEven
 
 		m_msaCurLBInStrings[wxT("Place:Unfolded")] = m_ArrayUnPlaces;
 		m_msaCurLBInStrings[wxT("Place:Colored")] = m_ArrayColPlaces;
-		m_msaCurLBInStrings[wxT("Place:Auxiliary variables")] = m_ArrayPlaceAuxVar;
+		//m_msaCurLBInStrings[wxT("Place:Auxiliary variables")] = m_ArrayPlaceAuxVar;
 
 		m_pcChooseColoredPlace->Clear();
 		m_pcChooseColoredPlace->Append(wxT(""));
@@ -415,6 +629,55 @@ void SP_DLG_ColPlacesSelection::OnChangedPlaceTransition(wxCommandEvent& p_cEven
 		m_pcChooseColoredPlace->SetSelection(0);	
 		
 	}
+
+	else if (m_pcPlaceTransitionRadioBox->GetSelection() == 2)//observer place
+		{
+			m_sNodeType = wxT("Observer places");
+
+			m_pcOutputTypeRadioBox->Show(2, true);
+
+
+			m_msaCurLBInStrings[wxT("Observer places:Unfolded")] = m_ArrayUnPlacesObserver;
+			m_msaCurLBInStrings[wxT("Observer places:Colored")] = m_ArrayColPlacesObserver;
+
+
+			m_pcChooseColoredPlace->Clear();
+			m_pcChooseColoredPlace->Append(wxT(""));
+
+			m_pcChooseColoredPlace->SetSelection(0);
+		}
+		else if (m_pcPlaceTransitionRadioBox->GetSelection() == 3)//observer transition
+		{
+			m_sNodeType = wxT("Observer transitions");
+
+			m_pcOutputTypeRadioBox->Show(2, true);
+
+
+			m_msaCurLBInStrings[wxT("Observer transitions:Unfolded")] = m_ArrayUnTransObserver;
+			m_msaCurLBInStrings[wxT("Observer transitions:Colored")] = m_ArrayColTransObserver;
+
+
+			m_pcChooseColoredPlace->Clear();
+			m_pcChooseColoredPlace->Append(wxT(""));
+
+			m_pcChooseColoredPlace->SetSelection(0);
+		}
+		else if (m_pcPlaceTransitionRadioBox->GetSelection() == 4)
+		{
+			m_sNodeType = wxT("Mixed observers");
+
+			m_pcOutputTypeRadioBox->Show(2, true);
+
+
+			m_msaCurLBInStrings[wxT("Mixed observers:Unfolded")] = m_ArrayMixedObservers;
+			m_msaCurLBInStrings[wxT("Mixed observers:Colored")] = m_ArrayMixedObservers;
+
+
+			m_pcChooseColoredPlace->Clear();
+			m_pcChooseColoredPlace->Append(wxT(""));
+
+			m_pcChooseColoredPlace->SetSelection(0);
+		}
 	else
 	{
 		m_sNodeType = wxT("Transition");
