@@ -470,6 +470,22 @@ bool SP_DLG_NewConstantDefinition::LoadData()
 		wxString l_sMetadataType = dynamic_cast<SP_DS_TypeAttribute*>(l_pcMetadata->GetAttribute(wxT("Type")))->GetValue();
 		wxString l_sMetadataComment = dynamic_cast<SP_DS_TextAttribute*>(l_pcMetadata->GetAttribute(wxT("Comment")))->GetValue();
 
+		//by george
+		if (l_sMetadataName.IsEmpty())//should nott happen
+		{
+			continue;
+		}
+
+		if (l_sMetadataGroup.IsEmpty())//should nott happen
+		{
+			l_sMetadataGroup = wxT("all");
+		}
+		if (l_sMetadataType.IsEmpty())//should nott happen
+		{
+			l_sMetadataType = wxT("double");
+		}
+
+
 		wxString l_sMetadataShow = l_pcMetadata->GetShow() ? wxT("1") : wxT("0");
 		SP_DS_ColListAttribute * l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcMetadata->GetAttribute(wxT("ValueList")));
 
@@ -806,6 +822,7 @@ bool SP_DLG_NewConstantDefinition::DoCheckFunction(const wxString& p_sName, cons
 		return true;
 	}
 	return false;
+
 }
 
 void SP_DLG_NewConstantDefinition::OnGridCellValueChanged(wxGridEvent& p_gEvent)
