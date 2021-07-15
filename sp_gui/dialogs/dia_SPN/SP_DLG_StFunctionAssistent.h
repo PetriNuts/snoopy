@@ -4,6 +4,8 @@
 // $Version: 0.0 $
 // $Revision: 1.30 $
 // $Date: 2007/06/22 11:20:00 $
+// $Modified: George $
+// $Modification Date:2.2021:update the assistant to be suitable for observers, color marking and color sets def.$
 // Short Description:
 //////////////////////////////////////////////////////////////////////
 
@@ -60,13 +62,21 @@ class SP_DLG_StFunctionAssistent : public wxDialog
 
     wxString m_sReturnText;
 
+    SP_VectorString* m_vUnfoldedPlaces;
+    SP_VectorString* m_vUnfoldedTrans;
+
     SP_StParserType m_nAssistentType;
 
     wxTextCtrl* m_pcFormulaTextCtrl;
+    wxTextCtrl* m_pcRegExTextCtrl;//for regExp
 
     SP_DLG_StFunctionAssistent_ListCtrl* m_pcPlaceListCtrl;
     SP_DLG_StFunctionAssistent_ListCtrl* m_pcParameterListCtrl;
     SP_DLG_StFunctionAssistent_ListCtrl* m_pcFunctionListCtrl;
+
+    SP_DLG_StFunctionAssistent_ListCtrl* m_pcTransListCtrl;//by george for observers
+    SP_DLG_StFunctionAssistent_ListCtrl* m_pcUnfoldedTransListCtrl;//by george for observers
+    SP_DLG_StFunctionAssistent_ListCtrl* m_pcUnfoldedPlacesListCtrl;//by george for observers
 
     void LoadData();
 
@@ -78,6 +88,13 @@ class SP_DLG_StFunctionAssistent : public wxDialog
 
     void LoadFunctions();
 
+
+    void LoadTransitions();//by george for observers
+
+    void LoadUnfoldedElements();//by george for observers
+
+    void OnRegexSelection(wxCommandEvent& p_cEvent);//by george for observers
+
     DECLARE_CLASS( SP_DLG_StFunctionAssistent )
 
   protected :
@@ -88,7 +105,7 @@ class SP_DLG_StFunctionAssistent : public wxDialog
     SP_DLG_StFunctionAssistent( SP_StParserType p_nAssistentType, SP_DS_Node* m_pcParentNode,
       wxString p_psReturnText, wxWindow* p_pcParent, wxString p_sHelpText = wxT(""),
       const wxString& p_sTitle = wxT("Assistent"),
-      long p_nStyle = wxDEFAULT_DIALOG_STYLE );
+      long p_nStyle = wxDEFAULT_DIALOG_STYLE, SP_VectorString* p_vUnfoldedTrans=NULL, SP_VectorString* p_vUnfoldedPlaces = NULL);
 
     void OnDlgOk( wxCommandEvent& p_cEvent );
 

@@ -4,6 +4,7 @@
 // $Version: 0.0 $
 // $Revision: 1.30 $
 // $Date: 2007/06/22 11:20:00 $
+// $Updated: by george by adding columns for observer assistant$
 // Short Description:
 //////////////////////////////////////////////////////////////////////#
 
@@ -23,6 +24,7 @@
 #include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ValueAssign.h"
 #include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ColorSetClass.h"
 #include "sp_ds/extensions/Col_PN/SyntaxChecking/SP_CPN_SyntaxChecking.h"
+#include <wx/regex.h>
 
 IMPLEMENT_CLASS( SP_DLG_StFunctionAssistent, wxDialog )
 
@@ -33,7 +35,13 @@ enum
 	SP_ID_BUTTON_CHECK,
 	SP_ID_LISTCTRL_PLACE,
 	SP_ID_LISTCTRL_PARAMETER,
-	SP_ID_LISTCTRL_FUNCTION
+	SP_ID_LISTCTRL_FUNCTION,
+	//by george
+	SP_ID_LISTCTRL_TRANS,
+	SP_ID_LISTCTRL_UNFOLDED_TRANS,
+	SP_ID_LISTCTRL_UNFOLDED_PLACES,
+	SP_ID_TEXTCTRL_REGEXP,
+	SP_ID_BUTTON_COMPILE_REGEXP
 
 };
 
@@ -43,6 +51,8 @@ EVT_BUTTON( wxID_OK, SP_DLG_StFunctionAssistent::OnDlgOk )
 EVT_BUTTON( wxID_CANCEL, SP_DLG_StFunctionAssistent::OnDlgCancel )
 
 EVT_BUTTON( SP_ID_BUTTON_CHECK, SP_DLG_StFunctionAssistent::OnCheckFormula )
+EVT_BUTTON(SP_ID_BUTTON_COMPILE_REGEXP, SP_DLG_StFunctionAssistent::OnRegexSelection)
+
 
 END_EVENT_TABLE()
 
@@ -52,21 +62,37 @@ EVT_LIST_ITEM_ACTIVATED( SP_ID_LISTCTRL_PLACE, SP_DLG_StFunctionAssistent_ListCt
 EVT_LIST_ITEM_ACTIVATED( SP_ID_LISTCTRL_PARAMETER, SP_DLG_StFunctionAssistent_ListCtrl::OnDblClick )
 EVT_LIST_ITEM_ACTIVATED( SP_ID_LISTCTRL_FUNCTION, SP_DLG_StFunctionAssistent_ListCtrl::OnDblClick )
 
+EVT_LIST_ITEM_ACTIVATED(SP_ID_LISTCTRL_TRANS, SP_DLG_StFunctionAssistent_ListCtrl::OnDblClick)
+EVT_LIST_ITEM_ACTIVATED(SP_ID_LISTCTRL_UNFOLDED_TRANS, SP_DLG_StFunctionAssistent_ListCtrl::OnDblClick)
+EVT_LIST_ITEM_ACTIVATED(SP_ID_LISTCTRL_UNFOLDED_PLACES, SP_DLG_StFunctionAssistent_ListCtrl::OnDblClick)
 END_EVENT_TABLE()
 
 SP_DLG_StFunctionAssistent::SP_DLG_StFunctionAssistent(
 		SP_StParserType p_nAssistentType,SP_DS_Node* p_pcParentNode,
 		wxString p_psReturnText, wxWindow* p_pcParent, wxString p_sHelpText,
-		const wxString& p_sTitle, long p_nStyle)
+		const wxString& p_sTitle, long p_nStyle, SP_VectorString* p_vUnfoldedTrans, SP_VectorString* p_vUnfoldedPlaces)
 
 :
-	wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxSize(300, 500),
+	wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxSize(200, 400),
 			p_nStyle | wxSTAY_ON_TOP | wxRESIZE_BORDER | wxMAXIMIZE_BOX )
 
 {
+	m_vUnfoldedPlaces = p_vUnfoldedPlaces;
+	m_vUnfoldedTrans = p_vUnfoldedTrans;
+
 	m_nAssistentType = p_nAssistentType;
-	wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(p_pcParentNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-	SetTitle(wxT("Function assistant (")+l_sName+wxT(")"));
+	wxString l_sName;
+
+	if (p_pcParentNode)
+	{
+		l_sName = dynamic_cast<SP_DS_NameAttribute*>(p_pcParentNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+		SetTitle(wxT("Function assistant (") + l_sName + wxT(")"));
+	}
+	else
+	{
+		l_sName = wxT("Function assistant");
+	}
+
 	m_pcParentNode = p_pcParentNode;
 	m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
 
@@ -85,24 +111,59 @@ SP_DLG_StFunctionAssistent::SP_DLG_StFunctionAssistent(
 	l_pcFormulaSizer->Add(new wxButton(this, SP_ID_BUTTON_CHECK, wxT("Check")), 0, wxALL | wxEXPAND, 5);
 	m_pcSizer->Add(l_pcFormulaSizer, 1, wxALL | wxEXPAND, 1);
 
+	if (m_pcParentNode == NULL)//observers
+    {//RegEx
+			wxBoxSizer* l_pcRegExpSizer = new wxBoxSizer(wxHORIZONTAL);
+			l_pcRegExpSizer->Add(new wxStaticText(this, -1, _T("RegEXP")), 0, wxALL | wxEXPAND, 5);
+			m_pcRegExTextCtrl = new wxTextCtrl(this, SP_ID_TEXTCTRL_REGEXP, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+			l_pcRegExpSizer->Add(m_pcRegExTextCtrl, 1, wxALL | wxEXPAND, 5);
+			l_pcRegExpSizer->Add(new wxButton(this, SP_ID_BUTTON_COMPILE_REGEXP, wxT("Compile RegEx")), 0, wxALL | wxEXPAND, 5);
+			m_pcSizer->Add(l_pcRegExpSizer, 1, wxALL | wxEXPAND, 1);
+	}
+
+
 	//listboxes
 	wxBoxSizer* l_pcListBoxesSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	wxStaticBoxSizer* l_pcPlaceListBoxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, l_sPlaceLabel), wxHORIZONTAL);
 	m_pcPlaceListCtrl = new SP_DLG_StFunctionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_PLACE, wxDefaultPosition,
-								wxSize(200, 200), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
+								wxSize(100, 100), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
 	l_pcPlaceListBoxSizer->Add(m_pcPlaceListCtrl, 1, wxALL| wxEXPAND, 2);
 	l_pcListBoxesSizer->Add(l_pcPlaceListBoxSizer, 1, wxALL| wxEXPAND, 2);
 
-	wxStaticBoxSizer* l_pcParameterListBoxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Parameter")), wxHORIZONTAL);
+
+	if (p_pcParentNode == NULL)//observer assistant
+		{
+			wxStaticBoxSizer* l_pcTransListBoxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, _T("Transition")), wxHORIZONTAL);
+			m_pcTransListCtrl = new SP_DLG_StFunctionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_TRANS, wxDefaultPosition,
+				wxSize(100,100), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
+			l_pcTransListBoxSizer->Add(m_pcTransListCtrl, 1, wxALL | wxEXPAND, 2);
+			l_pcListBoxesSizer->Add(l_pcTransListBoxSizer, 1, wxALL | wxEXPAND, 2);
+
+			if (SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName().Contains(_T("Colored")))
+			{//only for colored nets
+				wxStaticBoxSizer* l_pcUnfoldTransListBoxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, _T("Unfolded Transitions")), wxHORIZONTAL);
+				m_pcUnfoldedTransListCtrl = new SP_DLG_StFunctionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_UNFOLDED_TRANS, wxDefaultPosition,
+					wxSize(100, 100), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
+				l_pcUnfoldTransListBoxSizer->Add(m_pcUnfoldedTransListCtrl, 1, wxALL | wxEXPAND, 2);
+				l_pcListBoxesSizer->Add(l_pcUnfoldTransListBoxSizer, 1, wxALL | wxEXPAND, 2);
+
+				wxStaticBoxSizer* l_pcUnfoldPlacesBxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, _T("Unfolded Places")), wxHORIZONTAL);
+				m_pcUnfoldedPlacesListCtrl = new SP_DLG_StFunctionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_UNFOLDED_PLACES, wxDefaultPosition,
+					wxSize(100, 100), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
+				l_pcUnfoldPlacesBxSizer->Add(m_pcUnfoldedPlacesListCtrl, 1, wxALL | wxEXPAND, 2);
+				l_pcListBoxesSizer->Add(l_pcUnfoldPlacesBxSizer, 1, wxALL | wxEXPAND, 2);
+			}
+		}
+	wxStaticBoxSizer* l_pcParameterListBoxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Constants")), wxHORIZONTAL);
 	m_pcParameterListCtrl = new SP_DLG_StFunctionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_PARAMETER, wxDefaultPosition,
-								wxSize(200, 200), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
+								wxSize(100, 100), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
 	l_pcParameterListBoxSizer->Add(m_pcParameterListCtrl, 1, wxALL| wxEXPAND, 2);
 	l_pcListBoxesSizer->Add(l_pcParameterListBoxSizer, 1, wxALL| wxEXPAND, 2);
 
 	wxStaticBoxSizer* l_pcFunctionListBoxSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, wxT("Functions / Lookup-Tables")), wxHORIZONTAL);
 	m_pcFunctionListCtrl = new SP_DLG_StFunctionAssistent_ListCtrl(this, this, SP_ID_LISTCTRL_FUNCTION, wxDefaultPosition,
-								wxSize(200, 200), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
+								wxSize(100, 100), wxLC_REPORT | wxLC_HRULES | wxLC_VRULES /*| wxLC_SORT_ASCENDING*/);
 	l_pcFunctionListBoxSizer->Add(m_pcFunctionListCtrl, 1, wxALL| wxEXPAND, 2);
 	l_pcListBoxesSizer->Add(l_pcFunctionListBoxSizer, 1, wxALL| wxEXPAND, 2);
 	m_pcSizer->Add(l_pcListBoxesSizer, 2, wxALL | wxEXPAND, 1);
@@ -158,10 +219,65 @@ void SP_DLG_StFunctionAssistent::LoadPrePlaces()
 
 	SP_DS_Node* l_pcNode = m_pcParentNode;
 
-	if (l_pcNode == NULL)
+
+
+	if (l_pcNode == NULL)//for observers in coloured nets
 	{
+		m_pcPlaceListCtrl->InsertColumn(0, wxT("Places"), wxLIST_FORMAT_LEFT);
+		SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+		wxString l_sName;
+		if (l_pcNodeclass)
+		{
+			for (SP_ListNode::const_iterator l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+			{
+				SP_DS_Node* l_pcNode = (*l_itElem);
+				l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+
+				l_cItem.SetBackgroundColour(*wxWHITE);
+
+				l_cItem.m_itemId = l_nPos++;
+				l_cItem.m_col = 0;
+				l_cItem.m_mask = wxLIST_MASK_TEXT;
+
+				l_cItem.m_text = l_sName;
+				m_pcPlaceListCtrl->InsertItem(l_cItem);
+			}
+		}
+
+		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+
+		if (l_pcNodeclass)
+		{
+			for (SP_ListNode::const_iterator l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+			{
+				SP_DS_Node* l_pcNode = (*l_itElem);
+				l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+
+				l_cItem.SetBackgroundColour(*wxWHITE);
+
+				l_cItem.m_itemId = l_nPos++;
+				l_cItem.m_col = 0;
+				l_cItem.m_mask = wxLIST_MASK_TEXT;
+
+				l_cItem.m_text = l_sName;
+				m_pcPlaceListCtrl->InsertItem(l_cItem);
+			}
+		}
+
+		m_pcPlaceListCtrl->SetColumnWidth(0, wxLIST_AUTOSIZE);
+		if (m_pcPlaceListCtrl->GetColumnWidth(0) < 180)
+			m_pcPlaceListCtrl->SetColumnWidth(0, 180);
+
+
 		return;
 	}
+
+
+	if (l_pcNode == NULL)
+	{
+			return;
+	}
+
 
 	SP_ListEdge::const_iterator l_itEdge;
 
@@ -232,32 +348,7 @@ void SP_DLG_StFunctionAssistent::LoadParameter()
 			m_pcParameterListCtrl->InsertItem(l_cItem);
 		
 		}
-		/* - old code before harmonize the constants
-		SP_DS_Nodeclass* l_pcNodeclass;
 
-		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_PARAM);
-
-		SP_ListNode::const_iterator l_itElem;
-
-		m_pcParameterListCtrl->InsertColumn(0, wxT("Parameter"), wxLIST_FORMAT_LEFT);
-
-		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem
-				!= l_pcNodeclass->GetElements()->end(); ++l_itElem)
-		{
-
-			l_sParameterName = dynamic_cast<SP_DS_NameAttribute*>((*l_itElem)->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-
-			l_cItem.SetBackgroundColour(*wxWHITE);
-
-			l_cItem.m_itemId = l_nPos++;
-			l_cItem.m_col = 0;
-			l_cItem.m_mask = wxLIST_MASK_TEXT;
-			l_cItem.m_text = l_sParameterName;
-
-			m_pcParameterListCtrl->InsertItem(l_cItem);
-
-		}
-		*/
 	}
 	else
 	{
@@ -339,27 +430,7 @@ void SP_DLG_StFunctionAssistent::LoadFunctions()
     l_cItem.m_text = wxT("");
     l_cItem.m_text << wxT("MassAction( . )");
    	m_pcFunctionListCtrl->InsertItem(l_cItem);
-/*
-	l_cItem.m_itemId = l_nPos++;
-	l_cItem.m_text = wxT("");
-	l_cItem.m_text << wxT("LevelInterpretation( . , . )");
-	m_pcFunctionListCtrl->InsertItem(l_cItem);
 
-	l_cItem.m_itemId = l_nPos++;
-	l_cItem.m_text = wxT("");
-	l_cItem.m_text << wxT("Summation( _PrePlaces )");
-	m_pcFunctionListCtrl->InsertItem(l_cItem);
-
-	l_cItem.m_itemId = l_nPos++;
-	l_cItem.m_text = wxT("");
-	l_cItem.m_text << wxT("Product( _PrePlaces )");
-	m_pcFunctionListCtrl->InsertItem(l_cItem);
-
-	l_cItem.m_itemId = l_nPos++;
-	l_cItem.m_text = wxT("");
-	l_cItem.m_text << wxT("Multiplicity( . )");
-	m_pcFunctionListCtrl->InsertItem(l_cItem);
-*/
 	l_cItem.m_itemId = l_nPos++;
 	l_cItem.m_text = wxT("");
 	l_cItem.m_text << wxT("MichaelisMenten( , )");
@@ -569,6 +640,13 @@ void SP_DLG_StFunctionAssistent::LoadData()
 		m_pcFormulaTextCtrl->SetSelection(-1,-1);
 	}
 
+	LoadTransitions();//for observer assistant
+
+	if(SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName().Contains(_T("Colored")))
+	{//only for colored nets
+			LoadUnfoldedElements();//for observers colored nets assistant
+	}
+
 	LoadPrePlaces();
 	LoadParameter();
 	LoadFunctions();
@@ -678,6 +756,128 @@ void SP_DLG_StFunctionAssistent::OnCheckFormula(wxCommandEvent& p_cEvent)
 
 }
 
+
+void SP_DLG_StFunctionAssistent::LoadUnfoldedElements()
+{
+	if (!m_vUnfoldedPlaces || !m_vUnfoldedTrans||!m_pcUnfoldedTransListCtrl) return;
+
+	if (m_pcParentNode == NULL)//means observers assistant
+	{
+		wxListItem l_cItem;
+		int l_nPos = 0;
+
+		SP_DS_Node* l_pcNode = m_pcParentNode;
+
+		if (l_pcNode == NULL)//for observers in coloured nets
+		{
+			m_pcUnfoldedTransListCtrl->InsertColumn(0, wxT(" Unfolded transition"), wxLIST_FORMAT_LEFT);
+
+			for (int i = 0; i < m_vUnfoldedTrans->size(); i++)
+			{
+				l_cItem.SetBackgroundColour(*wxWHITE);
+
+				l_cItem.m_itemId = l_nPos++;
+				l_cItem.m_col = 0;
+				l_cItem.m_mask = wxLIST_MASK_TEXT;
+
+				l_cItem.m_text = (*m_vUnfoldedTrans)[i];
+				//m_pcPlaceListCtrl->InsertItem(l_cItem);
+				m_pcUnfoldedTransListCtrl->InsertItem(l_cItem);
+			}
+
+			m_pcUnfoldedTransListCtrl->SetColumnWidth(0, wxLIST_AUTOSIZE);
+			if (m_pcUnfoldedTransListCtrl->GetColumnWidth(0) < 180)
+				m_pcUnfoldedTransListCtrl->SetColumnWidth(0, 180);
+			///unfolded places
+			m_pcUnfoldedPlacesListCtrl->InsertColumn(0, wxT(" Unfolded places"), wxLIST_FORMAT_LEFT);
+
+			for (int i = 0; i < m_vUnfoldedPlaces->size(); i++)
+			{
+				l_cItem.SetBackgroundColour(*wxWHITE);
+
+				l_cItem.m_itemId = l_nPos++;
+				l_cItem.m_col = 0;
+				l_cItem.m_mask = wxLIST_MASK_TEXT;
+
+				l_cItem.m_text = (*m_vUnfoldedPlaces)[i];
+				//m_pcPlaceListCtrl->InsertItem(l_cItem);
+				m_pcUnfoldedPlacesListCtrl->InsertItem(l_cItem);
+			}
+
+			m_pcUnfoldedPlacesListCtrl->SetColumnWidth(0, wxLIST_AUTOSIZE);
+			if (m_pcUnfoldedPlacesListCtrl->GetColumnWidth(0) < 180)
+				m_pcUnfoldedPlacesListCtrl->SetColumnWidth(0, 180);
+			return;
+		}
+	}
+}
+
+
+
+
+void SP_DLG_StFunctionAssistent::LoadTransitions()
+{
+	if (m_pcParentNode == NULL)//means observers assistant
+	{
+		wxListItem l_cItem;
+		int l_nPos = 0;
+
+		SP_DS_Node* l_pcNode = m_pcParentNode;
+
+		if (l_pcNode == NULL)//for observers in coloured nets
+		{
+		   m_pcTransListCtrl->InsertColumn(0, wxT("Transition"), wxLIST_FORMAT_LEFT);
+			SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_STOCHASTIC_TRANS);
+			wxString l_sName;
+			if (l_pcNodeclass)
+			{
+				for (SP_ListNode::const_iterator l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+				{
+					SP_DS_Node* l_pcNode = (*l_itElem);
+					l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+
+					l_cItem.SetBackgroundColour(*wxWHITE);
+
+					l_cItem.m_itemId = l_nPos++;
+					l_cItem.m_col = 0;
+					l_cItem.m_mask = wxLIST_MASK_TEXT;
+
+					l_cItem.m_text = l_sName;
+					//m_pcPlaceListCtrl->InsertItem(l_cItem);
+					m_pcTransListCtrl->InsertItem(l_cItem);
+				}
+			}
+
+			l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_TRANS);
+
+			if (l_pcNodeclass)
+			{
+				for (SP_ListNode::const_iterator l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+				{
+					SP_DS_Node* l_pcNode = (*l_itElem);
+					l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+
+					l_cItem.SetBackgroundColour(*wxWHITE);
+
+					l_cItem.m_itemId = l_nPos++;
+					l_cItem.m_col = 0;
+					l_cItem.m_mask = wxLIST_MASK_TEXT;
+
+					l_cItem.m_text = l_sName;
+					m_pcTransListCtrl->InsertItem(l_cItem);
+				}
+			}
+
+			m_pcTransListCtrl->SetColumnWidth(0, wxLIST_AUTOSIZE);
+			if (m_pcTransListCtrl->GetColumnWidth(0) < 180)
+				m_pcTransListCtrl->SetColumnWidth(0, 180);
+
+			return;
+		}
+    }
+}
+
+
 void SP_DLG_StFunctionAssistent::InsertIntoFormulaText(const wxString& p_sInsertText)
 {
 	long l_nInsertFrom = 0;
@@ -695,3 +895,101 @@ void SP_DLG_StFunctionAssistent_ListCtrl::OnDblClick(wxListEvent& event)
 
 }
 
+
+void SP_DLG_StFunctionAssistent::OnRegexSelection(wxCommandEvent& p_cEvent)
+{
+
+	if(!m_pcRegExTextCtrl) return;
+
+	wxString l_nRegexString = m_pcRegExTextCtrl->GetValue();
+
+	if (!m_vUnfoldedPlaces || !m_vUnfoldedTrans) return;
+
+	SP_VectorString* l_vAllElement = new SP_VectorString;
+
+	l_vAllElement->insert(l_vAllElement->begin(), m_vUnfoldedPlaces->begin(), m_vUnfoldedPlaces->end());
+
+	l_vAllElement->insert(l_vAllElement->end(), m_vUnfoldedTrans->begin(), m_vUnfoldedTrans->end());
+
+	l_nRegexString.Replace(wxT(" "), wxT(""));
+	l_nRegexString.Replace(wxT("\t"), wxT(""));
+	//wxRegEx l_cExp;
+	SP_MapString2String l_mRegExp2Operator;
+	wxRegEx rx("((PLUS|MINUS|MULTI|DIVID)\(.*\))+", wxRE_ADVANCED);
+	bool l_bIsValidRegex = false;
+	if (rx.IsValid())
+	{
+
+
+		if (rx.Matches(l_nRegexString))
+		{
+			l_bIsValidRegex = true;
+
+		}
+
+	}
+
+		wxString l_sPlusExp = l_nRegexString;
+		l_sPlusExp.Replace(wxT("PLUS"),wxT("!"));
+		l_sPlusExp.Replace(wxT("MINUS"), wxT("$"));
+		bool l_bIsPlus = l_sPlusExp.Contains('!');
+		bool l_bIsMINUS = l_sPlusExp.Contains('$');
+		if (l_bIsPlus|| l_bIsMINUS)
+		{
+			l_sPlusExp.Replace(wxT("!"), wxT(""));
+			l_sPlusExp.Replace(wxT("$"), wxT(""));
+			l_sPlusExp.Replace(wxT("("), wxT(""));
+			l_sPlusExp.Replace(wxT(")"), wxT(""));
+		}
+
+		wxRegEx l_nRegex;
+
+		wxString l_sResult;
+
+		if (l_nRegex.Compile(l_sPlusExp, wxRE_DEFAULT))
+		{
+
+			for (int i = 0; i <l_vAllElement->size(); i++)
+			{
+				wxString l_tempString = (*l_vAllElement)[i];
+				bool match = l_nRegex.Matches(l_tempString);
+
+				if (match)
+				{
+					if (l_bIsMINUS)
+					{
+						l_sResult << l_tempString << wxT(" - ");
+					}
+					else if (l_bIsPlus)
+					{
+						l_sResult << l_tempString << wxT(" + ");
+					}
+					else
+					{
+						l_sResult << l_tempString << wxT(" ");
+					}
+
+				}
+				m_pcFormulaTextCtrl->Clear();
+				if (l_bIsMINUS)
+				{
+					InsertIntoFormulaText(l_sResult.BeforeLast('-'));
+					m_sReturnText = m_pcFormulaTextCtrl->GetValue();
+				}
+				else if (l_bIsPlus)
+				{
+					InsertIntoFormulaText(l_sResult.BeforeLast('+'));
+					m_sReturnText = m_pcFormulaTextCtrl->GetValue();
+				}
+				else
+				{
+					InsertIntoFormulaText(l_sResult.BeforeLast(' '));
+					m_sReturnText = m_pcFormulaTextCtrl->GetValue();
+				}
+
+			}
+
+		}
+
+
+}
