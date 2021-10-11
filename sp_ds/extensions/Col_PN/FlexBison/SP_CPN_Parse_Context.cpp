@@ -4,6 +4,7 @@
 // $Version: 0.0 $
 // $Revision: 1.00 $
 // $Date: 2009/09/28 10:20:00 $
+// $Updated:by george assaf with new operations for colored PN
 // Short Description: Binding class
 //////////////////////////////////////////////////////////////////////
 
@@ -277,6 +278,64 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 					}
 				}
 				
+				///////////////////1.9.2021
+				//Look up the colored place names
+				if (this->m_pcGraph)//for numOf
+				{//discrete places
+					SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+					SP_ListNode::const_iterator l_itElem;
+					if (l_pcNodeclass)
+					{
+						for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+						{
+							SP_DS_Node* l_pcPlaceNode = (*l_itElem);
+
+							if (l_pcNodeclass)
+							{
+								wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+								if (l_sPlaceName == m_VariableName)
+								{
+									m_ParseNode_Info.m_NodeType = CPN_PLACE_NODE;
+									m_ParseNode_Info.m_sColoredPlaceName = m_VariableName;
+									m_ParseNode_Info.m_bPlaceFlag = true;
+									m_ParseNode_Info.m_DataType = CPN_INTEGER;
+									return true;
+								}
+							}
+						}
+					}
+				}
+
+				if (this->m_pcGraph)//for numOf
+				{//continuous places
+					SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+					SP_ListNode::const_iterator l_itElem;
+					if (l_pcNodeclass)
+					{
+						for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+						{
+							SP_DS_Node* l_pcPlaceNode = (*l_itElem);
+
+							if (l_pcNodeclass)
+							{
+								wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+								if (l_sPlaceName == m_VariableName)
+								{
+									m_ParseNode_Info.m_NodeType = CPN_PLACE_NODE;
+									m_ParseNode_Info.m_sColoredPlaceName = m_VariableName;
+									m_ParseNode_Info.m_bPlaceFlag = true;
+									m_ParseNode_Info.m_DataType = CPN_DOUBLE;
+									return true;
+								}
+							}
+						}
+					}
+
+				}
+
+
+				///////////////////
+
 				wxString l_sError;				
 				l_sError << wxT("Variable: ") << m_VariableName << wxT(" is not defined. Position: ") << m_sErrorPosition;
 				SP_LOGERROR(l_sError);
@@ -495,6 +554,70 @@ bool SP_CPN_Parse_Variable_Node::ProcessingVariable()  // add flag to indicate c
 				return true;
 			}
 		}
+		//===========================
+
+		//Look up the colored place names
+		if (this->m_pcGraph)//for numOf
+		{//discrete places
+			SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+
+			if (l_pcNodeclass)
+			{
+				SP_ListNode::const_iterator l_itElem;
+				for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+				{
+					SP_DS_Node* l_pcPlaceNode = (*l_itElem);
+
+					if (l_pcNodeclass)
+					{
+						wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+						if (l_sPlaceName == m_VariableName)
+						{
+							m_ParseNode_Info.m_NodeType = CPN_PLACE_NODE;
+							m_ParseNode_Info.m_sColoredPlaceName = m_VariableName;
+							m_ParseNode_Info.m_bPlaceFlag = true;
+							m_ParseNode_Info.m_DataType = CPN_INTEGER;
+							return true;
+						}
+					}
+				}
+
+
+			}
+		}
+
+		if (this->m_pcGraph)//for numOf
+		{//continuous places
+
+			SP_DS_Nodeclass* l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+			SP_ListNode::const_iterator l_itElem;
+			if (l_pcNodeclass)
+			{
+				for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+				{
+					SP_DS_Node* l_pcPlaceNode = (*l_itElem);
+
+					if (l_pcNodeclass)
+					{
+						wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+						if (l_sPlaceName == m_VariableName)
+						{
+							m_ParseNode_Info.m_DataType = CPN_DOUBLE;
+							m_ParseNode_Info.m_NodeType = CPN_PLACE_NODE;
+							m_ParseNode_Info.m_sColoredPlaceName = m_VariableName;
+							m_ParseNode_Info.m_bPlaceFlag = true;
+
+							return true;
+						}
+					}
+				}
+
+			}
+		}
+		//============================
+
+
+
 		//////////////////////////
 		//for other cases, we report errors			
 		wxString l_sError;
@@ -1416,6 +1539,97 @@ bool SP_CPN_Parse_IndexAbstract_Node::GetIndex()
 }
 
 
+bool SP_CPN_Parse_Rand_Node::check()
+{
+
+	m_pLeft->check();
+	SP_CPN_ParseNode_Info* l_pLeftNodeInfo = m_pLeft->GetParseNodeInfo();
+	m_pRight->check();
+	SP_CPN_ParseNode_Info* l_pRightNodeInfo = m_pRight->GetParseNodeInfo();
+
+	wxString l_sLeftString, l_sRightString;
+	wxString l_sLeftCS, l_sRightCS;
+
+	if (l_pLeftNodeInfo->m_NodeType == CPN_VARIABLE_NODE && l_pLeftNodeInfo->m_NodeType == CPN_INTEGER)
+	{
+		l_sLeftString = l_pLeftNodeInfo->m_CheckedString;
+		l_sLeftCS = l_pLeftNodeInfo->m_ColorSet;
+		l_sRightString = wxString::Format(wxT("%d"), l_pRightNodeInfo->m_IntegerValue);
+	}
+	else if (l_pLeftNodeInfo->m_NodeType == CPN_ARGUMENT_NODE)
+	{
+		l_sLeftString = l_pLeftNodeInfo->m_CheckedString;
+		l_sLeftCS = l_pLeftNodeInfo->m_ColorSet;
+	}
+	else
+	{
+		/**
+		if (l_pLeftNodeInfo->m_DataType == CPN_INTEGER)
+		{
+			l_sLeftString = wxString::Format(wxT("%d"), l_pLeftNodeInfo->m_IntegerValue);
+		}
+		else if (l_pLeftNodeInfo->m_DataType == CPN_BOOLEAN)
+		{
+			if (l_pLeftNodeInfo->m_BooleanValue == true)
+				l_sLeftString = wxT("true");
+			else
+				l_sLeftString = wxT("false");
+		}
+		else
+		{
+			l_sLeftString = *(l_pLeftNodeInfo->m_StringValue);
+		}
+		l_sLeftCS << l_pLeftNodeInfo->m_DataType;
+		*/
+	}
+
+	//if (l_pRightNodeInfo->m_NodeType == CPN_VARIABLE_NODE)
+////	{
+	//	l_sRightString = l_pRightNodeInfo->m_CheckedString;
+	//	l_sRightCS =  l_pRightNodeInfo->m_ColorSet;
+	//}
+	//else if (l_pRightNodeInfo->m_NodeType == CPN_ARGUMENT_NODE)
+	//{
+	//	l_sRightString = l_pRightNodeInfo->m_CheckedString;
+	//	l_sRightCS = l_pRightNodeInfo->m_ColorSet;
+	//}
+
+		if (l_pRightNodeInfo->m_DataType == CPN_INTEGER)
+		{
+			l_sRightString = wxString::Format(wxT("%d"), l_pRightNodeInfo->m_IntegerValue);
+		}
+
+		else
+		{
+			l_sRightString = *(l_pRightNodeInfo->m_StringValue);
+		}
+		l_sRightCS << l_pRightNodeInfo->m_DataType;
+
+
+	m_ParseNode_Info.m_CheckedString = l_sLeftString + wxT(",") + l_sRightString;
+	m_ParseNode_Info.m_ColorSet = l_sLeftCS ;
+
+
+	return true;
+}
+
+
+  SP_CPN_ParseNode_Info SP_CPN_Parse_Rand_Node::evaluate()
+{
+	//GetIndex();
+
+	  SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pRight->evaluate();
+	  SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();//->evaluate();
+
+	  m_ParseNode_Info.m_DataType = l_RightNodeInfo->m_DataType;
+	  m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo.m_ColorSet;
+
+	  //TODO
+	CollectResult();
+
+	return m_ParseNode_Info;
+}
+
 bool SP_CPN_Parse_IndexAbstract_Node::check()
 {
 	if(!m_pLeft->check())
@@ -1624,9 +1838,124 @@ bool SP_CPN_Parse_Add_Node::check()
 	return true;
 }
 
+void SP_CPN_Parse_NumOf_Node::CollectResult()
+{
+	m_ParseNode_Info.m_EvalResults.clear();
+	SP_CPN_EvaluatedSingleValue l_stEvalRes;
+	SP_CPN_DATATYPE l_DataType = m_ParseNode_Info. m_DataType;
+
+
+	if (l_DataType == CPN_INTEGER)
+	{
+		wxString l_sTemp;
+		l_sTemp << m_ParseNode_Info.m_IntegerValue;
+		l_stEvalRes.m_ColorValue = l_sTemp; //wxString::Format(wxT("%d"),m_ParseNode_Info.m_IntegerValue);
+	}
+
+
+	else if (l_DataType == CPN_BOOLEAN)
+	{
+		if (m_ParseNode_Info.m_BooleanValue == true)
+			l_stEvalRes.m_ColorValue = wxT("true");
+		else
+			l_stEvalRes.m_ColorValue = wxT("false");
+	}
+	//else
+	//{
+		//l_stEvalRes.m_ColorValue = *(m_ParseNode_Info.m_StringValue);
+	//}
+
+	//if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE || l_DataType==CPN_DOUBLE)
+	if ( l_DataType == CPN_DOUBLE)
+	l_stEvalRes.m_DoubleMultiplicity = m_ParseNode_Info.m_DoubleMultiplicity;
+	else
+		l_stEvalRes.m_Multiplicity = m_ParseNode_Info.m_Multiplicity;
+
+	l_stEvalRes.m_Predicate = m_ParseNode_Info.m_Predicate;
+	l_stEvalRes.m_bPlaceFlag = m_ParseNode_Info.m_bPlaceFlag;
+	m_ParseNode_Info.m_EvalResults.push_back(l_stEvalRes);
+
+}
+
+
+ wxString SP_CPN_Parse_NumOf_Node::eval(wxString p_scolour, wxString p_sTokenNUM, SP_DS_Node* p_pcNode)
+{
+	 SP_DS_TextAttribute* l_pcNameAttibute = dynamic_cast<SP_DS_TextAttribute*>(p_pcNode->GetAttribute(SP_DS_CPN_COLORSETNAME));
+	 if (l_pcNameAttibute)
+	 {
+		 wxString l_sColorSetName = l_pcNameAttibute->GetValue();
+		 SP_CPN_ColorSet* l_pcColorSet = m_pColorSetClass->LookupColorSet(l_sColorSetName);
+
+
+
+		 if (l_pcColorSet)
+		 {
+			 std::vector<wxString> l_vColors = l_pcColorSet->GetStringValue();
+			 for (auto itV = l_vColors.begin(); itV != l_vColors.end(); ++itV)
+			 {
+				 if (*itV == p_scolour)
+				 {
+						 return p_sTokenNUM;
+
+				 }
+			 }
+		 }
+	 }
+
+	return wxT("0");
+}
+
+bool SP_CPN_Parse_NumOf_Node::check()
+{
+	if (!m_pLeft->check())
+		return false;
+	if (!m_pRight->check())
+		return false;
+
+	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
+	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
+
+	this->m_ParseNode_Info.m_DataType = l_RightNodeInfo->m_DataType;
+
+	if (l_LeftNodeInfo->m_bPlaceFlag == false && l_RightNodeInfo->m_bPlaceFlag == true)
+	{
+		m_ParseNode_Info.m_bPlaceFlag = true;
+
+	}
+
+	if (!m_ParseNode_Info.m_bSeparaterExpression)
+		{
+			if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && (l_RightNodeInfo->m_DataType == CPN_INTEGER || l_RightNodeInfo->m_DataType == CPN_DOUBLE)))
+			{
+				wxString l_sError;
+				l_sError = wxT("Operands of the numOf operator error. Position: ") + m_sErrorPosition;
+				SP_LOGERROR(l_sError);
+				return false;
+			}
+	           m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
+			if (l_LeftNodeInfo->m_ColorSet != wxT(""))
+				m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
+
+			if (l_RightNodeInfo->m_ColorSet != wxT(""))
+				m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
+
+			if (m_ParseNode_Info.m_ColorSet != wxT(""))
+				m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
+			else
+			{
+				m_ParseNode_Info.m_sColorSetList = wxT("");
+				m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+			}
+		}
+
+
+
+	return true;
+}
 
 bool SP_CPN_Parse_Substract_Node::check()
 {
+
 	if (m_ParseNode_Info.m_bSeparaterExpression)
 	{
 		m_pLeft->GetParseNodeInfo()->m_bSeparaterExpression = true;
@@ -1877,7 +2206,13 @@ bool SP_CPN_Parse_Equal_Node::check()
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if (l_LeftNodeInfo->m_DataType != l_RightNodeInfo->m_DataType)
+	///if (l_LeftNodeInfo->m_NodeType == CPN_NUMOF_NODE || l_RightNodeInfo->m_NodeType == CPN_NUMOF_NODE)
+	//{//george for numOf
+	//	return true;
+	//}
+
+	//CPN_NUMOF_NODE, it is possible to compare both discrete and cont token num in places in hybrid nets
+	if (l_LeftNodeInfo->m_DataType != l_RightNodeInfo->m_DataType &&  !(l_RightNodeInfo->m_NodeType == CPN_NUMOF_NODE || l_LeftNodeInfo->m_NodeType == CPN_NUMOF_NODE))
 	{
 		wxString l_sError;
 		l_sError = wxT("Operands of the logic Equal operator error. Position: ") + m_sErrorPosition;
@@ -1898,7 +2233,8 @@ bool SP_CPN_Parse_NotEqual_Node::check()
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if (l_LeftNodeInfo->m_DataType != l_RightNodeInfo->m_DataType)
+	//CPN_NUMOF_NODE, it is possible to compare both discrete and cont token num in places in hybrid nets
+	if (l_LeftNodeInfo->m_DataType != l_RightNodeInfo->m_DataType &&  !(l_RightNodeInfo->m_NodeType == CPN_NUMOF_NODE || l_LeftNodeInfo->m_NodeType == CPN_NUMOF_NODE))
 	{
 		wxString l_sError;
 		l_sError = wxT("Operands of the logic NotEqual operator error. Position: ") + m_sErrorPosition;
@@ -1919,7 +2255,7 @@ bool SP_CPN_Parse_GreaterThan_Node::check()
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER))
+	if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER)&& !(l_RightNodeInfo->m_NodeType == CPN_NUMOF_NODE || l_LeftNodeInfo->m_NodeType == CPN_NUMOF_NODE))
 	{
 		wxString l_sError;
 		l_sError = wxT("Operands of the logic Greatthan operator error. Position: ") + m_sErrorPosition;
@@ -1939,7 +2275,7 @@ bool SP_CPN_Parse_GreaterEqual_Node::check()
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER))
+	if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER)&& !(l_RightNodeInfo->m_NodeType == CPN_NUMOF_NODE || l_LeftNodeInfo->m_NodeType == CPN_NUMOF_NODE))
 
 	{
 		
@@ -2135,7 +2471,7 @@ bool SP_CPN_Parse_LessEqual_Node::check()
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	if(!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER))
+	if(!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && l_RightNodeInfo->m_DataType == CPN_INTEGER)&& !(l_RightNodeInfo->m_NodeType == CPN_NUMOF_NODE || l_LeftNodeInfo->m_NodeType == CPN_NUMOF_NODE))
 	{
 		wxString l_sError;					
 		l_sError = wxT("Operands of the logic Lessthan&Equal operator error. Position: ") +m_sErrorPosition;
@@ -2220,23 +2556,21 @@ bool SP_CPN_Parse_Comma_Node::check()
 	wxString l_sLCS = l_LeftNodeInfo->m_sColorSetList;
 	wxString l_sRCS = l_RightNodeInfo->m_sColorSetList;
 
-
 	if (l_sRCS.IsEmpty())//george 11.2.21 which allows a function to be used in the tupel e.g., (x,fun(x,y))
 	{
-			if (l_RightNodeInfo->m_NodeType == CPN_FUNCTION_NODE)
-			{
-				l_sRCS = l_RightNodeInfo->m_ColorSet;
-			}
+		if (l_RightNodeInfo->m_NodeType == CPN_FUNCTION_NODE)
+		{
+			l_sRCS = l_RightNodeInfo->m_ColorSet;
+		}
 	}
 
 	if (l_sLCS.IsEmpty())//george 11.2.21 which allows a function to be used in the tupel e.g., (fun(x,y),z)
 	{
-			if (l_LeftNodeInfo->m_NodeType == CPN_FUNCTION_NODE)
-			{
-				l_sLCS = l_LeftNodeInfo->m_ColorSet;
-			}
+		if (l_LeftNodeInfo->m_NodeType == CPN_FUNCTION_NODE)
+		{
+			l_sLCS = l_LeftNodeInfo->m_ColorSet;
+		}
 	}
-
 	
 	m_ParseNode_Info.m_sColorSetList = l_sLCS + wxT(",") + l_sRCS;
 
@@ -2450,7 +2784,6 @@ bool SP_CPN_Parse_Bracket_Node::check()
 			return false;
 
 		//SP_MESSAGEBOX(l_pcColorSet->GetName());
-
 		if( l_pcColorSet->GetDataType() == CPN_PRODUCT && ! l_pcColorSet->CheckProductSyntax( m_ParseNode_Info.m_sColorSetList,m_sErrorPosition ) )
 		{
 			wxString l_sError;					
@@ -4354,7 +4687,8 @@ void SP_CPN_Parse_Context::Configuration(SP_CPN_ParseNode* p_pcNode)
 	l_pParseNode->SetColored2UnColoredPlaceNames(m_psvColored2UnColoredPlaceNames);
 	//l_pParseNode->SetNetClassName(m_sNetClassName);
 	l_pParseNode->SetPlaceType(m_sPlaceType);
-
+	l_pParseNode->SetGraph();//by george 1.9.21
+//	m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
 	if(l_pParseNode->GetLeftNode())
 	{
 		Configuration(l_pParseNode->GetLeftNode()) ;

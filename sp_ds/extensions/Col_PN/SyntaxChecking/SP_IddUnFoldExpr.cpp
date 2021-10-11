@@ -554,6 +554,10 @@ bool SP_IddUnFoldExpr::CheckGuardEXpression(const std::string& p_sExp,const std:
 
     std::string funName="";
 
+	if (l_sGuard.find("numOf") != std::string::npos) {
+		return true;// todo:support idd unfolding for this operator
+	}
+
 
     if (l_sGuard.find('(') != std::string::npos && l_sGuard.find(')') != std::string::npos)
     {
@@ -586,6 +590,16 @@ bool SP_IddUnFoldExpr::CheckGuardEXpression(const std::string& p_sExp,const std:
 		}
 	}
 	try{
+
+	auto colfunChckNumOf = colDefinitions_.lookUpColorFunction(funName);
+
+	if (colfunChckNumOf)
+	{
+			if (colfunChckNumOf->body_.find("numOf") != std::string::npos) {
+				return true;// todo:support idd unfolding for this operator
+			}
+	}
+
 	colExprVec	guards;
 	colExpr expr = parseExpr(l_sGuard);
 	substituteColorFunctions(expr);

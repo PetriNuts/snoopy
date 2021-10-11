@@ -551,6 +551,11 @@ bool SP_CPN_SyntaxChecking::CheckGuard(SP_DS_Node* p_pcTransNode)
 
 	l_sGuard = l_pcColList->GetCell(0, 1);
 
+	if (l_sGuard.Contains(wxT("numOf")))//todo: add this operator to the colorparser in dssd_util
+	{
+			return true;
+	}
+
 	//unique
 	wxString l_sExpressionUnique = l_sGuard;
 	l_sExpressionUnique = l_sExpressionUnique.BeforeFirst(']');

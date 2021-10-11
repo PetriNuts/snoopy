@@ -4,6 +4,7 @@
 // $Version: 0.0 $
 // $Revision: 1.00 $
 // $Date: 2009/09/28 10:20:00 $
+// $Updated:by george assaf with new operations for colored PN
 // Short Description: Nodes classes
 //////////////////////////////////////////////////////////////////////
 
@@ -21,8 +22,14 @@
 #include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ColorSetClass.h"
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColCSPSovler.h"
 #include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_ColorSet.h"
-//#include <wx/tokenzr.h>//by george
-//#include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
+
+#include "sp_ds/SP_DS_Graph.h"
+#include "sp_ds/extensions/SP_DS_Coarse.h"
+#include "sp_gui/mdi/SP_MDI_Doc.h"
+#include "sp_gui/mdi/SP_MDI_CoarseDoc.h"
+#include "sp_gui/mdi/SP_MDI_View.h"
+#include "sp_ds/attributes/SP_DS_TextAttribute.h"
+
 ////////////define the structs for parser//////////
  
 // Define the node types of parse trees
@@ -66,7 +73,9 @@ enum SP_CPN_NODETYPE
 	CPN_PREDICATE_NODE,
 	CPN_CONNECTOR_NODE,
 	CPN_PLACE_NODE,
-	CPN_ELEMENT_OF_NODE
+	CPN_ELEMENT_OF_NODE,
+	CPN_NUMOF_NODE,
+	CPN_RAND_NODE
 };
 
 // Define the pattern types for bindings
@@ -140,6 +149,7 @@ struct SP_CPN_EvaluatedSingleValue
 	bool					m_bPlaceFlag;	//for marking-dependent arcs, added by Fei, 09.2015
 };
 
+
 // Define the information of each parse node
 struct SP_CPN_ParseNode_Info
  {
@@ -204,6 +214,7 @@ protected:
 	wxString m_sErrorPosition;
 	wxString m_sPlaceType;
 	map<wxString, vector<wxString> > *m_psvColored2UnColoredPlaceNames;
+	SP_DS_Graph* m_pcGraph;//by george for fetching number of token of a certain colour in a certain place 29.08.2021
 
 public:
 	void SetColorSetName(wxString p_ColorSetName){m_ColorSetName = p_ColorSetName;}
@@ -215,6 +226,7 @@ public:
 	void SetFunctionFlag(bool p_bFunctionFlag){m_bFunctionFlag = p_bFunctionFlag;}
 	void SetFunctionName(wxString p_sFunctionName){m_sFunctionName = p_sFunctionName;}	
 	void SetColored2UnColoredPlaceNames(map<wxString, vector<wxString> > *p_psvColored2UnColoredPlaceNames){ m_psvColored2UnColoredPlaceNames = p_psvColored2UnColoredPlaceNames;}
+	void SetGraph() { m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph(); }//by george 1.9.21
 
 public:    
 
@@ -794,6 +806,47 @@ public:
 
 };
 
+//Rand node, george
+
+class SP_CPN_Parse_Rand_Node : public SP_CPN_ParseNode
+{
+
+public:
+	explicit SP_CPN_Parse_Rand_Node(SP_CPN_ParseNode* p_pcNodeleft, SP_CPN_ParseNode* p_pcNoderight)
+		: SP_CPN_ParseNode()
+	{
+		m_pLeft = p_pcNodeleft;
+		m_pRight = p_pcNoderight;
+		m_ParseNode_Info.m_NodeType = CPN_RAND_NODE;
+		m_ParseNode_Info.m_DataType = CPN_STRING;
+	}
+
+	virtual ~SP_CPN_Parse_Rand_Node()
+	{
+		delete m_pLeft;
+		delete m_pRight;
+	}
+
+	//bool GetIndex();
+
+	virtual SP_CPN_ParseNode_Info evaluate();
+
+
+	virtual wxString GenerateExpression()
+	{
+		return wxT("@") + m_pLeft->GenerateExpression();
+	}
+
+	virtual bool check();
+
+	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver)
+	{
+		return false;
+	}
+
+
+};
+
 /** parse node not **/
 class SP_CPN_Parse_Not_Node : public SP_CPN_ParseNode
 {
@@ -1265,9 +1318,269 @@ public:
 
 };
 
+
+//=================================
+/** parse node numOf two operand nodes. */ // computes how many token of a certain color (right-hand operand) are exist in a certain place (right-hand operand)
+class SP_CPN_Parse_NumOf_Node : public SP_CPN_ParseNode
+{
+public:
+
+	explicit SP_CPN_Parse_NumOf_Node(SP_CPN_ParseNode* p_pLeft, SP_CPN_ParseNode* p_pcRight)
+		: SP_CPN_ParseNode()
+	{
+		m_pLeft = p_pLeft;
+		m_pRight = p_pcRight;
+		m_ParseNode_Info.m_NodeType = CPN_NUMOF_NODE;
+	}
+
+	virtual ~SP_CPN_Parse_NumOf_Node()
+	{
+		delete m_pLeft;
+		delete m_pRight;
+	}
+
+	virtual wxString eval(wxString colour, wxString l_sTokenNUM, SP_DS_Node* node);
+
+	virtual SP_CPN_ParseNode_Info evaluate()
+	{
+
+		SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
+		SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();//->evaluate();
+
+		m_ParseNode_Info.m_DataType = l_RightNodeInfo->m_DataType;
+		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo.m_ColorSet;
+
+		if (!m_ParseNode_Info.m_bSeparaterExpression)
+		{
+			if (l_LeftNodeInfo.m_DataType == CPN_INTEGER)
+			{
+				if (this->m_pcGraph)//for numOf
+				{
+					SP_VectorString l_vPlaceTypes = { SP_DS_DISCRETE_PLACE ,SP_DS_CONTINUOUS_PLACE };
+					for (auto itV = l_vPlaceTypes.begin(); itV != l_vPlaceTypes.end(); ++itV)
+					{
+						SP_DS_Nodeclass* l_pcNodeclass = this->m_pcGraph->GetNodeclass(*itV);
+						if (!l_pcNodeclass) continue;
+						SP_ListNode::const_iterator l_itElem;
+						for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+						{
+							SP_DS_Node* l_pcPlaceNode = (*l_itElem);
+
+							if (l_pcNodeclass)
+							{
+								wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+								if (l_sPlaceName == l_RightNodeInfo->m_sColoredPlaceName)
+								{
+									SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcPlaceNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
+									if (l_pcColList)
+									{
+
+										for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+										{
+											wxString l_sColorExpr = l_pcColList->GetCell(i, 0);
+											wxString l_sTupeExpression = l_pcColList->GetCell(i, 0 + 2);
+											wxString l_sTokenNum = l_pcColList->GetCell(i, 0 + 1);
+											wxString l_sColour;
+											l_sColour << l_LeftNodeInfo.m_IntegerValue;
+											if (l_sColorExpr == l_sColour)
+											{
+												if (*itV == SP_DS_DISCRETE_PLACE)
+												{
+													long l_nvalue;
+													if (l_sTokenNum.ToLong(&l_nvalue))
+													{
+														m_ParseNode_Info.m_IntegerValue = l_nvalue;
+														break;
+													}
+												}
+												else
+												{//cont place
+													double l_dvalue;
+													if (l_sTokenNum.ToDouble(&l_dvalue))
+													{
+														m_ParseNode_Info.m_DoubleValue = l_dvalue;
+														m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
+
+														break;
+													}
+												}
+											}
+											else if (l_sColorExpr == wxT("all()"))
+											{
+												wxString l_sVal = this->eval(l_sColour, l_sTokenNum, l_pcPlaceNode);
+
+												if (*itV == SP_DS_DISCRETE_PLACE)
+												{
+													long l_nvalue;
+
+													if (l_sVal.ToLong(&l_nvalue))
+													{
+														m_ParseNode_Info.m_IntegerValue = l_nvalue;
+														break;
+													}
+												}
+												else
+												{
+													double l_dvalue;
+
+													if (l_sVal.ToDouble(&l_dvalue))
+													{
+														m_ParseNode_Info.m_DoubleValue = l_dvalue;
+														m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
+														break;
+													}
+												}
+
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else if (l_LeftNodeInfo.m_DataType == CPN_PRODUCT)
+			{
+
+				if (this->m_pcGraph)//for numOf
+				{
+					SP_VectorString l_vPlaceTypes = { SP_DS_DISCRETE_PLACE ,SP_DS_CONTINUOUS_PLACE };
+					for (auto itV = l_vPlaceTypes.begin(); itV != l_vPlaceTypes.end(); ++itV)
+					{
+						SP_DS_Nodeclass* l_pcNodeclass = this->m_pcGraph->GetNodeclass(*itV);
+						if (!l_pcNodeclass) continue;
+						SP_ListNode::const_iterator l_itElem;
+						for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+						{
+							SP_DS_Node* l_pcPlaceNode = (*l_itElem);
+
+							if (l_pcNodeclass)
+							{
+								wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+								if (l_sPlaceName == l_RightNodeInfo->m_sColoredPlaceName)
+								{
+									SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcPlaceNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
+									if (l_pcColList)
+									{
+
+										for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+										{
+											wxString l_sColorExpr = l_pcColList->GetCell(i, 0);
+											wxString l_sTupeExpression = l_pcColList->GetCell(i, 0 + 2);
+											wxString l_sTokenNum = l_pcColList->GetCell(i, 0 + 1);
+
+											wxString l_sColour = l_LeftNodeInfo.m_EvalResults[0].m_ColorValue;
+										//
+											if (l_sColorExpr == l_sColour)
+											{
+												if (*itV == SP_DS_DISCRETE_PLACE)
+												{
+													long l_nvalue;
+													if (l_sTokenNum.ToLong(&l_nvalue))
+													{
+														m_ParseNode_Info.m_IntegerValue = l_nvalue;
+														break;
+													}
+												}
+												else
+												{//cont place
+													double l_dvalue;
+													if (l_sTokenNum.ToDouble(&l_dvalue))
+													{
+														m_ParseNode_Info.m_DoubleValue = l_dvalue;
+														m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
+
+														break;
+													}
+												}
+											}
+											else if (l_sColorExpr == wxT("all()"))
+											{
+												//TODO
+												wxString l_sVal = this->eval(l_sColour, l_sTokenNum, l_pcPlaceNode);
+
+												if (*itV == SP_DS_DISCRETE_PLACE)
+												{
+													long l_nvalue;
+
+													if (l_sVal.ToLong(&l_nvalue))
+													{
+														m_ParseNode_Info.m_IntegerValue = l_nvalue;
+														break;
+													}
+												}
+												else
+												{
+													double l_dvalue;
+
+													if (l_sVal.ToDouble(&l_dvalue))
+													{
+														m_ParseNode_Info.m_DoubleValue = l_dvalue;
+														m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
+														break;
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+			}
+			else
+			{
+			//TODO?
+			}
+
+			CollectResult();
+		}
+		else
+		{
+
+		}
+
+
+		return m_ParseNode_Info;
+
+
+	}
+
+	virtual void CollectResult();
+
+	virtual wxString GenerateExpression()
+	{
+		return wxT("");
+	}
+
+	virtual bool check();
+
+
+	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver)
+	{
+		if (!m_pLeft->GetConstraints(p_cCSPSolver))
+			return false;
+		SP_CPN_ParseNode_Info* l_pcLeftParseNode_Info = m_pLeft->GetParseNodeInfo();
+
+		if (!m_pRight->GetConstraints(p_cCSPSolver))
+			return false;
+		SP_CPN_ParseNode_Info* l_pcRightParseNode_Info = m_pRight->GetParseNodeInfo();
+
+		m_ParseNode_Info.m_IntConstraintExpr = expr(p_cCSPSolver, l_pcLeftParseNode_Info->m_IntConstraintExpr - l_pcRightParseNode_Info->m_IntConstraintExpr);
+
+		return true;
+	}
+
+
+};
+//=================================
+
 /** parse node subtracting two operand nodes. */
 class SP_CPN_Parse_Substract_Node : public SP_CPN_ParseNode
-{    
+{
 public:
 
     explicit SP_CPN_Parse_Substract_Node(SP_CPN_ParseNode* p_pLeft, SP_CPN_ParseNode* p_pcRight)
@@ -1275,7 +1588,7 @@ public:
     {
 		m_pLeft = p_pLeft;
 		m_pRight = p_pcRight;
-		m_ParseNode_Info.m_NodeType = CPN_SUBSTRACT_NODE ;	
+		m_ParseNode_Info.m_NodeType = CPN_SUBSTRACT_NODE ;
     }
 
     virtual ~SP_CPN_Parse_Substract_Node()
@@ -1284,9 +1597,9 @@ public:
 		delete m_pRight;
     }
 
-    virtual SP_CPN_ParseNode_Info evaluate() 
+    virtual SP_CPN_ParseNode_Info evaluate()
     {
-			
+
 		SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
 		SP_CPN_ParseNode_Info l_RightNodeInfo = m_pRight->evaluate();
 
@@ -1397,8 +1710,8 @@ public:
 	virtual bool check();
 
 
-	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver) 
-	{		
+	virtual bool GetConstraints(SP_DS_ColCSPSovler& p_cCSPSolver)
+	{
 		if( ! m_pLeft->GetConstraints(p_cCSPSolver) )
 			return false;
 		SP_CPN_ParseNode_Info* l_pcLeftParseNode_Info = m_pLeft->GetParseNodeInfo();
@@ -1407,8 +1720,8 @@ public:
 			return false;
 		SP_CPN_ParseNode_Info* l_pcRightParseNode_Info = m_pRight->GetParseNodeInfo();
 
-		m_ParseNode_Info.m_IntConstraintExpr = expr(p_cCSPSolver, l_pcLeftParseNode_Info->m_IntConstraintExpr - l_pcRightParseNode_Info->m_IntConstraintExpr);		
-		
+		m_ParseNode_Info.m_IntConstraintExpr = expr(p_cCSPSolver, l_pcLeftParseNode_Info->m_IntConstraintExpr - l_pcRightParseNode_Info->m_IntConstraintExpr);
+
 		return true;
 	}
 
@@ -1880,6 +2193,22 @@ public:
 		else if(l_LeftNodeInfo.m_DataType == CPN_BOOLEAN && l_RightNodeInfo.m_DataType == CPN_BOOLEAN)
 		{
 			m_ParseNode_Info.m_BooleanValue = l_LeftNodeInfo.m_BooleanValue == l_RightNodeInfo.m_BooleanValue;
+		}
+		else if (l_LeftNodeInfo.m_DataType == CPN_DOUBLE && l_RightNodeInfo.m_DataType == CPN_DOUBLE)
+		{//for numOf by george
+			m_ParseNode_Info.m_BooleanValue = l_LeftNodeInfo.m_DoubleValue == l_RightNodeInfo.m_DoubleValue;
+		}
+		else if (l_LeftNodeInfo.m_DataType == CPN_INTEGER && l_RightNodeInfo.m_DataType == CPN_DOUBLE && l_RightNodeInfo.m_NodeType==CPN_NUMOF_NODE)
+		{//for numOf, case of ColHPN , testing two different kinds of markings by george
+			int l_nRoundRight = round(l_RightNodeInfo.m_DoubleValue);
+
+			m_ParseNode_Info.m_BooleanValue = l_LeftNodeInfo.m_IntegerValue == l_nRoundRight;
+		}
+		else if (l_LeftNodeInfo.m_DataType == CPN_DOUBLE && l_RightNodeInfo.m_DataType == CPN_INTEGER  && l_RightNodeInfo.m_NodeType == CPN_NUMOF_NODE)
+		{//for numOf, case of ColHPN , testing two different kinds of markings by george
+			int l_nRoundLeft = round(l_LeftNodeInfo.m_DoubleValue);
+
+			m_ParseNode_Info.m_BooleanValue = l_nRoundLeft == l_RightNodeInfo.m_IntegerValue;
 		}
 		else
 		{
@@ -2606,6 +2935,7 @@ public:
 		delete m_pRight;
     }
 
+
     virtual SP_CPN_ParseNode_Info evaluate() 
     {
 		SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
@@ -2634,7 +2964,7 @@ public:
 				l_sLeftString = (*it).m_ColorValue;
 				if ((it)->m_Multiplicity == 0) continue;
 				l_sTotal << wxT("(") << l_sLeftString << wxT(",") << l_sRightString << wxT(")")<<wxT("|");
-				
+
 				l_sTupel = l_sTotal.BeforeLast(wxChar('|'));
 				wxString color;
 				color<<wxT("(") << l_sLeftString << wxT(",") << l_sRightString << wxT(")");
@@ -2776,6 +3106,7 @@ public:
 
 		return m_ParseNode_Info;
     }
+
 
 	virtual wxString GenerateExpression()
 	{
