@@ -94,6 +94,9 @@ typedef SP_CPN::SP_CPN_Parser::token_type token_type;
 }		
 "elemOf"    { yylval->stringVal = new std::string(yytext, yyleng); return(token::ELEM); }
 
+"numOf"    { yylval->stringVal = new std::string(yytext, yyleng); return(token::NUMOF); }
+
+
 [A-Za-z_][A-Za-z0-9_]* {
     yylval->stringVal = new std::string(yytext, yyleng);
     return token::IDENTIFIER;
