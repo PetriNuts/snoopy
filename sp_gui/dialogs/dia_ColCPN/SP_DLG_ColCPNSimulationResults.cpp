@@ -865,7 +865,7 @@ void SP_DLG_ColCPNSimulationResults::LoadTransitions()
 
 	m_pcMainSimulator->SetTransitionCount(m_pcUnfoldedNet->GetTransitionNames()->size());
 
-	SP_VectorString* l_pcTransitionName = m_pcUnfoldedNet->GetTransitionNames();
+	SP_VectorStdString* l_pcTransitionName = m_pcUnfoldedNet->GetTransitionNames();
 	SP_VectorString* l_pcTransitionFunction = m_pcUnfoldedNet->GetCurRateFunction();
 
 	if (l_pcTransitionFunction)//bugfix:by george
@@ -1030,7 +1030,7 @@ void SP_DLG_ColCPNSimulationResults::InitializeEmptyView(SP_DS_Metadata* p_pcVie
 
 	wxString l_sElementType = l_pcAttribute->GetValueString();
 
-	SP_VectorString* l_pvCurrentInfo;
+	SP_VectorStdString* l_pvCurrentInfo;
 
 	SP_VectorString l_asColours;
 
@@ -1194,7 +1194,7 @@ void SP_DLG_ColCPNSimulationResults::LoadParameters()
 	//l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_PARAM);
 	SP_ListNode::const_iterator l_itElem;
 	SP_DS_ColListAttribute* l_pcColList;
-	SP_VectorString l_asParameterNames;
+	SP_VectorStdString l_asParameterNames;
 	SP_VectorDouble l_anParameterValue;
 
 
@@ -1467,14 +1467,14 @@ SP_FunctionPtr SP_DLG_ColCPNSimulationResults::RegesterFunctionVariables(const w
 	{
 		for (unsigned int i = 0; i < m_msPlaceNames.size(); i++)
 		{
-			l_mVar2Pos1[m_msPlaceNames[i].ToStdString()] = i;
+			l_mVar2Pos1[m_msPlaceNames[i]] = i;
 		}
 	}
 	else if (p_sType == wxT("Transition instance"))
 	{
 		for (unsigned int i = 0; i < m_msTransitionNames.size(); i++)
 		{
-			l_mVar2Pos1[m_msTransitionNames[i].ToStdString()] = i;
+			l_mVar2Pos1[m_msTransitionNames[i]] = i;
 		}
 	}
 	else if (p_sType == wxT("Mixed"))
@@ -1524,8 +1524,8 @@ void SP_DLG_ColCPNSimulationResults::LoadObservers()
 		std::map<std::string, unsigned int> l_mPlaceToPosition;
 		std::map<std::string, unsigned int> l_mTransitionToPosition;
 		//14.12
-		SP_VectorString* l_pvsColoredPlaceNames = m_pcUnfoldedNet->GetColoredPlaceNames();
-		SP_VectorString* l_pvsColoredTransNames = m_pcUnfoldedNet->GetColoredTransitionNames();
+		SP_VectorStdString* l_pvsColoredPlaceNames = m_pcUnfoldedNet->GetColoredPlaceNames();
+		SP_VectorStdString* l_pvsColoredTransNames = m_pcUnfoldedNet->GetColoredTransitionNames();
 
 		for (unsigned i = 0; i < l_pvsColoredPlaceNames->size(); i++)
 		{

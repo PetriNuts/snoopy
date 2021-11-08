@@ -1204,7 +1204,7 @@ void SP_DLG_ColCPNDirSimulationResults::LoadTransitions()
 
 	m_pcMainSimulator->SetTransitionCount(m_pcColoredNet->GetColoredTransitionNames()->size());
 
-	SP_VectorString* l_pcTransitionName = m_pcColoredNet->GetColoredTransitionNames();
+	SP_VectorStdString* l_pcTransitionName = m_pcColoredNet->GetColoredTransitionNames();
 	SP_VectorString* l_pcTransitionFunction = m_pcColoredNet->GetColTransRatFun();
 	//SP_VectorString* l_pcTransitionGuard = m_pcColoredNet->GetColoredTranGuard();
 
@@ -1435,7 +1435,7 @@ void SP_DLG_ColCPNDirSimulationResults::InitializeEmptyView(SP_DS_Metadata* p_pc
 
 	wxString l_sElementType = l_pcAttribute->GetValueString();
 
-	SP_VectorString* l_pvCurrentInfo;
+	SP_VectorStdString* l_pvCurrentInfo;
 
 	SP_VectorString l_asColours;
 
@@ -1568,7 +1568,7 @@ void SP_DLG_ColCPNDirSimulationResults::LoadParameters()
 	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_PARAM);
 	SP_ListNode::const_iterator l_itElem;
 	SP_DS_ColListAttribute* l_pcColList;
-	SP_VectorString l_asParameterNames;
+	SP_VectorStdString l_asParameterNames;
 	SP_VectorDouble l_anParameterValue;
 
 	auto l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANTCLASS);

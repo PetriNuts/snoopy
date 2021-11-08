@@ -14,7 +14,7 @@
 #include <map>
 #include "sp_core/SP_Vector.h"
 
-typedef std::map<wxString, SP_VectorString*> SP_MapString2VectorString;
+typedef std::map<wxString, SP_VectorStdString*> SP_MapString2VectorString;
 
 class SP_DLG_SelectXAxisVariable: public wxDialog
 {

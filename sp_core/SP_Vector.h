@@ -10,12 +10,13 @@
 #define __SP_VECTOR_H__
 
 #include <vector>
-
+#include <string>
 using namespace std;
 
 class wxString;
 
 typedef vector<wxString> SP_VectorString;
+typedef vector<std::string> SP_VectorStdString;//by george for spsim
 typedef vector<double> SP_VectorDouble;
 typedef vector<long> SP_VectorLong;
 typedef vector<unsigned long> SP_VectorULong;

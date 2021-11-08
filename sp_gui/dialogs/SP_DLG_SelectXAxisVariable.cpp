@@ -69,7 +69,7 @@ SP_DLG_SelectXAxisVariable::~SP_DLG_SelectXAxisVariable()
 void SP_DLG_SelectXAxisVariable::AddItemNames()
 {
 	wxString l_sCurrentCategory = m_pcVariableTypeBox->GetStringSelection();
-	SP_VectorString* l_asSubCategory = m_mChoices[l_sCurrentCategory];
+	SP_VectorStdString* l_asSubCategory = m_mChoices[l_sCurrentCategory];
 
 	m_pcVariableNameBox->Clear();
 

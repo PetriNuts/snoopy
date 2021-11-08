@@ -430,7 +430,7 @@ void SP_DLG_Simulation::LoadInitialSimulatorConfig()
 
 }
 
-void SP_DLG_Simulation::SimulatorLogFunction(wxLogLevel p_nLogLevel, const wxString& p_sLogMsg)
+void SP_DLG_Simulation::SimulatorLogFunction(spsim::LogLevel p_nLogLevel, const std::string& p_sLogMsg)
 {
     switch (p_nLogLevel)
     {
@@ -711,9 +711,9 @@ void SP_DLG_Simulation::OnEditXAxis(wxWindow *p_pcExternalWindowDialog) {
     wxString l_sCategory = GetViewAttributeValue(m_pcCurrentTablePlot, wxT("XAxisVariable"));
     wxString l_sSubCategory = GetViewAttributeValue(m_pcCurrentTablePlot, wxT("XAxisVariableName"));
 
-    SP_VectorString l_asTimeVector;
-    l_asTimeVector.push_back(wxT("Simulation Time"));
-    l_asTimeVector.push_back(wxT("Run Time"));
+    SP_VectorStdString l_asTimeVector;
+    l_asTimeVector.push_back("Simulation Time");
+    l_asTimeVector.push_back("Run Time");
     m_pcXAxisChoices[wxT("Time")] = &l_asTimeVector;
 	 
 
@@ -1141,7 +1141,7 @@ void SP_DLG_Simulation::LoadParameters()
     SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
     SP_ListMetadata::const_iterator it;
 
-    SP_VectorString l_asParameterNames;
+    SP_VectorStdString l_asParameterNames;
     SP_VectorDouble l_anParameterValue;
 
     m_msParameterName2Value.clear();
@@ -1832,7 +1832,7 @@ void SP_DLG_Simulation::OnSimulationProperties(wxCommandEvent& p_cEvent)
     SetFocus();
 
     CHECK_POINTER(m_pcMainSimulator->GetSimulatorOptions(),return);
-    spsim::Property* l_pcRefershRate=m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("Refreshrate"));
+    spsim::Property* l_pcRefershRate=m_pcMainSimulator->GetSimulatorOptions()->GetOption("Refreshrate");
 
     CHECK_POINTER(l_pcRefershRate,return);
 
@@ -2803,8 +2803,8 @@ wxString SP_DLG_Simulation::GetColourString(unsigned int p_nIndex)
 void SP_DLG_Simulation::AddGuiOption2Simulator()
 {
     //display them in the same dialog
-    m_pcMainSimulator->GetSimulatorOptions()->InsertNewOption(0, wxT("InBetweenVisualization"), wxT("1"), wxT("Visualize in between results"), spsim::GUI_TYPE_CHECKBOX);
-    m_pcMainSimulator->GetSimulatorOptions()->InsertNewOption(1, wxT("Refreshrate"), wxT("5000"), wxT("Refresh rate(ms)"), spsim::GUI_TYPE_TXTBOX);
+    m_pcMainSimulator->GetSimulatorOptions()->InsertNewOption(0, "InBetweenVisualization", "1", "Visualize in between results", spsim::GUI_TYPE_CHECKBOX);
+    m_pcMainSimulator->GetSimulatorOptions()->InsertNewOption(1, "Refreshrate", "5000", "Refresh rate(ms)", spsim::GUI_TYPE_TXTBOX);
 }
 
 int SP_DLG_Simulation::LoadSimulatorProperties()

@@ -33,10 +33,10 @@ private:
 	SP_DS_ColPN_Unfolding* m_pcUnfoldedNet;
 	SP_DLG_Simulation* m_pcColSimulationResults;
 
-	vector<wxString>* m_pvUnfoldedPlace;
-	vector<wxString>* m_pvColoredPlace;
-	vector<wxString>* m_pvUnfoldedTrans;
-	vector<wxString>* m_pvColoredTrans;
+	vector<std::string>* m_pvUnfoldedPlace;
+	vector<std::string>* m_pvColoredPlace;
+	vector<std::string>* m_pvUnfoldedTrans;
+	vector<std::string>* m_pvColoredTrans;
 
 
 	//by george

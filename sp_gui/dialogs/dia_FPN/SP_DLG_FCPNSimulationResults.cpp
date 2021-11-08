@@ -414,7 +414,7 @@ void SP_DLG_FCPNSimulationResults::LoadParameters(unsigned long lIteration, doub
 	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 	SP_ListMetadata::const_iterator it;
 
-	SP_VectorString l_asParameterNames;
+	SP_VectorStdString l_asParameterNames;
 	SP_VectorDouble l_anParameterValue;
 
 	m_msParameterName2Value.clear();
@@ -870,14 +870,14 @@ bool SP_DLG_FCPNSimulationResults::InitializeSimulator(unsigned long ite, double
 
 
 	//Get some properties from the user
-	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("InBetweenVisualization")) != NULL)
+	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption("InBetweenVisualization") != NULL)
 	{
-		m_nRedraw = m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("InBetweenVisualization"))->GetValueBool();
+		m_nRedraw = m_pcMainSimulator->GetSimulatorOptions()->GetOption("InBetweenVisualization")->GetValueBool();
 	}
 
-	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("Refreshrate")) != NULL)
+	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption("Refreshrate") != NULL)
 	{
-		m_nRefreshRate = m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("Refreshrate"))->GetValuelong();
+		m_nRefreshRate = m_pcMainSimulator->GetSimulatorOptions()->GetOption("Refreshrate")->GetValuelong();
 	}
 
 	//SetSimulationProgressGaugeRange(l_nLong0);//
@@ -1179,7 +1179,7 @@ std::vector<double> SP_DLG_FCPNSimulationResults::GetCurentSamples(int iteration
 
 	SP_ListMetadata::const_iterator it;
 
-	SP_VectorString l_asParameterNames;
+	SP_VectorStdString l_asParameterNames;
 
 	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)
 	{

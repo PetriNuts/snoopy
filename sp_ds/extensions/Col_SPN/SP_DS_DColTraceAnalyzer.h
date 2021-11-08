@@ -50,12 +50,12 @@ private:
 	SP_DS_ColPN_Coloring* m_pcColored;
 	const SP_Vector2DDouble& m_aanResults;
 
-	SP_VectorString* m_pvsColoredPlaceNames;
+	SP_VectorStdString* m_pvsColoredPlaceNames;
 
 	map<wxString, long> m_mColoredPlNames2Pos;
 
 	map<long, SP_CPN_CountInterval>* m_pnsPlaceCountById;
-	SP_VectorString* m_pvsUnPlaceNames;
+	SP_VectorStdString* m_pvsUnPlaceNames;
 
 	SP_MapString2String* m_pmsColPlName2ColSet;
 	SP_VectorString* m_pvsPlaceColor;

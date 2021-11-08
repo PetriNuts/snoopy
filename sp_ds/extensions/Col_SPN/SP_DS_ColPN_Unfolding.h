@@ -294,9 +294,9 @@ public:
 protected:
 	//places
 	SP_MapString2Long m_mnPlaceArrayPos;
-    SP_VectorString m_msPlaceNames;	
-	SP_VectorString m_msColorsOfPlace; 
-	SP_VectorString m_msColoredPlaceNames;
+	SP_VectorStdString m_msPlaceNames;
+	SP_VectorStdString m_msColorsOfPlace;
+	SP_VectorStdString m_msColoredPlaceNames;
 	map<wxString, vector<wxString> > m_svColored2UnColoredPlaceNames; //for marking-dependent arcs, added by Fei, 09.2015
     SP_MapString2String m_msPlaceNamesById;
 	SP_MapString2String m_msColPlName2ColSet;
@@ -311,8 +311,8 @@ protected:
 
 	//transitions
 	SP_MapString2Long m_mnTransitionArrayPos;
-    SP_VectorString m_msTransitionNames;
-	SP_VectorString m_msColoredTransitionNames;
+	SP_VectorStdString m_msTransitionNames;
+	SP_VectorStdString m_msColoredTransitionNames;
     SP_MapString2String m_msTransitionNamesById;
 	vector<wxString>  m_vsTransNodeType;
 	vector<SP_VectorString> m_anNetFunctions;
@@ -355,10 +355,10 @@ public:
 public:
 	//places
 	SP_MapString2Long* GetPlaceArrayPos() { return &m_mnPlaceArrayPos; }
-    SP_VectorString* GetPlaceNames() { return &m_msPlaceNames; }
-	SP_VectorString* GetColoredPlaceNames() { return &m_msColoredPlaceNames; }
+	SP_VectorStdString* GetPlaceNames() { return &m_msPlaceNames; }
+	SP_VectorStdString* GetColoredPlaceNames() { return &m_msColoredPlaceNames; }
     SP_MapString2String* GetPlaceNamesById() { return &m_msPlaceNamesById; }
-	SP_VectorString* GetColorsOfPlace(){ return &m_msColorsOfPlace;}
+    SP_VectorStdString* GetColorsOfPlace(){ return &m_msColorsOfPlace;}
 	SP_MapString2String* GetColPlName2ColSet() { return &m_msColPlName2ColSet; }
 	map<long, SP_CPN_CountInterval>* GetPlaceCountById(){ return &m_nsPlaceCountById ;}
 
@@ -377,8 +377,8 @@ public:
 
 	//transitions
     SP_MapString2Long* GetTransitionArrayPos() { return &m_mnTransitionArrayPos; }
-    SP_VectorString* GetTransitionNames() { return &m_msTransitionNames; }
-	SP_VectorString* GetColoredTransitionNames() { return &m_msColoredTransitionNames; }
+    SP_VectorStdString* GetTransitionNames() { return &m_msTransitionNames; }
+    SP_VectorStdString* GetColoredTransitionNames() { return &m_msColoredTransitionNames; }
     SP_MapString2String* GetTransitionNamesById() { return &m_msTransitionNamesById; }
 	vector<SP_VectorString>* GetNetFunctions() { return &m_anNetFunctions; }
 	SP_MapString2String* GetAnimationTransitionNamesById() { return &m_msAnimationTransitionNamesById; }

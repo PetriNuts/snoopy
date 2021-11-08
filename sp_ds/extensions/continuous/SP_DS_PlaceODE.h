@@ -79,7 +79,7 @@ class SP_DS_PlaceODE: public SP_Error
 	      SP_MapLong2Long m_mPlacesPosByID;
 
 	      vector<SP_DS_Node*> m_apcPlaceNodes;
-	      SP_VectorString asPlaceNames;
+	      SP_VectorStdString asPlaceNames;
 
 
   protected:

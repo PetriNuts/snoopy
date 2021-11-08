@@ -816,6 +816,18 @@ void SP_GUI_ConnectToServer::UpdateConfig()
 
 }
 
+SP_VectorString SP_GUI_ConnectToServer::ToWxStringVector(SP_VectorStdString p_vsource)
+{
+	SP_VectorString l_vResultVector;
+	for(auto itV=p_vsource.begin();itV!=p_vsource.end();++itV)
+	{
+		wxString str((*itV).c_str(),wxConvUTF8);
+		l_vResultVector.push_back(str);
+	}
+
+	return l_vResultVector;
+}
+
 void SP_GUI_ConnectToServer::ReadConfig()
 {
 	wxConfig config(SP_APP_SHORT_NAME, SP_APP_VENDOR);
@@ -931,7 +943,7 @@ Model* SP_GUI_ConnectToServer::CreateColoredModel(const wxString& p_sModelName)
 	//uncolored information
 
 	//set places information
-	l_pcModel->SetPlaceNames(*l_pcUnfoldedNet->GetPlaceNames());
+	l_pcModel->SetPlaceNames(ToWxStringVector(*l_pcUnfoldedNet->GetPlaceNames()));
 	l_pcModel->SetInitialMarking(*l_pcUnfoldedNet->GetCurHybPNMarking());
 
 	//continuous place count: workaround
@@ -945,7 +957,7 @@ Model* SP_GUI_ConnectToServer::CreateColoredModel(const wxString& p_sModelName)
 	l_pcModel->SetPlaceTypes(l_aPlaceType);
 
 	//set transition information
-	l_pcModel->SetTransitionNames(*l_pcUnfoldedNet->GetTransitionNames());
+	l_pcModel->SetTransitionNames(ToWxStringVector(*l_pcUnfoldedNet->GetTransitionNames()));
 	l_pcModel->SetTransitionFunctions(*l_pcUnfoldedNet->GetCurRateFunction());
 
 	//load transition connection
@@ -1025,7 +1037,7 @@ Model* SP_GUI_ConnectToServer::CreateColoredModel(const wxString& p_sModelName)
 	//places
 	l_pcModel->SetColoredPlaceCount(l_nColoredPlaceCount);
 
-	l_pcModel->SetColoredPlaceNames(*l_pcUnfoldedNet->GetColoredPlaceNames());
+	l_pcModel->SetColoredPlaceNames(ToWxStringVector(*l_pcUnfoldedNet->GetColoredPlaceNames()));
 
 	//set the relationship between colored and uncolored places
 	for (unsigned long l_nPos = 0; l_nPos < l_nColoredPlaceCount; l_nPos++)
@@ -1037,7 +1049,7 @@ Model* SP_GUI_ConnectToServer::CreateColoredModel(const wxString& p_sModelName)
 
 	//transitions
 	l_pcModel->SetColoredTransitionCount(l_nColoredTransitionCount);
-	l_pcModel->SetColoredTransitionNames(*l_pcUnfoldedNet->GetColoredTransitionNames());
+	l_pcModel->SetColoredTransitionNames(ToWxStringVector(*l_pcUnfoldedNet->GetColoredTransitionNames()));
 
 	//set the relationship between colored and uncolored transitions
 	for (unsigned long l_nPos = 0; l_nPos < l_nColoredTransitionCount; l_nPos++)

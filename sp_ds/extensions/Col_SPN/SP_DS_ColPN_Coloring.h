@@ -71,11 +71,11 @@ protected:
 	SP_MapString2Long m_mnColPlaceArrayPos;
 	SP_MapString2String m_msPlaceNamesById;
 	SP_VectorString m_msPlaceNames;
-	SP_VectorString m_msColorSetOfPlace;
+	SP_VectorStdString m_msColorSetOfPlace;
 	SP_VectorString m_msColorSetOfstPlace;
 
 	vector<wxString>  m_vsUncolPlaceNodeType;
-	map<wxString, vector<wxString> > m_svColored2UnColoredPlaceNames;
+	map<wxString, vector<std::string> > m_svColored2UnColoredPlaceNames;
 	map<wxString, vector<wxString> > m_svColored2UnColoredstPlaceNames;
 
 	
@@ -87,12 +87,12 @@ protected:
 	SP_VectorString m_msColPreTransitionNames;
 	SP_VectorString m_msColPostTransitionNames;
 
-	SP_VectorString m_msColoredPlaceNames;
-	SP_VectorString m_msColoredstPlaceNames;
-	SP_VectorString m_msUnColoredPlacWColorSet;
-	SP_VectorString m_msUnColoredstPlacWColorSet;
-	SP_VectorString m_msMarking;
-	SP_VectorString m_msstMarking;
+	SP_VectorStdString m_msColoredPlaceNames;
+	SP_VectorStdString m_msColoredstPlaceNames;
+	SP_VectorStdString m_msUnColoredPlacWColorSet;
+	SP_VectorStdString m_msUnColoredstPlacWColorSet;
+	SP_VectorStdString m_msMarking;
+	SP_VectorStdString m_msstMarking;
 	SP_VectorDouble m_mDMarking;
 	SP_VectorString m_msColoredPrePlaceNames;
 	SP_VectorString m_msColoredPostPlaceNames;
@@ -110,7 +110,7 @@ protected:
 	vector<wxString>  m_vsColTransNodeType;
 	vector<SP_DS_Node*> m_vColTransitions;
 	vector<SP_VectorString> m_anNetFunctions;
-	SP_VectorString m_msColoredTransitionNames;
+	SP_VectorStdString m_msColoredTransitionNames;
 	SP_VectorString m_msColoredstTransitionNames;
 	SP_VectorString m_msColoredTransGuard;
 	SP_VectorString m_msColTransRatFun;
@@ -138,7 +138,7 @@ protected:
 	wxString m_sArcsInformation;
 	wxString m_sTranswithGuard;
 	//SP_VectorString m_adMarkinguncolor;
-	SP_VectorString m_vsUncoloredPlaces;
+	SP_VectorStdString m_vsUncoloredPlaces;
 	SP_VectorString m_vsUncoloredstPlaces;
 	SP_VectorString m_vsallPlaces;
 
@@ -155,23 +155,23 @@ protected:
 public:
 	
 	vector<SP_DS_Node*>* GetplaceNode() { return &m_vcolplaceNode; }
-	SP_VectorString* GetColoredPlaceNames() { return &m_msColoredPlaceNames; }
-	SP_VectorString* GetColoredstPlaceNames() { return &m_msColoredstPlaceNames; }
-	SP_VectorString* Getmarking() { return &m_msMarking; }
-	SP_VectorString* GetUncolorplaces() { return  &m_vsUncoloredPlaces; }
+	SP_VectorStdString* GetColoredPlaceNames() { return &m_msColoredPlaceNames; }
+	SP_VectorStdString* GetColoredstPlaceNames() { return &m_msColoredstPlaceNames; }
+	SP_VectorStdString* Getmarking() { return &m_msMarking; }
+	SP_VectorStdString* GetUncolorplaces() { return  &m_vsUncoloredPlaces; }
 	SP_VectorString* Getallplaces() { return  &m_vsallPlaces;}
 	SP_VectorDouble* GetmarkingDouble() { return &m_mDMarking; }
     SP_VectorLong* GetmarkingstPlaces() { return &m_anstplaceMarking; }
-	SP_VectorString* GetmarkingString() { return &m_msMarking; }
+	SP_VectorStdString* GetmarkingString() { return &m_msMarking; }
 	vector<SP_VectorLong> * GetNetMarkings() { return &m_anNetMarkings; }
 	SP_MapString2Long* GetColPlaceArrayPos() { return &m_mnColPlaceArrayPos; }
 	SP_MapString2String* GetPlaceNamesById() { return &m_msPlaceNamesById; }
-	SP_VectorString* GetPlaceNames() { return &m_msUnColoredPlacWColorSet/*m_vsUncoloredPlaces*/; }
-	SP_VectorString* GetColorSetOfPlace() { return &m_msColorSetOfPlace; }
-	SP_VectorString* GetColorSetOfPlaceUpdate() { return &m_msUnColoredPlacWColorSet; }
+	SP_VectorStdString* GetPlaceNames() { return &m_msUnColoredPlacWColorSet/*m_vsUncoloredPlaces*/; }
+	SP_VectorStdString* GetColorSetOfPlace() { return &m_msColorSetOfPlace; }
+	SP_VectorStdString* GetColorSetOfPlaceUpdate() { return &m_msUnColoredPlacWColorSet; }
 	map<long, SP_CPN_ColCountInterval>* GetPlaceCountById() { return &m_nsPlaceCountById; }
 	
-	map<wxString, vector<wxString> >* GetsvColored2UnColoredPlaceNames() { return &m_svColored2UnColoredPlaceNames; }
+	map<wxString, vector<std::string> >* GetsvColored2UnColoredPlaceNames() { return &m_svColored2UnColoredPlaceNames; }
 public:
 	wxString GetEdgeName(SP_DS_Edge* p_pcEdge);
 	SP_VectorString* GetEdgeExpression() { return &m_pcEdgeExpression; }
@@ -217,7 +217,7 @@ public:
 	wxString GetArcweightwithSize(SP_DS_Node* p_pcSourceNode, SP_DS_Edge* p_pcEdge, SP_DS_Node* p_pcTargetNode);
 public:
 	bool AssignTransInfo();
-	SP_VectorString* GetColoredTransitionNames() { return &m_msColoredTransitionNames; }
+	SP_VectorStdString* GetColoredTransitionNames() { return &m_msColoredTransitionNames; }
 	SP_VectorString* GetColoredstTransitionNames() { return &m_msColoredstTransitionNames; }
 	SP_VectorString* GetColoredTranGuard() { return &m_msColoredTransGuard; }
 	vector<SP_VectorString>* GetNetFunctions() { return &m_anNetFunctions; }

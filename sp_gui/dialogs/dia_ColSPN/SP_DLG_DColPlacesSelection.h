@@ -25,10 +25,10 @@ private:
 	SP_DS_ColPN_Coloring* m_pcColoredNet;
 	SP_DLG_DirColorSimulation* m_pcColSimulationResults;
 
-	vector<wxString>* m_pvUncoloredPlace;
-	vector<wxString>* m_pvColoredPlace;
+	vector<std::string>* m_pvUncoloredPlace;
+	vector<std::string>* m_pvColoredPlace;
 	//vector<wxString>* m_pvUnfoldedTrans;
-	vector<wxString>* m_pvColoredTrans;
+	vector<std::string>* m_pvColoredTrans;
 
 	map<wxString, long> m_mColPlaceName2ID;
 	map<wxString, long> m_mColTransName2ID;

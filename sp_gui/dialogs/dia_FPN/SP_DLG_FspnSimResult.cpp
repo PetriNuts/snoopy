@@ -545,7 +545,7 @@ void SP_DLG_FspnSimResult::LoadParameters(unsigned long lIteration, double dAlph
 	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 	SP_ListMetadata::const_iterator it;
 
-	SP_VectorString l_asParameterNames;
+	SP_VectorStdString l_asParameterNames;
 	SP_VectorDouble l_anParameterValue;
 
 	m_msParameterName2Value.clear();
@@ -658,7 +658,7 @@ void* SP_DLG_FspnSimResult::DoBasicSamplingFspnSimulThread()
 	long lthreadCounter = 0;
 	l_pcSimulator = dynamic_cast<spsim::StochasticSimulator*> (m_pcMainSimulator);
 	const std::string s_msgWarnMesag = "The total number of simulation runs is: ";
-	spsim::Property* l_pcPropRunCounts = l_pcSimulator->GetSimulatorOptions()->GetOption(wxT("RunCount"));
+	spsim::Property* l_pcPropRunCounts = l_pcSimulator->GetSimulatorOptions()->GetOption("RunCount");
 	if (l_pcPropRunCounts != NULL)
 	{
 		lRunCount = l_pcPropRunCounts->GetValuelong();
@@ -808,7 +808,7 @@ void* SP_DLG_FspnSimResult::DoReducedSamplingFspnSimulThread()
 	long lthreadCounter = 0;
 	l_pcSimulator = dynamic_cast<spsim::StochasticSimulator*> (m_pcMainSimulator);
 
-	spsim::Property* l_pcPropRunCounts = l_pcSimulator->GetSimulatorOptions()->GetOption(wxT("RunCount"));
+	spsim::Property* l_pcPropRunCounts = l_pcSimulator->GetSimulatorOptions()->GetOption("RunCount");
 	if (l_pcPropRunCounts != NULL)
 	{
 		lRunCount = l_pcPropRunCounts->GetValuelong();
@@ -1176,7 +1176,7 @@ std::vector<double>  SP_DLG_FspnSimResult::GetCurentSamples(int iteration)
 	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 	SP_ListMetadata::const_iterator it;
 
-	SP_VectorString l_asParameterNames;
+	SP_VectorStdString l_asParameterNames;
 	//	SP_VectorDouble l_anParameterValue;
 
 	//	m_msParameterName2Value.clear();

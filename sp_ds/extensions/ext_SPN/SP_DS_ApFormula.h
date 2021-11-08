@@ -29,7 +29,7 @@ public:
 
 protected:
 	SP_MapString2Long m_Placename2Id;
-	SP_VectorString m_Id2Placename;
+	SP_VectorStdString m_Id2Placename;
 	SP_MapString2Long m_Parametername2Id;
 	SP_VectorString m_Id2Parametername;
 
@@ -43,7 +43,7 @@ protected:
 
 	
 	SP_DS_ColPN_Unfolding* m_pcUnfoldedNet;
-	SP_VectorString m_msColoredPlaceNames;
+	SP_VectorStdString m_msColoredPlaceNames;
 	map<long, SP_CPN_CountInterval> m_pnsPlaceCountById;
 
 private:

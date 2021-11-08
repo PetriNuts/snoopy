@@ -2009,7 +2009,7 @@ void SP_DS_ColStAnimation::LoadParameters()
 	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_PARAM);
 	SP_ListNode::const_iterator l_itElem;
 	SP_DS_ColListAttribute* l_pcColList;
-	SP_VectorString l_asParameterNames;
+	SP_VectorStdString l_asParameterNames;
 	SP_VectorDouble l_anParameterValue;
 
 	l_anParameterValue.clear();
@@ -2082,7 +2082,7 @@ void SP_DS_ColStAnimation::LoadTransitions()
 
 	m_pcSimulator->SetTransitionCount(m_pcUnfolding->GetTransitionNames()->size());
 
-	SP_VectorString* l_pcTransitionName = m_pcUnfolding->GetTransitionNames();
+	SP_VectorStdString* l_pcTransitionName = m_pcUnfolding->GetTransitionNames();
 	SP_VectorString* l_pcTransitionFunction = m_pcUnfolding->GetCurRateFunction();
 	SP_VectorString* l_pcTransitionType = m_pcUnfolding->GetTransNodeType();
 

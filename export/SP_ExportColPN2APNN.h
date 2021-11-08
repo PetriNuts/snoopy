@@ -21,8 +21,8 @@ class SP_ExportColPN2APNN: public SP_ExportPT
 
 private:
 	wxString m_sNetClass;
-	SP_VectorString m_msPlaceNames;
-	SP_VectorString m_msTransitionNames;
+	SP_VectorStdString m_msPlaceNames;
+	SP_VectorStdString m_msTransitionNames;
 	SP_VectorLong m_anInitialNetMarking;
 	SP_VectorDouble m_adInitialNetMarking;
 	SP_VectorString m_msTransitionFunctions;

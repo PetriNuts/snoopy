@@ -29,9 +29,9 @@ private:
 	//map< long, SP_MapString2String >* m_pmPostPlace2ArcsOfTransitionNode; //for later considering post arcs
 
 	SP_MapString2Long* m_pmnPlaceArrayPos;
-    SP_VectorString* m_pmsPlaceNames;
+    SP_VectorStdString* m_pmsPlaceNames;
 
-	SP_VectorString* m_pmsColoredPlaceNames;
+	SP_VectorStdString* m_pmsColoredPlaceNames;
 
 	long m_nTransitionID;
 

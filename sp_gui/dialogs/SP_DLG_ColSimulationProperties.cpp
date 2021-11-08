@@ -86,7 +86,7 @@ void SP_DLG_ColSimulationProperties::SetProperties()
 	spsim::VectorProperty::iterator l_itProperty;
 
 	spsim::VectorProperty* l_pcProperties = m_pcMainSimulator->GetSimulatorOptions()->GetAllOptions();
-	SP_VectorString::const_iterator l_itStr;
+	SP_VectorStdString::const_iterator l_itStr;
 
 	unsigned int l_nPropertyPos = 0;
 	wxSizer* l_pcRowSizer;
@@ -104,8 +104,8 @@ void SP_DLG_ColSimulationProperties::SetProperties()
 
 		case spsim::GUI_TYPE_CHECKBOX:
 			m_apcPropertiesCtrl[l_nPropertyPos] = new wxCheckBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
-			(*l_itProperty)->GetValue().ToLong(&l_nVal);
-			dynamic_cast<wxCheckBox*>(m_apcPropertiesCtrl[l_nPropertyPos])->SetValue(l_nVal);
+			//(*l_itProperty)->GetValue().ToLong(&l_nVal);
+			dynamic_cast<wxCheckBox*>(m_apcPropertiesCtrl[l_nPropertyPos])->SetValue(std::stol((*l_itProperty)->GetValue()));
 			break;
 
 		case spsim::GUI_TYPE_COMBOBOX:

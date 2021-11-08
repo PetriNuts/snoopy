@@ -35,7 +35,7 @@ class SP_DS_ContinuousPlaceFormula
 	SP_VectorDouble m_Parameter;
 	SP_DS_Graph* m_pcGraph;
 	SP_MapString2Long m_Placename2Id;
-	SP_VectorString m_Id2Placename;
+	SP_VectorStdString m_Id2Placename;
 	SP_MapString2Long m_Parametername2Id;
 	SP_VectorString m_Id2Parametername;
 

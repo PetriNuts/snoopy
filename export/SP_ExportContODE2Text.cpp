@@ -109,12 +109,12 @@ void SP_ExportContODE2Text::LoadContPlaces()
 	l_pcNodeclass = m_graph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
 
 	SP_VectorDouble l_anCurrentMarking;
-	SP_VectorString l_asPlaceNames;
+	SP_VectorStdString l_asPlaceNames;
 	unsigned long l_nPlaceCount;
 
 	SP_ListNode::const_iterator l_itElem;
 	SP_VectorDouble::iterator l_itCurrentMarking;
-	SP_VectorString::iterator l_itPlaceName;
+	SP_VectorStdString::iterator l_itPlaceName;
 
 	//SP_DS_ColListAttribute* l_pcColList;
 	SP_DS_DoubleMarkingAttribute* l_pcMarking;
@@ -125,7 +125,7 @@ void SP_ExportContODE2Text::LoadContPlaces()
 
 	l_anCurrentMarking.assign(l_nPlaceCount, 0);
 
-	l_asPlaceNames.assign(l_nPlaceCount, wxT(""));
+	l_asPlaceNames.assign(l_nPlaceCount, "");
 
 	l_itCurrentMarking = l_anCurrentMarking.begin();
 
@@ -367,7 +367,7 @@ void SP_ExportContODE2Text::LoadParams()
 	SP_DS_Metadataclass* mc = m_graph->GetMetadataclass(SP_DS_META_CONSTANT);
 	SP_ListMetadata::const_iterator it;
 
-	SP_VectorString l_asParameterNames;
+	SP_VectorStdString l_asParameterNames;
 	SP_VectorDouble l_anParameterValue;
 
 	m_msParameterName2Value.clear();

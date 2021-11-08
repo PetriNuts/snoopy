@@ -98,7 +98,7 @@ private:
 	map<long, SP_CPN_CountInterval> m_pnsTransitionCountById ;
 	map<long, SP_CPN_CountInterval> m_nsPlaceCountById;
 	SP_MapString2String m_msTransitionNamesById;
-	SP_VectorString m_msColoredTransitionNames;
+	SP_VectorStdString m_msColoredTransitionNames;
 
 	SP_MapString2Long m_mnPlaceArrayPos;
 
@@ -106,9 +106,9 @@ private:
 
 	SP_VectorLong m_anCurrentMarking;
 
-	SP_VectorString m_msColorsOfPlace;
+	SP_VectorStdString m_msColorsOfPlace;
 
-	SP_VectorString m_msColoredPlaceNames;
+	SP_VectorStdString m_msColoredPlaceNames;
 
 	//speical to colored petir nets
 

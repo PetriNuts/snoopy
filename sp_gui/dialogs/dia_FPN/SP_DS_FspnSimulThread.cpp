@@ -41,8 +41,8 @@ void* SP_DS_FspnSimulThread::Entry()
 
 	long l_nRunCount;
 	long l_nThreadCount;
-	spsim::Property* l_pcPropRunCounts = l_pcSimulator->GetSimulatorOptions()->GetOption(wxT("RunCount"));
-	spsim::Property* l_pcPropThreadCount = l_pcSimulator->GetSimulatorOptions()->GetOption(wxT("ThreadCount"));
+	spsim::Property* l_pcPropRunCounts = l_pcSimulator->GetSimulatorOptions()->GetOption("RunCount");
+	spsim::Property* l_pcPropThreadCount = l_pcSimulator->GetSimulatorOptions()->GetOption("ThreadCount");
 	if (l_pcPropThreadCount != NULL)
 	{
 		l_nThreadCount = l_pcPropThreadCount->GetValuelong();

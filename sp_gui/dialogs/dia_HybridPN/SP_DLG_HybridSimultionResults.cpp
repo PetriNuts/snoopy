@@ -817,9 +817,9 @@ void SP_DLG_HybridSimulationResults::DoStartSimulation()
 	//Get the simulator run count
 	CHECK_POINTER( m_pcMainSimulator->GetSimulatorOptions(), return);
 
-	CHECK_POINTER( m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("RunCount")), return);
+	CHECK_POINTER( m_pcMainSimulator->GetSimulatorOptions()->GetOption("RunCount"), return);
 
-	l_nRunCount = m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("RunCount"))->GetValuelong();
+	l_nRunCount = m_pcMainSimulator->GetSimulatorOptions()->GetOption("RunCount")->GetValuelong();
 
 	if (m_pcWorkerThread != NULL)
 	{
@@ -1354,14 +1354,14 @@ bool SP_DLG_HybridSimulationResults::InitializeSimulator()
 	wxDELETE(l_pcInfo);
 
 	//Get some properties from the user
-	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("InBetweenVisualization")) != NULL)
+	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption("InBetweenVisualization") != NULL)
 	{
-		m_nRedraw = m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("InBetweenVisualization"))->GetValueBool();
+		m_nRedraw = m_pcMainSimulator->GetSimulatorOptions()->GetOption("InBetweenVisualization")->GetValueBool();
 	}
 
-	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("Refreshrate")) != NULL)
+	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption("Refreshrate") != NULL)
 	{
-		m_nRefreshRate = m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("Refreshrate"))->GetValuelong();
+		m_nRefreshRate = m_pcMainSimulator->GetSimulatorOptions()->GetOption("Refreshrate")->GetValuelong();
 	}
 
 	SetSimulationProgressGaugeRange(100);

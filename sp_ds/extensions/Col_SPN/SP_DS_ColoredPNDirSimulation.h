@@ -16,19 +16,19 @@ protected:
 	SP_DS_ColPN_Coloring* m_pcColoredNet;
 
 	
-	SP_VectorString m_msUncolPlaceNames;
-	SP_VectorString m_msColoredPlaceNames;
+	SP_VectorStdString m_msUncolPlaceNames;
+	SP_VectorStdString m_msColoredPlaceNames;
 
 	vector<SP_DS_Node*> m_vcolplaceNode;
-	SP_VectorString m_msColSetPlaceNames;
-	SP_VectorString m_msUncoloredPlaceNames;
-	SP_VectorString m_msuncoloredplaces;
+	SP_VectorStdString m_msColSetPlaceNames;
+	SP_VectorStdString m_msUncoloredPlaceNames;
+	SP_VectorStdString m_msuncoloredplaces;
 	map<long, SP_CPN_ColCountInterval> m_pnsPlaceCountById;
-	SP_VectorString m_msColorsOfPlace;
+	SP_VectorStdString m_msColorsOfPlace;
 
 	//transitions
 	
-	SP_VectorString m_msColoredTransitionNames;
+	SP_VectorStdString m_msColoredTransitionNames;
 	SP_MapString2String m_msTransitionNamesById;
 	map<long, SP_CPN_ColCountInterval> m_pnsTransitionCountById;
 	

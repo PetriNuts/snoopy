@@ -440,7 +440,7 @@ SP_DS_ContinuousPlaceFormula::SetNames(RFDAG& p_Expression)
 	case PLACE:
 		if(p_Expression.placename.empty())
 		{
-			p_Expression.placename = m_Id2Placename.at(p_Expression.placeid).mb_str();
+			p_Expression.placename = m_Id2Placename.at(p_Expression.placeid);
 		}
 		break;
 	case PARAMETER:
@@ -767,7 +767,7 @@ SP_DS_ContinuousPlaceFormula::Eval(const RFDAG& p_Expression)
 	 		break;
 	 	case rfdag::IDENT:
 	 	case rfdag::PLACE:
-	 		l_nReturn = p_bUseModelicaNaming==false? m_Id2Placename[p_Expression.placeid] :(m_Id2Placename[p_Expression.placeid]+wxT(".t")) ;
+	 		l_nReturn = p_bUseModelicaNaming==false? m_Id2Placename[p_Expression.placeid] :(m_Id2Placename[p_Expression.placeid]+".t") ;
 	 		break;
 	 	case rfdag::PARAMETER:
 	 		l_nReturn = m_Id2Parametername[p_Expression.placeid];

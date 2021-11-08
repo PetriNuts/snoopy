@@ -579,14 +579,14 @@ bool SP_DLG_CPNColDirSimResults::InitializeSimulator()
 	wxDELETE(l_pcInfo);
 
 	//Get some properties from the user
-	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("InBetweenVisualization")) != NULL)
+	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption("InBetweenVisualization") != NULL)
 	{
-		m_nRedraw = m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("InBetweenVisualization"))->GetValueBool();
+		m_nRedraw = m_pcMainSimulator->GetSimulatorOptions()->GetOption("InBetweenVisualization")->GetValueBool();
 	}
 
-	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("Refreshrate")) != NULL)
+	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption("Refreshrate") != NULL)
 	{
-		m_nRefreshRate = m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("Refreshrate"))->GetValuelong();
+		m_nRefreshRate = m_pcMainSimulator->GetSimulatorOptions()->GetOption("Refreshrate")->GetValuelong();
 	}
 
 	SetSimulationProgressGaugeRange(l_nLong0);

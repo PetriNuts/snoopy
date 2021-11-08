@@ -394,13 +394,13 @@ SP_DS_ApParser::SetNames(RFDAG& p_Expression)
 	case PLACE:
 		if(p_Expression.placename.empty())
 		{
-			p_Expression.placename = m_Id2Placename.at(p_Expression.placeid).mb_str();
+			p_Expression.placename = m_Id2Placename.at(p_Expression.placeid);
 		}
 		break;
 	case PARAMETER:
 		if(p_Expression.placename.empty())
 		{
-			p_Expression.placename = m_Id2Parametername.at(p_Expression.placeid).mb_str();
+			p_Expression.placename = m_Id2Parametername.at(p_Expression.placeid);
 		}
 		break;
 	default:
@@ -418,7 +418,7 @@ void SP_DS_ApParser::LoadUnfoldedPlaces()
 	m_Placename2Id = *( m_pcUnfoldedNet->GetPlaceArrayPos() );
 	m_Id2Placename = *( m_pcUnfoldedNet->GetPlaceNames() );
 	
-	SP_VectorString l_msColoredPlaceNames =  *(m_pcUnfoldedNet->GetColoredPlaceNames());	
+	SP_VectorStdString l_msColoredPlaceNames =  *(m_pcUnfoldedNet->GetColoredPlaceNames());
 	
 	for(unsigned i=0; i < l_msColoredPlaceNames.size(); i++)
 	{
@@ -429,7 +429,7 @@ void SP_DS_ApParser::LoadUnfoldedPlaces()
 	client::places.clear();
 	for(unsigned l_nPos = 0; l_nPos < m_Id2Placename.size(); l_nPos++)
 	{
-		client::places.add(m_Id2Placename[l_nPos].mb_str(), l_nPos);
+		client::places.add(m_Id2Placename[l_nPos], l_nPos);
 	}	
 
 }

@@ -67,9 +67,12 @@ public:
 
 	int  UnfoldPlace1(std::string marking,dssd::andl::Place_ptr p,dssd::andl::simple_net_builder&);//Do the actual unfold for evaluating the colour expression
 
-	bool CheckCoLourExpression(const std::string p_sExp,const std::string &p_sColorSet,const wxString& p_sErrorPos);//Check the colour expression for Arcs
+	//bool CheckCoLourExpression(const std::string p_sExp,const std::string &p_sColorSet,const wxString& p_sErrorPos);//Check the colour expression for Arcs
 
-	bool CheckGuardEXpression(const std::string& p_sExp, const std::string& p_sErrorPos);//Check Colour expression for guards
+	bool CheckCoLourExpression(const std::string& p_sExp,const std::string& p_sColorSet,const wxString& p_sErrorPos);
+
+
+	bool CheckGuardEXpression(std::string p_sExp, std::string p_sErrorPos);//Check Colour expression for guards
 
 	bool CheckTransRateFunction(SP_DS_Node*, wxString& p_sRateFun);
 	

@@ -195,8 +195,8 @@ protected:
 	*/
 
 	SP_VectorString m_asColPlaceNames;
-	SP_VectorString m_asPlaceNames;
-	SP_VectorString m_asTransitionNames;
+	SP_VectorStdString m_asPlaceNames;
+	SP_VectorStdString m_asTransitionNames;
 	SP_MapString2Long m_mPlaceName2Position;
 	SP_MapString2Long m_mTransitionName2Position;
 
@@ -454,7 +454,7 @@ public:
 	{
 	}
 
-	static void SimulatorLogFunction(wxLogLevel p_nLogLevel, const wxString& p_sLogMsg);
+	static void SimulatorLogFunction(spsim::LogLevel  p_nLogLevel, const std::string& p_sLogMsg);
 
 	virtual void LoadResults();
 	virtual void SetSimulationStopWatch(long p_nTime)

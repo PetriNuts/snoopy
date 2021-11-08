@@ -687,14 +687,14 @@ bool SP_DLG_CPNSimulationResults::InitializeSimulator()
 	wxDELETE(l_pcInfo);
 
 	//Get some properties from the user
-	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("InBetweenVisualization")) != NULL)
+	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption("InBetweenVisualization") != NULL)
 	{
-		m_nRedraw = m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("InBetweenVisualization"))->GetValueBool();
+		m_nRedraw = m_pcMainSimulator->GetSimulatorOptions()->GetOption("InBetweenVisualization")->GetValueBool();
 	}
 
-	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("Refreshrate")) != NULL)
+	if (m_pcMainSimulator->GetSimulatorOptions()->GetOption("Refreshrate") != NULL)
 	{
-		m_nRefreshRate = m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("Refreshrate"))->GetValuelong();
+		m_nRefreshRate = m_pcMainSimulator->GetSimulatorOptions()->GetOption("Refreshrate")->GetValuelong();
 	}
 
 	SetSimulationProgressGaugeRange(l_nLong0);
@@ -1273,12 +1273,12 @@ void SP_DLG_CPNSimulationResults::LoadPlaces()
 	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
 
 	SP_VectorDouble l_anCurrentMarking;
-	SP_VectorString l_asPlaceNames;
+	SP_VectorStdString l_asPlaceNames;
 	unsigned long l_nPlaceCount;
 
 	SP_ListNode::const_iterator l_itElem;
 	SP_VectorDouble::iterator l_itCurrentMarking;
-	SP_VectorString::iterator l_itPlaceName;
+	SP_VectorStdString::iterator l_itPlaceName;
 
 	//SP_DS_ColListAttribute* l_pcColList;
 	SP_DS_DoubleMarkingAttribute* l_pcMarking;
@@ -1289,7 +1289,7 @@ void SP_DLG_CPNSimulationResults::LoadPlaces()
 
 	l_anCurrentMarking.assign(l_nPlaceCount, 0);
 
-	l_asPlaceNames.assign(l_nPlaceCount, wxT(""));
+	l_asPlaceNames.assign(l_nPlaceCount, "");
 
 	l_itCurrentMarking = l_anCurrentMarking.begin();
 

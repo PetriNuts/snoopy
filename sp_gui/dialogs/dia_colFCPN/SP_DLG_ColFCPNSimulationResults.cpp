@@ -517,7 +517,7 @@ void SP_DLG_ColFCPNSimulationResults::InitializeEmptyView(SP_DS_Metadata* p_pcVi
 
 	wxString l_sElementType = l_pcAttribute->GetValueString();
 
-	SP_VectorString* l_pvCurrentInfo;
+	SP_VectorStdString* l_pvCurrentInfo;
 
 	SP_VectorString l_asColours;
 
@@ -599,7 +599,7 @@ void SP_DLG_ColFCPNSimulationResults::LoadTransitions()
 
 	m_pcMainSimulator->SetTransitionCount(m_pcUnfoldedNet->GetTransitionNames()->size());
 
-	SP_VectorString* l_pcTransitionName = m_pcUnfoldedNet->GetTransitionNames();
+	SP_VectorStdString* l_pcTransitionName = m_pcUnfoldedNet->GetTransitionNames();
 	SP_VectorString* l_pcTransitionFunction = m_pcUnfoldedNet->GetCurRateFunction();
 
 	if (l_pcTransitionFunction)//bugfix:by george

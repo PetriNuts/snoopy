@@ -374,7 +374,7 @@ wxString SP_DS_StAnimation::GetEdgeWeight(SP_DS_Edge* p_pcEdge)
 void SP_DS_StAnimation::LoadPlaces()
 {
 	SP_VectorLong l_anCurrentMarking;
-	SP_VectorString l_asPlaceNames;
+	SP_VectorStdString l_asPlaceNames;
 	unsigned long l_nPosition = 0;
 	wxString l_sName;
 
@@ -527,7 +527,7 @@ void SP_DS_StAnimation::LoadParameters()
 	SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_META_CONSTANT);
 	SP_ListMetadata::const_iterator it;
 
-	SP_VectorString l_asParameterNames;
+	SP_VectorStdString l_asParameterNames;
 	SP_VectorDouble l_anParameterValue;
 
 	for (it = mc->GetElements()->begin(); it != mc->GetElements()->end(); ++it)

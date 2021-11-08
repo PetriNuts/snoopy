@@ -49,12 +49,12 @@ protected:
     unsigned long m_nTransitionCount;
 
 	SP_MapString2Long m_mnPlaceArrayPos;
-    SP_VectorString m_msPlaceNames;
+    SP_VectorStdString m_msPlaceNames;
     SP_MapString2String m_msPlaceNamesById;
     vector<SP_DS_Node*> m_mpcPlaceNodes;
 
     SP_MapString2Long m_mnTransitionArrayPos;
-    SP_VectorString m_msTransitionNames;
+    SP_VectorStdString m_msTransitionNames;
     SP_MapString2String m_msTransitionNamesById;
     vector<SP_DS_Node*> m_mpcTransitionNodes;
 
@@ -159,13 +159,13 @@ public:
 
 	SP_MapString2Long* GetPlaceArrayPos() { return &m_mnPlaceArrayPos; }
 
-    SP_VectorString* GetPlaceNames() { return &m_msPlaceNames; }
+    SP_VectorStdString* GetPlaceNames() { return &m_msPlaceNames; }
 
     SP_MapString2String* GetPlaceNamesById() { return &m_msPlaceNamesById; }
 
     SP_MapString2Long* GetTransitionArrayPos() { return &m_mnTransitionArrayPos; }
 
-    SP_VectorString* GetTransitionNames() { return &m_msTransitionNames; }
+    SP_VectorStdString* GetTransitionNames() { return &m_msTransitionNames; }
 
     SP_MapString2String* GetTransitionNamesById() { return &m_msTransitionNamesById; }
 
@@ -176,7 +176,7 @@ public:
 	}
 	
 
-	void SetPlaceNames(SP_VectorString &p_msPlaceNames)
+	void SetPlaceNames(SP_VectorStdString &p_msPlaceNames)
 	{
 		m_msPlaceNames = p_msPlaceNames;
 	}
@@ -193,7 +193,7 @@ public:
 
 	
 	
-	void SetTransitionNames(SP_VectorString &p_msTransitionNames)
+	void SetTransitionNames(SP_VectorStdString &p_msTransitionNames)
 	{
 		m_msTransitionNames = p_msTransitionNames;
 	}

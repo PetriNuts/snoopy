@@ -43,9 +43,9 @@ void* SP_DS_SimulatorThreadStochastic::Entry()
 
 	unsigned int l_nThreadCount = 1;
 
-	if (m_pcSimulator->GetSimulatorOptions()->GetOption(wxT("ThreadCount")) != NULL)
+	if (m_pcSimulator->GetSimulatorOptions()->GetOption("ThreadCount") != NULL)
 	{
-		l_nThreadCount = m_pcSimulator->GetSimulatorOptions()->GetOption(wxT("ThreadCount"))->GetValuelong();
+		l_nThreadCount = m_pcSimulator->GetSimulatorOptions()->GetOption("ThreadCount")->GetValuelong();
 	}
 
 	if (l_nThreadCount > 1)

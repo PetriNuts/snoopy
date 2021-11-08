@@ -41,15 +41,15 @@ void* SP_DS_SimulatorThreadHybrid::Entry()
 
 	unsigned int l_nRunCount=1;
 
-	if(m_pcSimulator->GetSimulatorOptions()->GetOption(wxT("ThreadCount"))!=NULL)
+	if(m_pcSimulator->GetSimulatorOptions()->GetOption("ThreadCount")!=NULL)
 	{
-	 l_nThreadCount=m_pcSimulator->GetSimulatorOptions()->GetOption(wxT("ThreadCount"))->GetValuelong();
+	 l_nThreadCount=m_pcSimulator->GetSimulatorOptions()->GetOption("ThreadCount")->GetValuelong();
 	}
 
 	//number of runs
-	if(m_pcSimulator->GetSimulatorOptions()->GetOption(wxT("RunCount"))!=NULL)
+	if(m_pcSimulator->GetSimulatorOptions()->GetOption("RunCount")!=NULL)
 	{
-	 l_nRunCount=m_pcSimulator->GetSimulatorOptions()->GetOption(wxT("RunCount"))->GetValuelong();
+	 l_nRunCount=m_pcSimulator->GetSimulatorOptions()->GetOption("RunCount")->GetValuelong();
 	}
 
 	if(l_nThreadCount>1 && l_nRunCount>1)

@@ -22,15 +22,15 @@ protected:
 	//net - places
 	SP_MapString2String m_msPlaceNamesById_FromUnfolding;
     SP_MapString2Long m_mnPlaceArrayPos_FromUnfolding;
-	SP_VectorString m_msPlaceNames;
-    SP_VectorString m_msColoredPlaceNames;
+	SP_VectorStdString m_msPlaceNames;
+    SP_VectorStdString m_msColoredPlaceNames;
 	map<long, SP_CPN_CountInterval> m_pnsPlaceCountById;	      
-	SP_VectorString m_msColorsOfPlace;
+	SP_VectorStdString m_msColorsOfPlace;
 
 	//net - transitions
 	SP_MapString2Long m_mnTransitionArrayPos;
-    SP_VectorString m_msTransitionNames;
-	SP_VectorString m_msColoredTransitionNames;
+    SP_VectorStdString m_msTransitionNames;
+	SP_VectorStdString m_msColoredTransitionNames;
     SP_MapString2String m_msTransitionNamesById;
 	map<long, SP_CPN_CountInterval> m_pnsTransitionCountById ;
   // 	map<wxString, SP_CPN_CountInterval> m_nsTransitionCountByNodeClass;

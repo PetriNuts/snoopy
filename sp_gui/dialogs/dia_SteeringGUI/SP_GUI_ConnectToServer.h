@@ -64,6 +64,8 @@ protected:
 		  //create colored PN model
 		  spsa::Model* CreateColoredModel(const wxString& p_sModelName);
 
+		  SP_VectorString ToWxStringVector(SP_VectorStdString p_vsource);//by george for spsm
+
 		  unsigned long LoadNodeNames(const wxString& p_sNodeName,SP_VectorString& p_asNames);
 
 		  void loadInitialMarking(const wxString& p_sNodeName,SP_VectorDouble& p_anInitialMarking);

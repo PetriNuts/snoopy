@@ -59,15 +59,15 @@ class SP_DS_ColTraceAnalyzer
 	SP_DS_ColPN_Unfolding* m_pcUnfolding;
 	const SP_Vector2DDouble& m_aanResults;
 
-	SP_VectorString* m_pvsColoredPlaceNames;
+	SP_VectorStdString* m_pvsColoredPlaceNames;
 	
 	map<wxString,long> m_mColoredPlNames2Pos;
 
 	map<long, SP_CPN_CountInterval>* m_pnsPlaceCountById;
-	SP_VectorString* m_pvsUnPlaceNames;
+	SP_VectorStdString* m_pvsUnPlaceNames;
 
 	SP_MapString2String* m_pmsColPlName2ColSet;
-	SP_VectorString* m_pvsPlaceColor;
+	SP_VectorStdString* m_pvsPlaceColor;
 
 
 	wxString m_sVarName;

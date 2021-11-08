@@ -98,7 +98,7 @@ SP_ImportCSV::ReadFile(const wxString& fileName, spsim::Simulator* simulator)
 	}
 	else
 	{
-		SP_VectorString* l_Places = simulator->GetPlaceNames();
+		SP_VectorStdString* l_Places = simulator->GetPlaceNames();
 		m_RowLength = simulator->GetPlaceCount();
 		for(unsigned long i = 0; i < m_RowLength; ++i)
 		{

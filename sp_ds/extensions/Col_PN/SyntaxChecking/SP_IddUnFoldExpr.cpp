@@ -8,6 +8,7 @@
 #include "SP_IddUnFoldExpr.h"
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include <ctype.h>
+#include<algorithm>
 SP_IddUnFoldExpr::SP_IddUnFoldExpr(SP_DS_Graph* p_pcGraph, wxString p_sColExpr,wxString p_sPna)
 {
 	m_pcGraph = p_pcGraph;
@@ -316,7 +317,6 @@ int  SP_IddUnFoldExpr::UnfoldPlace1(std::string markingExp,dssd::andl::Place_ptr
 	}
 	//logger(aux::logDEBUG1) << "marking Exp: " << markingExpr;
 	// if(mapVarsNames.size() > 0) {
-
 	dssd::colexpr::DefaultExpressionCreator expr_creator(colDefinitions_, mapVarsNames, "", colorset);
 	// dssd::colexpr::DefaultExpressionCreator expr_creator(colDefinitions_, dssd::aux::toVector(tmpVarNames), "", colorset);
 	dssd::colexpr::col_expr_variable_substituter es(expr_creator);
@@ -547,24 +547,16 @@ unsigned  SP_IddUnFoldExpr::createPlaces(solution_space &sol,
 }
 
 
-bool SP_IddUnFoldExpr::CheckGuardEXpression(const std::string& p_sExp,const std::string& p_sErrorPos)
+bool SP_IddUnFoldExpr::CheckGuardEXpression( std::string p_sExp, std::string p_sErrorPos)
 {
-	
-    std::string l_sGuard="[" + p_sExp + "]";//added on 18.09.2020
+	 std::string ss = "[" + p_sExp + "]";//added on 18.09.2020
+	p_sExp = ss; // added on 18.09.2020
 
-    std::string funName="";
-
-	if (l_sGuard.find("numOf") != std::string::npos) {
-		return true;// todo:support idd unfolding for this operator
+	std::string funName;
+	if (p_sExp.find('(') != std::string::npos&&p_sExp.find(')') != std::string::npos)
+	{
+		funName = p_sExp.substr(1, p_sExp.find('(')-1);
 	}
-
-
-    if (l_sGuard.find('(') != std::string::npos && l_sGuard.find(')') != std::string::npos)
-    {
-    	funName = l_sGuard.substr(1, l_sGuard.find('(')-1);
-
-    }
-
 
 	//first step:register the net definitions
 	dssd::andl::Net_ptr m_ColoredNet;
@@ -590,18 +582,10 @@ bool SP_IddUnFoldExpr::CheckGuardEXpression(const std::string& p_sExp,const std:
 		}
 	}
 	try{
-
-	auto colfunChckNumOf = colDefinitions_.lookUpColorFunction(funName);
-
-	if (colfunChckNumOf)
-	{
-			if (colfunChckNumOf->body_.find("numOf") != std::string::npos) {
-				return true;// todo:support idd unfolding for this operator
-			}
-	}
-
 	colExprVec	guards;
-	colExpr expr = parseExpr(l_sGuard);
+	colExpr expr = parseExpr(p_sExp);
+
+
 	substituteColorFunctions(expr);
 	flatExpression(expr);
 	guards.push_back(expr);
@@ -613,56 +597,51 @@ bool SP_IddUnFoldExpr::CheckGuardEXpression(const std::string& p_sExp,const std:
 	solution_space sol(guards, colDefinitions_, varNames);
 	//
 	auto r = evalColExpr<colexpr_descriptor_evaluator>(expr, colDefinitions_);
-
 	bool isValid = true;
 	if (funName != "")
 	{
-			std::string expression = l_sGuard;
-			expression.erase(std::remove_if(expression.begin(), expression.end(),
-									[](char &c) {
-										return std::isspace<char>(c, std::locale::classic());
-									}),
-					expression.end());
-			//std::remove_if(expression.begin(), expression.end(), static_cast<int(&)(int)>(std::isspace));
-			std::string params;
-			size_t start = expression.find('(');
-			params = expression.substr(expression.find('(')+1, expression.length()-3- start);
+		std::string expression = p_sExp;
+		//todo:check check why remove_if does ot work
+		//remove_if(expression.begin(), expression.end(),isspace);
+		std::string params;
+		size_t start = expression.find('(');
+		params = expression.substr(expression.find('(') + 1, expression.length() - 3 - start);
 
 
-			std::vector<string> tokens;
-			std::vector<string> colorsets;
-			stringstream check1(params);
+		std::vector<string> tokens;
+		std::vector<string> colorsets;
+		stringstream check1(params);
 
-			string intermediate;
+		string intermediate;
 
-		     //tokenize
-			while (getline(check1, intermediate, ','))
-			{
-				tokens.push_back(intermediate);
-			}
+		//tokenize
+		while (getline(check1, intermediate, ','))
+		{
+			tokens.push_back(intermediate);
+		}
 
-			auto colfun = colDefinitions_.lookUpColorFunction(funName);
+		auto colfun = colDefinitions_.lookUpColorFunction(funName);
+		if(colfun)
+		{
 
-			if(colfun){
-
-			if (colfun->params_.size() != tokens.size())
-			{
-				isValid = false;
-			}
-			for (int i = 0; i < tokens.size(); i++)
-			{
-			   std::string csName= colDefinitions_.getVarColorsetName(tokens[i]);
-			   if(!csName.empty())
-			   colorsets.push_back(csName);
-			}
-			if (colfun->params_.size() != colorsets.size())
-			{
-				isValid = false;
-			}
-
-			if (colfun && isValid)
-			{
-				int k = 0;
+		if (colfun->params_.size() != tokens.size())
+		{
+			isValid = false;
+		}
+		for (int i = 0; i < tokens.size(); i++)
+		{
+			std::string csName = colDefinitions_.getVarColorsetName(tokens[i]);
+			if (!csName.empty())
+				colorsets.push_back(csName);
+		}
+		if (colfun->params_.size() != colorsets.size())
+		{
+			isValid = false;
+		}
+	}
+		if (colfun && isValid)
+		{
+			int k = 0;
 			for (auto itPar = colfun->params_.begin(); itPar != colfun->params_.end(); ++itPar)
 			{
 				std::string arg = itPar->first;
@@ -672,12 +651,11 @@ bool SP_IddUnFoldExpr::CheckGuardEXpression(const std::string& p_sExp,const std:
 					break;
 				}
 				k++;
-			 }
-		     }
 			}
+		}
 	}
 
-	if (!r.isGuard() || !isValid)
+	if (!r.isGuard() ||  !isValid)
 	{
 		if (p_sErrorPos=="")
 		{
@@ -685,17 +663,19 @@ bool SP_IddUnFoldExpr::CheckGuardEXpression(const std::string& p_sExp,const std:
 		}
 		else
 		{
-		SP_LOGERROR_("Not a valid guard, " + p_sErrorPos);//added on 18.09.2020
+			SP_LOGERROR_("Not a valid guard, " + p_sErrorPos);//added on 18.09.2020
 		}
-	return false;//added on 18.9.20
+		return false;//added on 18.9.20
 	}
 	}catch(dssd::exc::Exc& e){
-		SP_LOGERROR_("Not a valid expression, " + p_sErrorPos);//added on 18.09.2020
+		wxString l_sCaught = e.what();
+		l_sCaught.Replace("\n", "; ");
+		SP_LOGERROR_(l_sCaught +p_sErrorPos);
 		l_bRes = false;
 	}
 	return l_bRes;
 }
-bool SP_IddUnFoldExpr::CheckCoLourExpression(const std::string p_sExp,const std::string& p_sColorSet,const wxString& p_sErrorPos)
+bool SP_IddUnFoldExpr::CheckCoLourExpression(const std::string& p_sExp,const std::string& p_sColorSet, const wxString& p_sErrorPos)
 {
 	//p_sExp = "[(x=50&y=50&c=A)]1`((x,y),c)";
 	bool l_bRes = true;
@@ -885,6 +865,7 @@ bool SP_IddUnFoldExpr::CheckTransRateFunction(SP_DS_Node* p_pcTr, wxString& p_sR
 
 	}
 
+
 	std::string func = p_sRateFun.ToStdString();
 	func.erase(std::remove_if(func.begin(), func.end(),
 		std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), func.end());
@@ -927,7 +908,7 @@ bool SP_IddUnFoldExpr::CheckTransRateFunction(SP_DS_Node* p_pcTr, wxString& p_sR
 				else
 				{
 					l_bRes = false;
-					wxString l_sError=wxT("syntax error in rate function") + l_sTransName+wxT(" |")+l_sTransName;
+					wxString l_sError =wxT("syntax error in rate function")+ l_sTransName + wxT(" |") + l_sTransName;
 					SP_LOGERROR(l_sError);
 					return l_bRes;
 				}
@@ -1192,11 +1173,11 @@ unsigned SP_IddUnFoldExpr::createPlaces1(solution_space &sol,
 bool  SP_IddUnFoldExpr::ISValidIdientifer(std::string& p_SId, colEnv &env)
 {
 	std::vector<std::string> l_vFunctions = { "massaction","MassAction","ceil","cos",
-			"floor","log","log10","sin","sqr","sqrt","tan","abs","LigandBindingPotentia","BinomialCoefficient",
-			"nlinlog","linlog","geq","or","eq","and","neq","leq","lt","gt","min","max","pow","CountXY",
-			"linlog","nlinlog","BinomialCoefficient","LigandBindingPotential","acos","asin","ceil","exp",
-			"Move2DGrid","Rate"
-		};
+		"floor","log","log10","sin","sqr","sqrt","tan","abs","LigandBindingPotentia","BinomialCoefficient",
+		"nlinlog","linlog","geq","or","eq","and","neq","leq","lt","gt","min","max","pow","CountXY",
+		"linlog","nlinlog","BinomialCoefficient","LigandBindingPotential","acos","asin","ceil","exp",
+		"Move2DGrid","Rate"
+	};
 	//is it pre-defined function?
 	for (auto id : l_vFunctions)
 	{
@@ -1213,6 +1194,7 @@ bool  SP_IddUnFoldExpr::ISValidIdientifer(std::string& p_SId, colEnv &env)
 	for (auto place : m_vPlaceNames)
 	{
 		if (place == p_SId || p_SId.find(place) != std::string::npos)//colored or unfolded place
+
 			return true;
 	}
 
@@ -1227,4 +1209,3 @@ bool  SP_IddUnFoldExpr::ISValidIdientifer(std::string& p_SId, colEnv &env)
 	return false;
 }
 
- 

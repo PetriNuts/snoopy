@@ -345,7 +345,7 @@ bool SP_DLG_CheckNet :: CheckSPN( )
 	bool l_bNoError = true;
 	
 	spsim::Parser l_cParser;
-	SP_VectorString l_Constants;
+	SP_VectorStdString l_Constants;
 
 	SP_DS_Metadataclass* mc = m_graph->GetMetadataclass(SP_DS_META_CONSTANT);
 	if(mc)
@@ -459,7 +459,7 @@ bool SP_DLG_CheckNet :: CheckSPN( )
 
 bool SP_DLG_CheckNet::CheckRateFunction(spsim::Parser& p_Parser, const wxString& p_sFormula, SP_DS_Node* p_pcNode )
 {
-	SP_VectorString l_Places;
+	SP_VectorStdString l_Places;
     if(p_pcNode)
 	{
     	wxString l_sTransitionName = dynamic_cast<SP_DS_NameAttribute*>(p_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();

@@ -1911,7 +1911,7 @@ void SP_DLG_StSimulationResults::DoStartSimulation()
 	Update();
 
 	//Get the simulator run count
-	spsim::Property* l_pcProp = m_pcMainSimulator->GetSimulatorOptions()->GetOption(wxT("RunCount"));
+	spsim::Property* l_pcProp = m_pcMainSimulator->GetSimulatorOptions()->GetOption("RunCount");
 	if (l_pcProp != NULL)
 	{
 		l_nRunCount = l_pcProp->GetValuelong();

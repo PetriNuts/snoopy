@@ -1212,7 +1212,7 @@ void SP_DLG_ColStSimulationResults::InitializeEmptyView(SP_DS_Metadata* p_pcView
 
 	wxString l_sElementType = l_pcAttribute->GetValueString();
 
-	SP_VectorString* l_pvCurrentInfo;
+	SP_VectorStdString* l_pvCurrentInfo;
 
 	SP_VectorString l_asColours;
 
@@ -1413,7 +1413,7 @@ void SP_DLG_ColStSimulationResults::LoadTransitions()
 
 	m_pcMainSimulator->SetTransitionCount(m_pcUnfoldedNet->GetTransitionNames()->size());
 
-	SP_VectorString* l_pcTransitionName = m_pcUnfoldedNet->GetTransitionNames();
+	SP_VectorStdString* l_pcTransitionName = m_pcUnfoldedNet->GetTransitionNames();
 	SP_VectorString* l_pcTransitionFunction = m_pcUnfoldedNet->GetCurRateFunction();
 	SP_VectorString* l_pcTransitionType = m_pcUnfoldedNet->GetTransNodeType();
 
@@ -1622,7 +1622,7 @@ void SP_DLG_ColStSimulationResults::LoadParameters()
 			}
 		}
 	 
-		SP_VectorString l_asParameterNames;
+		SP_VectorStdString l_asParameterNames;
 		SP_VectorDouble l_anParameterValue;
 	//-----------------------------------------
 		SP_DS_Metadataclass* mc = m_pcGraph->GetMetadataclass(SP_DS_CPN_CONSTANT_HARMONIZING);
@@ -1888,14 +1888,14 @@ SP_FunctionPtr SP_DLG_ColStSimulationResults::RegesterFunctionVariables(const wx
 		   {
 			   for (unsigned int i = 0; i < m_msPlaceNames.size(); i++)
 			   {
-				   l_mVar2Pos1[m_msPlaceNames[i].ToStdString()] = i;
+				   l_mVar2Pos1[m_msPlaceNames[i]] = i;
 			   }
 		   }
 		   else if (p_sType == wxT("Transition instance"))
 		   {
 			   for (unsigned int i = 0; i < m_msTransitionNames.size(); i++)
 			   {
-				   l_mVar2Pos1[m_msTransitionNames[i].ToStdString()] = i;
+				   l_mVar2Pos1[m_msTransitionNames[i]] = i;
 			   }
 		   }
 		   else if (p_sType == wxT("Mixed"))
@@ -1947,8 +1947,8 @@ void SP_DLG_ColStSimulationResults::LoadObservers()
 	std::map<std::string, unsigned int> l_mPlaceToPosition;
 	std::map<std::string, unsigned int> l_mTransitionToPosition;
 	//14.12
-	SP_VectorString* l_pvsColoredPlaceNames = m_pcUnfoldedNet->GetColoredPlaceNames();
-	SP_VectorString* l_pvsColoredTransNames = m_pcUnfoldedNet->GetColoredTransitionNames();
+	SP_VectorStdString* l_pvsColoredPlaceNames = m_pcUnfoldedNet->GetColoredPlaceNames();
+	SP_VectorStdString* l_pvsColoredTransNames = m_pcUnfoldedNet->GetColoredTransitionNames();
 
 	for (unsigned i = 0; i < l_pvsColoredPlaceNames->size(); i++)
 	{
@@ -1973,7 +1973,7 @@ void SP_DLG_ColStSimulationResults::LoadObservers()
 	SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
 	if (l_pcMetadataclass)
 	{
-		SP_VectorString l_asParameterNames;
+		SP_VectorStdString l_asParameterNames;
 
 		SP_ListMetadata::const_iterator l_itElem;
 		for (l_itElem = l_pcMetadataclass->GetElements()->begin(); l_itElem != l_pcMetadataclass->GetElements()->end(); ++l_itElem)
@@ -2124,7 +2124,7 @@ void SP_DLG_ColStSimulationResults::UpdateUnfoldedObservers()
 	 SP_DS_Metadataclass* l_pcMetadataclass = m_pcGraph->GetMetadataclass(SP_DS_META_OBSERVER);
 	 if (l_pcMetadataclass)
 	 {
-		 SP_VectorString l_asParameterNames;
+		 SP_VectorStdString l_asParameterNames;
 
 		 SP_ListMetadata::const_iterator l_itElem;
 		 int l_nObserverPlacesIndex = 0;
