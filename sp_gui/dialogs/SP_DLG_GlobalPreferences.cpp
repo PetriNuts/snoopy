@@ -145,10 +145,58 @@ SP_DLG_GlobalPreferences::UpdateCanvas()
     {
     	SP_GUI_Canvas* canvas = dynamic_cast<SP_MDI_View*>(l_pcFrame->GetView())->GetCanvas();
     	wxClientDC dc(canvas);
-
+    	this->UpdateAnimator();
     	canvas->DoPrepareDC(dc);
     	SP_Core::Instance()->GetRootDocument()->GetGraph()->ShowOnCanvas(canvas);
     }
+}
+
+
+void
+SP_DLG_GlobalPreferences::UpdateAnimator()
+{
+
+		int tempInt;
+		double tempDouble;
+		wxString tempString;
+		SP_SetString::iterator itNC;
+		SP_SetString m_lsNCNames;
+		int l_nNCCount = SP_Core::Instance()->GetNetclassCount();
+		for (int i = 0; i < l_nNCCount; i++) {
+			m_lsNCNames.insert(SP_Core::Instance()->GetNetclassName(i));
+		}
+
+		for (itNC = m_lsNCNames.begin(); itNC != m_lsNCNames.end(); ++itNC) {
+			const wxString l_rString = *itNC;
+			if (l_rString.CmpNoCase(SP_DS_PN_CLASS) == 0 ||
+				l_rString.CmpNoCase(SP_DS_EXTPN_CLASS) == 0 ||
+				l_rString.CmpNoCase(SP_DS_MUSICPN_CLASS) == 0 ||
+				l_rString.CmpNoCase(SP_DS_MODULOPN_CLASS) == 0)
+
+
+			{
+				tempInt = m_pcAnimationPrefs->GetRefresh(l_rString);
+				int tempDouble1= m_pcAnimationPrefs->GetDuration(l_rString);
+				SP_Core::Instance()->ActivateAnimBAsedOnOptionSet(SP_Core::Instance()->GetRootDocument()->GetGraph(), tempInt, tempDouble1);
+				SP_ANIM_STEP_T stepping= m_pcAnimationPrefs->GetStepping(l_rString);
+
+				m_pcAnimationPrefs->SetStepping(l_rString, stepping);
+				SP_Core::Instance()->SetAnimRunning(true);
+
+			}
+			else if (l_rString.CmpNoCase(SP_DS_COLPN_CLASS) == 0 ||
+				l_rString.CmpNoCase(SP_DS_COLSPN_CLASS) == 0 ||
+				l_rString.CmpNoCase(SP_DS_COLEPN_CLASS) == 0)
+			{
+				tempInt = m_pcAnimationPrefs->GetRefresh(l_rString);
+				int tempDouble1 = m_pcAnimationPrefs->GetDuration(l_rString);
+				SP_Core::Instance()->ActivateAnimBAsedOnOptionSet(SP_Core::Instance()->GetRootDocument()->GetGraph(), tempInt, tempDouble1);
+				SP_ANIM_STEP_T stepping = m_pcAnimationPrefs->GetStepping(l_rString);
+				SP_Core::Instance()->SetActivatedRefreshDuration(l_rString,tempInt, tempDouble1);
+				//SP_Core::Instance()->SetActiv
+				m_pcAnimationPrefs->SetStepping(l_rString, stepping);
+			}
+		}
 }
 //////////////////////////////////////////////////////////////////////
 // Dialog events

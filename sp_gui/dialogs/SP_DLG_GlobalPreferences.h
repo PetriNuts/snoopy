@@ -46,6 +46,7 @@ protected:
 
 	void CreateNotebookPages();
 	void UpdateCanvas();
+	void UpdateAnimator();//by george 26.10.2021
 
 protected:
 	void OnDlgOk(wxCommandEvent& p_cEvent);

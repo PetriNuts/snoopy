@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cdtprojectproperties>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.IncludePaths">
+<language name="C++ Source File">
+<includepath workspace_path="true">/${ProjName}</includepath>
+<includepath>/home/george/workspace/OGDF-snapshot/include</includepath>
+<includepath>/home/george/workspace/dssd_util/include</includepath>
+<includepath workspace_path="true">/SPSA_SteeringAPI/include</includepath>
+<includepath workspace_path="true">/SP_SteeringAPI/include</includepath>
+<includepath workspace_path="true">/SP_Simulator/include</includepath>
+<includepath workspace_path="true">/Snoopy Simulator/include</includepath>
+<includepath>/usr/local/include/wx-3.1</includepath>
+<includepath>/usr/local/lib/wx/include/gtk2-unicode-3.1</includepath>
+
+</language>
+<language name="C Source File">
+
+</language>
+<language name="Object File">
+
+</language>
+<language name="Assembly Source File">
+
+</language>
+</section>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.Macros">
+<language name="C++ Source File">
+<macro>
+<name>__WXGTK__</name><value/>
+</macro>
+<macro>
+<name>UNICODE</name><value/>
+</macro>
+<macro>
+<name>__SNOOPY__</name><value/>
+</macro>
+<macro>
+<name>_FILE_OFFSET_BITS</name><value>64</value>
+</macro>
+<macro>
+<name>wxDEBUG_LEVEL</name><value>0</value>
+</macro>
+<macro>
+<name>WXUSINGDLL</name><value/>
+</macro>
+
+</language>
+<language name="C Source File">
+
+</language>
+<language name="Object File">
+
+</language>
+<language name="Assembly Source File">
+
+</language>
+</section>
+</cdtprojectproperties>

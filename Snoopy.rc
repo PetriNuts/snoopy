@@ -85,7 +85,11 @@ PLOT_ENL_BMP            BITMAP  MOVEABLE PURE   "wx/plot/plot_enl.bmp"
 PLOT_SHR_BMP            BITMAP  MOVEABLE PURE   "wx/plot/plot_shr.bmp"
 PLOT_ZIN_BMP            BITMAP  MOVEABLE PURE   "wx/plot/plot_zin.bmp"
 PLOT_ZOT_BMP            BITMAP  MOVEABLE PURE   "wx/plot/plot_zot.bmp"
-
+//by george
+BITMAP_ANIM_RECORD_TRACE   BITMAP  MOVEABLE PURE "bitmaps/recording.bmp"
+BITMAP_ANIM_REPLAY_TRACE   BITMAP  MOVEABLE PURE "bitmaps/Play-icon.bmp"
+BITMAP_ANIM_PAUSE_RECORD  BITMAP  MOVEABLE PURE "bitmaps/Pause-icon.bmp"
+ 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu

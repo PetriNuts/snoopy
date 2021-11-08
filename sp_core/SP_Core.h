@@ -390,7 +390,7 @@ public:
     bool RegisterAnimation(SP_DS_Netclass* p_pcNetclass, SP_DS_Animation* p_pcAnimation);
     bool RegisterAnimation(const wxString& p_sKey, SP_DS_Animation* p_pcAnimation);
     SP_DS_Animation* GetAnimation(SP_DS_Graph* p_pcGraph);
-
+	void SetActivatedRefreshDuration(const wxString& p_sNetClass,const int& p_nrefresh,const int& p_nDuration);//by george
 	void ActivateAnimBAsedOnOptionSet(SP_DS_Graph* p_pcGraph,const int& p_nRef, const int&p_nDur);//by george 30.11.2020
 	wxString GetActivatedRefreshDurationanim();//by george 30.11.2020
 

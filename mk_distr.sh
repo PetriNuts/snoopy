@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 #------------------------------------------------------------
@@ -90,7 +91,7 @@ if [ -z $DEBUG ] ; then DEBUG=$DEF_DEBUG ; fi
 if [ -z $VERBOSE ] ; then VERBOSE=$DEF_VERBOSE ; fi
 
 SNOOPYDIR="$HOME/workspace/snoopy"
-BUILDDIR="Release"
+BUILDDIR="Release-Linux-64"
 MACHINE_TYPE=`uname -m`
 if [ ${MACHINE_TYPE} == 'x86_64' ]; then
   # 64-bit stuff here

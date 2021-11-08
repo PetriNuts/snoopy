@@ -87,6 +87,7 @@
 %token <stringVal> 		ABSFUNC		"absfunc"
 %token <stringVal> 		VALFUNC		"valfunc"
 %token <stringVal> 		ELEM		"elemOfOP"
+%token <stringVal> 		NUMOF		"numOfOP"
 
 
 
@@ -318,6 +319,10 @@ CPN_Addexpr : CPN_Mulexpr
         | CPN_Addexpr '-' CPN_Mulexpr
           {
 	      $$ = new SP_CPN_Parse_Substract_Node($1, $3);
+	  }
+	| CPN_Addexpr NUMOF CPN_Mulexpr
+          {
+	      $$ =new SP_CPN_Parse_NumOf_Node($1, $3);
 	  }
 	   
 

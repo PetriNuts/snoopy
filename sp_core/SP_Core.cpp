@@ -841,6 +841,27 @@ void SP_Core::ActivateAnimBAsedOnOptionSet(SP_DS_Graph* p_pcGraph, const int& p_
 	}
 }
 
+/* Set the option values : refresh rate and duration of the last activated animator, by george */
+void SP_Core::SetActivatedRefreshDuration(const wxString& p_sNetClass,const int& p_nrefresh,const int& p_nDuration)
+{
+
+	SP_MapString2Animation::iterator l_itAnim = m_mAnimations.begin();
+	while (l_itAnim != m_mAnimations.end())
+	{
+		if (l_itAnim->first.IsSameAs(p_sNetClass))
+		{
+
+			l_itAnim->second->SetRefreshFrequ(p_nrefresh);
+			l_itAnim->second->SetStepDuration(p_nDuration);
+
+			break;
+		}
+
+		++l_itAnim;
+	}
+
+}
+
 SP_DS_Animation*
 SP_Core::GetAnimation(SP_DS_Graph* p_pcGraph)
 {
