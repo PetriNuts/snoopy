@@ -393,7 +393,7 @@ public:
 
 	void ActivateAnimBAsedOnOptionSet(SP_DS_Graph* p_pcGraph,const int& p_nRef, const int&p_nDur);//by george 30.11.2020
 	wxString GetActivatedRefreshDurationanim();//by george 30.11.2020
-
+	void SetActivatedRefreshDuration(const wxString& p_sNetClass,const int& p_nrefresh,const int& p_nDuration);
     /**	\brief	Avoid the reactivating of the last document
 
     */
