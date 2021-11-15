@@ -1146,13 +1146,12 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 
 					else if (l_sType == wxT("bool"))
 					{
-						//temp commented 1.11
-						/*
+
 						auto type = dssd::andl::ConstType::BOOL_T;
 						std::vector<std::string> values = l_sVsets;// { l_sConstVal };
 						auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);//l_sGroup was "all"
 						b.addConstant(c);
-						*/
+
 					}
 					else
 					{
@@ -1178,13 +1177,12 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 
 			    if (l_sType == wxT("bool"))
 				{
-			    	//temp commented
-			    	/*
+
 				     auto type = dssd::andl::ConstType::BOOL_T;
 					std::vector<std::string> values = l_sVsets;
 					auto c = std::make_shared<dssd::andl::Constant>(type, l_sName, l_sGroup, values);
 					b.addConstant(c);
-					*/
+
 				}
 
 			    if (!(l_sType == wxT("double") || l_sType == wxT("int") || l_sType == wxT("bool")))
@@ -1291,8 +1289,7 @@ bool SP_ColoredNetBuilder::CreateConstants(dssd::andl::simple_net_builder& b,boo
 				}
 				else if (l_sType == "bool")
 				{
-					//temp commented 1.11
-					//	type = dssd::andl::ConstType::BOOL_T;
+						type = dssd::andl::ConstType::BOOL_T;
 				}
 				else if( !(l_sType == "int" || l_sType == "bool"|| l_sType == "double"))
 				{

@@ -1140,7 +1140,7 @@ for (auto& constant : p_Constants)
 		}
 		*/
 		if (constant->type_ == dssd::andl::ConstType::DOUBLE_T || constant->type_ == dssd::andl::ConstType::INT_T
-				//|| constant->type_ == dssd::andl::ConstType::BOOL_T
+				|| constant->type_ == dssd::andl::ConstType::BOOL_T
 			&& (m_eNetType == dssd::andl::NetType::COL_SPN_T
 				|| m_eNetType == dssd::andl::NetType::COL_CPN_T
 				|| m_eNetType == dssd::andl::NetType::COL_HPN_T
@@ -1158,10 +1158,10 @@ for (auto& constant : p_Constants)
 			{
 				bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(wxT("double"));
 			}
-			//else if (constant->type_ == dssd::andl::ConstType::BOOL_T)
-			//{
-			//	bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(wxT("bool"));
-			//}
+			else if (constant->type_ == dssd::andl::ConstType::BOOL_T)
+			{
+				bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(wxT("bool"));
+			}
 			else {
 				bool l_bValue = l_pcConstant->GetAttribute(wxT("Type"))->SetValueString(wxT("int"));
 			}
