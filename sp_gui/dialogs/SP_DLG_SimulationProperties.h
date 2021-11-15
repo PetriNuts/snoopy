@@ -52,6 +52,8 @@ public:
         or closes the dialog with the window-close methods of the ui-manager.
     */
     void OnDlgCancel(wxCommandEvent& p_cEvent);
+
+    void OnToggle(wxCommandEvent& event);//by george
 };
 
 #endif // __SP_DLG_SIMULATIONPROPERTIES__

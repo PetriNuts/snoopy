@@ -11,11 +11,17 @@
 #include "spsim/helpers/simulationOptions.h"
 #include "sp_ds/SP_DS_Graph.h"
 
+enum
+{
+	SP_ID_RANDOM_SEED_ID = 10000001
+};
+
 IMPLEMENT_CLASS(SP_DLG_SimulationProperties, wxDialog)
 
 BEGIN_EVENT_TABLE(SP_DLG_SimulationProperties, wxDialog)
 EVT_BUTTON(wxID_OK, SP_DLG_SimulationProperties::OnDlgOk)
 EVT_BUTTON(wxID_CANCEL, SP_DLG_SimulationProperties::OnDlgCancel)
+EVT_CHECKBOX(SP_ID_RANDOM_SEED_ID, SP_DLG_SimulationProperties::OnToggle)
 END_EVENT_TABLE()
 //TODO: Clear out all the old code after the end of implementing the old simulator for all the classes
 SP_DLG_SimulationProperties::SP_DLG_SimulationProperties(spsim::Simulator* p_pcMainSimulator,
@@ -79,12 +85,45 @@ SP_DLG_SimulationProperties::OnDlgCancel(wxCommandEvent& p_cEvent)
 	}
 }
 
+
+void SP_DLG_SimulationProperties::OnToggle(wxCommandEvent& event)
+{
+   std::vector<wxControl*>::iterator l_itUI;
+
+   if(event.IsChecked())
+   {
+		for(l_itUI=m_apcPropertiesCtrl.begin();l_itUI!=m_apcPropertiesCtrl.end();l_itUI++)
+		{
+
+			if((*l_itUI)->GetName()=="text")
+			{
+				wxTextCtrl* pp=(wxTextCtrl*)(*l_itUI);
+				if(pp->GetId()==SP_ID_RANDOM_SEED_ID+10)
+				  pp->Enable(false);
+			}
+		}
+   }
+    else
+    {
+    	for(l_itUI=m_apcPropertiesCtrl.begin();l_itUI!=m_apcPropertiesCtrl.end();l_itUI++)
+    		{
+    		if((*l_itUI)->GetName()=="text")
+    				{
+    					wxTextCtrl* pp=(wxTextCtrl*)(*l_itUI);
+    					if(pp->GetId()==SP_ID_RANDOM_SEED_ID+10)
+    					  pp->Enable(true);
+    				}
+    		}
+    }
+}
+
 void SP_DLG_SimulationProperties::SetProperties()
 {
 	spsim::VectorProperty::iterator l_itProperty;
 
 	spsim::VectorProperty* l_pcProperties=m_pcMainSimulator->GetSimulatorOptions()->GetAllOptions();
 	SP_VectorStdString::const_iterator l_itStr;
+
 
 	unsigned int l_nPropertyPos=0;
 	wxSizer* l_pcRowSizer;
@@ -99,6 +138,13 @@ void SP_DLG_SimulationProperties::SetProperties()
 			m_pcMainSimulator->GetSimulatorOptions()->AddNewOption(new spsim::Property("Refreshrate", "5000", "Refresh rate(ms)", spsim::GUI_TYPE_TXTBOX));
 			m_pcMainSimulator->GetSimulatorOptions()->AddNewOption(new spsim::Property("In Between Visualization", "1", "Visualize in between results", spsim::GUI_TYPE_CHECKBOX));
 		}
+
+		if(!m_pcMainSimulator->GetSimulatorOptions()->GetOption("IsrandomSeed"))
+		{
+		  spsim::Property* l_pcProp=new spsim::Property("IsrandomSeed","1","random seed",spsim::GUI_TYPE_CHECKBOX);
+		  l_pcProperties->push_back(l_pcProp);
+
+		}
 	}
 	m_apcPropertiesCtrl.assign(l_pcProperties->size(),NULL);
 
@@ -108,13 +154,48 @@ void SP_DLG_SimulationProperties::SetProperties()
 		{
 		case spsim::GUI_TYPE_TXTBOX:
 			  m_apcPropertiesCtrl[l_nPropertyPos]=new wxTextCtrl( this, wxID_ANY,(*l_itProperty)->GetValue(), wxDefaultPosition, wxDefaultSize, 0 );
+			  if((*l_itProperty)->GetDisplayedText()=="Seed")
+			  {//by george disable text box seed if it is random
+
+						spsim::Property* l_pcPropISRandomSeed = m_pcMainSimulator->GetSimulatorOptions()->GetOption("IsrandomSeed");
+
+						if(l_pcPropISRandomSeed!=NULL)
+						{
+							if(l_pcPropISRandomSeed->GetValue()=="1"||l_pcPropISRandomSeed->GetValue()=="true")
+							{
+								 m_apcPropertiesCtrl[l_nPropertyPos]->Enable(false);
+							}
+							else
+							{
+								 m_apcPropertiesCtrl[l_nPropertyPos]->Enable(true);
+							}
+
+							m_apcPropertiesCtrl[l_nPropertyPos]->SetId(SP_ID_RANDOM_SEED_ID+10);
+
+						}
+
+
+			  }
 			  break;
 
 		case spsim::GUI_TYPE_CHECKBOX:
-			   m_apcPropertiesCtrl[l_nPropertyPos]=new wxCheckBox(this,wxID_ANY,wxT(""), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+			if((*l_itProperty)->GetDisplayedText()!="random seed")
+			   {
+				m_apcPropertiesCtrl[l_nPropertyPos]=new wxCheckBox(this,wxID_ANY,wxT(""), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
 			  // (*l_itProperty)->GetValue().ToLong(&l_nVal);
 			   l_nVal=std::stol((*l_itProperty)->GetValue());
 			   dynamic_cast<wxCheckBox*>(m_apcPropertiesCtrl[l_nPropertyPos])->SetValue(l_nVal);
+
+			   }
+			else
+			{//for handling the event we need a specific id for IsRandomSeed checkbox
+				m_apcPropertiesCtrl[l_nPropertyPos]=new wxCheckBox(this,SP_ID_RANDOM_SEED_ID,wxT(""), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+				 // (*l_itProperty)->GetValue().ToLong(&l_nVal);
+				l_nVal=std::stol((*l_itProperty)->GetValue());
+			   dynamic_cast<wxCheckBox*>(m_apcPropertiesCtrl[l_nPropertyPos])->SetValue(l_nVal);
+			 //  Bind(wxEVT_CHECKBOX, & SP_DLG_SimulationProperties::OnToggle,this,SP_ID_RANDOM_SEED_ID);
+
+			}
 			   break;
 
 		case spsim::GUI_TYPE_COMBOBOX:
@@ -150,6 +231,7 @@ void SP_DLG_SimulationProperties::GetProperties()
 	spsim::VectorProperty* l_pcProperties=m_pcMainSimulator->GetSimulatorOptions()->GetAllOptions();
 	SP_VectorString::const_iterator l_itStr;
 
+
 	unsigned int l_nPropertyPos=0;
 
 	double l_nValue=0;
@@ -177,6 +259,7 @@ void SP_DLG_SimulationProperties::GetProperties()
 			  (
 					  l_sUserInput
 			  );
+			 // SP_MESSAGEBOX(l_sUserInput);
 			  break;
 
 		case spsim::GUI_TYPE_CHECKBOX:
