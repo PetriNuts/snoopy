@@ -35,7 +35,6 @@
 SP_CPN_SyntaxChecking::SP_CPN_SyntaxChecking()
 {
 	m_mvCSExpr2PColors.clear();
-	//m_bIsNotUniqueNet = false;
 }
 
 SP_CPN_SyntaxChecking::~SP_CPN_SyntaxChecking()
@@ -2346,7 +2345,6 @@ bool SP_CPN_SyntaxChecking::CheckPredicateInRateFunction(wxString p_sPredicate, 
 
 	return l_bCheck;
 
-	//return true;
 }
 
 bool SP_CPN_SyntaxChecking::CheckIDSRateFunction(wxString p_sRate, SP_DS_Node* p_pcTransNode)

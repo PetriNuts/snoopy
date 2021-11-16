@@ -4,31 +4,13 @@
 // $Date: 2019/12/21 $
 // Short Description:Using dssd util for checking the syntax of colour expression
 // of guards, arcs and places, and compute initial marking of places.
+//TODO: functions of this class has to be implemented in dssd_util
 //////////////////////////////////////////////////////////////////////
 #ifndef __SP_DS_IDD_UNFOLD_EXPR_H__
 #define __SP_DS_IDD_UNFOLD_EXPR_H__
 #include "sp_core/tools/SP_NetUnfolder.h"
-//#include <dssd/andl/andl_builder.h>
-//#include <dssd/auxi/logger.h>
-//#include <dssd/colexpr/builder.h>
-//#include <dssd/colexpr/colexpr_parser.h>
-//#include <dssd/colexpr/environment.h>
-//#include <dssd/colexpr/eval.h>
-//#include <dssd/colexpr/modify.h>
-//#include <dssd/extern/alphanum.hpp>
-//#include <dssd/misc/net_evaluation.h>
-
-
 #include "sp_ds/extensions/Col_SPN/SP_DS_ColPN_Unfolding.h"
-//#include "sp_utilities.h"
-//#include "dssd/auxi/auxi.h"
-//#include "dssd/auxi/timer.h"
-//#include "dssd/andl/andl_reader.h"
-//#include "dssd/andl/andl_writer.h"
-//#include "dssd/candl/candl_writer.h"
-//#include "dssd/unfolding/net_unfolding.icc"
-//#include "dssd/unfolding/gecode_representation.h"
-//#include "dssd/unfolding/idd_representation.h"
+
 
 using namespace dssd::unfolding;
 using namespace dssd;
@@ -43,14 +25,7 @@ using colexpr::colexpr_expression_finder;
 using colexpr::colexpr_expression_collector;
  
 using colDescriptor = dssd::colexpr::element_descriptor;
-//using  colexpr::evalColExpr;
-//using  colexpr::checkColExpr;
-//using dssd::andl::Place_ptr;
-//using dssd::andl::Transition_ptr;
-//using dssd::andl::Update_ptr;
-//using dssd::andl::Condition_ptr;
-//using dssd::andl::Net_ptr;
-//using dssd::andl::Constant_ptr;
+
 
 using solution_space = idd_guard_representation;
  
@@ -67,7 +42,6 @@ public:
 
 	int  UnfoldPlace1(std::string marking,dssd::andl::Place_ptr p,dssd::andl::simple_net_builder&);//Do the actual unfold for evaluating the colour expression
 
-	//bool CheckCoLourExpression(const std::string p_sExp,const std::string &p_sColorSet,const wxString& p_sErrorPos);//Check the colour expression for Arcs
 
 	bool CheckCoLourExpression(const std::string& p_sExp,const std::string& p_sColorSet,const wxString& p_sErrorPos);
 
@@ -78,7 +52,6 @@ public:
 	
 	placeLookUpTable GetPlaceLookupTable() { return m_lkt; }
 
-	  
 
 	private:
 		colExpr parseExpr(const std::string& expr_string);
