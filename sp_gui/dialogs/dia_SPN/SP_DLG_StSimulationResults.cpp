@@ -1693,8 +1693,8 @@ bool SP_DLG_StSimulationResults::InitializeSimulator()
 			unsigned long l_nSeed = l_pcProp->GetValuelong();
 			l_pcStochSim->seed(l_nSeed);
 		     wxString l_sSeedVal;
-		     l_sSeedVal<<wxT("Seed: ")<<l_nSeed;
-			SP_LOGMESSAGE(l_sSeedVal);
+		     //l_sSeedVal<<wxT("Seed: ")<<l_nSeed;
+			//SP_LOGMESSAGE(l_sSeedVal);
 
 		   }
 
@@ -1717,6 +1717,23 @@ bool SP_DLG_StSimulationResults::InitializeSimulator()
 
 
 	    }
+	}
+	else
+	{
+		if(l_pcStochSim->IsInitialised())
+		 {
+			std::random_device rd;
+			l_pcStochSim->seed(rd());
+		    unsigned long l_nSeed = l_pcStochSim->seed();
+		    wxString l_sSeedVal;
+			 l_sSeedVal<<l_nSeed;
+
+		    std::stringstream l_strstream;
+			l_strstream<<l_nSeed;
+			spsim::Property*  l_pcProp = m_pcMainSimulator->GetSimulatorOptions()->GetOption("Seed");
+			l_pcProp->SetValue(l_strstream.str());
+		}
+
 	}
 
 	RefreshExternalWindows();
