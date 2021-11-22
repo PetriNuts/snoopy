@@ -1342,184 +1342,96 @@ public:
 	virtual wxString eval(wxString colour, wxString l_sTokenNUM, SP_DS_Node* node);
 
 	virtual SP_CPN_ParseNode_Info evaluate()
-	{
-
-		SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
-		SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();//->evaluate();
-
-		m_ParseNode_Info.m_DataType = l_RightNodeInfo->m_DataType;
-		m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo.m_ColorSet;
-
-		if (!m_ParseNode_Info.m_bSeparaterExpression)
 		{
-			if (l_LeftNodeInfo.m_DataType == CPN_INTEGER)
+
+			SP_CPN_ParseNode_Info l_LeftNodeInfo = m_pLeft->evaluate();
+			SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();//->evaluate();
+
+			m_ParseNode_Info.m_DataType = l_RightNodeInfo->m_DataType;
+			m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo.m_ColorSet;
+
+			if (!m_ParseNode_Info.m_bSeparaterExpression)
 			{
-				if (this->m_pcGraph)//for numOf
+				if (l_LeftNodeInfo.m_DataType == CPN_INTEGER)
 				{
-					SP_VectorString l_vPlaceTypes = { SP_DS_DISCRETE_PLACE ,SP_DS_CONTINUOUS_PLACE };
-					for (auto itV = l_vPlaceTypes.begin(); itV != l_vPlaceTypes.end(); ++itV)
+					if (this->m_pcGraph)//for numOf
 					{
-						SP_DS_Nodeclass* l_pcNodeclass = this->m_pcGraph->GetNodeclass(*itV);
-						if (!l_pcNodeclass) continue;
-						SP_ListNode::const_iterator l_itElem;
-						for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+						SP_VectorString l_vPlaceTypes = { SP_DS_DISCRETE_PLACE ,SP_DS_CONTINUOUS_PLACE };
+						for (auto itV = l_vPlaceTypes.begin(); itV != l_vPlaceTypes.end(); ++itV)
 						{
-							SP_DS_Node* l_pcPlaceNode = (*l_itElem);
-
-							if (l_pcNodeclass)
+							SP_DS_Nodeclass* l_pcNodeclass = this->m_pcGraph->GetNodeclass(*itV);
+							if (!l_pcNodeclass) continue;
+							SP_ListNode::const_iterator l_itElem;
+							for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
 							{
-								wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-								if (l_sPlaceName == l_RightNodeInfo->m_sColoredPlaceName)
+								SP_DS_Node* l_pcPlaceNode = (*l_itElem);
+
+								if (l_pcNodeclass)
 								{
-									SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcPlaceNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
-									if (l_pcColList)
+									wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+									if (l_sPlaceName == l_RightNodeInfo->m_sColoredPlaceName)
 									{
-
-										for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+										SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcPlaceNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
+										if (l_pcColList)
 										{
-											wxString l_sColorExpr = l_pcColList->GetCell(i, 0);
-											wxString l_sTupeExpression = l_pcColList->GetCell(i, 0 + 2);
-											wxString l_sTokenNum = l_pcColList->GetCell(i, 0 + 1);
-											wxString l_sColour;
-											l_sColour << l_LeftNodeInfo.m_IntegerValue;
-											if (l_sColorExpr == l_sColour)
+
+											for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
 											{
-												if (*itV == SP_DS_DISCRETE_PLACE)
+												wxString l_sColorExpr = l_pcColList->GetCell(i, 0);
+												wxString l_sTupeExpression = l_pcColList->GetCell(i, 0 + 2);
+												wxString l_sTokenNum = l_pcColList->GetCell(i, 0 + 1);
+												wxString l_sColour;
+												l_sColour << l_LeftNodeInfo.m_IntegerValue;
+												if (l_sColorExpr == l_sColour)
 												{
-													long l_nvalue;
-													if (l_sTokenNum.ToLong(&l_nvalue))
+													if (*itV == SP_DS_DISCRETE_PLACE)
 													{
-														m_ParseNode_Info.m_IntegerValue = l_nvalue;
-														break;
+														long l_nvalue;
+														if (l_sTokenNum.ToLong(&l_nvalue))
+														{
+															m_ParseNode_Info.m_IntegerValue = l_nvalue;
+															m_ParseNode_Info.m_DataType = CPN_INTEGER;
+															break;
+														}
+													}
+													else
+													{//cont place
+														double l_dvalue;
+														if (l_sTokenNum.ToDouble(&l_dvalue))
+														{
+															m_ParseNode_Info.m_DoubleValue = l_dvalue;
+															m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
+
+															break;
+														}
 													}
 												}
-												else
-												{//cont place
-													double l_dvalue;
-													if (l_sTokenNum.ToDouble(&l_dvalue))
-													{
-														m_ParseNode_Info.m_DoubleValue = l_dvalue;
-														m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
-
-														break;
-													}
-												}
-											}
-											else if (l_sColorExpr == wxT("all()"))
-											{
-												wxString l_sVal = this->eval(l_sColour, l_sTokenNum, l_pcPlaceNode);
-
-												if (*itV == SP_DS_DISCRETE_PLACE)
+												else if (l_sColorExpr == wxT("all()"))
 												{
-													long l_nvalue;
+													wxString l_sVal = this->eval(l_sColour, l_sTokenNum, l_pcPlaceNode);
 
-													if (l_sVal.ToLong(&l_nvalue))
+													if (*itV == SP_DS_DISCRETE_PLACE)
 													{
-														m_ParseNode_Info.m_IntegerValue = l_nvalue;
-														break;
-													}
-												}
-												else
-												{
-													double l_dvalue;
+														long l_nvalue;
 
-													if (l_sVal.ToDouble(&l_dvalue))
+														if (l_sVal.ToLong(&l_nvalue))
+														{
+															m_ParseNode_Info.m_IntegerValue = l_nvalue;
+															break;
+														}
+													}
+													else
 													{
-														m_ParseNode_Info.m_DoubleValue = l_dvalue;
-														m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
-														break;
+														double l_dvalue;
+
+														if (l_sVal.ToDouble(&l_dvalue))
+														{
+															m_ParseNode_Info.m_DoubleValue = l_dvalue;
+															m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
+															break;
+														}
 													}
-												}
 
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			else if (l_LeftNodeInfo.m_DataType == CPN_PRODUCT)
-			{
-
-				if (this->m_pcGraph)//for numOf
-				{
-					SP_VectorString l_vPlaceTypes = { SP_DS_DISCRETE_PLACE ,SP_DS_CONTINUOUS_PLACE };
-					for (auto itV = l_vPlaceTypes.begin(); itV != l_vPlaceTypes.end(); ++itV)
-					{
-						SP_DS_Nodeclass* l_pcNodeclass = this->m_pcGraph->GetNodeclass(*itV);
-						if (!l_pcNodeclass) continue;
-						SP_ListNode::const_iterator l_itElem;
-						for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
-						{
-							SP_DS_Node* l_pcPlaceNode = (*l_itElem);
-
-							if (l_pcNodeclass)
-							{
-								wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
-								if (l_sPlaceName == l_RightNodeInfo->m_sColoredPlaceName)
-								{
-									SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcPlaceNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
-									if (l_pcColList)
-									{
-
-										for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
-										{
-											wxString l_sColorExpr = l_pcColList->GetCell(i, 0);
-											wxString l_sTupeExpression = l_pcColList->GetCell(i, 0 + 2);
-											wxString l_sTokenNum = l_pcColList->GetCell(i, 0 + 1);
-
-											wxString l_sColour = l_LeftNodeInfo.m_EvalResults[0].m_ColorValue;
-										//
-											if (l_sColorExpr == l_sColour)
-											{
-												if (*itV == SP_DS_DISCRETE_PLACE)
-												{
-													long l_nvalue;
-													if (l_sTokenNum.ToLong(&l_nvalue))
-													{
-														m_ParseNode_Info.m_IntegerValue = l_nvalue;
-														break;
-													}
-												}
-												else
-												{//cont place
-													double l_dvalue;
-													if (l_sTokenNum.ToDouble(&l_dvalue))
-													{
-														m_ParseNode_Info.m_DoubleValue = l_dvalue;
-														m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
-
-														break;
-													}
-												}
-											}
-											else if (l_sColorExpr == wxT("all()"))
-											{
-												//TODO
-												wxString l_sVal = this->eval(l_sColour, l_sTokenNum, l_pcPlaceNode);
-
-												if (*itV == SP_DS_DISCRETE_PLACE)
-												{
-													long l_nvalue;
-
-													if (l_sVal.ToLong(&l_nvalue))
-													{
-														m_ParseNode_Info.m_IntegerValue = l_nvalue;
-														break;
-													}
-												}
-												else
-												{
-													double l_dvalue;
-
-													if (l_sVal.ToDouble(&l_dvalue))
-													{
-														m_ParseNode_Info.m_DoubleValue = l_dvalue;
-														m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
-														break;
-													}
 												}
 											}
 										}
@@ -1529,25 +1441,112 @@ public:
 						}
 					}
 				}
+				else if (l_LeftNodeInfo.m_DataType == CPN_PRODUCT)
+				{
 
+					if (this->m_pcGraph)//for numOf
+					{
+						SP_VectorString l_vPlaceTypes = { SP_DS_DISCRETE_PLACE ,SP_DS_CONTINUOUS_PLACE };
+						for (auto itV = l_vPlaceTypes.begin(); itV != l_vPlaceTypes.end(); ++itV)
+						{
+							SP_DS_Nodeclass* l_pcNodeclass = this->m_pcGraph->GetNodeclass(*itV);
+							if (!l_pcNodeclass) continue;
+							SP_ListNode::const_iterator l_itElem;
+							for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+							{
+								SP_DS_Node* l_pcPlaceNode = (*l_itElem);
+
+								if (l_pcNodeclass)
+								{
+									wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcPlaceNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+									if (l_sPlaceName == l_RightNodeInfo->m_sColoredPlaceName)
+									{
+										SP_DS_ColListAttribute* l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcPlaceNode->GetAttribute(SP_DS_CPN_MARKINGLIST));
+										if (l_pcColList)
+										{
+
+											for (unsigned int i = 0; i < l_pcColList->GetRowCount(); i++)
+											{
+												wxString l_sColorExpr = l_pcColList->GetCell(i, 0);
+												wxString l_sTupeExpression = l_pcColList->GetCell(i, 0 + 2);
+												wxString l_sTokenNum = l_pcColList->GetCell(i, 0 + 1);
+
+												wxString l_sColour = l_LeftNodeInfo.m_EvalResults[0].m_ColorValue;
+											//
+												if (l_sColorExpr == l_sColour)
+												{
+													if (*itV == SP_DS_DISCRETE_PLACE)
+													{
+														long l_nvalue;
+														if (l_sTokenNum.ToLong(&l_nvalue))
+														{
+															m_ParseNode_Info.m_IntegerValue = l_nvalue;
+															break;
+														}
+													}
+													else
+													{//cont place
+														double l_dvalue;
+														if (l_sTokenNum.ToDouble(&l_dvalue))
+														{
+															m_ParseNode_Info.m_DoubleValue = l_dvalue;
+															m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
+
+															break;
+														}
+													}
+												}
+												else if (l_sColorExpr == wxT("all()"))
+												{
+													//TODO
+													wxString l_sVal = this->eval(l_sColour, l_sTokenNum, l_pcPlaceNode);
+
+													if (*itV == SP_DS_DISCRETE_PLACE)
+													{
+														long l_nvalue;
+
+														if (l_sVal.ToLong(&l_nvalue))
+														{
+															m_ParseNode_Info.m_IntegerValue = l_nvalue;
+															break;
+														}
+													}
+													else
+													{
+														double l_dvalue;
+
+														if (l_sVal.ToDouble(&l_dvalue))
+														{
+															m_ParseNode_Info.m_DoubleValue = l_dvalue;
+															m_ParseNode_Info.m_DoubleMultiplicity = l_dvalue;
+															break;
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+
+				}
+				else
+				{
+				//TODO?
+				}
+
+				CollectResult();
 			}
 			else
 			{
-			//TODO?
+
 			}
 
-			CollectResult();
+
+			return m_ParseNode_Info;
 		}
-		else
-		{
-
-		}
-
-
-		return m_ParseNode_Info;
-
-
-	}
 
 	virtual void CollectResult();
 

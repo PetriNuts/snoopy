@@ -1848,8 +1848,10 @@ void SP_CPN_Parse_NumOf_Node::CollectResult()
 	if (l_DataType == CPN_INTEGER)
 	{
 		wxString l_sTemp;
+		//l_sTemp << m_ParseNode_Info.m_Multiplicity;
 		l_sTemp << m_ParseNode_Info.m_IntegerValue;
 		l_stEvalRes.m_ColorValue = l_sTemp; //wxString::Format(wxT("%d"),m_ParseNode_Info.m_IntegerValue);
+		//m_ParseNode_Info.m_IntegerValue= m_ParseNode_Info.m_Multiplicity;
 	}
 
 
@@ -1860,12 +1862,7 @@ void SP_CPN_Parse_NumOf_Node::CollectResult()
 		else
 			l_stEvalRes.m_ColorValue = wxT("false");
 	}
-	//else
-	//{
-		//l_stEvalRes.m_ColorValue = *(m_ParseNode_Info.m_StringValue);
-	//}
 
-	//if (m_sPlaceType == SP_DS_CONTINUOUS_PLACE || l_DataType==CPN_DOUBLE)
 	if ( l_DataType == CPN_DOUBLE)
 	l_stEvalRes.m_DoubleMultiplicity = m_ParseNode_Info.m_DoubleMultiplicity;
 	else
@@ -1876,6 +1873,7 @@ void SP_CPN_Parse_NumOf_Node::CollectResult()
 	m_ParseNode_Info.m_EvalResults.push_back(l_stEvalRes);
 
 }
+
 
 
  wxString SP_CPN_Parse_NumOf_Node::eval(wxString p_scolour, wxString p_sTokenNUM, SP_DS_Node* p_pcNode)
@@ -2696,6 +2694,10 @@ bool SP_CPN_Parse_Bracket_Node::check()
 
 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();	
 
+    bool l_bHasNumOf= false;
+
+    l_bHasNumOf= m_pLeft->GetLeftNode()->GetParseNodeInfo()->m_NodeType==CPN_NUMOF_NODE || m_pLeft->GetRightNode()->GetParseNodeInfo()->m_NodeType==CPN_NUMOF_NODE;
+
 	if (m_pLeft->GetLeftNode() && m_pLeft->GetRightNode() && l_LeftNodeInfo->m_NodeType == CPN_COMMA_NODE)//george 19.12
 	{
 		SP_CPN_ParseNode_Info* l_leftNodeInfo = m_pLeft->GetLeftNode()->GetParseNodeInfo();
@@ -2784,8 +2786,8 @@ bool SP_CPN_Parse_Bracket_Node::check()
 			return false;
 
 		//SP_MESSAGEBOX(l_pcColorSet->GetName());
-		if( l_pcColorSet->GetDataType() == CPN_PRODUCT && ! l_pcColorSet->CheckProductSyntax( m_ParseNode_Info.m_sColorSetList,m_sErrorPosition ) )
-		{
+		if( l_pcColorSet->GetDataType() == CPN_PRODUCT && ! l_pcColorSet->CheckProductSyntax( m_ParseNode_Info.m_sColorSetList,m_sErrorPosition ) && !l_bHasNumOf )
+		{// if the tuple has numOF operator, the number of token may not be bounded to the color set of the of the variable, to do: deal with this case
 			wxString l_sError;					
 			l_sError = wxT(" product type mismatch. Position: ") + m_sErrorPosition;
 			SP_LOGERROR(l_sError);
