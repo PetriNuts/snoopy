@@ -1903,53 +1903,72 @@ void SP_CPN_Parse_NumOf_Node::CollectResult()
 	return wxT("0");
 }
 
-bool SP_CPN_Parse_NumOf_Node::check()
-{
-	if (!m_pLeft->check())
-		return false;
-	if (!m_pRight->check())
-		return false;
+ bool SP_CPN_Parse_NumOf_Node::check()
+ {
+ 	if (!m_pLeft->check())
+ 		return false;
+ 	if (!m_pRight->check())
+ 		return false;
 
-	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
-	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
+ 	SP_CPN_ParseNode_Info* l_LeftNodeInfo = m_pLeft->GetParseNodeInfo();
+ 	SP_CPN_ParseNode_Info* l_RightNodeInfo = m_pRight->GetParseNodeInfo();
 
-	this->m_ParseNode_Info.m_DataType = l_RightNodeInfo->m_DataType;
+ 	this->m_ParseNode_Info.m_DataType = l_RightNodeInfo->m_DataType;
 
-	if (l_LeftNodeInfo->m_bPlaceFlag == false && l_RightNodeInfo->m_bPlaceFlag == true)
-	{
-		m_ParseNode_Info.m_bPlaceFlag = true;
+ 	if (l_LeftNodeInfo->m_bPlaceFlag == false && l_RightNodeInfo->m_bPlaceFlag == true)
+ 	{
+ 		m_ParseNode_Info.m_bPlaceFlag = true;
+ 		//return true;
+ 	}
 
-	}
+ 	if (!m_ParseNode_Info.m_bSeparaterExpression)
+ 	{
+ 		if ((l_LeftNodeInfo->m_DataType == CPN_INTEGER && (l_RightNodeInfo->m_bPlaceFlag)))
+ 		{
+ 			m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
+ 			if (l_LeftNodeInfo->m_ColorSet != wxT(""))
+ 				m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
 
-	if (!m_ParseNode_Info.m_bSeparaterExpression)
-		{
-			if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && (l_RightNodeInfo->m_DataType == CPN_INTEGER || l_RightNodeInfo->m_DataType == CPN_DOUBLE)))
-			{
-				wxString l_sError;
-				l_sError = wxT("Operands of the numOf operator error. Position: ") + m_sErrorPosition;
-				SP_LOGERROR(l_sError);
-				return false;
-			}
-	           m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
-			if (l_LeftNodeInfo->m_ColorSet != wxT(""))
-				m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
+ 			if (l_RightNodeInfo->m_ColorSet != wxT(""))
+ 				m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
 
-			if (l_RightNodeInfo->m_ColorSet != wxT(""))
-				m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
+ 			if (m_ParseNode_Info.m_ColorSet != wxT(""))
+ 				m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
+ 			else
+ 			{
+ 				m_ParseNode_Info.m_sColorSetList = wxT("");
+ 				m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+ 			}
 
-			if (m_ParseNode_Info.m_ColorSet != wxT(""))
-				m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
-			else
-			{
-				m_ParseNode_Info.m_sColorSetList = wxT("");
-				m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
-			}
-		}
+ 			return true;
+ 		}
 
+ 		if (!(l_LeftNodeInfo->m_DataType == CPN_INTEGER && (l_RightNodeInfo->m_DataType == CPN_INTEGER || l_RightNodeInfo->m_DataType == CPN_DOUBLE)))
+ 		{
+ 			wxString l_sError;
+ 			l_sError = wxT("Operands of the numOf operator error. Position: ") + m_sErrorPosition;
+ 			SP_LOGERROR(l_sError);
+ 			return false;
+ 		}
 
+ 		m_ParseNode_Info.m_DataType = l_LeftNodeInfo->m_DataType;
+ 		if (l_LeftNodeInfo->m_ColorSet != wxT(""))
+ 			m_ParseNode_Info.m_ColorSet = l_LeftNodeInfo->m_ColorSet;
 
-	return true;
-}
+ 		if (l_RightNodeInfo->m_ColorSet != wxT(""))
+ 			m_ParseNode_Info.m_ColorSet = l_RightNodeInfo->m_ColorSet;
+
+ 		if (m_ParseNode_Info.m_ColorSet != wxT(""))
+ 			m_ParseNode_Info.m_sColorSetList = m_ParseNode_Info.m_ColorSet;
+ 		else
+ 		{
+ 			m_ParseNode_Info.m_sColorSetList = wxT("");
+ 			m_ParseNode_Info.m_sColorSetList << m_ParseNode_Info.m_DataType;
+ 		}
+ 	}
+
+ 	return true;
+ }
 
 bool SP_CPN_Parse_Substract_Node::check()
 {
