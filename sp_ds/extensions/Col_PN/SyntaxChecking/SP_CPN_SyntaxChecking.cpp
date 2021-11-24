@@ -1159,27 +1159,10 @@ bool SP_CPN_SyntaxChecking::ComputeInitialMarking(SP_DS_Node* p_pcPlaceNode, map
 
 	//if there is no marking defined
 	if (l_pcColList->GetRowCount() == 0)
-	{
-
-
-
-		if (!p_bIsFromAnim)
-		{
-			wxString l_sError = wxT("there is no initial marking: |") + m_sPlaceName;
-			SP_LOGERROR(l_sError);
-			return false;
-		}
-		int l_nCount = l_pcColList->GetColCount() / 2;
-		l_ColorVector = l_cColorSet.GetStringValue();
-		SP_CPN_TokenNum l_nNum;
-		l_nNum.m_intMultiplicity = 0;
-		vector<SP_CPN_TokenNum> l_nColTokens;
-		l_nColTokens.assign(l_nCount, l_nNum);
-		for (unsigned i = 0; i < l_ColorVector.size(); i++)
-		{
-			p_mColorToMarkingMap[l_ColorVector[i]] = l_nColTokens;
-		}
-		return true;
+	{// for old snoopy files, where empty marking grid was allowed
+		l_pcColList->AppendEmptyRow();
+		l_pcColList->SetCell(0,0,wxT("all()"));
+		l_pcColList->SetCell(0,1,wxT("0"));
 	}
 	 
 
