@@ -93,6 +93,9 @@ SP_DS_CPN_TransAnimator::InformPrePlaces(const wxString& p_sColor)
 								}
 
 								m_cExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
+								m_cExprInfo.m_sExpression.Replace(wxT(" "), wxT(""));//by george
+								m_cExprInfo.m_sExpression.Replace(wxT("\t"), wxT(""));//by george
+								m_cExprInfo.m_sExpression.Replace(wxT("\n"), wxT(""));//by george
 								m_ExprInfoList.push_back(m_cExprInfo);
 							}
 						}
