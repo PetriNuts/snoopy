@@ -224,9 +224,10 @@ Build-Guide for Snoopy to compile under Mac OS X
 	`sudo ./b2 variant=release threading=multi architecture=x86 address-model=64 link=static cxxflags="-std=c++11 -stdlib=libc++" linkflags="-stdlib=libc++" toolset=clang install`  
 
 1. Sundials
-	1. download [sundials](https://computation.llnl.gov/projects/sundials/sundials-software) and unpack it into "~/workspace"
-	1. create a folder *build* 
-	1. go into *build* and run  
+	1. clone SUNDIALS CVODE to "~/workspace"
+	git clone https://github.com/LLNL/sundials.git
+	3. create a folder *build* 
+	4. go into *build* and run  
 	`cmake ..`  
 	`make && sudo make install`
 
