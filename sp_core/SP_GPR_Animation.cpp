@@ -438,9 +438,6 @@ SP_GPR_Animation::OnDialogOk(const wxString& p_sNetClass) {
 		|| p_sNetClass.CmpNoCase(SP_DS_MODULOPN_CLASS) == 0
 		|| p_sNetClass.CmpNoCase(SP_DS_FAULTTREE_CLASS) == 0
 		|| p_sNetClass.CmpNoCase(SP_DS_MUSICPN_CLASS) == 0
-		|| p_sNetClass.CmpNoCase(SP_DS_COLPN_CLASS) == 0//26.10.2021 by george
-		|| p_sNetClass.CmpNoCase(SP_DS_COLEPN_CLASS) == 0//26.10.2021 by george
-		|| p_sNetClass.CmpNoCase(SP_DS_COLSPN_CLASS) == 0//26.10.2021 by george
 		|| p_sNetClass.CmpNoCase(SP_DS_EXTFAULTTREE_CLASS) == 0)
 	{
 		long l_nRefresh = m_scRefresh->GetValue();
