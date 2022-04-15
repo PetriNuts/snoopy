@@ -2041,13 +2041,17 @@ void  SP_WDG_DeclarationTreectrl::OnUnSelecting(wxCommandEvent& p_cEvent)
 		for (auto itset = l_setDependenciesUnselected.begin(); itset != l_setDependenciesUnselected.end(); ++itset)
 		{
 			wxColour l_nColor1(wxT("Blue"));
+			wxColour l_nColorRed(wxT("Red"));
+
 			wxTreeItemId foundId = findTreeItem(this, this->GetRootItem(), *itset, true, true);
 			if (foundId.IsOk())
 			{
+				if(this->GetItemTextColour(foundId) == l_nColorRed){
 				this->SetItemTextColour(foundId, l_nColor1);
 
 				l_pcItem1[0]->Enable(true);
 				l_pcItem1[1]->Enable(false);
+				}
 
 			}
 		}
@@ -2063,14 +2067,17 @@ void  SP_WDG_DeclarationTreectrl::OnUnSelecting(wxCommandEvent& p_cEvent)
 		for (auto itset = l_setDependenciesUnselected.begin(); itset != l_setDependenciesUnselected.end(); ++itset)
 		{
 			wxColour l_nColor1(wxT("Blue"));
+			wxColour l_nColorRed(wxT("Red"));
 			wxTreeItemId foundId = findTreeItem(this, this->GetRootItem(), *itset, true, true);
 			if (foundId.IsOk())
 			{
+				if(this->GetItemTextColour(foundId) == l_nColorRed){
 				this->SetItemTextColour(foundId, l_nColor1);
 
 				l_pcItem1[0]->Enable(true);
 				l_pcItem1[1]->Enable(false);
 
+				}
 			}
 		}
 	}
