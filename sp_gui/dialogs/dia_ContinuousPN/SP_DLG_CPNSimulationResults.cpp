@@ -1391,7 +1391,17 @@ void SP_DLG_CPNSimulationResults::UpdateSimulationMatrix(SP_DS_Metadata* p_pcVie
 void SP_DLG_CPNSimulationResults::
 OnExportToCSV()
 {
-	    wxString l_sFilename = m_sExportFilename;
+	   //outfilename_viewName.csvs, by george
+		wxString l_sViewName = GetViewAttributeValue(m_pcCurrentTablePlot, wxT("Name"));
+
+		l_sViewName.Replace(wxT(" "), wxT(""));//get rid of spaces
+
+		wxString l_sIntermediateName = m_sExportFilename.BeforeLast(wxChar('.'));
+
+	    wxString l_sFilename = l_sIntermediateName + wxT("_") +l_sViewName + wxT(".csv");
+
+
+
 	    bool l_bCompressExact = false;
 	    SP_DLG_CSVExport* l_pcDlg = new SP_DLG_CSVExport(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this,
 	    		                                          &l_sFilename, &m_nExportSpacer,

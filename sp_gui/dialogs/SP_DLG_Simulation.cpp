@@ -2163,7 +2163,11 @@ void SP_DLG_Simulation::CloseExportFile()
 }
 void SP_DLG_Simulation::OnExportToCSV()
 {
-    wxString l_sFilename = m_sExportFilename;
+	wxString l_sViewName = GetViewAttributeValue(m_pcCurrentTablePlot, wxT("Name"));
+	l_sViewName.Replace(wxT(" "), wxT(""));
+	wxString l_sIntermediateName = m_sExportFilename.BeforeLast(wxChar('.'));
+
+    wxString l_sFilename = l_sIntermediateName + wxT("_") +l_sViewName + wxT(".csv");
     bool l_bCompressExact = false;
     SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this, &l_sFilename, &m_nExportSpacer, &l_bCompressExact);
 
