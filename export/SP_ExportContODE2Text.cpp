@@ -35,7 +35,8 @@ bool SP_ExportContODE2Text::AcceptsDoc(SP_MDI_Doc* p_doc)
 	CHECK_POINTER(p_doc, return false);
 	CHECK_POINTER(p_doc->GetGraph(), return false);
 	wxString cName = p_doc->GetNetclassName();
-	return (cName == SP_DS_CONTINUOUSPED_CLASS || cName ==SP_DS_HYBRIDPN_CLASS);
+	return (cName == SP_DS_CONTINUOUSPED_CLASS || cName ==SP_DS_HYBRIDPN_CLASS
+			|| cName == SP_DS_FUZZYCPN_CLASS || cName == SP_DS_FUZZYHPN_CLASS);
 }
 bool SP_ExportContODE2Text::DoWrite()
 {
