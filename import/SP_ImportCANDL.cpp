@@ -831,8 +831,16 @@ SP_ImportCANDL::CreatePlaces(const dssd::andl::Places& p_Places)
 		size_t prev = 0;
 		for(size_t i = marking.find(wxT("++")); i != wxNOT_FOUND; )
 		{
+			for(auto sub_marking : l_Markings){
+			 wxString l_sColor = marking.Mid(prev,i-prev).AfterFirst(wxChar('`'));
+
+             if(sub_marking.Contains(l_sColor)&& !l_sColor.IsEmpty()){
+            	 SP_LOGWARNING(wxT("the color ")+ l_sColor + wxT(" occurs more than one time in the marking of the place ")+name);
+             }
+			}
+
 			l_Markings.Add(marking.Mid(prev,i-prev));
-		    marking.Replace(marking.Mid(prev, i - prev), "");
+		    marking.Replace(marking.Mid(prev, i - prev), "",false);
 			prev = 0;
 			marking = marking.AfterFirst('+');
 			marking = marking.AfterFirst('+');
