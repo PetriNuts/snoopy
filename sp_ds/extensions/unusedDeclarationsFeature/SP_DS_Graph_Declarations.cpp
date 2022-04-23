@@ -358,7 +358,7 @@ void SP_DS_Graph_Declarations::operator()()
 bool SP_DS_Graph_Declarations::IsToken(const wxString& p_sExp, const wxString& p_sToken)
 {
 
-	wxStringTokenizer tokenizer(p_sExp, ":+-/*%(),={.}[]&|>< ");
+	wxStringTokenizer tokenizer(p_sExp, ":+-/*%(),={.}[]&|><^ ");
 	while (tokenizer.HasMoreTokens())
 	{
 		wxString token = tokenizer.GetNextToken();
