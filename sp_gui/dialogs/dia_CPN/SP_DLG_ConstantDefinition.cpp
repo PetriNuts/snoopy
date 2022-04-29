@@ -1985,6 +1985,30 @@ void SP_DLG_ConstantDefinition::OnMultiColSorting(wxCommandEvent&  event)
 		}
 		l_pcDialog->Destroy();
 
+		//mark the old constants to be deleted
+		SP_VectorString v_deleteTmp;
+
+		for (int n = 0; n < m_pcColorSetGrid->GetNumberRows(); n++)
+		{
+			for (SP_DS_Metadata* l_pcMeta : *(m_pcConstants->GetElements()))
+			{
+				wxString l_sName = m_pcColorSetGrid->GetCellValue(n, NAME);
+				for (SP_DS_Metadata* l_pcMeta : *(m_pcConstants->GetElements()))
+				{
+					if (l_pcMeta->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME)->GetValueString()
+						== l_sName)
+					{
+						auto it = std::find(v_deleteTmp.begin(), v_deleteTmp.end(), l_sName);
+						if (it == v_deleteTmp.end())
+						{
+							m_deleted.push_back(l_pcMeta);
+							v_deleteTmp.push_back(l_sName);
+						}
+					}
+				}
+			}
+		}
+
 }
 
 
