@@ -354,7 +354,7 @@ bool SP_DLG_FHybridSimulationResults::InitializeFuzzySetting()
 
 			if (m_fr == nullptr)
 			{
-				m_fr = new FuzzyReasoning(m_lAlphaLevels, m_lnDiscPoints, m_paramMatrix, m_lnFuzzyNum, m_lpCount);
+				m_fr = new FuzzyReasoning(m_lAlphaLevels, m_lnDiscPoints, m_paramMatrix, m_lnFuzzyNum, m_lpCount,l_tSamplingType);
 
 			}
 			else

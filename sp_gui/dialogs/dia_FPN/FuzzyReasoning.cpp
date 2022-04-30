@@ -17,14 +17,21 @@ fuzzification::FuzzyReasoning::FuzzyReasoning(unsigned long alphaLevels, unsigne
 	m_paramMatrix = paramMat;
 	m_bIsAbortCalculation = false;
 	m_tSample_type = p_Type;
-	//m_compMatrix = compMat;
+
 	m_compressedBand =new SP_Compressed_Fuzzy_Band( );
 	m_alphaStepSize =(double) 1 / m_nAlphaLevels;
-	double answer = static_cast<float>(static_cast<int>(m_alphaStepSize * 10.)) / 10.;
+
 	m_nFuzzyNum = FN;
 	m_pCount = pcount;
-	long LL = pow(m_nDiscPoints, m_nFuzzyNum);
-	 m_compMatrix.resize  (LL, std::vector<double>(m_paramMatrix.size(), 0));
+
+
+	if(m_tSample_type == SAMPLING_TYPE::BASIC || m_tSample_type == SAMPLING_TYPE::REDUCED ){
+
+		long LL = pow(m_nDiscPoints, m_nFuzzyNum);
+
+		 m_compMatrix.resize  (LL, std::vector<double>(m_paramMatrix.size(), 0));
+	}
+
 
 	m_vSamplingProperties = new SP_SamplingPropertyVector();
 	FillOutSamplingOptionsVector();

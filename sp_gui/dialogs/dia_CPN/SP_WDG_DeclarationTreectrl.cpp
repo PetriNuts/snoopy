@@ -2717,11 +2717,14 @@ SP_WDG_DeclarationTreectrl::UpdateOtherTree()
 				}
 			}
 			////////////////
-			if ((l_sMetadataType.Cmp(wxT("TFN")) == 0 || l_sMetadataType.Cmp(wxT("BFN")) == 0 || l_sMetadataType.Cmp(wxT("TZN")) == 0) && (netClass == SP_DS_FUZZYSPN_CLASS || netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS || netClass == SP_DS_FUZZY_ColCPN_CLASS || netClass == SP_DS_FUZZY_ColSPN_CLASS || netClass == SP_DS_FUZZY_ColHPN_CLASS))
+			if ((l_sMetadataType.Cmp(wxT("TFN")) == 0 ) && (netClass == SP_DS_FUZZYSPN_CLASS
+					|| netClass == SP_DS_FUZZYHPN_CLASS || netClass == SP_DS_FUZZYCPN_CLASS
+					|| netClass == SP_DS_FUZZY_ColCPN_CLASS || netClass == SP_DS_FUZZY_ColSPN_CLASS
+					|| netClass == SP_DS_FUZZY_ColHPN_CLASS))
 			{
 				m_ColorsMap[l_sMetadataName] = l_sMetadataGroup + wxT(" : ") + l_sMetadataValue;
 				AppendFileItem(l_cSecondChild, l_sMetadataName + l_sMetadataValue, NULL);
-				wxString msg = "new" + l_sMetadataType + " Fuzzy Number is defined  " + l_sMetadataName + ":" + l_sMetadataValue;
+				wxString msg = " a new constant (TFN) is defined  " + l_sMetadataName + ":" + l_sMetadataValue;
 				SP_LOGMESSAGE(msg);
 			}
 			/////////////////

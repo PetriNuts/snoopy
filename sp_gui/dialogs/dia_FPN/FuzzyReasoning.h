@@ -212,9 +212,13 @@ public:
 
 	void InitialiseCombinationMatrix()
 	{
-		long LL = pow(m_nDiscPoints, m_nFuzzyNum);
-		m_compMatrix.resize(LL, std::vector<double>(m_paramMatrix.size(), 0));
-		m_alphaStepSize = (double)1 / m_nAlphaLevels;
+		if(m_tSample_type == SAMPLING_TYPE::BASIC || m_tSample_type == SAMPLING_TYPE::REDUCED)
+		{
+			long LL = pow(m_nDiscPoints, m_nFuzzyNum);
+			m_compMatrix.resize(LL, std::vector<double>(m_paramMatrix.size(), 0));
+			m_alphaStepSize = (double)1 / m_nAlphaLevels;
+		}
+
 	}
 
 	void SetPlaceNum(const long& p_npCount)
