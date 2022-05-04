@@ -177,7 +177,8 @@ SP_DLG_ColStUnfolding::SP_DLG_ColStUnfolding( SP_DS_ColPN_Unfolding* p_pcColPN_U
 			}
 			if (l_pcNodeclass)
 			{
-				if (l_pcNodeclass->GetElements() > 0)
+				//TODO: by mos: we will need to fix this
+				if (l_pcNodeclass->GetElements() !=nullptr)
 				{
 					// rows of SetsSizer
 

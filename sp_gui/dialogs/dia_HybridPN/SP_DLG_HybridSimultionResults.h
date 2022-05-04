@@ -156,6 +156,11 @@ public:
 
 	virtual void DirectExportToCSV();
 
+#ifdef __NN_TRAINING__
+	//used to generate training data for the NN model
+	void ExportTrainingData();
+#endif
+
 	virtual void OnSimulatorThreadEvent(SP_DS_ThreadEvent& event);
 
 	virtual void CalculateXAxisValues(SP_DS_Metadata* p_pcView, SP_VectorDouble& p_anXAxisValues);

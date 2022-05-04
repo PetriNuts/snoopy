@@ -1028,6 +1028,7 @@ void SP_DLG_HybridSimulationResults::DirectExportToCSV()
 		l_sOutput << l_sCurrentRow;
 		*m_pcExport << l_sOutput << wxT("\n");
 	}
+
 }
 
 void SP_DLG_HybridSimulationResults::SaveODE(wxCommandEvent& p_cEvent)
@@ -1468,7 +1469,13 @@ void SP_DLG_HybridSimulationResults::LoadFixedFlag()
 		l_nPosition++;
 	}
 
-	(dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))->SetFixedFlag(l_abIsFixed);
+	if (m_sSimulatorType == wxT("hybrid")){
+		(dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator))->SetFixedFlag(l_abIsFixed);
+
+	}
+	else{
+		(dynamic_cast<spsim::StochasticSimulator*>(m_pcMainSimulator))->SetFixedFlag(l_abIsFixed);
+	}
 
 }
 void SP_DLG_HybridSimulationResults::LoadTransitions()
@@ -1855,6 +1862,10 @@ void SP_DLG_HybridSimulationResults::OnSimulatorThreadEvent(SP_DS_ThreadEvent& e
 		//log the total number of firing
 		l_nFiringCount=dynamic_cast<spsim::StochasticSimulator*>(m_pcMainSimulator)->GetFireCounter();
 
+#ifdef __NN_TRAINING__
+		ExportTrainingData();
+#endif
+
 		SP_LOGMESSAGE(wxString::Format("Total number of firing events: %ld",l_nFiringCount));
 
 		break;
@@ -1867,6 +1878,104 @@ void SP_DLG_HybridSimulationResults::OnSimulatorThreadEvent(SP_DS_ThreadEvent& e
 		break;
 	}
 }
+
+#ifdef __NN_TRAINING__
+void SP_DLG_HybridSimulationResults::ExportTrainingData(){
+
+	SP_LOGMESSAGE(wxT("exporting training data .."));
+
+	std::ofstream file("train.txt");
+	if(!file.is_open()){
+		SP_LOGMESSAGE(wxT("cannot open output file to write"));
+		return;
+	}
+
+	std::ofstream trainReactionFile("train_reactions.txt");
+	if(!file.is_open()){
+		SP_LOGMESSAGE(wxT("cannot open output file to write"));
+		return;
+	}
+
+	std::ofstream partitionFile("partition.txt");
+	if(!file.is_open()){
+		SP_LOGMESSAGE(wxT("cannot open output file to write"));
+		return;
+	}
+
+	auto placeResults=m_pcMainSimulator->GetResultMatrix();
+	auto transRateResults=m_pcMainSimulator->GetRateResultMatrix();
+
+	spsim::VectorTransition* transitionInfo=m_pcMainSimulator->GetTransitionInfo();
+	for (unsigned long point=0; point<m_pcMainSimulator->GetOutputPointsCount();point++){
+
+		file<<"trace: time: "<<point<<", action: 0{"<<"\n";
+		for(const auto& transition: *transitionInfo){
+
+			//transition information
+			auto transPos=transition->GetTransitionPosition();
+			file<<"reaction: "<<transition->GetTransitionName()
+				  <<", "       <<transRateResults[point][transPos]
+			      <<", "        <<"1"
+			                  <<std::endl;
+
+			trainReactionFile<<"reaction: "<<transition->GetTransitionName()
+							  <<", "       <<transRateResults[point][transPos]
+						      <<", "        <<"1"
+						                  <<std::endl;
+
+			//preplaces information
+			spsim::VectorLong manipulatedPlaces=transition->GetManipulatedPlaces();
+			spsim::VectorLong basedPlaces=transition->GetBasedPlacePositions();
+
+			std::sort(manipulatedPlaces.begin(), manipulatedPlaces.end());
+			std::sort(basedPlaces.begin(), basedPlaces.end());
+
+			spsim::VectorLong postPlaces;
+			postPlaces.clear();
+			std::set_difference(manipulatedPlaces.begin(), manipulatedPlaces.end(),
+					            basedPlaces.begin(), basedPlaces.end(), std::back_inserter(postPlaces));
+			file<<"[\n";
+			trainReactionFile<<"[\n";
+			//substrate
+			int i=1;
+			for (const auto& s: basedPlaces){
+				file<<" substrate: "<< i++<<", "<<placeResults[point][s]<<std::endl;
+				trainReactionFile<<" substrate: "<< i-1<<", "<<placeResults[point][s]<<std::endl;
+			}
+
+			//we assume a reaction has at most 2 substrates
+			for (int j=i;j<=2;j++){
+				file<<" substrate: "<< j<<", "<<-1<<std::endl;
+				trainReactionFile<<" substrate: "<< j<<", "<<-1<<std::endl;
+			}
+
+			//products
+			i=1;
+			for (const auto& p: postPlaces){
+				file<<" product: "<< i++<<", "<<placeResults[point][p]<<std::endl;
+				trainReactionFile<<" product: "<< i-1<<", "<<placeResults[point][p]<<std::endl;
+		    }
+
+			//we assume a reaction has at most 2 products
+			for (int j=i;j<=2;j++){
+				file<<" product: "<< j<<", "<<-1<<std::endl;
+				trainReactionFile<<" product: "<< j<<", "<<-1<<std::endl;
+			}
+
+			file<<"]\n";
+			trainReactionFile<<"]\n";
+		}
+
+		file<<"}\n";
+	}
+
+
+	file.close();
+
+}
+#endif
+
+
 void SP_DLG_HybridSimulationResults::OnTimer(wxTimerEvent& event)
 {
 	if (m_pcWorkerThread->GetRunCount() == 1)
