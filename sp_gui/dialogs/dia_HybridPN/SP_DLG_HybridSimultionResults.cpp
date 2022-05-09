@@ -770,6 +770,7 @@ void SP_DLG_HybridSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cE
 {
 	if (m_pcMainSimulator->IsSimulationRunning())
 	{
+		SP_LOGERROR(wxT("the simulator is already running!"));
 		m_pcMainSimulator->AbortSimulation();
 		return;
 	}
@@ -793,7 +794,7 @@ void SP_DLG_HybridSimulationResults::OnStartAbortSimulation(wxCommandEvent& p_cE
 		Update();
 
 		//start the simulator
-	 StartSimulation();
+	    StartSimulation();
 	
 	}
 	else
@@ -887,71 +888,51 @@ spsim::Simulator* SP_DLG_HybridSimulationResults::CreateSimulator(const int& p_n
 void SP_DLG_HybridSimulationResults::OnTimeSyncTypeChanged(wxCommandEvent& p_cEven)
 {
 
-	if (m_pcMainSimulator->IsSimulationRunning())
-		{
-			return;
-		}
+	if (m_pcMainSimulator->IsSimulationRunning()){
 
+		return;
+	}
 
 	int l_nMethodType = m_pcTimeSyncComboBox->GetSelection();
 
-		//bugfix by george 18.1.21
-		if (l_nMethodType == 4 || l_nMethodType == 0||
-			l_nMethodType == 1|| l_nMethodType == 3||
-			l_nMethodType == 2)
-		{
-			spsim::Simulator* l_pcNewSimulator =CreateSimulator(l_nMethodType);//dynamicCreateSimulator(l_nMethodType);
+
+	//Store properties of the old one
+	spsim::Simulator* l_pcNewSimulator = CreateSimulator(l_nMethodType);
 
 
-			l_pcNewSimulator->SetOutputEndPoint(m_pcMainSimulator->GetOutputEndPoint());
-			l_pcNewSimulator->SetOutputStartPoint(m_pcMainSimulator->GetOutputStartPoint());
-			l_pcNewSimulator->SetOutputSampleSize(m_pcMainSimulator->GetOutputSampleSize());
-			l_pcNewSimulator->SetPlaceCount(m_pcMainSimulator->GetPlaceCount());
-			l_pcNewSimulator->SetTransitionCount(m_pcMainSimulator->GetTransitionCount());
-			l_pcNewSimulator->SetPlaceNames(*m_pcMainSimulator->GetPlaceNames());
-			wxDELETE(m_pcMainSimulator);
-			m_pcMainSimulator = l_pcNewSimulator;
+	m_bIsSimulatorInitialized = false;
 
-			m_pcWorkerThread->SetSimulator(m_pcMainSimulator);
+	SP_LOGERROR(m_pcMainSimulator->GetSimulatorClass());
+	SP_LOGERROR(m_pcMainSimulator->GetSimulatorAlgorithm());
+	
 
-			AddGuiOption2Simulator();
+    //TODO: CopySettingFrom should work out of the box without these conditions
+    //new simulator is a stochastic simulator
+	if (m_sSimulatorType == wxT("Stochastic")){
+		(dynamic_cast<spsim::StochasticSimulator*>(l_pcNewSimulator))->CopySettingFrom(m_pcMainSimulator);
+	}
+	//old simulator is not a stochastic simulator
+	else if((dynamic_cast<spsim::StochasticSimulator*>(m_pcMainSimulator))==nullptr)
+	{
+        l_pcNewSimulator->CopySettingFrom(m_pcMainSimulator);
+	}
+	else{
+		l_pcNewSimulator->SetOutputEndPoint(m_pcMainSimulator->GetOutputEndPoint());
+		l_pcNewSimulator->SetOutputStartPoint(m_pcMainSimulator->GetOutputStartPoint());
+		l_pcNewSimulator->SetOutputSampleSize(m_pcMainSimulator->GetOutputSampleSize());
+		l_pcNewSimulator->SetPlaceCount(m_pcMainSimulator->GetPlaceCount());
+		l_pcNewSimulator->SetTransitionCount(m_pcMainSimulator->GetTransitionCount());
+		l_pcNewSimulator->SetPlaceNames(*m_pcMainSimulator->GetPlaceNames());
+	}
 
-			//change the current ODE solver
-			int l_nSolverIndex = m_pcContinuousSolver->GetSelection();
+	wxDELETE(m_pcMainSimulator);
+	m_pcMainSimulator = l_pcNewSimulator;
 
-			//change the ODE simulator
-			spsim::HybridSimulator* l_pcHybridSimulator = dynamic_cast<spsim::HybridSimulator*>(m_pcMainSimulator);
+	m_pcWorkerThread->SetSimulator(m_pcMainSimulator);
+	AddGuiOption2Simulator();
 
-			CHECK_POINTER(l_pcHybridSimulator, return);
-
-			l_pcHybridSimulator->SetODESolver((spsim::ODESolverType) (l_nSolverIndex));
-			return;
-		}
-
-
-
-		//Store properties of the old one
-		spsim::Simulator* l_pcNewSimulator = CreateSimulator(l_nMethodType);
-
-
-
-		m_bIsSimulatorInitialized = false;
-
-		if (l_nMethodType == 5)//george 18.1.21
-		{
-			(dynamic_cast<spsim::StochasticSimulator*>(l_pcNewSimulator))->CopySettingFrom(m_pcMainSimulator);
-		}
-		else
-		{
-		l_pcNewSimulator->CopySettingFrom(m_pcMainSimulator);
-		}
-
-		wxDELETE(m_pcMainSimulator);
-		m_pcMainSimulator = l_pcNewSimulator;
-
-		m_pcWorkerThread->SetSimulator(m_pcMainSimulator);
-
-		AddGuiOption2Simulator();
+	//set the ODE solver for non stochastic simulator
+	if (m_sSimulatorType != wxT("Stochastic")){
 
 		//change the current ODE solver
 		int l_nSolverIndex = m_pcContinuousSolver->GetSelection();
@@ -962,6 +943,8 @@ void SP_DLG_HybridSimulationResults::OnTimeSyncTypeChanged(wxCommandEvent& p_cEv
 		CHECK_POINTER(l_pcHybridSimulator, return);
 
 		l_pcHybridSimulator->SetODESolver((spsim::ODESolverType) (l_nSolverIndex));
+	}
+
 }
 
 void SP_DLG_HybridSimulationResults::ChangeODESolver()
