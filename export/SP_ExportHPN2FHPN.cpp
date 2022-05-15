@@ -64,13 +64,17 @@ bool SP_ExportHPN2FHPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pc
 		}
 	}
  
-	else
-	if (l_sNodeclassName == SP_DS_CONTINUOUS_PLACE)
+	else if (l_sNodeclassName == SP_DS_CONTINUOUS_PLACE)
 	{
-	for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
-	{
-	WritePlace((*l_Iter), m_pcElem);
-	}
+		m_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("nodeclass"));
+		m_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), m_nPlaceCount));
+		m_pcElem->AddAttribute(wxT("name"), SP_DS_CONTINUOUS_PLACE);
+		p_pcRoot->AddChild(m_pcElem);
+
+		for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
+		{
+			WritePlace((*l_Iter), m_pcElem);
+		}
 	}
 	 
 	else
@@ -90,6 +94,11 @@ bool SP_ExportHPN2FHPN::WriteNodeclass(SP_DS_Nodeclass* p_pcVal, wxXmlNode* p_pc
 		}
 		else if (l_sNodeclassName == SP_DS_CONTINUOUS_TRANS)
 		{
+			m_pcElem = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, wxT("nodeclass"));
+			m_pcElem->AddAttribute(wxT("count"), wxString::Format(wxT("%d"), m_nPlaceCount));
+			m_pcElem->AddAttribute(wxT("name"), SP_DS_CONTINUOUS_TRANS);
+			p_pcRoot->AddChild(m_pcElem);
+
 			for (l_Iter = l_plElements->begin(); l_Iter != l_plElements->end(); ++l_Iter)
 			{
 				WriteTransition((*l_Iter), m_pcElem);
