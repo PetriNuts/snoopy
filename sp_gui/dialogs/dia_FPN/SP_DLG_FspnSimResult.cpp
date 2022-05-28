@@ -1199,7 +1199,7 @@ void SP_DLG_FspnSimResult::DirectExportToCSV()
 	for (unsigned long l_nRow = 0; l_nRow < m_nFuzzyResultBand[0].size(); l_nRow++)
 	{
 		l_sOutput = wxT("");
-		l_sOutput << dssd::aux::toString(m_pcMainSimulator->GetOutputSampleSize() * l_nRow);
+		l_sOutput << dssd::aux::toString(m_pcMainSimulator->GetOutputStartPoint() + m_pcMainSimulator->GetOutputSampleSize() * l_nRow);
 		l_sCurrentRow = wxT("");
 		for (int iCount = 0; iCount < mPlaces2PosMap.size(); iCount++)
 		{
