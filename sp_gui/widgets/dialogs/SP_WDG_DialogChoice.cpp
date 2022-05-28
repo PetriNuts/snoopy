@@ -256,7 +256,8 @@ void SP_WDG_DialogChoice::LoadDataForNodeTypeAttribute(const SP_ListAttribute* p
 {
 	SP_DS_Graph* l_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
 	wxString l_sNetClass = l_pcGraph->GetNetclass()->GetName();
-	if (!l_sNetClass.Contains(wxT("Hybrid")))
+
+	if (!l_sNetClass.Contains(wxT("Hybrid")) && !l_sNetClass.Contains(wxT("Stochastic")))
 	{//one choice node type
 		SP_ListAttribute::iterator it = m_tlAttributes.begin();
 		SP_ListAttribute::iterator end = m_tlAttributes.end();
@@ -285,9 +286,10 @@ void SP_WDG_DialogChoice::LoadDataForNodeTypeAttribute(const SP_ListAttribute* p
 
 			if(l_pcAttr)
 			{
+			m_pcChoiceValues.Clear();
 			wxString l_pchValue = l_pcAttr->GetValueString();
 			unsigned int l_nArraysize;
-			if (l_pchValue.Contains(wxT("Place")))
+			if (l_pchValue.Contains(wxT("Place")) && l_sNetClass.Contains(wxT("Hybrid")))
 			{
 				l_nArraysize = 2;
 				m_pcChoiceValues.Clear();
@@ -304,7 +306,7 @@ void SP_WDG_DialogChoice::LoadDataForNodeTypeAttribute(const SP_ListAttribute* p
 				}
 				 
 			}
-			else if (l_pchValue.Contains(wxT("Transition")))
+			else if (l_pchValue.Contains(wxT("Transition")) &&  l_sNetClass.Contains(wxT("Hybrid")))
 			{
 				l_nArraysize = 5;
 				m_pcChoiceValues.Clear();
@@ -351,9 +353,37 @@ void SP_WDG_DialogChoice::LoadDataForNodeTypeAttribute(const SP_ListAttribute* p
 				}
 				
 			}
-			else
+			else if(l_pchValue.Contains(wxT("Stochastic Transition")) && l_sNetClass.Contains(wxT("Stochastic")))
+			{//conversion between special transitions for stoch nets
+				m_pcChoiceValues.Add(l_pchValue);
+				m_pcChoiceValues.Add(_T("Deterministic Transition"));
+				m_pcChoiceValues.Add(_T("Immediate Transition"));
+				m_pcChoiceValues.Add(_T("Scheduled Transition"));
+			}
+			else if (l_pchValue.Contains(wxT("Immediate Transition")) && l_sNetClass.Contains(wxT("Stochastic")))
 			{
-				
+				m_pcChoiceValues.Add(l_pchValue);
+				m_pcChoiceValues.Add(_T("Stochastic Transition"));
+				m_pcChoiceValues.Add(_T("Deterministic Transition"));
+				m_pcChoiceValues.Add(_T("Scheduled Transition"));
+			}
+			else if (l_pchValue.Contains(wxT("Deterministic Transition")) && l_sNetClass.Contains(wxT("Stochastic")))
+			{
+				m_pcChoiceValues.Add(l_pchValue);
+				m_pcChoiceValues.Add(_T("Stochastic Transition"));
+				m_pcChoiceValues.Add(_T("Immediate Transition"));
+				m_pcChoiceValues.Add(_T("Scheduled Transition"));
+			}
+			else if (l_pchValue.Contains(wxT("Scheduled Transition")) && l_sNetClass.Contains(wxT("Stochastic")))
+			{
+				m_pcChoiceValues.Add(l_pchValue);
+				m_pcChoiceValues.Add(_T("Stochastic Transition"));
+				m_pcChoiceValues.Add(_T("Immediate Transition"));
+				m_pcChoiceValues.Add(_T("Deterministic Transition"));
+			}
+			else if (l_pchValue.Contains(wxT("Place")) && l_sNetClass.Contains(wxT("Stochastic")))
+			{
+				m_pcChoiceValues.Add(wxT("Discrete Place"));
 			}
 			
 			}

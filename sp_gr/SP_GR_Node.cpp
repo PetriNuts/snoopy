@@ -176,8 +176,8 @@ SP_GR_Node::EditProperties()
 		// show and forget about the dlg
 		// the dialog manages the events (OK, CANCEL) by itself
 		l_cDialog.ShowModal();
-
-		if(!SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName().Contains(_T("Hybrid")))//when there is no node type converion
+		bool l_bIsStochNet = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName().Contains(_T("Stochastic"));
+		if(!SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName().Contains(_T("Hybrid")) && !l_bIsStochNet)//when there is no node type converion
 		{
 			if (GetPrimitive())
 			 {

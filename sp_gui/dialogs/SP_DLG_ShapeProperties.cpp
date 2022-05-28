@@ -319,8 +319,12 @@ SP_DLG_ShapeProperties::DoDlgApply()
 			// simply set values
         l_bReturn &= (*l_Iter)->OnDlgOk();
     }
+
+	bool l_bIsStochasticNet = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName().Contains(_T("Stochastic"));
+
+	bool l_bIsHybridNet = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName().Contains(_T("Hybrid"));
 	 
-	if (!SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName().Contains(_T("Hybrid")))
+	if (!l_bIsStochasticNet && !l_bIsHybridNet)
 	{
 		return l_bReturn;
 	}
@@ -526,11 +530,28 @@ SP_DLG_ShapeProperties::DoDlgApply()
 			{
 				continue;
 			}
+			else if (l_sClassName == l_sSelectedType || l_sSelectedType.IsEmpty()) 
+			{//case for the same type or coarse transitions/places
+				return true;
+
+			}
 			else
 			{
 				//try to convert a node if possible
+
+				if (l_sSelectedType.IsSameAs(wxT("Stochastic Transition"))) {
+					//the node calss of stoch transitions is "Transition"
+					l_sSelectedType = wxT("Transition");
+				}
+				
 				SP_DS_Nodeclass* l_pcOldNetClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclass(l_sClassName);
 				SP_DS_Nodeclass* l_pcConvertToNodeClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNodeclassByDisplayedName(l_sSelectedType);//(l_sSelectedType);
+
+				if (l_pcConvertToNodeClass == nullptr)
+				{
+					SP_LOGERROR(wxT("Error occured during convertion node type!"));
+					return true;
+				}
 				wxString l_sName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 				if (CheckEdgeRequirementofNode(l_pcNode, l_pcConvertToNodeClass->GetPrototype()) == false)
 				{
