@@ -96,7 +96,7 @@ protected:
 	wxGauge* m_pcSimulationProgressGauge;
 	wxStaticText* m_pcSimulationProgressText;
 	 
-
+	bool m_bExportAllTracesForFuzzy;//george
 	bool m_bCompressExact;
 	wxString m_sNodeclass;
 	bool m_bSumOfNodes;

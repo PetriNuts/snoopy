@@ -41,6 +41,7 @@ public:
 						  wxString* p_psFilename,
 						  int* p_pnSpacer,
 						  bool* p_pbCompressExact,
+		                  bool* p_pbAlltraces,
 						  const bool& p_bReplaceValues,
 						  const double& p_nReplacedValues,
 						  const wxString& p_sTitle = wxT("Direct export properties"),

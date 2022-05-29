@@ -1807,9 +1807,11 @@ void SP_DLG_Simulation::OnCloseWindow(wxCloseEvent& p_cEvent)
 
 void SP_DLG_Simulation::OnDirectExportProperties(wxCommandEvent& p_cEvent)
 {
-    SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT, this, &m_sExportFilename, &m_nExportSpacer, &m_bCompressExact);
+    SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT, this, &m_sExportFilename, &m_nExportSpacer, &m_bCompressExact,&m_bExportAllTracesForFuzzy);
 
     l_pcDlg->ShowModal();
+
+	m_bExportAllTracesForFuzzy = l_pcDlg->IsAllTracesChecked();
 
     l_pcDlg->Destroy();
 }
@@ -2169,7 +2171,9 @@ void SP_DLG_Simulation::OnExportToCSV()
 
     wxString l_sFilename = l_sIntermediateName + wxT("_") +l_sViewName + wxT(".csv");
     bool l_bCompressExact = false;
-    SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this, &l_sFilename, &m_nExportSpacer, &l_bCompressExact);
+	bool l_bAlltraces = false;
+    SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this, &l_sFilename, &m_nExportSpacer, &l_bCompressExact, &l_bAlltraces);
+
 
     if (l_pcDlg->ShowModal() == wxID_OK)
     {
@@ -2182,7 +2186,7 @@ void SP_DLG_Simulation::OnExportToCSV()
         		m_sExportFilename << wxT("(")
         		 << wxDateTime::Now().Format(wxT("%Y-%m-%dT%H-%M-%S%Z")) << wxT(")");
          }
-
+		m_bExportAllTracesForFuzzy = l_pcDlg->IsAllTracesChecked();
         OpenExportFile();
         DirectExportToCSV();
         CloseExportFile();

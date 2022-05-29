@@ -1405,7 +1405,7 @@ OnExportToCSV()
 	    bool l_bCompressExact = false;
 	    SP_DLG_CSVExport* l_pcDlg = new SP_DLG_CSVExport(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this,
 	    		                                          &l_sFilename, &m_nExportSpacer,
-														  &l_bCompressExact,m_bReplaceValue,
+														  &l_bCompressExact,false,m_bReplaceValue,
 														  m_nReplacedVaue);
 
 	    if (l_pcDlg->ShowModal() == wxID_OK)

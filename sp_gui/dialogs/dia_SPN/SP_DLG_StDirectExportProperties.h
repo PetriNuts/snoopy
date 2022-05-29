@@ -37,6 +37,8 @@ class SP_DLG_StDirectExportProperties : public wxDialog
 
     wxFilePickerCtrl* m_pcFilePickerCtrl;
     wxCheckBox* m_pcCompressCheckBox;
+	wxCheckBox* m_pcAllTracesesForFuzzySimulation;//by george
+	bool* m_pbAlltraces;
 
     wxString* m_psFilename;
     int* m_pnSpacer;
@@ -55,6 +57,7 @@ class SP_DLG_StDirectExportProperties : public wxDialog
       wxString* p_psFilename,
       int* p_pnSpacer,
       bool* p_pbCompressExact,
+	  bool* p_pbAlltraces,
       const wxString& p_sTitle = wxT("Direct export properties"),
       long p_nStyle = wxDEFAULT_DIALOG_STYLE );
 
@@ -62,6 +65,16 @@ class SP_DLG_StDirectExportProperties : public wxDialog
     void OnDlgCancel( wxCommandEvent& p_cEvent );
 
     bool IsCompressChecked() { return m_pcCompressCheckBox->GetValue(); }//george 12.2020
+
+	bool IsAllTracesChecked() {
+		wxString netClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();///Added by G.A
+		bool isFuzzyNet = netClass.Contains(wxT("Fuzzy")) ? true : false;
+
+		if(isFuzzyNet)
+		return m_pcAllTracesesForFuzzySimulation->GetValue();
+		else
+		return false;
+	}
 
     DECLARE_CLASS( SP_DLG_StDirectExportProperties )
     DECLARE_EVENT_TABLE()

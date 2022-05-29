@@ -1053,6 +1053,8 @@ void SP_DLG_FCPNSimulationResults::DirectExportToCSV()
 	if (!m_pcExport)
 		return;
 
+
+	 
 	*m_pcExport << wxT("Time");
 
 	wxString l_sSpacer = GetSpacer(m_nExportSpacer);
@@ -1088,56 +1090,112 @@ void SP_DLG_FCPNSimulationResults::DirectExportToCSV()
 		}
 
 	}
-	////////////////////////////
+	 
 
-	for (int iIt = 0; iIt < mPlaces2PosMap.size(); iIt++)
-	{
-		wxString l_sName = vsplaces[iIt];
+	if (!m_bExportAllTracesForFuzzy) {
 
-
-		wxString sCol, sCol1;
-		sCol << l_sSpacer << l_sName << "_Min";
-		*m_pcExport << sCol;
-		sCol1 << l_sSpacer << l_sName << "_Max";
-		*m_pcExport << sCol1;
-	}
-	*m_pcExport << wxT("\n");
-	std::vector<SP_Vector2DDouble> m_nFuzzyResultBand;
-	m_nFuzzyResultBand.clear();
-	m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMinimumCurve());
-	m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMaximumCurve());
-	for (unsigned long l_nRow = 0; l_nRow < m_pcMainSimulator->GetGeneratedResultPointsCount(); l_nRow++)
-	{
-		l_sOutput = wxT("");
-		l_sOutput << dssd::aux::toString(m_pcMainSimulator->GetOutputStartPoint() + m_pcMainSimulator->GetOutputSampleSize() * l_nRow);
-		l_sCurrentRow = wxT("");
 		for (int iIt = 0; iIt < mPlaces2PosMap.size(); iIt++)
 		{
 			wxString l_sName = vsplaces[iIt];
-			wxString l_sPos = mPlaces2PosMap[l_sName];
-			long l_nPos;
-			if (!l_sPos.ToLong(&l_nPos))
-				return;
-			double l_dResult = 0;
-			//l_dResult = l_aanPLResults[l_nRow][l_nPos];
-			for (int iIter = 0; iIter < m_nFuzzyResultBand.size(); iIter++)
-			{
-				SP_Vector2DDouble currentMat = m_nFuzzyResultBand[iIter];
-				l_dResult = currentMat[l_nRow][l_nPos];
-				//write
-				if (m_bReplaceValue == true && l_dResult <= m_nReplacedVaue)
-				{
-					l_dResult = 0;
 
+
+			wxString sCol, sCol1;
+			sCol << l_sSpacer << l_sName << "_Min";
+			*m_pcExport << sCol;
+			sCol1 << l_sSpacer << l_sName << "_Max";
+			*m_pcExport << sCol1;
+		}
+		*m_pcExport << wxT("\n");
+		std::vector<SP_Vector2DDouble> m_nFuzzyResultBand;
+		m_nFuzzyResultBand.clear();
+		m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMinimumCurve());
+		m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMaximumCurve());
+		for (unsigned long l_nRow = 0; l_nRow < m_pcMainSimulator->GetGeneratedResultPointsCount(); l_nRow++)
+		{
+			l_sOutput = wxT("");
+			l_sOutput << dssd::aux::toString(m_pcMainSimulator->GetOutputStartPoint() + m_pcMainSimulator->GetOutputSampleSize() * l_nRow);
+			l_sCurrentRow = wxT("");
+			for (int iIt = 0; iIt < mPlaces2PosMap.size(); iIt++)
+			{
+				wxString l_sName = vsplaces[iIt];
+				wxString l_sPos = mPlaces2PosMap[l_sName];
+				long l_nPos;
+				if (!l_sPos.ToLong(&l_nPos))
+					return;
+				double l_dResult = 0;
+				//l_dResult = l_aanPLResults[l_nRow][l_nPos];
+				for (int iIter = 0; iIter < m_nFuzzyResultBand.size(); iIter++)
+				{
+					SP_Vector2DDouble currentMat = m_nFuzzyResultBand[iIter];
+					l_dResult = currentMat[l_nRow][l_nPos];
+					//write
+					if (m_bReplaceValue == true && l_dResult <= m_nReplacedVaue)
+					{
+						l_dResult = 0;
+
+					}
+					l_sCurrentRow << l_sSpacer;
+					l_sCurrentRow << wxString::Format(wxT("%.16g"), l_dResult);
 				}
-				l_sCurrentRow << l_sSpacer;
-				l_sCurrentRow << wxString::Format(wxT("%.16g"), l_dResult);
+
+			}
+			l_sOutput << l_sCurrentRow;
+			*m_pcExport << l_sOutput;// << wxT("\n");
+			*m_pcExport << wxT("\n");
+		}
+	}
+	else {
+
+		for (int iCount = 0; iCount < mPlaces2PosMap.size(); iCount++)
+		{
+			wxString l_sName = vsplaces[iCount];
+
+			for (unsigned i = 0; i < m_vResultFBand.size(); i++)
+			{
+				wxString sCol;
+				sCol << l_sSpacer << l_sName << wxT("_") << i;
+				*m_pcExport << sCol;
 			}
 
+
 		}
-		l_sOutput << l_sCurrentRow;
-		*m_pcExport << l_sOutput;// << wxT("\n");
 		*m_pcExport << wxT("\n");
+
+		if (m_vResultFBand.size() == 0) return;
+
+		for (unsigned int l_nTime = 0; l_nTime < m_vResultFBand[0].fuzzyTrace.size(); ++l_nTime)
+		{
+			l_sOutput = wxT("");
+			l_sOutput << dssd::aux::toString(m_pcMainSimulator->GetOutputStartPoint() + m_pcMainSimulator->GetOutputSampleSize() * l_nTime);
+			l_sCurrentRow = wxT("");
+
+			for (int j = 0; j < mPlaces2PosMap.size(); j++)
+			{
+				wxString l_sName = vsplaces[j];
+				wxString l_sPos = mPlaces2PosMap[l_sName];
+				long l_nPos;
+				if (!l_sPos.ToLong(&l_nPos))
+					return;
+				double l_dResult = 0;
+
+
+				for (unsigned l_nRun = 0; l_nRun < m_vResultFBand.size(); ++l_nRun) {
+
+					SP_Vector2DDouble currentMat = m_vResultFBand[l_nRun].fuzzyTrace;
+					l_dResult = currentMat[l_nTime][l_nPos];
+
+
+					l_sCurrentRow << l_sSpacer;
+					l_sCurrentRow << wxString::Format(wxT("%.16g"), l_dResult);
+
+				}
+			}
+
+			l_sOutput << l_sCurrentRow;
+			*m_pcExport << l_sOutput;
+			*m_pcExport << wxT("\n");
+
+		}
 	}
 
 
@@ -1148,10 +1206,11 @@ OnExportToCSV()
 {
 	wxString l_sFilename = m_sExportFilename;
 	bool     l_bCompressExact = false;
+	bool l_bAlltraces = false;
 
 	SP_DLG_CSVExport* l_pcDlg = new SP_DLG_CSVExport(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this,
 		&l_sFilename, &m_nExportSpacer,
-		&l_bCompressExact, m_bReplaceValue,
+		&l_bCompressExact, &l_bAlltraces, m_bReplaceValue,
 		m_nReplacedVaue);
 
 	if (l_pcDlg->ShowModal() == wxID_OK)
@@ -1159,6 +1218,7 @@ OnExportToCSV()
 		wxString l_sBackupFilename = m_sExportFilename;
 		m_sExportFilename = l_sFilename;
 		m_nReplacedVaue = l_pcDlg->GetReplacedValues();
+		m_bExportAllTracesForFuzzy = l_pcDlg->IsAllTracesChecked();
 		OpenExportFile();
 		DirectExportToCSV();
 		CloseExportFile();
@@ -1445,10 +1505,10 @@ void    SP_DLG_FCPNSimulationResults::OnSimulatorThreadEvent(SP_DS_ThreadEvent& 
 		m_pcStartButton->SetLabel(wxT("Start Simulation"));
 		m_pcStartButton->SetBackgroundColour(*wxGREEN);
 		m_pcMainSimulator->AbortSimulation();
-		m_vResultFBand.clear();
+		//m_vResultFBand.clear();
 		LoadResults();
 		m_bIsAbort = false;
-		//wxDELETE(m_fr);
+		
 		m_fr->ClearData();
 		break;
 	}

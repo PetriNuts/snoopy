@@ -1478,7 +1478,7 @@ void SP_DLG_DirColStSimulation::OnCloseWindow(wxCloseEvent& p_cEvent)
 
 void SP_DLG_DirColStSimulation::OnDirectExportProperties(wxCommandEvent& p_cEvent)
 {
-	SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT, this, &m_sExportFilename, &m_nExportSpacer, &m_bCompressExact);
+	SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT, this, &m_sExportFilename, &m_nExportSpacer, &m_bCompressExact,&m_bCAllTraces);
 
 	l_pcDlg->ShowModal();
 
@@ -1791,7 +1791,7 @@ void SP_DLG_DirColStSimulation::OnExportToCSV()
 {
 	wxString l_sFilename = m_sExportFilename;
 	bool l_bCompressExact = false;
-	SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this, &l_sFilename, &m_nExportSpacer, &l_bCompressExact);
+	SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this, &l_sFilename, &m_nExportSpacer, &l_bCompressExact,false);
 
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{

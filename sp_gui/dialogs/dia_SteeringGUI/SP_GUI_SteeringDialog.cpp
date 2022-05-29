@@ -1745,7 +1745,7 @@ void SP_GUI_SteeringDialog::OnExport2CSVSelected(wxCommandEvent& WXUNUSED(event)
 		m_sExportFilename = (*m_pcModelViews)[m_nCurrentView]->GetName();
 	}
 
-	SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this, &m_sExportFilename, &m_nExportSpacer, &l_bCompressExact);
+	SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this, &m_sExportFilename, &m_nExportSpacer, &l_bCompressExact,false);
 
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{

@@ -84,6 +84,7 @@ protected:
 	bool m_bCompressExact;
 	wxString m_sNodeclass;
 	bool m_bSumOfNodes;
+	bool m_bAllTracesFuzzy;
 
 	//ApFormulae used with SPN
 	wxString m_sApFormulae;

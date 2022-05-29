@@ -1180,52 +1180,106 @@ void SP_DLG_FspnSimResult::DirectExportToCSV()
 		}
 
 	}
-	////////////////////////////
-	for (int iIter = 0; iIter < mPlaces2PosMap.size(); iIter++)
-	{
-		wxString l_sName = vsPlaces[iIter];
-		wxString sCol, sCol1;
-		sCol << l_sSpacer << l_sName << "_Min";
-		*m_pcExport << sCol;
-		sCol1 << l_sSpacer << l_sName << "_Max";
-		*m_pcExport << sCol1;
-	}
-	*m_pcExport << wxT("\n");
-	std::vector<SP_Vector2DDouble> m_nFuzzyResultBand;
-	m_nFuzzyResultBand.clear();
-	m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMinimumCurve());
-	m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMaximumCurve());
 
-	for (unsigned long l_nRow = 0; l_nRow < m_nFuzzyResultBand[0].size(); l_nRow++)
-	{
-		l_sOutput = wxT("");
-		l_sOutput << dssd::aux::toString(m_pcMainSimulator->GetOutputStartPoint() + m_pcMainSimulator->GetOutputSampleSize() * l_nRow);
-		l_sCurrentRow = wxT("");
+	if (!m_bExportAllTracesForFuzzy) {
+
+		for (int iIter = 0; iIter < mPlaces2PosMap.size(); iIter++)
+		{
+			wxString l_sName = vsPlaces[iIter];
+			wxString sCol, sCol1;
+			sCol << l_sSpacer << l_sName << "_Min";
+			*m_pcExport << sCol;
+			sCol1 << l_sSpacer << l_sName << "_Max";
+			*m_pcExport << sCol1;
+		}
+		*m_pcExport << wxT("\n");
+		std::vector<SP_Vector2DDouble> m_nFuzzyResultBand;
+		m_nFuzzyResultBand.clear();
+		m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMinimumCurve());
+		m_nFuzzyResultBand.push_back(m_pcCompressedBand->GetMaximumCurve());
+
+		for (unsigned long l_nRow = 0; l_nRow < m_nFuzzyResultBand[0].size(); l_nRow++)
+		{
+			l_sOutput = wxT("");
+			l_sOutput << dssd::aux::toString(m_pcMainSimulator->GetOutputStartPoint() + m_pcMainSimulator->GetOutputSampleSize() * l_nRow);
+			l_sCurrentRow = wxT("");
+			for (int iCount = 0; iCount < mPlaces2PosMap.size(); iCount++)
+			{
+				wxString l_sName = vsPlaces[iCount];
+				wxString l_sPos = mPlaces2PosMap[l_sName];
+				long l_nPos;
+				if (!l_sPos.ToLong(&l_nPos))
+					return;
+				double l_dResult = 0;
+				//l_dResult = l_aanPLResults[l_nRow][l_nPos];
+				for (int i = 0; i < m_nFuzzyResultBand.size(); i++)
+				{
+					SP_Vector2DDouble currentMat = m_nFuzzyResultBand[i];
+					l_dResult = currentMat[l_nRow][l_nPos];
+					//write 
+
+					l_sCurrentRow << l_sSpacer;
+					l_sCurrentRow << wxString::Format(wxT("%.16g"), l_dResult);
+				}
+
+			}
+			l_sOutput << l_sCurrentRow;
+			*m_pcExport << l_sOutput;// << wxT("\n");
+			*m_pcExport << wxT("\n");
+		}
+	}
+	else {
 		for (int iCount = 0; iCount < mPlaces2PosMap.size(); iCount++)
 		{
 			wxString l_sName = vsPlaces[iCount];
-			wxString l_sPos = mPlaces2PosMap[l_sName];
-			long l_nPos;
-			if (!l_sPos.ToLong(&l_nPos))
-				return;
-			double l_dResult = 0;
-			//l_dResult = l_aanPLResults[l_nRow][l_nPos];
-			for (int i = 0; i < m_nFuzzyResultBand.size(); i++)
-			{
-				SP_Vector2DDouble currentMat = m_nFuzzyResultBand[i];
-				l_dResult = currentMat[l_nRow][l_nPos];
-				//write 
 
-				l_sCurrentRow << l_sSpacer;
-				l_sCurrentRow << wxString::Format(wxT("%.16g"), l_dResult);
+			for (unsigned i = 0; i < m_ResultFBand.size(); i++)
+			{
+				wxString sCol;
+				sCol << l_sSpacer << l_sName << wxT("_") << i;
+				*m_pcExport << sCol;
 			}
 
-		}
-		l_sOutput << l_sCurrentRow;
-		*m_pcExport << l_sOutput;// << wxT("\n");
-		*m_pcExport << wxT("\n");
-	}
 
+		}
+		*m_pcExport << wxT("\n");
+
+		if (m_ResultFBand.size() == 0) return;
+
+		for (unsigned int l_nTime = 0; l_nTime < m_ResultFBand[0].fuzzyTrace.size(); ++l_nTime)
+		{
+			l_sOutput = wxT("");
+			l_sOutput << dssd::aux::toString(m_pcMainSimulator->GetOutputStartPoint() + m_pcMainSimulator->GetOutputSampleSize() * l_nTime);
+			l_sCurrentRow = wxT("");
+
+			for (int j = 0; j < mPlaces2PosMap.size(); j++)
+			{
+				wxString l_sName = vsPlaces[j];
+				wxString l_sPos = mPlaces2PosMap[l_sName];
+				long l_nPos;
+				if (!l_sPos.ToLong(&l_nPos))
+					return;
+				double l_dResult = 0;
+
+
+				for (unsigned l_nRun = 0; l_nRun < m_ResultFBand.size(); ++l_nRun) {
+
+					SP_Vector2DDouble currentMat = m_ResultFBand[l_nRun].fuzzyTrace;
+					l_dResult = currentMat[l_nTime][l_nPos];
+
+
+					l_sCurrentRow << l_sSpacer;
+					l_sCurrentRow << wxString::Format(wxT("%.16g"), l_dResult);
+
+				}
+			}
+
+			l_sOutput << l_sCurrentRow;
+			*m_pcExport << l_sOutput;
+			*m_pcExport << wxT("\n");
+
+		}
+	}
 
 }
 std::vector<double>  SP_DLG_FspnSimResult::GetCurentSamples(int iteration)
@@ -1426,7 +1480,7 @@ void     SP_DLG_FspnSimResult::OnSimulatorThreadEvent(SP_DS_ThreadEvent& event)
 		m_pcStartButton->SetLabel(wxT("Start Simulation"));
 		m_pcStartButton->SetBackgroundColour(*wxGREEN);
 		m_pcMainSimulator->AbortSimulation();
-		m_ResultFBand.clear();
+		//m_ResultFBand.clear();
 		LoadResults();
 		m_bIsAbort = false;
 		//wxDELETE(m_fr);

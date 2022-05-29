@@ -25,7 +25,7 @@ END_EVENT_TABLE()
 
 SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 		SP_DS_StExportCSVEditDlgType p_eType, wxDialog* p_pcParent,
-		wxString* p_psFilename, int* p_pnSpacer, bool* p_pbCompressExact,
+		wxString* p_psFilename, int* p_pnSpacer, bool* p_pbCompressExact, bool* p_pbAlltraces,
 		const wxString& p_sTitle, long p_nStyle) :
 
 	wxDialog(p_pcParent, -1, p_sTitle, wxDefaultPosition, wxSize( 500, 300),
@@ -37,7 +37,7 @@ SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 	m_psFilename = p_psFilename;
 	m_pnSpacer = p_pnSpacer;
 	m_pbCompressExact = p_pbCompressExact;
-
+	m_pbAlltraces = p_pbAlltraces;
 	if (m_eDlgType == SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT)
 	{
 
@@ -88,7 +88,16 @@ SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 
 		m_pcCompressCheckBox = new wxCheckBox( this, -1, wxT("Compress Output") );
 
+
 		l_pcRowSizer->Add( m_pcCompressCheckBox, 1, wxALL | wxEXPAND, 5 );
+
+		wxString netClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();///Added by G.A
+		bool isFuzzyNet = netClass.Contains(wxT("Fuzzy")) ? true : false; 
+
+		if (isFuzzyNet) {
+			m_pcAllTracesesForFuzzySimulation = new wxCheckBox(this, -1, wxT("Export Entire Band"));
+			l_pcRowSizer->Add(m_pcAllTracesesForFuzzySimulation, 1, wxALL | wxEXPAND, 5);
+		}
 
 		m_pcPropertiesSizer->Add( l_pcRowSizer, 1, wxALL | wxEXPAND );
 
@@ -179,6 +188,12 @@ bool SP_DLG_StDirectExportProperties::SaveData()
 	*m_pnSpacer = m_pcSpacerChoice->GetSelection();
 	if (m_eDlgType == SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT)
 		*m_pbCompressExact = m_pcCompressCheckBox->GetValue();
+
+	wxString netClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();///Added by G.A
+	bool isFuzzyNet = netClass.Contains(wxT("Fuzzy")) ? true : false;
+	if (isFuzzyNet) {
+		*m_pbAlltraces = m_pcAllTracesesForFuzzySimulation->GetValue();
+	}
 
 	return true;
 
