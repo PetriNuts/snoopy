@@ -67,7 +67,7 @@ class SP_DLG_StDirectExportProperties : public wxDialog
     void OnDlgOk( wxCommandEvent& p_cEvent );
     void OnDlgCancel( wxCommandEvent& p_cEvent );
 
-	void OnCheckMembershipFunction(wxCommandEvent& p_cEvent);//by george
+ 
 
     bool IsCompressChecked() { return m_pcCompressCheckBox->GetValue(); }//george 12.2020
 
