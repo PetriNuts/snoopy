@@ -1791,7 +1791,7 @@ void SP_DLG_DirColStSimulation::OnExportToCSV()
 {
 	wxString l_sFilename = m_sExportFilename;
 	bool l_bCompressExact = false;
-	SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this, &l_sFilename, &m_nExportSpacer, &l_bCompressExact,false);
+	SP_DLG_StDirectExportProperties* l_pcDlg = new SP_DLG_StDirectExportProperties(SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT, this, &l_sFilename, &m_nExportSpacer, &l_bCompressExact, &m_bCAllTraces);
 
 	if (l_pcDlg->ShowModal() == wxID_OK)
 	{
