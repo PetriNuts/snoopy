@@ -40,7 +40,7 @@ class SP_DLG_StDirectExportProperties : public wxDialog
     wxCheckBox* m_pcCompressCheckBox;
 	wxCheckBox* m_pcAllTracesesForFuzzySimulation;//by george
 	wxCheckBox* m_pcExportMembershipFunction;//by george
-	//wxTextCtrl* m_pcTimePoint;//by george
+	 
 	bool* m_pbAlltraces;//by george
 
     wxString* m_psFilename;

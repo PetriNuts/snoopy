@@ -21,8 +21,7 @@ BEGIN_EVENT_TABLE( SP_DLG_StDirectExportProperties, wxDialog )
 EVT_BUTTON( wxID_OK, SP_DLG_StDirectExportProperties :: OnDlgOk )
 EVT_BUTTON( wxID_CANCEL, SP_DLG_StDirectExportProperties :: OnDlgCancel )
 
-EVT_CHECKBOX(SP_ST_SIM_EXPORT_CSV_EXPORT_MEMBERSHIP_FUN, OnCheckMembershipFunction) 
-
+ 
 END_EVENT_TABLE()
 
 SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
@@ -157,10 +156,7 @@ void SP_DLG_StDirectExportProperties::OnDlgOk(wxCommandEvent& p_cEvent)
 	}
 }
 
-void SP_DLG_StDirectExportProperties::OnCheckMembershipFunction(wxCommandEvent& p_cEvent)
-{
  
-}
 
 void SP_DLG_StDirectExportProperties::OnDlgCancel(wxCommandEvent& p_cEvent)
 {
