@@ -1141,11 +1141,11 @@ std::vector<double> SP_DLG_FspnSimResult::GetCombinationVectorForTopLevel()
 
 void SP_DLG_FspnSimResult::DirectExportToCSV()
 {
-
 	if (!m_pcExport)
 		return;
 
 	*m_pcExport << wxT("Time");
+
 
 	wxString l_sSpacer = GetSpacer(m_nExportSpacer);
 	wxString l_sCurrentRow, l_sOutput;
@@ -1155,7 +1155,7 @@ void SP_DLG_FspnSimResult::DirectExportToCSV()
 	wxString l_sElementType = l_pcAttribute->GetValueString();
 
 	std::map<wxString, wxString> mPlaces2PosMap;
-	std::vector<wxString> vsPlaces;
+	std::vector<wxString> vstrPlaces;
 
 
 	SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(m_pcCurrentTablePlot->GetAttribute(wxT("CurveInfo")));
@@ -1175,17 +1175,21 @@ void SP_DLG_FspnSimResult::DirectExportToCSV()
 		{
 			wxString l_sName = l_pcCurveInfoList->GetCell(l_n, 6);
 			mPlaces2PosMap[l_sName] = l_sPos;
-			vsPlaces.push_back(l_sName);
+			vstrPlaces.push_back(l_sName);
 
 		}
 
 	}
 
-	if (!m_bExportAllTracesForFuzzy) {
 
-		for (int iIter = 0; iIter < mPlaces2PosMap.size(); iIter++)
+
+	if (!m_bExportAllTracesForFuzzy) { //export min/max bands over time
+
+		for (int iCount = 0; iCount < mPlaces2PosMap.size(); iCount++)
 		{
-			wxString l_sName = vsPlaces[iIter];
+			wxString l_sName = vstrPlaces[iCount];
+
+
 			wxString sCol, sCol1;
 			sCol << l_sSpacer << l_sName << "_Min";
 			*m_pcExport << sCol;
@@ -1203,15 +1207,15 @@ void SP_DLG_FspnSimResult::DirectExportToCSV()
 			l_sOutput = wxT("");
 			l_sOutput << dssd::aux::toString(m_pcMainSimulator->GetOutputStartPoint() + m_pcMainSimulator->GetOutputSampleSize() * l_nRow);
 			l_sCurrentRow = wxT("");
-			for (int iCount = 0; iCount < mPlaces2PosMap.size(); iCount++)
+			for (int j = 0; j < mPlaces2PosMap.size(); j++)
 			{
-				wxString l_sName = vsPlaces[iCount];
+				wxString l_sName = vstrPlaces[j];
 				wxString l_sPos = mPlaces2PosMap[l_sName];
 				long l_nPos;
 				if (!l_sPos.ToLong(&l_nPos))
 					return;
 				double l_dResult = 0;
-				//l_dResult = l_aanPLResults[l_nRow][l_nPos];
+
 				for (int i = 0; i < m_nFuzzyResultBand.size(); i++)
 				{
 					SP_Vector2DDouble currentMat = m_nFuzzyResultBand[i];
@@ -1227,11 +1231,13 @@ void SP_DLG_FspnSimResult::DirectExportToCSV()
 			*m_pcExport << l_sOutput;// << wxT("\n");
 			*m_pcExport << wxT("\n");
 		}
+
 	}
-	else {
+	else {// export all traces of each band
+
 		for (int iCount = 0; iCount < mPlaces2PosMap.size(); iCount++)
 		{
-			wxString l_sName = vsPlaces[iCount];
+			wxString l_sName = vstrPlaces[iCount];
 
 			for (unsigned i = 0; i < m_ResultFBand.size(); i++)
 			{
@@ -1254,7 +1260,7 @@ void SP_DLG_FspnSimResult::DirectExportToCSV()
 
 			for (int j = 0; j < mPlaces2PosMap.size(); j++)
 			{
-				wxString l_sName = vsPlaces[j];
+				wxString l_sName = vstrPlaces[j];
 				wxString l_sPos = mPlaces2PosMap[l_sName];
 				long l_nPos;
 				if (!l_sPos.ToLong(&l_nPos))
@@ -1279,6 +1285,108 @@ void SP_DLG_FspnSimResult::DirectExportToCSV()
 			*m_pcExport << wxT("\n");
 
 		}
+
+	}
+
+	if (m_bExportMembershipFunction) {//export all membership functions over time
+
+		if (!m_pcExportMembershipfuns) return;
+		*m_pcExportMembershipfuns << wxT("Time_point") << l_sSpacer << wxT("Level") << l_sSpacer;
+
+		for (int j = 0; j < mPlaces2PosMap.size(); j++)
+		{
+			wxString l_sName = vstrPlaces[j];
+
+			wxString l_sHeader;
+
+			l_sHeader << l_sName << l_sSpacer;
+
+			*m_pcExportMembershipfuns << l_sHeader;
+		}
+
+		*m_pcExportMembershipfuns << wxT("\n");
+
+		SP_VectorDouble l_vAlphaLevels = m_pcCompressedBand->GetAlphaLevels();
+
+		std::vector<Time2Membership> l_vAllVariablesMMf;
+
+		for (int j = 0; j < mPlaces2PosMap.size(); j++)
+		{
+			wxString l_sName = vstrPlaces[j];
+			wxString l_sPos = mPlaces2PosMap[l_sName];
+			long l_nPos;
+			if (!l_sPos.ToLong(&l_nPos))
+				return;
+			Time2Membership tfn_list = m_pcCompressedBand->GetTimeMembershipofPlace(l_nPos);
+
+			l_vAllVariablesMMf.push_back(tfn_list);
+		}
+
+
+		for (int level = 0; level < l_vAlphaLevels.size(); ++level)
+		{
+			 
+
+			for (int j = 0; j < mPlaces2PosMap.size(); j++)
+			{
+				wxString l_sName = vstrPlaces[j];
+				wxString l_sPos = mPlaces2PosMap[l_sName];
+				long l_nPos;
+				if (!l_sPos.ToLong(&l_nPos))
+					return;
+				Time2Membership tfn_list = m_pcCompressedBand->GetTimeMembershipofPlace(l_nPos);
+
+				for (int timePoint = 0; timePoint < tfn_list.size(); ++timePoint) {
+
+					for (int level = 0; level < l_vAlphaLevels.size(); ++level)
+					{
+						 
+						wxString l_sExport;
+
+						 
+						l_sExport << timePoint << l_sSpacer << l_vAlphaLevels[level] << l_sSpacer;
+						
+						for (int mf = 0; mf < l_vAllVariablesMMf.size(); ++mf) {
+
+							Time2Membership l_mfTemp = l_vAllVariablesMMf[mf];
+
+							auto tfn_vec = l_mfTemp[timePoint];
+							l_sExport << tfn_vec[level][0] << l_sSpacer;
+						}
+						
+						l_sExport<< wxT("\n");
+
+						*m_pcExportMembershipfuns << l_sExport;
+					}
+
+					for (int level = l_vAlphaLevels.size() - 1; level >= 0; --level)
+					{
+						auto tfn = tfn_list[timePoint];
+						wxString l_sExport;
+
+						 
+						l_sExport << timePoint << l_sSpacer << l_vAlphaLevels[level] << l_sSpacer;
+
+						for (int mf = 0; mf < l_vAllVariablesMMf.size(); ++mf) {
+
+							Time2Membership l_mfTemp = l_vAllVariablesMMf[mf];
+
+							auto tfn_vec = l_mfTemp[timePoint];
+							l_sExport << tfn_vec[level][1] << l_sSpacer;
+						}
+
+						l_sExport << wxT("\n");
+						*m_pcExportMembershipfuns << l_sExport;
+					}
+
+				}
+
+			}
+		}
+
+		wxDELETE(m_pcExportMembershipfuns);
+		wxDELETE(m_pcExportBufferdOutputStreamMembershipFun);
+		wxDELETE(m_pcExportFileOutputStreamMembershipFun);
 	}
 
 }

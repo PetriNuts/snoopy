@@ -19,7 +19,8 @@
 typedef enum {
   
   SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT,
-  SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT
+  SP_ST_SIM_EXPORT_CSV_EDIT_DLG_EXPLICIT,
+  SP_ST_SIM_EXPORT_CSV_EXPORT_MEMBERSHIP_FUN
 
 } SP_DS_StExportCSVEditDlgType;
 
@@ -38,7 +39,9 @@ class SP_DLG_StDirectExportProperties : public wxDialog
     wxFilePickerCtrl* m_pcFilePickerCtrl;
     wxCheckBox* m_pcCompressCheckBox;
 	wxCheckBox* m_pcAllTracesesForFuzzySimulation;//by george
-	bool* m_pbAlltraces;
+	wxCheckBox* m_pcExportMembershipFunction;//by george
+	//wxTextCtrl* m_pcTimePoint;//by george
+	bool* m_pbAlltraces;//by george
 
     wxString* m_psFilename;
     int* m_pnSpacer;
@@ -64,6 +67,8 @@ class SP_DLG_StDirectExportProperties : public wxDialog
     void OnDlgOk( wxCommandEvent& p_cEvent );
     void OnDlgCancel( wxCommandEvent& p_cEvent );
 
+	void OnCheckMembershipFunction(wxCommandEvent& p_cEvent);//by george
+
     bool IsCompressChecked() { return m_pcCompressCheckBox->GetValue(); }//george 12.2020
 
 	bool IsAllTracesChecked() {
@@ -76,6 +81,28 @@ class SP_DLG_StDirectExportProperties : public wxDialog
 		return false;
 	}
 
+
+	bool IsMembershipFunctionChecked() {
+		wxString netClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();///Added by G.A
+		bool isFuzzyNet = netClass.Contains(wxT("Fuzzy")) ? true : false;
+
+		if (isFuzzyNet)
+			return m_pcExportMembershipFunction->GetValue();
+		else
+			return false;
+	}
+
+	bool IsMembershipFunctionEnabled() {
+		wxString netClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();///Added by G.A
+		bool isFuzzyNet = netClass.Contains(wxT("Fuzzy")) ? true : false;
+
+		if (isFuzzyNet)
+			return m_pcExportMembershipFunction->IsEnabled();
+		else
+			return false;
+	}
+
+ 
     DECLARE_CLASS( SP_DLG_StDirectExportProperties )
     DECLARE_EVENT_TABLE()
 };

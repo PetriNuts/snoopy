@@ -87,6 +87,10 @@ protected:
 	wxString m_sDirectExportName;
 	double m_nPlotYMax;
 
+	wxFileOutputStream* m_pcExportFileOutputStreamMembershipFun;
+	wxBufferedOutputStream* m_pcExportBufferdOutputStreamMembershipFun;
+	wxTextOutputStream* m_pcExportMembershipfuns;
+
 	SP_DS_Metadata* m_pcCurrentTablePlot;
 
 	wxColour* m_apColours;
@@ -97,7 +101,9 @@ protected:
 	wxStaticText* m_pcSimulationProgressText;
 	 
 	bool m_bExportAllTracesForFuzzy;//george
-	bool m_bCompressExact;
+	bool m_bExportMembershipFunction;//george
+	bool m_bCompressExact;//george
+	 
 	wxString m_sNodeclass;
 	bool m_bSumOfNodes;
 

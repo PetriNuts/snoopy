@@ -21,6 +21,8 @@ BEGIN_EVENT_TABLE( SP_DLG_StDirectExportProperties, wxDialog )
 EVT_BUTTON( wxID_OK, SP_DLG_StDirectExportProperties :: OnDlgOk )
 EVT_BUTTON( wxID_CANCEL, SP_DLG_StDirectExportProperties :: OnDlgCancel )
 
+EVT_CHECKBOX(SP_ST_SIM_EXPORT_CSV_EXPORT_MEMBERSHIP_FUN, OnCheckMembershipFunction) 
+
 END_EVENT_TABLE()
 
 SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
@@ -97,6 +99,17 @@ SP_DLG_StDirectExportProperties::SP_DLG_StDirectExportProperties(
 		if (isFuzzyNet) {
 			m_pcAllTracesesForFuzzySimulation = new wxCheckBox(this, -1, wxT("Export Entire Band"));
 			l_pcRowSizer->Add(m_pcAllTracesesForFuzzySimulation, 1, wxALL | wxEXPAND, 5);
+			m_pcExportMembershipFunction = new wxCheckBox(this, SP_ST_SIM_EXPORT_CSV_EXPORT_MEMBERSHIP_FUN, wxT("Membership Function"));
+			
+			wxSizer* l_pcRowSizerTFN = new wxBoxSizer(wxHORIZONTAL);
+			
+			l_pcRowSizerTFN->Add(m_pcExportMembershipFunction, 1, wxALL | wxEXPAND, 5);
+
+			m_pcExportMembershipFunction->SetValue(false);
+
+		
+			m_pcMainSizer->Add(l_pcRowSizerTFN);
+		 
 		}
 
 		m_pcPropertiesSizer->Add( l_pcRowSizer, 1, wxALL | wxEXPAND );
@@ -144,6 +157,11 @@ void SP_DLG_StDirectExportProperties::OnDlgOk(wxCommandEvent& p_cEvent)
 	}
 }
 
+void SP_DLG_StDirectExportProperties::OnCheckMembershipFunction(wxCommandEvent& p_cEvent)
+{
+ 
+}
+
 void SP_DLG_StDirectExportProperties::OnDlgCancel(wxCommandEvent& p_cEvent)
 {
 	if (IsModal())
@@ -189,11 +207,6 @@ bool SP_DLG_StDirectExportProperties::SaveData()
 	if (m_eDlgType == SP_ST_SIM_EXPORT_CSV_EDIT_DLG_DIRECT)
 		*m_pbCompressExact = m_pcCompressCheckBox->GetValue();
 
-	wxString netClass = SP_Core::Instance()->GetRootDocument()->GetGraph()->GetNetclass()->GetName();///Added by G.A
-	bool isFuzzyNet = netClass.Contains(wxT("Fuzzy")) ? true : false;
-	if (isFuzzyNet) {
-		*m_pbAlltraces = m_pcAllTracesesForFuzzySimulation->GetValue();
-	}
 
 	return true;
 

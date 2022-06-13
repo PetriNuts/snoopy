@@ -2055,11 +2055,6 @@ void SP_DLG_Simulation::OpenExportFile()
 {
     wxString l_sExportFilename = m_sExportFilename.BeforeLast('.');
 
-    //if (l_sExportFilename == m_pcGraph->GetParentDoc()->GetFilename().BeforeLast('.'))
-   // {
-      //  l_sExportFilename << wxT("(")
-      //  << wxDateTime::Now().Format(wxT("%Y-%m-%dT%H:%M:%S%Z")) << wxT(")");
-   // }
 
     if (m_bIsCompressChosen)
     	{//by george12.2020
@@ -2133,6 +2128,28 @@ void SP_DLG_Simulation::OpenExportFile()
 	{
 		(*m_pcExport) << l_sOutput << endl;
 	}
+
+	if (sNetClass.Contains(wxT("Fuzzy")) && m_bExportMembershipFunction) {
+
+		wxString l_sMembershipFunctions = m_sExportFilename;
+
+		l_sMembershipFunctions << wxT("_tfn.csv");
+
+		m_pcExportFileOutputStreamMembershipFun = new wxFileOutputStream(l_sMembershipFunctions);
+
+		if (!m_pcExportFileOutputStreamMembershipFun->IsOk())
+		{
+			m_pcExportFileOutputStreamMembershipFun = new wxFileOutputStream(l_sMembershipFunctions);
+
+			if (!m_pcExportFileOutputStreamMembershipFun->IsOk())
+			{
+				return;
+			}
+		}
+
+		m_pcExportBufferdOutputStreamMembershipFun = new wxBufferedOutputStream(*m_pcExportFileOutputStreamMembershipFun);
+		m_pcExportMembershipfuns = new wxTextOutputStream(*m_pcExportBufferdOutputStreamMembershipFun);
+	}
 }
 
 void SP_DLG_Simulation::CloseExportFile()
@@ -2187,6 +2204,8 @@ void SP_DLG_Simulation::OnExportToCSV()
         		 << wxDateTime::Now().Format(wxT("%Y-%m-%dT%H-%M-%S%Z")) << wxT(")");
          }
 		m_bExportAllTracesForFuzzy = l_pcDlg->IsAllTracesChecked();
+		m_bExportMembershipFunction = l_pcDlg->IsMembershipFunctionChecked();
+	 
         OpenExportFile();
         DirectExportToCSV();
         CloseExportFile();
