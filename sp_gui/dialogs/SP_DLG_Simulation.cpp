@@ -2128,7 +2128,7 @@ void SP_DLG_Simulation::OpenExportFile()
 	{
 		(*m_pcExport) << l_sOutput << endl;
 	}
-
+	/**
 	if (sNetClass.Contains(wxT("Fuzzy")) && m_bExportMembershipFunction) {
 
 		wxString l_sMembershipFunctions = m_sExportFilename;
@@ -2150,6 +2150,7 @@ void SP_DLG_Simulation::OpenExportFile()
 		m_pcExportBufferdOutputStreamMembershipFun = new wxBufferedOutputStream(*m_pcExportFileOutputStreamMembershipFun);
 		m_pcExportMembershipfuns = new wxTextOutputStream(*m_pcExportBufferdOutputStreamMembershipFun);
 	}
+	*/
 }
 
 void SP_DLG_Simulation::CloseExportFile()
