@@ -749,7 +749,8 @@ void SP_DLG_HybridSimulationResults::LoadSets()
 	if (m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS)->GetElements()->size() > 0)
 	{
 	//Load scheduled set
-	m_pcDelaySetComboBox->Clear();
+	 if(m_pcScheduledSetComboBox)
+		 m_pcScheduledSetComboBox->Clear();
 	l_pcNodesList = (m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS)->GetElements());
 	if (!l_pcNodesList->empty())
 	{
@@ -757,9 +758,9 @@ void SP_DLG_HybridSimulationResults::LoadSets()
 		l_pcAttr = l_pcFstNode->GetAttribute(wxT("PeriodicList"));
 		l_pcColListAttr = dynamic_cast<SP_DS_ColListAttribute *>(l_pcAttr);
 		for (unsigned int i = 0; i < l_pcColListAttr->GetRowCount(); i++)
-			m_pcDelaySetComboBox->Append(l_pcColListAttr->GetCell(i, 0));
+			m_pcScheduledSetComboBox->Append(l_pcColListAttr->GetCell(i, 0));
 		//select the first function
-		m_pcDelaySetComboBox->SetSelection(l_pcColListAttr->GetActiveList());
+		m_pcScheduledSetComboBox->SetSelection(l_pcColListAttr->GetActiveList());
 	}
 	}
 	//Load all other sets
