@@ -17,10 +17,14 @@
 #define BAR_RATIO 4	//aspect ratio between width and height
 #define NODE_DIM_MIN 5
 #define NODE_DIM_MAX 250
+#define DEFAULT_NAME_ATT_OFFSET_X 25
+#define DEFAULT_NAME_ATT_OFFSET_Y 20
 
 #define NODE_THICKNESS_MIN 1//by george
 #define NODE_THICKNESS_MAX 20//by george
 #define DEFAULT_THICKNESS 1
+#define NODE_POSX_MIN -600 //by george
+#define NODE_POSX_MAX  600  ///by george
 #include "sp_core/SP_GPR_Base.h"
 #include "sp_gr/shapes/SP_GR_ExtendedDrawnShape.h"
 #include "sp_gr/edges/SP_GR_ExtendedEdge.h"
@@ -47,6 +51,8 @@ protected:
 	SP_MapString2Int m_mnHeight;
 	SP_MapString2Int m_mnWidth;
 	SP_MapString2Int m_mnThickness;//by george
+	SP_MapString2Int m_mnGraphicAttrPosX; // by george
+	SP_MapString2Int m_mnGraphicAttrPosY; // by george
 	SP_MapString2Bool m_mbFixedSize;
 
 	map<wxString, wxString> m_msColorSetColor;
@@ -68,6 +74,8 @@ protected:
 	map<wxString, wxSpinCtrl*> m_mscWidth;
 
 	map<wxString, wxSpinCtrl*> m_mscThickness;//by george
+	map<wxString, wxSpinCtrl*> m_mscGraphic_att_pos_x;//by george
+	map<wxString, wxSpinCtrl*> m_mscGraphic_att_pos_y;//by george
 	map<wxString, wxCheckBox*> m_mcbFixed;
 
 	map<wxString, wxColourPickerCtrl*> m_mcpColorSet;
@@ -149,8 +157,17 @@ public:
 	void SetExpressionShowOption(const wxString& p_sNetClass, bool p_bVal);
 	bool GetExpressionShowOption(const wxString& p_sNetClass);
 
+	//For Name Attribute OFFSET X of Active elements
+	void SetNameAttPosX(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal);
+	int GetNameAttPosX(const wxString& p_sNetClass, const wxString& p_sNodeClass);
+
+	//For Name Attribute OFFSET Y of Active elements
+	void SetNameAttPosY(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal);
+	int GetNameAttPosY(const wxString& p_sNetClass, const wxString& p_sNodeClass);
 
 
+
+	map<wxString, SP_SetString > GetNetClassMap(){return m_mlClassNodes;}
 
 	//this is called from the net class constructor to register its editable node classes
 	void RegisterNodeclass(const wxString& p_sNetClass, const wxString& p_pcNodeclass);
@@ -163,6 +180,7 @@ public:
 
 	bool UpdateFromConfig(wxConfig& p_config);
 	bool WriteToConfig(wxConfig& p_config);
+
 
 };
 

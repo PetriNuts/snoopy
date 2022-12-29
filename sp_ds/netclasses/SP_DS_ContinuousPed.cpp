@@ -102,7 +102,7 @@ SP_DS_ContinuousPed::SP_DS_ContinuousPed(const wxString& p_pchName) :
 }
 
 SP_DS_Graph*
-SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph,SP_MapString2Int p_mapAttribute2Value )
 {
 
 	if (!SP_DS_BipartGraph::CreateGraph(p_pcGraph))
@@ -129,6 +129,47 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcNC->SetShortcut(wxT("P"));
 	l_pcAttr = l_pcNC->GetPrototype()->GetAttribute(wxT("Name"));//Name
 	l_pcAttr->SetGlobalShow();
+
+
+	//adjust positioning offset of name graphic att of Continuous Place
+	/////////////////////////////////////////////////
+
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+        wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+        wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+        wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+        l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+		if(l_sNetClass.IsSameAs(SP_DS_CONTINUOUSPED_CLASS) && l_sNodeType.IsSameAs(wxT("Continuous Place")))
+		 {
+
+			SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+					(*it)->SetOffsetX((itMap)->second);
+					//wxString l_sLog;
+					//l_sLog<<(itMap)->first << wxT(" value of offset X of Continuous Place is:") <<(itMap)->second;
+					//SP_LOGMESSAGE(l_sLog);
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+					  //wxString l_sLog;
+					 // l_sLog<<(itMap)->first << wxT(" value of offset Y of Continuous Place is:") <<(itMap)->second;
+					  //SP_LOGMESSAGE(l_sLog);
+				}
+
+			}
+			}
+	}
+
+	/////////////////////////////////////////////////
+
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));//ID
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_NumberAttribute(l_pcAttr, wxT("_p%_")));
@@ -171,6 +212,52 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	l_pcAttr = l_pcNC->GetPrototype()->GetAttribute(wxT("Name"));//Name
 	l_pcAttr->SetGlobalShow();
+
+
+	//adjust positioning offset of name graphic att of Continuous Transition
+	/////////////////////////////////////////////////
+
+	//l_pcNCTemp = p_pcGraph->GetNodeclass( wxT("Continuous Transition") );
+
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+        wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+        wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+        wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+        l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+
+		if(l_sNetClass.IsSameAs(SP_DS_CONTINUOUSPED_CLASS) && l_sNodeType.IsSameAs(wxT("Continuous Transition")))
+		 {
+
+			SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+					(*it)->SetOffsetX((itMap)->second);
+					//wxString l_sLog;
+					//l_sLog<<(itMap)->first << wxT(" value of offset X of Continuous Transition is:") <<(itMap)->second;
+					//SP_LOGMESSAGE(l_sLog);
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+					 // wxString l_sLog;
+					 // l_sLog<<(itMap)->first << wxT(" value of offset Y of Continuous Transition is:") <<(itMap)->second;
+					 // SP_LOGMESSAGE(l_sLog);
+				}
+
+			}
+			}
+	}
+
+	/////////////////////////////////////////////////
+
+
+
 	l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( wxT("FunctionList"), SP_COLLIST_STRING, 2 ) );
 	l_pcAttr->SetDisplayName(wxT("Function set"));
 	l_pcAttr->RegisterDialogWidget( new SP_WDG_StFunctionList( wxT("Function") ) );

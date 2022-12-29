@@ -23,7 +23,7 @@ public:
 		class, which takes care of playing back the files
 		\param p_pcGraph the graph
 	*/
-    virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGraph);
+    virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mapAttributeValue = SP_MapString2Int());
 
 };
 

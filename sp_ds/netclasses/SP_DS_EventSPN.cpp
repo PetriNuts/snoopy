@@ -121,7 +121,7 @@ SP_DS_EventSPN::SP_DS_EventSPN( const wxString& p_pchName )
 
 
 SP_DS_Graph*
-SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
+SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph,SP_MapString2Int p_mapAttribute2Value  )
 {
 
 	if ( ! SP_DS_ExtPT::CreateGraph( p_pcGraph ) )
@@ -142,11 +142,78 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->GetNodeclass( wxT("Place") );
 
+
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+        wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+        wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+        wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+        l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+
+		if(l_sNetClass.IsSameAs(SP_DS_SPN_CLASS) && l_sNodeType.IsSameAs(wxT("Place")))
+		 {
+
+			SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+					(*it)->SetOffsetX((itMap)->second);
+
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+
+				}
+
+			}
+			}
+	}
+
+
 	// animator
 	l_pcNC->AddAnimator( new SP_DS_StPlaceAnimator( wxT("Marking") ) );
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->GetNodeclass( wxT("Transition") );
+
+	//Adjust Positioning info of namegraohicAtt of transitions
+
+
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+        wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+        wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+        wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+        l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+
+		if(l_sNetClass.IsSameAs(SP_DS_SPN_CLASS) && l_sNodeType.IsSameAs(wxT("Transition")))
+		 {
+
+			SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+					(*it)->SetOffsetX((itMap)->second);
+
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+
+				}
+
+			}
+			}
+	}
 
 	// special EventSPN components
 
@@ -177,8 +244,46 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
 	l_pcAttr->SetGlobalShow();
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-	l_pcGrAttr->SetOffsetX(25);
-	l_pcGrAttr->SetOffsetY(20);
+	//l_pcGrAttr->SetOffsetX(25);
+	//l_pcGrAttr->SetOffsetY(20);
+
+	//adjust positioning offset of name graphic att of immediate transitions
+	/////////////////////////////////////////////////
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+        wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+        wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+        wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+        l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+
+		if(l_sNetClass.IsSameAs(SP_DS_SPN_CLASS) && l_sNodeType.IsSameAs(wxT("Immediate Transition")))
+		 {
+
+			SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+					(*it)->SetOffsetX((itMap)->second);
+
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+
+				}
+
+			}
+			}
+	}
+
+	/////////////////////////////////////////////////
+
+
+
 
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));
@@ -245,8 +350,43 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
 	l_pcAttr->SetGlobalShow();
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-	l_pcGrAttr->SetOffsetX(25);
-	l_pcGrAttr->SetOffsetY(20);
+	//l_pcGrAttr->SetOffsetX(25);
+	//l_pcGrAttr->SetOffsetY(20);
+
+	//adjust positioning offset of name graphic att of Deterministic Transition
+	/////////////////////////////////////////////////
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+        wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+        wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+        wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+        l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+
+		if(l_sNetClass.IsSameAs(SP_DS_SPN_CLASS) && l_sNodeType.IsSameAs(wxT("Deterministic Transition")))
+		 {
+
+			SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+					(*it)->SetOffsetX((itMap)->second);
+
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+
+				}
+
+			}
+			}
+	}
+
+	/////////////////////////////////////////////////
 
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));
@@ -312,8 +452,44 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
 	l_pcAttr->SetGlobalShow();
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-	l_pcGrAttr->SetOffsetX(25);
-	l_pcGrAttr->SetOffsetY(20);
+	//l_pcGrAttr->SetOffsetX(25);
+	//l_pcGrAttr->SetOffsetY(20);
+
+	//adjust positioning offset of name graphic att of Scheduled Transitio
+	/////////////////////////////////////////////////
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+        wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+        wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+        wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+        l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+
+		if(l_sNetClass.IsSameAs(SP_DS_SPN_CLASS) && l_sNodeType.IsSameAs(wxT("Scheduled Transition")))
+		 {
+
+			SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+					(*it)->SetOffsetX((itMap)->second);
+
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+
+				}
+
+			}
+			}
+	}
+
+	/////////////////////////////////////////////////
+
 
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));

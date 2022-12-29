@@ -39,6 +39,7 @@ private:
 	double DELTA = 500;
 	// standard offset
 	double STD_OFFSET = 20;
+	map<wxString,SP_SetString> m_mClasses2Nodes;
 
 
 protected:
@@ -122,6 +123,16 @@ public:
 	void setStdOffset(double stdOffset)
 	{
 		STD_OFFSET = stdOffset;
+	}
+
+	void setNetClassesMap(map<wxString,SP_SetString> p_mClasses2Nodes)
+	{
+		m_mClasses2Nodes = p_mClasses2Nodes;
+	}
+
+	map<wxString,SP_SetString> getNetClassesMap()
+	{
+		return m_mClasses2Nodes;
 	}
 
 };

@@ -85,7 +85,7 @@ SP_DS_FaultTree::SP_DS_FaultTree(const wxString& p_pchName)
 }
 
 SP_DS_Graph*
-SP_DS_FaultTree::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_FaultTree::CreateGraph(SP_DS_Graph* p_pcGraph,SP_MapString2Int p_mapAttributeValue )
 {
     if (!SP_DS_SimpleGraph::CreateGraph(p_pcGraph))
         return NULL;

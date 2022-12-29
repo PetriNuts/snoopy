@@ -88,6 +88,9 @@ SP_DS_ExtPT(SP_DS_HYBRIDPN_CLASS)
 	wxGetApp().GetElementPrefs()->RegisterNodeclass(GetName(), wxT("Continuous Place"));
 	wxGetApp().GetElementPrefs()->RegisterNodeclass(GetName(), wxT("Discrete Transition"));
 	wxGetApp().GetElementPrefs()->RegisterNodeclass(GetName(), wxT("Continuous Transition"));
+	wxGetApp().GetElementPrefs()->RegisterNodeclass( GetName(), wxT("Immediate Transition") );
+	wxGetApp().GetElementPrefs()->RegisterNodeclass( GetName(), wxT("Deterministic Transition") );
+	wxGetApp().GetElementPrefs()->RegisterNodeclass( GetName(), wxT("Scheduled Transition") );
 	wxGetApp().GetElementPrefs()->RegisterNodeclass(GetName(), SP_DS_PARAM);
 
 }
@@ -106,7 +109,7 @@ SP_DS_ExtPT(p_pchName)
 
 }
 
-SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph,SP_MapString2Int p_mapAttribute2Value)
 {
 
 	SP_DS_Attribute* l_pcAttr;
@@ -128,6 +131,42 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
+
+	//adjust positioning offset of name graphic att of Deterministic Transition
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+		wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+		wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+		wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+		l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+
+		if(l_sNetClass.IsSameAs(SP_DS_HYBRIDPN_CLASS) && l_sNodeType.IsSameAs(wxT("Place")))
+		 {
+
+			SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+
+					(*it)->SetOffsetX((itMap)->second);
+
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+
+				}
+
+			}
+			}
+	}
+
+
   	//==============================================================================================================
   	/*
      * Continuous Place
@@ -136,18 +175,63 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcNC->SetShortcut(wxT("Shift+P"));
   	 l_pcNC->SetDisplayName(wxT("Continuous Place"));
 
+
+  	//l_pcNC = p_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE );
+
+  	//SP_MESSAGEBOX(wxT("cont"));
+
+
+
 	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));
 	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
-	
+
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_BoolAttribute(wxT("Fixed"), FALSE));//Fixed
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogBool(wxT("General"), 1));
 
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_NameAttribute(wxT("Name")));
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
   	 l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-  	 l_pcGrAttr->SetOffsetY(20);
+  	  //l_pcGrAttr->SetOffsetY(20);
   	 l_pcGrAttr->SetShow(TRUE);
   	 l_pcAttr->SetGlobalShow();
+
+
+  	//adjust positioning offset of name graphic att of Continuous Place
+  		for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+  		{
+  			wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+  			wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+  			wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+  			l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+
+  			if(l_sNetClass.IsSameAs(SP_DS_HYBRIDPN_CLASS) && l_sNodeType.IsSameAs(wxT("Continuous Place")))
+  			 {
+  	           if(!l_pcNC) break;
+
+  				SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+
+  				for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+  				{
+  					if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+  					{
+
+  						(*it)->SetOffsetX((itMap)->second);
+
+  					}
+  					else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+  					{
+  						(*it)->SetOffsetY((itMap)->second);
+
+  					}
+
+  				}
+  				}
+  		}
+
+
+
 
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));
@@ -208,6 +292,42 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	l_pcColList->SetCell(l_nNewRow, 0, wxT("Main"));
   	l_pcColList->SetCell(l_nNewRow, 1, wxT("MassAction(1)"));
 
+	//adjust positioning offset of name graphic att of Stochastic Transition
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+		wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+		wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+		wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+		l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+		//SP_LOGMESSAGE(l_sNodeType);
+
+		if(l_sNetClass.IsSameAs(SP_DS_HYBRIDPN_CLASS) && l_sNodeType.IsSameAs(wxT("Transition")))
+		 {
+		   if(!l_pcNC) break;
+
+		   SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+		  if(!pc_ListAtt) break;
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+					(*it)->SetOffsetX((itMap)->second);
+
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+
+				}
+
+			}
+			}
+	}
+
+
   	//Reorder net elements
   	l_pcNC=p_pcGraph->RemoveNodeclass(l_pcNC);
   	p_pcGraph->AddNodeclass(l_pcNC);
@@ -229,8 +349,44 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General"), 1));
   	 l_pcAttr->SetGlobalShow();
   	 l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-  	 l_pcGrAttr->SetOffsetX(25);
-  	 l_pcGrAttr->SetOffsetY(20);
+  	// l_pcGrAttr->SetOffsetX(25);
+  	// l_pcGrAttr->SetOffsetY(20);
+
+ 	//adjust positioning offset of name graphic att of Continuous Transition
+ 	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+ 	{
+ 		wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+ 		wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+ 		wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+ 		l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+ 		//SP_LOGMESSAGE(l_sNodeType);
+
+ 		if(l_sNetClass.IsSameAs(SP_DS_HYBRIDPN_CLASS) && l_sNodeType.IsSameAs(wxT("Continuous Transition")))
+ 		 {
+ 		   if(!l_pcNC) break;
+
+ 		   SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+ 		  if(!pc_ListAtt) break;
+
+ 			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+ 			{
+ 				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+ 				{
+ 					(*it)->SetOffsetX((itMap)->second);
+
+ 				}
+ 				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+ 				{
+ 					(*it)->SetOffsetY((itMap)->second);
+
+ 				}
+
+ 			}
+ 			}
+ 	}
+
 
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));
@@ -285,8 +441,47 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
 	
 
   	 l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-  	 l_pcGrAttr->SetOffsetX(25);
-  	 l_pcGrAttr->SetOffsetY(20);
+  	 //l_pcGrAttr->SetOffsetX(25);
+  	 //l_pcGrAttr->SetOffsetY(20);
+
+
+  	//adjust positioning offset of name graphic att of Immediate Transition
+  	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+  	{
+  		wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+  		wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+  		wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+  		l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+  		//SP_LOGMESSAGE(l_sNodeType);
+
+  		if(l_sNetClass.IsSameAs(SP_DS_HYBRIDPN_CLASS) && l_sNodeType.IsSameAs(wxT("Immediate Transition")))
+  		 {
+  		   if(!l_pcNC) break;
+
+  		   SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+  		  if(!pc_ListAtt) break;
+
+  			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+  			{
+  				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+  				{
+  					(*it)->SetOffsetX((itMap)->second);
+
+  				}
+  				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+  				{
+  					(*it)->SetOffsetY((itMap)->second);
+
+  				}
+
+  			}
+  			}
+  	}
+
+
+
 
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));
@@ -354,8 +549,42 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcAttr->SetGlobalShow();
 
   	 l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-  	 l_pcGrAttr->SetOffsetX(25);
-  	 l_pcGrAttr->SetOffsetY(20);
+  	 //l_pcGrAttr->SetOffsetX(25);
+  	 //l_pcGrAttr->SetOffsetY(20);
+
+   	//adjust positioning offset of name graphic att of Deterministic Transition
+   	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+   	{
+   		wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+   		wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+   		wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+   		l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+   		//SP_LOGMESSAGE(l_sNodeType);
+
+   		if(l_sNetClass.IsSameAs(SP_DS_HYBRIDPN_CLASS) && l_sNodeType.IsSameAs(wxT("Deterministic Transition")))
+   		 {
+   		   if(!l_pcNC) break;
+
+   		   SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+   		  if(!pc_ListAtt) break;
+
+   			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+   			{
+   				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+   				{
+   					(*it)->SetOffsetX((itMap)->second);
+
+   				}
+   				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+   				{
+   					(*it)->SetOffsetY((itMap)->second);
+   				}
+
+   			}
+   			}
+   	}
 
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));
@@ -418,8 +647,46 @@ SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
   	 l_pcAttr->SetGlobalShow();
 
   	 l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-  	 l_pcGrAttr->SetOffsetX(25);
-  	 l_pcGrAttr->SetOffsetY(20);
+  	 //l_pcGrAttr->SetOffsetX(25);
+  	 //l_pcGrAttr->SetOffsetY(20);
+   	//adjust positioning offset of name graphic att of Scheduled Transition
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+		wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+		wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+		wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+		l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+		//SP_LOGMESSAGE(l_sNodeType);
+
+		if(l_sNetClass.IsSameAs(SP_DS_HYBRIDPN_CLASS) && l_sNodeType.IsSameAs(SP_DS_SCHEDULED_TRANS))
+		 {
+		   if(!l_pcNC) break;
+
+		   SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+		  if(!pc_ListAtt) break;
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+					(*it)->SetOffsetX((itMap)->second);
+
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+				}
+
+			}
+			}
+	}
+
+
+
+
+
   	 l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));
   	 l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));
   	 l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_NumberAttribute(l_pcAttr, wxT("_st%_")));

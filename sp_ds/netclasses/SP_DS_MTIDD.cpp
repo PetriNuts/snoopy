@@ -58,7 +58,7 @@ SP_DS_MTIDD::SP_DS_MTIDD(const wxString& p_pchName)
 }
 
 SP_DS_Graph*
-SP_DS_MTIDD::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_MTIDD::CreateGraph(SP_DS_Graph* p_pcGraph,SP_MapString2Int p_mapAttributeValue )
 {
     if (!SP_DS_SimpleGraph::CreateGraph(p_pcGraph))
         return NULL;

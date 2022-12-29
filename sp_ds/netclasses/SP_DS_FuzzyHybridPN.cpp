@@ -106,7 +106,7 @@ SP_DS_FuzzyHybridPN::SP_DS_FuzzyHybridPN(const wxString& p_pchName) :
 
 }
 
-SP_DS_Graph* SP_DS_FuzzyHybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_Graph* SP_DS_FuzzyHybridPN::CreateGraph(SP_DS_Graph* p_pcGraph,SP_MapString2Int p_mapAttributeValue )
 {
 
 	

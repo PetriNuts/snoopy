@@ -17,7 +17,7 @@ public:
     SP_DS_TimePT();
     SP_DS_TimePT(const wxString& p_pchName);
 
-    virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGraph);
+    virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mapAttributeValue = SP_MapString2Int());
 
 };
 

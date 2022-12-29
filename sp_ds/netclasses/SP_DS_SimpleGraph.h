@@ -19,7 +19,7 @@ public:
     SP_DS_SimpleGraph();
     SP_DS_SimpleGraph(const wxString& p_pchName);
 
-    virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGraph);
+    virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mapAttributeValue = SP_MapString2Int());
     virtual bool CreateInitialElements(SP_DS_Graph* p_pcGraph);
     virtual bool MetadataRequirement(SP_DS_Metadata* p_pcMetadata);
 };

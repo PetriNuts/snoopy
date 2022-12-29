@@ -416,6 +416,151 @@ int SP_GPR_Elements::GetNodeWidth(const wxString& p_sNetClass, const wxString& p
 }
 
 
+void SP_GPR_Elements::SetNameAttPosX(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal)
+{
+	wxString l_sKey = p_sNetClass + wxT("|") + p_sNodeClass;
+	map<wxString, SP_SetString>::iterator itNC = m_mlClassNodes.find(p_sNetClass);
+
+	if (itNC != m_mlClassNodes.end())
+	{
+		if (((*itNC).second).find(p_sNodeClass) != ((*itNC).second).end())
+		{
+			if (p_nVal >= NODE_POSX_MIN && p_nVal <= NODE_POSX_MAX)
+			{
+				m_mnGraphicAttrPosX[l_sKey] = p_nVal;
+			}
+			else
+				{m_mnGraphicAttrPosX[l_sKey] = DEFAULT_NAME_ATT_OFFSET_X; p_nVal = DEFAULT_NAME_ATT_OFFSET_X;}
+		}
+	}
+
+	if(!SP_Core::Instance()->GetRootDocument()) return;
+
+    SP_DS_Graph* m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+
+    if(m_pcGraph==NULL) return;
+	//set the att value
+   SP_DS_Nodeclass* l_pcNodeclass;
+
+   if(p_sNodeClass== wxT("Continuous Transition"))
+			l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Transition, Continuous"));
+   else if(p_sNodeClass == wxT("Continuous Place"))
+			 l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Place, Continuous"));
+   else if(p_sNodeClass == wxT("Discrete Place"))
+			 l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Place"));
+   else if(p_sNodeClass == wxT("Discrete Transition"))
+			 l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Transition"));
+   else if (p_sNodeClass.Contains(wxT("Immediate")))
+			 l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_IMMEDIATE_TRANS);
+   else if (p_sNodeClass.Contains(wxT("Scheduled")))
+			 l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS);
+   else
+   //SP_DS_DISCRETE_PLACE
+   l_pcNodeclass = m_pcGraph->GetNodeclass(p_sNodeClass);
+
+   if (l_pcNodeclass) {
+			  SP_ListGraphic* pc_listAttgraph = l_pcNodeclass->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+			  for (auto it = pc_listAttgraph->begin(); it != pc_listAttgraph->end(); ++it) {
+			     (*it)->SetOffsetX(p_nVal);
+			  }
+
+   }
+
+
+
+}
+
+
+int SP_GPR_Elements::GetNameAttPosX(const wxString& p_sNetClass, const wxString& p_sNodeClass)
+{
+	wxString l_sKey = wxString::Format(wxT("%s|%s"), p_sNetClass.c_str(), p_sNodeClass.c_str());
+	SP_MapString2Int::iterator l_it = m_mnGraphicAttrPosX.find(l_sKey);
+	if(l_it != m_mnGraphicAttrPosX.end())
+	{
+		if (l_it->second >= NODE_POSX_MIN)
+		{
+			return l_it->second;
+		}
+	}
+
+	return DEFAULT_NAME_ATT_OFFSET_X;
+}
+
+
+void SP_GPR_Elements::SetNameAttPosY(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal)
+{
+	wxString l_sKey = p_sNetClass + wxT("|") + p_sNodeClass;
+	map<wxString, SP_SetString>::iterator itNC = m_mlClassNodes.find(p_sNetClass);
+
+	if (itNC != m_mlClassNodes.end())
+	{
+		if (((*itNC).second).find(p_sNodeClass) != ((*itNC).second).end())
+		{
+			if (p_nVal >= NODE_POSX_MIN && p_nVal <= NODE_POSX_MAX)
+			{
+				m_mnGraphicAttrPosY[l_sKey] = p_nVal;
+			}
+			else
+			{
+				m_mnGraphicAttrPosY[l_sKey] = DEFAULT_NAME_ATT_OFFSET_Y;
+				p_nVal = DEFAULT_NAME_ATT_OFFSET_Y;
+			}
+
+		}
+	}
+	/////////////////////////
+	if(!SP_Core::Instance()->GetRootDocument()) return;
+
+	//apply the value
+	SP_DS_Graph* m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+
+    if(m_pcGraph==NULL) return;
+
+   SP_DS_Nodeclass* l_pcNodeclass;
+
+   if(p_sNodeClass== wxT("Continuous Transition"))
+			l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Transition, Continuous"));
+   else if(p_sNodeClass == wxT("Continuous Place"))
+			 l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Place, Continuous"));
+   else if(p_sNodeClass == wxT("Discrete Place"))
+			 l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Place"));
+   else if(p_sNodeClass == wxT("Discrete Transition"))
+			 l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Transition"));
+   else if (p_sNodeClass.Contains(wxT("Immediate")))
+			 l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_IMMEDIATE_TRANS);
+   else if (p_sNodeClass.Contains(wxT("Scheduled")))
+			 l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS);
+   else
+   //SP_DS_DISCRETE_PLACE
+   l_pcNodeclass = m_pcGraph->GetNodeclass(p_sNodeClass);
+
+   if (l_pcNodeclass) {
+			  SP_ListGraphic* pc_listAttgraph = l_pcNodeclass->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+			  for (auto it = pc_listAttgraph->begin(); it != pc_listAttgraph->end(); ++it) {
+				  (*it)->SetOffsetY(p_nVal);
+			  }
+
+   }
+
+}
+
+
+int SP_GPR_Elements::GetNameAttPosY(const wxString& p_sNetClass, const wxString& p_sNodeClass)
+{
+	wxString l_sKey = wxString::Format(wxT("%s|%s"), p_sNetClass.c_str(), p_sNodeClass.c_str());
+	SP_MapString2Int::iterator l_it = m_mnGraphicAttrPosY.find(l_sKey);
+	if(l_it != m_mnGraphicAttrPosY.end())
+	{
+		if (l_it->second >= NODE_POSX_MIN)
+		{
+			return l_it->second;
+		}
+	}
+
+	return DEFAULT_NAME_ATT_OFFSET_Y;
+}
+
+
 int SP_GPR_Elements::GetNodeThickness(const wxString& p_sNetClass, const wxString& p_sNodeClass)
 {
 	wxString l_sKey = p_sNetClass + wxT("|") + p_sNodeClass;
@@ -588,6 +733,8 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 	m_mcpExpression.clear();
 	m_mcbDotExpressionShow.clear();
 	m_mscThickness.clear();//by george
+	m_mscGraphic_att_pos_x.clear();//by george
+	m_mscGraphic_att_pos_y.clear();//by george
 
 
 	//add some space at top
@@ -629,6 +776,8 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			int SP_ID_WIDTH = -1;
 			int SP_ID_HEIGHT = -1;
 			int SP_ID_THICKNESS = -1;//by george
+			int SP_ID_NAME_ATT_POS_X = -1;
+			int SP_ID_NAME_ATT_POS_Y = -1;
 
 			//there are pre-defined shapes for transitions which are added here
 			if ((p_sNetClass.CmpNoCase(SP_DS_PN_CLASS) == 0 ||
@@ -667,6 +816,23 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Width (pt):")), 0, wxALL, 4);
 			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Height (pt):")), 0, wxALL, 4);
 			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Thickness (pt):")), 0, wxALL, 4);
+
+			if(!(*itN == wxT("Discrete Place") || *itN == wxT("Discrete Transition") || *itN == wxT("Parameter") || *itN == wxT("LookupTable")))
+			{
+				helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Name Attribute Offset X (pt):")), 0, wxALL, 4);
+				helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Name Attribute Offset Y (pt):")), 0, wxALL, 4);
+			}
+			else if (p_sNetClass.Contains(wxT("Hybrid")))
+			{
+				if(!(*itN == wxT("Parameter") || *itN == wxT("LookupTable")))
+				{
+					helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Name Attribute Offset X (pt):")), 0, wxALL, 4);
+				    helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Name Attribute Offset Y (pt):")), 0, wxALL, 4);
+				}
+
+			}
+
+
 			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Fixed Size:")), 0, wxALL, 4);
 
 			if ((p_sNetClass.CmpNoCase(SP_DS_COLSPN_CLASS) == 0 ||			    
@@ -705,6 +871,27 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 
 			m_mscThickness[*itN] = new wxSpinCtrl(p_pcPage, SP_ID_THICKNESS, wxString::Format(wxT("%d"), GetNodeThickness(p_sNetClass, *itN)), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, NODE_DIM_MIN, NODE_DIM_MAX, GetNodeThickness(p_sNetClass, *itN));//by george
 			helpSizer->Add(m_mscThickness[*itN], 0, wxLEFT | wxRIGHT, 5);
+
+			if(!(*itN == wxT("Discrete Place") || *itN == wxT("Discrete Transition") || *itN == wxT("Parameter") || *itN == wxT("LookupTable"))){
+
+				//m_mscGraphic_att_pos_x[*itN] = new wxSpinCtrl(p_pcPage,SP_ID_NAME_ATT_POS_X, wxString::Format("%d"),GetNameAttPosX(p_sNetClass, *itN)), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, NODE_DIM_MIN, NODE_DIM_MAX, GetNameAttPosX(p_sNetClass, *itN));//by george
+				m_mscGraphic_att_pos_x[*itN] = new wxSpinCtrl(p_pcPage, SP_ID_NAME_ATT_POS_X, wxString::Format(wxT("%d"), GetNameAttPosX(p_sNetClass, *itN)), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, NODE_POSX_MIN, NODE_POSX_MAX, GetNameAttPosX(p_sNetClass, *itN));//by george
+				helpSizer->Add(m_mscGraphic_att_pos_x[*itN], 0, wxLEFT | wxRIGHT, 5);
+
+				m_mscGraphic_att_pos_y[*itN] = new wxSpinCtrl(p_pcPage, SP_ID_NAME_ATT_POS_Y, wxString::Format(wxT("%d"), GetNameAttPosY(p_sNetClass, *itN)), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, NODE_POSX_MIN, NODE_POSX_MAX, GetNameAttPosY(p_sNetClass, *itN));//by george
+				helpSizer->Add(m_mscGraphic_att_pos_y[*itN], 0, wxLEFT | wxRIGHT, 5);
+			}
+			else if (p_sNetClass.Contains(wxT("Hybrid")))
+			{
+				if(!(*itN == wxT("Parameter") || *itN == wxT("LookupTable")))
+				{
+					m_mscGraphic_att_pos_x[*itN] = new wxSpinCtrl(p_pcPage, SP_ID_NAME_ATT_POS_X, wxString::Format(wxT("%d"), GetNameAttPosX(p_sNetClass, *itN)), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, NODE_POSX_MIN, NODE_POSX_MAX, GetNameAttPosX(p_sNetClass, *itN));//by george
+					helpSizer->Add(m_mscGraphic_att_pos_x[*itN], 0, wxLEFT | wxRIGHT, 5);
+
+					m_mscGraphic_att_pos_y[*itN] = new wxSpinCtrl(p_pcPage, SP_ID_NAME_ATT_POS_Y, wxString::Format(wxT("%d"), GetNameAttPosY(p_sNetClass, *itN)), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, NODE_POSX_MIN, NODE_POSX_MAX, GetNameAttPosY(p_sNetClass, *itN));//by george
+					helpSizer->Add(m_mscGraphic_att_pos_y[*itN], 0, wxLEFT | wxRIGHT, 5);
+				}
+			}
 
 			wxCheckBox* l_pcCheckBox = new wxCheckBox(p_pcPage, -1, wxT(""));
 			l_pcCheckBox->SetValue(GetNodeFixed(p_sNetClass, *itN));
@@ -846,6 +1033,8 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 				}
 			}
 			l_pcSizer->Add(m_LineListBox, 0, wxEXPAND | wxALL, 5);
+
+
 		}
 		if (p_sNetClass.CmpNoCase(SP_DS_FREESTYLE_CLASS) == 0)
 		{
@@ -1015,6 +1204,14 @@ bool SP_GPR_Elements::OnDialogOk(const wxString& p_sNetClass)
 				wxTheColourDatabase->AddColour(l_sColor, l_SelColour);
 				SetGuardColor(p_sNetClass, *itN, l_sColor);
 			}
+
+			if(!(*itN == wxT("Discrete Place") || *itN == wxT("Discrete Transition") || *itN == wxT("Parameter") || *itN == wxT("LookupTable")))
+			{
+				SetNameAttPosX(p_sNetClass, *itN, m_mscGraphic_att_pos_x[*itN]->GetValue());
+
+				SetNameAttPosY(p_sNetClass, *itN, m_mscGraphic_att_pos_y[*itN]->GetValue());
+
+			}
 		}
 		if (p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0)
 		{
@@ -1174,6 +1371,13 @@ bool SP_GPR_Elements::UpdateFromConfig(wxConfig& p_config)
 			p_config.Read(wxString::Format(wxT("%s//%s_Fixed"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), &tempInt, DEFAULT_FIXED);
 			m_mbFixedSize[l_sKey] = tempInt;
 
+
+			p_config.Read(wxString::Format(wxT("%s//%s_NameAttPosX"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), &tempInt, DEFAULT_NAME_ATT_OFFSET_X);
+			m_mnGraphicAttrPosX[l_sKey] = tempInt;
+
+			p_config.Read(wxString::Format(wxT("%s//%s_NameAttPosY"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), &tempInt, DEFAULT_NAME_ATT_OFFSET_Y);
+			m_mnGraphicAttrPosY[l_sKey] = tempInt;
+
 			if(l_sCurrentClass.Find(wxT("Colored")) != wxNOT_FOUND)
 			{
 				if( l_sCurrentNode.Find(wxT("Place")) != wxNOT_FOUND )
@@ -1220,6 +1424,8 @@ bool SP_GPR_Elements::UpdateFromConfig(wxConfig& p_config)
 	return true;
 }
 
+
+
 bool SP_GPR_Elements::WriteToConfig(wxConfig& p_config)
 {
 	//temps for reading values from config
@@ -1239,6 +1445,8 @@ bool SP_GPR_Elements::WriteToConfig(wxConfig& p_config)
 			p_config.Write(wxString::Format(wxT("%s//%s_Width"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), (long) m_mnWidth[l_sKey]);
 			p_config.Write(wxString::Format(wxT("%s//%s_Height"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), (long) m_mnHeight[l_sKey]);
 			p_config.Write(wxString::Format(wxT("%s//%s_Thickness"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), (long)m_mnThickness[l_sKey]);//by george
+			p_config.Write(wxString::Format(wxT("%s//%s_NameAttPosX"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()),  m_mnGraphicAttrPosX[l_sKey]);
+			p_config.Write(wxString::Format(wxT("%s//%s_NameAttPosY"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()),  m_mnGraphicAttrPosY[l_sKey]);
 			p_config.Write(wxString::Format(wxT("%s//%s_Fixed"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), (long) m_mbFixedSize[l_sKey]);
 
 			if(l_sCurrentClass.Find(wxT("Colored")) != wxNOT_FOUND)
@@ -1253,6 +1461,7 @@ bool SP_GPR_Elements::WriteToConfig(wxConfig& p_config)
 					p_config.Write(wxString::Format(wxT("%s//%s_GuardColor"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()),  m_msGuardColor[l_sKey]);
 				}
 			}
+
 		}
 
 		p_config.Write(wxString::Format(wxT("%s//DesignType"), l_sCurrentClass.c_str()), (long) m_mnDesignType[l_sCurrentClass]);

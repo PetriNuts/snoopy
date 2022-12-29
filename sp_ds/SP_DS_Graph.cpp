@@ -31,6 +31,7 @@
 #include <wx/wupdlock.h>
 
 
+
 SP_DS_Graph::SP_DS_Graph(SP_DS_Netclass* p_pcNetclass)
 :SP_Type(SP_ELEMENT_GRAPH),
 SP_Name(wxT("Graph")),
@@ -46,10 +47,60 @@ m_bIsCopy(FALSE)
 {
 	if (m_pcNetclass)
     {
+
+		map<wxString,int> l_mAttrNetClassGraphic2VAl;
+
+		ReadConfig(m_pcNetclass->GetName(),l_mAttrNetClassGraphic2VAl);
+
+
+		//l_mGraphicsToPosX_AttName[wxT("Stochastic Petri Net|NameAttPosX")] = 90;
 		SetName(m_pcNetclass->GetName());
-        m_pcNetclass->CreateGraph(this);
+        m_pcNetclass->CreateGraph(this, l_mAttrNetClassGraphic2VAl);
         m_pcNetclass->CreateInitialElements(this);
     }
+}
+
+bool SP_DS_Graph::ReadConfig(const wxString& p_sNetClass, map<wxString,int>& p_mGraphicToValue)
+{
+
+	wxConfig config(SP_APP_SHORT_NAME,SP_APP_VENDOR);
+
+	map<wxString,SP_SetString> l_mNetClass2Nodes = wxGetApp().getNetClassesMap();// get map of registered net classes to their elements
+
+	//temps for reading values from config
+		map<wxString, SP_SetString>::iterator itCN;
+		SP_SetString::iterator itN;
+		wxString l_sCurrentClass, l_sCurrentNode, l_sKey;
+		int tempInt;
+		wxString tempString;
+
+		for (itCN = l_mNetClass2Nodes.begin(); itCN != l_mNetClass2Nodes.end(); ++itCN)
+		{
+			l_sCurrentClass = (*itCN).first;
+
+			for (itN = ((*itCN).second).begin(); itN != ((*itCN).second).end(); ++itN)
+			{
+				l_sCurrentNode = (*itN);
+				l_sKey = wxString::Format(wxT("%s|%s"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str());
+
+
+				config.Read(wxString::Format(wxT("%s//%s_NameAttPosX"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), &tempInt, 20);
+				wxString l_sKeyOffsetX;
+				l_sKeyOffsetX<< l_sKey <<wxT("|")<< wxT("NameAttPosX");
+				p_mGraphicToValue[l_sKeyOffsetX] = tempInt;
+
+
+				config.Read(wxString::Format(wxT("%s//%s_NameAttPosY"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), &tempInt, 20);
+
+				wxString l_sKeyOffsetY;
+				l_sKeyOffsetY<< l_sKey<<wxT("|")<< wxT("NameAttPosY");
+				p_mGraphicToValue[l_sKeyOffsetY] = tempInt;
+
+			}
+
+		}
+
+return true;
 }
 
 SP_DS_Graph::~SP_DS_Graph()

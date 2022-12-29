@@ -126,7 +126,7 @@ SP_DS_ColSPN::SP_DS_ColSPN( const wxString& p_pchName )
 
 
 SP_DS_Graph*
-SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
+SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph,SP_MapString2Int p_mapAttribute2Value  )
 {
 
 	if ( ! SP_DS_EventSPN::CreateGraph( p_pcGraph ) ) 
@@ -144,6 +144,48 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->GetNodeclass( wxT("Place") );
+
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+		wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+		wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+		wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+		l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+		//SP_LOGMESSAGE(l_sNodeType);
+
+		if(l_sNetClass.IsSameAs(SP_DS_COLSPN_CLASS) && l_sNodeType.IsSameAs(wxT("Place")))
+		 {
+		   if(!l_pcNC) break;
+
+		   SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+		  if(!pc_ListAtt) break;
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+					(*it)->SetOffsetX((itMap)->second);
+					wxString l_slog;
+					l_slog<<wxT("Offset x for Plce Node: ")<<(itMap)->second;
+					SP_LOGMESSAGE(l_slog);
+
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+					wxString l_slog;
+					l_slog<<wxT("Offset y for Plce Node: ")<<(itMap)->second;
+					SP_LOGMESSAGE(l_slog);
+				}
+
+			}
+			}
+	}
+
+
+
 
 	// animator
 	l_pcNC->AddAnimator( new SP_DS_ColStPlaceAnimator( wxT("Marking") ) );
@@ -188,6 +230,47 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->GetNodeclass( wxT("Transition") );
+
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+		{
+			wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+			wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+			wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+			l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+			//SP_LOGMESSAGE(l_sNodeType);
+
+			if(l_sNetClass.IsSameAs(SP_DS_COLSPN_CLASS) && l_sNodeType.IsSameAs(wxT("Transition")))
+			 {
+			   if(!l_pcNC) break;
+
+			   SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+			  if(!pc_ListAtt) break;
+
+				for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+				{
+					if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+					{
+						(*it)->SetOffsetX((itMap)->second);
+						wxString l_slog;
+						l_slog<<wxT("Offset x for Transition Node: ")<<(itMap)->second;
+						SP_LOGMESSAGE(l_slog);
+
+
+					}
+					else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+					{
+						(*it)->SetOffsetY((itMap)->second);
+						wxString l_slog;
+						l_slog<<wxT("Offset y for Transition Node: ")<<(itMap)->second;;
+					     SP_LOGMESSAGE(l_slog);
+					}
+
+				}
+				}
+		}
+
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcAttr = l_pcNC->GetPrototype()->GetAttribute( wxT("FunctionList") );	
 	l_pcAttr->RegisterDialogWidget( new SP_WDG_ColStFunctionList( wxT("Functions") ) );
@@ -226,6 +309,47 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->GetNodeclass( wxT("Immediate Transition") );
+
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+			{
+				wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+				wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+				wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+				l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+				//SP_LOGMESSAGE(l_sNodeType);
+
+				if(l_sNetClass.IsSameAs(SP_DS_COLSPN_CLASS) && l_sNodeType.IsSameAs(wxT("Immediate Transition")))
+				 {
+				   if(!l_pcNC) break;
+
+				   SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+				  if(!pc_ListAtt) break;
+
+					for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+					{
+						if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+						{
+							(*it)->SetOffsetX((itMap)->second);
+							wxString l_slog;
+							l_slog<<wxT("Offset x for Immediate Transition Node: ")<<(itMap)->second;
+							SP_LOGMESSAGE(l_slog);
+
+
+						}
+						else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+						{
+							(*it)->SetOffsetY((itMap)->second);
+							wxString l_slog;
+							l_slog<<wxT("Offset y for Immediate Transition Node: ")<<(itMap)->second;
+						     SP_LOGMESSAGE(l_slog);
+						}
+
+					}
+					}
+			}
+
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcAttr = l_pcNC->GetPrototype()->GetAttribute( wxT("FunctionList") );	
 	l_pcAttr->RegisterDialogWidget( new SP_WDG_ColStFunctionList( wxT("Weight") ) );
@@ -264,6 +388,48 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->GetNodeclass( wxT("Deterministic Transition") );
+
+
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+		{
+			wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+			wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+			wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+			l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+			//SP_LOGMESSAGE(l_sNodeType);
+
+			if(l_sNetClass.IsSameAs(SP_DS_COLSPN_CLASS) && l_sNodeType.IsSameAs(wxT("Deterministic Transition")))
+			 {
+			   if(!l_pcNC) break;
+
+			   SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+			  if(!pc_ListAtt) break;
+
+				for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+				{
+					if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+					{
+						(*it)->SetOffsetX((itMap)->second);
+						wxString l_slog;
+						l_slog<<wxT("Offset x for Deterministic Transition Node: ")<<(itMap)->second;
+						SP_LOGMESSAGE(l_slog);
+
+
+					}
+					else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+					{
+						(*it)->SetOffsetY((itMap)->second);
+						wxString l_slog;
+						l_slog<<wxT("Offset y for Deterministic Transition Node: ")<<(itMap)->second;
+					     SP_LOGMESSAGE(l_slog);
+					}
+
+				}
+				}
+		}
+
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcAttr = l_pcNC->GetPrototype()->GetAttribute( wxT("DelayList") );
 	l_pcAttr->RegisterDialogWidget( new SP_WDG_DialogColList( wxT("Delay") ) );
@@ -303,6 +469,46 @@ SP_DS_ColSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->GetNodeclass( wxT("Scheduled Transition") );
+
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+		{
+			wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+			wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+			wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+			l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+			//SP_LOGMESSAGE(l_sNodeType);
+
+			if(l_sNetClass.IsSameAs(SP_DS_COLSPN_CLASS) && l_sNodeType.IsSameAs(wxT("Scheduled Transition")))
+			 {
+			   if(!l_pcNC) break;
+
+			   SP_ListGraphic* pc_ListAtt= l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+			  if(!pc_ListAtt) break;
+
+				for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+				{
+					if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+					{
+						(*it)->SetOffsetX((itMap)->second);
+						wxString l_slog;
+						l_slog<<wxT("Offset x for Scheduled Transition Node: ")<<(itMap)->second;
+						SP_LOGMESSAGE(l_slog);
+
+
+					}
+					else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+					{
+						(*it)->SetOffsetY((itMap)->second);
+						wxString l_slog;
+						l_slog<<wxT("Offset y for Scheduled Transition Node: ")<<(itMap)->second;
+					     SP_LOGMESSAGE(l_slog);
+					}
+
+				}
+				}
+		}
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcAttr = l_pcNC->GetPrototype()->GetAttribute( wxT("PeriodicList") );
 	l_pcAttr->RegisterDialogWidget( new SP_WDG_DialogColList( wxT("Periodic") ) );

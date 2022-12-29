@@ -51,7 +51,7 @@ SP_DS_ExtPT::SP_DS_ExtPT(const wxString& p_pchName) :
 }
 
 SP_DS_Graph*
-SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph)
+SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph,SP_MapString2Int p_mapAttribute2Value )
 {
 	if (!SP_DS_SimplePed::CreateGraph(p_graph))
 		return NULL;
@@ -64,6 +64,46 @@ SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph)
 
 	//////////////////////////////////////////////////////////////////////////////
 	nc = p_graph->GetNodeclass(wxT("Place"));
+	 //adjust positioning offset of name graphic att of  Place
+		for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+		{
+			wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+			wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+			wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+			l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+			if(l_sNetClass.IsSameAs(SP_DS_EXTPN_CLASS) && l_sNodeType.IsSameAs(wxT("Place")))
+			 {
+			   if(!nc) break;
+
+			   SP_ListGraphic* pc_ListAtt= nc->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+			  if(!pc_ListAtt) break;
+
+				for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+				{
+					if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+					{
+						(*it)->SetOffsetX((itMap)->second);
+						//wxString l_slog;
+						//l_slog<<wxT("offset on x of  Place is")<<(itMap)->second;
+						//SP_LOGMESSAGE(l_slog);
+
+					}
+					else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+					{
+						(*it)->SetOffsetY((itMap)->second);
+						//wxString l_slog;
+						// l_slog<<wxT("offset on y of  Place is")<<(itMap)->second;
+						//SP_LOGMESSAGE(l_slog);
+					}
+
+				}
+				}
+		}
+
+
+	///////////////////////
 	attr = nc->AddAttribute(new SP_DS_BoolAttribute(wxT("Fixed"), FALSE));//Fixed
 	attr->RegisterDialogWidget(new SP_WDG_DialogBool(wxT("General")));
 
@@ -79,6 +119,46 @@ SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph)
 	attr->RegisterDialogWidget(new SP_WDG_DialogChoice(wxT("General")));
 
 	nc = p_graph->GetNodeclass(wxT("Transition"));
+	//adjust positioning offset of name graphic att of  Transition
+	for(auto itMap=p_mapAttribute2Value.begin();itMap!= p_mapAttribute2Value.end();++itMap)
+	{
+		wxString l_sNetClass = (itMap)->first.BeforeFirst('|');
+		wxString l_sGraphicAttribute= (itMap)->first.AfterLast(wxChar('|'));
+		wxString l_sNodeType = (itMap)->first.AfterFirst(wxChar('|'));
+		l_sNodeType = l_sNodeType.BeforeFirst(wxT('|'));
+
+		if(l_sNetClass.IsSameAs(SP_DS_EXTPN_CLASS) && l_sNodeType.IsSameAs(wxT("Transition")))
+		 {
+		   if(!nc) break;
+
+		   SP_ListGraphic* pc_ListAtt= nc->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+
+		  if(!pc_ListAtt) break;
+
+			for(auto it=pc_ListAtt->begin();it!=pc_ListAtt->end();++it)
+			{
+				if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosX")))
+				{
+					(*it)->SetOffsetX((itMap)->second);
+					//wxString l_slog;
+					//l_slog<<wxT("offset on x of  Transition is")<<(itMap)->second;
+					//SP_LOGMESSAGE(l_slog);
+
+				}
+				else if(l_sGraphicAttribute.IsSameAs(wxT("NameAttPosY")))
+				{
+					(*it)->SetOffsetY((itMap)->second);
+					//wxString l_slog;
+					// l_slog<<wxT("offset on y of  Transition is")<<(itMap)->second;
+					//SP_LOGMESSAGE(l_slog);
+				}
+
+			}
+			}
+	}
+
+
+		///////////////////////
 	nc->AddAnimator(new SP_DS_ExtPTTransAnimator());
 
 	attr = nc->AddAttribute(new SP_DS_NodeTypeAttribute(wxT("Node Type")));//by george

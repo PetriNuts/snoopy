@@ -1567,6 +1567,8 @@ bool Snoopy::OnInit()
 	ReadOptions();
 	wxOGLInitialize();
 
+	setNetClassesMap(m_pcElementPrefs->GetNetClassMap());//george
+
 	m_pcMainframe = new SP_GUI_Mainframe(
 			m_pcDocmanager,
 			NULL,

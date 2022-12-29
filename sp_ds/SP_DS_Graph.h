@@ -177,6 +177,8 @@ public:
 	bool Update();
 
 	SP_DS_FunctionRegistry* GetFunctionRegistry();
+
+	bool ReadConfig(const wxString& p_sNetClass, map<wxString,int>& p_mGraphicToValue);
 };
 
 #endif // __SP_DS_GRAPH_H__
