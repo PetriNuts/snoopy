@@ -80,7 +80,7 @@ SP_DS_ExtendedFaultTree::SP_DS_ExtendedFaultTree(const wxString& p_pchName)
 }
 
 SP_DS_Graph*
-SP_DS_ExtendedFaultTree::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_ExtendedFaultTree::CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap)
 {
     if (!SP_DS_FaultTree::CreateGraph(p_pcGraph))
         return NULL;

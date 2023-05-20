@@ -461,7 +461,9 @@ void fuzzification::FuzzyReasoning::DoSamplePointsCombination(double calpha)
 							long g = pow(m_nDiscPoints, count - 1);
 							for (int nn = 0; nn < g; nn++)
 							{
-
+								if (set[m] < 0) {
+									SP_LOGERROR(set[m]);
+								}
 								m_compMatrix[k][i] = set[m];
 								k++;
 

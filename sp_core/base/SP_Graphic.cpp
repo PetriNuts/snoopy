@@ -171,7 +171,9 @@ SP_Graphic::AddChildToCanvas(SP_Graphic* p_pcChild)
     // (they should be attributes in most (all?) cases, that's why the
     // points are reported by GetPosAttribute methods)
 
-    double tmpX =  GetPosAttributesX() + p_pcChild->GetOffsetX();
+	double tmpX = GetPosAttributesX() + p_pcChild->GetOffsetX();//george: attribute position
+	 
+
     if (tmpX < 0) {
       tmpX = GetPosAttributesX() + 5;
       SP_LOGDEBUG(wxString::Format(wxT("refused to assign a negative x position (%f)")

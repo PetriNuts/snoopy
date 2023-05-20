@@ -46,7 +46,7 @@ SP_DS_ModuloNets::SP_DS_ModuloNets(const wxString& p_pchName)
 }
 
 SP_DS_Graph*
-SP_DS_ModuloNets::CreateGraph(SP_DS_Graph* p_graph)
+SP_DS_ModuloNets::CreateGraph(SP_DS_Graph* p_graph, SP_MapString2Int p_mgraphicsPosMap)
 {
 	if (!SP_DS_SimplePed::CreateGraph(p_graph))
 	return NULL;

@@ -45,6 +45,8 @@ protected:
     unsigned int m_nStepDuration;
     unsigned int m_nSteps;
     unsigned int m_nActStep;
+	bool m_bColSimMode;
+	bool m_bInPreStep;
 
     //indicates direction for animation
 	SP_DIRECTION_T	m_nDir;
@@ -88,7 +90,7 @@ protected:
 	bool m_bIsActiveAnimator;//by george
 
 public:
-    SP_DS_Animation(unsigned int p_nRefresh, unsigned int p_nDuration);
+    SP_DS_Animation(unsigned int p_nRefresh, unsigned int p_nDuration, bool p_bColSimMode=false);
     virtual ~SP_DS_Animation();
 
     virtual bool Initialise(SP_DS_Graph* p_pcGraph);

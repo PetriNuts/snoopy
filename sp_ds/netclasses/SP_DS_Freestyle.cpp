@@ -76,7 +76,7 @@ SP_DS_Freestyle::SP_DS_Freestyle(const wxString& p_pchName):SP_DS_SimpleGraph(p_
 	wxGetApp().GetElementPrefs()->RegisterNodeclass(GetName(), wxT("Loop"));
 }
 
-SP_DS_Graph* SP_DS_Freestyle::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_Graph* SP_DS_Freestyle::CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap)
 {
     if (!SP_DS_SimpleGraph::CreateGraph(p_pcGraph))
         return NULL;

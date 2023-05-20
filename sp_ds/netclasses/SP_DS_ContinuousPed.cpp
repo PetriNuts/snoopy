@@ -102,7 +102,7 @@ SP_DS_ContinuousPed::SP_DS_ContinuousPed(const wxString& p_pchName) :
 }
 
 SP_DS_Graph*
-SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap)
 {
 
 	if (!SP_DS_BipartGraph::CreateGraph(p_pcGraph))
@@ -128,6 +128,10 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcNC->SetAbbreviation(wxT("PC"));
 	l_pcNC->SetShortcut(wxT("P"));
 	l_pcAttr = l_pcNC->GetPrototype()->GetAttribute(wxT("Name"));//Name
+	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));//
+	l_pcGrAttr->SetOffsetY(40);//40
+	l_pcAttr->SetGlobalShow();
+
 	l_pcAttr->SetGlobalShow();
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_IdAttribute(wxT("ID")));//ID
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogShowOnly(wxT("General")));
@@ -146,10 +150,11 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_LogicAttribute(wxT("Logic"), wxT("Name")));//logic
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogBool(wxT("General")));
 
+
 	l_pcAttr = l_pcNC->AddAttribute(new SP_DS_TextAttribute(wxT("Comment"), wxT("")));//Comment
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogMultiline(wxT("General")));
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
-	l_pcGrAttr->SetOffsetY(40);
+	l_pcGrAttr->SetOffsetY(40);//40
 	l_pcAttr->SetGlobalShow();
 
 	int pwidth = wxGetApp().GetElementPrefs()->GetNodeWidth(GetName(), SP_DS_CONTINUOUS_PLACE);
@@ -229,6 +234,8 @@ SP_DS_ContinuousPed::CreateGraph(SP_DS_Graph* p_pcGraph)
 	l_pcAttr->RegisterDialogWidget(new SP_WDG_DialogText(wxT("General")));
 	l_pcGrAttr = l_pcAttr->AddGraphic(new SP_GR_TextAttribute(l_pcAttr));
 	l_pcGrAttr->SetOffsetY(20);
+
+
 	l_pcGrAttr->SetShow(TRUE);
 	l_pcAttr->SetGlobalShow();
 

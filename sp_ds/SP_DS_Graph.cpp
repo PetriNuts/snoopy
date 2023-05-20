@@ -29,7 +29,9 @@
 #include "sp_gui/commands/SP_CMD_Edit.h"
 
 #include <wx/wupdlock.h>
+#include "sp_core/SP_GPR_Elements.h"
 
+#include "snoopy.h"
 
 SP_DS_Graph::SP_DS_Graph(SP_DS_Netclass* p_pcNetclass)
 :SP_Type(SP_ELEMENT_GRAPH),
@@ -46,8 +48,13 @@ m_bIsCopy(FALSE)
 {
 	if (m_pcNetclass)
     {
+		map<wxString, SP_SetString> mm = wxGetApp().getNetClases();
+		SP_GPR_Elements* l_pcGrElements = new SP_GPR_Elements();
+		//wxConfig config(SP_APP_SHORT_NAME, SP_APP_VENDOR);
+		map<wxString, int> l_mmGraphicstoPosX=   l_pcGrElements->GetNameAttGRaphicsPosXMap();
+		
 		SetName(m_pcNetclass->GetName());
-        m_pcNetclass->CreateGraph(this);
+        m_pcNetclass->CreateGraph(this, l_mmGraphicstoPosX);
         m_pcNetclass->CreateInitialElements(this);
     }
 }
@@ -686,6 +693,12 @@ SP_DS_Graph::AddToViewMenu(wxMenu* p_pcMenu)
     {
     	//Simulation mode
 		p_pcMenu->AppendSeparator();
+		if (l_sName == SP_DS_COLSPN_CLASS) {
+		
+		}
+		else {
+
+		}
 		wxMenuItem* l_pcMenuItem = new wxMenuItem(p_pcMenu,
 					  SP_MENU_ITEM_TOGGLESIMULATION,
 					  wxT("Start Simulation-Mode\tF6"),
@@ -706,8 +719,8 @@ SP_DS_Graph::AddToViewMenu(wxMenu* p_pcMenu)
 		p_pcMenu->AppendSeparator();
 		wxMenuItem* l_pcMenuItem = new wxMenuItem(p_pcMenu,
 			SP_MENU_ITEM_TOGGLEDIRSIMULATION,
-			wxT("&Start Direct Simulation-Mode\tCtrl+F6"),
-			wxT("Direct Simulation mode"));
+			wxT("&Start Color Simulation-Mode\tCtrl+F6"),
+			wxT("Color Simulation mode"));
 		p_pcMenu->Append(l_pcMenuItem);
 		
 	}

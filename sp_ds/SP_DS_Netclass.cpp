@@ -32,7 +32,7 @@ SP_DS_Netclass::~SP_DS_Netclass()
 }
 
 SP_DS_Graph*
-SP_DS_Netclass::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_Netclass::CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap)
 {
 	CHECK_POINTER(p_pcGraph, return NULL);
 

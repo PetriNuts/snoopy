@@ -31,6 +31,8 @@ private:
 		//true, if backstepping is allowed - false, otherwise
 		bool m_bBackStepping;
 
+	
+
     DECLARE_CLASS(SP_DLG_Animation)
 protected:
     void OnMyClose(wxCloseEvent& p_cEvent);
@@ -69,6 +71,12 @@ public:
 		void ResetPlayButtons();
 		//back stepping must be explicitly enabled by the animation itself
 		inline void EnableBackStepping(bool p_bVal) { m_bBackStepping = p_bVal; }
+
+		//diable anim mode when color simulation is chosen for color stochastic Petri nets
+		void DisapleAnimMode();
+
+		//diable anim mode when color simulation is deselected for color stochastic Petri nets
+		void EnableAnimMode();
 };
 
 #endif // __SP_DLG_ANIMATION__

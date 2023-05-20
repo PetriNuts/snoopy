@@ -27,7 +27,7 @@ EVT_BUTTON(wxID_CANCEL, ExportStochCPN::OnExit)
 EVT_RADIOBOX(wxID_RADIO_CHOICE, ExportStochCPN::OnRadioChoice)
 END_EVENT_TABLE()
 
-ExportStochCPN::ExportStochCPN(const wxString &title, SP_DS_ColStAnimation *temp) :
+ExportStochCPN::ExportStochCPN(const wxString &title, SP_DS_ColStAnimation *temp,bool p_bIsColSimMode) :m_bIsColSimMode(p_bIsColSimMode),
 	wxFrame((wxFrame *)NULL, -1, title)
 {
 	m_pc_Animator = temp; //Gets the current animation window object
@@ -78,48 +78,49 @@ ExportStochCPN::ExportStochCPN(const wxString &title, SP_DS_ColStAnimation *temp
 		m_pc_StLine1 = new wxStaticLine(m_pc_Panel, wxID_ANY);
 		m_pc_VBox->Add(m_pc_StLine1, 0, wxALL | wxEXPAND, 5);
 
-		//Step Details
-		m_pc_StepDetails = new wxStaticText(m_pc_Panel, wxID_ANY, wxT("Step Details"));
-		m_pc_VBox->Add(m_pc_StepDetails, 0, 5);
+		if (!m_bIsColSimMode) {
+			//Step Details
+			m_pc_StepDetails = new wxStaticText(m_pc_Panel, wxID_ANY, wxT("Step Details"));
+			m_pc_VBox->Add(m_pc_StepDetails, 0, 5);
 
-		//Horizontal Line
-		m_pc_StLine2 = new wxStaticLine(m_pc_Panel, wxID_ANY);
-		m_pc_VBox->Add(m_pc_StLine2, 0, wxALL | wxEXPAND, 5);
+			//Horizontal Line
+			m_pc_StLine2 = new wxStaticLine(m_pc_Panel, wxID_ANY);
+			m_pc_VBox->Add(m_pc_StLine2, 0, wxALL | wxEXPAND, 5);
 
-		//Start
-		m_pc_Start = new wxStaticText(m_pc_Panel, wxID_ANY, wxT("Start"));
-		m_pc_HBox2->Add(m_pc_Start, 0, wxALL, 5);
+			//Start
+			m_pc_Start = new wxStaticText(m_pc_Panel, wxID_ANY, wxT("Start"));
+			m_pc_HBox2->Add(m_pc_Start, 0, wxALL, 5);
 
-		//Start text
-		m_pc_StartText = new wxTextCtrl(m_pc_Panel, wxID_START_TEXT, wxT("1"));
-		m_pc_HBox2->Add(m_pc_StartText, 1, wxALL | wxEXPAND, 5);
+			//Start text
+			m_pc_StartText = new wxTextCtrl(m_pc_Panel, wxID_START_TEXT, wxT("1"));
+			m_pc_HBox2->Add(m_pc_StartText, 1, wxALL | wxEXPAND, 5);
 
-		m_pc_VBox->Add(m_pc_HBox2, 0, wxALL | wxEXPAND, 5);
+			m_pc_VBox->Add(m_pc_HBox2, 0, wxALL | wxEXPAND, 5);
 
-		//Every
-		m_pc_Every = new wxStaticText(m_pc_Panel, wxID_ANY, wxT("Every"));
-		m_pc_HBox3->Add(m_pc_Every, 0, wxALL, 5);
+			//Every
+			m_pc_Every = new wxStaticText(m_pc_Panel, wxID_ANY, wxT("Every"));
+			m_pc_HBox3->Add(m_pc_Every, 0, wxALL, 5);
 
-		//Every text
-		m_pc_EveryText = new wxTextCtrl(m_pc_Panel, wxID_EVERY_TEXT, wxT("1"));
-		m_pc_HBox3->Add(m_pc_EveryText, 1, wxALL | wxEXPAND, 5);
+			//Every text
+			m_pc_EveryText = new wxTextCtrl(m_pc_Panel, wxID_EVERY_TEXT, wxT("1"));
+			m_pc_HBox3->Add(m_pc_EveryText, 1, wxALL | wxEXPAND, 5);
 
-		m_pc_VBox->Add(m_pc_HBox3, 0, wxALL | wxEXPAND, 5);
+			m_pc_VBox->Add(m_pc_HBox3, 0, wxALL | wxEXPAND, 5);
 
-		//Stop
-		m_pc_Stop = new wxStaticText(m_pc_Panel, wxID_ANY, wxT("Stop"));
-		m_pc_HBox4->Add(m_pc_Stop, 0, wxALL, 5);
+			//Stop
+			m_pc_Stop = new wxStaticText(m_pc_Panel, wxID_ANY, wxT("Stop"));
+			m_pc_HBox4->Add(m_pc_Stop, 0, wxALL, 5);
 
-		//Stop every
-		m_pc_StopText = new wxTextCtrl(m_pc_Panel, wxID_STOP_TEXT, wxT("100"));
-		m_pc_HBox4->Add(m_pc_StopText, 1, wxALL | wxEXPAND, 5);
-		m_pc_VBox->Add(m_pc_HBox4, 0, wxALL | wxEXPAND, 5);
+			//Stop every
+			m_pc_StopText = new wxTextCtrl(m_pc_Panel, wxID_STOP_TEXT, wxT("100"));
+			m_pc_HBox4->Add(m_pc_StopText, 1, wxALL | wxEXPAND, 5);
+			m_pc_VBox->Add(m_pc_HBox4, 0, wxALL | wxEXPAND, 5);
 
-		//Export Options
-		m_pc_RadioChoice = new wxRadioBox(m_pc_Panel, wxID_RADIO_CHOICE, wxT("Export Options"), wxDefaultPosition, wxDefaultSize, 2, m_choices, 1, wxRA_SPECIFY_ROWS);
-		m_pc_RadioChoice->SetSelection(0);
-		m_pc_VBox->Add(m_pc_RadioChoice, 0, wxALL | wxEXPAND, 5);
-
+			//Export Options
+			m_pc_RadioChoice = new wxRadioBox(m_pc_Panel, wxID_RADIO_CHOICE, wxT("Export Options"), wxDefaultPosition, wxDefaultSize, 2, m_choices, 1, wxRA_SPECIFY_ROWS);
+			m_pc_RadioChoice->SetSelection(0);
+			m_pc_VBox->Add(m_pc_RadioChoice, 0, wxALL | wxEXPAND, 5);
+		}
 		//Okay Button
 		m_pc_OKBtn = new wxButton(m_pc_Panel, wxID_OK, wxT("OK"));
 		m_pc_HBox5->Add(m_pc_OKBtn, 0, wxLEFT | wxRIGHT | wxEXPAND, 75);

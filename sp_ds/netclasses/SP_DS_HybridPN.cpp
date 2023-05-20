@@ -106,7 +106,7 @@ SP_DS_ExtPT(p_pchName)
 
 }
 
-SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_Graph* SP_DS_HybridPN::CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap)
 {
 
 	SP_DS_Attribute* l_pcAttr;

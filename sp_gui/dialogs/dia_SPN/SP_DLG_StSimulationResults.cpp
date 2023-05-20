@@ -1853,7 +1853,7 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 		wxString l_sTransitionName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 
 		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_pcNode->GetAttribute(wxT("FunctionList")));
-
+	 
 		wxString l_sTransitionFunction = l_pcColList->GetActiveCellValue( 1);
 		SP_FunctionPtr l_pcFunction = l_pcFR->parseFunctionString(l_sTransitionFunction);
 		wxString l_sExpanded;
@@ -1865,7 +1865,7 @@ void SP_DLG_StSimulationResults::LoadTransitions()
 		{
 			l_sExpanded = l_sTransitionFunction;
 		}
-
+		
 		m_asTransitionNames.push_back(l_sTransitionName);
 
 		m_mTransitionName2Position[l_sTransitionName] = l_nTransitionPosition++;

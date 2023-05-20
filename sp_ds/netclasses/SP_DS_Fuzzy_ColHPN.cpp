@@ -128,7 +128,7 @@ SP_DS_Fuzzy_ColHPN::SP_DS_Fuzzy_ColHPN(const wxString& p_pchName)
 }
 
 SP_DS_Graph*
-SP_DS_Fuzzy_ColHPN::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_Fuzzy_ColHPN::CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap)
 {
 
 	if (!SP_DS_ColHPN::CreateGraph(p_pcGraph))

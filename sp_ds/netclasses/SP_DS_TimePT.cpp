@@ -31,7 +31,7 @@ SP_DS_TimePT::SP_DS_TimePT(const wxString& p_pchName) :
 	m_sFilter = wxT("*.tpn;*.sptpt");
 }
 
-SP_DS_Graph* SP_DS_TimePT::CreateGraph(SP_DS_Graph* p_graph)
+SP_DS_Graph* SP_DS_TimePT::CreateGraph(SP_DS_Graph* p_graph, SP_MapString2Int p_mgraphicsPosMap)
 {
 	if (!SP_DS_SimplePed::CreateGraph(p_graph))
 		return NULL;

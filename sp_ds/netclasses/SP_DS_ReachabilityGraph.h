@@ -19,7 +19,7 @@ public:
     SP_DS_ReachabilityGraph();
     SP_DS_ReachabilityGraph(const wxString& p_pchName);
 
-    virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGraph);
+	virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap = SP_MapString2Int());
 
     virtual bool EdgeRequirement(SP_DS_Edgeclass* p_pcEdgeclass, SP_Data* p_pcNode1, SP_Data* p_pcNode2);
 

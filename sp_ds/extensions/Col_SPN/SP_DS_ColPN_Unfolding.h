@@ -34,6 +34,8 @@
 #include "sp_gui/dialogs/dia_ColSPN//SP_DLG_ColStUnfolding.h"
 
 #include <wx/ffile.h>
+#include "snoopy.h"
+#include "sp_utilities.h"
 
 
 struct SP_CPN_PlaceInfo

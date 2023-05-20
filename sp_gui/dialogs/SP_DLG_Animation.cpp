@@ -308,6 +308,26 @@ SP_DLG_Animation::ResetPlayButtons() {
 	m_buPlayFwd->Refresh();
 }
 
+
+void SP_DLG_Animation::EnableAnimMode() {
+	//by george for enabling anim mode when color simulation is selected
+	m_buPlayBwd->Enable(true);
+	m_buPlayFwd->Enable(true);
+	m_buStepBwd->Enable(true);
+	m_buReset->Enable(true);
+	m_buStepFwd->Enable(true);
+}
+
+void SP_DLG_Animation::DisapleAnimMode() {
+	//by george for diabling anim mode when color simulation is selected
+	m_buPlayBwd->Enable(false);
+	m_buPlayFwd->Enable(false);
+	m_buStepBwd->Enable(false);
+	m_buReset->Enable(false);
+	m_buStepFwd->Enable(false);
+	
+		 
+}
 wxWindow*
 SP_DLG_Animation::getWindow()
 {

@@ -55,7 +55,7 @@ SP_DS_ReachabilityGraph::SP_DS_ReachabilityGraph(const wxString& p_pchName)
 }
 
 SP_DS_Graph*
-SP_DS_ReachabilityGraph::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_ReachabilityGraph::CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap)
 {
   if (!SP_DS_SimpleGraph::CreateGraph(p_pcGraph))
         return NULL;

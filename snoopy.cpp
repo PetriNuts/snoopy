@@ -207,7 +207,7 @@
 #include <wx/cmdline.h>
 #include <wx/fs_zip.h>
 #include <wx/datetime.h>
-#include <wx/config.h>
+
 #include <locale.h>
 
 #include <wx/sysopt.h>
@@ -434,6 +434,9 @@ bool Snoopy::ProcessCommandLine(wxArrayString& p_aargs)//by george 2021, handle 
 			m_pcFontPrefs = new SP_GPR_Fonts();
 			m_pcElementPrefs = new SP_GPR_Elements();
 			SP_Core* l_pcCore = SP_Core::Instance();
+
+		
+			
 
 			l_pcCore->InitialiseNetclasses(m_pcDocmanager);
 			ReadOptions();
@@ -1567,6 +1570,8 @@ bool Snoopy::OnInit()
 	ReadOptions();
 	wxOGLInitialize();
 
+	setNetClases(m_pcElementPrefs->GetNetClassesMap());
+
 	m_pcMainframe = new SP_GUI_Mainframe(
 			m_pcDocmanager,
 			NULL,
@@ -1630,6 +1635,8 @@ bool Snoopy::OnInit()
 	// enter mainloop
 	return TRUE;
 }
+
+ 
 
 int Snoopy::OnExit()
 {
@@ -1708,8 +1715,7 @@ bool Snoopy::WriteOptions()
 	}
 	config.Write(wxT("isMaximized"), (bool)m_bMaximize);
 	config.Write(wxT("LogicBrush"), (long)m_pcCanvasLogicBrush->GetStyle());
-
-	//write global preferences to config
+  	//write global preferences to config
 	m_pcCanvasPrefs->WriteToConfig(config);
 	m_pcAnimationPrefs->WriteToConfig(config);
 	m_pcElementPrefs->WriteToConfig(config);

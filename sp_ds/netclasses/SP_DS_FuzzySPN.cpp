@@ -120,7 +120,7 @@ SP_DS_FuzzySPN::SP_DS_FuzzySPN(const wxString& p_pchName)
 
 
 SP_DS_Graph*
-SP_DS_FuzzySPN::CreateGraph(SP_DS_Graph* p_pcGraph)
+SP_DS_FuzzySPN::CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap)
 {
 
 	//return SP_DS_EventSPN::CreateGraph(p_pcGraph);

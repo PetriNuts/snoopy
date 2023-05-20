@@ -42,7 +42,7 @@ public:
     virtual bool AddToGui(SP_GM_Docmanager* p_pcDocmanager);
     virtual bool CreateCoarse();
 
-    virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGraph);
+    virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGrap, SP_MapString2Int p_mgraphicsPosMap= SP_MapString2Int());
 
     virtual bool CreateInitialElements(SP_DS_Graph* p_pcGraph) { return true; }
 

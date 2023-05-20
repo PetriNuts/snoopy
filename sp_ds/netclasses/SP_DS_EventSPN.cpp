@@ -121,7 +121,7 @@ SP_DS_EventSPN::SP_DS_EventSPN( const wxString& p_pchName )
 
 
 SP_DS_Graph*
-SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
+SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap)
 {
 
 	if ( ! SP_DS_ExtPT::CreateGraph( p_pcGraph ) )
@@ -141,14 +141,19 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->GetNodeclass( wxT("Place") );
-
-	// animator
+ 	// animator
 	l_pcNC->AddAnimator( new SP_DS_StPlaceAnimator( wxT("Marking") ) );
 
 	//////////////////////////////////////////////////////////////////////////////
 	l_pcNC = p_pcGraph->GetNodeclass( wxT("Transition") );
-
+	/* to change offset of the graphic
+	SP_ListGraphic* pc_listAttgraph = l_pcNC->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+	for (auto it = pc_listAttgraph->begin(); it != pc_listAttgraph->end(); ++it) {
+		 (*it)->SetOffsetX(xxx);
+	}
+	*/
 	// special EventSPN components
+	
 
 	l_pcAttr = l_pcNC->AddAttribute( new SP_DS_ColListAttribute( wxT("FunctionList"), SP_COLLIST_STRING, 2 ) );
 	l_pcAttr->SetDisplayName(wxT("Function set"));
@@ -225,6 +230,7 @@ SP_DS_EventSPN::CreateGraph( SP_DS_Graph* p_pcGraph )
 	l_pcGr->SetWidth(10.0);
 	l_pcGr->SetDefaultBrush(wxTheBrushList->FindOrCreateBrush(wxColour(0, 0, 0)));
     l_pcGr->SetFixedSize(wxGetApp().GetElementPrefs()->GetNodeFixed(GetName(), l_pcNC->GetName()));
+	//l_pcGr->SetOffsetX(xxx);//adjust offset value
 	l_pcNC->SetGraphic(l_pcGr);
 	l_pcNC->RegisterGraphicWidget(new SP_WDG_DialogGraphic(wxT("Graphic")));
 

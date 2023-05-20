@@ -287,6 +287,8 @@ void SP_GPR_Elements::SetNodeThickness(const wxString& p_sNetClass, const wxStri
 	}
 }
 
+
+
 void SP_GPR_Elements::SetNodeHeight(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal)
 {
 	wxString l_sKey = p_sNetClass + wxT("|") + p_sNodeClass;
@@ -429,6 +431,68 @@ int SP_GPR_Elements::GetNodeThickness(const wxString& p_sNetClass, const wxStrin
 	}
 
 	return DEFAULT_THICKNESS;
+}
+
+void SP_GPR_Elements::SetNodeNameAttPosX(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal)
+
+{
+	wxString l_sKey = p_sNetClass + wxT("|") + p_sNodeClass;
+	SP_MapString2Int::iterator l_it = m_mnNodeNameAttrPosX.find(l_sKey);
+	m_mnNodeNameAttrPosX[l_sKey] = p_nVal;
+}
+
+
+
+int SP_GPR_Elements::GetNameAttributeOfNode(const wxString& p_sNetClass, const wxString& p_sNodeClass)
+{
+	/**
+	if (p_sNodeClass.IsEmpty()) return DEFAULT_NAMEATT_POS_X;
+
+	SP_DS_Graph* m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+
+	SP_DS_Nodeclass* l_pcNodeclass;
+
+	if(p_sNodeClass== wxT("Continuous Transition"))
+		l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Transition, Continuous"));
+	else if(p_sNodeClass == wxT("Continuous Place"))
+		l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Place, Continuous"));
+	else if(p_sNodeClass == wxT("Discrete Place"))
+		l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Place"));
+	else if(p_sNodeClass == wxT("Discrete Transition"))
+		l_pcNodeclass = m_pcGraph->GetNodeclass(wxT("Transition"));
+	else if (p_sNodeClass.Contains(wxT("Immediate")))
+		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_IMMEDIATE_TRANS);
+	else if (p_sNodeClass.Contains(wxT("Scheduled")))
+		l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_SCHEDULED_TRANS);
+	else
+	//SP_DS_DISCRETE_PLACE
+	 l_pcNodeclass = m_pcGraph->GetNodeclass(p_sNodeClass);
+
+	if (l_pcNodeclass) {
+		SP_ListGraphic* pc_listAttgraph = l_pcNodeclass->GetPrototype()->GetAttribute(wxT("Name"))->GetGraphics();
+		for (auto it = pc_listAttgraph->begin(); it != pc_listAttgraph->end(); ++it) {
+			return (*it)->GetOffsetX();
+		}
+
+	}
+
+	return 0;
+
+
+
+	*/
+
+	wxString l_sKey = p_sNetClass + wxT("|") + p_sNodeClass;
+	SP_MapString2Int::iterator l_it = m_mnNodeNameAttrPosX.find(l_sKey);
+	if (l_it != m_mnNodeNameAttrPosX.end())
+	{
+		if (l_it->second >= NODE_NAMEATT_POS_X_MIN)
+		{
+			return l_it->second;
+		}
+	}
+
+	return DEFAULT_NAMEATT_POS_X;
 }
 
 int SP_GPR_Elements::GetNodeHeight(const wxString& p_sNetClass, const wxString& p_sNodeClass)
@@ -588,7 +652,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 	m_mcpExpression.clear();
 	m_mcbDotExpressionShow.clear();
 	m_mscThickness.clear();//by george
-
+	m_mscPlceNameAttributePosX.clear();//by george
 
 	//add some space at top
 	l_pcSizer->Add(0, 20, 0);
@@ -629,7 +693,7 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			int SP_ID_WIDTH = -1;
 			int SP_ID_HEIGHT = -1;
 			int SP_ID_THICKNESS = -1;//by george
-
+			int SP_ID_NAMEATTPOSX = -1;//by george
 			//there are pre-defined shapes for transitions which are added here
 			if ((p_sNetClass.CmpNoCase(SP_DS_PN_CLASS) == 0 ||
 				p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0 ||
@@ -656,6 +720,8 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 				helpSizer->Add(m_rbTransShape, 1);
 				l_pcNodeSectionSizer->Add(helpSizer, 0, wxEXPAND | wxALL, 5);
 
+				
+
 				SP_ID_WIDTH = SP_ID_SPINCTRL_TRANSWIDTH;
 				SP_ID_HEIGHT = SP_ID_SPINCTRL_TRANSHEIGHT;
 				SP_ID_THICKNESS = SP_ID_SPINCTRL_THICKNESS;
@@ -667,7 +733,9 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Width (pt):")), 0, wxALL, 4);
 			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Height (pt):")), 0, wxALL, 4);
 			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Thickness (pt):")), 0, wxALL, 4);
+			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Name Attribute Offset X:")), 0, wxALL, 4);
 			helpSizer->Add(new wxStaticText(p_pcPage, -1, wxT("Fixed Size:")), 0, wxALL, 4);
+		
 
 			if ((p_sNetClass.CmpNoCase(SP_DS_COLSPN_CLASS) == 0 ||			    
 				p_sNetClass.CmpNoCase(SP_DS_COLEPN_CLASS) == 0 ||
@@ -706,6 +774,11 @@ bool SP_GPR_Elements::AddToDialogPage(const wxString& p_sNetClass, SP_WDG_Notebo
 			m_mscThickness[*itN] = new wxSpinCtrl(p_pcPage, SP_ID_THICKNESS, wxString::Format(wxT("%d"), GetNodeThickness(p_sNetClass, *itN)), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, NODE_DIM_MIN, NODE_DIM_MAX, GetNodeThickness(p_sNetClass, *itN));//by george
 			helpSizer->Add(m_mscThickness[*itN], 0, wxLEFT | wxRIGHT, 5);
 
+			if (!(*itN == wxT("Discrete Place") || *itN == wxT("Discrete Transition") || *itN == (wxT("Parameter"))|| *itN == (wxT("LookupTable"))))
+			{
+				m_mscPlceNameAttributePosX[*itN] = new wxSpinCtrl(p_pcPage, SP_ID_NAMEATTPOSX, wxString::Format(wxT("%d"), GetNameAttributeOfNode(p_sNetClass, *itN)), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, NODE_NAMEATT_POS_X_MIN, NODE_NAMEATT_POS_X_MAX, GetNameAttributeOfNode(p_sNetClass, *itN));//by george
+				helpSizer->Add(m_mscPlceNameAttributePosX[*itN], 0, wxLEFT | wxRIGHT, 5);
+			}
 			wxCheckBox* l_pcCheckBox = new wxCheckBox(p_pcPage, -1, wxT(""));
 			l_pcCheckBox->SetValue(GetNodeFixed(p_sNetClass, *itN));
 			m_mcbFixed[*itN] = l_pcCheckBox;
@@ -1015,6 +1088,11 @@ bool SP_GPR_Elements::OnDialogOk(const wxString& p_sNetClass)
 				wxTheColourDatabase->AddColour(l_sColor, l_SelColour);
 				SetGuardColor(p_sNetClass, *itN, l_sColor);
 			}
+
+			if (!(*itN == wxT("Discrete Place") || *itN == wxT("Discrete Transition") || *itN == (wxT("Parameter"))|| *itN == (wxT("LookupTable"))))
+			{
+				SetNodeNameAttPosX(p_sNetClass, *itN, m_mscPlceNameAttributePosX[*itN]->GetValue());
+			}
 		}
 		if (p_sNetClass.CmpNoCase(SP_DS_CONTINUOUSPED_CLASS) == 0)
 		{
@@ -1036,6 +1114,7 @@ bool SP_GPR_Elements::OnDialogOk(const wxString& p_sNetClass)
 			)
 		{
 			SetLineEdgeDesignType(p_sNetClass, (SP_EXTENDED_TYPE_EDGE) (m_LineListBox->GetSelection() ));
+		
 		}
 	}
 	else
@@ -1046,6 +1125,7 @@ bool SP_GPR_Elements::OnDialogOk(const wxString& p_sNetClass)
 				SetNodeWidth(p_sNetClass, *itN, m_mscWidth[*itN]->GetValue());
 				SetNodeHeight(p_sNetClass, *itN, m_mscHeight[*itN]->GetValue());
 				SetNodeFixed(p_sNetClass, *itN, m_mcbFixed[*itN]->GetValue());
+
 			}
 			SetLineEdgeDesignType(p_sNetClass, (SP_EXTENDED_TYPE_EDGE) (m_LineListBox->GetSelection() ));
 			SetArrowEdgeTypeR(p_sNetClass, (SP_EXTENDED_ARROW_TYPE_EDGE) (m_ARListBox->GetSelection() ));
@@ -1058,6 +1138,7 @@ bool SP_GPR_Elements::OnDialogOk(const wxString& p_sNetClass)
 				SetNodeWidth(p_sNetClass, *itN, m_mscWidth[*itN]->GetValue());
 				SetNodeHeight(p_sNetClass, *itN, m_mscHeight[*itN]->GetValue());
 				SetNodeFixed(p_sNetClass, *itN, m_mcbFixed[*itN]->GetValue());
+				
 			}
 			SetEdgeDesignType(p_sNetClass, (SP_EXTENDED_ARC_TYPE) (m_lbListBox->GetSelection()));
 		}
@@ -1145,6 +1226,13 @@ void SP_GPR_Elements::OnUpdateTransHeight()
 	}
 }
 
+map<wxString, int> SP_GPR_Elements::GetNameAttGRaphicsPosXMap() {
+
+	wxConfig config(SP_APP_SHORT_NAME, SP_APP_VENDOR);
+	//UpdateFromConfig(config);
+	return m_mnHeight;
+}
+
 bool SP_GPR_Elements::UpdateFromConfig(wxConfig& p_config)
 {
 	//temps for reading values from config
@@ -1173,6 +1261,10 @@ bool SP_GPR_Elements::UpdateFromConfig(wxConfig& p_config)
 
 			p_config.Read(wxString::Format(wxT("%s//%s_Fixed"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), &tempInt, DEFAULT_FIXED);
 			m_mbFixedSize[l_sKey] = tempInt;
+
+			p_config.Read(wxString::Format(wxT("%s//%s_NameAttPosX"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()), &tempInt, DEFAULT_NAMEATT_POS_X);
+			m_mnNodeNameAttrPosX[l_sKey] = tempInt;
+			 
 
 			if(l_sCurrentClass.Find(wxT("Colored")) != wxNOT_FOUND)
 			{
@@ -1253,6 +1345,8 @@ bool SP_GPR_Elements::WriteToConfig(wxConfig& p_config)
 					p_config.Write(wxString::Format(wxT("%s//%s_GuardColor"), l_sCurrentClass.c_str(), l_sCurrentNode.c_str()),  m_msGuardColor[l_sKey]);
 				}
 			}
+
+			p_config.Write(wxString::Format(wxT("%s//NameAttPosX"), l_sCurrentClass.c_str()), (long)m_mnNodeNameAttrPosX[l_sKey]);//by george
 		}
 
 		p_config.Write(wxString::Format(wxT("%s//DesignType"), l_sCurrentClass.c_str()), (long) m_mnDesignType[l_sCurrentClass]);
@@ -1271,6 +1365,9 @@ bool SP_GPR_Elements::WriteToConfig(wxConfig& p_config)
 
 			p_config.Write(wxString::Format(wxT("%s//DotExpressionShow"), l_sCurrentClass.c_str()), m_mbDotExpressionShow[l_sCurrentClass]);
 		}
+
+	
+		
 	}
 
 	return true;

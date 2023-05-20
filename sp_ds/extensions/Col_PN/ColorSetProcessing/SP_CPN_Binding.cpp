@@ -28,7 +28,7 @@ SP_CPN_Binding::~SP_CPN_Binding()
 }
 
 bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick,SP_DS_Animator* p_pcTransAnimator, 
-								int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString,int> > >& p_mmmBind2Edge2Mult2Color)
+								int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString,int> > >& p_mmmBind2Edge2Mult2Color, const std::vector<wxString>& p_vBindingVector)
 {
 	m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
 
@@ -235,10 +235,234 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 		m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());//george
 		m_OutputVector = l_CompleteBinding[0];//by george
 	}
+
+	if (p_vBindingVector.size() != 0) {// by george for color simulation, force a transition to fire under a given binding
+		m_OutputVector = p_vBindingVector;
+	}
 	writecolors(&(l_EnabledChoiceList[l_nChose]),p_pcExprInfoVector);
 	return true;
 
 }
+
+
+/************************************************************/
+
+bool SP_CPN_Binding::EnableTestForColorSimulation(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, wxString m_sTransitionName,
+	int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString, int> > >& p_mmmBind2Edge2Mult2Color)
+{
+	m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
+
+	//m_sTransitionName = dynamic_cast<SP_DS_NameAttribute*>(p_pcTransAnimator->GetAnimObject()->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+
+	if (!m_ValueAssign.InitializeColorset(m_ColorSetClass))
+		return false;
+
+	//Initialize parsing and build parser tree
+	if (!BuildParserTree(p_pcExprInfoVector))
+		return false;
+
+	//Order the binding patterns so as to get an efficient binding
+
+	Ordering();  // to be replaced
+
+				 //begin to binding
+	vector<vector<wxString> > l_CompleteBinding;
+	SP_MapString2UInt l_IndexMap;
+
+	bool l_bBinding = BindingInference(l_IndexMap, l_CompleteBinding);
+
+	//Disable the transition
+	if (!l_bBinding)
+		return false;
+
+	if (l_bBinding)
+		return true;//end of function
+
+	//Deal with the case that all arcs are constant colors
+	if (l_bBinding && l_IndexMap.size() == 0)
+	{
+		if (Parsing())
+		{
+			if (m_pcGraph->GetNetclass()->GetName() != SP_DS_COLSPN_CLASS && m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColSPN_CLASS/*added by george */)
+			{
+				map<SP_DS_Edge*, map<wxString, int> > l_mmEdge2Mult2Color;
+				GetBinding(l_mmEdge2Mult2Color);
+				wxString l_sTransitionName = m_sTransitionName + wxT("_constant");
+				p_mmmBind2Edge2Mult2Color[l_sTransitionName] = l_mmEdge2Mult2Color;
+			}
+			writecolors(&m_ParseInputVector, p_pcExprInfoVector);
+			return true;
+		}
+		else
+			return false;
+	}
+
+	//Deal with the case that has the variables
+	//Assign values for variables
+	SP_MapString2UInt::iterator itMap;
+
+	vector<vector<SP_CPN_ParseInput> > l_EnabledChoiceList;
+	vector<wxString> l_EnabledBindings;
+
+	map<wxString, int> l_mUnionCheck; // to check the case of union
+
+	for (unsigned i = 0; i < l_CompleteBinding.size(); i++)
+	{
+		wxString l_sBinding;
+		l_sBinding = wxT("");
+		//Assign values to variables
+		for (itMap = l_IndexMap.begin(); itMap != l_IndexMap.end(); itMap++)
+		{
+			if (!m_ColorSetClass.SetVariableValue(itMap->first, l_CompleteBinding[i][itMap->second]))
+				return false;
+
+			l_sBinding = l_sBinding + itMap->first + wxT(" = ") + l_CompleteBinding[i][itMap->second] + wxT(";");
+
+		}
+		//Then begin to parse
+		if (Parsing())
+		{
+			vector<SP_CPN_ParseInput>::iterator itList;
+			int l_nCheck = 0;
+			int l_nInputArcCount = 0;
+			wxString l_sArcEvalSum;  //for testing if there are repeated bindings, for the union case
+
+			for (unsigned i = 0; i < m_ParseInputVector.size(); i++)
+			{
+				if (m_ParseInputVector[i].m_eExprType == CPN_INPUT_EXPR)
+				{
+					vector<SP_CPN_EvaluatedSingleValue>::iterator itEvalVector;
+					for (itEvalVector = m_ParseInputVector[i].m_ParsedInfo.begin(); itEvalVector != m_ParseInputVector[i].m_ParsedInfo.end(); itEvalVector++)
+					{
+						l_nCheck = l_nCheck + itEvalVector->m_Multiplicity;
+					}
+
+					l_nInputArcCount++;
+				}
+
+
+				//deal with the union type, remove redundant transitions 
+
+				if (m_ParseInputVector[i].m_eExprType == CPN_INPUT_EXPR || m_ParseInputVector[i].m_eExprType == CPN_OUTPUT_EXPR)
+				{
+					vector<SP_CPN_EvaluatedSingleValue>::iterator itEvalVector;
+					for (itEvalVector = m_ParseInputVector[i].m_ParsedInfo.begin(); itEvalVector != m_ParseInputVector[i].m_ParsedInfo.end(); itEvalVector++)
+					{
+						if (itEvalVector->m_Predicate == true)
+						{
+							l_sArcEvalSum += wxString::Format(wxT("%d"), i) + itEvalVector->m_ColorValue + wxString::Format(wxT("%d"), itEvalVector->m_Multiplicity);
+						}
+					}
+				}
+
+
+			}
+
+			//
+			if (l_mUnionCheck.find(l_sArcEvalSum) != l_mUnionCheck.end())
+			{
+				continue;   //we do care the same bindings
+			}
+			else
+			{
+				l_mUnionCheck[l_sArcEvalSum] = 1;
+			}
+			//
+
+
+			if ((l_nInputArcCount == 0) || (l_nInputArcCount != 0 && l_nCheck != 0))
+			{
+				wxString l_sArc2Color2Num = RemoveRedundantTransInstances();
+				if (m_mExistingBindings.find(l_sArc2Color2Num) == m_mExistingBindings.end())
+				{
+					m_mExistingBindings[l_sArc2Color2Num] = true;
+					l_EnabledChoiceList.push_back(m_ParseInputVector);   //Store all enabled binding choices
+
+					if (m_pcGraph->GetNetclass()->GetName() != SP_DS_COLSPN_CLASS &&m_pcGraph->GetNetclass()->GetName() != SP_DS_FUZZY_ColSPN_CLASS /*added by george*/)
+					{
+						map<SP_DS_Edge*, map<wxString, int> > l_mmEdge2Mult2Color;
+						GetBinding(l_mmEdge2Mult2Color);
+						p_mmmBind2Edge2Mult2Color[l_sBinding] = l_mmEdge2Mult2Color;
+					}
+
+					l_EnabledBindings.push_back(l_sBinding);
+				}
+			}
+		}
+	}
+
+	//for the variables
+	if (l_EnabledChoiceList.size() == 0)
+		return false;
+
+
+
+	return true;
+	 
+	//decide to show dialog or random, depending on animation mode (single click or run)
+	//int l_nChose = 0;
+	//if (p_bSingleClick)
+//	{
+	 
+		///	if (m_pcGraph->GetNetclass()->GetName() == SP_DS_COLSPN_CLASS || m_pcGraph->GetNetclass()->GetName() == SP_DS_FUZZY_ColSPN_CLASS /*added by george*/)
+		//	{
+		//		SP_DS_ColStTransAnimator* l_pcCPN_TransAnimator = dynamic_cast<SP_DS_ColStTransAnimator*>(p_pcTransAnimator);
+		//		l_pcCPN_TransAnimator->ResetSingleClick(false);  //reset singlick flage to false
+		//	}
+
+		//if (p_nBindingChoice == 2 || (p_nBindingChoice == 1 && l_EnabledBindings.size()>1))
+		//{
+			//SP_DLG_BindingSelection* l_pcDlg = new SP_DLG_BindingSelection(l_EnabledBindings, NULL);
+
+			//if (l_pcDlg->ShowModal() == wxID_OK)
+			//{
+				///l_nChose = (int)(l_pcDlg->GetReturnSelection());
+				//m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());
+				//m_OutputVector = l_CompleteBinding[l_nChose];//by george
+			//}
+			//else
+			//{
+				//l_nChose = 0;
+			//}
+		///	l_pcDlg->Destroy();
+		//}
+		//else if (p_nBindingChoice == 1 && l_EnabledBindings.size() == 1)
+		//{
+		//	l_nChose = 0;
+		//}
+		//else
+	//	{
+			//Randomly select one binding to enable
+			//l_nChose = SP_RandomLong(l_EnabledChoiceList.size());
+			//m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());//george
+			//m_OutputVector = l_CompleteBinding[l_nChose];//by george
+		//}
+	//}
+	//else
+	//{
+		//Randomly select one binding to enable
+		//l_nChose = SP_RandomLong(l_EnabledChoiceList.size());
+		//m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());//george
+		//m_OutputVector = l_CompleteBinding[l_nChose];//by george
+	//}
+	//if (l_nChose > (int)(l_EnabledChoiceList.size()) - 1)
+	//{
+		//l_nChose = 0;
+	//}
+	//if (l_CompleteBinding.size()>0 && m_OutputVector.size() == 0)
+	//{
+		//m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());//george
+		//m_OutputVector = l_CompleteBinding[0];//by george
+	//}
+	//writecolors(&(l_EnabledChoiceList[l_nChose]), p_pcExprInfoVector);
+	//return true;
+
+}
+
+
+
+
+/*********************************************************/
 
 void SP_CPN_Binding::GetBinding(map<SP_DS_Edge*, map<wxString, int> >& p_mmEdge2Mult2Color)
 {	

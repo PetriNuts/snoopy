@@ -57,7 +57,8 @@ public:
     bool TestConcession();
     bool Reset();
 
-    bool InformStPrePlaces(const wxString& p_sColor=wxT("") );
+    bool InformStPrePlaces(const wxString& p_sColor=wxT(""), const std::vector<wxString>& values = std::vector<wxString>());
+	bool IsEnabled(SP_VectorString& v);
     SP_IMPORT_STATE CheckColour(const wxString& p_sColor);
 
     virtual bool OnLeftClick();

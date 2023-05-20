@@ -51,7 +51,7 @@ SP_DS_ExtPT::SP_DS_ExtPT(const wxString& p_pchName) :
 }
 
 SP_DS_Graph*
-SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph)
+SP_DS_ExtPT::CreateGraph(SP_DS_Graph* p_graph, SP_MapString2Int p_mgraphicsPosMap)
 {
 	if (!SP_DS_SimplePed::CreateGraph(p_graph))
 		return NULL;

@@ -173,6 +173,7 @@ DocBuilder& DocBuilder::appendPlaces(const std::vector<Place>& vPlaces) {
 		pNode->GetAttribute("Name")->SetShow(TRUE);
 		pNode->GetAttribute("Marking")->SetValueString(place.m_strValue);
 		pNode->ShowOnCanvas(pMdiView->GetCanvas(), FALSE, 10, 10, 0);
+	
 		// For edge Place <-> Transition
 		m_mapPlaceNode[place.m_strName] = pNode;
 	}

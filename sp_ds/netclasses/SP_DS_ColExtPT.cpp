@@ -101,7 +101,7 @@ SP_DS_ColExtPT::SP_DS_ColExtPT( const wxString& p_pchName )
 
 
 SP_DS_Graph*
-SP_DS_ColExtPT::CreateGraph( SP_DS_Graph* p_pcGraph )
+SP_DS_ColExtPT::CreateGraph( SP_DS_Graph* p_pcGraph , SP_MapString2Int p_mgraphicsPosMap)
 {
 
 	if ( ! SP_DS_ExtPT::CreateGraph( p_pcGraph ) ) 

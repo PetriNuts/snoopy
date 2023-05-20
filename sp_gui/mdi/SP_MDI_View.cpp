@@ -84,6 +84,8 @@
 
 
 #include <wx/busyinfo.h> 
+//#include "sp_gui/dialogs/dia_ColSPN/SP_DLG_ColLevelStSimulationResults.h"
+
 
 
 IMPLEMENT_DYNAMIC_CLASS(SP_MDI_View, wxView)
@@ -1929,6 +1931,8 @@ void SP_MDI_View::OnStartDirSimulation(wxCommandEvent& p_cEvent)
 
 		SP_DLG_DirColorSimulation* l_pccolDiDlg = NULL;
 
+	//	SP_DLG_ColLevelStSimulationResults* l_pcColLevelSim = NULL;
+
 
 		SP_DS_ColPN_Coloring* l_pcoloredNet = NULL;
 		
@@ -1937,6 +1941,18 @@ void SP_MDI_View::OnStartDirSimulation(wxCommandEvent& p_cEvent)
 			(l_sName == SP_DS_COLHPN_CLASS) ||
 			(l_sName == SP_DS_COLSPN_CLASS))
 		{
+		  if (l_sName == SP_DS_COLSPN_CLASS)
+		{
+			//l_pcColLevelSim = new SP_DLG_ColLevelStSimulationResults(l_pcGraph, m_pcFrame);
+
+			//if (l_pcColLevelSim != nullptr) {
+			//	l_pcColLevelSim->Show();
+			//}
+			SP_LOGERROR(wxT("Sorry, The Method for this class  under preparing"));
+			return;
+			//l_pccolDiDlg = new SP_DLG_ColStDirSimResults(l_pcGraph, l_pcoloredNet, m_pcFrame);
+		}
+
 			l_pcoloredNet = new SP_DS_ColPN_Coloring();
 			if (!l_pcoloredNet->Coloring())
 			{
@@ -1952,12 +1968,7 @@ void SP_MDI_View::OnStartDirSimulation(wxCommandEvent& p_cEvent)
 				
 
 			}
-			else if (l_sName == SP_DS_COLSPN_CLASS)
-			{
 
-				SP_LOGERROR(wxT("Sorry, The Method for this class  under preparing"));
-				//l_pccolDiDlg = new SP_DLG_ColStDirSimResults(l_pcGraph, l_pcoloredNet, m_pcFrame);
-			}
 			else if (l_sName == SP_DS_COLCPN_CLASS)
 			{
 				l_pccolDiDlg = new SP_DLG_ColCPNDirSimulationResults(l_pcGraph, l_pcoloredNet, m_pcFrame);

@@ -276,9 +276,105 @@ SP_DS_ColStTransAnimator::Enable(SP_DS_ColStPlaceAnimator* p_pcAnimator)
     m_lCandidates.push_back(p_pcAnimator);
 }
 
+bool SP_DS_ColStTransAnimator::IsEnabled(SP_VectorString& v) {
+	Reset();
+
+	if (!m_pcNode || !m_pcAnimation)
+		return FALSE;
+
+	vector<SP_CPN_ExpressionInfo> m_StExprInfoVector;
+	SP_CPN_ExpressionInfo m_cStExprInfo;
+
+	// i inform all nodes at my incoming edges of wanting their markings
+	SP_ListEdge::const_iterator l_itEdges;
+	SP_DS_ColStPlaceAnimator* l_pcAnim;
+	if (m_pcAnimation->GetDirection() == FORWARD)
+	{
+
+		//////////////////////
+		// Colored Petri nets
+		//push back the preplace and edges
+
+		m_StExprInfoVector.clear();
+
+		//push back the preplace and edges
+		for (l_itEdges = m_pcNode->GetTargetEdges()->begin(); l_itEdges != m_pcNode->GetTargetEdges()->end(); ++l_itEdges)
+		{
+			if ((*l_itEdges)->GetSource())
+			{
+				l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetSource(), SP_DS_ANIMATOR_PLACE));
+				if (l_pcAnim)
+				{
+					m_mlPrePlaces[l_pcAnim].push_back((*l_itEdges));
+
+					m_cStExprInfo.m_eExprType = CPN_INPUT_EXPR;
+					m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
+					m_cStExprInfo.m_pcEdge = *l_itEdges;
+					m_pcColList = dynamic_cast<SP_DS_ColListAttribute*>((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION));
+					if (!m_pcColList)
+						return false;
+					if (m_pcColList->GetCell(0, 1) == wxT(""))
+					{
+						wxString l_sError;
+						l_sError = wxT("Arc exprssion should not be empty");
+						SP_MESSAGEBOX(l_sError, wxT("Expression checking"), wxOK | wxICON_ERROR);
+						return false;
+					}
+
+					m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
+					m_StExprInfoVector.push_back(m_cStExprInfo);
+				}
+			}
+		}
+
+		//push back the postplace and edges
+		for (l_itEdges = m_pcNode->GetSourceEdges()->begin(); l_itEdges != m_pcNode->GetSourceEdges()->end(); ++l_itEdges)
+		{
+			if ((*l_itEdges)->GetTarget())
+			{
+				l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetTarget(), SP_DS_ANIMATOR_PLACE));
+				if (l_pcAnim)
+				{
+					m_cStExprInfo.m_eExprType = CPN_OUTPUT_EXPR;
+					m_cStExprInfo.m_pcPlAnimator = dynamic_cast<SP_DS_Animator*>(l_pcAnim);
+					m_cStExprInfo.m_pcEdge = *l_itEdges;
+					m_pcColList = dynamic_cast<SP_DS_ColListAttribute*>((*l_itEdges)->GetAttribute(SP_DS_CPN_INSCRIPTION));
+					if (!m_pcColList)
+						return false;
+					if (m_pcColList->GetCell(0, 1) == wxT(""))
+						return false;
+					m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
+
+					m_StExprInfoVector.push_back(m_cStExprInfo);
+				}
+			}
+		}
+
+		//push back the guard
+		m_cStExprInfo.m_eExprType = CPN_GUARD_EXPR;
+		m_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(m_pcNode->GetAttribute(SP_DS_CPN_GUARDLIST));
+		if (m_pcColList)
+			m_cStExprInfo.m_sExpression = m_pcColList->GetCell(0, 1);
+
+		if (m_cStExprInfo.m_sExpression != wxT(""))
+			m_StExprInfoVector.push_back(m_cStExprInfo);
+
+		//begin to binding and enable test
+		SP_CPN_Binding l_cBinding;
+		SP_DS_Animator* l_pcAnimator = dynamic_cast<SP_DS_ColStTransAnimator*>(this);
+		map<wxString, map<SP_DS_Edge*, map<wxString, int> > > l_mmmBind2Edge2Mult2Color;
+		bool l_bEnableTest = l_cBinding.EnableTest(&m_StExprInfoVector, m_bSingleClick, l_pcAnimator, m_nBindingChoice, l_mmmBind2Edge2Mult2Color);
+
+		v = l_cBinding.GetBindingSelection();
+
+		return  l_bEnableTest;
+	}
+	return false;
+}
+
 
 bool
-SP_DS_ColStTransAnimator::InformStPrePlaces(const wxString& p_sColor)
+SP_DS_ColStTransAnimator::InformStPrePlaces(const wxString& p_sColor, const std::vector<wxString>& values)
 {
 	  Reset();
 

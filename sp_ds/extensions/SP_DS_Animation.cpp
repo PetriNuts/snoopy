@@ -16,7 +16,7 @@
 BEGIN_EVENT_TABLE(SP_DS_Animation, wxEvtHandler)
 END_EVENT_TABLE()
 
-SP_DS_Animation::SP_DS_Animation(unsigned int p_nRefresh, unsigned int p_nDuration)
+SP_DS_Animation::SP_DS_Animation(unsigned int p_nRefresh, unsigned int p_nDuration,bool b_bColSimMode)
   : m_cTimer(this, (int)GetId()),
     m_bConnected(FALSE),
     m_bRunning(FALSE),
@@ -35,7 +35,8 @@ SP_DS_Animation::SP_DS_Animation(unsigned int p_nRefresh, unsigned int p_nDurati
 	m_msMarkingSets(0),
 	m_msFunctionSets(0),
 	m_msParameterSets(0),
-	m_mnResultsMap(0)
+	m_mnResultsMap(0),
+	m_bColSimMode(b_bColSimMode)
 {
 	m_bIsActiveAnimator = false;
     ConnectEvent();
@@ -81,6 +82,8 @@ SP_DS_Animation::Initialise(SP_DS_Graph* p_pcGraph)
 void
 SP_DS_Animation::OnTimer(wxTimerEvent& p_cEvent)
 {
+	if (m_bColSimMode) return;//for colsimulation 
+
     bool res = TRUE;
 
     if (m_nActStep == 0)

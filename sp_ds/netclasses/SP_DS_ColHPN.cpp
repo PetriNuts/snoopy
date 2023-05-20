@@ -124,7 +124,7 @@ SP_DS_ColHPN::SP_DS_ColHPN( const wxString& p_pchName )
 
 
 SP_DS_Graph*
-SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph )
+SP_DS_ColHPN::CreateGraph( SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap)
 {
 	if ( ! SP_DS_HybridPN::CreateGraph( p_pcGraph ) ) 
 	{

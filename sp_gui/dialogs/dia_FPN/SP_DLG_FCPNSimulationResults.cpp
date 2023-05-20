@@ -370,17 +370,25 @@ std::vector<TriangularFN> SP_DLG_FCPNSimulationResults::LoadParams()
 
 						}
 
-						if (l_nValue)
+						// (l_nValue 28.11.22
 						{
 							TriangularFN ttf(l_nValue, l_nValue, l_nValue);
 							asTFNParams.push_back(ttf);
+							
 						}
+					}else
+					{
+						SP_LOGERROR(l_sName + wxT(" not valid!"));
 					}
 
+				}
+				else {
+					SP_LOGERROR(l_sName+wxT(" not exist!"));
 				}
 				iPos++;
 			}
 		}
+		
 		return asTFNParams;
 }
 SP_VectorDouble   SP_DLG_FCPNSimulationResults::GetFNConstants(const wxString &val)
@@ -469,14 +477,29 @@ void SP_DLG_FCPNSimulationResults::LoadParameters(unsigned long lIteration, doub
 			l_anParameterValue.push_back(c[pos]);
 
 			m_msParameterName2Value[l_asParameterNames[y]] = c[pos];
-
+		 
 			wxString ss1;
 			ss1 << c[pos];
 			m_pcGraph->GetFunctionRegistry()->registerFunction(l_asParameterNames[y], ss1);
 			m_vCurrentSample.push_back(c[pos]);
+
+			if (c[y] < 0) {
+
+				SP_LOGERROR(l_asParameterNames[y]);
+				wxString ss1; ss1 << y;
+				SP_MESSAGEBOX(ss1);
+			}
+
 			continue;
 		}
-
+		if (c[y] < 0) {
+			 
+				SP_LOGERROR(l_asParameterNames[y]);
+				wxString ss1; ss1 << y;
+				SP_MESSAGEBOX(ss1);
+				m_pcMainSimulator->AbortSimulation();
+			 
+		}
 		l_anParameterValue.push_back(c[y]);
 
 		m_msParameterName2Value[l_asParameterNames[y]] = c[y];
@@ -1017,10 +1040,12 @@ void SP_DLG_FCPNSimulationResults::LoadUsedParams()
 		}
 		*/
 		wxString l_sTobeTokenized=m_sParamName;
-				wxStringTokenizer tokenize(l_sTobeTokenized,"(+-/%*) ");
+				wxStringTokenizer tokenize(l_sTobeTokenized,"(+-/%*)^ ");
 				while(tokenize.HasMoreTokens())
 				{
+					
 					wxString l_sToken=tokenize.GetNextToken();
+					if (l_sToken.IsEmpty()) continue;
 					m_mTransParamNames[l_sToken] = l_sName;
 
 				}

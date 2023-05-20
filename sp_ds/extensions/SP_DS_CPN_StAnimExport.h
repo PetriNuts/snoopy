@@ -55,10 +55,14 @@ public:
 
 	wxDialog *m_pc_Overwrite;
 
-	ExportStochCPN(const wxString &, class SP_DS_ColStAnimation *);
+	ExportStochCPN(const wxString &, class SP_DS_ColStAnimation *, bool p_bIsColSimMode=false);
 	void OnRadioChoice(wxCommandEvent &);
 	void OnOK(wxCommandEvent &);
 	void OnExit(wxCommandEvent &);
+
+
+private:
+	bool m_bIsColSimMode;
 
 	DECLARE_EVENT_TABLE()
 };

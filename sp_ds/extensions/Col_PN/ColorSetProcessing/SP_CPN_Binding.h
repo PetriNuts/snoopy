@@ -100,7 +100,9 @@ public:
 	SP_CPN_Binding();	
 	~SP_CPN_Binding();
 
-	bool EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, SP_DS_Animator* p_pcTransAnimator, int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString,int> > >& p_mmmBind2Edge2Mult2Color);
+	bool EnableTestForColorSimulation(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, wxString m_sTransitionName,
+		int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString, int> > >& p_mmmBind2Edge2Mult2Color);
+	bool EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, SP_DS_Animator* p_pcTransAnimator, int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString,int> > >& p_mmmBind2Edge2Mult2Color, const std::vector<wxString>& values = std::vector<wxString>());
 	void GetBinding(map<SP_DS_Edge*, map<wxString, int> >& p_mmEdge2Mult2Color);
 	SP_VectorString GetBindingSelection() {return  m_OutputVector; }//by george
 	vector<vector<wxString> > GetColmpleteBinding() { return m_vvCompleteBinding; }//george

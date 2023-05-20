@@ -10,6 +10,7 @@
 #define __SNOOPY_H__
 
 #include <wx/wx.h>
+#include <wx/config.h>
 #include "sp_utilities.h"
 
 #include "sp_core/SP_Map.h"
@@ -39,6 +40,8 @@ private:
 	double DELTA = 500;
 	// standard offset
 	double STD_OFFSET = 20;
+
+	map<wxString, SP_SetString > m_mlClassNodes;
 
 
 protected:
@@ -84,6 +87,7 @@ public:
     bool ReadOptions();
     bool ReadHistory();
     bool WriteOptions();
+ 	
 
     // accessors
     inline wxBrush* GetCanvasNormalBrush() const { return m_pcCanvasNormalBrush; }
@@ -124,6 +128,15 @@ public:
 		STD_OFFSET = stdOffset;
 	}
 
+	void setNetClases(map<wxString, SP_SetString > p_mNetClassesMap)
+	{
+		m_mlClassNodes = p_mNetClassesMap;
+ 	}
+
+	map<wxString, SP_SetString > getNetClases()
+	{
+		return m_mlClassNodes;
+	}
 };
 
 DECLARE_APP(Snoopy)

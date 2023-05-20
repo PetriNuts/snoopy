@@ -24,7 +24,7 @@ public:
 	SP_DS_FuzzyCPN();
 	SP_DS_FuzzyCPN(const wxString& p_pchName);
 
-	virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGraph);
+	virtual SP_DS_Graph* CreateGraph(SP_DS_Graph* p_pcGraph, SP_MapString2Int p_mgraphicsPosMap = SP_MapString2Int());
 
 	virtual bool MetadataRequirement(SP_DS_Metadata* p_pcMetadata);
 	virtual bool NodeRequirement(SP_DS_Node* p_pcNode);

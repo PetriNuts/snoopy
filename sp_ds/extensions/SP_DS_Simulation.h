@@ -143,6 +143,8 @@ public:
 
 	virtual void SetMemoryFree() = 0;
 
+	virtual void   TestEnablednessColCondition() = 0;//by george
+
 	void SetUnfoldedNet(SP_DS_ColPN_Unfolding* p_pcUnfolding)
 	{
 		m_pcUnfoldedNet = p_pcUnfolding;

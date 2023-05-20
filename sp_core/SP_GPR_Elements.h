@@ -21,6 +21,10 @@
 #define NODE_THICKNESS_MIN 1//by george
 #define NODE_THICKNESS_MAX 20//by george
 #define DEFAULT_THICKNESS 1
+
+#define NODE_NAMEATT_POS_X_MIN 1//by george
+#define NODE_NAMEATT_POS_X_MAX 200//by george
+#define DEFAULT_NAMEATT_POS_X 25
 #include "sp_core/SP_GPR_Base.h"
 #include "sp_gr/shapes/SP_GR_ExtendedDrawnShape.h"
 #include "sp_gr/edges/SP_GR_ExtendedEdge.h"
@@ -48,6 +52,7 @@ protected:
 	SP_MapString2Int m_mnWidth;
 	SP_MapString2Int m_mnThickness;//by george
 	SP_MapString2Bool m_mbFixedSize;
+	SP_MapString2Int m_mnNodeNameAttrPosX;//by george
 
 	map<wxString, wxString> m_msColorSetColor;
 	map<wxString, wxString> m_msMarkingColor;
@@ -68,6 +73,7 @@ protected:
 	map<wxString, wxSpinCtrl*> m_mscWidth;
 
 	map<wxString, wxSpinCtrl*> m_mscThickness;//by george
+	map<wxString, wxSpinCtrl*> m_mscPlceNameAttributePosX;//by george
 	map<wxString, wxCheckBox*> m_mcbFixed;
 
 	map<wxString, wxColourPickerCtrl*> m_mcpColorSet;
@@ -111,6 +117,10 @@ public:
 	void SetNodeThickness(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal);
 	int GetNodeThickness(const wxString& p_sNetClass, const wxString& p_sNodeClass);
 
+	//by george
+	int GetNameAttributeOfNode(const wxString& p_sNetClass, const wxString& p_sNodeClass);
+	void SetNodeNameAttPosX(const wxString& p_sNetClass, const wxString& p_sNodeClass, int p_nVal);
+
 	void SetNodeFixed(const wxString& p_sNetClass, const wxString& p_sNodeClass, bool p_bVal);
 	bool GetNodeFixed(const wxString& p_sNetClass, const wxString& p_sNodeClass);
 
@@ -149,6 +159,8 @@ public:
 	void SetExpressionShowOption(const wxString& p_sNetClass, bool p_bVal);
 	bool GetExpressionShowOption(const wxString& p_sNetClass);
 
+	map<wxString, SP_SetString > GetNetClassesMap() { return m_mlClassNodes; }
+
 
 
 
@@ -161,6 +173,7 @@ public:
 	void OnUpdateTransWidth();
 	void OnUpdateTransHeight();
 
+	map<wxString, int> GetNameAttGRaphicsPosXMap();//by george
 	bool UpdateFromConfig(wxConfig& p_config);
 	bool WriteToConfig(wxConfig& p_config);
 
