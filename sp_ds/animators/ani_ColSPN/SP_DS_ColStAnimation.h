@@ -34,10 +34,13 @@
 #include <wx/filedlg.h>
 #include <fstream>
 #include <wx/stopwatch.h>
+#include <random>
+#include "sp_core/tools/MersenneTwister.h"
+#include <fstream>
 class ExportStochCPN;
 class ImportColAnim;
 
-
+//class MTRand;
 
 struct ColPlace2InstancesStates {
 	wxString colPlace;
@@ -68,11 +71,14 @@ private:
 
 	//MyFrame* frame;
 	//wxScrolledWindow* m_pcScrolledWindow;
+
+
 	
 	//Input parameters for simulation
 	wxTextCtrl* m_pcIntervalStartTextCtrl;
 	wxTextCtrl* m_pcIntervalEndTextCtrl;
 	wxTextCtrl* m_pcResultPointCountTextCtrl;
+	wxTextCtrl* m_pcSeedTextCtrl;
 	wxGauge* gauge;
 	wxStaticText* m_pcHint;
 	wxStaticText* m_pcHintTime;
@@ -95,6 +101,9 @@ private:
 	long m_nStop; //Marking stop
 	int m_nMarkingOption;
 	wxTextFile m_ExportTextfile;
+	wxTextFile m_ExportRandom;//testing, writing generated random numbers 
+	wxTextFile m_ExportRandomDisc;//testing
+	wxTextFile m_ExportBindings;//testing
 	bool m_bAutoConcurrency;
 	int m_nStepCount;
 	wxString m_sTriggiredUnfoldedTrans;
@@ -236,12 +245,26 @@ protected:
 	void DoColSimulation();
 	double ComputeFunctionHazard(int l_nTransition);
 	void  SetSimulationStopWatch(long p_nTime);
+	void RemoveTranistionFromFiringSchedule(const wxString& l_sColTransName);
+	void RemoveRemainingTranistionInstancesFromFiringSchedule(const wxString& l_sColTransName, const std::vector<wxString>& p_vBinding);
+	wxString ColTransName(unsigned long p_nTranNum);
+	double RateFunction(unsigned long p_nTranNumber, const wxString& b);
+	bool EvaluatePredicate(const wxString& p_sPredicate, const wxString& p_sBinding);
+	bool IsVariable(const wxString& p_sVar);
+	wxString SubstituteToken(const wxString& expression, const wxString& token, const wxString& value);
+
+
+
+	long  GetTransitionPosByName(const wxString& p_sName);
 
 	bool  ExtractPlaceIds(const wxString& expression, SP_VectorString& p_vResultVector);
 	wxString  ExtractInstanceMarking(const wxString& p_sColPlaceId, const wxString& color);
-	bool SubstituteRateFunction(const wxString& p_sRate,const wxString& colPlace, SP_VectorString p_vChosenBinding,wxString& substituted);
+	bool SubstituteRateFunction(const wxString& p_sRate,const wxString& colPlace, const wxString& p_vChosenBinding,wxString& substituted);
 	double  GenerateRandomVariableExpDistr(double p_nLambda);
 	long GenerateRandomVariableDiscrete(double p_nSum);
+	long GenerateRandomVariableDiscreteBySeed(double p_nSum);
+	double GenerateRandomVariableExpDistrBySeed(double p_nLambda);
+	void SetSeed(unsigned long p_nSeed);
 
 	wxString GetColorTransitionName(long p_nPos);
 
@@ -269,7 +292,12 @@ protected:
     map< int, SP_DS_ColStPlaceAnimator* > m_mpcPlaceAnimators;
 
 	//color simulation purpose
+	SP_VectorDouble m_RowSum;
+	unsigned m_RowLength;
+	unsigned m_RowCount;
+	unsigned m_nInstanceId;
 	SP_VectorDouble m_anHazardValues;
+	std::map<wxString, double> m_mInstance2HazardValue;
 	double m_nIntervalStart;
 	double m_nIntervalEnd;
 	double m_nIntervalSize;
@@ -278,7 +306,16 @@ protected:
 	bool m_bStopSimulation;
 	SP_VectorString m_vColPlaceNames;
 	std::map<long, SP_VectorString> m_vColTrans2Binding;
-
+	//for Gillespie's SSA
+	std::mt19937 m_Generator;// for seed value
+	unsigned long m_ulSeed = 0;
+	MTRand* m_pcRandGen;// for Gillespie 
+	//std::map<wxString, SP_VectorString> m_vColTrans2Binding;
+	SP_VectorString m_vColTransInstances;
+	std::map<wxString, double> m_mTransInstance2Hazard;
+	std::map<wxString, unsigned> m_mTransInstance2Id;
+	double m_nCombinedHazardValue;
+	//wxFileOutputStream fileStream;
 public:
 	SP_DS_ColStAnimation(unsigned int p_nRefresh, unsigned int p_nDuration, SP_ANIM_STEP_T p_eStepping,bool p_bColSimMode=false);
 	virtual ~SP_DS_ColStAnimation();

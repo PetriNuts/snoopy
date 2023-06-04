@@ -221,23 +221,65 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 	}
 	else
 	{
-		//Randomly select one binding to enable
-		l_nChose = SP_RandomLong(l_EnabledChoiceList.size());
-		m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());//george
-		m_OutputVector = l_CompleteBinding[l_nChose];//by george
+		if (p_vBindingVector.size() == 0) {
+			//Randomly select one binding to enable
+			l_nChose = SP_RandomLong(l_EnabledChoiceList.size());
+			m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());//george
+			m_OutputVector = l_CompleteBinding[l_nChose];//by george
+		}
+		else {
+			//select the index whose binding is given by user
+			bool l_bFound = false;
+			for (auto l_sSimBinding : p_vBindingVector) {
+				for (long i = 0; i < l_CompleteBinding.size(); ++i)
+				{
+					wxString l_sBindVal;
+					for (int j = 0; j < l_CompleteBinding[i].size(); ++j) {
+						l_sBindVal << l_CompleteBinding[i][j];
+						l_sBindVal << wxT("_");
+
+					}
+
+					if (l_sSimBinding == l_sBindVal.BeforeLast('_')) {
+						l_bFound = true;
+						l_nChose = i;
+						m_OutputVector = p_vBindingVector;
+						break;
+					}
+				}
+				if (l_bFound) break;
+			}
+		}
 	}
 	if(l_nChose > (int)(l_EnabledChoiceList.size())-1)
 	{
 		l_nChose = 0;
 	}
-	if (l_CompleteBinding.size()>0 && m_OutputVector.size()==0)
+	if (l_CompleteBinding.size()>0 && m_BindingVector.size()==0 && p_vBindingVector.size()==0)
 	{
 		m_OutputVector.erase(m_OutputVector.begin(), m_OutputVector.end());//george
 		m_OutputVector = l_CompleteBinding[0];//by george
+		m_BindingVector.clear();
+		for (long i = 0; i < l_CompleteBinding.size(); ++i)
+		{
+			//l_CompleteBinding
+			wxString l_sBindVal;
+			for (int j = 0; j < l_CompleteBinding[i].size();++j) {
+				l_sBindVal<< l_CompleteBinding[i][j];
+				l_sBindVal << wxT("_");
+			
+			}
+
+			m_BindingVector.push_back(l_sBindVal.BeforeLast('_'));
+ 		}
+
+		m_OutputVector = m_BindingVector;
+ 		
 	}
 
 	if (p_vBindingVector.size() != 0) {// by george for color simulation, force a transition to fire under a given binding
 		m_OutputVector = p_vBindingVector;
+		
 	}
 	writecolors(&(l_EnabledChoiceList[l_nChose]),p_pcExprInfoVector);
 	return true;
@@ -2205,7 +2247,7 @@ bool SP_CPN_Binding::IsbalanceParentheses(const wxString& p_sColExp)
 {
 	stack<char> a;
 
-	string exp = p_sColExp.ToStdString();
+	std::string exp = p_sColExp.ToStdString();
 
 	for (int i = 0; i < exp.length(); i++)
 	{
@@ -2216,7 +2258,7 @@ bool SP_CPN_Binding::IsbalanceParentheses(const wxString& p_sColExp)
 	}
 	exp.erase(remove_if(exp.begin(), exp.end(), ::isspace), exp.end());
 
-	stack<char> stk;
+	std::stack<char> stk;
 	char x;
 	for (int i = 0; i<exp.length(); i++) {
 		if (exp[i] == '(' || exp[i] == '[' || exp[i] == '{') {

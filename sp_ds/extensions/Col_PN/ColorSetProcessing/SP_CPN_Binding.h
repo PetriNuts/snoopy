@@ -95,6 +95,7 @@ private:
 
 	vector<wxString> m_vMultiTupleExpression;
 	SP_VectorString m_OutputVector;//by george
+	SP_VectorString m_BindingVector;//by george
 	vector<vector<wxString> > m_vvCompleteBinding;//george we need this for checking the possible bindings of the variables when we do import trace fro the col animators
 public:
 	SP_CPN_Binding();	
@@ -104,7 +105,7 @@ public:
 		int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString, int> > >& p_mmmBind2Edge2Mult2Color);
 	bool EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, SP_DS_Animator* p_pcTransAnimator, int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString,int> > >& p_mmmBind2Edge2Mult2Color, const std::vector<wxString>& values = std::vector<wxString>());
 	void GetBinding(map<SP_DS_Edge*, map<wxString, int> >& p_mmEdge2Mult2Color);
-	SP_VectorString GetBindingSelection() {return  m_OutputVector; }//by george
+	SP_VectorString GetBindingSelection() { return m_BindingVector; }// m_OutputVector;//by george
 	vector<vector<wxString> > GetColmpleteBinding() { return m_vvCompleteBinding; }//george
 private:
 	bool BindingInference(SP_MapString2UInt &p_IndexMap, vector<vector<wxString> > & p_CompleteBinding);

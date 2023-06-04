@@ -462,7 +462,7 @@ SP_DS_ColStTransAnimator::InformStPrePlaces(const wxString& p_sColor, const std:
 				SP_CPN_Binding l_cBinding;
 				SP_DS_Animator* l_pcAnimator = dynamic_cast<SP_DS_ColStTransAnimator*>(this);
 				map<wxString, map<SP_DS_Edge*, map<wxString, int> > > l_mmmBind2Edge2Mult2Color;
-				bool l_bEnableTest = l_cBinding.EnableTest(&m_StExprInfoVector,m_bSingleClick,l_pcAnimator,m_nBindingChoice,l_mmmBind2Edge2Mult2Color);
+				bool l_bEnableTest = l_cBinding.EnableTest(&m_StExprInfoVector,m_bSingleClick,l_pcAnimator,m_nBindingChoice,l_mmmBind2Edge2Mult2Color,values);
 				
 
 				if(!l_bEnableTest)

@@ -477,26 +477,124 @@ double SP_DS_ColStAnimation::GenerateRandomVariableExpDistr(double p_nLambda)
 double SP_DS_ColStAnimation::CalculateTotalHazard() {
 
 	double l_dTotal = 0.0; 
-	m_anHazardValues.assign(m_mpcTransitionAnimators.size(),0.0);
-	m_vColTrans2Binding.clear();
+	//m_anHazardValues.assign(m_mpcTransitionAnimators.size(),0.0);
+	//m_anHazardValues.clear();
+	//m_vColTrans2Binding.clear();
+	//m_vColTransInstances.clear();
+	//m_RowSum.clear();
+	//m_vColTransInstances.clear();
 
 	for (long i = 0; i < m_mpcTransitionAnimators.size(); ++i) {
 		
 		double l_dHaz = ComputeFunctionHazard(i);
 
-		m_anHazardValues[i] = l_dHaz;
+		//m_anHazardValues[i] = l_dHaz;
 
 		l_dTotal += l_dHaz;
 	}
+
+	
 	return l_dTotal;
 
 }
 
+void SP_DS_ColStAnimation::SetSeed(unsigned long ulSeed)
+{
+	m_Generator.seed(ulSeed);
+	if (m_pcRandGen) {
+		m_pcRandGen->seed(ulSeed);
+	}
+	m_ulSeed = ulSeed;
+
+}
+
+
+double SP_DS_ColStAnimation::GenerateRandomVariableExpDistrBySeed(double p_nLambda)
+{
+
+	double l_nRandom = m_pcRandGen->randDblExc();//m_pcRandGen->randExc();
+	wxString l_sRN; l_sRN<<"lambda Exp: " << p_nLambda;
+
+	//SP_LOGMESSAGE(l_sRN);
+	//m_ExportRandom.AddLine(l_sRN);
+
+	return -1 * log(l_nRandom) / p_nLambda;
+}
+
+long SP_DS_ColStAnimation::GenerateRandomVariableDiscreteBySeed(double p_nSum)
+{
+
+	m_anHazardValues.clear();
+	for (const auto& pair : m_mInstance2HazardValue) {
+		
+		double value = pair.second;
+		m_anHazardValues.push_back(value);
+	}
+	
+	 
+	double r = m_pcRandGen->randDblExc();
+
+	for (unsigned n = 0; n < 2; ++n)
+	{
+		double l_nU = p_nSum * r;
+		SP_VectorDouble::iterator rit = m_RowSum.begin();
+		SP_VectorDouble::iterator rbegin = m_RowSum.begin();
+		SP_VectorDouble::iterator rend = m_RowSum.end();
+		unsigned i = 0;
+		for (; rit != rend && (l_nU -= *rit) > 0; ++rit, ++i)
+		{
+		}
+		if (rit == rend)
+		{
+			--i;
+			--rit;
+		}
+		l_nU += *rit;
+
+		SP_VectorDouble::iterator it = m_anHazardValues.begin()
+			+  (i * m_RowLength);// (i*m_anHazardValues.size());
+		SP_VectorDouble::iterator begin = m_anHazardValues.begin();
+		SP_VectorDouble::iterator end = m_anHazardValues.end();
+		for (; it != end && (l_nU -= *it) > 0; ++it)
+		{
+		}
+		if (l_nU <= 0)
+		{
+			return std::distance(begin, it) - (it == end);
+		}
+		else
+
+		{
+			m_nCombinedHazardValue = p_nSum = 0.0;
+			std::fill(m_RowSum.begin(), m_RowSum.end(), 0.0);
+			rit = rbegin;
+			i = 0;
+			for (it = begin; it != end; ++it)
+			{
+				p_nSum += *it;
+				*rit += *it;
+				++i;
+				if (i == m_RowLength)
+				{
+					++rit;
+					i = 0;
+				}
+			}
+			m_nCombinedHazardValue = p_nSum;
+		}
+	}
+	
+	return -1;
+	 
+}
+
+
 long SP_DS_ColStAnimation::GenerateRandomVariableDiscrete(double p_nSum)
 {
+	double r = m_pcRandGen->randDblExc();
 	while (true)
 	{
-		double l_nU = p_nSum * SP_RandomDouble();
+		double l_nU = p_nSum *  SP_RandomDouble();
 		double l_nRunningSum = 0;
 		SP_VectorDouble::const_iterator l_it;
 		long l_nTransitionPos = 0;
@@ -535,9 +633,10 @@ wxString SP_DS_ColStAnimation::GetColorTransitionName(long p_nPos)
 
 }
 
-bool SP_DS_ColStAnimation::SubstituteRateFunction(const wxString& p_sRate, const wxString& colPlace, SP_VectorString p_vChosenBinding, wxString& substituted)
+bool SP_DS_ColStAnimation::SubstituteRateFunction(const wxString& p_sRate, const wxString& colPlace, const wxString& p_sChosenBinding, wxString& substituted)
 {
-	wxString l_sMarking = ExtractInstanceMarking(colPlace, p_vChosenBinding[0]);
+	wxString l_sMarking = ExtractInstanceMarking(colPlace, p_sChosenBinding);
+	if (l_sMarking == wxT("0")) { SP_MESSAGEBOX(p_sRate+wxT(" ")+ p_sChosenBinding); }
 	substituted = p_sRate;
 	substituted.Replace(colPlace, l_sMarking);
 	return true;
@@ -639,7 +738,7 @@ wxString  SP_DS_ColStAnimation::ExtractInstanceMarking(const wxString& p_sColPla
 
 		}
 	}
-	return wxT("");
+	return wxT("0");
 }
 
 bool  SP_DS_ColStAnimation::ExtractPlaceIds(const wxString& expression, SP_VectorString& p_vResultVector)
@@ -664,81 +763,240 @@ bool  SP_DS_ColStAnimation::ExtractPlaceIds(const wxString& expression, SP_Vecto
 	}
 }
 
+long SP_DS_ColStAnimation::GetTransitionPosByName(const wxString& p_sName)
+{
+	//if (!m_mpcTransitionAnimators[l_nTransition]->IsEnabled(b)) return 0.0;
+
+	//l_nTransition is enabled under binding <<b>>
+	for (long i = 0;i<m_mpcTransitionAnimators.size();++i)
+	{
+		SP_DS_Node* pc_Transnode = (SP_DS_Node*)(m_mpcTransitionAnimators[i])->GetParentNode();
+		SP_DS_Attribute* l_pcAttrTran = (pc_Transnode)->GetAttribute(wxT("Name"));
+		SP_DS_NameAttribute* l_pcNameAttrTr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttrTran);
+		wxString l_sTrnasName = l_pcNameAttrTr->GetValueString();
+
+		if (l_sTrnasName == p_sName) return i;
+	}
+
+	return -1;//not found
+}
+
+
+void SP_DS_ColStAnimation::RemoveRemainingTranistionInstancesFromFiringSchedule(const wxString& l_sColTransName, const std::vector<wxString>& p_vBinding)
+{
+	// we need to go to the all instances that are not enabled 
+	// reset their corresponding Hazard values
+	for (const auto& pair : m_mInstance2HazardValue) {
+		const wxString& key = pair.first;
+		double l_dHz = pair.second;
+
+		if (key.StartsWith(l_sColTransName)) {
+			// Key matches the given prefix, process it accordingly
+			wxString l_sColor;
+
+			//wxString fullString = wxT("t_m_1_1_1");
+
+			wxString prefix = l_sColTransName + wxT("_");  // Given prefix
+			wxString substring = key.Mid(prefix.Length()); // fetch the corresponding binding
+
+			if (std::find(p_vBinding.begin(), p_vBinding.end(), substring) != p_vBinding.end()) continue;
+
+			//if (key.EndsWith(l_sColor)) {
+			m_nCombinedHazardValue -= l_dHz;
+
+			auto l_it = m_mTransInstance2Id.find(key);
+			if (l_it != m_mTransInstance2Id.end())
+			{
+				unsigned l_nTransInstId = l_it->second;
+				m_RowSum[l_nTransInstId / m_RowLength] -= l_dHz;
+				m_mInstance2HazardValue[key] = 0;
+			}
+
+			if (m_nCombinedHazardValue < 0)
+			{
+				m_nCombinedHazardValue = 0;
+			}
+
+			wxString l_sInst;
+			l_sInst << l_sColTransName << wxT("|") << substring;
+			auto it = std::find(m_vColTransInstances.begin(), m_vColTransInstances.end(), l_sInst);
+			if (it != m_vColTransInstances.end()) {// remove this instance from firing candidates
+				m_vColTransInstances.erase(it);
+				//std::cout << "Element removed successfully!" << std::endl;
+			}
+
+		}
+	}
+}
+
+void SP_DS_ColStAnimation::RemoveTranistionFromFiringSchedule(const wxString& l_sColTransName)
+{
+	// we need to go to the all instances that are not enabled 
+	// reset their corresponding Hazard values
+	for (const auto& pair : m_mInstance2HazardValue) {
+		const wxString& key = pair.first;
+		double l_dHz = pair.second;
+
+		if (key.StartsWith(l_sColTransName)) {
+			// Key matches the given prefix, process it accordingly
+			m_nCombinedHazardValue -= l_dHz;
+
+			auto l_it = m_mTransInstance2Id.find(key);
+			if (l_it != m_mTransInstance2Id.end())
+			{
+				unsigned l_nTransInstId = l_it->second;
+				m_RowSum[l_nTransInstId / m_RowLength] -= l_dHz;
+				m_mInstance2HazardValue[key] = 0;
+
+				wxString l_spref = l_sColTransName + wxT("_");
+				wxString substring = key.Mid(l_spref.Length());
+
+				wxString l_sInst;
+				l_sInst << l_sColTransName << wxT("|") << substring;
+				auto it = std::find(m_vColTransInstances.begin(), m_vColTransInstances.end(), l_sInst);
+				if (it != m_vColTransInstances.end()) {// remove this instance from firing candidates
+					m_vColTransInstances.erase(it);
+					//std::cout << "Element removed successfully!" << std::endl;
+				}
+				 
+			}
+			
+			if (m_nCombinedHazardValue < 0)
+			{
+				m_nCombinedHazardValue = 0;
+			}
+		}
+	}
+
+}
+
+
 double SP_DS_ColStAnimation::ComputeFunctionHazard(int l_nTransition)
 {
 
 	SP_DS_ColStTransAnimator* l_pcNodeTrans = m_mpcTransitionAnimators[l_nTransition];
 
-	if (!l_pcNodeTrans) return 0.0;
+	if (l_pcNodeTrans==nullptr) return 0.0;
 
 	double l_dHaz = 0.0;
-	///
-	SP_DS_ColListAttribute* l_pcColList = nullptr;
-	SP_DS_Node* l_pcNode = l_pcNodeTrans->GetParentNode();
 
-	///SP_DS_Attribute* l_pcAttr = (l_pcNode)->GetAttribute(wxT("Name"));
-	//SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
-
-	l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("FunctionList")));
+	wxString l_sTrnasName = ColTransName(l_nTransition);  
 	
-	//if (!IsTransitionEnabled(l_pcNode)) return 0.0; //if the transition is not enabled, then return 0 as hazard value
 
 	SP_VectorString b;
-	if(!m_mpcTransitionAnimators[l_nTransition]->IsEnabled(b)) return 0.0;
+	if (!m_mpcTransitionAnimators[l_nTransition]->IsEnabled(b))
+	{//we need to remove the relevant instance from firing schedule
+		RemoveTranistionFromFiringSchedule(l_sTrnasName);
+		return 0.0;
+	}
 
-	//l_nTransition is enabled under binding <<b>>
+		for (auto binding : b) {
 
-	for (unsigned j = 1; j < l_pcColList->GetColCount(); j++)
-	{
+			double l_dEvaluatedRateFunction = RateFunction(l_nTransition, binding);
+			l_dHaz = l_dEvaluatedRateFunction;
 
-		wxString l_sRatefunction = l_pcColList->GetCell(0, j);
+			//if (l_dHaz <= 0.0) continue;
+			
+            wxString l_sInstance = l_sTrnasName + wxT("_") + binding;
 
-		SP_VectorString l_vPlaceVector;
-		wxString l_sSubstituedRF;
-		if (ExtractPlaceIds(l_sRatefunction, l_vPlaceVector)) {
-			for (auto colPlace : l_vPlaceVector) {
-				SubstituteRateFunction(l_sRatefunction, colPlace, b, l_sSubstituedRF);
+			auto itFindInst = m_mTransInstance2Id.find(l_sInstance);
+			unsigned l_nInstTNum = 0;
 
-				l_sRatefunction = l_sSubstituedRF;
+
+			if (itFindInst == m_mTransInstance2Id.end())
+			{
+				m_mTransInstance2Id[l_sInstance] = m_nInstanceId++;
+				l_nInstTNum = m_nInstanceId;
+				if (m_nInstanceId > 100) {
+					m_RowLength = floor(sqrt((double)m_nInstanceId));
+					m_RowCount = m_nInstanceId / m_RowLength;
+					while (m_RowLength * m_RowCount < m_nInstanceId)
+					{
+						++m_RowCount;
+					}
+				}
+				else {
+					m_RowLength = m_nInstanceId;
+					m_RowCount = 1;
+				}
 
 			}
-			l_sRatefunction = l_sSubstituedRF;
-		}
+			else {
+				l_nInstTNum = itFindInst->second;
+			}
+
+		 
+				if (m_RowSum.size() ==0) {
+					m_RowSum.assign(m_RowCount, 0.0);
+					std::fill(m_RowSum.begin(), m_RowSum.end(), 0.0);
+				}
+
+				if (m_RowCount > 1) {
+					SP_VectorDouble l_vnewVector;
+					l_vnewVector.assign(m_RowCount, 0.0);
+
+					for (unsigned k = m_RowSum.size(); k < m_RowCount; ++k) {
+						l_vnewVector.push_back(0.0);
+					}
+
+					m_RowSum = l_vnewVector;
+				}
 			
+			
+		
 
-		SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
-		SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sRatefunction));
-		if (!l_pcFunction)
-		{
-			return false;
+			double l_oldHazard = 0.0;
+			auto l_it = m_mInstance2HazardValue.find(l_sInstance);
+
+			if (l_it != m_mInstance2HazardValue.end()) {
+				l_oldHazard = l_it->second;
+				m_nCombinedHazardValue -= l_oldHazard;
+			}
+		 
+
+			l_dHaz = l_dHaz < 0 ? 0 : l_dHaz;
+			wxString l_sInst; l_sInst << l_sTrnasName << wxT("|") << binding;
+			m_anHazardValues.push_back(l_dHaz);
+			if (std::find(m_vColTransInstances.begin(), m_vColTransInstances.end(), l_sInst) == m_vColTransInstances.end())
+			{
+				m_vColTransInstances.push_back(l_sInst);
+			}
+			 
+			m_mInstance2HazardValue[l_sInstance] = l_dHaz;
+
+
+			//Add the new value to the cumulative propensity
+			m_nCombinedHazardValue += l_dHaz;
+
+			//ToDo: l_nTransition should be instance number not ColTrans
+			unsigned sId;
+			if (l_nInstTNum == 0)
+			{
+				sId = (l_nInstTNum) / m_RowLength;
+			}
+			else {
+				sId  = (l_nInstTNum - 1) / m_RowLength;
+			}
+			
+			m_RowSum[sId] -= l_oldHazard;
+			m_RowSum[sId] += l_dHaz;
+
+			if (m_nCombinedHazardValue < 0)
+			{
+				m_nCombinedHazardValue = 0;
+			}
+ 
 		}
 
-		SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
-
-		double val = 0;
-		val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, val }();
-		l_dHaz = val;
-
-		//get source edges
-		SP_ListEdge::const_iterator l_it;
-		const SP_ListEdge* sourceEdges = l_pcNode->GetTargetEdges();
-	
-
-		for (l_it = sourceEdges->begin(); l_it != sourceEdges->end(); ++l_it) {
-			//iterate over the pre-places of the chosen transition
-			SP_DS_Node* node = (SP_DS_Node*)(*l_it)->GetSource();
-			SP_DS_Attribute* l_pcAttr = (node)->GetAttribute(wxT("Name"));
-			SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
-			//SP_LOGMESSAGE(l_pcNameAttr->GetValueString());
-
-			int state = TokenNumerOfAnimatorPlace(l_pcNameAttr->GetValueString(),b);
-			l_dHaz *= state;
-		}
-
-	} 
-	m_vColTrans2Binding[l_nTransition] = b;
-	return l_dHaz;
+		// here we need to check the complement set of <b>, refferes to <b`>
+		//<b`>:  the binding set, that the colored transition of index l_nTransition is not enabled using them
+		RemoveRemainingTranistionInstancesFromFiringSchedule(l_sTrnasName,b);
+ 
+	 
+	return 1;
 }
+
+
 
 double SP_DS_ColStAnimation::SimulateSingleStep(double p_dcurrentTime) {
 
@@ -754,23 +1012,52 @@ double SP_DS_ColStAnimation::SimulateSingleStep(double p_dcurrentTime) {
 		return -1;
 	}
 
-	double tau = GenerateRandomVariableExpDistr(l_dTotalHazard);
+	double tau = GenerateRandomVariableExpDistrBySeed(m_nCombinedHazardValue);
 
 	p_dcurrentTime += tau;
 
 
-	long l_nSelectedTransition = GenerateRandomVariableDiscrete(l_dTotalHazard);
+	long l_nSelectedTransition = GenerateRandomVariableDiscreteBySeed(m_nCombinedHazardValue);
 
-	wxString l_sIndex; l_sIndex << "selected transition is: " << l_nSelectedTransition <<" with name  "<< GetColorTransitionName(l_nSelectedTransition);
+	wxString l_sIndex2; l_sIndex2 << "selected transition is: " << l_nSelectedTransition;// << " with name  " << GetColorTransitionName(l_nSelectedTransition);
 
-	SP_LOGMESSAGE(l_sIndex);
+	//SP_LOGMESSAGE(l_sIndex2);
 
+	
+	wxString l_sTransInstance;// = m_vColTransInstances[l_nSelectedTransition];
+	long l_nIndex = 0;
+	for (auto pair : m_mInstance2HazardValue) {
+	
+		if (l_nIndex == l_nSelectedTransition)
+		{
+			l_sTransInstance = pair.first;
+			break;
+		}
+		++l_nIndex;
+	}
+	wxString l_sInstance = l_sTransInstance;// l_sTransInstance.BeforeFirst('_');
+	
+	//l_sInstance.Replace(wxT("|"), wxT("_"));
+
+	wxString l_sIndex; 
+	l_sIndex << "selected transition instance is : " << l_sInstance;
 	//if(m_vColTrans2Binding.find()
-	auto it= m_vColTrans2Binding.find(l_nSelectedTransition);
+	SP_LOGMESSAGE(l_sIndex);
+	m_ExportBindings.AddLine(l_sIndex);
+
+
+	wxString l_sColTransName = l_sTransInstance.BeforeFirst(wxChar('_'));//BeforeFirst(wxChar('|'))
+
+	//auto it= m_vColTrans2Binding.find(l_nSelectedTransition);
+
 	SP_VectorString l_vbindingVector;
 
-	if(it!= m_vColTrans2Binding.end())
-		l_vbindingVector  = it->second;
+	l_vbindingVector.push_back(l_sTransInstance.AfterFirst(wxChar('_')));
+
+
+	l_nSelectedTransition = GetTransitionPosByName(l_sColTransName);
+	//if(it!= m_vColTrans2Binding.end())
+	//	l_vbindingVector  = it->second;
 	//if(m_vColTrans2Binding.find()
 
 	//SP_MESSAGEBOX(l_sIndex);
@@ -843,6 +1130,28 @@ bool SP_DS_ColStAnimation::InitiliseSimulator() {
 		m_nIntervalEnd = dblValue;
 	}
 
+
+	wxString l_sSeed = m_pcSeedTextCtrl->GetValue();
+
+	 long l_nSeed;
+	success = l_sSeed.ToLong(&l_nSeed);
+
+	m_pcRandGen = new MTRand();// necessary here before we set the seed for the random number
+
+	if (!success) {
+		// generate a random Seed 
+		std::random_device rd;
+		SetSeed(rd());
+		wxString l_sSeed;
+		l_sSeed << m_ulSeed;
+		m_pcSeedTextCtrl->SetValue(l_sSeed);
+	}
+	else {//feed with user's seed
+		SetSeed(l_nSeed);
+	}
+	
+
+
 	if (!StartTimer()) {
 		l_sLogmsg << "Error while unfolding color places";
 		SP_LOGMESSAGE(l_sLogmsg);
@@ -874,6 +1183,30 @@ bool SP_DS_ColStAnimation::InitiliseSimulator() {
 	if (!m_cValueAssign.InitializeColorset(m_cColorSetClass))
 		return false;
 
+
+
+	wxString l_sLog; l_sLog << "Seed: " << m_ulSeed;
+
+	SP_LOGMESSAGE(l_sLog);
+
+	//if (m_ExportRandom.Create(wxT("random.txt")) == false)
+	//{
+	//	SP_MESSAGEBOX(wxT("Error in creating file."), wxT("Error"), wxOK | wxICON_ERROR);
+	//}
+
+	//if (m_ExportRandomDisc.Create(wxT("random_disc.txt")) == false)
+	//{
+	//	SP_MESSAGEBOX(wxT("Error in creating file."), wxT("Error"), wxOK | wxICON_ERROR);
+	//}
+	 
+	//if (m_ExportBindings.Create(wxT("fired_instances.txt")) == false)
+	//{
+	//	SP_MESSAGEBOX(wxT("Error in creating file."), wxT("Error"), wxOK | wxICON_ERROR);
+	//}
+	
+	m_nInstanceId = 0;
+
+
 	return true;
 
 }
@@ -882,6 +1215,11 @@ void SP_DS_ColStAnimation::Simulate() {
 
 	if (!InitiliseSimulator()) { return; }
 
+	m_nCombinedHazardValue = 0.0;
+	m_anHazardValues.clear();
+	m_RowSum.clear();
+	m_vColTrans2Binding.clear();
+	m_vColTransInstances.clear();
 	 
 	m_pcBtn->SetBackgroundColour(wxColour(255, 0, 0));
 
@@ -1776,6 +2114,15 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 		m_pcResultPointCountTextCtrl = new wxTextCtrl(p_pcCtrl, -1, "100", wxDefaultPosition, wxDefaultSize, 0);
 		l_pcRowSizerSimConfig3->Add(m_pcResultPointCountTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
 		p_pcSizer->Add(l_pcRowSizerSimConfig3, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
+		wxSizer* l_pcRowSizerSimConfigSeed = new wxBoxSizer(wxHORIZONTAL);
+		l_pcRowSizerSimConfigSeed->Add(new wxStaticText(p_pcCtrl, -1, wxT("Seed Value:")),
+			wxSizerFlags(1).Expand().Border(wxALL, 2));
+		m_pcSeedTextCtrl = new wxTextCtrl(p_pcCtrl, -1, "Random Seed", wxDefaultPosition, wxDefaultSize, 0);
+		l_pcRowSizerSimConfigSeed->Add(m_pcSeedTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
+		p_pcSizer->Add(l_pcRowSizerSimConfigSeed, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
 
 		wxSizer* l_pcRowSizerSimConfig4 = new wxBoxSizer(wxHORIZONTAL);
 		l_pcRowSizerSimConfig4->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_ExportSIMTRACES_COLSIM, wxT("Export Traces")), 0, wxALL, 5);
@@ -3627,7 +3974,7 @@ void SP_DS_ColStAnimation::DoExport()
 	l_sTemp.Clear();
 
 	l_sTemp << wxT("0\t");
-
+	//write initial marking
 	for (auto it = m_mPlaceInstance2Marking.begin(); it != m_mPlaceInstance2Marking.end(); ++it) {
 		l_sTemp << it->second << wxT("\t");
 	}
@@ -3636,22 +3983,6 @@ void SP_DS_ColStAnimation::DoExport()
 	m_ExportTextfile.AddLine(l_sTemp);
 
 
-	/*
-	struct ColPlace2InstancesStates {
-	wxString colPlace;
-	SP_MapString2String color2Marking;
-	};
-
-
-	struct StepState {
-
-	double timepoint;
-	std::vector<ColPlace2InstancesStates> instancePlaces;
-
-	};
-
-	vector<StepState> Traces
-	*/
 
 	for (long i = 1; i < Traces.size(); ++i) {
 
@@ -3692,41 +4023,56 @@ void SP_DS_ColStAnimation::DoExport()
 void SP_DS_ColStAnimation::OnExportSimTraces(wxCommandEvent &p_pc_Event)
 {
 	 
-
+	 
 	ExportStochCPN *export_frame = new ExportStochCPN(wxT("Export Details"), this,true);
 
 	export_frame->Show(true);
+	 
+ 
+	 
+ 
+	//ToDO: extend this parser by variable supporting, error handling and comparision operations
+	/**
+	std::string l_sExpression;
+	
+	wxTextEntryDialog l_pcDialog(NULL, _T("enter your expression to be evaluted"), wxT("Add Exp"));
 
  
-	/**
-	MathExpressionParser parser;
-	try
-	{
-		wxTextEntryDialog l_pcDialog(NULL, _T("enter your expression to be evaluted"), wxT("Add Exp"));
-
-
-
-		//l_pcDialog.SetValue(l_sName);
-
+	
+	    std::string res_log;
 		int l_nModalResult = l_pcDialog.ShowModal();
-		std::string l_sExpression = l_pcDialog.GetValue().ToStdString();
 		if (wxID_OK == l_nModalResult) {
 			l_sExpression = l_pcDialog.GetValue().ToStdString();
 		}
-	//	parser.registerConstant("k1", 0.06);
-		double result = parser.parse(l_sExpression);
-		std::stringstream ss;
-		ss << "Result of the exp "<< l_sExpression <<"is :"<< setprecision(15) << result; // Set the desired precision
-		std::string output = ss.str();
-		SP_LOGMESSAGE(output);
- 	}
-	catch (const std::exception& e)
-	{
-		//std::string l_sError = "Error: " + e.what().c_str();
-		const char* s = e.what();
-		SP_LOGMESSAGE(s);
-	}
-	*/
+	    
+		std::stringstream ss(l_sExpression);
+
+		using iterator_type = boost::spirit::istream_iterator;
+		iterator_type begin(ss >> std::noskipws), end;
+
+		 ExpressionEvaluator evaluator;
+		 evaluator.setVariable("k", 2);
+		 evaluator.setVariable("s1", 0.5);
+		 evaluator.setVariable("k_1", 1);
+		ExpressionGrammar<iterator_type> grammar(evaluator);
+
+		double result;
+		bool success = boost::spirit::qi::phrase_parse(begin, end, grammar, boost::spirit::ascii::space, result);
+
+		if (success && begin == end)
+		{
+			res_log = "Result of: " + l_sExpression + " is: "+ std::to_string(result);
+		}
+		else
+		{
+			
+			res_log = "Parsing of the expression" + l_sExpression +" failed at position: ";// +std::to_string(position) + "\n";
+	
+		}
+		SP_LOGMESSAGE(res_log);
+		*/
+		
+
 }
 
 void SP_DS_ColStAnimation::OnSimulationStart(wxCommandEvent &p_pc_Event)
@@ -3736,8 +4082,16 @@ void SP_DS_ColStAnimation::OnSimulationStart(wxCommandEvent &p_pc_Event)
 	DoExport();
 
 	m_pcBtn->SetBackgroundColour(wxColour(0, 255, 0));
-	//RemoveIsolatedPlaces();
-	//SP_MESSAGEBOX(filebrowse->GetPath());
+
+	//m_ExportRandom.Write();
+	//m_ExportRandom.Close();
+
+	//m_ExportRandomDisc.Write();
+	//m_ExportRandomDisc.Close();
+
+//	m_ExportBindings.Write();
+	//m_ExportBindings.Close();
+
 }
 
 void SP_DS_ColStAnimation::OnExport(wxCommandEvent &p_pc_Event)
@@ -3813,6 +4167,12 @@ int SP_DS_ColStAnimation::TokenNumerOfAnimatorPlace(wxString p_sName, SP_VectorS
 			for (unsigned int i = 0; i < l_pcCollis->GetRowCount(); i++)
 			{
 				wxString color = l_pcCollis->GetCell(i, 0);
+
+				//deal with tuple color (c1,c2,..)
+				color.Replace(wxT(","), "_");
+				color.Replace(wxT("("), "");
+				color.Replace(wxT(")"), "");
+				color.Replace(wxT(" "), "");
 				wxString marking;
 
 				if (color != wxT("all()") && color == l_sGivenColor)
@@ -4059,6 +4419,7 @@ void SP_DS_ColStAnimation::OutputStateAt(double p_dTime) {
 					}
 					else {
 						wxString l_sTupleColor = l_pcCollis->GetCell(i, 0);
+						l_ActualColorVector.push_back(l_sTupleColor);
 
 						l_sTupleColor.Replace(wxT(","), "_");
 						l_sTupleColor.Replace(wxT("("), "");
@@ -4072,12 +4433,13 @@ void SP_DS_ColStAnimation::OutputStateAt(double p_dTime) {
 						marking << l_pcCollis->GetCell(i, 1);
 
 						instances[instance_id] = marking;
+						
 					}
 					
 
 					if (m_mPlaceInstance2Marking.find(instance_id) == m_mPlaceInstance2Marking.end()) {
 						m_mPlaceInstance2Marking[instance_id] = marking;
-					}
+ 					}
 				}
 				else{
 					//deal with initial marking x`all()
@@ -4131,7 +4493,7 @@ void SP_DS_ColStAnimation::OutputStateAt(double p_dTime) {
 			}
 
 			//l_sMulti << l_pcCollis->GetCell(i, 1) << wxT("`") << l_pcCollis->GetCell(i, 0) << wxT("++");
-			if (!l_bIsAll) {// in case marking is not all(), we need to complete the rest of colors of instances with zeros
+			if (!l_bIsAll ) {// in case marking is not all(), we need to complete the rest of colors of instances with zeros
 				if (l_ActualColorVector.size() != l_ColorVector.size()) {
 					//ToDO: deal with product colors
 					for (auto color : l_ColorVector) {
@@ -4144,6 +4506,10 @@ void SP_DS_ColStAnimation::OutputStateAt(double p_dTime) {
 
 							wxString marking = wxT("0");
 							instances[instance_id] = marking;
+
+							if (m_mPlaceInstance2Marking.find(instance_id) == m_mPlaceInstance2Marking.end()) {
+								m_mPlaceInstance2Marking[instance_id] = marking;
+							}
 						}
 					}
 				}
@@ -4769,3 +5135,211 @@ void SP_DS_ColStAnimation::ResetTransSequenceFile()
 	wxString l_sTimeFormat = wxString::Format("%*s%s", 80, "", l_sTime);
 	m_pcHintTime->SetLabel(l_sTimeFormat);
 }
+
+ wxString SP_DS_ColStAnimation::ColTransName(unsigned long p_nTranNum)
+ {
+
+	 SP_DS_ColStTransAnimator* p_pcTrans = m_mpcTransitionAnimators[p_nTranNum];
+
+	 if (!p_pcTrans) return wxT("");
+
+	 SP_DS_ColListAttribute* l_pcColList = nullptr;
+	 SP_DS_Node* l_pcNode = p_pcTrans->GetParentNode();
+
+	 SP_DS_Node* pc_Transnode = (SP_DS_Node*)(p_pcTrans)->GetParentNode();
+	 SP_DS_Attribute* l_pcAttrTran = (pc_Transnode)->GetAttribute(wxT("Name"));
+	 SP_DS_NameAttribute* l_pcNameAttrTr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttrTran);
+
+	 return l_pcNameAttrTr->GetValueString();
+ }
+
+ wxString SP_DS_ColStAnimation::SubstituteToken(const wxString& expression, const wxString& token, const wxString& value)
+ {
+
+	 wxString result = expression;
+
+	 size_t pos = result.Find(token);
+	 size_t tokenLength = token.length();
+	 size_t valueLength = value.length();
+
+	 while (pos != wxString::npos)
+	 {
+		 result = result.Left(pos) + value + result.Mid(pos + tokenLength);
+		 pos = result.Find(token);
+		 if (pos != wxString::npos)
+			 pos += valueLength;
+	 }
+
+	 return result;
+ }
+
+
+
+
+ bool SP_DS_ColStAnimation::IsVariable(const wxString& p_sVar)
+ {
+	 auto  it = m_cColorSetClass.GetVariableMap()->find(p_sVar);
+	 if (it != m_cColorSetClass.GetVariableMap()->end())
+	 {
+		 return true;
+	 }
+
+	 return false;
+ }
+
+ bool SP_DS_ColStAnimation::EvaluatePredicate(const wxString& p_sPredicate, const wxString& p_sBinding)
+ {
+	 wxString l_sEmptyCheck = p_sPredicate;
+	 l_sEmptyCheck.Replace(wxT(" "), wxT(""));
+	 l_sEmptyCheck.Replace(wxT("\t"), wxT(""));
+	 l_sEmptyCheck.Replace(wxT("\n"), wxT(""));
+
+	 if (l_sEmptyCheck == wxT("true"))
+	 {
+		 return true;
+	 }
+	 wxString l_sSubstitued = l_sEmptyCheck;
+	 wxStringTokenizer tokenizer(p_sPredicate, wxT("=><&|()+-*/"), wxTOKEN_RET_EMPTY_ALL);
+
+	 while (tokenizer.HasMoreTokens())
+	 {
+		 wxString token = tokenizer.GetNextToken().Trim();
+		 if (IsVariable(token))
+		 {
+			
+			 l_sSubstitued =  SubstituteToken(l_sSubstitued, token, p_sBinding);
+		 }
+	 }
+	 
+
+	 std::stringstream ss(l_sSubstitued);
+
+	 using iterator_type = boost::spirit::istream_iterator;
+	 iterator_type begin(ss >> std::noskipws), end;
+	 ExpressionEvaluator evaluator;
+	
+
+	 std::vector<SP_CPN_ColorSet*>* l_pcColorSetVector = m_cColorSetClass.GetColorSetVector(); //.LookupColorSet(l_sColorSetName);
+
+	 for (int i = 0; i < l_pcColorSetVector->size(); ++i) {
+		 SP_CPN_ColorSet l_pcCs = *l_pcColorSetVector->at(i);
+		 SP_VectorString l_vColoValues = l_pcCs.GetStringValue();
+
+
+		 if (l_pcCs.GetDataType() == CPN_ENUM) {
+		 for (unsigned i = 0; i < l_vColoValues.size(); ++i) {
+			 evaluator.setVariable(l_vColoValues[i], i);
+		 }
+	 }
+		 
+		  
+
+	 }
+
+	 ExpressionGrammar<iterator_type> grammar(evaluator);
+	 double result;
+	 wxString res_log;
+	 bool success = boost::spirit::qi::phrase_parse(begin, end, grammar, boost::spirit::ascii::space, result);
+
+	 if (success && begin == end)
+	 {
+		 return (bool)result;
+	 }
+	 else
+	 {
+
+		 res_log = "Parsing of the expression" + l_sSubstitued + " failed at position: ";//
+
+	 }
+
+	 SP_LOGERROR(res_log);
+
+	 return false;
+ }
+
+ double SP_DS_ColStAnimation::RateFunction(unsigned long p_nTranNumber, const wxString& b) {
+
+	 SP_DS_ColStTransAnimator* l_pcNodeTrans = m_mpcTransitionAnimators[p_nTranNumber];
+
+	 if (l_pcNodeTrans == nullptr) return 0.0;
+
+	 SP_DS_ColListAttribute* l_pcColList = nullptr;
+
+	 SP_DS_Node* l_pcNode = l_pcNodeTrans->GetParentNode();
+
+	 l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("FunctionList")));
+
+	 //deal with predicates of each rate function
+	 unsigned l_nPredicateIndex = 0;
+	 double val = 0.0;
+	 for (unsigned j = 0; j < l_pcColList->GetRowCount(); j++)
+	 {
+		 wxString l_sPredicate = l_pcColList->GetCell(j, 0);
+
+		 if (!EvaluatePredicate(l_sPredicate, b)) continue;
+
+
+		 for (unsigned col = 1; col < l_pcColList->GetColCount(); col++)
+		 {
+			 wxString l_sRatefunction = l_pcColList->GetCell(j, col);
+			 wxString nosub = l_sRatefunction;
+			 SP_VectorString l_vPlaceVector;
+			 wxString l_sSubstituedRF;
+			 if (ExtractPlaceIds(l_sRatefunction, l_vPlaceVector)) {
+				 for (auto colPlace : l_vPlaceVector) {
+					 SubstituteRateFunction(l_sRatefunction, colPlace, b, l_sSubstituedRF);
+
+					 l_sRatefunction = l_sSubstituedRF;
+
+				 }
+				 l_sRatefunction = l_sSubstituedRF;
+			 }
+
+
+			 SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+			 auto parse_tree = l_pcFR->parseFunctionString(l_sRatefunction);
+
+			 if (parse_tree == nullptr) {
+
+				 wxString l_sLoGError = wxT("Error in parsing the expression: ") + l_sRatefunction;
+				 SP_LOGMESSAGE(l_sLoGError);
+				 return false;
+			 }
+			 //SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sRatefunction));
+
+			 SP_FunctionPtr l_pcFunction(parse_tree);
+			 if (!l_pcFunction)
+			 {
+				 wxString l_sLoGError = wxT("Error in parsing the expression: ") + l_sRatefunction;
+				 SP_LOGMESSAGE(l_sLoGError);
+				 return false;
+			 }
+
+			 SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
+
+
+			 val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, val }();
+
+			 break;
+		 }
+	 }
+	 return val;
+ }
+
+
+ /*get pre places of a col transition
+ SP_ListEdge::const_iterator l_it;
+ const SP_ListEdge* sourceEdges = l_pcNode->GetTargetEdges();
+ for (l_it = sourceEdges->begin(); l_it != sourceEdges->end(); ++l_it) {
+ //iterate over the pre-places of the chosen transition
+ SP_DS_Node* node = (SP_DS_Node*)(*l_it)->GetSource();
+ SP_DS_Attribute* l_pcAttr = (node)->GetAttribute(wxT("Name"));
+ SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
+
+ SP_VectorString l_vBind;
+ l_vBind.push_back(binding);
+ int state = 1;//TokenNumerOfAnimatorPlace(l_pcNameAttr->GetValueString(), l_vBind);
+ l_dHaz *= state;
+
+ }
+ */
