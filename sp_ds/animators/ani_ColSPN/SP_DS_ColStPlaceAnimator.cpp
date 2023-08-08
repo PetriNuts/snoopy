@@ -704,7 +704,8 @@ bool SP_DS_ColStPlaceAnimator::ResetMarking()
 	}
 
     m_pcNode->Update(TRUE);   
-
+	//m_cPlaceMultiSet.clear();//by george 7.23
+	 
     return TRUE;
 }
 

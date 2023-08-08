@@ -4,7 +4,7 @@
 // $Version: 0.0 $
 // $Revision: 1.00 $
 // $Date: 2009/09/28 10:20:00 $
-// @Modified : George Assaf 01/02/2020
+// @Modified : George Assaf 01/02/2020: Constant grouping + high-level simulation
 // Short Description: colored PN animation class
 //////////////////////////////////////////////////////////////////////
 #include <wx/statline.h>
@@ -47,6 +47,8 @@
 #include "sp_gui/dialogs/dia_CPN/SP_DLG_ConstantDefinition.h"
 #include <chrono>
 #include <iomanip> 
+
+
  
 enum
 {
@@ -83,7 +85,9 @@ enum
 	SP_ID_SIMMDE,
 	SP_ID_COLLAPSEPANEL_PROPERTY_SIZER,
 	SP_ID_BUTTON_START_COLSIM,
-	SP_ID_BUTTON_ExportSIMTRACES_COLSIM
+	//SP_ID_BUTTON_ExportSIMTRACES_COLSIM,
+	SP_ID_BUTTON_CHOOSE_PLACES,
+	SP_ID_LISTBOX_VIEWS
 };
 
 BEGIN_EVENT_TABLE(SP_DS_ColStAnimation, SP_DS_Animation)
@@ -120,10 +124,9 @@ EVT_UPDATE_UI(SP_ID_PEDEXPORT, SP_DS_ColStAnimation::OnUpdateUI)//george on 10.2
 EVT_BUTTON(SP_ID_PEDEXPORT, SP_DS_ColStAnimation::OnExport)//george on 10.2020
 EVT_BUTTON(SP_ID_PEDIMPORT, SP_DS_ColStAnimation::OnImport)//george on 10.2020
 EVT_BUTTON(SP_ID_BUTTON_START_COLSIM, SP_DS_ColStAnimation::OnSimulationStart) 
-EVT_BUTTON(SP_ID_BUTTON_ExportSIMTRACES_COLSIM, SP_DS_ColStAnimation::OnExportSimTraces)
-
-
-
+//EVT_BUTTON(SP_ID_BUTTON_ExportSIMTRACES_COLSIM, SP_DS_ColStAnimation::OnExportSimTraces)
+EVT_BUTTON(SP_ID_BUTTON_CHOOSE_PLACES, SP_DS_ColStAnimation::OnChoosePlaces)
+EVT_LISTBOX_DCLICK(SP_ID_LISTBOX_VIEWS, SP_DS_ColStAnimation::OnOpenSelectedGraphViews)
 
 END_EVENT_TABLE()
 
@@ -159,7 +162,7 @@ SP_DS_ColStAnimation::SP_DS_ColStAnimation(unsigned int p_nRefresh, unsigned int
 
 	m_nIntervalSize = (m_nIntervalEnd - m_nIntervalStart) / (m_nNumberofPoints-1);
 	m_dCurrentTime = m_nIntervalStart;
-	m_bStopSimulation = false;
+	m_bStopSimulation = true;
 	
 	m_bColSimMode = false;
 	m_bInPreStep = false;
@@ -168,10 +171,7 @@ SP_DS_ColStAnimation::SP_DS_ColStAnimation(unsigned int p_nRefresh, unsigned int
 
 SP_DS_ColStAnimation::~SP_DS_ColStAnimation()
 {
-	 
-	//wxDELETE(m_pcPropertyWindowPropertySizercolSimAnim);
-	//m_pcPropertyWindowPropertySizercolSimAnim->Destroy();
-
+ 
 	bool l_bIsKeep = m_bIsKeepClicked;
 		if (m_cbKeep) {
 			if (m_cbKeep->IsChecked()) {
@@ -193,8 +193,7 @@ SP_DS_ColStAnimation::~SP_DS_ColStAnimation()
 		UpdateMarkingPlaces();
 		Refresh();
 
-		//if (m_pcUnfolding)
-	//	wxDELETE(m_pcUnfolding);
+ 
 		}
 
 		if (m_nIsClose == SP_ID_DESTROY_ANIM&& !l_bIsKeep)
@@ -289,11 +288,120 @@ SP_DS_ColStAnimation::~SP_DS_ColStAnimation()
 				wxDELETE(m_pcUnfolding);
 				}
 
-	//	if (m_cbKeep)
-		//	wxDELETE(m_cbKeep);
+ 
  	    Refresh();
 
 }
+
+void SP_DS_ColStAnimation::LaodIntialNetState() {
+
+
+	LoadDefaultConstantsGroups();//by george: in case a conatnt used as number of token, 
+	//so we need to reset intial constant groups
+
+	for (auto it : m_mpcTransitionAnimators) {
+		it.second->Reset();
+	}
+
+	list<SP_DS_ColStPlaceAnimator*>::iterator l_Iter;
+
+	//reset marking places
+	for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
+		(*l_Iter)->ResetMarking();
+
+	SP_DS_ColListAttribute* l_pcColList;
+
+	SP_ListNode::const_iterator l_itElem;
+	vector<SP_DS_Node*> l_vPlaceNodes;
+	SP_DS_Nodeclass* l_pcNodeclass;
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_DISCRETE_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		{
+			l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+		}
+	}
+
+	l_pcNodeclass = m_pcGraph->GetNodeclass(SP_DS_CONTINUOUS_PLACE);
+	if (l_pcNodeclass)
+	{
+		for (l_itElem = l_pcNodeclass->GetElements()->begin(); l_itElem != l_pcNodeclass->GetElements()->end(); ++l_itElem)
+		{
+			l_vPlaceNodes.push_back(dynamic_cast<SP_DS_Node*>(*l_itElem));
+		}
+	}
+
+	for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
+		//(*l_Iter) = nullptr;
+
+
+	int l_nGridRowNumber = 0;
+	for (unsigned int l_nPos = 0; l_nPos < l_vPlaceNodes.size(); l_nPos++)
+	{
+		l_pcColList = dynamic_cast<SP_DS_ColListAttribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(SP_DS_CPN_MARKINGLIST));
+
+		//int l_nBegin = l_nGridRowNumber;
+		wxString l_sMainMarking;
+
+		l_vPlaceNodes[l_nPos]->Update(TRUE);
+
+
+		SP_CPN_SyntaxChecking l_cSyntaxChecking;
+		if (!l_cSyntaxChecking.Initialize())
+			continue;
+
+		l_sMainMarking = wxT("");
+		map<wxString, vector<SP_CPN_TokenNum> > l_mColorToMarkingMap;
+		if (!l_cSyntaxChecking.ComputeInitialMarking(l_vPlaceNodes[l_nPos], l_mColorToMarkingMap, false, true))
+			continue;
+		map<wxString, vector<SP_CPN_TokenNum> >::iterator itMap;
+
+		wxString l_sNodeClass = l_vPlaceNodes[l_nPos]->GetNodeclass()->GetName();
+
+		if (l_sNodeClass == SP_DS_CONTINUOUS_PLACE)
+		{
+			double l_dMarking = 0;
+			for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+			{
+				l_dMarking = l_dMarking + itMap->second[0].m_DoubleMultiplicity;
+			}
+			l_sMainMarking << l_dMarking;
+		}
+		else
+		{
+			long l_nMarking = 0;
+			for (itMap = l_mColorToMarkingMap.begin(); itMap != l_mColorToMarkingMap.end(); itMap++)
+			{
+				l_nMarking = l_nMarking + itMap->second[0].m_intMultiplicity;
+			}
+			l_sMainMarking << l_nMarking;
+		}
+
+
+		SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast<SP_DS_Attribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(wxT("Marking")));
+		if (l_pcMarkingAttr)
+			l_pcMarkingAttr->SetValueString(l_sMainMarking);
+
+		l_vPlaceNodes[l_nPos]->Update(TRUE);
+	}
+
+	SP_CPN_SyntaxChecking l_cSyntaxChecking;
+	if (!l_cSyntaxChecking.Initialize())
+		return;
+
+	SP_Core::Instance()->GetRootDocument()->Modify(true);
+
+	//Initialise(m_pcGraph);
+	//StopTimer();
+	//Initialise(m_pcGraph);
+	//StartTimer();
+	Refresh();
+
+
+
+}
+
 
 void SP_DS_ColStAnimation::UpdateMarkingPlaces()
 {
@@ -477,22 +585,15 @@ double SP_DS_ColStAnimation::GenerateRandomVariableExpDistr(double p_nLambda)
 double SP_DS_ColStAnimation::CalculateTotalHazard() {
 
 	double l_dTotal = 0.0; 
-	//m_anHazardValues.assign(m_mpcTransitionAnimators.size(),0.0);
-	//m_anHazardValues.clear();
-	//m_vColTrans2Binding.clear();
-	//m_vColTransInstances.clear();
-	//m_RowSum.clear();
-	//m_vColTransInstances.clear();
 
 	for (long i = 0; i < m_mpcTransitionAnimators.size(); ++i) {
+
+		if (m_bStopSimulation) return -1;
 		
 		double l_dHaz = ComputeFunctionHazard(i);
 
-		//m_anHazardValues[i] = l_dHaz;
-
 		l_dTotal += l_dHaz;
 	}
-
 	
 	return l_dTotal;
 
@@ -633,14 +734,71 @@ wxString SP_DS_ColStAnimation::GetColorTransitionName(long p_nPos)
 
 }
 
+
 bool SP_DS_ColStAnimation::SubstituteRateFunction(const wxString& p_sRate, const wxString& colPlace, const wxString& p_sChosenBinding, wxString& substituted)
 {
-	wxString l_sMarking = ExtractInstanceMarking(colPlace, p_sChosenBinding);
-	if (l_sMarking == wxT("0")) { SP_MESSAGEBOX(p_sRate+wxT(" ")+ p_sChosenBinding); }
+	SP_MapString2String l_mcolPlace2ColorMap;
+	ExtractPlaceIntanceMarking(p_sRate, l_mcolPlace2ColorMap);
 	substituted = p_sRate;
-	substituted.Replace(colPlace, l_sMarking);
+	for (auto it = l_mcolPlace2ColorMap.begin(); it != l_mcolPlace2ColorMap.end(); ++it)
+	{
+		wxString l_sMarking = ExtractInstanceMarking(it->first, it->second);
+		
+		wxString l_sToBeSubstituted = it->first + wxT("_") + it->second;//instnce
+		substituted.Replace(l_sToBeSubstituted, l_sMarking);
+	}
+
 	return true;
 
+}
+
+void  SP_DS_ColStAnimation::ExtractPlaceIntanceMarking(const wxString& p_sRate, SP_MapString2String& l_mColorPlace2Color)
+{
+	 //buggy method
+	wxStringTokenizer tokenizer(p_sRate, " +-*/=^()");
+
+	while (tokenizer.HasMoreTokens())
+	{
+		wxString token = tokenizer.GetNextToken();
+
+		for (const auto& place : m_vColPlaceNamesModified)
+		{
+			std::string l_scolor = ExtractSubstring(token, place);
+
+			if (l_scolor != "")
+			{
+				l_mColorPlace2Color[place.BeforeFirst(wxChar('_'))] = l_scolor;
+				break;//token found
+			}
+		 
+		}
+	 
+	}
+
+}
+
+std::string SP_DS_ColStAnimation::ExtractSubstring(const std::string& lengthyString, const std::string& pattern) {
+	/**
+	size_t pos = lengthyString.find(pattern);
+	if (pos != std::string::npos) {
+		return lengthyString.substr(pos + pattern.length());
+	}
+	*/
+	wxString str1 = lengthyString;
+	wxString str2 = pattern;
+	if (!str1.Contains(str2)) return "";
+	wxString result = str1;
+
+	result.Replace(str2, "");
+	/**
+	for (wxString::const_iterator it = str2.begin(); it != str2.end(); ++it)
+	{
+		wxString character = *it;
+		result.Replace(character, wxEmptyString);
+	}
+	*/
+	return result.ToStdString();
+	//return ""; // Pattern not found
 }
 
 wxString  SP_DS_ColStAnimation::ExtractInstanceMarking(const wxString& p_sColPlaceId, const wxString& p_color)
@@ -666,10 +824,6 @@ wxString  SP_DS_ColStAnimation::ExtractInstanceMarking(const wxString& p_sColPla
 		if (!l_pcNameAttibute)
 			continue;
 		wxString l_sColorSetName = l_pcNameAttibute->GetValue();
-
-		//ToDo move this to an init step
-		//if (!m_cValueAssign.InitializeColorset(m_cColorSetClass))
-		//	return wxT("");
 
 		SP_CPN_ColorSet* l_pcColorSet = m_cColorSetClass.LookupColorSet(l_sColorSetName);
 		if (!l_pcColorSet)
@@ -730,9 +884,6 @@ wxString  SP_DS_ColStAnimation::ExtractInstanceMarking(const wxString& p_sColPla
 					}
 
 				}
-
-
-
 
 			}
 
@@ -890,12 +1041,24 @@ double SP_DS_ColStAnimation::ComputeFunctionHazard(int l_nTransition)
 		return 0.0;
 	}
 
+
+	if (m_bStopSimulation) { return -1; }
+
+
 		for (auto binding : b) {
 
+			if (m_bStopSimulation) { return -1; }
+
 			double l_dEvaluatedRateFunction = RateFunction(l_nTransition, binding);
+
+
+			if (l_dEvaluatedRateFunction <= 0 && !m_bStopSimulation) {
+				SP_MESSAGEBOX(wxT("Stop"));
+			}
+
+		 
 			l_dHaz = l_dEvaluatedRateFunction;
 
-			//if (l_dHaz <= 0.0) continue;
 			
             wxString l_sInstance = l_sTrnasName + wxT("_") + binding;
 
@@ -1008,7 +1171,7 @@ double SP_DS_ColStAnimation::SimulateSingleStep(double p_dcurrentTime) {
 
 	l_dTotalHazard = CalculateTotalHazard();
 
-	if (m_anHazardValues.size() == 0) {
+	if (m_anHazardValues.size() == 0 || m_bStopSimulation || l_dTotalHazard==-1) {
 		return -1;
 	}
 
@@ -1024,7 +1187,7 @@ double SP_DS_ColStAnimation::SimulateSingleStep(double p_dcurrentTime) {
 	//SP_LOGMESSAGE(l_sIndex2);
 
 	
-	wxString l_sTransInstance;// = m_vColTransInstances[l_nSelectedTransition];
+	wxString l_sTransInstance;
 	long l_nIndex = 0;
 	for (auto pair : m_mInstance2HazardValue) {
 	
@@ -1035,32 +1198,24 @@ double SP_DS_ColStAnimation::SimulateSingleStep(double p_dcurrentTime) {
 		}
 		++l_nIndex;
 	}
-	wxString l_sInstance = l_sTransInstance;// l_sTransInstance.BeforeFirst('_');
+	wxString l_sInstance = l_sTransInstance; 
 	
-	//l_sInstance.Replace(wxT("|"), wxT("_"));
-
+ 
 	wxString l_sIndex; 
 	l_sIndex << "selected transition instance is : " << l_sInstance;
-	//if(m_vColTrans2Binding.find()
-	SP_LOGMESSAGE(l_sIndex);
+ 
 	m_ExportBindings.AddLine(l_sIndex);
 
 
 	wxString l_sColTransName = l_sTransInstance.BeforeFirst(wxChar('_'));//BeforeFirst(wxChar('|'))
 
-	//auto it= m_vColTrans2Binding.find(l_nSelectedTransition);
-
+ 
 	SP_VectorString l_vbindingVector;
 
 	l_vbindingVector.push_back(l_sTransInstance.AfterFirst(wxChar('_')));
 
 
 	l_nSelectedTransition = GetTransitionPosByName(l_sColTransName);
-	//if(it!= m_vColTrans2Binding.end())
-	//	l_vbindingVector  = it->second;
-	//if(m_vColTrans2Binding.find()
-
-	//SP_MESSAGEBOX(l_sIndex);
 
 	//fire l_nSelectedTransition
 	FireOneTransition(l_nSelectedTransition, l_vbindingVector);
@@ -1070,7 +1225,11 @@ double SP_DS_ColStAnimation::SimulateSingleStep(double p_dcurrentTime) {
 
 bool SP_DS_ColStAnimation::InitiliseSimulator() {
 
-
+	if (m_vSelectedPlaces.size() == 0)
+	{
+		SP_MESSAGEBOX(wxT("No place traces are chosen to export!"), wxT("Notification"), wxOK | wxICON_ERROR);
+		return false;
+	}
 	if (!m_cbSimMode->IsChecked()) {
 		SP_MESSAGEBOX(wxT("Simulation Mode is not selected!"), wxT("Notification"), wxOK | wxICON_ERROR);
 		return false;
@@ -1080,9 +1239,13 @@ bool SP_DS_ColStAnimation::InitiliseSimulator() {
 	double dblValue;
 	long l_nVal;
 	bool success;
-
+	m_nProgress = 0;
 	Traces.clear();
-
+	m_RowLength = 0;
+	m_mTransInstance2Id.clear();
+	m_mTransInstance2Hazard.clear();
+	m_nCombinedHazardValue = 0;
+	m_mInstance2HazardValue.clear();
 	wxString l_sIntervalStart = m_pcIntervalStartTextCtrl->GetValue();
 	success = l_sIntervalStart.ToDouble(&dblValue);
 
@@ -1133,8 +1296,8 @@ bool SP_DS_ColStAnimation::InitiliseSimulator() {
 
 	wxString l_sSeed = m_pcSeedTextCtrl->GetValue();
 
-	 long l_nSeed;
-	success = l_sSeed.ToLong(&l_nSeed);
+	unsigned long  l_nSeed;
+	success = l_sSeed.ToULong(&l_nSeed);
 
 	m_pcRandGen = new MTRand();// necessary here before we set the seed for the random number
 
@@ -1149,23 +1312,20 @@ bool SP_DS_ColStAnimation::InitiliseSimulator() {
 	else {//feed with user's seed
 		SetSeed(l_nSeed);
 	}
-	
-
-
-	if (!StartTimer()) {
-		l_sLogmsg << "Error while unfolding color places";
-		SP_LOGMESSAGE(l_sLogmsg);
-	}
 
 	m_nIntervalSize = (m_nIntervalEnd - m_nIntervalStart) / (m_nNumberofPoints - 1);
 	m_dCurrentTime = m_nIntervalStart;
 
 	m_nRefreshFrequ = 25;
 	m_nStepDuration = 100;
-
+	m_nProgress = 0;
+	gauge->SetValue(m_nProgress);
 
 	//extract colplace name
 	list<SP_DS_ColStPlaceAnimator*>::iterator l_itPlace;
+	m_vColPlaceNames.clear();
+	m_vColPlaceNamesModified.clear();
+
 
 	for (l_itPlace = (m_lAllPlaceAnimators).begin(); l_itPlace != (m_lAllPlaceAnimators).end(); ++l_itPlace)
 	{
@@ -1177,35 +1337,21 @@ bool SP_DS_ColStAnimation::InitiliseSimulator() {
 
 		wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(itNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 		m_vColPlaceNames.push_back(l_sPlaceName);
+		m_vColPlaceNamesModified.push_back(l_sPlaceName+wxT("_"));
 	}
 
 	//Initilise color defintions
 	if (!m_cValueAssign.InitializeColorset(m_cColorSetClass))
 		return false;
 
-
+	m_mPlaceInstance2Marking.clear();
 
 	wxString l_sLog; l_sLog << "Seed: " << m_ulSeed;
 
 	SP_LOGMESSAGE(l_sLog);
-
-	//if (m_ExportRandom.Create(wxT("random.txt")) == false)
-	//{
-	//	SP_MESSAGEBOX(wxT("Error in creating file."), wxT("Error"), wxOK | wxICON_ERROR);
-	//}
-
-	//if (m_ExportRandomDisc.Create(wxT("random_disc.txt")) == false)
-	//{
-	//	SP_MESSAGEBOX(wxT("Error in creating file."), wxT("Error"), wxOK | wxICON_ERROR);
-	//}
-	 
-	//if (m_ExportBindings.Create(wxT("fired_instances.txt")) == false)
-	//{
-	//	SP_MESSAGEBOX(wxT("Error in creating file."), wxT("Error"), wxOK | wxICON_ERROR);
-	//}
 	
 	m_nInstanceId = 0;
-
+	
 
 	return true;
 
@@ -1222,40 +1368,46 @@ void SP_DS_ColStAnimation::Simulate() {
 	m_vColTransInstances.clear();
 	 
 	m_pcBtn->SetBackgroundColour(wxColour(255, 0, 0));
+	m_pcBtn->SetLabel(wxT("Abort Simulation"));
 
 	m_stopwatch.Start();
 	SetSimulationStopWatch(m_stopwatch.Time());
 
+	//init grid time 
 	double l_dGridTime = m_nIntervalStart;
 
+	// init output grid rows
 	unsigned long l_nCurrentRow = 1;
 
-	wxString lmsg; lmsg << wxT("current time: ") << l_dGridTime;
+	//wxString lmsg; lmsg << wxT("current time: ") << l_dGridTime;
 
-	SP_LOGMESSAGE(lmsg);
-
-	OutputStateAt(m_nIntervalStart);//record initial state 
+    //write initial state to output trace file
+	OutputStateAt(m_nIntervalStart);
 
 	l_dGridTime = l_dGridTime + m_nIntervalSize;
 
-	long l_nStep = 0;
+	long l_nStep = 0;// init num of steps with 0
 
-	int progress = (l_nCurrentRow ) * 100 / m_nNumberofPoints;
-	gauge->SetValue(progress);
-	//wxString l_sProgress = progress +wxT(" %");
-	m_pcHint->SetLabel(wxString::Format(wxT("%i %%"), progress));
+	m_nProgress = (l_nCurrentRow ) * 100 / m_nNumberofPoints;
+	gauge->SetValue(m_nProgress);
+	//m_pcHint->SetLabel(wxString::Format(wxT("%i %%"), m_nProgress));
+	m_sHint.clear();
+	m_sHint<<m_nProgress;
+	m_pcHint->SetLabel(m_sHint);
+	wxYield();
 
 	while ((m_dCurrentTime < m_nIntervalEnd) && (!m_bStopSimulation) && (l_nCurrentRow <= m_nNumberofPoints - 1)) {
 		
-		//SetSimulationStopWatch(l_nStep);
 		SetSimulationStopWatch(m_stopwatch.Time());
 
 		m_dCurrentTime = SimulateSingleStep(m_dCurrentTime);
-
-	//	wxString log; log<< wxT("current time: ") << m_dCurrentTime;
-
-	//	SP_LOGMESSAGE(log);
-
+		
+		if (m_dCurrentTime == -1)
+		{
+			SP_LOGERROR_(wxT("Simulation Aborted!"));
+			break;
+		}
+		wxYield();//update GUI
 		l_nStep++;
 
 		if (m_dCurrentTime < 0) {
@@ -1268,15 +1420,14 @@ void SP_DS_ColStAnimation::Simulate() {
 
 				l_dGridTime += m_nIntervalSize;
 
-				int progress = (s ) * 100 / m_nNumberofPoints;
-				gauge->SetValue(progress);
-				//wxString l_sProgress = progress + wxT(" %");
-			 
-				m_pcHint->SetLabel(wxString::Format(wxT("%i %%"), progress));
+				//update progress bar
+				m_nProgress = (s ) * 100 / m_nNumberofPoints;
+				gauge->SetValue(m_nProgress);
+				m_sHint.clear();
+				m_sHint << m_nProgress;
+				m_pcHint->SetLabel(m_sHint);
+				wxYield();
 
-				wxString log; log << wxT("current time: ") << l_dGridTime;
-
-				SP_LOGMESSAGE(log);
 			}
 			return;
 		}
@@ -1289,21 +1440,21 @@ void SP_DS_ColStAnimation::Simulate() {
 
 			l_dGridTime = l_dGridTime + m_nIntervalSize;
 
-			wxString log; log << wxT("current time: ") << l_dGridTime;
 
-			SP_LOGMESSAGE(log);
-
-			int progress = (l_nCurrentRow ) * 100 / m_nNumberofPoints;
-			gauge->SetValue(progress);
-			//wxString l_sProgress = progress + wxT(" %");
-			m_pcHint->SetLabel(wxString::Format(wxT("%i %%"), progress)); 
-
+			m_nProgress = (l_nCurrentRow ) * 100 / m_nNumberofPoints;
+			gauge->SetValue(m_nProgress);
+			m_sHint.clear();
+			m_sHint<< m_nProgress;
+			m_pcHint->SetLabel(m_sHint);
+			wxYield();
 			if (l_nCurrentRow > m_nNumberofPoints - 1)
 				break;
 		}
 	}
-	m_bStopSimulation = true;
+	//m_bStopSimulation = false;
 	m_pcBtn->SetBackgroundColour(wxColour(0, 255, 0));
+	m_pcBtn->SetLabel(wxT("Start"));
+
 }
 
 
@@ -1466,16 +1617,14 @@ SP_DS_ColStAnimation::PreStep(int p_nColTrans, const std::vector<wxString>& p_vB
 		}
 	}
 
-	SP_LOGMESSAGE(wxT("Fired instance: "+ m_sTriggiredUnfoldedTrans));
+	//SP_LOGMESSAGE(wxT("Fired instance: "+ m_sTriggiredUnfoldedTrans));
 	m_sTriggiredUnfoldedTrans.Clear();
 	// all transitions with concession are resolved, now test the stepping option
-	//ReduceTransitions();
-
+ 
 	if (m_bExport == true)
 		ExportStepSequences();
 
-	//	ReduceColTransitions();
-
+ 
 	m_cFiredTransitions.clear();
 	for (l_itTrans = m_lStepTransAnimators.begin(); l_itTrans != m_lStepTransAnimators.end(); ++l_itTrans) {
 		m_cFiredTransitions.push_back((*l_itTrans)->GetAnimObject());
@@ -1616,15 +1765,17 @@ SP_DS_ColStAnimation::OnTimer(wxTimerEvent& p_cEvent)
 	{
 		if (!m_bStopSimulation)
 		{
-			//wxString l_sNow; l_sNow << m_stopwatch.Time() << "s";
-			//wxString l_sTime = wxString::Format("%*s%s", 90, "", l_sNow);
-			//m_pcHintTime->SetLabel(l_sTime);
-
-			//SetSimulationStopWatch(m_stopwatch.Time());
+ 
 		}
 		else {
-			m_stopwatch.Pause();
-			m_bStopSimulation = false;
+		//	m_stopwatch.Pause();
+		//	m_bStopSimulation = false;
+		}
+		if (m_nProgress == 100)
+		{
+			m_pcDialog->SetClose(true);
+			m_pcDialog->SetSimMode(false);
+			m_nProgress = 0;
 		}
 			
 		return;
@@ -1876,41 +2027,39 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 
 	m_pcDialog = p_pcCtrl;
 
-	/*********by george**********/
 		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-		p_pcSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDSET, wxT("Keep Marking")), 1, wxALL | wxEXPAND, 5);
+		p_pcSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDSET, wxT("Keep Marking")));// , 1, wxALL | wxEXPAND, 5);
 		m_cbKeep = new wxCheckBox(p_pcCtrl, SP_ID_PEDKEEP, wxT("Always keep marking when closing."));
 		m_cbKeep->SetValue(wxGetApp().GetAnimationPrefs()->GetKeepMarking());
-		p_pcSizer->Add(m_cbKeep, 0, wxALL, 5);
+		p_pcSizer->Add(m_cbKeep);// 0, wxALL, 5);
 
 		//------------------------------------------
 		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
 		wxSizer* m_pcExportImportSizer = new wxBoxSizer(wxHORIZONTAL);
 		m_pcExportImportSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDEXPORT, wxT("Export")), 1, wxALL | wxEXPAND, 5);
 		m_pcExportImportSizer->Add(new wxButton(p_pcCtrl, SP_ID_PEDIMPORT, wxT("Import")), 1, wxALL | wxEXPAND, 5);
-		p_pcSizer->Add(m_pcExportImportSizer, 0, wxALL, 5);
+		p_pcSizer->Add(m_pcExportImportSizer);// 0, wxALL, 5);
 		//------------------------------------------
 		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
 		wxString l_tmp;
 		l_tmp << m_nStepCount;
 		m_pcStepCounter = new wxBoxSizer(wxHORIZONTAL);
-		m_pcStepCounterText = new wxStaticText(p_pcCtrl, wxID_ANY, wxT("Step Counter"));
+		m_pcStepCounterText = new wxStaticText(p_pcCtrl, wxID_ANY, wxT("Step Counter: "));
 		m_pcStepCounterValue = new wxStaticText(p_pcCtrl, wxID_ANY, l_tmp);
 
-		m_pcStepCounter->Add(m_pcStepCounterText, 1, wxEXPAND | wxALL, 5);
-		m_pcStepCounter->Add(m_pcStepCounterValue, 1, wxEXPAND | wxALL, 5);
+		m_pcStepCounter->Add(m_pcStepCounterText);// 1, wxEXPAND | wxALL, 5);
+		m_pcStepCounter->Add(m_pcStepCounterValue);// 1, wxEXPAND | wxALL, 5);
 
 		p_pcSizer->Add(m_pcStepCounter, 0, wxEXPAND);
 		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-		//-------------------------------------------
-		
+		/**************************************************************/
+		// Create the sizer for the scrollable content
+		wxBoxSizer* scrolledConfigSizer = new wxBoxSizer(wxVERTICAL);
 
-		//p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-		//---------------------------------------------
 		wxSizer* l_pcSetsSizer = new wxBoxSizer(wxVERTICAL);
 
 
-		wxSizer* l_pcRowSizer;// = new wxBoxSizer(wxHORIZONTAL);
+		wxSizer* l_pcRowSizer; 
 
 
 		if (m_pcGraph->GetNodeclass(wxT("Place"))->GetElements()->size() > 0)//by george, preventing of occuring empty v-sets
@@ -1929,6 +2078,9 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 			    l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
 			    m_mGroup2Pos[wxT("Marking")] = m_apcComboBoxes.size()-1;
+
+				scrolledConfigSizer->Add(l_pcSetsSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
 		}
 
 		if (m_pcGraph->GetNodeclass(wxT("Transition"))->GetElements()->size())
@@ -1947,6 +2099,9 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 				l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
 				m_mGroup2Pos[wxT("Rate")] = m_apcComboBoxes.size() - 1;
+
+				scrolledConfigSizer->Add(l_pcSetsSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
 
 		}
 
@@ -1968,6 +2123,9 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 
 				m_mGroup2Pos[wxT("Weight")] = m_apcComboBoxes.size() - 1;
 
+				scrolledConfigSizer->Add(l_pcSetsSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
+
 		}
 
 
@@ -1987,6 +2145,9 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 				l_pcSetsSizer->Add(l_pcRowSizer, 0, wxEXPAND);
 
 				m_mGroup2Pos[wxT("Delay")] = m_apcComboBoxes.size() - 1;
+
+				scrolledConfigSizer->Add(l_pcSetsSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
 
 
 		}
@@ -2008,11 +2169,13 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 
 				m_mGroup2Pos[wxT("Schedule")] = m_apcComboBoxes.size() - 1;
 
+				scrolledConfigSizer->Add(l_pcSetsSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
+
 		}
 
-
-		/**************george**************/
 		UpdateChoices();
+
 		SP_SetString::iterator l_itChoice;
 		for (l_itChoice = m_choices.begin(); l_itChoice != m_choices.end(); ++l_itChoice)
 		{
@@ -2024,142 +2187,158 @@ SP_DS_ColStAnimation::AddToControl(SP_DLG_Animation* p_pcCtrl, wxSizer* p_pcSize
 			l_pcRowSizer->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_MODIFY_CONSTANT_SETS, wxT("Modify")), 0, wxALL, 5);
 			l_pcSetsSizer->Add(l_pcRowSizer, 1, wxEXPAND);
 
+			scrolledConfigSizer->Add(l_pcSetsSizer);// wxSizerFlags(0).Expand().Border(wxALL, 2));
 
 		}
 
-		//m_msMarkingSets
+		/************************************************/
+		// Set the sizer for the scrolled window
+		//scrolleConfigdWindow->SetSizer(scrolledConfigSizer);
 
-		/*****************************/
+		// Calculate and set the virtual size for the scrolled window
+		//wxSize virtualSizeConfig = scrolledConfigSizer->GetMinSize();
+		//scrolleConfigdWindow->SetVirtualSize(virtualSizeConfig);
 
+		// Optionally, set the scrolling rate (horizontal_rate, vertical_rate)
+		//scrolleConfigdWindow->SetScrollRate(5, 5);
+
+
+		// Add the wxScrolledWindow to the main sizer
+		//p_pcSizer->Add(collapsiblePaneModelConfig);
+
+		/************************************************************/
+		//m_msMarking Sets
 	 
-		p_pcSizer->Add(l_pcSetsSizer, 0, wxALL, 5);
+		p_pcSizer->Add(l_pcSetsSizer);// , 0, wxALL, 5);
 		p_pcSizer->Add( new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL ), 0, wxEXPAND);
  
 
 		LoadSets();
-		/*********************************************************/
-	
-	//	wxCollapsiblePane *m_pcCollpanePropertySizer;// = new wxCollapsiblePane();
-		 
-		//m_pcPropertyWindowPropertySizercolSimAnim = new wxWindow();
-		l_pcRowSizer2 = new wxBoxSizer(wxVERTICAL);
-		/**
-		wxScrolledWindow* scrolledWindow = new wxScrolledWindow(p_pcCtrl, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL);
-		wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+		/**********************************************************/
 
-		// Add some controls to the box sizer
-	//	vbox->Add(new wxButton(scrolledWindow, wxID_ANY, "Button 1"), wxSizerFlags().Expand());
-	//	vbox->Add(new wxButton(scrolledWindow, wxID_ANY, "Button 2"), wxSizerFlags().Expand());
-	//	vbox->Add(new wxButton(scrolledWindow, wxID_ANY, "Button 3"), wxSizerFlags().Expand());
-	//	vbox->Add(new wxButton(scrolledWindow, wxID_ANY, "Button 4"), wxSizerFlags().Expand());
-		m_cbSimMode = new wxCheckBox(scrolledWindow, SP_ID_SIMMDE, wxT("Color Simulation Mode"));
-		m_cbSimMode->SetValue(false);
-		vbox->Add(m_cbSimMode, 0, wxALL, 5);
-		vbox->Add(new wxStaticLine(scrolledWindow, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-		
-		
-		wxSizer* l_pcRowSizerSimConfigIntStart = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizerSimConfigIntStart->Add(new wxStaticText(scrolledWindow, -1, wxT("interval start:")),
-			wxSizerFlags(1).Expand().Border(wxALL, 2));
-
-		m_pcIntervalStartTextCtrl = new wxTextCtrl(scrolledWindow, -1, "0", wxDefaultPosition, wxDefaultSize, 0);
-		l_pcRowSizerSimConfigIntStart->Add(m_pcIntervalStartTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
-
-		vbox->Add(l_pcRowSizerSimConfigIntStart, wxSizerFlags(0).Expand().Border(wxALL, 2));
-
-		
-		
-		
-		// Set the box sizer on the scrolled window
-		scrolledWindow->SetSizer(vbox);
-
-		// Enable vertical scrolling
-		scrolledWindow->SetScrollRate(0, 20);
-		p_pcSizer->Add(scrolledWindow, wxSizerFlags().Proportion(1).Expand());
-	*/
-		/****************/
-		
- 
 		m_cbSimMode = new wxCheckBox(p_pcCtrl, SP_ID_SIMMDE, wxT("Color Simulation Mode"));
 		m_cbSimMode->SetValue(false);
 		p_pcSizer->Add(m_cbSimMode, 0, wxALL, 5);
 		p_pcSizer->Add(new wxStaticLine(p_pcCtrl, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
-		 
 
-		wxSizer* l_pcRowSizerSimConfigIntStart = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizerSimConfigIntStart->Add(new wxStaticText(p_pcCtrl, -1, wxT("interval start:")),
-			wxSizerFlags(1).Expand().Border(wxALL, 2));
-
-		m_pcIntervalStartTextCtrl = new wxTextCtrl(p_pcCtrl, -1, "0", wxDefaultPosition, wxDefaultSize, 0);
-		l_pcRowSizerSimConfigIntStart->Add(m_pcIntervalStartTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
-
-		p_pcSizer->Add(l_pcRowSizerSimConfigIntStart, wxSizerFlags(0).Expand().Border(wxALL, 2));
-
-
-
-		l_pcRowSizerSimConfigIntStart = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizerSimConfigIntStart->Add(new wxStaticText(p_pcCtrl, -1, wxT("interval end:")),
-			wxSizerFlags(1).Expand().Border(wxALL, 2));
-
-		m_pcIntervalEndTextCtrl = new wxTextCtrl(p_pcCtrl, -1, "100", wxDefaultPosition, wxDefaultSize, 0);
-		l_pcRowSizerSimConfigIntStart->Add(m_pcIntervalEndTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
-		p_pcSizer->Add(l_pcRowSizerSimConfigIntStart, wxSizerFlags(0).Expand().Border(wxALL, 2));
-
-
-
-		wxSizer* l_pcRowSizerSimConfig3 = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizerSimConfig3->Add(new wxStaticText(p_pcCtrl, -1, wxT("interval splitting:")),
-			wxSizerFlags(1).Expand().Border(wxALL, 2));
-
-		m_pcResultPointCountTextCtrl = new wxTextCtrl(p_pcCtrl, -1, "100", wxDefaultPosition, wxDefaultSize, 0);
-		l_pcRowSizerSimConfig3->Add(m_pcResultPointCountTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
-		p_pcSizer->Add(l_pcRowSizerSimConfig3, wxSizerFlags(0).Expand().Border(wxALL, 2));
-
-		wxSizer* l_pcRowSizerSimConfigSeed = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizerSimConfigSeed->Add(new wxStaticText(p_pcCtrl, -1, wxT("Seed Value:")),
-			wxSizerFlags(1).Expand().Border(wxALL, 2));
-		m_pcSeedTextCtrl = new wxTextCtrl(p_pcCtrl, -1, "Random Seed", wxDefaultPosition, wxDefaultSize, 0);
-		l_pcRowSizerSimConfigSeed->Add(m_pcSeedTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
-
-		p_pcSizer->Add(l_pcRowSizerSimConfigSeed, wxSizerFlags(0).Expand().Border(wxALL, 2));
-
-
-		wxSizer* l_pcRowSizerSimConfig4 = new wxBoxSizer(wxHORIZONTAL);
-		l_pcRowSizerSimConfig4->Add(new wxButton(p_pcCtrl, SP_ID_BUTTON_ExportSIMTRACES_COLSIM, wxT("Export Traces")), 0, wxALL, 5);
-		p_pcSizer->Add(l_pcRowSizerSimConfig4, wxSizerFlags(0).Expand().Border(wxALL, 2));
-
-		wxSizer* l_pcProgressSizer = new wxBoxSizer(wxVERTICAL);
-		wxSizer* l_pcHinSizer = new wxBoxSizer(wxHORIZONTAL);
-		wxSize size(300, 20);
-		gauge = new wxGauge(p_pcCtrl, wxID_ANY, 100, wxDefaultPosition, size, wxGA_HORIZONTAL);//wxDefaultPosition
-		l_pcProgressSizer->Add(gauge);
-		m_pcHint = new wxStaticText(p_pcCtrl, -1, wxT("0%"));
-		wxString l_sTime; 
-		l_sTime = wxString::Format("%*s%s", 90, "", "0.0s");
-		m_pcHintTime = new wxStaticText(p_pcCtrl, -1, l_sTime);
-		l_pcHinSizer->Add(m_pcHint);
-		l_pcHinSizer->Add(m_pcHintTime, wxSizerFlags(0).Align(wxALIGN_RIGHT));
-		 
-		//l_pcProgressSizer->Add(m_pcHint);
-		p_pcSizer->Add(l_pcProgressSizer);
-		p_pcSizer->Add(l_pcHinSizer);
-		 m_pcBtn = new wxButton(p_pcCtrl, SP_ID_BUTTON_START_COLSIM, wxT("Start"));
-		p_pcSizer->Add(m_pcBtn, 0, wxALL, 5);
-	 
 		/*********************************************************/
+		// Create the wxCollapsiblePane
+		 wxCollapsiblePane* collapsiblePane = new wxCollapsiblePane(p_pcCtrl, wxID_ANY, "Expand/Collapse Sim. Configuration",
+			 wxDefaultPosition, wxDefaultSize, wxCP_DEFAULT_STYLE);
+
+		 // Get the pane (a wxWindow) inside the collapsible pane
+		 wxWindow* pane = collapsiblePane->GetPane();
+
+		 // Create the wxScrolledWindow to hold the scrollable content
+		 wxScrolledWindow* scrolledWindow = new wxScrolledWindow(p_pcCtrl, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL | wxHSCROLL);
+
+		 // Create the sizer for the scrollable content
+		 wxBoxSizer* scrolledSizer = new wxBoxSizer(wxVERTICAL);
+
+	
+		 // Add your UI elements to the scrolledSizer
+		 /***********************************************************************/
+		 wxSizer* l_pcRowSizerSimConfigIntStart = new wxBoxSizer(wxHORIZONTAL);
+		 l_pcRowSizerSimConfigIntStart->Add(new wxStaticText(pane, -1, wxT("interval start:")),wxSizerFlags(1).Expand().Border(wxALL, 2));
+
+		 m_pcIntervalStartTextCtrl = new wxTextCtrl(pane, -1, "0", wxDefaultPosition, wxDefaultSize, 0);
+		 l_pcRowSizerSimConfigIntStart->Add(m_pcIntervalStartTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
+		// p_pcSizer->Add(l_pcRowSizerSimConfigIntStart, wxSizerFlags(0).Expand().Border(wxALL, 2));
+		 scrolledSizer->Add(l_pcRowSizerSimConfigIntStart, wxSizerFlags(0).Expand().Border(wxALL, 2));
+		 /**************************************************************************/
+		 //scrolledSizer->Add(new wxStaticLine(pane, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+		 l_pcRowSizerSimConfigIntStart = new wxBoxSizer(wxHORIZONTAL);
+		 l_pcRowSizerSimConfigIntStart->Add(new wxStaticText(pane, -1, wxT("interval end:")),wxSizerFlags(1).Expand().Border(wxALL, 2));
+		 m_pcIntervalEndTextCtrl = new wxTextCtrl(pane, -1, "100", wxDefaultPosition, wxDefaultSize, 0);
+		 l_pcRowSizerSimConfigIntStart->Add(m_pcIntervalEndTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
+		 scrolledSizer->Add(l_pcRowSizerSimConfigIntStart,wxSizerFlags(0).Expand().Border(wxALL, 2));
+
+		 /**************************************************************************/
+ 		 
+		 wxSizer* l_pcRowSizerSimConfig3 = new wxBoxSizer(wxHORIZONTAL);
+		 l_pcRowSizerSimConfig3->Add(new wxStaticText(pane, -1, wxT("interval splitting:")), wxSizerFlags(1).Expand().Border(wxALL, 2));
+		 m_pcResultPointCountTextCtrl = new wxTextCtrl(pane, -1, "100", wxDefaultPosition, wxDefaultSize, 0);
+		 l_pcRowSizerSimConfig3->Add(m_pcResultPointCountTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
+		 scrolledSizer->Add(l_pcRowSizerSimConfig3, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
+		 /**************************************************************************/
+		 wxSizer* l_pcRowSizerSimConfigSeed = new wxBoxSizer(wxHORIZONTAL);
+		 l_pcRowSizerSimConfigSeed->Add(new wxStaticText(pane, -1, wxT("Seed Value:")),wxSizerFlags(1).Expand().Border(wxALL, 2));
+		 m_pcSeedTextCtrl = new wxTextCtrl(pane, -1, "Random Seed", wxDefaultPosition, wxDefaultSize, 0);
+		 l_pcRowSizerSimConfigSeed->Add(m_pcSeedTextCtrl, wxSizerFlags(0).Expand().Border(wxALL, 2));
+		 scrolledSizer->Add(l_pcRowSizerSimConfigSeed, wxSizerFlags(0).Expand().Border(wxALL, 2));
+
+		 /**************************************************************************/
+ 
+		 scrolledSizer->Add(new wxStaticLine(pane, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND);
+
+		 wxSizer* l_pcRowSizerSimConfig4 = new wxBoxSizer(wxHORIZONTAL);
+		 //l_pcRowSizerSimConfig4->Add(new wxButton(pane, SP_ID_BUTTON_ExportSIMTRACES_COLSIM, wxT("Trace File")), 0, wxALL, 5);
+
+		 /**************************************************************************/
+		 l_pcRowSizerSimConfig4->Add(new wxButton(pane, SP_ID_BUTTON_CHOOSE_PLACES, wxT("Choose Places")), 0, wxALL, 5);
+		 scrolledSizer->Add(l_pcRowSizerSimConfig4);// wxSizerFlags(0).Expand().Border(wxALL, 2));
+
+		 /*************************************************************************/
+		 //view
+		 wxSizer* l_pcViewSizer = new wxStaticBoxSizer(new wxStaticBox(pane, -1, wxT("View")), wxVERTICAL);
+		 wxListBox* m_pcListboxShowAllGraphViewName = new wxListBox(pane, SP_ID_LISTBOX_VIEWS, wxDefaultPosition, wxSize(-1, 50), 0, NULL, wxLB_EXTENDED | wxLB_HSCROLL);
+		 l_pcViewSizer->Add(m_pcListboxShowAllGraphViewName, wxSizerFlags(1).Expand().Border(wxALL, 5));
+		 m_pcListboxShowAllGraphViewName->SetToolTip(wxT("Double click to open selected view(s)"));
+		 scrolledSizer->Add(l_pcViewSizer, wxSizerFlags(0).Expand().Border(wxALL, 2));
+		 m_pcListboxShowAllGraphViewName->Insert(wxT("Plot Viewer"), m_pcListboxShowAllGraphViewName->GetCount());
+		
+
+		 /**************************************************************************/
+		 wxSizer* l_pcProgressSizer = new wxBoxSizer(wxVERTICAL);
+		 wxSizer* l_pcHinSizer = new wxBoxSizer(wxHORIZONTAL);
+		 wxSize size(300, 20);
+		 gauge = new wxGauge(pane, wxID_ANY, 100, wxDefaultPosition, size, wxGA_HORIZONTAL);//wxDefaultPosition
+		 l_pcProgressSizer->Add(gauge);
+		 m_pcHint = new wxStaticText(pane, -1, wxT("0"));
+		 m_pcPercentage = new wxStaticText(pane, -1, wxT("   %"));
+		 wxString l_sTime;
+		 l_sTime = wxString::Format("%*s%s", 90, "", "0.0s");
+		 m_pcHintTime = new wxStaticText(pane, -1, l_sTime);
+		 l_pcHinSizer->Add(m_pcHint);
+		 l_pcHinSizer->Add(m_pcPercentage);
+
+		 l_pcHinSizer->Add(m_pcHintTime, wxSizerFlags(0).Align(wxALIGN_RIGHT));
+
+
+		 scrolledSizer->Add(l_pcProgressSizer);
+		 scrolledSizer->Add(l_pcHinSizer);
+		 m_pcBtn = new wxButton(pane, SP_ID_BUTTON_START_COLSIM, wxT("Start"), wxDefaultPosition, wxSize(100, 40));
+		 scrolledSizer->Add(m_pcBtn, 0, wxALL, 5);
+		 /**************************************************************************/
+		 // Set the sizer for the scrolled window
+		 scrolledWindow->SetSizer(scrolledSizer);
+
+		 // Calculate and set the virtual size for the scrolled window
+		 wxSize virtualSize = scrolledSizer->GetMinSize();
+		 scrolledWindow->SetVirtualSize(virtualSize);
+
+		 // Optionally, set the scrolling rate (horizontal_rate, vertical_rate)
+		 scrolledWindow->SetScrollRate(5, 5);
+ 
+
+		 // Add the wxScrolledWindow to the main sizer
+		 p_pcSizer->Add(collapsiblePane, 1, wxEXPAND | wxALL, 5);
+
+		/*********************************************************/
+
 
 		p_pcCtrl->PushEventHandler(this);
 
 		//allow backstepping
 		m_pcDialog->EnableBackStepping(true);
 
-		 
-
 		return TRUE;
 }
 
 void
-SP_DS_ColStAnimation::OnReset()
+SP_DS_ColStAnimation::OnReset(bool p_bIsAnimMode)
 {
 
 	list<SP_DS_ColStPlaceAnimator*>::iterator l_Iter;
@@ -2178,8 +2357,15 @@ SP_DS_ColStAnimation::OnReset()
 		ResetTransSequenceFile();//reset exported trans seq file
 	}
 
-	SetStepCounter();
+	if (p_bIsAnimMode)
+	{
+		SetStepCounter();
+	}
+	
 	Refresh();
+ 
+
+	
 }
 
 void
@@ -2206,18 +2392,45 @@ SP_DS_ColStAnimation::OnSimMode(wxCommandEvent& event) {
 		//if (m_bColSimMode) return;
 		m_bColSimMode = true;
 		m_pcDialog->DisapleAnimMode();
+		m_pcDialog->SetSimMode(true);
 
 	}
 	else
 	{
 		m_bColSimMode = false;
 		m_pcDialog->EnableAnimMode();
+		m_pcDialog->SetSimMode(false);
+
 	}
 }
 
 void
 SP_DS_ColStAnimation::OnUpdateUI(wxUpdateUIEvent& p_cEvent)
 {
+
+	if (m_bColSimMode)
+	{
+		if (m_bStopSimulation)
+		{
+			m_pcDialog->SetClose(true);
+			m_pcDialog->SetSimMode(true);
+		}
+		else
+		{
+			m_pcDialog->SetClose(false);
+
+		}
+		/**
+		if (m_nProgress == 100)
+		{
+			m_pcDialog->SetClose(true);
+			m_pcDialog->SetSimMode(false);
+		}*/
+	}
+	else {
+		m_pcDialog->SetClose(true);
+
+	}
 	//if (m_cbSimMode) return;
 	if (p_cEvent.GetId() == SP_ID_PEDSET) p_cEvent.Enable(!m_bRunning && !m_cbKeep->IsChecked());
 	else p_cEvent.Enable(!m_bRunning);
@@ -2255,6 +2468,7 @@ SP_DS_ColStAnimation::OnUpdateUI(wxUpdateUIEvent& p_cEvent)
 			m_pcDialog->EnableAnimMode();
 			
 		}
+		
 }
 
 
@@ -2425,6 +2639,14 @@ void SP_DS_ColStAnimation::OnModifyParameterSets(wxCommandEvent& p_cEvent)
 	l_pcDlg->Destroy();
 }
 
+void SP_DS_ColStAnimation::OnClose(wxCommandEvent& p_cEvent)
+{
+	if (!m_bStopSimulation)
+	{
+		return;
+	}
+	
+}
 
 void
 SP_DS_ColStAnimation::OnSetsChanged(wxCommandEvent& p_cEvent)
@@ -2764,6 +2986,12 @@ SP_DS_ColStAnimation::StartTimer()
 			m_bRestartAnimationFlag = true;
 			return false;
 		}
+	}
+
+	SP_VectorStdString* l_vUnfoldedPlaces = (m_pcUnfolding)->GetPlaceNames();
+
+	for (const auto& place : *l_vUnfoldedPlaces) {
+		ar_PlaceList.Add(place);
 	}
 	
 	return SP_DS_Animation::StartTimer();
@@ -3121,9 +3349,13 @@ void SP_DS_ColStAnimation::LoadCurrentMarking()
 
 		for (unsigned j = l_nLow; j <= l_nUp; j++)
 		{
-			wxString l_sColor = m_msColorsOfPlace[j];
-			long l_nMarking = m_anCurrentMarking[j];
-			l_pcPlaceMultiSet->AddMultiSet(l_sColor, l_nMarking);
+			if (m_msColorsOfPlace.size() == 0 || m_anCurrentMarking.size() == 0) {
+				return;
+			}
+				wxString l_sColor = m_msColorsOfPlace[j];
+				long l_nMarking = m_anCurrentMarking[j];
+				l_pcPlaceMultiSet->AddMultiSet(l_sColor, l_nMarking);
+			
 		}
 
 		(*l_itPlace)->UpdateMarking(); //Update the marking of a place
@@ -3735,7 +3967,7 @@ void SP_DS_ColStAnimation::UpdateColMarking()
 			}
 			l_sMainMarking << l_nMarking;
 		}
-		////////////////////////////////////////////////////////////////
+		 
 
 		SP_DS_Attribute* l_pcMarkingAttr = dynamic_cast< SP_DS_Attribute*>(l_vPlaceNodes[l_nPos]->GetAttribute(wxT("Marking")));
 		if (l_pcMarkingAttr)
@@ -3747,7 +3979,7 @@ void SP_DS_ColStAnimation::UpdateColMarking()
 
 	SP_Core::Instance()->GetRootDocument()->Modify(true);
 
-	////////////////////////////////////////////////////////
+	 
 	if(!m_IsDestructor)
 	LoadSets();
 
@@ -3760,11 +3992,6 @@ void SP_DS_ColStAnimation::UpdateColMarking()
 		m_bRestartAnimationFlag = false;  // let it not animate
 		return;
 	}
-
-	 
-	//////////////////////////////////////////////////////////////////
-	 
-
 
 		for (l_Iter = m_lAllPlaceAnimators.begin(); l_Iter != m_lAllPlaceAnimators.end(); ++l_Iter)
 		{
@@ -3929,8 +4156,49 @@ void SP_DS_ColStAnimation::ExportDetailsCPN(ExportStochCPN *export_frame)
 	}
 }
 
+void SP_DS_ColStAnimation::ComputeResultMatrix()
+{
+	m_vvResultMatrix.clear();
+
+	m_vxAxisVieverDate.clear();
+
+	m_vvResultMatrix.resize(Traces.size(), std::vector<double>(m_vSelectedPlaces.size()));
+
+	for (long i = 1; i < Traces.size(); ++i) {
+
+		m_vxAxisVieverDate.push_back(Traces[i-1].timepoint);
+
+		for (auto l_sPlace : m_vSelectedPlaces)
+		{
+			wxString placeInstance = l_sPlace;
+
+			if (std::find(m_vSelectedPlaces.begin(), m_vSelectedPlaces.end(), placeInstance) == m_vSelectedPlaces.end())
+				continue;
+
+			for (long k = 0; k < Traces[i-1].instancePlaces.size(); ++k)
+			{
+				SP_MapString2String instancesmap = Traces[i-1].instancePlaces[k].color2Marking;
+				wxString l_sTemp;
+				SP_MapString2String::iterator it;
+				it = instancesmap.find(placeInstance);
+				if (it != instancesmap.end()) {
+					l_sTemp << it->second; 
+					double result;
+					if (l_sTemp.ToDouble(&result)) {
+						m_vvResultMatrix[i - 1][m_mselectedPlace2Index[placeInstance]] = result;
+							break;
+					}
+				}
+			}
+
+		}
+	}
+
+}
+
 void SP_DS_ColStAnimation::DoExport()
 {
+	
 	if (wxFileExists(m_ExportFilename) == true)
 	{
 		int l_Answer = SP_MESSAGEBOX(wxT("File already exists. Do you want to overwrite it?"), wxT("Overwrite"), wxYES_NO);
@@ -3959,74 +4227,155 @@ void SP_DS_ColStAnimation::DoExport()
 		}
 	}
 
+	//clear the content intially 
+	m_ExportTextfile.Clear();
 
 	wxString l_sTemp = wxT("t\t");
 
 
-	for (auto it = m_mPlaceInstance2Marking.begin(); it != m_mPlaceInstance2Marking.end(); ++it) {
-		l_sTemp << it->first << wxT("\t");
+	for (auto l_sPlace : m_vSelectedPlaces)
+	{
+		auto it = m_mPlaceInstance2Marking.find(l_sPlace);
+		if (it != m_mPlaceInstance2Marking.end())
+		{
+			l_sTemp << it->first << wxT("\t");
+ 		}
 	}
+
+	//Add colour places if selected (to the header)
+	SP_VectorStdString* l_vColPlaces = (m_pcUnfolding)->GetColoredPlaceNames();
+
 
 	l_sTemp << wxT("\n");
 
 	m_ExportTextfile.AddLine(l_sTemp);
+	
 
+	//now we add net net evolution over time
 	l_sTemp.Clear();
 
 	l_sTemp << wxT("0\t");
 	//write initial marking
-	for (auto it = m_mPlaceInstance2Marking.begin(); it != m_mPlaceInstance2Marking.end(); ++it) {
-		l_sTemp << it->second << wxT("\t");
-	}
 
-	//l_sTemp << wxT("\n");
+	for (auto l_sPlace : m_vSelectedPlaces)
+	{
+		auto it = m_mPlaceInstance2Marking.find(l_sPlace);
+		if (it != m_mPlaceInstance2Marking.end())
+		{
+			l_sTemp << it->second << wxT("\t");
+ 		}
+	}
+	
+ 
 	m_ExportTextfile.AddLine(l_sTemp);
 
 
+		for (long i = 1; i < Traces.size(); ++i) {
 
-	for (long i = 1; i < Traces.size(); ++i) {
+			l_sTemp.Clear();
 
-		l_sTemp.Clear();
+			l_sTemp << Traces[i].timepoint << "\t";
 
-		l_sTemp << Traces[i].timepoint << "\t";
+			for (auto l_sPlace : m_vSelectedPlaces)
+ 			{
+				wxString placeInstance = l_sPlace;
 
-		for (auto it = m_mPlaceInstance2Marking.begin(); it != m_mPlaceInstance2Marking.end(); ++it)
-		{
-			wxString placeInstance = it->first;
-			//	bool isfound = false;
+				if (std::find(m_vSelectedPlaces.begin(), m_vSelectedPlaces.end(), placeInstance) == m_vSelectedPlaces.end())
+					continue;
 
-			for (long k = 0; k < Traces[i].instancePlaces.size(); ++k)
-			{
-				SP_MapString2String instancesmap = Traces[i].instancePlaces[k].color2Marking;
 
-				SP_MapString2String::iterator it;
-				it = instancesmap.find(placeInstance);
-				if (it != instancesmap.end()) {
-					l_sTemp << it->second << wxT("\t");
+				for (long k = 0; k < Traces[i].instancePlaces.size(); ++k)
+				{
+					SP_MapString2String instancesmap = Traces[i].instancePlaces[k].color2Marking;
 
-					//	isfound = true;
-					break;
+					SP_MapString2String::iterator it;
+					it = instancesmap.find(placeInstance);
+					if (it != instancesmap.end()) {
+						l_sTemp << it->second << wxT("\t");
+
+
+						break;
+					}
 				}
+
 			}
 
-		}
-	//	l_sTemp << wxT("\n");
-		m_ExportTextfile.AddLine(l_sTemp);
+			m_ExportTextfile.AddLine(l_sTemp);
 
-	}
+		}
+	
 
 	m_ExportTextfile.Write();
 	m_ExportTextfile.Close();
 }
 
+void SP_DS_ColStAnimation::OnChoosePlaces(wxCommandEvent &p_pc_Event)
+{
+
+	if (m_cbSimMode->IsChecked())
+	{
+
+		SP_CPN_SyntaxChecking l_cSyntaxChecking;
+		if (!l_cSyntaxChecking.SyntaxChecking())
+			return ;
+
+
+		if (!LoadUnfoldingInformation())
+			return ;
+
+
+		m_pcSimulator->SetOutputStartPoint(0);
+		m_pcSimulator->SetOutputEndPoint(100);
+
+		LoadCurrentMarking();
+
+	SP_VectorStdString* l_vUnfoldedPlaces = (m_pcUnfolding)->GetPlaceNames();
+
+	for (const auto& place : *l_vUnfoldedPlaces) {
+		ar_PlaceList.Add(place);
+	}
+
+	//Add coloured places as well
+	SP_VectorStdString* l_vColPlaces = (m_pcUnfolding)->GetColoredPlaceNames();
+
+	for (const auto& place : *l_vColPlaces) {
+		ar_PlaceList.Add(place);
+	}
+
+	ps = new SP_DS_ColSPN_PlaceSelection(NULL,wxT("Choose Place Instance"), ar_PlaceList);
+	 
+	if (ps->ShowModal() == wxID_OK)
+	{
+		m_vSelectedPlaces = ps->GetChosenVariables();
+
+		for (long i = 0; i < m_vSelectedPlaces.size(); i++) {
+ 			m_mselectedPlace2Index[m_vSelectedPlaces[i]] = i;
+		}
+
+	}
+	}
+	else {
+		SP_MESSAGEBOX(wxT("Simulation mode is not selected."), wxT("Error"), wxOK | wxICON_ERROR);
+		return;
+	}
+
+
+
+	
+}
 
 void SP_DS_ColStAnimation::OnExportSimTraces(wxCommandEvent &p_pc_Event)
 {
-	 
-	 
-	ExportStochCPN *export_frame = new ExportStochCPN(wxT("Export Details"), this,true);
+	if (m_cbSimMode->IsChecked()) {
+
+	ExportStochCPN *export_frame = new ExportStochCPN(wxT("Export Details"), this, true);
 
 	export_frame->Show(true);
+    }
+	else {
+		SP_MESSAGEBOX(wxT("Simulation mode is not selected."), wxT("Error"), wxOK | wxICON_ERROR);
+		return;
+	}
 	 
  
 	 
@@ -4077,21 +4426,48 @@ void SP_DS_ColStAnimation::OnExportSimTraces(wxCommandEvent &p_pc_Event)
 
 void SP_DS_ColStAnimation::OnSimulationStart(wxCommandEvent &p_pc_Event)
 {
-	Simulate(); 
 
-	DoExport();
+	if (m_bStopSimulation)
+	{//simulator starts
 
-	m_pcBtn->SetBackgroundColour(wxColour(0, 255, 0));
+	  m_bStopSimulation = false;
 
-	//m_ExportRandom.Write();
-	//m_ExportRandom.Close();
+	 //transition firing counter
+	  m_nStepCount = 0;
+	  SetStepCounter();
 
-	//m_ExportRandomDisc.Write();
-	//m_ExportRandomDisc.Close();
+	  //do simulation
+	  Simulate();
 
-//	m_ExportBindings.Write();
-	//m_ExportBindings.Close();
+	  ComputeResultMatrix();
+	  
+	  m_bInPreStep = false;
 
+	  m_nProgress = 100;
+	  gauge->SetValue(m_nProgress);
+	  m_sHint.clear();
+	  m_sHint << m_nProgress;
+	  m_pcHint->SetLabel(m_sHint);
+
+	}
+	else {
+		m_bStopSimulation = true;
+		m_nProgress = 100;
+		gauge->SetValue(m_nProgress);
+		m_sHint.clear();
+		m_sHint << m_nProgress;
+		m_pcHint->SetLabel(m_sHint);
+		m_pcBtn->SetLabel(wxT("Start"));
+		m_pcBtn->SetBackgroundColour(wxColour(0, 255, 0));
+
+		//refresh the parent window
+		wxYield();
+		m_stopwatch.Pause();
+	}
+
+	OnReset(false);
+	m_bStopSimulation = true;
+ 
 }
 
 void SP_DS_ColStAnimation::OnExport(wxCommandEvent &p_pc_Event)
@@ -4104,27 +4480,6 @@ void SP_DS_ColStAnimation::OnExport(wxCommandEvent &p_pc_Event)
 
 int SP_DS_ColStAnimation::TokenNumerOfAnimatorPlace(wxString p_sName, SP_VectorString p_vBindingVector)
 {
-	/**
-	list<SP_DS_ColStPlaceAnimator*>::iterator l_itPlace;
-	int l_nTokenNumber = 0;
-
-
-	for (l_itPlace = (m_lAllPlaceAnimators).begin(); l_itPlace != (m_lAllPlaceAnimators).end(); ++l_itPlace)
-	{
-		SP_DS_Node*  itNode = (*l_itPlace)->GetNode();
-		SP_DS_Attribute* l_pcAttr = itNode->GetAttribute(wxT("Name"));
-		SP_DS_NameAttribute* l_pcNameAttr = dynamic_cast<SP_DS_NameAttribute*>(l_pcAttr);
-		if (l_pcNameAttr->GetValueString() == p_sName)
-		{
-			l_nTokenNumber = (*l_itPlace)->GetMarking();
-			 
-		
-		}
-	}
-
-	return l_nTokenNumber;
-	*/
-
 	if (p_vBindingVector.size() == 0) return -1;
 	
 	long l_n_token_value;
@@ -4274,7 +4629,7 @@ bool   SP_DS_ColStAnimation::IsTransitionEnabled(SP_DS_Node* m_pcNode) {
 		if ((*l_itEdges)->GetSource())
 		{
 			l_pcAnim = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_pcAnimation->GetAnimator((*l_itEdges)->GetSource(), SP_DS_ANIMATOR_PLACE));
-
+			
 			if (l_pcAnim)
 			{
 				m_mlPrePlaces[l_pcAnim].push_back((*l_itEdges));
@@ -4339,11 +4694,8 @@ bool   SP_DS_ColStAnimation::IsTransitionEnabled(SP_DS_Node* m_pcNode) {
 	map<wxString, map<SP_DS_Edge*, map<wxString, int> > > l_mmmBind2Edge2Mult2Color;
 	bool l_bEnableTest = l_cBinding.EnableTestForColorSimulation(&m_StExprInfoVector, false, wxT("dummy"), m_nBindingChoice, l_mmmBind2Edge2Mult2Color);
 
-	//anim->LoadMarkingForcolorSimulation(m_vColPlacesInterval, m_vColorofPlacesVector, m_vColorVector);
 
 	m_pcAnimation->StopTimer();
-
-	//m_pcAnimation->OnReset();
 
 	return l_bEnableTest;
 
@@ -4363,6 +4715,8 @@ void SP_DS_ColStAnimation::OutputStateAt(double p_dTime) {
 
 	l_tempStepTrace << p_dTime << wxT('\t');
 
+	wxString l_sColMarking;
+
 	list<SP_DS_ColStPlaceAnimator*>::iterator l_itPlace;
 
 	for (l_itPlace = (m_lAllPlaceAnimators).begin(); l_itPlace != (m_lAllPlaceAnimators).end(); ++l_itPlace)
@@ -4370,6 +4724,10 @@ void SP_DS_ColStAnimation::OutputStateAt(double p_dTime) {
 		ColPlace2InstancesStates currentStateCol2InstancesMap;
 
 		l_n_token_value = (*l_itPlace)->GetMarking();
+
+		l_sColMarking.Empty();
+
+		l_sColMarking << l_n_token_value;
 
 		SP_DS_Node*  itNode = (*l_itPlace)->GetNode();
 
@@ -4515,7 +4873,12 @@ void SP_DS_ColStAnimation::OutputStateAt(double p_dTime) {
 				}
 			}
 		
-
+			instances[l_sPlaceName] = l_sColMarking;
+			if (m_mPlaceInstance2Marking.find(l_sPlaceName) == m_mPlaceInstance2Marking.end())
+			{
+				m_mPlaceInstance2Marking[l_sPlaceName] = l_sColMarking;
+			}
+			
 			currentStateCol2InstancesMap.color2Marking = instances;
 			l_vCol2State.push_back(currentStateCol2InstancesMap);
 			
@@ -4581,8 +4944,7 @@ std::vector<ColPlace2InstancesStates> instancePlaces;
 void SP_DS_ColStAnimation::ExportMarkings()
 {
 	list<SP_DS_ColStPlaceAnimator*>::iterator l_itPlace;
-	//list<SP_DS_CPN_PlaceAnimator*>::iterator l_itPlace;
-
+  
 	if (m_ExportFilename.Cmp(wxT("")) != 0)
 	{
 		m_ExportTextfile.Open(m_ExportFilename);
@@ -5267,62 +5629,40 @@ void SP_DS_ColStAnimation::ResetTransSequenceFile()
 
 	 SP_DS_Node* l_pcNode = l_pcNodeTrans->GetParentNode();
 
-	 l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(l_pcNode->GetAttribute(wxT("FunctionList")));
+	 SP_MapString2String l_funMap = m_mpcTransitionAnimators[p_nTranNumber]->GetResolvedRateFunction();
 
-	 //deal with predicates of each rate function
-	 unsigned l_nPredicateIndex = 0;
 	 double val = 0.0;
-	 for (unsigned j = 0; j < l_pcColList->GetRowCount(); j++)
+	 auto itFind = l_funMap.find(b);
+	 if (itFind != l_funMap.end())
 	 {
-		 wxString l_sPredicate = l_pcColList->GetCell(j, 0);
+		 wxString l_sSubstituedRF;
+		 wxString nosub = itFind->second;
+		 SubstituteRateFunction(itFind->second, "", "", l_sSubstituedRF);
 
-		 if (!EvaluatePredicate(l_sPredicate, b)) continue;
+		 SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
+		 auto parse_tree = l_pcFR->parseFunctionString(l_sSubstituedRF);
 
+		 if (parse_tree == nullptr) {
 
-		 for (unsigned col = 1; col < l_pcColList->GetColCount(); col++)
-		 {
-			 wxString l_sRatefunction = l_pcColList->GetCell(j, col);
-			 wxString nosub = l_sRatefunction;
-			 SP_VectorString l_vPlaceVector;
-			 wxString l_sSubstituedRF;
-			 if (ExtractPlaceIds(l_sRatefunction, l_vPlaceVector)) {
-				 for (auto colPlace : l_vPlaceVector) {
-					 SubstituteRateFunction(l_sRatefunction, colPlace, b, l_sSubstituedRF);
-
-					 l_sRatefunction = l_sSubstituedRF;
-
-				 }
-				 l_sRatefunction = l_sSubstituedRF;
-			 }
-
-
-			 SP_DS_FunctionRegistry* l_pcFR = m_pcGraph->GetFunctionRegistry();
-			 auto parse_tree = l_pcFR->parseFunctionString(l_sRatefunction);
-
-			 if (parse_tree == nullptr) {
-
-				 wxString l_sLoGError = wxT("Error in parsing the expression: ") + l_sRatefunction;
-				 SP_LOGMESSAGE(l_sLoGError);
-				 return false;
-			 }
-			 //SP_FunctionPtr l_pcFunction(l_pcFR->parseFunctionString(l_sRatefunction));
-
-			 SP_FunctionPtr l_pcFunction(parse_tree);
-			 if (!l_pcFunction)
-			 {
-				 wxString l_sLoGError = wxT("Error in parsing the expression: ") + l_sRatefunction;
-				 SP_LOGMESSAGE(l_sLoGError);
-				 return false;
-			 }
-
-			 SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
-
-
-			 val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, val }();
-
-			 break;
+			 wxString l_sLoGError = wxT("Error in parsing the expression: ") + l_sSubstituedRF;
+			 SP_LOGMESSAGE(l_sLoGError);
+			 return false;
 		 }
+
+		 SP_FunctionPtr l_pcFunction(parse_tree);
+		 if (!l_pcFunction)
+		 {
+			 wxString l_sLoGError = wxT("Error in parsing the expression: ") + l_sSubstituedRF;
+			 SP_LOGMESSAGE(l_sLoGError);
+			 return false;
+		 }
+
+		 SP_FunctionPtr l_pcExpanded(l_pcFR->substituteFunctions(l_pcFunction));
+
+
+		 val = SP_DS_FunctionEvaluatorDouble{ l_pcFR, l_pcFunction, val }();
 	 }
+
 	 return val;
  }
 
@@ -5343,3 +5683,105 @@ void SP_DS_ColStAnimation::ResetTransSequenceFile()
 
  }
  */
+
+ void SP_DS_ColStAnimation::OnOpenSelectedGraphViews(wxCommandEvent &p_pc_Event)
+ {
+
+	 m_ArrayColPlaces.Clear();
+	 // m_ArrayColTranstions.Clear();
+	 for (unsigned int i = 0; i < m_vSelectedPlaces.size(); i++) {
+		 m_ArrayColPlaces.Add(m_vSelectedPlaces[i]);
+	 }
+	 wxString l_sExportName = m_pcGraph->GetParentDoc()->GetFilename().BeforeFirst(wxChar('.'));
+	// m_vvResultMatrix
+	 SP_DLG_ColSimViewerWindow* l_pcView = new SP_DLG_ColSimViewerWindow(m_pcDialog, m_mselectedPlace2Index, m_vvResultMatrix, m_vxAxisVieverDate, l_sExportName);
+	 l_pcView->Show();
+
+ }
+
+
+ bool SP_DS_ColStAnimation::LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Metadata* p_pcView, wxArrayString& p_asPlaces)
+ {
+	 wxString l_sName;
+
+	 CHECK_POINTER(p_pcView, return false);
+
+	 //get the current nodeclass type
+	 SP_DS_Attribute* l_pcAttribute = p_pcView->GetAttribute(wxT("Nodeclass"));
+
+	 CHECK_POINTER(l_pcAttribute, return false);
+
+	 wxString l_sElementType = l_pcAttribute->GetValueString();
+
+	 CHECK_POINTER(p_pcViewer, return false);
+
+	 //remove old curves
+	 p_pcViewer->ClearCurves();
+
+	 //remove shown curves
+	 p_pcViewer->ClearShownCurves();
+
+	 SP_DS_ColListAttribute* l_pcCurveInfoList = dynamic_cast<SP_DS_ColListAttribute*>(p_pcView->GetAttribute(wxT("CurveInfo")));
+	 CHECK_POINTER(l_pcCurveInfoList, return false);
+
+	 m_ArrayColPlaces.Clear();
+	// m_ArrayColTranstions.Clear();
+	 for (unsigned int i = 0; i < m_vSelectedPlaces.size(); i++) {
+		 m_ArrayColPlaces.Add(m_vSelectedPlaces[i]);
+	 }
+
+	// for (unsigned int i = 0; i < m_asTransitionNames.size(); i++) {
+	//	 m_ArrayColTranstions.Add(m_asTransitionNames[i]);
+	// }
+
+	 //CreateViewerDataFromRegex(p_pcView);
+	 
+	 /**
+	 for (unsigned int l_nRow = 0; l_nRow < l_pcCurveInfoList->GetRowCount(); l_nRow++)
+	 {
+		 wxString l_sPosition = l_pcCurveInfoList->GetCell(l_nRow, 0);
+		 unsigned long l_nPosition = 0;
+		 if (!l_sPosition.ToULong(&l_nPosition))
+		 {
+			 return false;
+		 }
+
+		 wxString l_sOutType = l_pcCurveInfoList->GetCell(l_nRow, 1);
+
+		 if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Place")) && l_nPosition < m_asColPlaceNames.size()) //unfolded place
+		 {
+			 l_sName = m_asColPlaceNames[l_nPosition];
+
+			 p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
+		 }
+		 else if (l_sOutType == wxT("Unfolded") && l_sElementType.IsSameAs(wxT("Transition")) && l_nPosition < m_asTransitionNames.size()) //unfolded transitions
+		 {
+			 l_sName = m_asTransitionNames[l_nPosition];
+
+			 p_pcViewer->AddCurve(l_sName, l_nPosition, &m_anResultMatrix);
+		 }
+		 else
+		 {
+			 SP_LOGERROR(wxT("Invalid node names, we stop loading the rest of the file"));
+
+			 //invalid row index, therefore we ignore the remaining rows
+			 l_pcCurveInfoList->RemoveRemainingRows(l_nRow);
+
+			 break;
+		 }
+
+		 wxString l_sOrignialName = l_pcCurveInfoList->GetCell(l_nRow, 6);
+
+		 if (l_sOrignialName != l_sName)
+		 {
+			 SP_LOGWARNING(l_sOrignialName + wxT("  ") + l_sName + wxT("Name for position (") + wxString::Format(wxT("%d"), l_nRow) + wxT(") is changed to ") + l_sName);
+		 }
+
+		 //update curve name
+		 l_pcCurveInfoList->SetCell(l_nRow, 6, l_sName);
+		 p_asPlaces.Add(l_sName);
+	 }
+
+	 */
+	 return true;
+ }

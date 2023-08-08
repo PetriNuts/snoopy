@@ -17,7 +17,8 @@
 #include "sp_ds/attributes/SP_DS_NameAttribute.h"
 #include <stack>
 #include <cctype>
-
+#include <regex>
+#include <wx/regex.h>
 SP_CPN_Binding::SP_CPN_Binding()
 {	
 }
@@ -27,8 +28,34 @@ SP_CPN_Binding::~SP_CPN_Binding()
 	m_ParseInputVector.clear();
 }
 
+std::string SP_CPN_Binding::SubstituteSubstring(const std::string& input, const std::string& target, const std::string& replacement) {
+	std::string result;
+	size_t currentPosition = 0;
+	size_t nextPosition = input.find(target);
+
+	while (nextPosition != std::string::npos) {
+		// Append the part of the input string before the target substring
+		result += input.substr(currentPosition, nextPosition - currentPosition);
+
+		// Append the replacement substring
+		result += replacement;
+
+		// Move the current position to the end of the target substring
+		currentPosition = nextPosition + target.length();
+
+		// Find the next occurrence of the target substring
+		nextPosition = input.find(target, currentPosition);
+	}
+
+	// Append the remaining part of the input string after the last occurrence of the target substring
+	result += input.substr(currentPosition);
+
+	return result;
+}
+
+ 
 bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick,SP_DS_Animator* p_pcTransAnimator, 
-								int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString,int> > >& p_mmmBind2Edge2Mult2Color, const std::vector<wxString>& p_vBindingVector)
+								int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString,int> > >& p_mmmBind2Edge2Mult2Color, const std::vector<wxString>& p_vBindingVector, bool p_bIsColSim)
 {
 	m_pcGraph = SP_Core::Instance()->GetRootDocument()->GetGraph();
 
@@ -37,6 +64,7 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 	if( ! m_ValueAssign.InitializeColorset(m_ColorSetClass) )
 		return false;
 
+	m_BindingVector.clear();
 	//Initialize parsing and build parser tree
 	if( !BuildParserTree(p_pcExprInfoVector))
 		return false;	
@@ -54,7 +82,11 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 	//Disable the transition
 	if(!l_bBinding )
 		return false;
-
+	wxString l_sRateFunction;// no colour dependent
+	for (auto it = m_mRateFunctionMap.begin(); it != m_mRateFunctionMap.end(); ++it) {
+		l_sRateFunction = it->second;
+	}
+	SP_MapString2String l_mRateMap;
 	//Deal with the case that all arcs are constant colors
 	if(l_bBinding && l_IndexMap.size() == 0)   
 	{
@@ -82,9 +114,10 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 	vector<wxString> l_EnabledBindings;	
 
 	map<wxString, int> l_mUnionCheck; // to check the case of union
-
+	bool l_bChosenRate = false;
 	for( unsigned i = 0; i < l_CompleteBinding.size(); i++)
 	{
+		wxString l_sRateForOneInstance = l_sRateFunction;
 		wxString l_sBinding;
 		l_sBinding = wxT("");
 		//Assign values to variables
@@ -96,9 +129,33 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 			l_sBinding = l_sBinding + itMap->first + wxT(" = ") + l_CompleteBinding[i][itMap->second] + wxT(";");
 
 		}
+		wxString l_sCurrentBinding = l_sBinding;
+		l_sCurrentBinding =l_sCurrentBinding.BeforeFirst(wxChar(';'));
+		l_sCurrentBinding.Replace(wxT(" "), wxT(""));
+
+		if (m_mRateFunctionMap.size() > 1) {//handle color-dependent rates
+			for (auto it = m_mRateFunctionMap.begin(); it != m_mRateFunctionMap.end(); ++it) {
+				if (it->first == l_sCurrentBinding)
+				{
+					l_sRateForOneInstance = it->second;
+					l_bChosenRate = true;
+					break;
+				}
+			}
+		}
+
+		if (m_mRateFunctionMap.size() > 1 && !l_bChosenRate)//handle color-dependent rates
+		{
+			continue;
+
+		}
+
+
 		//Then begin to parse
 		if(Parsing())
-		{		
+		{
+			m_mPreplace2Color.clear();
+		    m_mColor2Preplace.clear();
 			vector<SP_CPN_ParseInput>::iterator itList;
 			int l_nCheck = 0;
 			int l_nInputArcCount = 0;
@@ -108,10 +165,32 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 			{
 				if( m_ParseInputVector[i].m_eExprType == CPN_INPUT_EXPR )
 				{
+					
+
 					vector<SP_CPN_EvaluatedSingleValue>::iterator itEvalVector;
 					for(itEvalVector =  m_ParseInputVector[i].m_ParsedInfo.begin(); itEvalVector !=  m_ParseInputVector[i].m_ParsedInfo.end(); itEvalVector++)
 					{
 						l_nCheck = l_nCheck + itEvalVector->m_Multiplicity;
+						// george for color simulation 6.6.23
+						if (p_bIsColSim && m_mRateFunctionMap.size()==1 || (l_bChosenRate && p_bIsColSim)) {//no color-dependent rates
+							wxString l_sPrePlace;
+							SP_DS_ColStPlaceAnimator* l_pcCPN_PlaceAnimator = dynamic_cast<SP_DS_ColStPlaceAnimator*>(m_ParseInputVector[i].m_pcPlAnimator);
+
+							if (l_pcCPN_PlaceAnimator == nullptr) continue;
+
+							SP_DS_Node* l_pcNode = l_pcCPN_PlaceAnimator->GetNode();
+							wxString l_sPlaceName = dynamic_cast<SP_DS_NameAttribute*>(l_pcNode->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
+							wxString l_ParsedColor = itEvalVector->m_ColorValue;
+							m_mPreplace2Color[l_sPlaceName] = l_ParsedColor;
+							m_mColor2Preplace[l_ParsedColor] = l_sPlaceName;
+							wxString l_sInstance = l_sPlaceName + wxT("_") + l_ParsedColor;
+							 
+							wxString SubstitutedRate = SubstituteSubstring(l_sRateForOneInstance, l_sPlaceName, l_sInstance);
+							
+							l_mRateMap[ConvertToNewFormat(l_sBinding)] = SubstitutedRate;// replaceSubstring(l_sRateFunction, l_sPlaceName, l_sInstance);
+							l_sRateForOneInstance = SubstitutedRate;
+						}
+					 
 					}
 					
 					l_nInputArcCount++;
@@ -163,9 +242,39 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 					}
 
 					l_EnabledBindings.push_back(l_sBinding);
+				 
 				}				
 			}
 		}		
+	}
+
+	if (p_bIsColSim)
+	{
+	 
+			wxString l_sBindVal;
+			for (int j = 0; j < l_EnabledBindings.size(); ++j) {
+				//l_sBindVal << l_EnabledBindings[j];
+				//l_sBindVal << wxT("_");
+
+				//m_BindingVector.push_back(l_sBindVal.BeforeLast('_'));
+				m_BindingVector.push_back(ConvertToNewFormat(l_EnabledBindings[j]));
+				 
+			}
+
+		 
+
+		//m_OutputVector = m_BindingVector;
+		if (l_EnabledBindings.size() > 0)
+		{
+			m_mbinding2ResolvedRateFunction = l_mRateMap;
+			return true;
+
+		}
+		else {
+			return false;
+		}
+		
+
 	}
 
 	//for the variables
@@ -286,6 +395,108 @@ bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVecto
 
 }
 
+/*************************************************************/
+
+SP_MapString2String SP_CPN_Binding::GetResolvedRateFunctions(SP_MapString2String& pred2RateMap)
+{
+	SP_MapString2String l_mResolvedMap;
+	m_mbinding2ResolvedRateFunction.clear();
+	if (pred2RateMap.size() == 1) {
+		for (auto it = pred2RateMap.begin(); it != pred2RateMap.end(); ++it)
+		{
+			m_mbinding2ResolvedRateFunction =
+				FormatRateFunction(it->second);
+		}
+	}
+	else {//todo colour dependent rates
+
+	}
+
+	return m_mbinding2ResolvedRateFunction;
+	
+}
+
+SP_MapString2String SP_CPN_Binding::FormatRateFunction(const  wxString& inpuRateFunction)
+{
+	// ugly solution, find inteligant way one
+	 SP_MapString2String l_mColor2ResolvedRate;
+	 for (auto binding : m_BindingVector)
+	 {
+		 wxString l_sReturnString = inpuRateFunction;
+		 //m_mPreplace2Color
+		 std::string expression = inpuRateFunction.ToStdString();
+		 // Regular expression to match mathematical operators and parentheses
+		 std::regex regex("[()+\\-*/]");
+
+		 // Tokenizing the expression using std::regex_token_iterator
+		 std::vector<std::string> tokens{
+			 std::sregex_token_iterator(expression.begin(), expression.end(), regex, -1),
+			 std::sregex_token_iterator()
+		 };
+
+		 // Displaying the tokens
+		 for (const std::string& token : tokens) {
+			 std::cout << token << std::endl;
+			 std::string replacement;
+			 auto itfind = m_mPreplace2Color.find(token);
+			 if (itfind != m_mPreplace2Color.end())
+			 {
+				 for (const auto& iter : m_mColor2Preplace) {
+					 //auto itFind_input_color = m_mColor2Preplace.find(binding);
+					  replacement = "";
+					 
+						 if (iter.second == token)
+						 {
+							 if (std::find(m_BindingVector.begin(), m_BindingVector.end(), itfind->second) != m_BindingVector.end())
+							 {
+								 replacement = itfind->first + "_" + binding;
+							 }
+							 else
+							 {
+								 replacement = itfind->first + "_" + itfind->second;
+							 }
+							 break;
+						 }
+					 
+					/// else {
+					//	 replacement = itfind->first + "_" + itfind->second;
+					/// }
+				 }
+				 size_t startPos = expression.find(token);
+				 if (startPos != std::string::npos) {
+					 expression.replace(startPos, token.length(), replacement);
+				 }
+			 }
+		 }
+		 wxString  wxstr1(expression.c_str(), wxConvUTF8);
+		 l_mColor2ResolvedRate[binding] = wxstr1;
+	 }
+	
+
+	
+
+	return l_mColor2ResolvedRate;
+}
+
+std::string SP_CPN_Binding::ConvertToNewFormat(const std::string& inputString) {
+	std::stringstream ss(inputString);
+	std::string variable;
+	std::string value;
+	std::string result;
+
+	while (std::getline(ss, variable, ';')) {
+		size_t pos = variable.find('=');
+		if (pos != std::string::npos) {
+			value = variable.substr(pos + 2);
+			if (!result.empty()) {
+				result += "_";
+			}
+			result += value;
+		}
+	}
+
+	return result;
+}
 
 /************************************************************/
 
@@ -1558,7 +1769,7 @@ void SP_CPN_Binding::ParseMultiSetTuple(wxString p_sExpr)
 //only for colored stochastic Petri Nets
 /////////////////////////////////////////////////////////////////
 
-bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, SP_DS_ColStTransAnimator* p_pcTransAnimator, SP_DS_Node* p_pcParent, map<wxString,wxString>& p_msBindingsToTransition)
+bool SP_CPN_Binding::EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, SP_DS_ColStTransAnimator* p_pcTransAnimator, SP_DS_Node* p_pcParent, map<wxString,wxString>& p_msBindingsToTransition, bool p_bIscolSim)
 {
 	m_sTransitionName = dynamic_cast<SP_DS_NameAttribute*>(p_pcParent->GetFirstAttributeByType(SP_ATTRIBUTE_TYPE::SP_ATTRIBUTE_NAME))->GetValue();
 

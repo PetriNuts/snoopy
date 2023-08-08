@@ -29,6 +29,8 @@ m_pcProtoshape(NULL)
     {
         m_pcNode = p_pcParent;
         m_pcProtoshape = new SP_GR_MarkAnimator();
+
+		FillStochasticRateMap();
     }
 }
 
@@ -38,6 +40,32 @@ SP_DS_ColStTransAnimator::~SP_DS_ColStTransAnimator()
         wxDELETE(m_pcProtoshape);
 
     m_pcProtoshape = NULL;
+}
+
+void SP_DS_ColStTransAnimator::FillStochasticRateMap()
+{
+ 
+	 if (m_pcNode == nullptr) return ;
+
+	 SP_DS_ColListAttribute* l_pcColList = nullptr;
+
+	 l_pcColList = dynamic_cast< SP_DS_ColListAttribute* >(m_pcNode->GetAttribute(wxT("FunctionList")));
+
+	 // predicates of each rate function
+	
+	 for (unsigned j = 0; j < l_pcColList->GetRowCount(); j++)
+	 {
+		 wxString l_sPredicate = l_pcColList->GetCell(j, 0);
+
+		 for (unsigned col = 1; col < l_pcColList->GetColCount(); col++)
+		 {
+			 wxString l_sRatefunction = l_pcColList->GetCell(j, col);
+
+			 m_mPredicate2RateFunMap[l_sPredicate] = l_sRatefunction;
+		 }
+	 }
+		 
+ 
 }
 
 SP_DS_Animator*
@@ -363,10 +391,13 @@ bool SP_DS_ColStTransAnimator::IsEnabled(SP_VectorString& v) {
 		SP_CPN_Binding l_cBinding;
 		SP_DS_Animator* l_pcAnimator = dynamic_cast<SP_DS_ColStTransAnimator*>(this);
 		map<wxString, map<SP_DS_Edge*, map<wxString, int> > > l_mmmBind2Edge2Mult2Color;
-		bool l_bEnableTest = l_cBinding.EnableTest(&m_StExprInfoVector, m_bSingleClick, l_pcAnimator, m_nBindingChoice, l_mmmBind2Edge2Mult2Color);
+		SP_VectorString l_vDummy;
+		l_cBinding.SetRateFunctionMap(m_mPredicate2RateFunMap);
+		bool l_bEnableTest = l_cBinding.EnableTest(&m_StExprInfoVector, m_bSingleClick, l_pcAnimator, m_nBindingChoice, l_mmmBind2Edge2Mult2Color, l_vDummy,true);
 
 		v = l_cBinding.GetBindingSelection();
-
+		m_mRateFunctionMap = l_cBinding.GetResolvedbindedRateFunctions();
+		//m_mRateFunctionMap = l_cBinding.GetResolvedRateFunctions(m_mPredicate2RateFunMap);
 		return  l_bEnableTest;
 	}
 	return false;

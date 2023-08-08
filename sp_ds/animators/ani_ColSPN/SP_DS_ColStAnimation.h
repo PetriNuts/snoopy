@@ -36,10 +36,16 @@
 #include <wx/stopwatch.h>
 #include <random>
 #include "sp_core/tools/MersenneTwister.h"
+#include "sp_ds/extensions/SP_DS_ColSPN_PlaceSelection.h"
+#include "sp_gui/dialogs/SP_DLG_ShowAllModelView.h"
+#include "sp_ds/animators/ani_ColSPN/SP_DLG_ColSimViewerWindow.h"
+
+
 #include <fstream>
 class ExportStochCPN;
 class ImportColAnim;
-
+class SP_DS_ResultViewer;
+class SP_DLG_ShowAllModelView;
 //class MTRand;
 
 struct ColPlace2InstancesStates {
@@ -68,6 +74,10 @@ private:
 	wxCheckBox *m_cbSimMode;
 	wxSizer* l_pcRowSizer2;
 	wxButton* m_pcBtn;
+	SP_Vector2DDouble m_vvResultMatrix;
+
+	//result viewer
+	wxArrayString m_ArrayColPlaces;
 
 	//MyFrame* frame;
 	//wxScrolledWindow* m_pcScrolledWindow;
@@ -81,6 +91,7 @@ private:
 	wxTextCtrl* m_pcSeedTextCtrl;
 	wxGauge* gauge;
 	wxStaticText* m_pcHint;
+	wxStaticText* m_pcPercentage;
 	wxStaticText* m_pcHintTime;
 	SP_DS_Animator* m_pcSingleStep;
 	bool m_IsDestructor;//by george
@@ -92,7 +103,7 @@ private:
 	wxStaticText *m_pcStepCounterValue; //For counter
 	wxSizer* m_pcStepCounter;//by george
 	wxFilePickerCtrl* filebrowse;
-
+	SP_DS_ColSPN_PlaceSelection* ps;
 	wxString m_ExportFilename;// by george
 	bool m_bExport; // by george
 	bool m_bExportComplete;// by george
@@ -104,6 +115,9 @@ private:
 	wxTextFile m_ExportRandom;//testing, writing generated random numbers 
 	wxTextFile m_ExportRandomDisc;//testing
 	wxTextFile m_ExportBindings;//testing
+	SP_VectorString m_vSelectedPlaces;
+	SP_VectorDouble m_vxAxisVieverDate;
+	std::map<wxString, long> m_mselectedPlace2Index;
 	bool m_bAutoConcurrency;
 	int m_nStepCount;
 	wxString m_sTriggiredUnfoldedTrans;
@@ -179,6 +193,7 @@ private:
 	void OnModifyWeightSets( wxCommandEvent& p_cEvent );
 	void OnModifyDelaySets( wxCommandEvent& p_cEvent );
 	void OnModifyScheduleSets( wxCommandEvent& p_cEvent );
+	void OnClose(wxCommandEvent& p_cEvent);
 
 	void OnSetsChanged( wxCommandEvent& p_cEvent );
 
@@ -219,6 +234,10 @@ private:
 
 	void OnSimulationStart(wxCommandEvent &p_pc_Event);//george
 	void OnExportSimTraces(wxCommandEvent &p_pc_Event);//george
+	void OnChoosePlaces(wxCommandEvent &p_pc_Event);//george
+	void OnOpenSelectedGraphViews(wxCommandEvent &p_pc_Event);
+	bool  LoadViewerData(SP_DS_ResultViewer* p_pcViewer, SP_DS_Metadata* p_pcView, wxArrayString& p_asPlaces);
+	void ComputeResultMatrix();
 	void DoExport( );//george
 
 
@@ -259,6 +278,9 @@ protected:
 
 	bool  ExtractPlaceIds(const wxString& expression, SP_VectorString& p_vResultVector);
 	wxString  ExtractInstanceMarking(const wxString& p_sColPlaceId, const wxString& color);
+	std::string  ExtractSubstring(const std::string& lengthyString, const std::string& pattern);
+
+	void  ExtractPlaceIntanceMarking(const wxString& p_sRate, SP_MapString2String& l_colplace2colMap);
 	bool SubstituteRateFunction(const wxString& p_sRate,const wxString& colPlace, const wxString& p_vChosenBinding,wxString& substituted);
 	double  GenerateRandomVariableExpDistr(double p_nLambda);
 	long GenerateRandomVariableDiscrete(double p_nSum);
@@ -304,8 +326,12 @@ protected:
 	long m_nNumberofPoints;
 	double m_dCurrentTime;
 	bool m_bStopSimulation;
+	long m_nProgress = 0;
+	wxString m_sHint;
 	SP_VectorString m_vColPlaceNames;
+	SP_VectorString m_vColPlaceNamesModified;
 	std::map<long, SP_VectorString> m_vColTrans2Binding;
+	wxArrayString ar_PlaceList;
 	//for Gillespie's SSA
 	std::mt19937 m_Generator;// for seed value
 	unsigned long m_ulSeed = 0;
@@ -335,7 +361,7 @@ public:
 	void OnOpenSimulation( wxCommandEvent& p_cEvent );
 
 	// special to ped animation
-	virtual void OnReset();
+	virtual void OnReset(bool p_bIsAnimMode=true);
 	void OnSet(wxCommandEvent& p_cEvent);
 	void OnUpdateUI(wxUpdateUIEvent& p_cEvent);
 	void OnSimMode(wxCommandEvent& event);
@@ -354,6 +380,7 @@ public:
 	bool GetChooseRandomColorFlag(){return m_bChooseRandomColor;}
 
 	void UpdateMarkingPlaces();//by george
+	void LaodIntialNetState();//by george
 	void ExportDetailsCPN(ExportStochCPN *export_frame);//george
 	void ImportDetails(ImportColAnim *import_frame);//george
 

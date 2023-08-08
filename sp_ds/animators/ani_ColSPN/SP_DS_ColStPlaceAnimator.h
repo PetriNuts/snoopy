@@ -19,6 +19,8 @@
 
 #include "sp_ds/extensions/Col_PN/ColorSetProcessing/SP_CPN_PlaceMultiSet.h"
 #include "sp_ds/attributes/SP_DS_MarkingAttribute.h"
+#include "snoopy.h"
+
 
 
 class SP_DS_ColStTransAnimator;

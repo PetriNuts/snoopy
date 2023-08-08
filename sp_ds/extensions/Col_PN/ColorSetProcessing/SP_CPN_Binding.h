@@ -96,17 +96,34 @@ private:
 	vector<wxString> m_vMultiTupleExpression;
 	SP_VectorString m_OutputVector;//by george
 	SP_VectorString m_BindingVector;//by george
+	SP_MapString2String m_mPreplace2Color;//by george
+	SP_MapString2String m_mColor2Preplace;//by george
+	SP_MapString2String m_mbinding2ResolvedRateFunction;
+	SP_MapString2String m_mRateFunctionMap;
 	vector<vector<wxString> > m_vvCompleteBinding;//george we need this for checking the possible bindings of the variables when we do import trace fro the col animators
+	std::string ConvertToNewFormat(const std::string& inputString);
+	SP_MapString2String FormatRateFunction(const wxString& inpuRateFunction);
+
 public:
 	SP_CPN_Binding();	
 	~SP_CPN_Binding();
+	SP_MapString2String GetResolvedbindedRateFunctions() {
+		return m_mbinding2ResolvedRateFunction
+			;
+	}
+	void SetRateFunctionMap(const SP_MapString2String& p_mRateFunMap) {
+		m_mRateFunctionMap = p_mRateFunMap
+			;
+	}
+	std::string SubstituteSubstring(const std::string& input, const std::string& target, const std::string& replacement);
 
 	bool EnableTestForColorSimulation(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, wxString m_sTransitionName,
 		int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString, int> > >& p_mmmBind2Edge2Mult2Color);
-	bool EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, SP_DS_Animator* p_pcTransAnimator, int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString,int> > >& p_mmmBind2Edge2Mult2Color, const std::vector<wxString>& values = std::vector<wxString>());
+	bool EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, SP_DS_Animator* p_pcTransAnimator, int p_nBindingChoice, map<wxString, map<SP_DS_Edge*, map<wxString,int> > >& p_mmmBind2Edge2Mult2Color, const std::vector<wxString>& values = std::vector<wxString>(), bool p_bIsColSim=false);
 	void GetBinding(map<SP_DS_Edge*, map<wxString, int> >& p_mmEdge2Mult2Color);
 	SP_VectorString GetBindingSelection() { return m_BindingVector; }// m_OutputVector;//by george
 	vector<vector<wxString> > GetColmpleteBinding() { return m_vvCompleteBinding; }//george
+	SP_MapString2String GetResolvedRateFunctions(SP_MapString2String& pred2RateMap);
 private:
 	bool BindingInference(SP_MapString2UInt &p_IndexMap, vector<vector<wxString> > & p_CompleteBinding);
 	bool Ordering();
@@ -132,7 +149,7 @@ private:
 
 //not used any longer
 public:	
-	bool EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, SP_DS_ColStTransAnimator* p_pcTransAnimator, SP_DS_Node* p_pcParent, map<wxString,wxString>& p_msBindingsToTransition);
+	bool EnableTest(vector<SP_CPN_ExpressionInfo>* p_pcExprInfoVector, bool p_bSingleClick, SP_DS_ColStTransAnimator* p_pcTransAnimator, SP_DS_Node* p_pcParent, map<wxString,wxString>& p_msBindingsToTransition, bool p_bIscolSim= false);
 private:
 	bool writeConstantcolors(vector<SP_CPN_ParseInput> *p_ParseInputList ,vector<SP_CPN_ExpressionInfo>* p_pcStExprInfoVector);
 //not used any longer	

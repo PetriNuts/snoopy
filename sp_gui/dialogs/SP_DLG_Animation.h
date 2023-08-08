@@ -23,6 +23,8 @@ private:
     wxBoxSizer* m_pcSizer;
     SP_DS_Animation* m_pcAnimation;
 	wxWindow* m_pcParent;
+	bool m_bCloseAnim;
+	bool m_bIscolSim;
 
 		//controls
 		wxBitmap m_bitmaps[6];
@@ -42,7 +44,8 @@ protected:
 public:
     SP_DLG_Animation(SP_DS_Animation* p_pcAnim,
         SP_GUI_Mainframe* p_pcParent);
-
+	void SetClose(bool p_bclose) { m_bCloseAnim = p_bclose; }
+	void SetSimMode(bool p_bSim) { m_bIscolSim = p_bSim; }
     bool CleanUp();
 	wxWindow* getWindow();
     /* EVENTS */

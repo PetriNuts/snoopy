@@ -65,8 +65,23 @@ m_pcAnimation(p_pcAnim),
 m_pcParent(p_pcParent),
 m_bBackStepping(false)
 {
+	wxString l_sTitle = m_pcAnimation->GetGraphClass();
+
+	if (l_sTitle.IsSameAs(wxT("Colored Stochastic Petri Net")))
+	{
+		this->SetTitle("High-level Simulation/Animation");
+	}
     /* top level sizer */
     m_pcSizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	/*scrollable window*/
+	//wxScrolledWindow* m_pcScrolledWindow = new wxScrolledWindow(this);
+
+	//m_pcScrolledWindow->SetSizer(l_pcSizer);
+	//m_pcScrolledWindow->SetScrollRate(5, 5);
+	//m_pcScrolledWindow->SetMinClientSize(wxSize(400, 500));
+	//m_pcSizer->Add(m_pcScrolledWindow, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
 #if defined(__WXMSW__)
     m_bitmaps[0] = wxBitmap(wxT("BITMAP_ANIM_PLAY_BWD"), wxBITMAP_TYPE_BMP_RESOURCE);
@@ -93,7 +108,7 @@ m_bBackStepping(false)
     m_bitmaps[5].SetMask(new wxMask(m_bitmaps[5], *wxBLUE));
 */
 
-    wxBoxSizer* l_pcSizer = new wxBoxSizer(wxHORIZONTAL);
+
 		m_buPlayBwd = new wxBitmapButton(this, SP_ID_BUTTON_ANIM_PLAYBWD,
 												m_bitmaps[0], wxDefaultPosition, wxDefaultSize);
 		m_buPlayBwd->SetToolTip(wxT("Play backward / Pause"));
@@ -129,12 +144,14 @@ m_bBackStepping(false)
         m_pcAnimation->AddToControl(this, m_pcSizer);
 
     SetSizerAndFit(m_pcSizer);
+ 
 
 	GetSize(&x, &y);
 	wxWindow *l_cMF = wxGetApp().GetMainframe();
 	wxRect r = l_cMF->GetRect();
 	Move(r.GetLeft() + 10, r.GetBottom() - y - 10);
-
+	m_bCloseAnim = false;//for avoiding close Anim dialog while color simulation is running
+	m_bIscolSim = false;
 }
 
 bool
@@ -150,6 +167,8 @@ SP_DLG_Animation::CleanUp()
 void
 SP_DLG_Animation::OnMyClose(wxCloseEvent& p_cEvent)
 {
+	if (!m_bCloseAnim && m_bIscolSim) return;
+
 	m_pcAnimation->StopTimer();
 	SP_MDI_Doc* l_pcMyDoc = SP_Core::Instance()->GetRootDocument();
 	CHECK_POINTER(l_pcMyDoc, return );

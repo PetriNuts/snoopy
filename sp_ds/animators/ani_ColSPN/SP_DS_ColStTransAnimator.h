@@ -38,14 +38,21 @@ protected:
     SP_DS_Node* m_pcNode;
     list<SP_DS_ColStPlaceAnimator*> m_lCandidates;
     map<SP_DS_ColStPlaceAnimator*, SP_ListEdge > m_mlPrePlaces;	
+	wxString m_sStochasticRateFunction;
+	
 
 private:
 	SP_VectorString m_vChosenBinding;
-
+	SP_MapString2String m_mPredicate2RateFunMap;//george for colSim
+	SP_MapString2String m_mRateFunctionMap;
+private:
+	void FillStochasticRateMap();//george for colSim
 public:
     SP_DS_ColStTransAnimator(SP_DS_Animation* p_pcAnim = NULL, SP_DS_Node* p_pcParent = NULL);
     virtual ~SP_DS_ColStTransAnimator();
 
+	SP_MapString2String GetBindedRateFunctionMap() { m_mPredicate2RateFunMap; }
+	SP_MapString2String GetResolvedRateFunction() { return m_mRateFunctionMap; }
     bool PreStep(unsigned int p_nSteps, SP_DIRECTION_T p_nDir);
     bool Step(unsigned int p_nStep);
     bool PostStep();

@@ -419,10 +419,18 @@ SP_GUI_Mainframe::OnUpdateUI(wxUpdateUIEvent& p_cEvent)
       p_cEvent.Enable(m_pcActiveChild != NULL);
       break;
     case SP_MENU_ITEM_TOGGLEANIM:
-        p_cEvent.Check(SP_Core::Instance()->GetAnimMode());
-        p_cEvent.SetText((SP_Core::Instance()->GetAnimMode())?wxT("End Anim-Mode\tF5"):wxT("Start Anim-Mode\tF5"));
-        p_cEvent.Enable(!SP_Core::Instance()->GetAnimRunning());
-        break;
+	{   
+	wxString l_sNetClass = SP_Core::Instance()->GetRootDocument()->GetNetclassName();
+	wxString l_sModeSelection = wxT("Start Anim-Mode\tF5");
+	if (l_sNetClass == SP_DS_COLSPN_CLASS)
+	{
+		l_sModeSelection = wxT("Start High-level Simulation/Anim-Mode\tF5");
+	}
+	p_cEvent.Check(SP_Core::Instance()->GetAnimMode());
+	p_cEvent.SetText((SP_Core::Instance()->GetAnimMode()) ? wxT("End Anim-Mode\tF5") : l_sModeSelection);
+	p_cEvent.Enable(!SP_Core::Instance()->GetAnimRunning());
+	break; 
+	}
     case wxID_EXIT:
     case SP_ID_GRAPHTREE_CTRL_ID:
         p_cEvent.Enable(!(SP_Core::Instance()->GetAnimMode() || SP_Core::Instance()->GetSimulationMode()));

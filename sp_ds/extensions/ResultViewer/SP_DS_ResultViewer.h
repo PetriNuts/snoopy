@@ -93,6 +93,8 @@ protected:
 protected:
 
 public:
+
+	SP_MapString2Long GetCurvePositions() { return m_mCurveName2Postion; }
 	//Set a reference to the time serie
 	virtual void SetXAxisValues(const SP_VectorDouble* p_pcXAxisValues)
 	{

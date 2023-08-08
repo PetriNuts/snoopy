@@ -671,11 +671,23 @@ SP_DS_Graph::AddToViewMenu(wxMenu* p_pcMenu)
     if (m_bHasAnimators)
     {
 		p_pcMenu->AppendSeparator();
-		wxMenuItem* l_pcMenuItem = new wxMenuItem(p_pcMenu,
-					  SP_MENU_ITEM_TOGGLEANIM,
-					  wxT("Start Anim-Mode\tF5"),
-					  wxT("Toggle animation mode"),
-					  wxITEM_CHECK);
+		wxMenuItem* l_pcMenuItem;
+		
+		if (this->GetNetclass()->GetName() == SP_DS_COLSPN_CLASS) {
+			l_pcMenuItem = new wxMenuItem(p_pcMenu,
+				SP_MENU_ITEM_TOGGLEANIM,
+				wxT("Start High-level Simulation/Anim-Mode\tF5"),
+				wxT("Toggle animation mode"),
+				wxITEM_CHECK);
+		}
+		else {
+			l_pcMenuItem = new wxMenuItem(p_pcMenu,
+				SP_MENU_ITEM_TOGGLEANIM,
+				wxT("Start Anim-Mode\tF5"),
+				wxT("Toggle animation mode"),
+				wxITEM_CHECK);
+		}
+		 
 		p_pcMenu->Append(l_pcMenuItem);
 		l_pcMenuItem->Check(SP_Core::Instance()->GetAnimMode());
 	}
@@ -716,12 +728,12 @@ SP_DS_Graph::AddToViewMenu(wxMenu* p_pcMenu)
 		(l_sName == SP_DS_COLHPN_CLASS) )
 	{
 		//Direct Simulation mode
-		p_pcMenu->AppendSeparator();
-		wxMenuItem* l_pcMenuItem = new wxMenuItem(p_pcMenu,
-			SP_MENU_ITEM_TOGGLEDIRSIMULATION,
-			wxT("&Start Color Simulation-Mode\tCtrl+F6"),
-			wxT("Color Simulation mode"));
-		p_pcMenu->Append(l_pcMenuItem);
+		//p_pcMenu->AppendSeparator();
+		//wxMenuItem* l_pcMenuItem = new wxMenuItem(p_pcMenu,
+		//	SP_MENU_ITEM_TOGGLEDIRSIMULATION,
+		//	wxT("&Start Color Simulation-Mode\tCtrl+F6"),
+		//	wxT("Color Simulation mode"));
+		//p_pcMenu->Append(l_pcMenuItem);
 		
 	}
     //by sl

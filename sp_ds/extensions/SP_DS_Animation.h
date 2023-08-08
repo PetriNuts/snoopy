@@ -95,6 +95,13 @@ public:
 
     virtual bool Initialise(SP_DS_Graph* p_pcGraph);
 
+	virtual  wxString GetGraphClass() { 
+
+		if (!m_pcGraph) return wxT("");
+
+		return m_pcGraph->GetNetclass()->GetName();
+	}
+
     virtual bool RestartTimer();
     virtual bool StartTimer();
     virtual bool StopTimer();
